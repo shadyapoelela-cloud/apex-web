@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'unit2_screen.dart';
+import 'package:flutter/material.dart';
 import 'main.dart';
 import 'multistage_screen.dart';
 
@@ -21,7 +22,7 @@ class UnitsScreen extends StatelessWidget {
           const SizedBox(height: 20),
           _UnitCard(unit: '1', title: 'إعداد القوائم المالية', subtitle: 'من ميزان المراجعة إلى قوائم مالية كاملة', icon: Icons.account_balance_rounded, color: AC.gold, features: const ['قائمة الدخل','قائمة المركز المالي','قائمة التدفقات النقدية','تحليل مالي شامل بالذكاء الاصطناعي'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MultistageScreen()))),
           const SizedBox(height: 14),
-          _UnitCard(unit: '2', title: 'إرفاق القوائم المالية المعتمدة', subtitle: 'ارفع قوائمك المعتمدة واحصل على تحليل فوري', icon: Icons.upload_file_rounded, color: AC.cyan, features: const ['رفع قائمة الدخل','رفع الميزانية العمومية','رفع قائمة التدفقات النقدية','تحليل مالي كامل + توصيات'], status: 'قريباً', statusColor: AC.warning, onTap: () => _showSoon(context, 'إرفاق القوائم المالية المعتمدة')),
+          _UnitCard(unit: '2', title: 'إرفاق القوائم المالية المعتمدة', subtitle: 'ارفع قوائمك المعتمدة واحصل على تحليل فوري', icon: Icons.upload_file_rounded, color: AC.cyan, features: const ['رفع قائمة الدخل','رفع الميزانية العمومية','رفع قائمة التدفقات النقدية','تحليل مالي كامل + توصيات'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit2Screen()))),
           const SizedBox(height: 14),
           _UnitCard(unit: '3', title: 'تحليل المبيعات', subtitle: 'نسب ومتوسطات ومؤشرات أداء المبيعات', icon: Icons.trending_up_rounded, color: AC.success, features: const ['مؤشرات أداء المبيعات KPIs','متوسطات ونسب النمو','مقارنات السوق حسب الدولة','تحليل حسب النشاط التجاري'], status: 'قريباً', statusColor: AC.warning, onTap: () => _showSoon(context, 'تحليل المبيعات')),
           const SizedBox(height: 14),
@@ -110,4 +111,5 @@ class _MiniCard extends StatelessWidget {
           child: Icon(icon, color: color, size: 18))])));
   }
 }
+
 

@@ -584,6 +584,27 @@ def calculate_financials(rows):
         }
     }
 
+async def analyze_with_openai(financial_data: dict, api_key: str, prompt: str) -> dict:
+    """تحليل OpenAI GPT-4"""
+    import json
+    from openai import OpenAI
+    client = OpenAI(api_key=api_key)
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=2000
+    )
+    raw = response.choices[0].message.content.strip().replace("```json","").replace("```","").strip()
+    return json.loads(raw)
+
+async def analyze_with_gemini(financial_data: dict, api_key: str, prompt: str) -> dict:
+    """تحليل Google Gemini"""
+    import json, requests
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    resp = requests.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
+    raw = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip().replace("```json","").replace("```","").strip()
+    return json.loads(raw)
+
 async def analyze_with_claude(financial_data: dict, api_key: str, stage: str) -> dict:
     """تحليل Claude — يُستخدم في مراحل متعددة"""
     import anthropic, json
@@ -665,14 +686,47 @@ async def unit1_multistage(file: UploadFile = File(...)):
         # ═══════════════════════════════════════════
         # المرحلة الأولى: منصات AI (المسار ب)
         # ═══════════════════════════════════════════
-        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        # ═══ المرحلة الأولى: تحليل AI من 3 منصات ═══
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+
+        ai_prompt = f"""أنت محلل مالي خبير. حلل البيانات المالية التالية وأعطِ تحليلاً أولياً.
+البيانات: {json.dumps(code_result, ensure_ascii=False)}
+أجب بـ JSON فقط بدون أي نص آخر:
+{{"summary": "ملخص", "key_findings": ["نتيجة 1", "نتيجة 2", "نتيجة 3"],
+  "risks": ["خطر 1", "خطر 2"], "confidence_pct": 88,
+  "data_quality_score": 85, "flags": ["تحذير إن وجد"]}}"""
+
         stage1_ai = {}
-        if api_key:
+        stage1_gpt = {}
+        stage1_gemini = {}
+
+        # Claude
+        if anthropic_key:
             try:
-                stage1_ai = await analyze_with_claude(code_result, api_key, "initial")
+                stage1_ai = await analyze_with_claude(code_result, anthropic_key, "initial")
                 stage1_ai["source"] = "claude_initial"
             except Exception as ai_err:
                 stage1_ai = {"error": str(ai_err), "source": "claude_failed"}
+
+        # GPT-4
+        if openai_key:
+            try:
+                stage1_gpt = await analyze_with_openai(code_result, openai_key, ai_prompt)
+                stage1_gpt["source"] = "gpt4_initial"
+            except Exception as gpt_err:
+                stage1_gpt = {"error": str(gpt_err), "source": "gpt4_failed"}
+
+        # Gemini
+        if google_key:
+            try:
+                stage1_gemini = await analyze_with_gemini(code_result, google_key, ai_prompt)
+                stage1_gemini["source"] = "gemini_initial"
+            except Exception as gem_err:
+                stage1_gemini = {"error": str(gem_err), "source": "gemini_failed"}
+
+        api_key = anthropic_key
 
         # ═══════════════════════════════════════════
         # المرحلة الثالثة: مراجعة شاملة
@@ -711,6 +765,14 @@ async def unit1_multistage(file: UploadFile = File(...)):
         confidence_scores = [90]  # الكود دائماً 90%
         if stage1_ai.get("confidence_pct"):
             confidence_scores.append(stage1_ai["confidence_pct"])
+        if stage1_gpt.get("confidence_pct"):
+            confidence_scores.append(stage1_gpt["confidence_pct"])
+        if stage1_gemini.get("confidence_pct"):
+            confidence_scores.append(stage1_gemini["confidence_pct"])
+        if stage1_gpt.get("confidence_pct"):
+            confidence_scores.append(stage1_gpt["confidence_pct"])
+        if stage1_gemini.get("confidence_pct"):
+            confidence_scores.append(stage1_gemini["confidence_pct"])
         if stage3_review.get("overall_confidence"):
             confidence_scores.append(stage3_review["overall_confidence"])
         avg_confidence = sum(confidence_scores) / len(confidence_scores)
@@ -741,8 +803,11 @@ async def unit1_multistage(file: UploadFile = File(...)):
                 },
                 "stage1_ai_initial": {
                     "description": "التحليل الأولي بالذكاء الاصطناعي",
-                    "analysis": stage1_ai,
-                    "confidence_pct": stage1_ai.get("confidence_pct", 0)
+                    "claude": stage1_ai,
+                    "gpt4": stage1_gpt,
+                    "gemini": stage1_gemini,
+                    "confidence_pct": stage1_ai.get("confidence_pct", 0),
+                    "platforms_used": [p for p in ["claude" if stage1_ai and "error" not in stage1_ai else "", "gpt4" if stage1_gpt and "error" not in stage1_gpt else "", "gemini" if stage1_gemini and "error" not in stage1_gemini else ""] if p]
                 },
                 "stage3_review": {
                     "description": "مراجعة شاملة وتحديد التوافق",
@@ -954,3 +1019,7 @@ async def unit2_multistage(file: UploadFile = File(...)):
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
+
+
+
