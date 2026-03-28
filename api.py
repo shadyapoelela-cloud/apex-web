@@ -1030,3 +1030,5 @@ async def unit2_multistage(file: UploadFile = File(...)):
 
 
 
+
+# AI platforms: Claude + GPT-4 + Gemini
