@@ -1089,6 +1089,8 @@ async def unit3_multistage(file: UploadFile = File(...)):
         client_col = find_col(["عميل", "customer", "client", "زبون"])
         region_col = find_col(["منطقة", "region", "فرع", "branch", "مدينة", "city"])
 
+        if sales_col:
+            df[sales_col] = pd.to_numeric(df[sales_col], errors="coerce").fillna(0)
         total_sales = float(df[sales_col].sum()) if sales_col else 0
         avg_sale = float(df[sales_col].mean()) if sales_col else 0
         max_sale = float(df[sales_col].max()) if sales_col else 0
@@ -1274,4 +1276,5 @@ async def unit3_multistage(file: UploadFile = File(...)):
 # يقبل ملف Excel يحتوي على بيانات المبيعات
 # ويحللها بنظام 4 مراحل مع KPIs ونسب النمو
 # ═══════════════════════════════════════════════════════════
+
 
