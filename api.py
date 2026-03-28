@@ -600,7 +600,7 @@ async def analyze_with_openai(financial_data: dict, api_key: str, prompt: str) -
 async def analyze_with_gemini(financial_data: dict, api_key: str, prompt: str) -> dict:
     """تحليل Google Gemini"""
     import json, requests
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
     resp = requests.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
     rj = resp.json()
     if "candidates" in rj and len(rj["candidates"]) > 0:
@@ -1032,3 +1032,4 @@ async def unit2_multistage(file: UploadFile = File(...)):
 
 
 # AI platforms: Claude + GPT-4 + Gemini
+
