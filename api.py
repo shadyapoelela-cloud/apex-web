@@ -1961,3 +1961,134 @@ async def unit8_multistage(file: UploadFile = File(...)):
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 1 - STEP 0: تقييم التبويب المحاسبي
+# يقيّم اتساق التبويب مع IFRS والأنظمة السعودية
+# ═══════════════════════════════════════════════════════════
+@app.post("/unit1/evaluate-tabs")
+async def unit1_evaluate_tabs(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel")
+    try:
+        import tempfile, os, json, warnings
+        from openpyxl import load_workbook
+        warnings.filterwarnings("ignore")
+
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        wb = load_workbook(tmp_path, read_only=True, data_only=True)
+        ws = wb.active
+
+        accounts = []
+        for row in ws.iter_rows(min_row=7, values_only=True):
+            tab = row[1]; name = row[2]
+            if not tab or not name: continue
+            accounts.append({"tab": str(tab).strip(), "name": str(name).strip()})
+
+        wb.close()
+        try:
+            os.unlink(tmp_path)
+        except:
+            pass
+
+        total_accounts = len(accounts)
+        tabs_summary = {}
+        for acc in accounts:
+            t = acc["tab"]
+            if t not in tabs_summary:
+                tabs_summary[t] = {"count": 0, "examples": []}
+            tabs_summary[t]["count"] += 1
+            if len(tabs_summary[t]["examples"]) < 3:
+                tabs_summary[t]["examples"].append(acc["name"])
+
+        # تقييم بالذكاء الاصطناعي
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+
+        eval_prompt = f"""أنت خبير محاسبة معتمد ومتخصص في معايير IFRS والأنظمة المحاسبية السعودية (SOCPA).
+
+قيّم التبويب المحاسبي التالي لميزان مراجعة شركة سعودية:
+
+عدد الحسابات: {total_accounts}
+التبويبات المستخدمة وأمثلة الحسابات:
+{json.dumps(tabs_summary, ensure_ascii=False, indent=2)}
+
+المطلوب: قيّم كل تبويب من حيث:
+1. هل التبويب متوافق مع IFRS؟
+2. هل التبويب متوافق مع الأنظمة السعودية (SOCPA/هيئة الزكاة)؟
+3. هل أسماء الحسابات متسقة مع التبويب؟
+4. هل هناك حسابات مصنفة بشكل خاطئ؟
+
+أجب بـ JSON فقط:
+{{
+  "overall_score": 85,
+  "overall_rating": "جيد/ممتاز/يحتاج تعديل/ضعيف",
+  "ifrs_compliance_pct": 90,
+  "socpa_compliance_pct": 85,
+  "total_tabs": 0,
+  "correct_tabs": 0,
+  "needs_review_tabs": 0,
+  "incorrect_tabs": 0,
+  "tab_evaluations": [
+    {{
+      "tab_name": "اسم التبويب",
+      "status": "صحيح/يحتاج مراجعة/خطأ",
+      "ifrs_match": true,
+      "socpa_match": true,
+      "notes": "ملاحظات",
+      "suggested_correction": "التصحيح المقترح إن وجد"
+    }}
+  ],
+  "misclassified_accounts": [
+    {{
+      "account_name": "اسم الحساب",
+      "current_tab": "التبويب الحالي",
+      "correct_tab": "التبويب الصحيح",
+      "reason": "السبب"
+    }}
+  ],
+  "recommendations": ["توصية 1", "توصية 2"],
+  "summary": "ملخص التقييم",
+  "can_proceed": true,
+  "confidence_pct": 90
+}}"""
+
+        ai_result = {}
+        platform_used = ""
+
+        if openai_key:
+            try:
+                ai_result = await analyze_with_openai({}, openai_key, eval_prompt)
+                platform_used = "gpt4"
+            except:
+                ai_result = {}
+
+        if not ai_result and google_key:
+            try:
+                ai_result = await analyze_with_gemini({}, google_key, eval_prompt)
+                platform_used = "gemini"
+            except:
+                ai_result = {}
+
+        return {
+            "success": True,
+            "total_accounts": total_accounts,
+            "total_tabs": len(tabs_summary),
+            "tabs_summary": tabs_summary,
+            "ai_evaluation": ai_result,
+            "platform_used": platform_used,
+            "overall_score": ai_result.get("overall_score", 0),
+            "can_proceed": ai_result.get("can_proceed", True),
+            "overall_rating": ai_result.get("overall_rating", "غير متاح")
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+

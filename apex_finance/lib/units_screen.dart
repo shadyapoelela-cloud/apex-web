@@ -1,4 +1,5 @@
-﻿import 'unit4_screen.dart';
+﻿import 'consultation_screen.dart';
+import 'unit4_screen.dart';
 import 'advanced_unit_screen.dart';
 import 'unit4_screen.dart';
 import 'unit3_screen.dart';
@@ -25,34 +26,36 @@ class UnitsScreen extends StatelessWidget {
           const SizedBox(height: 4),
           const Text('حلول مالية متكاملة مدعومة بالذكاء الاصطناعي', textDirection: TextDirection.rtl, style: TextStyle(fontSize: 13, color: AC.textSecondary, fontFamily: 'Tajawal')),
           const SizedBox(height: 20),
-          _UnitCard(unit: '1', title: 'إعداد القوائم المالية', subtitle: 'من ميزان المراجعة إلى قوائم مالية كاملة', icon: Icons.account_balance_rounded, color: AC.gold, features: const ['قائمة الدخل','قائمة المركز المالي','قائمة التدفقات النقدية','تحليل مالي شامل بالذكاء الاصطناعي'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MultistageScreen()))),
+          _UnitCard(unit: '1', title: 'إعداد القوائم المالية', subtitle: 'من ميزان المراجعة إلى قوائم مالية كاملة', icon: Icons.account_balance_rounded, color: AC.gold, features: const ['المطلوب: ميزان المراجعة (Excel)','المخرجات: قائمة الدخل + الميزانية','+ التدفقات النقدية + 16 نسبة مالية','تحليل AI متعدد المراحل بدقة 95%+'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MultistageScreen()))),
           const SizedBox(height: 14),
-          _UnitCard(unit: '2', title: 'إرفاق القوائم المالية المعتمدة', subtitle: 'ارفع قوائمك المعتمدة واحصل على تحليل فوري', icon: Icons.upload_file_rounded, color: AC.cyan, features: const ['رفع قائمة الدخل','رفع الميزانية العمومية','رفع قائمة التدفقات النقدية','تحليل مالي كامل + توصيات'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit2Screen()))),
+          _UnitCard(unit: '2', title: 'إرفاق القوائم المالية المعتمدة', subtitle: 'ارفع قوائمك المعتمدة واحصل على تحليل فوري', icon: Icons.upload_file_rounded, color: AC.cyan, features: const ['المطلوب: قائمة دخل + ميزانية (Excel/PDF)','+ قائمة التدفقات النقدية (اختياري)','المخرجات: تحليل شامل + نسب مالية','توصيات AI + مقارنة بالقطاع'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit2Screen()))),
           const SizedBox(height: 14),
-          _UnitCard(unit: '3', title: 'تحليل المبيعات', subtitle: 'نسب ومتوسطات ومؤشرات أداء المبيعات', icon: Icons.trending_up_rounded, color: AC.success, features: const ['مؤشرات أداء المبيعات KPIs','متوسطات ونسب النمو','مقارنات السوق حسب الدولة','تحليل حسب النشاط التجاري'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit3Screen()))),
+          _UnitCard(unit: '3', title: 'تحليل المبيعات', subtitle: 'نسب ومتوسطات ومؤشرات أداء المبيعات', icon: Icons.trending_up_rounded, color: AC.success, features: const ['المطلوب: تقرير مبيعات بالفاتورة (Excel)','المخرجات: صافي المبيعات + المرتجعات','نسب النمو الشهري + مقارنة بالسوق','أفضل المنتجات والعملاء + توصيات AI'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit3Screen()))),
           const SizedBox(height: 14),
-          _UnitCard(unit: '4', title: 'تحليل الجرد', subtitle: 'مقارنة الجرد الفعلي بالمخزني وتحليل الانحرافات', icon: Icons.inventory_2_rounded, color: AC.warning, features: const ['نسب الانحراف في قيمة المخزون','معدل دوران المخزون','عدد أيام المخزون','المخاطر والنصائح'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit4Screen()))),
+          _UnitCard(unit: '4', title: 'تحليل الجرد', subtitle: 'مقارنة الجرد الفعلي بالمخزني وتحليل الانحرافات', icon: Icons.inventory_2_rounded, color: AC.warning, features: const ['المطلوب: كشف الجرد / بضاعة آخر المدة (Excel)','المخرجات: تحليل ABC + هوامش الربح','منتجات خاسرة + مقارنة بالسوق','توصيات AI لتحسين إدارة المخزون'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit4Screen()))),
           const SizedBox(height: 24),
           const Text('الخدمات المتقدمة', textDirection: TextDirection.rtl, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AC.textPrimary, fontFamily: 'Tajawal')),
           const SizedBox(height: 4),
           const Text('للشركات والمستثمرين', textDirection: TextDirection.rtl, style: TextStyle(fontSize: 12, color: AC.textSecondary, fontFamily: 'Tajawal')),
           const SizedBox(height: 14),
-          _MiniCard(title: 'التحليل الائتماني وجاهزية البنوك', icon: Icons.account_balance_wallet_rounded, color: const Color(0xFF6C5CE7), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 5, title: 'التحليل الائتماني', subtitle: 'تقييم جاهزية التمويل البنكي', endpoint: 'https://apex-api-ootk.onrender.com/unit5/analyze/multistage', icon: Icons.account_balance_wallet_rounded, color: Color(0xFF6C5CE7))))),
-          const SizedBox(height: 10),
-          _MiniCard(title: 'التدفق النقدي والتوقعات', icon: Icons.auto_graph_rounded, color: const Color(0xFF00B894), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 6, title: 'التدفق النقدي والتوقعات', subtitle: 'توقعات 3-5 سنوات بثلاث سيناريوهات', endpoint: 'https://apex-api-ootk.onrender.com/unit6/analyze/multistage', icon: Icons.auto_graph_rounded, color: Color(0xFF00B894))))),
-          const SizedBox(height: 10),
-          _MiniCard(title: 'التقييم ودراسة الجدوى', icon: Icons.assessment_rounded, color: const Color(0xFFE17055), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 7, title: 'التقييم ودراسة الجدوى', subtitle: 'تقييم الشركة + ROI + NPV + IRR', endpoint: 'https://apex-api-ootk.onrender.com/unit7/analyze/multistage', icon: Icons.assessment_rounded, color: Color(0xFFE17055))))),
-          const SizedBox(height: 10),
-          _MiniCard(title: 'المقارنة القطاعية والتنافسية', icon: Icons.compare_arrows_rounded, color: const Color(0xFF0984E3), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 8, title: 'المقارنة القطاعية والتنافسية', subtitle: 'موقعك في السوق + SWOT + حصة سوقية', endpoint: 'https://apex-api-ootk.onrender.com/unit8/analyze/multistage', icon: Icons.compare_arrows_rounded, color: Color(0xFF0984E3))))),
+          _UnitCard(unit: '5', title: 'التحليل الائتماني وجاهزية البنوك', subtitle: 'تقييم جاهزية التمويل البنكي', icon: Icons.account_balance_wallet_rounded, color: const Color(0xFF6C5CE7), features: const ['المطلوب: القوائم المالية + كشف حساب بنكي','+ جدول الديون والالتزامات (Excel/PDF)','المخرجات: درجة ائتمانية + جاهزية البنوك','نطاق التمويل المتوقع + المستندات اللازمة'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 5, title: 'التحليل الائتماني', subtitle: 'تقييم جاهزية التمويل البنكي', endpoint: 'https://apex-api-ootk.onrender.com/unit5/analyze/multistage', icon: Icons.account_balance_wallet_rounded, color: Color(0xFF6C5CE7))))),
+          const SizedBox(height: 14),
+          _UnitCard(unit: '6', title: 'التدفق النقدي والتوقعات', subtitle: 'توقعات 3-5 سنوات بثلاث سيناريوهات', icon: Icons.auto_graph_rounded, color: const Color(0xFF00B894), features: const ['المطلوب: القوائم المالية + تقرير التدفقات','+ الميزانية التقديرية (Excel/PDF)','المخرجات: توقعات 3-5 سنوات بـ 3 سيناريوهات','معدل الحرق + المدرج الزمني + توصيات'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 6, title: 'التدفق النقدي والتوقعات', subtitle: 'توقعات 3-5 سنوات بثلاث سيناريوهات', endpoint: 'https://apex-api-ootk.onrender.com/unit6/analyze/multistage', icon: Icons.auto_graph_rounded, color: Color(0xFF00B894))))),
+          const SizedBox(height: 14),
+          _UnitCard(unit: '7', title: 'التقييم ودراسة الجدوى', subtitle: 'تقييم الشركة + ROI + NPV + IRR', icon: Icons.assessment_rounded, color: const Color(0xFFE17055), features: const ['المطلوب: القوائم المالية + خطة العمل','+ دراسة السوق (Excel/PDF)','المخرجات: تقييم DCF + ROI + NPV + IRR','درجة الجدوى + فترة الاسترداد + توصيات'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 7, title: 'التقييم ودراسة الجدوى', subtitle: 'تقييم الشركة + ROI + NPV + IRR', endpoint: 'https://apex-api-ootk.onrender.com/unit7/analyze/multistage', icon: Icons.assessment_rounded, color: Color(0xFFE17055))))),
+          const SizedBox(height: 14),
+          _UnitCard(unit: '8', title: 'المقارنة القطاعية والتنافسية', subtitle: 'موقعك في السوق + SWOT + حصة سوقية', icon: Icons.compare_arrows_rounded, color: const Color(0xFF0984E3), features: const ['المطلوب: القوائم المالية + بيانات المنافسين','+ تقارير القطاع (Excel/PDF)','المخرجات: موقعك التنافسي + حصة سوقية','تحليل SWOT + معايير القطاع + توصيات'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 8, title: 'المقارنة القطاعية والتنافسية', subtitle: 'موقعك في السوق + SWOT + حصة سوقية', endpoint: 'https://apex-api-ootk.onrender.com/unit8/analyze/multistage', icon: Icons.compare_arrows_rounded, color: Color(0xFF0984E3))))),
           const SizedBox(height: 24),
-          Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.gold.withOpacity(0.1), AC.navy3]), borderRadius: BorderRadius.circular(16), border: Border.all(color: AC.gold.withOpacity(0.3))),
-            child: Row(children: [const Icon(Icons.arrow_back_ios_rounded, color: AC.gold, size: 14), const Spacer(),
-              Expanded(flex: 4, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: const [
-                Text('استشارة مهنية متخصصة', textDirection: TextDirection.rtl, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AC.gold, fontFamily: 'Tajawal')),
-                SizedBox(height: 4),
-                Text('فريق من المستشارين الماليين المعتمدين جاهز لمساعدتك', textDirection: TextDirection.rtl, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: AC.textSecondary, fontFamily: 'Tajawal', height: 1.4))])),
-              const SizedBox(width: 12),
-              Container(width: 48, height: 48, decoration: BoxDecoration(gradient: const LinearGradient(colors: [AC.gold, AC.goldDim]), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.support_agent_rounded, color: AC.navy, size: 24))])),
+          // بانر الاستشارة محذوف — يُستخدم الزر الذهبي أدناه
+          const SizedBox(height: 14),
+          GestureDetector(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConsultationScreen())),
+            child: Container(width: double.infinity, height: 52,
+              decoration: BoxDecoration(gradient: const LinearGradient(colors: [AC.gold, AC.goldDim]), borderRadius: BorderRadius.circular(14)),
+              child: const Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(Icons.support_agent_rounded, color: AC.navy, size: 20),
+                SizedBox(width: 8),
+                Text('احجز استشارة مهنية — تبدأ من 249 ريال', style: TextStyle(color: AC.navy, fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'Tajawal')),
+              ])))),
           const SizedBox(height: 40),
         ])));
   }
@@ -116,6 +119,16 @@ class _MiniCard extends StatelessWidget {
           child: Icon(icon, color: color, size: 18))])));
   }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

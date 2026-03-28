@@ -77,6 +77,30 @@ class _Unit3ScreenState extends State<Unit3Screen> {
               ])])),
           const SizedBox(height: 16),
 
+          // المستندات المطلوبة
+          Container(width: double.infinity, padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.border)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                const Text("المستندات المطلوبة", textDirection: TextDirection.rtl, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AC.textPrimary, fontFamily: "Tajawal")),
+                const SizedBox(width: 8),
+                Icon(Icons.checklist_rounded, color: AC.success, size: 18),
+              ]),
+              const SizedBox(height: 10),
+              _docRow("تقرير المبيعات بالفاتورة (Excel)", true),
+              _docRow("يحتوي: التاريخ + صافي المبيعات + الكمية", true),
+              _docRow("نوع الفاتورة (مبيعات / مرتجع)", true),
+              _docRow("رقم الفاتورة + قيمة الضريبة", false),
+              _docRow("اسم العميل / المنطقة / الفرع (اختياري)", false),
+              const SizedBox(height: 6),
+              Container(width: double.infinity, padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: AC.success.withOpacity(0.06), borderRadius: BorderRadius.circular(8)),
+                child: const Text("ارفع ملف Excel يحتوي على بيانات المبيعات — المنصة تكتشف الأعمدة تلقائياً",
+                  textDirection: TextDirection.rtl, textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11, color: AC.success, fontFamily: "Tajawal"))),
+            ])),
+          const SizedBox(height: 14),
+
           // رفع الملف
           GestureDetector(onTap: _pickFile,
             child: Container(width: double.infinity, height: 130,
@@ -145,6 +169,17 @@ class _Unit3ScreenState extends State<Unit3Screen> {
 
   Map<String, dynamic> _getData() => _result?['final_result']?['data'] ?? _result?['stages']?['stage1_code']?['data'] ?? {};
   Map<String, dynamic> _getMap(String key) => Map<String, dynamic>.from(_getData()[key] ?? {});
+
+  Widget _docRow(String text, bool required) {
+    return Padding(padding: const EdgeInsets.only(bottom: 6),
+      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+        Flexible(child: Text(text, textDirection: TextDirection.rtl,
+          style: TextStyle(fontSize: 12, color: required ? AC.textPrimary : AC.textSecondary, fontFamily: "Tajawal"))),
+        const SizedBox(width: 8),
+        Icon(required ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+          color: required ? AC.success : AC.textHint, size: 16),
+      ]));
+  }
 
   Widget _buildConfidence() {
     final fr = _result!['final_result'] ?? {};
@@ -319,6 +354,8 @@ class _Unit3ScreenState extends State<Unit3Screen> {
       ]));
   }
 }
+
+
 
 
 

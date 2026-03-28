@@ -147,6 +147,9 @@ class _Unit2ScreenState extends State<Unit2Screen> with SingleTickerProviderStat
                       decoration: BoxDecoration(color: AC.cyan.withOpacity(0.08), borderRadius: BorderRadius.circular(14)),
                       child: const Icon(Icons.cloud_upload_rounded, color: AC.cyan, size: 28)),
                     const SizedBox(height: 10),
+                    const Text('المطلوب: قائمة الدخل + الميزانية + التدفقات النقدية',
+                    textDirection: TextDirection.rtl, style: TextStyle(color: AC.textSecondary, fontSize: 11, fontFamily: 'Tajawal')),
+                    const SizedBox(height: 6),
                     const Text('اضغط لرفع القوائم المالية', style: TextStyle(color: AC.textPrimary, fontSize: 14, fontFamily: 'Tajawal')),
                     const SizedBox(height: 4),
                     const Text('Excel (.xlsx) أو PDF', style: TextStyle(color: AC.textSecondary, fontSize: 12, fontFamily: 'Tajawal')),
@@ -447,5 +450,6 @@ class _StageRow extends StatelessWidget {
     ]);
   }
 }
+
 
 

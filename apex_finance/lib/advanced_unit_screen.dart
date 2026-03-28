@@ -72,6 +72,34 @@ class _AdvancedUnitScreenState extends State<AdvancedUnitScreen> {
               ])])),
           const SizedBox(height: 16),
 
+          // المستندات المطلوبة
+          Container(width: double.infinity, padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.border)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                const Text('المستندات المطلوبة', textDirection: TextDirection.rtl, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AC.textPrimary, fontFamily: 'Tajawal')),
+                const SizedBox(width: 8),
+                Icon(Icons.checklist_rounded, color: widget.color, size: 18),
+              ]),
+              const SizedBox(height: 10),
+              ..._getRequiredDocs().map((doc) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  Flexible(child: Text(doc['name']!, textDirection: TextDirection.rtl,
+                    style: TextStyle(fontSize: 12, color: doc['req'] == '1' ? AC.textPrimary : AC.textSecondary, fontFamily: 'Tajawal'))),
+                  const SizedBox(width: 8),
+                  Icon(doc['req'] == '1' ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+                    color: doc['req'] == '1' ? widget.color : AC.textHint, size: 16),
+                ]))),
+              const SizedBox(height: 6),
+              Container(width: double.infinity, padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: widget.color.withOpacity(0.06), borderRadius: BorderRadius.circular(8)),
+                child: Text('ارفع ملف واحد يحتوي على البيانات — المنصة تكتشف الأعمدة تلقائياً',
+                  textDirection: TextDirection.rtl, textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11, color: widget.color, fontFamily: 'Tajawal'))),
+            ])),
+          const SizedBox(height: 14),
+
           // رفع الملف
           GestureDetector(onTap: _pickFile,
             child: Container(width: double.infinity, height: 130,
@@ -211,6 +239,16 @@ class _AdvancedUnitScreenState extends State<AdvancedUnitScreen> {
       ]));
   }
 
+  List<Map<String, String>> _getRequiredDocs() {
+    final docs = {
+      5: [{"name": "القوائم المالية (قائمة دخل + ميزانية)", "req": "1"}, {"name": "كشف حساب بنكي آخر 12 شهر", "req": "1"}, {"name": "جدول الديون والالتزامات", "req": "1"}, {"name": "السجل التجاري + رخصة النشاط", "req": "0"}, {"name": "تقرير SIMAH الائتماني", "req": "0"}],
+      6: [{"name": "القوائم المالية لآخر 3 سنوات", "req": "1"}, {"name": "قائمة التدفقات النقدية", "req": "1"}, {"name": "الميزانية التقديرية", "req": "0"}, {"name": "تقرير المبيعات الشهرية", "req": "0"}, {"name": "جدول الالتزامات والأقساط", "req": "0"}],
+      7: [{"name": "القوائم المالية لآخر 3 سنوات", "req": "1"}, {"name": "خطة العمل Business Plan", "req": "1"}, {"name": "دراسة السوق / تحليل المنافسين", "req": "0"}, {"name": "توقعات الإيرادات والمصروفات", "req": "0"}, {"name": "تفاصيل الأصول والممتلكات", "req": "0"}],
+      8: [{"name": "القوائم المالية للشركة", "req": "1"}, {"name": "بيانات المنافسين (إن وجدت)", "req": "0"}, {"name": "تقارير القطاع / السوق", "req": "0"}, {"name": "تقرير المبيعات حسب المنطقة", "req": "0"}, {"name": "بيانات الحصة السوقية", "req": "0"}],
+    };
+    return docs[widget.unitNumber] ?? [{"name": "ملف البيانات المالية", "req": "1"}];
+  }
+
   String _labelAr(String key) {
     const map = {
       'summary': 'الملخص', 'executive_summary': 'الملخص التنفيذي',
@@ -248,4 +286,6 @@ class _AdvancedUnitScreenState extends State<AdvancedUnitScreen> {
     return map[key] ?? key.replaceAll('_', ' ');
   }
 }
+
+
 

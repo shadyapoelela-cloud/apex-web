@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -78,6 +78,30 @@ class _Unit4ScreenState extends State<Unit4Screen> {
               ])])),
           const SizedBox(height: 16),
 
+          // المستندات المطلوبة
+          Container(width: double.infinity, padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.border)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                const Text("المستندات المطلوبة", textDirection: TextDirection.rtl, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AC.textPrimary, fontFamily: "Tajawal")),
+                const SizedBox(width: 8),
+                Icon(Icons.checklist_rounded, color: AC.warning, size: 18),
+              ]),
+              const SizedBox(height: 10),
+              _docRow("كشف الجرد / بضاعة آخر المدة (Excel)", true),
+              _docRow("يحتوي: اسم المنتج + الكمية + سعر الشراء", true),
+              _docRow("سعر البيع (قبل أو شامل الضريبة)", true),
+              _docRow("الباركود (اختياري — لتحديد المنتجات)", false),
+              _docRow("تصنيف المنتجات / الأقسام (اختياري)", false),
+              const SizedBox(height: 6),
+              Container(width: double.infinity, padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: AC.warning.withOpacity(0.06), borderRadius: BorderRadius.circular(8)),
+                child: const Text("ارفع ملف Excel يحتوي على بيانات الجرد — المنصة تكتشف الأعمدة تلقائياً",
+                  textDirection: TextDirection.rtl, textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11, color: AC.warning, fontFamily: "Tajawal"))),
+            ])),
+          const SizedBox(height: 14),
+
           // رفع الملف
           GestureDetector(onTap: _pickFile,
             child: Container(width: double.infinity, height: 130,
@@ -144,6 +168,17 @@ class _Unit4ScreenState extends State<Unit4Screen> {
             const SizedBox(height: 40),
           ],
         ])));
+  }
+
+  Widget _docRow(String text, bool required) {
+    return Padding(padding: const EdgeInsets.only(bottom: 6),
+      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+        Flexible(child: Text(text, textDirection: TextDirection.rtl,
+          style: TextStyle(fontSize: 12, color: required ? AC.textPrimary : AC.textSecondary, fontFamily: "Tajawal"))),
+        const SizedBox(width: 8),
+        Icon(required ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+          color: required ? AC.warning : AC.textHint, size: 16),
+      ]));
   }
 
   Widget _buildConfidence() {
@@ -347,3 +382,5 @@ class _Unit4ScreenState extends State<Unit4Screen> {
       ]));
   }
 }
+
+

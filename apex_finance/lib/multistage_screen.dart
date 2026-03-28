@@ -248,6 +248,9 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
                       decoration: BoxDecoration(color: AC.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(14)),
                       child: const Icon(Icons.cloud_upload_outlined, color: AC.gold, size: 28)),
                     const SizedBox(height: 10),
+                    const Text('المطلوب: ميزان المراجعة (Excel) يحتوي على تبويب الحساب + الأرصدة',
+                    textDirection: TextDirection.rtl, style: TextStyle(color: AC.textSecondary, fontSize: 11, fontFamily: 'Tajawal')),
+                    const SizedBox(height: 6),
                     const Text('اضغط لرفع ميزان المراجعة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, fontFamily: 'Tajawal', color: AC.textPrimary)),
                     const SizedBox(height: 4),
                     const Text('Excel فقط (.xlsx, .xls)', style: TextStyle(color: AC.textSecondary, fontSize: 12, fontFamily: 'Tajawal')),
@@ -758,6 +761,7 @@ class _RingPainter extends CustomPainter {
   @override
   bool shouldRepaint(_) => false;
 }
+
 
 
 
