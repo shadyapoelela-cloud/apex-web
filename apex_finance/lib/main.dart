@@ -1,3 +1,6 @@
+﻿import 'dashboard_screen.dart';
+import 'units_screen.dart';
+import 'multistage_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -253,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 await Future.delayed(const Duration(seconds: 2));
                 if (mounted) {
                   setState(() => _loading = false);
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const DashboardScreen()));
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const NewDashboardScreen()));
                 }
               }),
             const SizedBox(height: 20),
@@ -339,7 +342,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 20),
 
           // Upload banner
-          _UploadBanner(onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const UploadScreen()))),
+          _UploadBanner(onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const UnitsScreen()))),
           const SizedBox(height: 20),
 
           // KPIs
@@ -382,7 +385,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onTap: (i) {
           setState(() => _navIdx = i);
           if (i == 1) {
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const UploadScreen()));
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const UnitsScreen()));
           } else if (i == 3) {
             Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
           }
@@ -1148,3 +1151,10 @@ class _SettingTile {
   final VoidCallback? onTap;
   const _SettingTile({required this.icon, required this.label, this.trailing, this.onTap});
 }
+
+
+
+
+
+
+

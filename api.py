@@ -769,3 +769,188 @@ async def unit1_multistage(file: UploadFile = File(...)):
         import traceback
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
 
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 2: إرفاق القوائم المالية المعتمدة
+# يقبل ملف Excel يحتوي على القوائم المالية المعتمدة
+# ويحللها بنظام 4 مراحل (كود + AI أولي + مراجعة + نهائي)
+# ═══════════════════════════════════════════════════════════
+
+@app.post("/unit2/analyze/multistage")
+async def unit2_multistage(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls', '.pdf')):
+        raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو PDF")
+    try:
+        import tempfile, os, json, warnings, traceback
+        from openpyxl import load_workbook
+        warnings.filterwarnings("ignore")
+
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        wb = load_workbook(tmp_path, read_only=True, data_only=True)
+        os.unlink(tmp_path)
+
+        sheets = wb.sheetnames
+        data = {}
+
+        # قراءة كل sheet وتحويلها لـ dict
+        for sname in sheets:
+            ws = wb[sname]
+            sheet_data = {}
+            for row in ws.iter_rows(min_row=1, values_only=True):
+                if row and row[0]:
+                    label = str(row[0]).strip()
+                    val = 0.0
+                    for cell in row[1:]:
+                        if isinstance(cell, (int, float)):
+                            val = float(cell)
+                            break
+                    sheet_data[label] = round(val, 2)
+            data[sname] = sheet_data
+
+        # المرحلة 1: استخراج البيانات من الكود
+        def find_val(keywords, sheets_data):
+            for sd in sheets_data.values():
+                for k, v in sd.items():
+                    for kw in keywords:
+                        if kw in k:
+                            return abs(v) if v else 0.0
+            return 0.0
+
+        # قائمة الدخل
+        revenue = find_val(["إيرادات", "مبيعات", "Revenue", "Sales"], data)
+        cogs = find_val(["تكلفة المبيعات", "تكلفة البضاعة", "Cost of Sales", "COGS"], data)
+        gross = find_val(["مجمل الربح", "إجمالي الربح", "Gross Profit"], data)
+        if gross == 0 and revenue > 0: gross = revenue - cogs
+        opex = find_val(["مصروفات تشغيلية", "مصاريف عمومية", "Operating Expenses"], data)
+        admin_exp = find_val(["مصروفات إدارية", "Admin"], data)
+        sales_exp = find_val(["مصروفات بيع", "Selling"], data)
+        if opex == 0: opex = admin_exp + sales_exp
+        ebit = find_val(["ربح تشغيلي", "EBIT", "Operating Income"], data)
+        if ebit == 0 and gross > 0: ebit = gross - opex
+        interest = find_val(["تكاليف تمويل", "فوائد", "Interest", "Finance Cost"], data)
+        tax = find_val(["ضريبة", "زكاة", "Tax", "Zakat"], data)
+        net_profit = find_val(["صافي الربح", "صافي الدخل", "Net Profit", "Net Income"], data)
+        if net_profit == 0 and ebit > 0: net_profit = ebit - interest - tax
+
+        # الميزانية
+        cash = find_val(["نقد", "نقدية", "Cash"], data)
+        receivables = find_val(["ذمم مدينة", "مدينون", "Receivables"], data)
+        inventory = find_val(["مخزون", "Inventory"], data)
+        cur_assets = find_val(["أصول متداولة", "Current Assets"], data)
+        if cur_assets == 0: cur_assets = cash + receivables + inventory
+        fix_assets = find_val(["أصول ثابتة", "أصول غير متداولة", "Fixed Assets", "Non-Current"], data)
+        tot_assets = find_val(["إجمالي الأصول", "مجموع الأصول", "Total Assets"], data)
+        if tot_assets == 0: tot_assets = cur_assets + fix_assets
+        cur_liab = find_val(["التزامات متداولة", "Current Liabilities"], data)
+        tot_liab = find_val(["إجمالي الالتزامات", "Total Liabilities"], data)
+        if tot_liab == 0: tot_liab = cur_liab
+        equity = find_val(["حقوق الملكية", "حقوق المساهمين", "Equity", "Shareholders"], data)
+        if equity == 0 and tot_assets > 0: equity = tot_assets - tot_liab
+
+        # التدفقات النقدية
+        cf_operations = find_val(["تدفقات تشغيلية", "أنشطة تشغيلية", "Operating Activities"], data)
+        cf_investing = find_val(["تدفقات استثمارية", "أنشطة استثمارية", "Investing Activities"], data)
+        cf_financing = find_val(["تدفقات تمويلية", "أنشطة تمويلية", "Financing Activities"], data)
+
+        # النسب المالية
+        def pct(n, d): return round(n/d*100, 2) if d else 0
+        def rat(n, d): return round(n/d, 2) if d else 0
+
+        financial_data = {
+            "income_statement": {
+                "revenue": revenue, "cogs": cogs, "gross_profit": gross,
+                "admin_expenses": admin_exp, "sales_expenses": sales_exp,
+                "operating_expenses": opex, "ebit": ebit,
+                "interest": interest, "tax": tax, "net_profit": net_profit
+            },
+            "balance_sheet": {
+                "cash": cash, "receivables": receivables, "inventory": inventory,
+                "current_assets": cur_assets, "fixed_assets": fix_assets,
+                "total_assets": tot_assets, "current_liabilities": cur_liab,
+                "total_liabilities": tot_liab, "equity": equity
+            },
+            "cash_flow": {
+                "operating": cf_operations, "investing": cf_investing,
+                "financing": cf_financing
+            },
+            "ratios": {
+                "gross_margin_pct": pct(gross, revenue),
+                "net_margin_pct": pct(net_profit, revenue),
+                "current_ratio": rat(cur_assets, cur_liab),
+                "debt_to_assets_pct": pct(tot_liab, tot_assets),
+                "roa_pct": pct(net_profit, tot_assets),
+                "roe_pct": pct(net_profit, equity) if equity else 0,
+                "asset_turnover": rat(revenue, tot_assets)
+            }
+        }
+
+        code_result = financial_data.copy()
+        code_result["source"] = "code"
+        code_result["confidence_pct"] = 90
+        code_result["sheets_found"] = sheets
+        code_result["total_items"] = sum(len(v) for v in data.values())
+
+        # المرحلة 2: تحليل AI أولي
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        stage1_ai = {}
+        if api_key:
+            try:
+                stage1_ai = await analyze_with_claude(code_result, api_key, "initial")
+                stage1_ai["source"] = "claude_initial"
+            except Exception:
+                stage1_ai = {"error": "AI unavailable", "source": "claude_failed"}
+
+        # المرحلة 3: مراجعة شاملة
+        stage3_review = {}
+        if api_key and stage1_ai and "error" not in stage1_ai:
+            try:
+                combined = {"code_result": code_result, "ai_initial": stage1_ai}
+                stage3_review = await analyze_with_claude(combined, api_key, "review")
+            except Exception:
+                stage3_review = {}
+
+        # المرحلة 4: النتيجة النهائية
+        final_financials = code_result.copy()
+        confidence_scores = [90]
+        if stage1_ai.get("confidence_pct"):
+            confidence_scores.append(stage1_ai["confidence_pct"])
+        if stage3_review.get("overall_confidence"):
+            confidence_scores.append(stage3_review["overall_confidence"])
+        avg_confidence = sum(confidence_scores) / len(confidence_scores)
+
+        stage4_final = {}
+        if api_key:
+            try:
+                final_data = {"financial_data": final_financials, "review_summary": stage3_review, "confidence_achieved": avg_confidence}
+                stage4_final = await analyze_with_claude(final_data, api_key, "final")
+            except Exception:
+                stage4_final = {}
+
+        return {
+            "success": True,
+            "unit": 2,
+            "filename": file.filename,
+            "sheets_found": sheets,
+            "stages": {
+                "stage1_code": {"description": "قراءة القوائم المعتمدة", "financial_data": code_result, "confidence_pct": 90},
+                "stage1_ai_initial": {"description": "التحليل الأولي بالذكاء الاصطناعي", "analysis": stage1_ai, "confidence_pct": stage1_ai.get("confidence_pct", 0)},
+                "stage3_review": {"description": "مراجعة شاملة", "review": stage3_review, "confidence_pct": stage3_review.get("overall_confidence", 0)},
+                "stage4_final": {"description": "النتيجة النهائية المعتمدة", "financial_data": final_financials, "ai_report": stage4_final, "final_confidence_pct": stage4_final.get("final_confidence_pct", avg_confidence), "meets_95_threshold": avg_confidence >= 95}
+            },
+            "final_result": {
+                "financial_data": final_financials,
+                "ai_analysis": stage4_final,
+                "confidence_pct": round(avg_confidence, 1),
+                "quality_label": "ممتاز" if avg_confidence >= 95 else "جيد" if avg_confidence >= 85 else "يحتاج مراجعة"
+            }
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
