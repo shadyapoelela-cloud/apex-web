@@ -602,8 +602,12 @@ async def analyze_with_gemini(financial_data: dict, api_key: str, prompt: str) -
     import json, requests
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
     resp = requests.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
-    raw = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip().replace("```json","").replace("```","").strip()
-    return json.loads(raw)
+    rj = resp.json()
+    if "candidates" in rj and len(rj["candidates"]) > 0:
+        raw = rj["candidates"][0]["content"]["parts"][0]["text"].strip().replace("```json","").replace("```","").strip()
+        return json.loads(raw)
+    else:
+        return {"error": rj.get("error", {}).get("message", str(rj)), "source": "gemini_error"}
 
 async def analyze_with_claude(financial_data: dict, api_key: str, stage: str) -> dict:
     """تحليل Claude — يُستخدم في مراحل متعددة"""
@@ -1019,6 +1023,7 @@ async def unit2_multistage(file: UploadFile = File(...)):
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
 
 
 
