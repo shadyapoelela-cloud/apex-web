@@ -7,3 +7,5 @@ anthropic
 reportlab
 openai
 requests
+arabic_reshaper
+python-bidi

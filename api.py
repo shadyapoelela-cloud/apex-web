@@ -2108,6 +2108,12 @@ async def unit1_notes_pdf():
     from reportlab.lib.colors import HexColor
     import tempfile, os
     from starlette.responses import FileResponse
+    import arabic_reshaper
+    from bidi.algorithm import get_display
+
+    def ar(text):
+        reshaped = arabic_reshaper.reshape(text)
+        return get_display(reshaped)
 
     try:
         pdfmetrics.registerFont(TTFont("Amiri", "Amiri-Regular.ttf"))
@@ -2128,7 +2134,7 @@ async def unit1_notes_pdf():
     c.setFont(font, 22)
     c.drawRightString(w - 50, h - 60, "APEX Financial Platform")
     c.setFont(font, 16)
-    c.drawRightString(w - 50, h - 90, "ملاحظات تعبئة نموذج ميزان المراجعة المعتمد")
+    c.drawRightString(w - 50, h - 90, ar("ملاحظات تعبئة نموذج ميزان المراجعة المعتمد"))
 
     c.setStrokeColor(HexColor("#D4A84B"))
     c.line(50, h - 105, w - 50, h - 105)
@@ -2164,7 +2170,7 @@ async def unit1_notes_pdf():
             c.roundRect(50, y - 5, 35, 18, 4, fill=1)
             c.setFillColor(HexColor("#0A1628"))
             c.setFont(font, 8)
-            c.drawCentredString(67.5, y, "مهم")
+            c.drawCentredString(67.5, y, ar("مهم"))
             c.setFillColor(HexColor("#FFFFFF"))
         else:
             c.setFillColor(HexColor("#8899AA"))
@@ -2172,7 +2178,7 @@ async def unit1_notes_pdf():
             c.setFillColor(HexColor("#CCCCCC"))
 
         c.setFont(font, 11)
-        c.drawRightString(w - 50, y, text)
+        c.drawRightString(w - 50, y, ar(text))
         y -= 30
 
     # تذييل
@@ -2182,8 +2188,9 @@ async def unit1_notes_pdf():
     y -= 25
     c.setFillColor(HexColor("#D4A84B"))
     c.setFont(font, 10)
-    c.drawRightString(w - 50, y, "APEX Financial Platform — منصة أبكس للتحليل المالي")
+    c.drawRightString(w - 50, y, ar("APEX Financial Platform — منصة أبكس للتحليل المالي"))
     c.drawString(50, y, "www.apex-finance.sa")
 
     c.save()
     return FileResponse(tmp.name, filename="APEX_Notes_Guidelines.pdf", media_type="application/pdf")
+
