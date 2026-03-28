@@ -1426,3 +1426,538 @@ async def unit3_multistage(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
 
 
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 4: تحليل الجرد
+# تحليل بضاعة آخر المدة + هوامش الربح + دوران المخزون
+# + مقارنة بمعايير السوق + تحليل AI
+# ═══════════════════════════════════════════════════════════
+
+@app.post("/unit4/analyze/multistage")
+async def unit4_multistage(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
+        raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو CSV")
+    try:
+        import tempfile, os, json, warnings
+        import pandas as pd
+        import numpy as np
+        warnings.filterwarnings("ignore")
+
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        if suffix == '.csv':
+            df = pd.read_csv(tmp_path)
+        else:
+            df = pd.read_excel(tmp_path)
+        os.unlink(tmp_path)
+
+        cols = [str(c).strip() for c in df.columns]
+        df.columns = cols
+        cols_lower = [c.lower() for c in cols]
+
+        def find_col(keywords):
+            for kw in keywords:
+                for i, c in enumerate(cols_lower):
+                    if kw in c:
+                        return cols[i]
+            return None
+
+        # تحديد الأعمدة
+        product_col = find_col(["مادة", "المادة", "منتج", "صنف", "product", "item", "اسم"])
+        barcode_col = find_col(["باركود", "barcode", "كود", "code"])
+        qty_col = find_col(["كمية", "الكمية", "quantity", "qty"])
+        cost_col = find_col(["السعر الافرادي", "سعر الشراء", "التكلفة", "cost price", "unit cost"])
+        total_cost_col = find_col(["قيمة البضاعة", "إجمالي التكلفة", "total cost"])
+        sell_col = find_col(["مبيع غير شامل", "سعر البيع", "sell price", "selling"])
+        sell_tax_col = find_col(["مبيع شامل", "سعر شامل"])
+        tax_col = find_col(["الضريبة", "ضريبة", "tax", "vat"])
+
+        # تحويل الأعمدة لأرقام
+        for col in [qty_col, cost_col, total_cost_col, sell_col, sell_tax_col]:
+            if col:
+                df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
+        # حذف صفوف بدون منتج أو كمية صفر
+        if product_col:
+            df = df[df[product_col].notna() & (df[product_col] != '')]
+        if qty_col:
+            df = df[df[qty_col] > 0]
+
+        num_items = len(df)
+
+        # ─── حسابات المخزون ───
+        total_qty = float(df[qty_col].sum()) if qty_col else 0
+        total_cost_value = float(df[total_cost_col].sum()) if total_cost_col else 0
+        if total_cost_value == 0 and cost_col and qty_col:
+            df["_calc_cost"] = df[cost_col] * df[qty_col]
+            total_cost_value = float(df["_calc_cost"].sum())
+
+        total_sell_value = 0
+        if sell_col and qty_col:
+            df["_calc_sell"] = df[sell_col] * df[qty_col]
+            total_sell_value = float(df["_calc_sell"].sum())
+        elif sell_tax_col and qty_col:
+            df["_calc_sell"] = df[sell_tax_col] * df[qty_col]
+            total_sell_value = float(df["_calc_sell"].sum())
+
+        # هامش الربح المتوقع
+        expected_profit = total_sell_value - total_cost_value
+        expected_margin = round(expected_profit / total_sell_value * 100, 2) if total_sell_value > 0 else 0
+
+        # متوسطات
+        avg_cost_per_unit = round(total_cost_value / total_qty, 2) if total_qty > 0 else 0
+        avg_sell_per_unit = round(total_sell_value / total_qty, 2) if total_qty > 0 else 0
+        avg_qty_per_item = round(total_qty / num_items, 1) if num_items > 0 else 0
+
+        # ─── تحليل هامش الربح لكل منتج ───
+        if cost_col and sell_col:
+            df["_margin_pct"] = ((df[sell_col] - df[cost_col]) / df[sell_col] * 100).replace([np.inf, -np.inf], 0).fillna(0)
+        else:
+            df["_margin_pct"] = 0
+
+        avg_item_margin = round(float(df["_margin_pct"].mean()), 2)
+
+        # منتجات بهامش سلبي (خسارة)
+        loss_items = df[df["_margin_pct"] < 0] if "_margin_pct" in df.columns else pd.DataFrame()
+        num_loss_items = len(loss_items)
+        loss_pct = round(num_loss_items / num_items * 100, 2) if num_items > 0 else 0
+
+        # منتجات بهامش عالي
+        high_margin = df[df["_margin_pct"] > 50] if "_margin_pct" in df.columns else pd.DataFrame()
+        num_high_margin = len(high_margin)
+
+        # ─── توزيع المخزون حسب القيمة (ABC Analysis) ───
+        if total_cost_col or "_calc_cost" in df.columns:
+            cost_field = total_cost_col if total_cost_col else "_calc_cost"
+            df_sorted = df.sort_values(cost_field, ascending=False)
+            df_sorted["_cum_pct"] = df_sorted[cost_field].cumsum() / df_sorted[cost_field].sum() * 100
+            a_items = len(df_sorted[df_sorted["_cum_pct"] <= 80])
+            b_items = len(df_sorted[(df_sorted["_cum_pct"] > 80) & (df_sorted["_cum_pct"] <= 95)])
+            c_items = len(df_sorted[df_sorted["_cum_pct"] > 95])
+            a_value = round(float(df_sorted[df_sorted["_cum_pct"] <= 80][cost_field].sum()), 2)
+            b_value = round(float(df_sorted[(df_sorted["_cum_pct"] > 80) & (df_sorted["_cum_pct"] <= 95)][cost_field].sum()), 2)
+            c_value = round(float(df_sorted[df_sorted["_cum_pct"] > 95][cost_field].sum()), 2)
+        else:
+            a_items = b_items = c_items = 0
+            a_value = b_value = c_value = 0
+
+        # ─── أعلى المنتجات قيمة ───
+        top_by_value = {}
+        if product_col and (total_cost_col or "_calc_cost" in df.columns):
+            vcol = total_cost_col if total_cost_col else "_calc_cost"
+            tp = df.nlargest(10, vcol)
+            top_by_value = {str(row[product_col]): round(float(row[vcol]), 2) for _, row in tp.iterrows()}
+
+        # أعلى المنتجات كمية
+        top_by_qty = {}
+        if product_col and qty_col:
+            tq = df.nlargest(10, qty_col)
+            top_by_qty = {str(row[product_col]): int(row[qty_col]) for _, row in tq.iterrows()}
+
+        # أعلى هامش ربح
+        top_by_margin = {}
+        if product_col and "_margin_pct" in df.columns:
+            tm = df[df["_margin_pct"] > 0].nlargest(10, "_margin_pct")
+            top_by_margin = {str(row[product_col]): round(float(row["_margin_pct"]), 1) for _, row in tm.iterrows()}
+
+        # منتجات خاسرة
+        loss_products = {}
+        if product_col and num_loss_items > 0:
+            lp = loss_items.nsmallest(10, "_margin_pct")
+            loss_products = {str(row[product_col]): round(float(row["_margin_pct"]), 1) for _, row in lp.iterrows()}
+
+        # ─── مقارنة بالسوق ───
+        inv_benchmarks = {"avg_margin": 25.0, "loss_items_pct": 5.0, "a_items_pct": 20.0}
+        market_comparison = {
+            "margin": compare_to_market(expected_margin, inv_benchmarks["avg_margin"], "هامش الربح المتوقع"),
+            "loss_rate": compare_to_market(loss_pct, inv_benchmarks["loss_items_pct"], "نسبة المنتجات الخاسرة"),
+            "concentration": {
+                "status": "طبيعي" if a_items / num_items * 100 <= 25 else "مركّز جداً" if num_items > 0 else "غير متاح",
+                "detail": f"{a_items} منتج ({round(a_items/num_items*100,1)}%) يمثل 80% من قيمة المخزون" if num_items > 0 else ""
+            }
+        }
+
+        # ─── تجميع النتائج ───
+        code_result = {
+            "summary": {
+                "num_items": num_items,
+                "total_quantity": round(total_qty, 2),
+                "total_cost_value": round(total_cost_value, 2),
+                "total_sell_value": round(total_sell_value, 2),
+                "expected_profit": round(expected_profit, 2),
+                "expected_margin_pct": expected_margin,
+                "avg_cost_per_unit": avg_cost_per_unit,
+                "avg_sell_per_unit": avg_sell_per_unit,
+                "avg_qty_per_item": avg_qty_per_item,
+                "avg_item_margin_pct": avg_item_margin,
+                "num_loss_items": num_loss_items,
+                "loss_items_pct": loss_pct,
+                "num_high_margin_items": num_high_margin
+            },
+            "abc_analysis": {
+                "a_items": a_items, "a_value": a_value,
+                "b_items": b_items, "b_value": b_value,
+                "c_items": c_items, "c_value": c_value
+            },
+            "top_by_value": top_by_value,
+            "top_by_qty": top_by_qty,
+            "top_by_margin": top_by_margin,
+            "loss_products": loss_products,
+            "market_comparison": market_comparison,
+            "columns_detected": {
+                "product": product_col, "barcode": barcode_col, "quantity": qty_col,
+                "cost": cost_col, "total_cost": total_cost_col,
+                "sell": sell_col, "sell_tax": sell_tax_col
+            },
+            "source": "code",
+            "confidence_pct": 90
+        }
+
+        # ─── AI Analysis ───
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+
+        ai_prompt = f"""أنت خبير إدارة مخزون في السوق السعودي. حلل بيانات الجرد التالية بالعربية.
+البيانات: {json.dumps(code_result["summary"], ensure_ascii=False)}
+تحليل ABC: {json.dumps(code_result["abc_analysis"], ensure_ascii=False)}
+مقارنة السوق: {json.dumps(code_result["market_comparison"], ensure_ascii=False)}
+منتجات خاسرة: {json.dumps(code_result["loss_products"], ensure_ascii=False)}
+أجب بـ JSON فقط:
+{{"summary": "ملخص وضع المخزون 3-4 جمل",
+  "key_findings": ["نتيجة 1", "نتيجة 2", "نتيجة 3"],
+  "inventory_health": "ممتاز/جيد/متوسط/ضعيف",
+  "risks": ["خطر 1", "خطر 2"],
+  "recommendations": ["توصية 1", "توصية 2", "توصية 3"],
+  "loss_items_action": "إجراء مقترح للمنتجات الخاسرة",
+  "confidence_pct": 90}}"""
+
+        stage1_gpt = {}
+        stage1_gemini = {}
+        stage1_ai = {}
+
+        if openai_key:
+            try:
+                stage1_gpt = await analyze_with_openai(code_result, openai_key, ai_prompt)
+                stage1_gpt["source"] = "gpt4_initial"
+            except Exception:
+                stage1_gpt = {"error": "GPT-4 unavailable", "source": "gpt4_failed"}
+
+        if google_key:
+            try:
+                stage1_gemini = await analyze_with_gemini(code_result, google_key, ai_prompt)
+                stage1_gemini["source"] = "gemini_initial"
+            except Exception:
+                stage1_gemini = {"error": "Gemini unavailable", "source": "gemini_failed"}
+
+        if anthropic_key:
+            try:
+                stage1_ai = await analyze_with_claude(code_result, anthropic_key, "initial")
+                stage1_ai["source"] = "claude_initial"
+            except Exception:
+                stage1_ai = {"error": "Claude unavailable", "source": "claude_failed"}
+
+        confidence_scores = [90]
+        for s in [stage1_gpt, stage1_gemini, stage1_ai]:
+            if s.get("confidence_pct"): confidence_scores.append(s["confidence_pct"])
+        avg_confidence = sum(confidence_scores) / len(confidence_scores)
+
+        stage4_final = {}
+        if openai_key:
+            try:
+                final_prompt = f"""أنت خبير مخزون أول. قدم التقرير النهائي بالعربية.
+البيانات: {json.dumps(code_result["summary"], ensure_ascii=False)}
+تحليل ABC: {json.dumps(code_result["abc_analysis"], ensure_ascii=False)}
+أجب بـ JSON فقط:
+{{"executive_summary": "ملخص تنفيذي",
+  "strengths": ["قوة 1", "قوة 2"],
+  "weaknesses": ["ضعف 1", "ضعف 2"],
+  "abc_verdict": "تقييم توزيع المخزون ABC",
+  "action_plan": [{{"priority": "عالية", "action": "إجراء", "timeline": "المدة"}}],
+  "final_confidence_pct": 92,
+  "inventory_score": 75}}"""
+                stage4_final = await analyze_with_openai(code_result, openai_key, final_prompt)
+            except Exception:
+                stage4_final = {}
+
+        platforms = [p for p in [
+            "claude" if stage1_ai and "error" not in stage1_ai else "",
+            "gpt4" if stage1_gpt and "error" not in stage1_gpt else "",
+            "gemini" if stage1_gemini and "error" not in stage1_gemini else ""
+        ] if p]
+
+        return {
+            "success": True,
+            "unit": 4,
+            "filename": file.filename,
+            "items_analyzed": num_items,
+            "stages": {
+                "stage1_code": {"description": "تحليل الكود", "data": code_result, "confidence_pct": 90},
+                "stage1_ai": {"description": "تحليل AI", "claude": stage1_ai, "gpt4": stage1_gpt, "gemini": stage1_gemini, "platforms_used": platforms},
+                "stage3_review": {"description": "مراجعة شاملة"},
+                "stage4_final": {"description": "التقرير النهائي", "report": stage4_final, "final_confidence_pct": stage4_final.get("final_confidence_pct", avg_confidence)}
+            },
+            "final_result": {
+                "data": code_result,
+                "ai_analysis": stage4_final,
+                "confidence_pct": round(avg_confidence, 1),
+                "quality_label": "ممتاز" if avg_confidence >= 95 else "جيد" if avg_confidence >= 85 else "يحتاج مراجعة"
+            }
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 5: التحليل الائتماني وجاهزية البنوك
+# ═══════════════════════════════════════════════════════════
+@app.post("/unit5/analyze/multistage")
+async def unit5_multistage(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls', '.pdf', '.csv')):
+        raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو PDF أو CSV")
+    try:
+        import tempfile, os, json, warnings
+        import pandas as pd
+        warnings.filterwarnings("ignore")
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+        if suffix == '.csv':
+            df = pd.read_csv(tmp_path)
+        else:
+            df = pd.read_excel(tmp_path)
+        os.unlink(tmp_path)
+        cols = [str(c).strip() for c in df.columns]
+        df.columns = cols
+        num_rows = len(df)
+        raw_data = {}
+        for col in cols:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+            if df[col].notna().sum() > 0:
+                raw_data[col] = round(float(df[col].sum()), 2)
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        ai_result = {}
+        prompt = f"""أنت محلل ائتماني خبير في السوق السعودي. حلل البيانات التالية وقيّم جاهزية الشركة للحصول على تمويل بنكي.
+البيانات: {json.dumps(raw_data, ensure_ascii=False)}
+عدد الصفوف: {num_rows}، الأعمدة: {cols}
+أجب بـ JSON فقط:
+{{"credit_score": 75, "credit_rating": "جيد/ممتاز/ضعيف/مقبول",
+  "bank_readiness_pct": 70, "summary": "ملخص الوضع الائتماني",
+  "strengths": ["قوة 1", "قوة 2"], "risks": ["خطر 1", "خطر 2"],
+  "required_documents": ["مستند 1", "مستند 2"],
+  "recommendations": ["توصية 1", "توصية 2", "توصية 3"],
+  "estimated_financing_range": "من X إلى Y ريال",
+  "confidence_pct": 88}}"""
+        if openai_key:
+            try:
+                ai_result = await analyze_with_openai(raw_data, openai_key, prompt)
+            except: ai_result = {}
+        if not ai_result and google_key:
+            try:
+                ai_result = await analyze_with_gemini(raw_data, google_key, prompt)
+            except: ai_result = {}
+        return {"success": True, "unit": 5, "filename": file.filename, "rows": num_rows,
+            "columns": cols, "raw_data": raw_data, "ai_analysis": ai_result,
+            "confidence_pct": ai_result.get("confidence_pct", 85),
+            "quality_label": "جيد" if ai_result.get("confidence_pct", 85) >= 85 else "يحتاج مراجعة"}
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 6: التدفق النقدي والتوقعات
+# ═══════════════════════════════════════════════════════════
+@app.post("/unit6/analyze/multistage")
+async def unit6_multistage(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls', '.pdf', '.csv')):
+        raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو PDF أو CSV")
+    try:
+        import tempfile, os, json, warnings
+        import pandas as pd
+        warnings.filterwarnings("ignore")
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+        if suffix == '.csv':
+            df = pd.read_csv(tmp_path)
+        else:
+            df = pd.read_excel(tmp_path)
+        os.unlink(tmp_path)
+        cols = [str(c).strip() for c in df.columns]
+        df.columns = cols
+        num_rows = len(df)
+        raw_data = {}
+        for col in cols:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+            if df[col].notna().sum() > 0:
+                raw_data[col] = round(float(df[col].sum()), 2)
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        ai_result = {}
+        prompt = f"""أنت خبير تدفقات نقدية. حلل البيانات وقدم توقعات لـ 3-5 سنوات بثلاث سيناريوهات.
+البيانات: {json.dumps(raw_data, ensure_ascii=False)}
+عدد الصفوف: {num_rows}، الأعمدة: {cols}
+أجب بـ JSON فقط:
+{{"summary": "ملخص التدفقات النقدية",
+  "current_cash_position": "الوضع النقدي الحالي",
+  "burn_rate_monthly": 0,
+  "runway_months": 0,
+  "forecast_optimistic": {{"year1": 0, "year2": 0, "year3": 0}},
+  "forecast_neutral": {{"year1": 0, "year2": 0, "year3": 0}},
+  "forecast_pessimistic": {{"year1": 0, "year2": 0, "year3": 0}},
+  "risks": ["خطر 1", "خطر 2"],
+  "recommendations": ["توصية 1", "توصية 2"],
+  "confidence_pct": 88}}"""
+        if openai_key:
+            try:
+                ai_result = await analyze_with_openai(raw_data, openai_key, prompt)
+            except: ai_result = {}
+        if not ai_result and google_key:
+            try:
+                ai_result = await analyze_with_gemini(raw_data, google_key, prompt)
+            except: ai_result = {}
+        return {"success": True, "unit": 6, "filename": file.filename, "rows": num_rows,
+            "columns": cols, "raw_data": raw_data, "ai_analysis": ai_result,
+            "confidence_pct": ai_result.get("confidence_pct", 85),
+            "quality_label": "جيد" if ai_result.get("confidence_pct", 85) >= 85 else "يحتاج مراجعة"}
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 7: التقييم ودراسة الجدوى
+# ═══════════════════════════════════════════════════════════
+@app.post("/unit7/analyze/multistage")
+async def unit7_multistage(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls', '.pdf', '.csv')):
+        raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو PDF أو CSV")
+    try:
+        import tempfile, os, json, warnings
+        import pandas as pd
+        warnings.filterwarnings("ignore")
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+        if suffix == '.csv':
+            df = pd.read_csv(tmp_path)
+        else:
+            df = pd.read_excel(tmp_path)
+        os.unlink(tmp_path)
+        cols = [str(c).strip() for c in df.columns]
+        df.columns = cols
+        num_rows = len(df)
+        raw_data = {}
+        for col in cols:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+            if df[col].notna().sum() > 0:
+                raw_data[col] = round(float(df[col].sum()), 2)
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        ai_result = {}
+        prompt = f"""أنت خبير تقييم شركات ودراسة جدوى في السوق السعودي. قيّم الشركة بناءً على البيانات.
+البيانات: {json.dumps(raw_data, ensure_ascii=False)}
+عدد الصفوف: {num_rows}، الأعمدة: {cols}
+أجب بـ JSON فقط:
+{{"company_valuation": 0, "valuation_method": "DCF/مضاعفات/صافي الأصول",
+  "valuation_range": {{"low": 0, "mid": 0, "high": 0}},
+  "roi_pct": 0, "payback_period_years": 0, "npv": 0, "irr_pct": 0,
+  "feasibility_score": 75, "feasibility_label": "مجدي/غير مجدي/يحتاج دراسة",
+  "summary": "ملخص التقييم",
+  "strengths": ["قوة 1", "قوة 2"],
+  "risks": ["خطر 1", "خطر 2"],
+  "recommendations": ["توصية 1", "توصية 2"],
+  "confidence_pct": 85}}"""
+        if openai_key:
+            try:
+                ai_result = await analyze_with_openai(raw_data, openai_key, prompt)
+            except: ai_result = {}
+        if not ai_result and google_key:
+            try:
+                ai_result = await analyze_with_gemini(raw_data, google_key, prompt)
+            except: ai_result = {}
+        return {"success": True, "unit": 7, "filename": file.filename, "rows": num_rows,
+            "columns": cols, "raw_data": raw_data, "ai_analysis": ai_result,
+            "confidence_pct": ai_result.get("confidence_pct", 85),
+            "quality_label": "جيد" if ai_result.get("confidence_pct", 85) >= 85 else "يحتاج مراجعة"}
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 8: المقارنة القطاعية والتنافسية
+# ═══════════════════════════════════════════════════════════
+@app.post("/unit8/analyze/multistage")
+async def unit8_multistage(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls', '.pdf', '.csv')):
+        raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو PDF أو CSV")
+    try:
+        import tempfile, os, json, warnings
+        import pandas as pd
+        warnings.filterwarnings("ignore")
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+        if suffix == '.csv':
+            df = pd.read_csv(tmp_path)
+        else:
+            df = pd.read_excel(tmp_path)
+        os.unlink(tmp_path)
+        cols = [str(c).strip() for c in df.columns]
+        df.columns = cols
+        num_rows = len(df)
+        raw_data = {}
+        for col in cols:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+            if df[col].notna().sum() > 0:
+                raw_data[col] = round(float(df[col].sum()), 2)
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        ai_result = {}
+        prompt = f"""أنت خبير تحليل قطاعي وتنافسي في السوق السعودي. قارن أداء الشركة بالقطاع والمنافسين.
+البيانات: {json.dumps(raw_data, ensure_ascii=False)}
+عدد الصفوف: {num_rows}، الأعمدة: {cols}
+أجب بـ JSON فقط:
+{{"market_position": "قائد/منافس/تابع",
+  "market_share_estimate_pct": 0,
+  "sector_avg_margin_pct": 0, "company_margin_pct": 0,
+  "competitive_advantages": ["ميزة 1", "ميزة 2"],
+  "competitive_threats": ["تهديد 1", "تهديد 2"],
+  "sector_benchmarks": {{"growth_rate": 0, "profit_margin": 0, "debt_ratio": 0}},
+  "swot": {{"strengths": ["قوة"], "weaknesses": ["ضعف"], "opportunities": ["فرصة"], "threats": ["تهديد"]}},
+  "recommendations": ["توصية 1", "توصية 2"],
+  "summary": "ملخص المقارنة القطاعية",
+  "confidence_pct": 85}}"""
+        if openai_key:
+            try:
+                ai_result = await analyze_with_openai(raw_data, openai_key, prompt)
+            except: ai_result = {}
+        if not ai_result and google_key:
+            try:
+                ai_result = await analyze_with_gemini(raw_data, google_key, prompt)
+            except: ai_result = {}
+        return {"success": True, "unit": 8, "filename": file.filename, "rows": num_rows,
+            "columns": cols, "raw_data": raw_data, "ai_analysis": ai_result,
+            "confidence_pct": ai_result.get("confidence_pct", 85),
+            "quality_label": "جيد" if ai_result.get("confidence_pct", 85) >= 85 else "يحتاج مراجعة"}
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")

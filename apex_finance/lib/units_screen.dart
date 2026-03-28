@@ -1,4 +1,7 @@
-﻿import 'unit3_screen.dart';
+﻿import 'unit4_screen.dart';
+import 'advanced_unit_screen.dart';
+import 'unit4_screen.dart';
+import 'unit3_screen.dart';
 import 'unit3_screen.dart';
 import 'unit2_screen.dart';
 import 'package:flutter/material.dart';
@@ -28,19 +31,19 @@ class UnitsScreen extends StatelessWidget {
           const SizedBox(height: 14),
           _UnitCard(unit: '3', title: 'تحليل المبيعات', subtitle: 'نسب ومتوسطات ومؤشرات أداء المبيعات', icon: Icons.trending_up_rounded, color: AC.success, features: const ['مؤشرات أداء المبيعات KPIs','متوسطات ونسب النمو','مقارنات السوق حسب الدولة','تحليل حسب النشاط التجاري'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit3Screen()))),
           const SizedBox(height: 14),
-          _UnitCard(unit: '4', title: 'تحليل الجرد', subtitle: 'مقارنة الجرد الفعلي بالمخزني وتحليل الانحرافات', icon: Icons.inventory_2_rounded, color: AC.warning, features: const ['نسب الانحراف في قيمة المخزون','معدل دوران المخزون','عدد أيام المخزون','المخاطر والنصائح'], status: 'قريباً', statusColor: AC.warning, onTap: () => _showSoon(context, 'تحليل الجرد')),
+          _UnitCard(unit: '4', title: 'تحليل الجرد', subtitle: 'مقارنة الجرد الفعلي بالمخزني وتحليل الانحرافات', icon: Icons.inventory_2_rounded, color: AC.warning, features: const ['نسب الانحراف في قيمة المخزون','معدل دوران المخزون','عدد أيام المخزون','المخاطر والنصائح'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit4Screen()))),
           const SizedBox(height: 24),
           const Text('الخدمات المتقدمة', textDirection: TextDirection.rtl, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AC.textPrimary, fontFamily: 'Tajawal')),
           const SizedBox(height: 4),
           const Text('للشركات والمستثمرين', textDirection: TextDirection.rtl, style: TextStyle(fontSize: 12, color: AC.textSecondary, fontFamily: 'Tajawal')),
           const SizedBox(height: 14),
-          _MiniCard(title: 'التحليل الائتماني وجاهزية البنوك', icon: Icons.account_balance_wallet_rounded, color: const Color(0xFF6C5CE7), onTap: () => _showSoon(context, 'التحليل الائتماني')),
+          _MiniCard(title: 'التحليل الائتماني وجاهزية البنوك', icon: Icons.account_balance_wallet_rounded, color: const Color(0xFF6C5CE7), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 5, title: 'التحليل الائتماني', subtitle: 'تقييم جاهزية التمويل البنكي', endpoint: 'https://apex-api-ootk.onrender.com/unit5/analyze/multistage', icon: Icons.account_balance_wallet_rounded, color: Color(0xFF6C5CE7))))),
           const SizedBox(height: 10),
-          _MiniCard(title: 'التدفق النقدي والتوقعات', icon: Icons.auto_graph_rounded, color: const Color(0xFF00B894), onTap: () => _showSoon(context, 'التدفق النقدي')),
+          _MiniCard(title: 'التدفق النقدي والتوقعات', icon: Icons.auto_graph_rounded, color: const Color(0xFF00B894), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 6, title: 'التدفق النقدي والتوقعات', subtitle: 'توقعات 3-5 سنوات بثلاث سيناريوهات', endpoint: 'https://apex-api-ootk.onrender.com/unit6/analyze/multistage', icon: Icons.auto_graph_rounded, color: Color(0xFF00B894))))),
           const SizedBox(height: 10),
-          _MiniCard(title: 'التقييم ودراسة الجدوى', icon: Icons.assessment_rounded, color: const Color(0xFFE17055), onTap: () => _showSoon(context, 'التقييم ودراسة الجدوى')),
+          _MiniCard(title: 'التقييم ودراسة الجدوى', icon: Icons.assessment_rounded, color: const Color(0xFFE17055), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 7, title: 'التقييم ودراسة الجدوى', subtitle: 'تقييم الشركة + ROI + NPV + IRR', endpoint: 'https://apex-api-ootk.onrender.com/unit7/analyze/multistage', icon: Icons.assessment_rounded, color: Color(0xFFE17055))))),
           const SizedBox(height: 10),
-          _MiniCard(title: 'المقارنة القطاعية والتنافسية', icon: Icons.compare_arrows_rounded, color: const Color(0xFF0984E3), onTap: () => _showSoon(context, 'المقارنة القطاعية')),
+          _MiniCard(title: 'المقارنة القطاعية والتنافسية', icon: Icons.compare_arrows_rounded, color: const Color(0xFF0984E3), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdvancedUnitScreen(unitNumber: 8, title: 'المقارنة القطاعية والتنافسية', subtitle: 'موقعك في السوق + SWOT + حصة سوقية', endpoint: 'https://apex-api-ootk.onrender.com/unit8/analyze/multistage', icon: Icons.compare_arrows_rounded, color: Color(0xFF0984E3))))),
           const SizedBox(height: 24),
           Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.gold.withOpacity(0.1), AC.navy3]), borderRadius: BorderRadius.circular(16), border: Border.all(color: AC.gold.withOpacity(0.3))),
             child: Row(children: [const Icon(Icons.arrow_back_ios_rounded, color: AC.gold, size: 14), const Spacer(),
@@ -113,6 +116,8 @@ class _MiniCard extends StatelessWidget {
           child: Icon(icon, color: color, size: 18))])));
   }
 }
+
+
 
 
 
