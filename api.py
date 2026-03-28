@@ -590,6 +590,7 @@ async def analyze_with_openai(financial_data: dict, api_key: str, prompt: str) -
     from openai import OpenAI
     client = OpenAI(api_key=api_key)
     response = client.chat.completions.create(
+        temperature=0,
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}],
         max_tokens=2000
@@ -601,7 +602,7 @@ async def analyze_with_gemini(financial_data: dict, api_key: str, prompt: str) -
     """تحليل Google Gemini"""
     import json, requests
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
-    resp = requests.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
+    resp = requests.post(url, json={"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"temperature": 0}})
     rj = resp.json()
     if "candidates" in rj and len(rj["candidates"]) > 0:
         raw = rj["candidates"][0]["content"]["parts"][0]["text"].strip().replace("```json","").replace("```","").strip()
@@ -2091,4 +2092,5 @@ async def unit1_evaluate_tabs(file: UploadFile = File(...)):
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
 
