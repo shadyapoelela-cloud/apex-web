@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -182,21 +182,21 @@ class _Unit3ScreenState extends State<Unit3Screen> {
           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AC.gold, fontFamily: 'Tajawal')),
         const SizedBox(height: 12),
         Row(children: [
-          Expanded(child: _kpiCard('إجمالي المبيعات', _fmt(s['total_sales']), AC.gold)),
+          Expanded(child: _kpiCard('صافي المبيعات', _fmt(s['net_sales'] ?? s['total_sales']), AC.gold)),
           const SizedBox(width: 8),
-          Expanded(child: _kpiCard('هامش الربح', '${kpis['gross_margin_pct'] ?? 0}%', AC.success)),
+          Expanded(child: _kpiCard('نسبة المرتجعات', '${s['return_rate_pct'] ?? 0}%', AC.success)),
         ]),
         const SizedBox(height: 8),
         Row(children: [
-          Expanded(child: _kpiCard('عدد المعاملات', '${s['num_transactions'] ?? 0}', AC.cyan)),
+          Expanded(child: _kpiCard('عدد الفواتير', '${s['num_sales'] ?? s['num_transactions'] ?? 0}', AC.cyan)),
           const SizedBox(width: 8),
-          Expanded(child: _kpiCard('متوسط النمو الشهري', '${kpis['avg_monthly_growth_pct'] ?? 0}%', const Color(0xFF6C5CE7))),
+          Expanded(child: _kpiCard('متوسط الفاتورة', '${s['avg_invoice'] ?? kpis['avg_transaction_value'] ?? 0}%', const Color(0xFF6C5CE7))),
         ]),
         const SizedBox(height: 8),
         Row(children: [
-          Expanded(child: _kpiCard('متوسط قيمة المعاملة', _fmt(kpis['avg_transaction_value']), AC.warning)),
+          Expanded(child: _kpiCard('إجمالي المبيعات', _fmt(s['gross_sales'] ?? s['total_sales']), AC.warning)),
           const SizedBox(width: 8),
-          Expanded(child: _kpiCard('سعر الوحدة', _fmt(kpis['revenue_per_unit']), const Color(0xFFE17055))),
+          Expanded(child: _kpiCard('المرتجعات', _fmt(s['total_returns']), const Color(0xFFE24B4A))),
         ]),
       ]));
   }
@@ -319,3 +319,6 @@ class _Unit3ScreenState extends State<Unit3Screen> {
       ]));
   }
 }
+
+
+

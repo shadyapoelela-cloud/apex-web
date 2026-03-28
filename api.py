@@ -1050,12 +1050,50 @@ async def unit2_multistage(file: UploadFile = File(...)):
 # ويحللها بنظام 4 مراحل مع KPIs ونسب النمو
 # ═══════════════════════════════════════════════════════════
 
+MARKET_BENCHMARKS = {
+    "retail": {"return_rate": 8.0, "gross_margin": 25.0, "monthly_growth": 3.0, "avg_invoice": 500},
+    "wholesale": {"return_rate": 5.0, "gross_margin": 15.0, "monthly_growth": 2.5, "avg_invoice": 5000},
+    "food": {"return_rate": 3.0, "gross_margin": 35.0, "monthly_growth": 2.0, "avg_invoice": 200},
+    "services": {"return_rate": 2.0, "gross_margin": 40.0, "monthly_growth": 4.0, "avg_invoice": 1000},
+    "default": {"return_rate": 5.0, "gross_margin": 20.0, "monthly_growth": 3.0, "avg_invoice": 1000}
+}
+
+def compare_to_market(value, benchmark, label):
+    if benchmark == 0:
+        return {"status": "غير متاح", "detail": ""}
+    pct_diff = round((value - benchmark) / benchmark * 100, 1) if benchmark else 0
+    if abs(pct_diff) <= 10:
+        return {"status": "ضمن المعدل", "detail": f"{label}: {value} (معيار السوق: {benchmark})", "color": "green"}
+    elif value > benchmark:
+        return {"status": "أعلى من السوق", "detail": f"{label}: {value} أعلى من {benchmark} بنسبة {abs(pct_diff)}%", "color": "blue"}
+    else:
+        return {"status": "أقل من السوق", "detail": f"{label}: {value} أقل من {benchmark} بنسبة {abs(pct_diff)}%", "color": "red"}
+
+MARKET_BENCHMARKS = {
+    "retail": {"return_rate": 8.0, "gross_margin": 25.0, "monthly_growth": 3.0, "avg_invoice": 500},
+    "wholesale": {"return_rate": 5.0, "gross_margin": 15.0, "monthly_growth": 2.5, "avg_invoice": 5000},
+    "food": {"return_rate": 3.0, "gross_margin": 35.0, "monthly_growth": 2.0, "avg_invoice": 200},
+    "services": {"return_rate": 2.0, "gross_margin": 40.0, "monthly_growth": 4.0, "avg_invoice": 1000},
+    "default": {"return_rate": 5.0, "gross_margin": 20.0, "monthly_growth": 3.0, "avg_invoice": 1000}
+}
+
+def compare_to_market(value, benchmark, label):
+    if benchmark == 0:
+        return {"status": "غير متاح", "detail": ""}
+    pct_diff = round((value - benchmark) / benchmark * 100, 1) if benchmark else 0
+    if abs(pct_diff) <= 10:
+        return {"status": "ضمن المعدل", "detail": f"{label}: {value} (معيار السوق: {benchmark})", "color": "green"}
+    elif value > benchmark:
+        return {"status": "أعلى من السوق", "detail": f"{label}: {value} أعلى من {benchmark} بنسبة {abs(pct_diff)}%", "color": "blue"}
+    else:
+        return {"status": "أقل من السوق", "detail": f"{label}: {value} أقل من {benchmark} بنسبة {abs(pct_diff)}%", "color": "red"}
+
 @app.post("/unit3/analyze/multistage")
 async def unit3_multistage(file: UploadFile = File(...)):
     if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
         raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو CSV")
     try:
-        import tempfile, os, json, warnings, traceback
+        import tempfile, os, json, warnings
         import pandas as pd
         warnings.filterwarnings("ignore")
 
@@ -1071,119 +1109,239 @@ async def unit3_multistage(file: UploadFile = File(...)):
             df = pd.read_excel(tmp_path)
         os.unlink(tmp_path)
 
-        cols = [c.lower().strip() for c in df.columns]
+        cols = [str(c).strip() for c in df.columns]
         df.columns = cols
+        cols_lower = [c.lower() for c in cols]
 
         def find_col(keywords):
             for kw in keywords:
-                for c in cols:
+                for i, c in enumerate(cols_lower):
                     if kw in c:
-                        return c
+                        return cols[i]
             return None
 
-        sales_col = find_col(["مبيعات", "إيرادات", "sales", "revenue", "amount", "المبلغ", "قيمة"])
-        date_col = find_col(["تاريخ", "date", "شهر", "month", "فترة", "period"])
+        # تحديد الأعمدة
+        net_sales_col = find_col(["صافي المبيعات", "صافي البيع", "net sales"])
+        gross_sales_col = find_col(["اجمالي المبيعات", "إجمالي المبيعات", "gross sales"])
+        returns_col = find_col(["مرتجع", "returns", "return"])
+        date_col = find_col(["تاريخ", "date", "شهر"])
+        qty_col = find_col(["كمية", "صافي الكمية", "quantity", "qty"])
+        type_col = find_col(["نوع", "type"])
+        tax_col = find_col(["قيمة الضريبة", "ضريبة", "vat", "tax"])
+        total_tax_col = find_col(["اجمالي مع الضريبة", "إجمالي مع"])
         product_col = find_col(["منتج", "صنف", "product", "item", "بند"])
-        qty_col = find_col(["كمية", "quantity", "qty", "عدد"])
-        cost_col = find_col(["تكلفة", "cost", "كلفة"])
         client_col = find_col(["عميل", "customer", "client", "زبون"])
-        region_col = find_col(["منطقة", "region", "فرع", "branch", "مدينة", "city"])
+        region_col = find_col(["منطقة", "region", "فرع", "branch", "مدينة"])
+        invoice_col = find_col(["رقم الفاتورة", "invoice", "فاتورة"])
+        cost_col = find_col(["تكلفة", "cost"])
 
+        # العمود الرئيسي: صافي المبيعات قبل الضريبة
+        sales_col = net_sales_col or gross_sales_col or find_col(["مبيعات", "sales", "revenue", "المبلغ"])
         if sales_col:
             df[sales_col] = pd.to_numeric(df[sales_col], errors="coerce").fillna(0)
-        if sales_col:
-            df[sales_col] = pd.to_numeric(df[sales_col], errors="coerce").fillna(0)
-        total_sales = float(df[sales_col].sum()) if sales_col else 0
-        avg_sale = float(df[sales_col].mean()) if sales_col else 0
-        max_sale = float(df[sales_col].max()) if sales_col else 0
-        min_sale = float(df[sales_col].min()) if sales_col else 0
-        num_transactions = len(df)
+        if qty_col:
+            df[qty_col] = pd.to_numeric(df[qty_col], errors="coerce").fillna(0)
+        if returns_col:
+            df[returns_col] = pd.to_numeric(df[returns_col], errors="coerce").fillna(0)
+        if tax_col:
+            df[tax_col] = pd.to_numeric(df[tax_col], errors="coerce").fillna(0)
+        if cost_col:
+            df[cost_col] = pd.to_numeric(df[cost_col], errors="coerce").fillna(0)
 
-        total_qty = float(df[qty_col].sum()) if qty_col else 0
+        # ─── فصل المبيعات عن المرتجعات ───
+        if sales_col:
+            df_sales_only = df[df[sales_col] > 0]
+            df_returns_only = df[df[sales_col] < 0]
+        else:
+            df_sales_only = df
+            df_returns_only = pd.DataFrame()
+
+        num_total = len(df)
+        num_sales = len(df_sales_only)
+        num_returns = len(df_returns_only)
+
+        # إجمالي المبيعات (موجب فقط)
+        gross_sales = float(df_sales_only[sales_col].sum()) if sales_col and num_sales > 0 else 0
+        # إجمالي المرتجعات (القيمة المطلقة)
+        total_returns_val = abs(float(df_returns_only[sales_col].sum())) if sales_col and num_returns > 0 else 0
+        # صافي المبيعات
+        net_sales = gross_sales - total_returns_val
+        # متوسط الفاتورة (المبيعات فقط بدون المرتجعات)
+        avg_invoice = round(float(df_sales_only[sales_col].mean()), 2) if sales_col and num_sales > 0 else 0
+        max_invoice = float(df_sales_only[sales_col].max()) if sales_col and num_sales > 0 else 0
+        min_invoice_series = df_sales_only[df_sales_only[sales_col] > 0][sales_col] if sales_col else pd.Series()
+        min_invoice = float(min_invoice_series.min()) if len(min_invoice_series) > 0 else 0
+
+        # نسبة المرتجعات
+        return_rate = round(total_returns_val / gross_sales * 100, 2) if gross_sales > 0 else 0
+        avg_return_val = round(abs(float(df_returns_only[sales_col].mean())), 2) if num_returns > 0 and sales_col else 0
+
+        # الكميات
+        total_qty_sold = float(df_sales_only[qty_col].sum()) if qty_col and num_sales > 0 else 0
+        total_qty_returned = abs(float(df_returns_only[qty_col].sum())) if qty_col and num_returns > 0 else 0
+        qty_return_rate = round(total_qty_returned / total_qty_sold * 100, 2) if total_qty_sold > 0 else 0
+
+        # التكلفة والربح
         total_cost = float(df[cost_col].sum()) if cost_col else 0
-        gross_profit = total_sales - total_cost if total_cost > 0 else 0
-        gross_margin = round(gross_profit / total_sales * 100, 2) if total_sales else 0
-        avg_price_per_unit = round(total_sales / total_qty, 2) if total_qty else 0
+        gross_profit = net_sales - abs(total_cost) if total_cost else 0
+        gross_margin = round(gross_profit / net_sales * 100, 2) if net_sales > 0 else 0
 
-        monthly_sales = {}
+        # الضريبة
+        total_tax = abs(float(df_sales_only[tax_col].sum())) if tax_col and num_sales > 0 else 0
+        tax_on_returns = abs(float(df_returns_only[tax_col].sum())) if tax_col and num_returns > 0 else 0
+        net_tax = total_tax - tax_on_returns
+
+        # سعر الوحدة
+        avg_price_per_unit = round(net_sales / total_qty_sold, 2) if total_qty_sold > 0 else 0
+
+        # ─── التحليل الشهري ───
+        monthly_data = {}
         if date_col and sales_col:
             df["_date"] = pd.to_datetime(df[date_col], errors="coerce")
             df["_month"] = df["_date"].dt.to_period("M").astype(str)
-            monthly_sales = df.groupby("_month")[sales_col].sum().to_dict()
-            monthly_sales = {k: round(float(v), 2) for k, v in monthly_sales.items()}
+            
+            for month in sorted(df["_month"].dropna().unique()):
+                mdf = df[df["_month"] == month]
+                m_sales = mdf[mdf[sales_col] > 0]
+                m_returns = mdf[mdf[sales_col] < 0]
+                monthly_data[month] = {
+                    "gross_sales": round(float(m_sales[sales_col].sum()), 2),
+                    "returns": round(abs(float(m_returns[sales_col].sum())), 2) if len(m_returns) > 0 else 0,
+                    "net_sales": round(float(m_sales[sales_col].sum()) - abs(float(m_returns[sales_col].sum())) if len(m_returns) > 0 else float(m_sales[sales_col].sum()), 2),
+                    "num_invoices": len(m_sales),
+                    "num_returns": len(m_returns)
+                }
 
+        # نسب النمو الشهري
+        months = sorted(monthly_data.keys())
         monthly_growth = {}
-        months = sorted(monthly_sales.keys())
         for i in range(1, len(months)):
-            prev = monthly_sales[months[i-1]]
-            curr = monthly_sales[months[i]]
+            prev = monthly_data[months[i-1]]["net_sales"]
+            curr = monthly_data[months[i]]["net_sales"]
             if prev > 0:
                 monthly_growth[months[i]] = round((curr - prev) / prev * 100, 2)
+        avg_growth = round(sum(monthly_growth.values()) / len(monthly_growth), 2) if monthly_growth else 0
 
+        # ─── أفضل المنتجات والعملاء ───
         top_products = {}
         if product_col and sales_col:
-            top_products = df.groupby(product_col)[sales_col].sum().nlargest(10).to_dict()
-            top_products = {str(k): round(float(v), 2) for k, v in top_products.items()}
+            tp = df_sales_only.groupby(product_col)[sales_col].sum().nlargest(10)
+            top_products = {str(k): round(float(v), 2) for k, v in tp.items()}
 
         top_clients = {}
         if client_col and sales_col:
-            top_clients = df.groupby(client_col)[sales_col].sum().nlargest(10).to_dict()
-            top_clients = {str(k): round(float(v), 2) for k, v in top_clients.items()}
+            tc = df_sales_only.groupby(client_col)[sales_col].sum().nlargest(10)
+            top_clients = {str(k): round(float(v), 2) for k, v in tc.items()}
 
         region_sales = {}
         if region_col and sales_col:
-            region_sales = df.groupby(region_col)[sales_col].sum().to_dict()
-            region_sales = {str(k): round(float(v), 2) for k, v in region_sales.items()}
+            rs = df_sales_only.groupby(region_col)[sales_col].sum()
+            region_sales = {str(k): round(float(v), 2) for k, v in rs.items()}
 
-        avg_growth = round(sum(monthly_growth.values()) / len(monthly_growth), 2) if monthly_growth else 0
+        # ─── تحليل المرتجعات المفصل ───
+        returns_by_month = {}
+        if date_col and sales_col and num_returns > 0:
+            df_returns_only["_date"] = pd.to_datetime(df_returns_only[date_col], errors="coerce")
+            df_returns_only["_month"] = df_returns_only["_date"].dt.to_period("M").astype(str)
+            for month in sorted(df_returns_only["_month"].dropna().unique()):
+                mret = df_returns_only[df_returns_only["_month"] == month]
+                returns_by_month[month] = {
+                    "count": len(mret),
+                    "value": round(abs(float(mret[sales_col].sum())), 2)
+                }
 
+        top_returned_products = {}
+        if product_col and sales_col and num_returns > 0:
+            trp = df_returns_only.groupby(product_col)[sales_col].sum().nsmallest(10)
+            top_returned_products = {str(k): round(abs(float(v)), 2) for k, v in trp.items()}
+
+        # ─── مقارنة بمعايير السوق ───
+        benchmark = MARKET_BENCHMARKS["default"]
+        market_comparison = {
+            "return_rate": compare_to_market(return_rate, benchmark["return_rate"], "نسبة المرتجعات"),
+            "gross_margin": compare_to_market(gross_margin, benchmark["gross_margin"], "هامش الربح"),
+            "monthly_growth": compare_to_market(avg_growth, benchmark["monthly_growth"], "النمو الشهري"),
+            "avg_invoice": compare_to_market(avg_invoice, benchmark["avg_invoice"], "متوسط الفاتورة"),
+            "benchmark_used": "default (عام)"
+        }
+
+        # ─── تجميع النتائج ───
         code_result = {
             "summary": {
-                "total_sales": round(total_sales, 2),
-                "avg_sale": round(avg_sale, 2),
-                "max_sale": round(max_sale, 2),
-                "min_sale": round(min_sale, 2),
-                "num_transactions": num_transactions,
-                "total_quantity": round(total_qty, 2),
-                "total_cost": round(total_cost, 2),
+                "gross_sales": round(gross_sales, 2),
+                "total_returns": round(total_returns_val, 2),
+                "net_sales": round(net_sales, 2),
+                "return_rate_pct": return_rate,
+                "avg_invoice": avg_invoice,
+                "max_invoice": round(max_invoice, 2),
+                "min_invoice": round(min_invoice, 2),
+                "num_transactions": num_total,
+                "num_sales": num_sales,
+                "num_returns": num_returns,
+                "total_quantity_sold": round(total_qty_sold, 2),
+                "total_quantity_returned": round(total_qty_returned, 2),
+                "qty_return_rate_pct": qty_return_rate,
                 "gross_profit": round(gross_profit, 2),
                 "gross_margin_pct": gross_margin,
                 "avg_price_per_unit": avg_price_per_unit,
-                "avg_monthly_growth_pct": avg_growth
+                "avg_monthly_growth_pct": avg_growth,
+                "total_tax": round(total_tax, 2),
+                "tax_on_returns": round(tax_on_returns, 2),
+                "net_tax": round(net_tax, 2)
             },
             "kpis": {
-                "total_revenue": round(total_sales, 2),
+                "net_revenue": round(net_sales, 2),
                 "gross_margin_pct": gross_margin,
-                "avg_transaction_value": round(avg_sale, 2),
-                "transactions_count": num_transactions,
+                "return_rate_pct": return_rate,
+                "avg_invoice_value": avg_invoice,
+                "transactions_count": num_sales,
                 "avg_monthly_growth_pct": avg_growth,
-                "revenue_per_unit": avg_price_per_unit
+                "revenue_per_unit": avg_price_per_unit,
+                "qty_return_rate_pct": qty_return_rate
             },
-            "monthly_sales": monthly_sales,
+            "monthly_data": monthly_data,
             "monthly_growth": monthly_growth,
             "top_products": top_products,
             "top_clients": top_clients,
             "region_sales": region_sales,
+            "returns_analysis": {
+                "total_returns_value": round(total_returns_val, 2),
+                "total_returns_count": num_returns,
+                "return_rate_pct": return_rate,
+                "avg_return_value": avg_return_val,
+                "qty_return_rate_pct": qty_return_rate,
+                "returns_by_month": returns_by_month,
+                "top_returned_products": top_returned_products
+            },
+            "market_comparison": market_comparison,
             "columns_detected": {
                 "sales": sales_col, "date": date_col, "product": product_col,
-                "quantity": qty_col, "cost": cost_col, "client": client_col, "region": region_col
+                "quantity": qty_col, "cost": cost_col, "client": client_col,
+                "region": region_col, "type": type_col, "tax": tax_col,
+                "returns": returns_col, "invoice": invoice_col
             },
             "source": "code",
             "confidence_pct": 90
         }
 
-        # AI Analysis (GPT-4 + Gemini + Claude)
+        # ─── AI Analysis ───
         openai_key = os.environ.get("OPENAI_API_KEY", "")
         google_key = os.environ.get("GOOGLE_API_KEY", "")
         anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
 
-        ai_prompt = f"""أنت محلل مبيعات خبير. حلل بيانات المبيعات التالية وأعطِ تحليلاً شاملاً بالعربية.
-البيانات: {json.dumps(code_result, ensure_ascii=False)}
+        ai_prompt = f"""أنت محلل مبيعات خبير في السوق السعودي. حلل البيانات التالية بالعربية.
+البيانات: {json.dumps(code_result["summary"], ensure_ascii=False)}
+المرتجعات: {json.dumps(code_result["returns_analysis"], ensure_ascii=False)}
+مقارنة السوق: {json.dumps(code_result["market_comparison"], ensure_ascii=False)}
 أجب بـ JSON فقط:
-{{"summary": "ملخص أداء المبيعات", "key_findings": ["نتيجة 1", "نتيجة 2", "نتيجة 3"],
-  "trends": ["اتجاه 1", "اتجاه 2"], "risks": ["خطر 1", "خطر 2"],
+{{"summary": "ملخص أداء المبيعات 3-4 جمل",
+  "key_findings": ["نتيجة 1", "نتيجة 2", "نتيجة 3"],
+  "returns_assessment": "تقييم نسبة المرتجعات مقارنة بالسوق",
+  "trends": ["اتجاه 1", "اتجاه 2"],
+  "risks": ["خطر 1", "خطر 2"],
   "recommendations": ["توصية 1", "توصية 2", "توصية 3"],
-  "confidence_pct": 90, "sales_rating": "ممتاز/جيد/ضعيف"}}"""
+  "confidence_pct": 90,
+  "sales_rating": "ممتاز/جيد/متوسط/ضعيف"}}"""
 
         stage1_gpt = {}
         stage1_gemini = {}
@@ -1210,35 +1368,30 @@ async def unit3_multistage(file: UploadFile = File(...)):
             except Exception:
                 stage1_ai = {"error": "Claude unavailable", "source": "claude_failed"}
 
-        # Review stage
-        stage3_review = {}
-        api_key = anthropic_key or ""
-        if api_key and (stage1_gpt or stage1_gemini or stage1_ai):
-            try:
-                combined = {"code": code_result, "gpt4": stage1_gpt, "gemini": stage1_gemini, "claude": stage1_ai}
-                stage3_review = await analyze_with_claude(combined, api_key, "review")
-            except Exception:
-                stage3_review = {}
-
-        # Confidence
+        # Final stage
         confidence_scores = [90]
         for s in [stage1_gpt, stage1_gemini, stage1_ai]:
-            if s.get("confidence_pct"):
-                confidence_scores.append(s["confidence_pct"])
+            if s.get("confidence_pct"): confidence_scores.append(s["confidence_pct"])
         avg_confidence = sum(confidence_scores) / len(confidence_scores)
 
-        # Final
         stage4_final = {}
         if openai_key:
             try:
-                final_prompt = f"""أنت محلل مبيعات أول. قدم التقرير النهائي المعتمد بالعربية.
-البيانات: {json.dumps(code_result, ensure_ascii=False)}
+                final_prompt = f"""أنت محلل مبيعات أول في السوق السعودي. قدم التقرير النهائي بالعربية.
+البيانات: {json.dumps(code_result["summary"], ensure_ascii=False)}
+المرتجعات: {json.dumps(code_result["returns_analysis"], ensure_ascii=False)}
+مقارنة السوق: {json.dumps(code_result["market_comparison"], ensure_ascii=False)}
 أجب بـ JSON فقط:
-{{"executive_summary": "ملخص تنفيذي", "strengths": ["قوة 1", "قوة 2"],
-  "weaknesses": ["ضعف 1", "ضعف 2"], "opportunities": ["فرصة 1", "فرصة 2"],
+{{"executive_summary": "ملخص تنفيذي شامل",
+  "strengths": ["قوة 1", "قوة 2"],
+  "weaknesses": ["ضعف 1", "ضعف 2"],
+  "returns_verdict": "حكم نهائي على المرتجعات: هل النسبة طبيعية أم تحتاج تدخل",
+  "market_position": "موقع الشركة مقارنة بالسوق",
+  "opportunities": ["فرصة 1", "فرصة 2"],
   "threats": ["تهديد 1", "تهديد 2"],
   "action_plan": [{{"priority": "عالية", "action": "إجراء", "timeline": "المدة"}}],
-  "final_confidence_pct": 92, "sales_health": "جيد"}}"""
+  "final_confidence_pct": 92,
+  "sales_health": "جيد/ممتاز/ضعيف"}}"""
                 stage4_final = await analyze_with_openai(code_result, openai_key, final_prompt)
             except Exception:
                 stage4_final = {}
@@ -1253,11 +1406,11 @@ async def unit3_multistage(file: UploadFile = File(...)):
             "success": True,
             "unit": 3,
             "filename": file.filename,
-            "rows_analyzed": num_transactions,
+            "rows_analyzed": num_total,
             "stages": {
-                "stage1_code": {"description": "تحليل الكود للمبيعات", "data": code_result, "confidence_pct": 90},
+                "stage1_code": {"description": "تحليل الكود", "data": code_result, "confidence_pct": 90},
                 "stage1_ai": {"description": "تحليل AI", "claude": stage1_ai, "gpt4": stage1_gpt, "gemini": stage1_gemini, "platforms_used": platforms},
-                "stage3_review": {"description": "مراجعة شاملة", "review": stage3_review},
+                "stage3_review": {"description": "مراجعة شاملة"},
                 "stage4_final": {"description": "التقرير النهائي", "report": stage4_final, "final_confidence_pct": stage4_final.get("final_confidence_pct", avg_confidence)}
             },
             "final_result": {
@@ -1271,13 +1424,5 @@ async def unit3_multistage(file: UploadFile = File(...)):
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
-
-
-# ═══════════════════════════════════════════════════════════
-# UNIT 3: تحليل المبيعات
-# يقبل ملف Excel يحتوي على بيانات المبيعات
-# ويحللها بنظام 4 مراحل مع KPIs ونسب النمو
-# ═══════════════════════════════════════════════════════════
-
 
 
