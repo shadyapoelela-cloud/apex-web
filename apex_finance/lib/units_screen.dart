@@ -1,4 +1,6 @@
-﻿import 'unit2_screen.dart';
+﻿import 'unit3_screen.dart';
+import 'unit3_screen.dart';
+import 'unit2_screen.dart';
 import 'package:flutter/material.dart';
 import 'main.dart';
 import 'multistage_screen.dart';
@@ -24,7 +26,7 @@ class UnitsScreen extends StatelessWidget {
           const SizedBox(height: 14),
           _UnitCard(unit: '2', title: 'إرفاق القوائم المالية المعتمدة', subtitle: 'ارفع قوائمك المعتمدة واحصل على تحليل فوري', icon: Icons.upload_file_rounded, color: AC.cyan, features: const ['رفع قائمة الدخل','رفع الميزانية العمومية','رفع قائمة التدفقات النقدية','تحليل مالي كامل + توصيات'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit2Screen()))),
           const SizedBox(height: 14),
-          _UnitCard(unit: '3', title: 'تحليل المبيعات', subtitle: 'نسب ومتوسطات ومؤشرات أداء المبيعات', icon: Icons.trending_up_rounded, color: AC.success, features: const ['مؤشرات أداء المبيعات KPIs','متوسطات ونسب النمو','مقارنات السوق حسب الدولة','تحليل حسب النشاط التجاري'], status: 'قريباً', statusColor: AC.warning, onTap: () => _showSoon(context, 'تحليل المبيعات')),
+          _UnitCard(unit: '3', title: 'تحليل المبيعات', subtitle: 'نسب ومتوسطات ومؤشرات أداء المبيعات', icon: Icons.trending_up_rounded, color: AC.success, features: const ['مؤشرات أداء المبيعات KPIs','متوسطات ونسب النمو','مقارنات السوق حسب الدولة','تحليل حسب النشاط التجاري'], status: 'متاح', statusColor: AC.success, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Unit3Screen()))),
           const SizedBox(height: 14),
           _UnitCard(unit: '4', title: 'تحليل الجرد', subtitle: 'مقارنة الجرد الفعلي بالمخزني وتحليل الانحرافات', icon: Icons.inventory_2_rounded, color: AC.warning, features: const ['نسب الانحراف في قيمة المخزون','معدل دوران المخزون','عدد أيام المخزون','المخاطر والنصائح'], status: 'قريباً', statusColor: AC.warning, onTap: () => _showSoon(context, 'تحليل الجرد')),
           const SizedBox(height: 24),
@@ -111,5 +113,7 @@ class _MiniCard extends StatelessWidget {
           child: Icon(icon, color: color, size: 18))])));
   }
 }
+
+
 
 
