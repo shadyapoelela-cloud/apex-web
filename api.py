@@ -1042,3 +1042,453 @@ async def unit2_multistage(file: UploadFile = File(...)):
 # Gemini 2.0 flash 001 active
 
 
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 3: تحليل المبيعات
+# يقبل ملف Excel يحتوي على بيانات المبيعات
+# ويحللها بنظام 4 مراحل مع KPIs ونسب النمو
+# ═══════════════════════════════════════════════════════════
+
+@app.post("/unit3/analyze/multistage")
+async def unit3_multistage(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
+        raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو CSV")
+    try:
+        import tempfile, os, json, warnings, traceback
+        import pandas as pd
+        warnings.filterwarnings("ignore")
+
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        if suffix == '.csv':
+            df = pd.read_csv(tmp_path)
+        else:
+            df = pd.read_excel(tmp_path)
+        os.unlink(tmp_path)
+
+        cols = [c.lower().strip() for c in df.columns]
+        df.columns = cols
+
+        def find_col(keywords):
+            for kw in keywords:
+                for c in cols:
+                    if kw in c:
+                        return c
+            return None
+
+        sales_col = find_col(["مبيعات", "إيرادات", "sales", "revenue", "amount", "المبلغ", "قيمة"])
+        date_col = find_col(["تاريخ", "date", "شهر", "month", "فترة", "period"])
+        product_col = find_col(["منتج", "صنف", "product", "item", "بند"])
+        qty_col = find_col(["كمية", "quantity", "qty", "عدد"])
+        cost_col = find_col(["تكلفة", "cost", "كلفة"])
+        client_col = find_col(["عميل", "customer", "client", "زبون"])
+        region_col = find_col(["منطقة", "region", "فرع", "branch", "مدينة", "city"])
+
+        total_sales = float(df[sales_col].sum()) if sales_col else 0
+        avg_sale = float(df[sales_col].mean()) if sales_col else 0
+        max_sale = float(df[sales_col].max()) if sales_col else 0
+        min_sale = float(df[sales_col].min()) if sales_col else 0
+        num_transactions = len(df)
+
+        total_qty = float(df[qty_col].sum()) if qty_col else 0
+        total_cost = float(df[cost_col].sum()) if cost_col else 0
+        gross_profit = total_sales - total_cost if total_cost > 0 else 0
+        gross_margin = round(gross_profit / total_sales * 100, 2) if total_sales else 0
+        avg_price_per_unit = round(total_sales / total_qty, 2) if total_qty else 0
+
+        monthly_sales = {}
+        if date_col and sales_col:
+            df["_date"] = pd.to_datetime(df[date_col], errors="coerce")
+            df["_month"] = df["_date"].dt.to_period("M").astype(str)
+            monthly_sales = df.groupby("_month")[sales_col].sum().to_dict()
+            monthly_sales = {k: round(float(v), 2) for k, v in monthly_sales.items()}
+
+        monthly_growth = {}
+        months = sorted(monthly_sales.keys())
+        for i in range(1, len(months)):
+            prev = monthly_sales[months[i-1]]
+            curr = monthly_sales[months[i]]
+            if prev > 0:
+                monthly_growth[months[i]] = round((curr - prev) / prev * 100, 2)
+
+        top_products = {}
+        if product_col and sales_col:
+            top_products = df.groupby(product_col)[sales_col].sum().nlargest(10).to_dict()
+            top_products = {str(k): round(float(v), 2) for k, v in top_products.items()}
+
+        top_clients = {}
+        if client_col and sales_col:
+            top_clients = df.groupby(client_col)[sales_col].sum().nlargest(10).to_dict()
+            top_clients = {str(k): round(float(v), 2) for k, v in top_clients.items()}
+
+        region_sales = {}
+        if region_col and sales_col:
+            region_sales = df.groupby(region_col)[sales_col].sum().to_dict()
+            region_sales = {str(k): round(float(v), 2) for k, v in region_sales.items()}
+
+        avg_growth = round(sum(monthly_growth.values()) / len(monthly_growth), 2) if monthly_growth else 0
+
+        code_result = {
+            "summary": {
+                "total_sales": round(total_sales, 2),
+                "avg_sale": round(avg_sale, 2),
+                "max_sale": round(max_sale, 2),
+                "min_sale": round(min_sale, 2),
+                "num_transactions": num_transactions,
+                "total_quantity": round(total_qty, 2),
+                "total_cost": round(total_cost, 2),
+                "gross_profit": round(gross_profit, 2),
+                "gross_margin_pct": gross_margin,
+                "avg_price_per_unit": avg_price_per_unit,
+                "avg_monthly_growth_pct": avg_growth
+            },
+            "kpis": {
+                "total_revenue": round(total_sales, 2),
+                "gross_margin_pct": gross_margin,
+                "avg_transaction_value": round(avg_sale, 2),
+                "transactions_count": num_transactions,
+                "avg_monthly_growth_pct": avg_growth,
+                "revenue_per_unit": avg_price_per_unit
+            },
+            "monthly_sales": monthly_sales,
+            "monthly_growth": monthly_growth,
+            "top_products": top_products,
+            "top_clients": top_clients,
+            "region_sales": region_sales,
+            "columns_detected": {
+                "sales": sales_col, "date": date_col, "product": product_col,
+                "quantity": qty_col, "cost": cost_col, "client": client_col, "region": region_col
+            },
+            "source": "code",
+            "confidence_pct": 90
+        }
+
+        # AI Analysis (GPT-4 + Gemini + Claude)
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+
+        ai_prompt = f"""أنت محلل مبيعات خبير. حلل بيانات المبيعات التالية وأعطِ تحليلاً شاملاً بالعربية.
+البيانات: {json.dumps(code_result, ensure_ascii=False)}
+أجب بـ JSON فقط:
+{{"summary": "ملخص أداء المبيعات", "key_findings": ["نتيجة 1", "نتيجة 2", "نتيجة 3"],
+  "trends": ["اتجاه 1", "اتجاه 2"], "risks": ["خطر 1", "خطر 2"],
+  "recommendations": ["توصية 1", "توصية 2", "توصية 3"],
+  "confidence_pct": 90, "sales_rating": "ممتاز/جيد/ضعيف"}}"""
+
+        stage1_gpt = {}
+        stage1_gemini = {}
+        stage1_ai = {}
+
+        if openai_key:
+            try:
+                stage1_gpt = await analyze_with_openai(code_result, openai_key, ai_prompt)
+                stage1_gpt["source"] = "gpt4_initial"
+            except Exception:
+                stage1_gpt = {"error": "GPT-4 unavailable", "source": "gpt4_failed"}
+
+        if google_key:
+            try:
+                stage1_gemini = await analyze_with_gemini(code_result, google_key, ai_prompt)
+                stage1_gemini["source"] = "gemini_initial"
+            except Exception:
+                stage1_gemini = {"error": "Gemini unavailable", "source": "gemini_failed"}
+
+        if anthropic_key:
+            try:
+                stage1_ai = await analyze_with_claude(code_result, anthropic_key, "initial")
+                stage1_ai["source"] = "claude_initial"
+            except Exception:
+                stage1_ai = {"error": "Claude unavailable", "source": "claude_failed"}
+
+        # Review stage
+        stage3_review = {}
+        api_key = anthropic_key or ""
+        if api_key and (stage1_gpt or stage1_gemini or stage1_ai):
+            try:
+                combined = {"code": code_result, "gpt4": stage1_gpt, "gemini": stage1_gemini, "claude": stage1_ai}
+                stage3_review = await analyze_with_claude(combined, api_key, "review")
+            except Exception:
+                stage3_review = {}
+
+        # Confidence
+        confidence_scores = [90]
+        for s in [stage1_gpt, stage1_gemini, stage1_ai]:
+            if s.get("confidence_pct"):
+                confidence_scores.append(s["confidence_pct"])
+        avg_confidence = sum(confidence_scores) / len(confidence_scores)
+
+        # Final
+        stage4_final = {}
+        if openai_key:
+            try:
+                final_prompt = f"""أنت محلل مبيعات أول. قدم التقرير النهائي المعتمد بالعربية.
+البيانات: {json.dumps(code_result, ensure_ascii=False)}
+أجب بـ JSON فقط:
+{{"executive_summary": "ملخص تنفيذي", "strengths": ["قوة 1", "قوة 2"],
+  "weaknesses": ["ضعف 1", "ضعف 2"], "opportunities": ["فرصة 1", "فرصة 2"],
+  "threats": ["تهديد 1", "تهديد 2"],
+  "action_plan": [{{"priority": "عالية", "action": "إجراء", "timeline": "المدة"}}],
+  "final_confidence_pct": 92, "sales_health": "جيد"}}"""
+                stage4_final = await analyze_with_openai(code_result, openai_key, final_prompt)
+            except Exception:
+                stage4_final = {}
+
+        platforms = [p for p in [
+            "claude" if stage1_ai and "error" not in stage1_ai else "",
+            "gpt4" if stage1_gpt and "error" not in stage1_gpt else "",
+            "gemini" if stage1_gemini and "error" not in stage1_gemini else ""
+        ] if p]
+
+        return {
+            "success": True,
+            "unit": 3,
+            "filename": file.filename,
+            "rows_analyzed": num_transactions,
+            "stages": {
+                "stage1_code": {"description": "تحليل الكود للمبيعات", "data": code_result, "confidence_pct": 90},
+                "stage1_ai": {"description": "تحليل AI", "claude": stage1_ai, "gpt4": stage1_gpt, "gemini": stage1_gemini, "platforms_used": platforms},
+                "stage3_review": {"description": "مراجعة شاملة", "review": stage3_review},
+                "stage4_final": {"description": "التقرير النهائي", "report": stage4_final, "final_confidence_pct": stage4_final.get("final_confidence_pct", avg_confidence)}
+            },
+            "final_result": {
+                "data": code_result,
+                "ai_analysis": stage4_final,
+                "confidence_pct": round(avg_confidence, 1),
+                "quality_label": "ممتاز" if avg_confidence >= 95 else "جيد" if avg_confidence >= 85 else "يحتاج مراجعة"
+            }
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
+
+# ═══════════════════════════════════════════════════════════
+# UNIT 3: تحليل المبيعات
+# يقبل ملف Excel يحتوي على بيانات المبيعات
+# ويحللها بنظام 4 مراحل مع KPIs ونسب النمو
+# ═══════════════════════════════════════════════════════════
+
+@app.post("/unit3/analyze/multistage")
+async def unit3_multistage(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
+        raise HTTPException(status_code=400, detail="يُقبل ملفات Excel أو CSV")
+    try:
+        import tempfile, os, json, warnings, traceback
+        import pandas as pd
+        warnings.filterwarnings("ignore")
+
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        if suffix == '.csv':
+            df = pd.read_csv(tmp_path)
+        else:
+            df = pd.read_excel(tmp_path)
+        os.unlink(tmp_path)
+
+        cols = [c.lower().strip() for c in df.columns]
+        df.columns = cols
+
+        def find_col(keywords):
+            for kw in keywords:
+                for c in cols:
+                    if kw in c:
+                        return c
+            return None
+
+        sales_col = find_col(["مبيعات", "إيرادات", "sales", "revenue", "amount", "المبلغ", "قيمة"])
+        date_col = find_col(["تاريخ", "date", "شهر", "month", "فترة", "period"])
+        product_col = find_col(["منتج", "صنف", "product", "item", "بند"])
+        qty_col = find_col(["كمية", "quantity", "qty", "عدد"])
+        cost_col = find_col(["تكلفة", "cost", "كلفة"])
+        client_col = find_col(["عميل", "customer", "client", "زبون"])
+        region_col = find_col(["منطقة", "region", "فرع", "branch", "مدينة", "city"])
+
+        total_sales = float(df[sales_col].sum()) if sales_col else 0
+        avg_sale = float(df[sales_col].mean()) if sales_col else 0
+        max_sale = float(df[sales_col].max()) if sales_col else 0
+        min_sale = float(df[sales_col].min()) if sales_col else 0
+        num_transactions = len(df)
+
+        total_qty = float(df[qty_col].sum()) if qty_col else 0
+        total_cost = float(df[cost_col].sum()) if cost_col else 0
+        gross_profit = total_sales - total_cost if total_cost > 0 else 0
+        gross_margin = round(gross_profit / total_sales * 100, 2) if total_sales else 0
+        avg_price_per_unit = round(total_sales / total_qty, 2) if total_qty else 0
+
+        monthly_sales = {}
+        if date_col and sales_col:
+            df["_date"] = pd.to_datetime(df[date_col], errors="coerce")
+            df["_month"] = df["_date"].dt.to_period("M").astype(str)
+            monthly_sales = df.groupby("_month")[sales_col].sum().to_dict()
+            monthly_sales = {k: round(float(v), 2) for k, v in monthly_sales.items()}
+
+        monthly_growth = {}
+        months = sorted(monthly_sales.keys())
+        for i in range(1, len(months)):
+            prev = monthly_sales[months[i-1]]
+            curr = monthly_sales[months[i]]
+            if prev > 0:
+                monthly_growth[months[i]] = round((curr - prev) / prev * 100, 2)
+
+        top_products = {}
+        if product_col and sales_col:
+            top_products = df.groupby(product_col)[sales_col].sum().nlargest(10).to_dict()
+            top_products = {str(k): round(float(v), 2) for k, v in top_products.items()}
+
+        top_clients = {}
+        if client_col and sales_col:
+            top_clients = df.groupby(client_col)[sales_col].sum().nlargest(10).to_dict()
+            top_clients = {str(k): round(float(v), 2) for k, v in top_clients.items()}
+
+        region_sales = {}
+        if region_col and sales_col:
+            region_sales = df.groupby(region_col)[sales_col].sum().to_dict()
+            region_sales = {str(k): round(float(v), 2) for k, v in region_sales.items()}
+
+        avg_growth = round(sum(monthly_growth.values()) / len(monthly_growth), 2) if monthly_growth else 0
+
+        code_result = {
+            "summary": {
+                "total_sales": round(total_sales, 2),
+                "avg_sale": round(avg_sale, 2),
+                "max_sale": round(max_sale, 2),
+                "min_sale": round(min_sale, 2),
+                "num_transactions": num_transactions,
+                "total_quantity": round(total_qty, 2),
+                "total_cost": round(total_cost, 2),
+                "gross_profit": round(gross_profit, 2),
+                "gross_margin_pct": gross_margin,
+                "avg_price_per_unit": avg_price_per_unit,
+                "avg_monthly_growth_pct": avg_growth
+            },
+            "kpis": {
+                "total_revenue": round(total_sales, 2),
+                "gross_margin_pct": gross_margin,
+                "avg_transaction_value": round(avg_sale, 2),
+                "transactions_count": num_transactions,
+                "avg_monthly_growth_pct": avg_growth,
+                "revenue_per_unit": avg_price_per_unit
+            },
+            "monthly_sales": monthly_sales,
+            "monthly_growth": monthly_growth,
+            "top_products": top_products,
+            "top_clients": top_clients,
+            "region_sales": region_sales,
+            "columns_detected": {
+                "sales": sales_col, "date": date_col, "product": product_col,
+                "quantity": qty_col, "cost": cost_col, "client": client_col, "region": region_col
+            },
+            "source": "code",
+            "confidence_pct": 90
+        }
+
+        # AI Analysis (GPT-4 + Gemini + Claude)
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+
+        ai_prompt = f"""أنت محلل مبيعات خبير. حلل بيانات المبيعات التالية وأعطِ تحليلاً شاملاً بالعربية.
+البيانات: {json.dumps(code_result, ensure_ascii=False)}
+أجب بـ JSON فقط:
+{{"summary": "ملخص أداء المبيعات", "key_findings": ["نتيجة 1", "نتيجة 2", "نتيجة 3"],
+  "trends": ["اتجاه 1", "اتجاه 2"], "risks": ["خطر 1", "خطر 2"],
+  "recommendations": ["توصية 1", "توصية 2", "توصية 3"],
+  "confidence_pct": 90, "sales_rating": "ممتاز/جيد/ضعيف"}}"""
+
+        stage1_gpt = {}
+        stage1_gemini = {}
+        stage1_ai = {}
+
+        if openai_key:
+            try:
+                stage1_gpt = await analyze_with_openai(code_result, openai_key, ai_prompt)
+                stage1_gpt["source"] = "gpt4_initial"
+            except Exception:
+                stage1_gpt = {"error": "GPT-4 unavailable", "source": "gpt4_failed"}
+
+        if google_key:
+            try:
+                stage1_gemini = await analyze_with_gemini(code_result, google_key, ai_prompt)
+                stage1_gemini["source"] = "gemini_initial"
+            except Exception:
+                stage1_gemini = {"error": "Gemini unavailable", "source": "gemini_failed"}
+
+        if anthropic_key:
+            try:
+                stage1_ai = await analyze_with_claude(code_result, anthropic_key, "initial")
+                stage1_ai["source"] = "claude_initial"
+            except Exception:
+                stage1_ai = {"error": "Claude unavailable", "source": "claude_failed"}
+
+        # Review stage
+        stage3_review = {}
+        api_key = anthropic_key or ""
+        if api_key and (stage1_gpt or stage1_gemini or stage1_ai):
+            try:
+                combined = {"code": code_result, "gpt4": stage1_gpt, "gemini": stage1_gemini, "claude": stage1_ai}
+                stage3_review = await analyze_with_claude(combined, api_key, "review")
+            except Exception:
+                stage3_review = {}
+
+        # Confidence
+        confidence_scores = [90]
+        for s in [stage1_gpt, stage1_gemini, stage1_ai]:
+            if s.get("confidence_pct"):
+                confidence_scores.append(s["confidence_pct"])
+        avg_confidence = sum(confidence_scores) / len(confidence_scores)
+
+        # Final
+        stage4_final = {}
+        if openai_key:
+            try:
+                final_prompt = f"""أنت محلل مبيعات أول. قدم التقرير النهائي المعتمد بالعربية.
+البيانات: {json.dumps(code_result, ensure_ascii=False)}
+أجب بـ JSON فقط:
+{{"executive_summary": "ملخص تنفيذي", "strengths": ["قوة 1", "قوة 2"],
+  "weaknesses": ["ضعف 1", "ضعف 2"], "opportunities": ["فرصة 1", "فرصة 2"],
+  "threats": ["تهديد 1", "تهديد 2"],
+  "action_plan": [{{"priority": "عالية", "action": "إجراء", "timeline": "المدة"}}],
+  "final_confidence_pct": 92, "sales_health": "جيد"}}"""
+                stage4_final = await analyze_with_openai(code_result, openai_key, final_prompt)
+            except Exception:
+                stage4_final = {}
+
+        platforms = [p for p in [
+            "claude" if stage1_ai and "error" not in stage1_ai else "",
+            "gpt4" if stage1_gpt and "error" not in stage1_gpt else "",
+            "gemini" if stage1_gemini and "error" not in stage1_gemini else ""
+        ] if p]
+
+        return {
+            "success": True,
+            "unit": 3,
+            "filename": file.filename,
+            "rows_analyzed": num_transactions,
+            "stages": {
+                "stage1_code": {"description": "تحليل الكود للمبيعات", "data": code_result, "confidence_pct": 90},
+                "stage1_ai": {"description": "تحليل AI", "claude": stage1_ai, "gpt4": stage1_gpt, "gemini": stage1_gemini, "platforms_used": platforms},
+                "stage3_review": {"description": "مراجعة شاملة", "review": stage3_review},
+                "stage4_final": {"description": "التقرير النهائي", "report": stage4_final, "final_confidence_pct": stage4_final.get("final_confidence_pct", avg_confidence)}
+            },
+            "final_result": {
+                "data": code_result,
+                "ai_analysis": stage4_final,
+                "confidence_pct": round(avg_confidence, 1),
+                "quality_label": "ممتاز" if avg_confidence >= 95 else "جيد" if avg_confidence >= 85 else "يحتاج مراجعة"
+            }
+        }
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
