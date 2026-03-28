@@ -621,7 +621,7 @@ async def analyze_with_claude(financial_data: dict, api_key: str, stage: str) ->
   "red_flags": []}}"""
 
     message = client.messages.create(
-        model="claude-opus-4-5",
+        model="claude-sonnet-4-20250514",
         max_tokens=2000,
         messages=[{"role": "user", "content": prompt}]
     )
@@ -668,8 +668,11 @@ async def unit1_multistage(file: UploadFile = File(...)):
         api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         stage1_ai = {}
         if api_key:
-            stage1_ai = await analyze_with_claude(code_result, api_key, "initial")
-            stage1_ai["source"] = "claude_initial"
+            try:
+                stage1_ai = await analyze_with_claude(code_result, api_key, "initial")
+                stage1_ai["source"] = "claude_initial"
+            except Exception as ai_err:
+                stage1_ai = {"error": str(ai_err), "source": "claude_failed"}
 
         # ═══════════════════════════════════════════
         # المرحلة الثالثة: مراجعة شاملة
@@ -681,7 +684,10 @@ async def unit1_multistage(file: UploadFile = File(...)):
                 "ai_initial": stage1_ai,
                 "financial_data": code_result
             }
-            stage3_review = await analyze_with_claude(combined, api_key, "review")
+            try:
+                stage3_review = await analyze_with_claude(combined, api_key, "review")
+            except Exception:
+                stage3_review = {}
 
         # ═══════════════════════════════════════════
         # المرحلة الرابعة: الاستقرار على النتيجة النهائية
@@ -717,7 +723,10 @@ async def unit1_multistage(file: UploadFile = File(...)):
                 "review_summary": stage3_review,
                 "confidence_achieved": avg_confidence
             }
-            stage4_final = await analyze_with_claude(final_data, api_key, "final")
+            try:
+                stage4_final = await analyze_with_claude(final_data, api_key, "final")
+            except Exception:
+                stage4_final = {}
 
         return {
             "success": True,
@@ -759,3 +768,4 @@ async def unit1_multistage(file: UploadFile = File(...)):
     except Exception as e:
         import traceback
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
+
