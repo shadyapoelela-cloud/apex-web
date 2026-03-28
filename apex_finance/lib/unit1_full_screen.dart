@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -30,6 +31,11 @@ class _Unit1FullScreenState extends State<Unit1FullScreen> {
     {'text': 'راجع التبويبات مع المعايير السعودية (SOCPA) و IFRS', 'important': true},
     {'text': 'لا تترك خلايا فارغة — ضع صفر بدلاً منها', 'important': false},
   ];
+
+  void _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) { await launchUrl(uri, mode: LaunchMode.externalApplication); }
+  }
 
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['xlsx', 'xls'], withData: true);
@@ -139,34 +145,32 @@ class _Unit1FullScreenState extends State<Unit1FullScreen> {
   // ─── الخطوة 0: الملاحظات ───
   Widget _buildNotesStep() {
     return Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-      const Text('ملاحظات هامة قبل التعبئة', textDirection: TextDirection.rtl,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AC.gold, fontFamily: 'Tajawal')),
-      const SizedBox(height: 4),
-      const Text('التزم بهذه الملاحظات للحصول على نتائج بدقة 95%+', textDirection: TextDirection.rtl,
-        style: TextStyle(fontSize: 12, color: AC.textSecondary, fontFamily: 'Tajawal')),
-      const SizedBox(height: 14),
-      ..._notes.map((n) => Padding(padding: const EdgeInsets.only(bottom: 8),
-        child: Container(padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: n['important'] == true ? AC.gold.withOpacity(0.3) : AC.border)),
-          child: Row(children: [
-            if (n['important'] == true)
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-                child: const Text('مهم', style: TextStyle(fontSize: 9, color: AC.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.w700))),
-            const Spacer(),
-            Flexible(child: Text(n['text'] as String, textDirection: TextDirection.rtl,
-              style: TextStyle(fontSize: 13, color: n['important'] == true ? AC.textPrimary : AC.textSecondary, fontFamily: 'Tajawal'))),
-            const SizedBox(width: 8),
-            Icon(n['important'] == true ? Icons.warning_amber_rounded : Icons.info_outline_rounded,
-              color: n['important'] == true ? AC.gold : AC.textHint, size: 18),
-          ])))),
+      // بانر الخطوة الأولى
+      Container(width: double.infinity, padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.gold.withOpacity(0.1), AC.navy3]), borderRadius: BorderRadius.circular(16), border: Border.all(color: AC.gold.withOpacity(0.3))),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          const Text('إعداد القوائم المالية', textDirection: TextDirection.rtl,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AC.gold, fontFamily: 'Tajawal')),
+          const SizedBox(height: 8),
+          const Text('قائمة الدخل + الميزانية العمومية + التدفقات النقدية + 16 نسبة مالية\\nتحليل متعدد المراحل بدقة 95%+ باستخدام GPT-4 و Gemini',
+            textDirection: TextDirection.rtl,
+            style: TextStyle(fontSize: 12, color: AC.textSecondary, fontFamily: 'Tajawal', height: 1.6)),
+        ])),
       const SizedBox(height: 16),
-      // زر تحميل النموذج
+      // أزرار التحميل
+      GestureDetector(
+        onTap: () { _launchUrl('https://apex-api-ootk.onrender.com/unit1/notes-pdf'); },
+        child: Container(width: double.infinity, height: 48, margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(color: AC.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.gold.withOpacity(0.3))),
+          child: const Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(Icons.picture_as_pdf_rounded, color: AC.gold, size: 20),
+            SizedBox(width: 8),
+            Text('تحميل ملاحظات التعبئة (PDF)', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'Tajawal')),
+          ])))),
       GestureDetector(
         onTap: () {},
         child: Container(width: double.infinity, height: 48,
-          decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.cyan.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AC.cyan.withOpacity(0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.cyan.withOpacity(0.3))),
           child: const Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Icon(Icons.download_rounded, color: AC.cyan, size: 20),
             SizedBox(width: 8),
@@ -469,6 +473,8 @@ class _Unit1FullScreenState extends State<Unit1FullScreen> {
       ]));
   }
 }
+
+
 
 
 

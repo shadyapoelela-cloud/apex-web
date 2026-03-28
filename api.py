@@ -2094,3 +2094,96 @@ async def unit1_evaluate_tabs(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
 
 
+
+
+# ═══════════════════════════════════════════════════════════
+# نموذج ملاحظات التعبئة - PDF
+# ═══════════════════════════════════════════════════════════
+@app.get("/unit1/notes-pdf")
+async def unit1_notes_pdf():
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.colors import HexColor
+    import tempfile, os
+    from starlette.responses import FileResponse
+
+    try:
+        pdfmetrics.registerFont(TTFont("Amiri", "Amiri-Regular.ttf"))
+        font = "Amiri"
+    except:
+        font = "Helvetica"
+
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    c = canvas.Canvas(tmp.name, pagesize=A4)
+    w, h = A4
+
+    # خلفية
+    c.setFillColor(HexColor("#0A1628"))
+    c.rect(0, 0, w, h, fill=1)
+
+    # عنوان
+    c.setFillColor(HexColor("#D4A84B"))
+    c.setFont(font, 22)
+    c.drawRightString(w - 50, h - 60, "APEX Financial Platform")
+    c.setFont(font, 16)
+    c.drawRightString(w - 50, h - 90, "ملاحظات تعبئة نموذج ميزان المراجعة المعتمد")
+
+    c.setStrokeColor(HexColor("#D4A84B"))
+    c.line(50, h - 105, w - 50, h - 105)
+
+    notes = [
+        ("مهم", "استخدم نموذج ميزان المراجعة المعتمد من المنصة فقط"),
+        ("مهم", "عمود B: تبويب الحساب طبقاً لمعايير IFRS و SOCPA"),
+        ("مهم", "عمود C: اسم الحساب كما هو مسجل في دفاترك المحاسبية"),
+        ("", "عمود D: رصيد أول المدة — مدين"),
+        ("", "عمود E: رصيد أول المدة — دائن"),
+        ("", "عمود F: حركة المدين خلال الفترة المالية"),
+        ("", "عمود G: حركة الدائن خلال الفترة المالية"),
+        ("مهم", "تأكد من توازن إجمالي المدين مع إجمالي الدائن في كل عمود"),
+        ("", "أدخل بيانات 12 شهراً كاملة للحصول على نتائج أدق"),
+        ("مهم", "راجع التبويبات مع المعايير المحاسبية الدولية IFRS والسعودية SOCPA"),
+        ("", "لا تترك خلايا فارغة — ضع صفر (0) بدلاً منها"),
+        ("مهم", "لا تدمج أي خلايا في الملف — كل حساب في صف مستقل"),
+        ("", "تأكد من أن اسم الحساب واضح ومحدد (مثال: بنك الراجحي بدلاً من بنك)"),
+        ("مهم", "ابدأ البيانات من الصف رقم 7 — الصفوف 1-6 مخصصة لمعلومات الشركة"),
+        ("", "أدخل اسم الشركة والسنة المالية في الصفوف العلوية من النموذج"),
+    ]
+
+    y = h - 135
+    for tag, text in notes:
+        if y < 80:
+            c.showPage()
+            c.setFillColor(HexColor("#0A1628"))
+            c.rect(0, 0, w, h, fill=1)
+            y = h - 50
+
+        if tag == "مهم":
+            c.setFillColor(HexColor("#D4A84B"))
+            c.roundRect(50, y - 5, 35, 18, 4, fill=1)
+            c.setFillColor(HexColor("#0A1628"))
+            c.setFont(font, 8)
+            c.drawCentredString(67.5, y, "مهم")
+            c.setFillColor(HexColor("#FFFFFF"))
+        else:
+            c.setFillColor(HexColor("#8899AA"))
+            c.circle(62, y + 5, 3, fill=1)
+            c.setFillColor(HexColor("#CCCCCC"))
+
+        c.setFont(font, 11)
+        c.drawRightString(w - 50, y, text)
+        y -= 30
+
+    # تذييل
+    y -= 20
+    c.setStrokeColor(HexColor("#D4A84B"))
+    c.line(50, y, w - 50, y)
+    y -= 25
+    c.setFillColor(HexColor("#D4A84B"))
+    c.setFont(font, 10)
+    c.drawRightString(w - 50, y, "APEX Financial Platform — منصة أبكس للتحليل المالي")
+    c.drawString(50, y, "www.apex-finance.sa")
+
+    c.save()
+    return FileResponse(tmp.name, filename="APEX_Notes_Guidelines.pdf", media_type="application/pdf")
