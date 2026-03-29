@@ -16,13 +16,14 @@ from app.core.constants import (
 
 class BalanceSheetBuilder:
 
-    def build(self, classified_rows: list, net_profit: float = 0.0) -> dict:
+    def build(self, classified_rows: list, net_profit: float = 0.0, closing_inventory_override: float = None) -> dict:
         """
         Build balance sheet from classified rows.
 
         Args:
             classified_rows: rows with normalized_class
             net_profit: from income statement (for equity completeness)
+            closing_inventory_override: مخزون آخر المدة الفعلي (من الجرد) — للجرد الدوري
         """
         warnings = []
 
@@ -71,6 +72,19 @@ class BalanceSheetBuilder:
                 current_assets_detail[cls_name] = round(val, 2)
 
         total_current_assets = sum(current_assets_detail.values())
+
+        # Override inventory if provided (periodic system)
+        if closing_inventory_override is not None:
+            # Replace existing inventory with override value
+            old_inv = current_assets_detail.get("inventory", 0)
+            current_assets_detail["inventory"] = round(closing_inventory_override, 2)
+            total_current_assets = sum(current_assets_detail.values())
+            if old_inv != closing_inventory_override:
+                warnings.append({
+                    "code": "BS_INVENTORY_OVERRIDE",
+                    "severity": "INFO",
+                    "message": f"تم استبدال مخزون الميزانية ({old_inv:,.0f}) بمخزون آخر المدة الفعلي ({closing_inventory_override:,.0f}) من الجرد الدوري",
+                })
 
         # ─── Non-Current Assets ───
         nca_classes = get_non_current_assets()
