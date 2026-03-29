@@ -85,15 +85,14 @@ class IncomeStatementBuilder:
             inv_source = "trial_balance"
 
         # COGS calculation
-        if cogs_direct > 0 and purchases == 0:
-            # Direct COGS (perpetual system)
-            cogs = cogs_direct
-            cogs_method = "direct"
-        elif purchases > 0:
+        if purchases > 0:
             # Periodic system: COGS = opening + net_purchases - closing
             net_purchases = purchases - purchases_returns + freight_in
             cogs = opening_inventory + net_purchases - closing_inventory
             cogs_method = f"periodic_{inv_source}"
+            if cogs_direct > 0:
+                cogs += cogs_direct  # Add any direct COGS items too
+                cogs_method = f"periodic_plus_direct_{inv_source}"
             if closing_inventory_override is not None:
                 warnings.append({
                     "code": "PERIODIC_CLOSING_INV_USED",
@@ -106,6 +105,10 @@ class IncomeStatementBuilder:
                     "severity": "WARNING",
                     "message": "تكلفة البضاعة المباعة محسوبة بدون بيانات مخزون أول وآخر المدة",
                 })
+        elif cogs_direct > 0:
+            # Perpetual system: direct COGS
+            cogs = cogs_direct
+            cogs_method = "direct"
         else:
             cogs = 0
             cogs_method = "none"
