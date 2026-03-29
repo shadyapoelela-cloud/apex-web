@@ -2195,3 +2195,25 @@ async def unit1_notes_pdf():
     return FileResponse(tmp.name, filename="APEX_Notes_Guidelines.pdf", media_type="application/pdf")
 
 
+
+
+# ═══════════════════════════════════════════════════════════
+# تحميل نماذج ميزان المراجعة المعتمدة
+# ═══════════════════════════════════════════════════════════
+@app.get("/unit1/template/ar")
+async def download_template_ar():
+    from starlette.responses import FileResponse
+    import os
+    path = os.path.join(os.path.dirname(__file__), "templates", "APEX_Template_AR.xlsx")
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="النموذج العربي غير متاح")
+    return FileResponse(path, filename="APEX_نموذج_ميزان_المراجعة_المعتمد.xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+@app.get("/unit1/template/en")
+async def download_template_en():
+    from starlette.responses import FileResponse
+    import os
+    path = os.path.join(os.path.dirname(__file__), "templates", "APEX_Template_EN.xlsx")
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Template not available")
+    return FileResponse(path, filename="APEX_Approved_Trial_Balance_Template.xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")

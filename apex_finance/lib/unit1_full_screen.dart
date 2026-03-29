@@ -168,7 +168,7 @@ class _Unit1FullScreenState extends State<Unit1FullScreen> {
             Text('تحميل إرشادات التعبئة (PDF)', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'Tajawal')),
           ])))),
       GestureDetector(
-        onTap: () {},
+        onTap: () { _launchUrl('https://apex-api-ootk.onrender.com/unit1/template/ar'); },
         child: Container(width: double.infinity, height: 48,
           decoration: BoxDecoration(color: AC.cyan.withOpacity(0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.cyan.withOpacity(0.3))),
           child: const Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -473,6 +473,7 @@ class _Unit1FullScreenState extends State<Unit1FullScreen> {
       ]));
   }
 }
+
 
 
 
