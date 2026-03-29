@@ -1,355 +1,158 @@
 """
-APEX Tab Consistency Checker — مراجعة اتساق التبويب المحاسبي
-═══════════════════════════════════════════════════════════════
+APEX Tab Consistency Checker v2 — مراجعة اتساق التبويب
+═══════════════════════════════════════════════════════
 
-يراجع:
-1. اتساق اسم الحساب مع التبويب الفرعي والرئيسي
-2. توافق التبويب مع IFRS و SOCPA
-3. كشف الحسابات المصنّفة في تبويب غير منطقي
-4. اقتراح التصحيحات
-5. كشف نظام الجرد (دوري/مستمر)
+فحص عميق لكل حساب:
+1. اسم الحساب ↔ التبويب الفرعي ↔ التبويب الرئيسي ↔ التصنيف
+2. التوافق مع IAS 1 (current/non-current)
+3. التوافق مع تصنيف قوائم (QAWAEM)
+4. كشف نظام الجرد + فحص الإشارات + اقتراحات التصحيح
 """
-
-import re
-from typing import List, Dict
 from app.core.constants import ACCOUNT_TAXONOMY
 
+EXPECTED_MAIN_TAB = {
+    "cash": "أصول متداولة", "bank": "أصول متداولة", "trade_receivables": "أصول متداولة",
+    "other_receivables": "أصول متداولة", "employee_advances": "أصول متداولة", "inventory": "أصول متداولة",
+    "prepaid_expenses": "أصول متداولة", "vat_receivable": "أصول متداولة",
+    "land": "أصول غير متداولة", "buildings": "أصول غير متداولة", "machinery": "أصول غير متداولة",
+    "vehicles": "أصول غير متداولة", "furniture": "أصول غير متداولة", "computers": "أصول غير متداولة",
+    "leasehold_improvements": "أصول غير متداولة", "rou_assets": "أصول غير متداولة",
+    "accum_depr_buildings": "أصول غير متداولة", "accum_depr_machinery": "أصول غير متداولة",
+    "accum_depr_vehicles": "أصول غير متداولة", "accum_depr_furniture": "أصول غير متداولة",
+    "accum_depr_computers": "أصول غير متداولة",
+    "trade_payables": "التزامات متداولة", "other_payables": "التزامات متداولة",
+    "accrued_expenses": "التزامات متداولة", "wages_payable": "التزامات متداولة",
+    "vat_payable": "التزامات متداولة", "net_vat_payable": "التزامات متداولة",
+    "zakat_payable": "التزامات متداولة", "short_term_loans": "التزامات متداولة",
+    "unearned_revenue": "التزامات متداولة",
+    "long_term_loans": "التزامات غير متداولة", "end_of_service": "التزامات غير متداولة",
+    "non_current_lease_liabilities": "التزامات غير متداولة",
+    "share_capital": "حقوق الملكية", "statutory_reserve": "حقوق الملكية",
+    "retained_earnings": "حقوق الملكية", "partner_current_account": "حقوق الملكية",
+    "revenue": "إيرادات", "service_revenue": "إيرادات", "sales_returns": "إيرادات",
+    "cogs": "تكلفة المبيعات", "purchases": "تكلفة المبيعات", "purchases_returns": "تكلفة المبيعات",
+    "payroll": "مصروفات إدارية", "rent_expense": "مصروفات إدارية", "utilities": "مصروفات إدارية",
+    "depreciation_expense": "مصروفات إدارية", "professional_fees": "مصروفات إدارية",
+    "gosi_expense": "مصروفات إدارية", "insurance_expense": "مصروفات إدارية",
+    "selling_expenses": "مصروفات بيع", "marketing_expense": "مصروفات بيع", "commissions": "مصروفات بيع",
+    "interest_expense": "تكاليف تمويل", "bank_charges": "تكاليف تمويل",
+    "zakat_tax": "زكاة وضريبة",
+}
+
+TAB_VARIANTS = {
+    "أصول متداولة": ["أصول متداولة", "أصول جارية"],
+    "أصول غير متداولة": ["أصول غير متداولة", "أصول ثابتة", "ممتلكات"],
+    "التزامات متداولة": ["التزامات متداولة", "خصوم متداولة"],
+    "التزامات غير متداولة": ["التزامات غير متداولة", "خصوم طويلة"],
+    "حقوق الملكية": ["حقوق الملكية", "حقوق المساهمين", "حقوق الشركاء", "رأس المال"],
+    "إيرادات": ["إيرادات", "مبيعات"], "تكلفة المبيعات": ["تكلفة المبيعات", "تكلفة البضاعة", "مشتريات"],
+    "مصروفات إدارية": ["مصروفات إدارية", "مصاريف إدارية", "عمومية"],
+    "مصروفات بيع": ["مصروفات بيع", "تسويق", "توزيع"],
+    "تكاليف تمويل": ["تكاليف تمويل", "مصروفات تمويل"], "زكاة وضريبة": ["زكاة", "ضريبة"],
+}
 
 class TabConsistencyChecker:
-    """
-    Reviews the consistency between account names, their assigned tabs,
-    and the normalized classification. Detects mismatches and suggests corrections.
-    """
-
     def check(self, classified_rows: list) -> dict:
-        """
-        Run all consistency checks.
+        findings, mismatches, suggestions, ifrs_notes, socpa_notes = [], [], [], [], []
+        inv_system = self._detect_inventory(classified_rows, findings)
+        self._check_consistency(classified_rows, mismatches, suggestions)
+        self._check_ifrs(classified_rows, ifrs_notes)
+        self._check_socpa(classified_rows, socpa_notes)
+        self._check_signs(classified_rows, findings)
+        crit = len([m for m in mismatches if m.get("severity") == "error"])
+        warn = len([m for m in mismatches if m.get("severity") == "warning"])
+        score = max(0, 100 - crit * 5 - warn * 2 - len(findings))
+        return {"inventory_system": inv_system, "consistency_score": round(score, 1),
+                "total_checked": len(classified_rows), "mismatches_count": len(mismatches),
+                "critical_mismatches": crit, "findings": findings, "mismatches": mismatches[:30],
+                "suggestions": suggestions[:20], "ifrs_notes": ifrs_notes, "socpa_notes": socpa_notes}
 
-        Returns:
-            {
-                "inventory_system": "periodic" | "perpetual" | "unknown",
-                "consistency_score": 0-100,
-                "findings": [...],
-                "mismatches": [...],
-                "suggestions": [...],
-                "ifrs_notes": [...],
-                "socpa_notes": [...],
-            }
-        """
-        findings = []
-        mismatches = []
-        suggestions = []
-        ifrs_notes = []
-        socpa_notes = []
+    def _detect_inventory(self, rows, findings):
+        has_purch = any(r.get("normalized_class") == "purchases" for r in rows)
+        has_cogs = any(r.get("normalized_class") == "cogs" and "مشتريات" not in r.get("name", "").lower() for r in rows)
+        if has_purch and not has_cogs:
+            findings.append({"code": "PERIODIC", "severity": "INFO", "category": "inventory",
+                "message": "نظام جرد دوري — يتطلب إدخال مخزون آخر المدة الفعلي",
+                "reference": "IAS 2 — الفقرة 34", "authority": "SOCPA/IFRS"})
+            return "periodic"
+        if has_cogs:
+            findings.append({"code": "PERPETUAL", "severity": "INFO", "category": "inventory", "message": "نظام جرد مستمر"})
+            return "perpetual"
+        return "unknown"
 
-        # 1. Detect inventory system
-        inv_system = self._detect_inventory_system(classified_rows, findings)
+    def _tabs_match(self, actual, expected):
+        if expected in actual: return True
+        for v in TAB_VARIANTS.get(expected, [expected]):
+            if v in actual: return True
+        return False
 
-        # 2. Check tab-name consistency
-        self._check_tab_name_consistency(classified_rows, mismatches, suggestions)
-
-        # 3. Check IFRS compliance
-        self._check_ifrs_compliance(classified_rows, ifrs_notes)
-
-        # 4. Check SOCPA compliance
-        self._check_socpa_compliance(classified_rows, socpa_notes)
-
-        # 5. Check for common classification errors
-        self._check_common_errors(classified_rows, findings, suggestions)
-
-        # 6. Check sign consistency
-        self._check_sign_patterns(classified_rows, findings)
-
-        # Calculate consistency score
-        total_accounts = len(classified_rows)
-        mismatch_count = len(mismatches)
-        consistency_score = max(0, 100 - (mismatch_count / max(total_accounts, 1)) * 100 - len(findings) * 2)
-
-        return {
-            "inventory_system": inv_system,
-            "consistency_score": round(consistency_score, 1),
-            "total_checked": total_accounts,
-            "mismatches_count": mismatch_count,
-            "findings": findings,
-            "mismatches": mismatches[:20],  # Limit to 20
-            "suggestions": suggestions[:15],
-            "ifrs_notes": ifrs_notes,
-            "socpa_notes": socpa_notes,
-        }
-
-    # ─────────────────────────────────────────────────────────────────────
-
-    def _detect_inventory_system(self, rows: list, findings: list) -> str:
-        """
-        Detect if the company uses periodic or perpetual inventory system.
-
-        Periodic: has purchases account, no COGS account, inventory is static
-        Perpetual: has COGS account, inventory changes with each sale
-        """
-        has_purchases = False
-        has_cogs_direct = False
-        has_inventory = False
-        inventory_has_movement = False
-
+    def _check_consistency(self, rows, mismatches, suggestions):
         for row in rows:
-            cls = row.get("normalized_class", "")
-            name = row.get("name", "").lower()
-
-            if cls == "purchases":
-                has_purchases = True
-            if cls == "cogs":
-                # Check if it's actual COGS or purchases labeled as COGS
-                if "مشتريات" not in name and "purchases" not in name:
-                    has_cogs_direct = True
-            if cls and "inventory" in cls:
-                has_inventory = True
-                # Check if inventory has movements
-                mov_d = row.get("movement_debit", 0)
-                mov_c = row.get("movement_credit", 0)
-                if mov_d > 0 or mov_c > 0:
-                    inventory_has_movement = True
-
-        if has_purchases and not has_cogs_direct:
-            system = "periodic"
-            findings.append({
-                "code": "PERIODIC_INVENTORY",
-                "severity": "INFO",
-                "category": "inventory",
-                "message": "الشركة تستخدم نظام الجرد الدوري — يتطلب إدخال مخزون آخر المدة يدوياً من الجرد الفعلي",
-                "detail": "تم اكتشاف حسابات مشتريات بدون حساب تكلفة بضاعة مباعة مباشر. يجب إدخال رصيد المخزون الفعلي في نهاية الفترة لحساب تكلفة البضاعة المباعة بدقة.",
-            })
-        elif has_cogs_direct:
-            system = "perpetual"
-            findings.append({
-                "code": "PERPETUAL_INVENTORY",
-                "severity": "INFO",
-                "category": "inventory",
-                "message": "الشركة تستخدم نظام الجرد المستمر",
-            })
-        else:
-            system = "unknown"
-            findings.append({
-                "code": "UNKNOWN_INVENTORY_SYSTEM",
-                "severity": "WARNING",
-                "category": "inventory",
-                "message": "لم يتم تحديد نظام الجرد — لا توجد حسابات مشتريات أو تكلفة بضاعة مباعة",
-            })
-
-        return system
-
-    def _check_tab_name_consistency(self, rows: list, mismatches: list, suggestions: list):
-        """Check if account names are consistent with their tab classification."""
-
-        # Keywords that should match specific tabs
-        tab_keywords = {
-            "أصول متداولة": ["صندوق", "بنك", "نقد", "عملاء", "مدين", "مخزون", "مدفوعة مقدم", "ضريبة مدخلات"],
-            "أصول غير متداولة": ["أثاث", "سيارات", "آلات", "مباني", "أراضي", "ديكور", "إهلاك", "حاسب"],
-            "التزامات متداولة": ["دائن", "موردين", "مستحق", "ضريبة مخرجات", "رواتب مستحق"],
-            "التزامات غير متداولة": ["قرض طويل", "مكافأة نهاية", "إيجار طويل"],
-            "حقوق ملكية": ["رأس المال", "احتياطي", "أرباح مبقاة", "جاري الشريك"],
-            "إيرادات": ["مبيعات", "إيرادات", "خدمات"],
-            "تكلفة مبيعات": ["مشتريات", "تكلفة بضاعة", "مرتجع مشتريات"],
-            "مصروفات إدارية": ["رواتب", "إيجار", "كهرباء", "صيانة", "تأمين", "أتعاب", "رسوم حكومية"],
-            "مصروفات بيع": ["عمولات", "تسويق", "إعلان", "شحن", "نقل"],
-        }
-
-        for row in rows:
-            tab = row.get("tab", "")
-            name = row.get("name", "").lower()
-            cls = row.get("normalized_class", "")
-
-            if not cls or not tab:
-                continue
-
-            # Check: is the account name in a logical tab?
+            name, tab, cls = row.get("name", ""), row.get("tab", ""), row.get("normalized_class", "")
+            if not cls or not tab: continue
             main_tab = tab.split(" - ")[0].strip() if " - " in tab else tab
-
-            # Revenue in expense tab or vice versa
-            if cls == "revenue" and "مصروفات" in tab:
-                mismatches.append({
-                    "account": row.get("name", ""),
-                    "current_tab": tab,
-                    "classified_as": cls,
-                    "issue": "حساب إيرادات مصنّف ضمن المصروفات",
-                    "suggestion": "نقل إلى تبويب إيرادات",
-                })
-
-            # Expense in revenue tab
-            if cls in ("payroll", "rent_expense", "utilities") and "إيرادات" in tab:
-                mismatches.append({
-                    "account": row.get("name", ""),
-                    "current_tab": tab,
-                    "classified_as": cls,
-                    "issue": "حساب مصروف مصنّف ضمن الإيرادات",
-                    "suggestion": "نقل إلى تبويب المصروفات",
-                })
-
-            # Asset in liability tab
+            expected = EXPECTED_MAIN_TAB.get(cls)
+            if expected and not self._tabs_match(main_tab, expected):
+                sev = "error" if cls in ("cash","bank","trade_receivables","inventory","trade_payables","share_capital","revenue") else "warning"
+                mismatches.append({"account": name, "current_tab": main_tab, "expected_tab": expected,
+                    "classified_as": cls, "severity": sev,
+                    "issue_ar": f"'{name}' ({cls}) يجب أن يكون في '{expected}' لكنه في '{main_tab}'",
+                    "reference": "IAS 1 — تصنيف متداول/غير متداول", "authority": "SOCPA/IFRS"})
             tax = ACCOUNT_TAXONOMY.get(cls, {})
             if tax.get("section") == "balance_sheet":
                 is_asset = not tax.get("liability") and not tax.get("contra")
-                is_liability = tax.get("liability", False)
-
                 if is_asset and "التزامات" in main_tab:
-                    mismatches.append({
-                        "account": row.get("name", ""),
-                        "current_tab": tab,
-                        "classified_as": cls,
-                        "issue": "حساب أصل مصنّف ضمن الالتزامات",
-                        "suggestion": f"نقل إلى أصول {'متداولة' if tax.get('current') else 'غير متداولة'}",
-                    })
+                    mismatches.append({"account": name, "severity": "error",
+                        "issue_ar": f"أصل '{name}' مبوّب في الالتزامات", "reference": "IAS 1", "authority": "SOCPA/IFRS"})
+                if tax.get("liability") and "أصول" in main_tab and "إهلاك" not in name.lower():
+                    mismatches.append({"account": name, "severity": "error",
+                        "issue_ar": f"التزام '{name}' مبوّب في الأصول", "reference": "IAS 1", "authority": "SOCPA/IFRS"})
+            if cls in ("payroll","admin_expenses") and ("سلفة" in name.lower() or "عهدة" in name.lower()):
+                suggestions.append({"account": name, "current_class": cls,
+                    "suggested": "أصل متداول (سلف وعهد)", "reference": "IAS 1"})
 
-                if is_liability and "أصول" in main_tab:
-                    mismatches.append({
-                        "account": row.get("name", ""),
-                        "current_tab": tab,
-                        "classified_as": cls,
-                        "issue": "حساب التزام مصنّف ضمن الأصول",
-                        "suggestion": f"نقل إلى التزامات {'متداولة' if tax.get('current') else 'غير متداولة'}",
-                    })
+    def _check_ifrs(self, rows, notes):
+        has = lambda c: any(c in (r.get("normalized_class") or "") for r in rows)
+        if has("trade_receivables") and not has("allowance_doubtful"):
+            notes.append({"standard": "IFRS 9", "severity": "WARNING", "issue": "ذمم مدينة بدون مخصص ECL",
+                "recommendation": "مصفوفة المخصص المبسّطة", "reference": "IFRS 9 — 5.5.15"})
+        if has("rent_expense") and not has("rou_assets"):
+            notes.append({"standard": "IFRS 16", "severity": "INFO", "issue": "مصروف إيجار بدون أصل حق استخدام",
+                "recommendation": "مراجعة عقود الإيجار > 12 شهراً", "reference": "IFRS 16 — الفقرة 9"})
+        if (has("machinery") or has("vehicles") or has("furniture")) and not has("accum_depr"):
+            notes.append({"standard": "IAS 16", "severity": "WARNING", "issue": "أصول ثابتة بدون إهلاك",
+                "reference": "IAS 16 — 43-62"})
+        if has("inventory"):
+            notes.append({"standard": "IAS 2", "severity": "INFO", "issue": "تحقق من طريقة تقييم المخزون (FIFO/متوسط مرجح — LIFO محظور)",
+                "reference": "IAS 2 — 25"})
 
-    def _check_ifrs_compliance(self, rows: list, notes: list):
-        """Check IFRS compliance issues."""
+    def _check_socpa(self, rows, notes):
+        has = lambda c: any(r.get("normalized_class") == c for r in rows)
+        has_any = lambda cs: any(r.get("normalized_class") in cs for r in rows)
+        if has("payroll") and not has("gosi_expense"):
+            notes.append({"standard": "GOSI", "severity": "WARNING", "issue": "رواتب بدون GOSI",
+                "recommendation": "12.5% سعوديين + 2% أجانب"})
+        if has("payroll") and not has("end_of_service"):
+            notes.append({"standard": "نظام العمل م84 + IAS 19", "severity": "WARNING",
+                "issue": "رواتب بدون مخصص نهاية خدمة"})
+        if has_any(["share_capital","retained_earnings"]) and not has("zakat_tax"):
+            notes.append({"standard": "ZATCA", "severity": "WARNING", "issue": "لا يوجد زكاة أو ضريبة"})
+        if not has("statutory_reserve") and has_any(["share_capital","retained_earnings"]):
+            notes.append({"standard": "نظام الشركات م158", "severity": "INFO", "issue": "لا يوجد احتياطي نظامي"})
 
-        has_rou = any(r.get("normalized_class") == "rou_assets" for r in rows)
-        has_lease_liab = any(r.get("normalized_class") == "non_current_lease_liabilities" for r in rows)
-        has_rent = any(r.get("normalized_class") == "rent_expense" for r in rows)
-
-        # IFRS 16: Leases
-        if has_rent and not has_rou:
-            notes.append({
-                "standard": "IFRS 16",
-                "issue": "وجود مصروف إيجار بدون أصول حق استخدام — قد يتطلب تطبيق IFRS 16",
-                "severity": "INFO",
-                "recommendation": "مراجعة عقود الإيجار لتحديد ما يجب رسملته حسب IFRS 16",
-            })
-
-        # IFRS 9: ECL
-        has_receivables = any(r.get("normalized_class") == "trade_receivables" for r in rows)
-        has_allowance = any(r.get("normalized_class") == "allowance_doubtful" for r in rows)
-        if has_receivables and not has_allowance:
-            notes.append({
-                "standard": "IFRS 9",
-                "issue": "ذمم مدينة بدون مخصص خسائر ائتمانية متوقعة (ECL)",
-                "severity": "WARNING",
-                "recommendation": "إنشاء مخصص خسائر ائتمانية متوقعة حسب IFRS 9",
-            })
-
-        # IAS 2: Inventory
-        has_inventory = any("inventory" in r.get("normalized_class", "") for r in rows)
-        if has_inventory:
-            notes.append({
-                "standard": "IAS 2",
-                "issue": "التحقق من طريقة تقييم المخزون (FIFO/المتوسط المرجح)",
-                "severity": "INFO",
-                "recommendation": "التأكد من استخدام طريقة FIFO أو المتوسط المرجح حسب IAS 2 (LIFO غير مقبول)",
-            })
-
-    def _check_socpa_compliance(self, rows: list, notes: list):
-        """Check Saudi accounting standards compliance."""
-
-        # Zakat
-        has_zakat = any(r.get("normalized_class") == "zakat_tax" for r in rows)
-        has_equity = any(r.get("normalized_class") in ("share_capital", "retained_earnings") for r in rows)
-        if has_equity and not has_zakat:
-            notes.append({
-                "standard": "SOCPA / هيئة الزكاة",
-                "issue": "لا يوجد حساب زكاة أو ضريبة دخل",
-                "severity": "WARNING",
-                "recommendation": "التأكد من احتساب الزكاة حسب نظام هيئة الزكاة والضريبة والجمارك",
-            })
-
-        # GOSI
-        has_payroll = any(r.get("normalized_class") == "payroll" for r in rows)
-        has_gosi = any(r.get("normalized_class") == "gosi_expense" for r in rows)
-        if has_payroll and not has_gosi:
-            notes.append({
-                "standard": "نظام التأمينات الاجتماعية",
-                "issue": "وجود رواتب بدون تأمينات اجتماعية (GOSI)",
-                "severity": "WARNING",
-                "recommendation": "التأكد من تسجيل مساهمات التأمينات الاجتماعية",
-            })
-
-        # End of Service
-        has_eos = any(r.get("normalized_class") == "end_of_service" for r in rows)
-        if has_payroll and not has_eos:
-            notes.append({
-                "standard": "نظام العمل السعودي",
-                "issue": "وجود رواتب بدون مخصص مكافأة نهاية الخدمة",
-                "severity": "WARNING",
-                "recommendation": "التأكد من احتساب مكافأة نهاية الخدمة حسب المادة 84 من نظام العمل",
-            })
-
-        # VAT
-        has_vat_in = any(r.get("normalized_class") == "vat_receivable" for r in rows)
-        has_vat_out = any(r.get("normalized_class") in ("vat_payable", "net_vat_payable") for r in rows)
-        if (has_vat_in or has_vat_out) and not (has_vat_in and has_vat_out):
-            notes.append({
-                "standard": "نظام ضريبة القيمة المضافة",
-                "issue": "وجود ضريبة مدخلات أو مخرجات فقط — يجب وجود الاثنين",
-                "severity": "INFO",
-                "recommendation": "مراجعة تسجيل ضريبة القيمة المضافة (مدخلات + مخرجات)",
-            })
-
-    def _check_common_errors(self, rows: list, findings: list, suggestions: list):
-        """Check for common classification errors."""
-
-        # Check: purchases classified as COGS
+    def _check_signs(self, rows, findings):
+        bad_assets, bad_liab = 0, 0
         for row in rows:
             cls = row.get("normalized_class", "")
-            name = row.get("name", "").lower()
-
-            # Purchases returns classified as COGS
-            if cls == "cogs" and ("مرتجع" in name or "مسموح" in name or "خصم مكتسب" in name):
-                findings.append({
-                    "code": "COGS_INCLUDES_RETURNS",
-                    "severity": "INFO",
-                    "category": "classification",
-                    "message": f"الحساب '{row.get('name', '')}' مصنّف كتكلفة بضاعة مباعة — تأكد أنه ليس مرتجع مشتريات",
-                })
-
-            # Employee advance in expense
-            if cls in ("payroll", "admin_expenses") and ("سلفة" in name or "عهدة" in name):
-                suggestions.append({
-                    "account": row.get("name", ""),
-                    "current_class": cls,
-                    "suggested_class": "employee_advances",
-                    "reason": "السلف والعهد تُسجّل كأصول متداولة وليس مصروفات",
-                })
-
-    def _check_sign_patterns(self, rows: list, findings: list):
-        """Check for unusual sign patterns that may indicate misclassification."""
-        credit_assets = 0
-        debit_liabilities = 0
-
-        for row in rows:
-            cls = row.get("normalized_class", "")
-            if not cls:
-                continue
+            if not cls: continue
             tax = ACCOUNT_TAXONOMY.get(cls, {})
             net = row.get("net_balance", 0)
-
             if tax.get("section") == "balance_sheet":
-                is_asset = not tax.get("liability") and not tax.get("contra")
-                is_liability = tax.get("liability", False)
-
-                if is_asset and net < -1000:
-                    credit_assets += 1
-                if is_liability and net > 1000:
-                    debit_liabilities += 1
-
-        if credit_assets > 3:
-            findings.append({
-                "code": "MANY_CREDIT_ASSETS",
-                "severity": "WARNING",
-                "category": "signs",
-                "message": f"{credit_assets} حساب أصل برصيد دائن — قد يشير لخطأ في التبويب أو قيد محاسبي",
-            })
-
-        if debit_liabilities > 3:
-            findings.append({
-                "code": "MANY_DEBIT_LIABILITIES",
-                "severity": "WARNING",
-                "category": "signs",
-                "message": f"{debit_liabilities} حساب التزام برصيد مدين — تحقق من التبويب",
-            })
+                if not tax.get("liability") and not tax.get("contra") and net < -5000: bad_assets += 1
+                if tax.get("liability") and net > 5000: bad_liab += 1
+        if bad_assets > 3:
+            findings.append({"code": "CREDIT_ASSETS", "severity": "WARNING",
+                "message": f"{bad_assets} أصل برصيد دائن — خطأ محتمل في التبويب", "reference": "IAS 1"})
+        if bad_liab > 3:
+            findings.append({"code": "DEBIT_LIABILITIES", "severity": "WARNING",
+                "message": f"{bad_liab} التزام برصيد مدين", "reference": "IAS 1"})

@@ -340,6 +340,7 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
     final narrative = r['narrative'] ?? {};
     final validationSummary = r['validation_summary'] ?? {};
     final meta = r['meta'] ?? {};
+    final brain = r['knowledge_brain'] ?? {};
 
     final confOverall = ((confidence['overall'] ?? 0) * 100).toDouble();
     final confLabel = confidence['label'] ?? '';
@@ -352,6 +353,14 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
       // ─── ملخص سريع ───
       _metaSummary(meta, validationSummary, confidence),
       const SizedBox(height: 16),
+
+      // ─── العقل المعرفي ───
+      if (brain.isNotEmpty && (brain['rules_triggered'] ?? 0) > 0) ...[
+        _sectionTitle('العقل المعرفي'),
+        const SizedBox(height: 8),
+        _brainCard(brain),
+        const SizedBox(height: 16),
+      ],
 
       // ─── قائمة الدخل ───
       _sectionTitle('قائمة الدخل'),
@@ -598,6 +607,128 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
             style: const TextStyle(fontSize: 12, color: AC.textSecondary, fontFamily: 'Tajawal', height: 1.5)),
         ],
       ]),
+    );
+  }
+
+  // ═══ بطاقة العقل المعرفي ═══
+  Widget _brainCard(Map<String, dynamic> brain) {
+    final findings = (brain['brain_findings'] as List?) ?? [];
+    final compliance = (brain['compliance_notes'] as List?) ?? [];
+    final recommendations = (brain['brain_recommendations'] as List?) ?? [];
+    final rulesEvaluated = brain['rules_evaluated'] ?? 0;
+    final rulesTriggered = brain['rules_triggered'] ?? 0;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AC.navy3,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AC.cyan.withOpacity(0.3)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        // Header
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            child: Text('$rulesTriggered / $rulesEvaluated قاعدة', style: const TextStyle(fontSize: 10, color: AC.cyan, fontFamily: 'Tajawal')),
+          ),
+          Row(children: [
+            const Text('العقل المعرفي', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AC.cyan, fontFamily: 'Tajawal')),
+            const SizedBox(width: 6),
+            const Icon(Icons.psychology_rounded, color: AC.cyan, size: 18),
+          ]),
+        ]),
+        const SizedBox(height: 12),
+
+        // Critical findings first
+        ...findings.where((f) => f['severity'] == 'critical').map((f) => _brainItem(
+          f['message'] ?? '', AC.danger, Icons.error_rounded,
+          reference: f['reference'], authority: f['authority'],
+        )),
+
+        // Warnings
+        ...findings.where((f) => f['severity'] == 'warning').map((f) => _brainItem(
+          f['message'] ?? '', AC.warning, Icons.warning_amber_rounded,
+          reference: f['reference'], authority: f['authority'],
+        )),
+
+        // Compliance notes
+        if (compliance.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            const Text('ملاحظات الامتثال', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AC.gold, fontFamily: 'Tajawal')),
+            const SizedBox(width: 4),
+            const Icon(Icons.gavel_rounded, color: AC.gold, size: 14),
+          ]),
+          const SizedBox(height: 6),
+          ...compliance.map((c) => _brainItem(
+            c['message'] ?? '', 
+            c['severity'] == 'warning' ? AC.warning : AC.gold,
+            c['severity'] == 'warning' ? Icons.warning_amber_rounded : Icons.info_outline_rounded,
+            reference: c['reference'], authority: c['authority'],
+          )),
+        ],
+
+        // Recommendations
+        if (recommendations.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            const Text('توصيات مبنية على الأنظمة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AC.success, fontFamily: 'Tajawal')),
+            const SizedBox(width: 4),
+            const Icon(Icons.tips_and_updates_rounded, color: AC.success, size: 14),
+          ]),
+          const SizedBox(height: 6),
+          ...recommendations.map((r) => _brainItem(
+            r['message'] ?? '', AC.success, Icons.lightbulb_outline_rounded,
+            reference: r['reference'], authority: r['authority'],
+          )),
+        ],
+
+        // Info findings
+        ...findings.where((f) => f['severity'] == 'info').map((f) => _brainItem(
+          f['message'] ?? '', AC.textSecondary, Icons.info_outline_rounded,
+          reference: f['reference'], authority: f['authority'],
+        )),
+      ]),
+    );
+  }
+
+  Widget _brainItem(String message, Color color, IconData icon, {String? reference, String? authority}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withOpacity(0.15)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(child: Text(message, textDirection: TextDirection.rtl,
+              style: TextStyle(fontSize: 12, color: color, fontFamily: 'Tajawal', height: 1.5))),
+            const SizedBox(width: 8),
+            Padding(padding: const EdgeInsets.only(top: 2), child: Icon(icon, color: color, size: 16)),
+          ]),
+          if (reference != null && reference.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              if (authority != null && authority.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  margin: const EdgeInsets.only(left: 6),
+                  decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
+                  child: Text(authority, style: TextStyle(fontSize: 9, color: color.withOpacity(0.7), fontFamily: 'Tajawal')),
+                ),
+              Flexible(child: Text(reference, textDirection: TextDirection.rtl, overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 9, color: color.withOpacity(0.5), fontFamily: 'Tajawal'))),
+              const SizedBox(width: 4),
+              Icon(Icons.menu_book_rounded, color: color.withOpacity(0.4), size: 10),
+            ]),
+          ],
+        ]),
+      ),
     );
   }
 
