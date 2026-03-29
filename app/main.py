@@ -122,9 +122,20 @@ async def analyze_with_narrative(
         if not result.get("success"):
             return result
 
-        # Step 2: AI Narrative (does NOT modify numbers)
+        # Step 2: AI Narrative with Brain context (does NOT modify numbers)
         narrator = NarrativeService()
-        narrative = await narrator.generate(result, language=language)
+
+        # Get brain context for AI
+        brain_context = ""
+        try:
+            from app.knowledge_brain.services.brain_service import KnowledgeBrainService
+            brain = KnowledgeBrainService()
+            brain_result = result.get("knowledge_brain", {})
+            brain_context = brain.get_context_for_narrative(result, brain_result)
+        except Exception:
+            pass
+
+        narrative = await narrator.generate(result, language=language, brain_context=brain_context)
 
         # Merge narrative into result
         result["narrative"] = narrative

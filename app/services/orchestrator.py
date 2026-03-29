@@ -2,7 +2,7 @@
 APEX Analysis Orchestrator v2 — المنسّق الرئيسي
 ═══════════════════════════════════════════════════
 
-Pipeline: Read → Classify → IS → BS → CF → Ratios → Readiness → Validate
+Pipeline: Read → Classify → Tab Review → IS → BS → CF → Ratios → Readiness → Validate → Knowledge Brain
 """
 
 import os
@@ -16,6 +16,7 @@ from app.services.financial.cashflow_builder import CashFlowBuilder
 from app.services.financial.ratio_engine import RatioEngine
 from app.services.financial.readiness_engine import ReadinessEngine
 from app.services.financial.validation_engine import ValidationEngine
+from app.knowledge_brain.services.brain_service import KnowledgeBrainService
 
 
 class AnalysisOrchestrator:
@@ -30,6 +31,7 @@ class AnalysisOrchestrator:
         self.ratio_engine = RatioEngine()
         self.readiness_engine = ReadinessEngine()
         self.validator = ValidationEngine()
+        self.brain = KnowledgeBrainService()
 
     def analyze_bytes(self, file_bytes: bytes, filename: str, industry: str = "general",
                       closing_inventory: float = None) -> dict:
@@ -121,6 +123,20 @@ class AnalysisOrchestrator:
         # Step 12: Readiness
         readiness_result = self.readiness_engine.calculate(income=income, balance=balance, ratios=ratios, validations=validations, confidence=confidence, industry=industry)
 
+        # Step 13: Knowledge Brain — evaluate against rules and regulations
+        brain_result = {}
+        try:
+            brain_result = self.brain.evaluate_analysis({
+                "income_statement": income,
+                "balance_sheet": balance,
+                "ratios": ratios,
+                "meta": {"company_name": meta.get("company_name", ""), "industry": industry, "inventory_system": inventory_system},
+                "confidence": confidence,
+                "tab_review": tab_review,
+            })
+        except Exception:
+            brain_result = {"brain_findings": [], "compliance_notes": [], "brain_recommendations": [], "citations": [], "rules_evaluated": 0, "rules_triggered": 0}
+
         return {
             "success": True,
             "meta": {
@@ -148,6 +164,7 @@ class AnalysisOrchestrator:
                 "info": severity_counts.get("INFO", 0),
                 "can_approve": self.validator.can_approve(validations),
             },
+            "knowledge_brain": brain_result,
             "line_items": {"income_statement": is_result.get("line_items", {}), "balance_sheet": bs_result.get("line_items", {})},
         }
 

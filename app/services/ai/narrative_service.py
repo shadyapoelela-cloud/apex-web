@@ -24,13 +24,14 @@ class NarrativeService:
         self.google_key = os.environ.get("GOOGLE_API_KEY", "")
         self.anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
 
-    async def generate(self, analysis_result: dict, language: str = "ar") -> dict:
+    async def generate(self, analysis_result: dict, language: str = "ar", brain_context: str = "") -> dict:
         """
         Generate narrative from locked analysis results.
 
         Args:
             analysis_result: Full result from AnalysisOrchestrator
             language: "ar" for Arabic, "en" for English
+            brain_context: Knowledge Brain context with compliance notes and citations
 
         Returns:
             dict with narrative sections + platform used
@@ -38,8 +39,8 @@ class NarrativeService:
         if not analysis_result.get("success"):
             return {"error": "لا يمكن إنشاء تقرير لتحليل فاشل", "platform": "none"}
 
-        # Build the prompt with locked data
-        prompt = self._build_prompt(analysis_result, language)
+        # Build the prompt with locked data + brain context
+        prompt = self._build_prompt(analysis_result, language, brain_context)
 
         # Try platforms in order: OpenAI → Gemini → Claude
         narrative = {}
@@ -70,8 +71,8 @@ class NarrativeService:
         narrative["language"] = language
         return narrative
 
-    def _build_prompt(self, result: dict, language: str) -> str:
-        """Build the AI prompt with locked financial data."""
+    def _build_prompt(self, result: dict, language: str, brain_context: str = "") -> str:
+        """Build the AI prompt with locked financial data + brain context."""
         income = result.get("income_statement", {})
         balance = result.get("balance_sheet", {})
         ratios = result.get("ratios", {})
@@ -133,10 +134,20 @@ class NarrativeService:
         }
 
         if language == "ar":
-            return self._arabic_prompt(financial_summary)
-        return self._english_prompt(financial_summary)
+            return self._arabic_prompt(financial_summary, brain_context)
+        return self._english_prompt(financial_summary, brain_context)
 
-    def _arabic_prompt(self, data: dict) -> str:
+    def _arabic_prompt(self, data: dict, brain_context: str = "") -> str:
+        brain_section = ""
+        if brain_context:
+            brain_section = f"""
+
+═══ نتائج العقل المعرفي (Knowledge Brain) ═══
+{brain_context}
+═══ انتهت نتائج العقل المعرفي ═══
+
+استخدم هذه المعلومات من العقل المعرفي لتعزيز تحليلك — اذكر المراجع الرسمية عند الإشارة لها.
+"""
         return f"""أنت محلل مالي تنفيذي خبير في السوق السعودي. استقبل نتائج مالية نهائية مقفلة.
 
 ⚠️ قواعد صارمة:
@@ -144,7 +155,8 @@ class NarrativeService:
 - لا تختلق بيانات غير موجودة
 - إذا كانت الثقة منخفضة أو فيه تحذيرات، اذكرها بوضوح
 - إذا فيه أخطاء في البيانات، نبّه عليها
-
+- استخدم المراجع الرسمية من العقل المعرفي عند الإشارة للأنظمة والمعايير
+{brain_section}
 البيانات المالية المقفلة:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
@@ -170,14 +182,18 @@ class NarrativeService:
   "management_letter": "رسالة موجزة للإدارة تلخص الوضع المالي وأهم التوصيات"
 }}"""
 
-    def _english_prompt(self, data: dict) -> str:
+    def _english_prompt(self, data: dict, brain_context: str = "") -> str:
+        brain_section = ""
+        if brain_context:
+            brain_section = f"\n=== Knowledge Brain Findings ===\n{brain_context}\n=== End Knowledge Brain ===\nUse these regulatory references to strengthen your analysis.\n"
         return f"""You are an expert financial analyst specializing in Saudi Arabian market. You received locked final financial results.
 
 ⚠️ Strict rules:
 - Do NOT modify any financial number — numbers are final from the financial engine
 - Do NOT fabricate missing data
 - If confidence is low or there are warnings, mention them clearly
-
+- Reference official regulations from the Knowledge Brain when applicable
+{brain_section}
 Locked Financial Data:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
