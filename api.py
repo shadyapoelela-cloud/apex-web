@@ -2134,7 +2134,7 @@ async def unit1_notes_pdf():
     c.setFont(font, 22)
     c.drawRightString(w - 50, h - 60, "APEX Financial Platform")
     c.setFont(font, 16)
-    c.drawRightString(w - 50, h - 90, ar("ملاحظات تعبئة نموذج ميزان المراجعة المعتمد"))
+    c.drawRightString(w - 50, h - 90, ar("إرشادات تعبئة نموذج ميزان المراجعة المعتمد"))
 
     c.setStrokeColor(HexColor("#D4A84B"))
     c.line(50, h - 105, w - 50, h - 105)
@@ -2193,4 +2193,5 @@ async def unit1_notes_pdf():
 
     c.save()
     return FileResponse(tmp.name, filename="APEX_Notes_Guidelines.pdf", media_type="application/pdf")
+
 

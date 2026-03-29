@@ -121,7 +121,7 @@ class _Unit1FullScreenState extends State<Unit1FullScreen> {
   }
 
   Widget _buildProgressBar() {
-    final steps = ['الملاحظات', 'رفع الملف', 'تقييم التبويب', 'التحليل', 'النتائج'];
+    final steps = ['الإرشادات', 'رفع الملف', 'تقييم التبويب', 'التحليل', 'النتائج'];
     final activeStep = _step >= 5 ? 4 : _step >= 3 ? 2 : _step >= 1 ? 1 : 0;
     return Container(padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.border)),
@@ -165,7 +165,7 @@ class _Unit1FullScreenState extends State<Unit1FullScreen> {
           child: const Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Icon(Icons.picture_as_pdf_rounded, color: AC.gold, size: 20),
             SizedBox(width: 8),
-            Text('تحميل ملاحظات التعبئة (PDF)', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'Tajawal')),
+            Text('تحميل إرشادات التعبئة (PDF)', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'Tajawal')),
           ])))),
       GestureDetector(
         onTap: () {},
@@ -473,6 +473,7 @@ class _Unit1FullScreenState extends State<Unit1FullScreen> {
       ]));
   }
 }
+
 
 
 
