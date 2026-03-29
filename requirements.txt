@@ -4,8 +4,8 @@ pandas
 openpyxl
 python-multipart
 anthropic
-reportlab
 openai
 requests
+reportlab
 arabic_reshaper
 python-bidi
