@@ -86,6 +86,53 @@ async def analyze_trial_balance(
         )
 
 
+# ─── Full Analysis with AI Narrative ─────────────────────────────────────
+
+@app.post("/analyze/full")
+async def analyze_with_narrative(
+    file: UploadFile = File(...),
+    industry: str = Query("general", description="القطاع"),
+    language: str = Query("ar", description="لغة التقرير: ar أو en"),
+):
+    """
+    تحليل شامل + تقرير AI.
+    المحرك المالي يحسب الأرقام → AI يشرح ويوصي بدون تغيير أي رقم.
+    """
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
+
+    try:
+        from app.services.ai.narrative_service import NarrativeService
+
+        content = await file.read()
+
+        # Step 1: Financial Engine (locked numbers)
+        result = orchestrator.analyze_bytes(
+            file_bytes=content,
+            filename=file.filename,
+            industry=industry,
+        )
+
+        if not result.get("success"):
+            return result
+
+        # Step 2: AI Narrative (does NOT modify numbers)
+        narrator = NarrativeService()
+        narrative = await narrator.generate(result, language=language)
+
+        # Merge narrative into result
+        result["narrative"] = narrative
+
+        return result
+
+    except Exception as e:
+        import traceback
+        raise HTTPException(
+            status_code=500,
+            detail=f"خطأ: {str(e)}\n{traceback.format_exc()}"
+        )
+
+
 # ─── Classification Only ────────────────────────────────────────────────────
 
 @app.post("/classify")
