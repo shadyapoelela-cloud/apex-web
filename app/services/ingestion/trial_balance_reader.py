@@ -2,47 +2,32 @@
 APEX Ingestion Service — قراءة الملفات وتطبيع البيانات
 ═══════════════════════════════════════════════════════════
 
-يقرأ ميزان المراجعة من Excel ويحوّل كل صف إلى normalized row
-يدعم النموذج الجديد (10 أعمدة) والقديم
+يدعم 3 أنواع من النماذج:
+  1. apex_v1: النموذج القديم (12 عمود) — B=tab, C=name, D-L=numbers
+  2. apex_v2: النموذج الجديد (10 عمود) — A=code, B=main_tab, C=sub_tab, D=name, E-J=numbers
+  3. generic: أي ملف Excel آخر → يُعامل كـ v1
 """
 
-from typing import Optional
 from openpyxl import load_workbook
 
 
 class TrialBalanceReader:
-    """
-    Reads a trial balance Excel file and returns normalized rows.
-    Supports both old format (tab + name + D + L) and new format (10 columns).
-    """
 
     def read(self, filepath: str) -> dict:
-        """
-        Read trial balance and return:
-        {
-            "rows": [...],
-            "meta": { company_name, period, ... },
-            "format": "new_10col" | "old",
-            "warnings": [...]
-        }
-        """
         wb = load_workbook(filepath, read_only=True, data_only=True)
         ws = wb.active
         warnings = []
 
-        # Detect format by checking header row
         format_type = self._detect_format(ws)
-
-        # Read company meta from rows 1-6
         meta = self._read_meta(ws)
 
-        # Read data rows
-        if format_type == "new_10col":
-            rows = self._read_new_format(ws, warnings)
+        if format_type == "apex_v2":
+            rows = self._read_v2_format(ws, warnings)
         else:
-            rows = self._read_old_format(ws, warnings)
+            rows = self._read_v1_format(ws, warnings)
 
         wb.close()
+        rows = self._filter_summary_rows(rows)
 
         return {
             "rows": rows,
@@ -53,23 +38,39 @@ class TrialBalanceReader:
         }
 
     def _detect_format(self, ws) -> str:
-        """Detect if this is the new 10-column template or old format."""
-        # Check row 7 or 8 for column count
+        """
+        apex_v1: Row 5-6 headers with 'تبويب الحساب' — 12 columns — data row 7
+        apex_v2: Row 7-8 headers with 'التبويب الرئيسي' — 10 columns — data row 9
+        """
+        for row in ws.iter_rows(min_row=5, max_row=6, values_only=True):
+            if not row:
+                continue
+            for cell in row:
+                if cell and isinstance(cell, str):
+                    if "تبويب الحساب" in cell or "Account Classific" in cell:
+                        return "apex_v1"
+
         for row in ws.iter_rows(min_row=7, max_row=8, values_only=True):
-            if row and len(row) >= 10:
-                # Check if column structure matches new format
-                # New: A=code, B=main_tab, C=sub_tab, D=name, E-J=numbers
-                return "new_10col"
+            if not row:
+                continue
+            for cell in row:
+                if cell and isinstance(cell, str):
+                    if "التبويب الرئيسي" in cell or "Main Category" in cell:
+                        return "apex_v2"
+
+        # Fallback: check first data row
+        for row in ws.iter_rows(min_row=7, max_row=8, values_only=True):
+            if row and len(row) >= 3:
+                b_val = row[1]
+                if b_val and isinstance(b_val, str):
+                    if any(kw in str(b_val) for kw in ["أصول", "التزامات", "حقوق", "إيرادات", "مصروفات", "تكلفة"]):
+                        return "apex_v1"
             break
-        return "old"
+
+        return "apex_v1"
 
     def _read_meta(self, ws) -> dict:
-        """Read company info from header rows 1-6."""
-        meta = {
-            "company_name": "",
-            "period": "",
-            "currency": "SAR",
-        }
+        meta = {"company_name": "", "period": "", "currency": "SAR"}
         for row in ws.iter_rows(min_row=1, max_row=6, values_only=True):
             if not row:
                 continue
@@ -78,65 +79,16 @@ class TrialBalanceReader:
                     text = cell.strip()
                     if any(kw in text for kw in ["شركة", "مؤسسة", "مجموعة", "Company"]):
                         meta["company_name"] = text
-                    if any(kw in text for kw in ["2024", "2025", "2026", "السنة", "الفترة"]):
-                        meta["period"] = text
+                    if any(kw in text for kw in ["2024", "2025", "2026", "Dec", "السنة", "الفترة"]):
+                        if not meta["period"]:
+                            meta["period"] = text
         return meta
 
-    def _read_new_format(self, ws, warnings: list) -> list:
+    def _read_v1_format(self, ws, warnings: list) -> list:
         """
-        Read new 10-column format:
-        A=code, B=main_tab, C=sub_tab, D=account_name,
-        E=open_debit, F=open_credit, G=mov_debit, H=mov_credit,
-        I=close_debit, J=close_credit
-        """
-        rows = []
-        for row_data in ws.iter_rows(min_row=9, values_only=True):  # Data starts row 9
-            if not row_data or len(row_data) < 8:
-                continue
-
-            main_tab = row_data[1]
-            sub_tab = row_data[2]
-            name = row_data[3]
-
-            if not name or not str(name).strip():
-                continue
-
-            code = str(row_data[0]).strip() if row_data[0] else ""
-            tab_raw = str(main_tab).strip() if main_tab else ""
-            sub = str(sub_tab).strip() if sub_tab else ""
-            name_clean = str(name).strip()
-
-            open_d = self._to_float(row_data[4])
-            open_c = self._to_float(row_data[5])
-            mov_d = self._to_float(row_data[6])
-            mov_c = self._to_float(row_data[7])
-
-            # Calculate net balance
-            net = (open_d - open_c) + (mov_d - mov_c)
-
-            rows.append({
-                "code": code,
-                "tab": tab_raw,
-                "sub_tab": sub,
-                "name": name_clean,
-                "open_debit": open_d,
-                "open_credit": open_c,
-                "movement_debit": mov_d,
-                "movement_credit": mov_c,
-                "close_debit": max(net, 0),
-                "close_credit": abs(min(net, 0)),
-                "net_balance": net,
-            })
-
-        if not rows:
-            warnings.append("لم يتم العثور على بيانات في الملف")
-
-        return rows
-
-    def _read_old_format(self, ws, warnings: list) -> list:
-        """
-        Read old format:
-        B=tab, C=name, D=open_debit, L=adj_balance
+        APEX v1 (12 columns): B=tab, C=name, D=open_dr, E=open_cr,
+        F=mov_dr, G=mov_cr, H=close_dr, I=close_cr,
+        J=bal_before, K=adj, L=bal_after. Data from row 7.
         """
         rows = []
         for row_data in ws.iter_rows(min_row=7, values_only=True):
@@ -148,26 +100,81 @@ class TrialBalanceReader:
 
             if not tab or not name:
                 continue
+            if not isinstance(name, str) or not name.strip():
+                continue
 
             tab_clean = str(tab).strip()
             name_clean = str(name).strip()
+
             open_d = self._to_float(row_data[3]) if len(row_data) > 3 else 0.0
+            open_c = self._to_float(row_data[4]) if len(row_data) > 4 else 0.0
+            mov_d = self._to_float(row_data[5]) if len(row_data) > 5 else 0.0
+            mov_c = self._to_float(row_data[6]) if len(row_data) > 6 else 0.0
+            close_d = self._to_float(row_data[7]) if len(row_data) > 7 else 0.0
+            close_c = self._to_float(row_data[8]) if len(row_data) > 8 else 0.0
 
-            # Old format: column L (index 11) has adjusted balance
-            adj = self._to_float(row_data[11]) if len(row_data) > 11 else open_d
+            # Column L (index 11) = adjusted balance — primary source
+            adj = self._to_float(row_data[11]) if len(row_data) > 11 else None
 
-            # Determine net balance from adjusted value
-            net = adj
+            if adj is not None and adj != 0:
+                net = adj
+            elif close_d != 0 or close_c != 0:
+                net = close_d - close_c
+            else:
+                net = (open_d - open_c) + (mov_d - mov_c)
 
             rows.append({
-                "code": "",
+                "code": str(row_data[0]).strip() if row_data[0] else "",
                 "tab": tab_clean,
                 "sub_tab": "",
                 "name": name_clean,
                 "open_debit": open_d,
-                "open_credit": 0.0,
-                "movement_debit": 0.0,
-                "movement_credit": 0.0,
+                "open_credit": open_c,
+                "movement_debit": mov_d,
+                "movement_credit": mov_c,
+                "close_debit": close_d,
+                "close_credit": close_c,
+                "net_balance": net,
+            })
+
+        if not rows:
+            warnings.append("لم يتم العثور على بيانات في الملف")
+        return rows
+
+    def _read_v2_format(self, ws, warnings: list) -> list:
+        """
+        APEX v2 (10 columns): A=code, B=main_tab, C=sub_tab, D=name,
+        E=open_dr, F=open_cr, G=mov_dr, H=mov_cr,
+        I=close_dr, J=close_cr. Data from row 9.
+        """
+        rows = []
+        for row_data in ws.iter_rows(min_row=9, values_only=True):
+            if not row_data or len(row_data) < 8:
+                continue
+
+            name = row_data[3]
+            if not name or not str(name).strip():
+                continue
+
+            tab_raw = str(row_data[1]).strip() if row_data[1] else ""
+            sub = str(row_data[2]).strip() if row_data[2] else ""
+            code = str(row_data[0]).strip() if row_data[0] else ""
+
+            open_d = self._to_float(row_data[4])
+            open_c = self._to_float(row_data[5])
+            mov_d = self._to_float(row_data[6])
+            mov_c = self._to_float(row_data[7])
+            net = (open_d - open_c) + (mov_d - mov_c)
+
+            rows.append({
+                "code": code,
+                "tab": tab_raw,
+                "sub_tab": sub,
+                "name": str(name).strip(),
+                "open_debit": open_d,
+                "open_credit": open_c,
+                "movement_debit": mov_d,
+                "movement_credit": mov_c,
                 "close_debit": max(net, 0),
                 "close_credit": abs(min(net, 0)),
                 "net_balance": net,
@@ -175,8 +182,22 @@ class TrialBalanceReader:
 
         if not rows:
             warnings.append("لم يتم العثور على بيانات في الملف")
-
         return rows
+
+    def _filter_summary_rows(self, rows: list) -> list:
+        """Remove total/summary rows."""
+        skip = ["إجمالي", "المجموع", "الإجمالي", "total", "مجموع",
+                "فحص التوازن", "balance check", "الفرق", "✓", "✗",
+                "متوازن", "غير متوازن"]
+        filtered = []
+        for row in rows:
+            name = row.get("name", "").lower().strip()
+            if any(kw in name for kw in skip):
+                continue
+            if not name:
+                continue
+            filtered.append(row)
+        return filtered
 
     @staticmethod
     def _to_float(v) -> float:
