@@ -539,6 +539,8 @@ class AccountClassifier:
         # Level 1: Exact tab match
         result = self._match_exact_tab(combined_tab, tab_clean)
         if result:
+            # Name override: if tab says COGS but name clearly says purchases
+            result = self._name_override(result, name_clean, name_lower)
             return self._build_result(result, 0.98, "exact_tab", tab_clean, name_clean)
 
         # Level 2: Alias match on account name
@@ -631,6 +633,30 @@ class AccountClassifier:
         if tab_raw in TAB_EXACT_MAP:
             return TAB_EXACT_MAP[tab_raw]
         return None
+
+    def _name_override(self, classification: str, name: str, name_lower: str) -> str:
+        """
+        Override classification when account name clearly contradicts the tab.
+        Example: tab says "تكلفة بضاعة مباعة" but name is "إجمالي مشتريات بغرض البيع"
+        → should be purchases, not cogs.
+        """
+        if classification == "cogs":
+            # If name contains clear purchase indicators → override to purchases
+            purchase_keywords = ["مشتريات", "إجمالي مشتريات", "مشتريات بغرض"]
+            returns_keywords = ["مردودات المشتريات", "مرتجع مشتريات", "مسموحات المشتريات", "مسموحات مشتريات"]
+            discount_keywords = ["خصم مكتسب"]
+
+            for kw in returns_keywords:
+                if kw in name:
+                    return "purchases_returns"
+            for kw in discount_keywords:
+                if kw in name:
+                    return "purchases_returns"
+            for kw in purchase_keywords:
+                if kw in name:
+                    return "purchases"
+
+        return classification
 
     def _match_alias(self, text: str, text_lower: str) -> Optional[str]:
         # Try longest match first for better accuracy
