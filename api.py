@@ -468,7 +468,7 @@ def parse_trial_balance(ws):
             "tab":    str(tab).strip(),
             "name":   str(name).strip(),
             "open_d": to_f(row[3]),
-            "adj":    to_f(row[11])
+            "adj":    to_f(row[3]) if len(row) <= 10 else to_f(row[11])
         })
     return rows
 
