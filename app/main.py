@@ -59,12 +59,15 @@ def health():
 async def analyze_trial_balance(
     file: UploadFile = File(...),
     industry: str = Query("general", description="القطاع: general, retail, manufacturing, services, construction, food_beverage"),
+    closing_inventory: float = Query(None, description="مخزون آخر المدة الفعلي (من الجرد) — مطلوب للجرد الدوري"),
 ):
     """
     تحليل شامل لميزان المراجعة.
 
-    يشمل: قائمة الدخل + الميزانية + التدفقات + النسب + الجاهزية + التحققات.
+    يشمل: قائمة الدخل + الميزانية + التدفقات + النسب + الجاهزية + التحققات + مراجعة التبويب.
     المحرك المالي يحسب كل شي — AI لا يغيّر أي رقم.
+
+    للشركات التي تستخدم الجرد الدوري: أرسل closing_inventory مع قيمة المخزون الفعلي في نهاية الفترة.
     """
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
@@ -75,6 +78,7 @@ async def analyze_trial_balance(
             file_bytes=content,
             filename=file.filename,
             industry=industry,
+            closing_inventory=closing_inventory,
         )
         return result
 
@@ -93,6 +97,7 @@ async def analyze_with_narrative(
     file: UploadFile = File(...),
     industry: str = Query("general", description="القطاع"),
     language: str = Query("ar", description="لغة التقرير: ar أو en"),
+    closing_inventory: float = Query(None, description="مخزون آخر المدة الفعلي (من الجرد)"),
 ):
     """
     تحليل شامل + تقرير AI.
@@ -111,6 +116,7 @@ async def analyze_with_narrative(
             file_bytes=content,
             filename=file.filename,
             industry=industry,
+            closing_inventory=closing_inventory,
         )
 
         if not result.get("success"):

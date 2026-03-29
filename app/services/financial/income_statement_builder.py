@@ -20,16 +20,15 @@ class IncomeStatementBuilder:
     - Returns/discounts are debit_normal → reduce revenue
     """
 
-    def build(self, classified_rows: list, opening_inventory: float = 0.0) -> dict:
+    def build(self, classified_rows: list, opening_inventory: float = 0.0,
+              closing_inventory_override: float = None) -> dict:
         """
         Build income statement from classified rows.
 
         Args:
             classified_rows: List of rows with normalized_class from classifier
             opening_inventory: بضاعة أول المدة (من عمود D في النموذج)
-
-        Returns:
-            dict with income_statement + line_items + warnings
+            closing_inventory_override: مخزون آخر المدة الفعلي (من الجرد) — للجرد الدوري
         """
         warnings = []
 
@@ -52,7 +51,6 @@ class IncomeStatementBuilder:
                 return 0.0
             sign = ACCOUNT_TAXONOMY.get(class_name, {}).get("sign", "debit_normal")
             total = sum(r.get("net_balance", 0) for r in groups.get(class_name, []))
-            # credit_normal accounts: negate to get positive value
             if sign == "credit_normal":
                 return -total
             return total
@@ -74,24 +72,35 @@ class IncomeStatementBuilder:
         # ─── COGS ───
         cogs_direct = sum_class("cogs")
         purchases = sum_class("purchases")
-        purchases_returns = sum_class("purchases_returns")  # credit → negative
+        purchases_returns = sum_class("purchases_returns")
         freight_in = sum_class("freight_in")
         direct_labor = sum_class("direct_labor")
 
-        # Closing inventory from balance sheet rows
-        closing_inventory = self._get_closing_inventory(classified_rows)
+        # Closing inventory: use override if provided (periodic system)
+        if closing_inventory_override is not None:
+            closing_inventory = closing_inventory_override
+            inv_source = "user_input"
+        else:
+            closing_inventory = self._get_closing_inventory(classified_rows)
+            inv_source = "trial_balance"
 
         # COGS calculation
-        if cogs_direct > 0:
-            # Direct COGS provided
+        if cogs_direct > 0 and purchases == 0:
+            # Direct COGS (perpetual system)
             cogs = cogs_direct
             cogs_method = "direct"
         elif purchases > 0:
-            # Calculate: opening + purchases - returns + freight - closing
+            # Periodic system: COGS = opening + net_purchases - closing
             net_purchases = purchases - purchases_returns + freight_in
             cogs = opening_inventory + net_purchases - closing_inventory
-            cogs_method = "calculated"
-            if opening_inventory == 0 and closing_inventory == 0:
+            cogs_method = f"periodic_{inv_source}"
+            if closing_inventory_override is not None:
+                warnings.append({
+                    "code": "PERIODIC_CLOSING_INV_USED",
+                    "severity": "INFO",
+                    "message": f"تم استخدام مخزون آخر المدة الفعلي ({closing_inventory_override:,.0f}) من الجرد الدوري لحساب تكلفة البضاعة المباعة",
+                })
+            elif opening_inventory == 0 and closing_inventory == 0:
                 warnings.append({
                     "code": "COGS_NO_INVENTORY",
                     "severity": "WARNING",

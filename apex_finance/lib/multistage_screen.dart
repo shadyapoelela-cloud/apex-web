@@ -1,14 +1,12 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'dart:convert';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'main.dart'; // AC colors
 
 // ═══════════════════════════════════════════════════════════
-// شاشة التحليل متعدد المراحل — Unit 1
+// شاشة التحليل — APEX v2
 // ═══════════════════════════════════════════════════════════
-
 class MultistageScreen extends StatefulWidget {
   const MultistageScreen({super.key});
   @override
@@ -32,10 +30,10 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
   static const _apiBase = 'https://apex-api-ootk.onrender.com';
 
   final _stageLabels = [
-    'حساب القوائم المالية بالكود...',
-    'تحليل أولي بالذكاء الاصطناعي...',
-    'مراجعة شاملة وتحديد التوافق...',
-    'إعداد النتيجة النهائية المعتمدة...',
+    'قراءة الملف وتصنيف الحسابات...',
+    'بناء القوائم المالية...',
+    'حساب النسب والتحقق...',
+    'إعداد تقرير الذكاء الاصطناعي...',
   ];
 
   @override
@@ -50,173 +48,146 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
     super.dispose();
   }
 
-  // ─── اختيار ملف ───
+  // ═══ اختيار الملف ═══
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
+    if (_analyzing) return;
+    final picked = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['xlsx', 'xls'],
+      withData: true,
     );
-    if (result != null && result.files.isNotEmpty) {
+    if (picked != null && picked.files.isNotEmpty) {
       setState(() {
         _fileSelected = true;
-        _fileName = result.files.first.name;
-        _pickedFileData = result.files.first;
         _done = false;
         _error = false;
         _result = null;
+        _pickedFileData = picked.files.first;
+        _fileName = _pickedFileData!.name;
       });
     }
   }
 
-  // ─── بدء التحليل ───
+  // ═══ التحليل ═══
   Future<void> _startAnalysis() async {
     if (_pickedFileData == null) return;
     setState(() {
       _analyzing = true;
+      _error = false;
+      _done = false;
       _progress = 0;
       _currentStage = 0;
-      _error = false;
-      _errorMsg = '';
     });
 
-    // محاكاة تقدم المراحل
-    _animateProgress();
-
     try {
-      final uri = Uri.parse('$_apiBase/unit1/analyze/multistage');
-      final request = http.MultipartRequest('POST', uri);
-      request.files.add(http.MultipartFile.fromBytes('file', _pickedFileData!.bytes!, filename: _pickedFileData!.name));
+      // Stage progress simulation
+      _animateProgress(0, 0.15, 1000);
+      setState(() => _currentStage = 0);
 
-      final streamed = await request.send().timeout(const Duration(seconds: 120));
+      final uri = Uri.parse('$_apiBase/analyze/full?industry=retail&language=ar');
+      final request = http.MultipartRequest('POST', uri);
+      request.files.add(http.MultipartFile.fromBytes('file', _pickedFileData!.bytes!,
+          filename: _pickedFileData!.name));
+
+      _animateProgress(0.15, 0.40, 2000);
+      setState(() => _currentStage = 1);
+
+      final streamed = await request.send().timeout(const Duration(seconds: 300));
+      
+      _animateProgress(0.40, 0.70, 1000);
+      setState(() => _currentStage = 2);
+
       final response = await http.Response.fromStream(streamed);
 
+      _animateProgress(0.70, 0.90, 500);
+      setState(() => _currentStage = 3);
+
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (mounted) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+        if (data['success'] == true) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          _animateProgress(0.90, 1.0, 300);
+          setState(() => _currentStage = 4);
           setState(() {
-            _analyzing = false;
-            _done = true;
-            _progress = 1.0;
-            _currentStage = 4;
             _result = data;
+            _done = true;
+            _analyzing = false;
+            _progress = 1.0;
           });
+        } else {
+          throw Exception(data['error'] ?? 'فشل التحليل');
         }
       } else {
-        final body = json.decode(response.body);
-        throw Exception(body['detail'] ?? 'خطأ ${response.statusCode}');
+        throw Exception('خطأ من السيرفر: ${response.statusCode}');
       }
     } catch (e) {
+      setState(() {
+        _error = true;
+        _errorMsg = e.toString().replaceAll('Exception: ', '');
+        _analyzing = false;
+      });
+    }
+  }
+
+  void _animateProgress(double from, double to, int ms) async {
+    final steps = 10;
+    final stepDur = ms ~/ steps;
+    for (int i = 0; i <= steps; i++) {
+      await Future.delayed(Duration(milliseconds: stepDur));
       if (mounted) {
-        setState(() {
-          _analyzing = false;
-          _error = true;
-          _errorMsg = e.toString().replaceAll('Exception: ', '');
-        });
+        setState(() => _progress = from + (to - from) * (i / steps));
       }
     }
   }
 
-  void _animateProgress() async {
-    for (int i = 0; i < 4; i++) {
-      if (!_analyzing || !mounted) return;
-      setState(() => _currentStage = i);
-      for (int j = 0; j < 20; j++) {
-        await Future.delayed(const Duration(milliseconds: 300));
-        if (!_analyzing || !mounted) return;
-        setState(() => _progress = (i * 25 + (j + 1) * 1.25) / 100);
-      }
-    }
-  }
-
+  // ═══ الواجهة ═══
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
         backgroundColor: AC.navy2,
-        elevation: 0,
-        title: const Text('التحليل متعدد المراحل',
-            style: TextStyle(fontFamily: 'Tajawal', color: AC.textPrimary, fontSize: 17, fontWeight: FontWeight.w700)),
+        title: const Text('تحليل ميزان المراجعة', style: TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700, color: AC.textPrimary)),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_rounded, color: AC.textSecondary, size: 18),
-          onPressed: () => Navigator.pop(context),
-        ),
-        bottom: PreferredSize(preferredSize: const Size.fromHeight(1), child: Container(color: AC.border, height: 1)),
+        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, color: AC.gold), onPressed: () => Navigator.pop(context)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(children: [
-          // ─── بانر النظام ───
-          _systemBanner(),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          // رفع الملف
+          _uploadArea(),
           const SizedBox(height: 16),
 
-          // ─── منطقة رفع الملف ───
-          _uploadZone(),
-          const SizedBox(height: 16),
+          // زر التحليل
+          if (_fileSelected && !_done)
+            _GoldBtn(label: 'بدء التحليل الشامل', onTap: _startAnalysis, isLoading: _analyzing),
 
-          // ─── شريط التقدم والمراحل ───
-          if (_analyzing) _progressSection(),
-
-          // ─── رسالة الخطأ ───
-          if (_error) _errorSection(),
-
-          // ─── زر التحليل ───
-          if (!_analyzing && !_done) ...[
-            const SizedBox(height: 8),
-            _GoldBtn(
-              label: _fileSelected ? 'بدء التحليل المتعدد المراحل' : 'اختر ملف ميزان المراجعة',
-              onTap: _fileSelected ? _startAnalysis : _pickFile,
-            ),
+          // شريط التقدم
+          if (_analyzing) ...[
+            const SizedBox(height: 16),
+            _progressSection(),
           ],
 
-          // ─── النتائج ───
+          // خطأ
+          if (_error) ...[
+            const SizedBox(height: 16),
+            _errorSection(),
+          ],
+
+          // النتائج
           if (_done && _result != null) ...[
             const SizedBox(height: 16),
             _resultSection(),
           ],
-
-          const SizedBox(height: 40),
         ]),
       ),
     );
   }
 
-  // ═══ بانر وصف النظام ═══
-  Widget _systemBanner() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [AC.navy4, AC.navy3]),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AC.gold.withOpacity(0.3)),
-      ),
-      child: Row(children: [
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: const [
-            Text('نظام 4 مراحل — دقة 95%+', textDirection: TextDirection.rtl,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'Tajawal', color: AC.gold)),
-            SizedBox(height: 4),
-            Text('كود + ذكاء اصطناعي + مراجعة + اعتماد نهائي', textDirection: TextDirection.rtl,
-                style: TextStyle(fontSize: 12, color: AC.textSecondary, fontFamily: 'Tajawal')),
-          ]),
-        ),
-        const SizedBox(width: 12),
-        Container(
-          width: 44, height: 44,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [AC.gold, AC.goldDim]),
-            borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.auto_awesome_rounded, color: AC.navy, size: 22),
-        ),
-      ]),
-    );
-  }
-
   // ═══ منطقة رفع الملف ═══
-  Widget _uploadZone() {
+  Widget _uploadArea() {
     return GestureDetector(
-      onTap: _analyzing ? null : _pickFile,
+      onTap: _pickFile,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         width: double.infinity, height: 150,
@@ -263,7 +234,6 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
   Widget _progressSection() {
     return Column(children: [
       const SizedBox(height: 8),
-      // شريط التقدم
       ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: LinearProgressIndicator(
@@ -276,8 +246,6 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
       const SizedBox(height: 8),
       Text('${(_progress * 100).toInt()}%', style: const TextStyle(color: AC.gold, fontFamily: 'Tajawal', fontSize: 13, fontWeight: FontWeight.w700)),
       const SizedBox(height: 16),
-
-      // المراحل الأربع
       ...List.generate(4, (i) => _stageRow(i)),
       const SizedBox(height: 16),
     ]);
@@ -286,7 +254,6 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
   Widget _stageRow(int index) {
     final isActive = _currentStage == index;
     final isDone = _currentStage > index;
-    final isPending = _currentStage < index;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -299,7 +266,6 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
             color: isDone ? AC.success.withOpacity(0.3) : isActive ? AC.gold.withOpacity(0.4) : AC.border),
         ),
         child: Row(children: [
-          // الأيقونة
           if (isDone)
             const Icon(Icons.check_circle_rounded, color: AC.success, size: 22)
           else if (isActive)
@@ -310,8 +276,6 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
           else
             Icon(Icons.radio_button_unchecked, color: AC.textHint, size: 22),
           const SizedBox(width: 10),
-
-          // رقم المرحلة
           Container(
             width: 24, height: 24,
             decoration: BoxDecoration(
@@ -323,8 +287,6 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
                 color: isDone ? AC.success : isActive ? AC.gold : AC.textHint))),
           ),
           const Spacer(),
-
-          // النص
           Text(
             isDone ? _stageLabels[index].replaceAll('...', ' ✓') : _stageLabels[index],
             textDirection: TextDirection.rtl,
@@ -362,56 +324,62 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
     );
   }
 
-  // ═══ عرض النتائج ═══
+  // ═══════════════════════════════════════════════════════════
+  //  عرض النتائج — V2 Schema
+  // ═══════════════════════════════════════════════════════════
   Widget _resultSection() {
-    final finalResult = _result!['final_result'] ?? {};
-    final financialData = finalResult['financial_data'] ?? {};
-    final incomeStatement = financialData['income_statement'] ?? {};
-    final balanceSheet = financialData['balance_sheet'] ?? {};
-    final ratios = financialData['ratios'] ?? {};
-    final aiAnalysis = finalResult['ai_analysis'] ?? {};
-    final confidence = (finalResult['confidence_pct'] ?? 0).toDouble();
-    final qualityLabel = finalResult['quality_label'] ?? '';
-    final stages = _result!['stages'] ?? {};
+    final r = _result!;
+    final income = r['income_statement'] ?? {};
+    final balance = r['balance_sheet'] ?? {};
+    final ratios = r['ratios'] ?? {};
+    final prof = ratios['profitability'] ?? {};
+    final liq = ratios['liquidity'] ?? {};
+    final lev = ratios['leverage'] ?? {};
+    final eff = ratios['efficiency'] ?? {};
+    final confidence = r['confidence'] ?? {};
+    final narrative = r['narrative'] ?? {};
+    final validationSummary = r['validation_summary'] ?? {};
+    final meta = r['meta'] ?? {};
+
+    final confOverall = ((confidence['overall'] ?? 0) * 100).toDouble();
+    final confLabel = confidence['label'] ?? '';
 
     return Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
       // ─── مؤشر الثقة ───
-      _confidenceCard(confidence, qualityLabel),
+      _confidenceCard(confOverall, confLabel),
       const SizedBox(height: 16),
 
-      // ─── ملخص المراحل ───
-      _sectionTitle('نتائج المراحل'),
-      const SizedBox(height: 8),
-      _stagesSummary(stages),
+      // ─── ملخص سريع ───
+      _metaSummary(meta, validationSummary, confidence),
       const SizedBox(height: 16),
 
       // ─── قائمة الدخل ───
       _sectionTitle('قائمة الدخل'),
       const SizedBox(height: 8),
-      _incomeCard(incomeStatement),
+      _incomeCard(income),
       const SizedBox(height: 16),
 
       // ─── الميزانية ───
       _sectionTitle('الميزانية العمومية'),
       const SizedBox(height: 8),
-      _balanceCard(balanceSheet),
+      _balanceCard(balance),
       const SizedBox(height: 16),
 
       // ─── النسب المالية ───
       _sectionTitle('النسب المالية'),
       const SizedBox(height: 8),
-      _ratiosCard(ratios),
+      _ratiosCard(prof, liq, lev, eff),
       const SizedBox(height: 16),
 
       // ─── تحليل الذكاء الاصطناعي ───
-      if (aiAnalysis.isNotEmpty) ...[
+      if (narrative.isNotEmpty && narrative['executive_summary'] != null) ...[
         _sectionTitle('تحليل الذكاء الاصطناعي'),
         const SizedBox(height: 8),
-        _aiCard(aiAnalysis),
+        _aiCard(narrative),
         const SizedBox(height: 16),
       ],
 
-      // ─── أزرار التصدير ───
+      // ─── أزرار ───
       Row(children: [
         Expanded(child: _GoldBtn(label: 'تحليل ملف آخر', onTap: () {
           setState(() { _fileSelected = false; _done = false; _result = null; _fileName = ''; _pickedFileData = null; });
@@ -420,9 +388,35 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
     ]);
   }
 
+  // ═══ ملخص سريع ═══
+  Widget _metaSummary(Map<String, dynamic> meta, Map<String, dynamic> vs, Map<String, dynamic> conf) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.border)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        if (meta['company_name'] != null && (meta['company_name'] as String).isNotEmpty)
+          Text(meta['company_name'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AC.gold, fontFamily: 'Tajawal')),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          _miniStat('الحسابات', '${meta['total_accounts'] ?? 0}', AC.cyan),
+          _miniStat('أخطاء', '${vs['errors'] ?? 0}', (vs['errors'] ?? 0) > 0 ? AC.danger : AC.success),
+          _miniStat('تحذيرات', '${vs['warnings'] ?? 0}', (vs['warnings'] ?? 0) > 0 ? AC.warning : AC.success),
+          _miniStat('يمكن الاعتماد', vs['can_approve'] == true ? '✓' : '✗', vs['can_approve'] == true ? AC.success : AC.danger),
+        ]),
+      ]),
+    );
+  }
+
+  Widget _miniStat(String label, String value, Color color) {
+    return Column(children: [
+      Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color, fontFamily: 'Tajawal')),
+      Text(label, style: const TextStyle(fontSize: 10, color: AC.textSecondary, fontFamily: 'Tajawal')),
+    ]);
+  }
+
   // ═══ بطاقة مؤشر الثقة ═══
   Widget _confidenceCard(double confidence, String label) {
-    final color = confidence >= 95 ? AC.success : confidence >= 85 ? AC.gold : AC.warning;
+    final color = confidence >= 90 ? AC.success : confidence >= 75 ? AC.gold : AC.warning;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -457,121 +451,93 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
     );
   }
 
-  // ═══ ملخص المراحل ═══
-  Widget _stagesSummary(Map<String, dynamic> stages) {
-    final items = [
-      {'key': 'stage1_code', 'icon': Icons.code_rounded, 'color': AC.cyan, 'label': 'حساب الكود'},
-      {'key': 'stage1_ai_initial', 'icon': Icons.psychology_rounded, 'color': AC.gold, 'label': 'تحليل AI'},
-      {'key': 'stage3_review', 'icon': Icons.rate_review_rounded, 'color': AC.warning, 'label': 'المراجعة'},
-      {'key': 'stage4_final', 'icon': Icons.verified_rounded, 'color': AC.success, 'label': 'النهائي'},
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.border)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: items.map((item) {
-          final stage = stages[item['key']] ?? {};
-          final conf = (stage['confidence_pct'] ?? stage['final_confidence_pct'] ?? 0);
-          return Column(children: [
-            Container(
-              width: 40, height: 40,
-              decoration: BoxDecoration(
-                color: (item['color'] as Color).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10)),
-              child: Icon(item['icon'] as IconData, color: item['color'] as Color, size: 20)),
-            const SizedBox(height: 6),
-            Text('$conf%', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: item['color'] as Color, fontFamily: 'Tajawal')),
-            Text(item['label'] as String, style: const TextStyle(fontSize: 10, color: AC.textSecondary, fontFamily: 'Tajawal')),
-          ]);
-        }).toList(),
-      ),
-    );
-  }
-
-  // ═══ قائمة الدخل ═══
+  // ═══ قائمة الدخل — v2 ═══
   Widget _incomeCard(Map<String, dynamic> data) {
     return _dataCard([
       _dataRow('الإيرادات', data['revenue']),
-      _dataRow('إيرادات أخرى', data['other_revenue']),
+      _dataRow('إيرادات خدمات', data['service_revenue']),
       _dataRow('مردودات المبيعات', data['sales_returns'], negative: true),
       _divider(),
       _dataRow('صافي الإيرادات', data['net_revenue'], bold: true, color: AC.gold),
       _divider(),
-      _dataRow('مخزون أول المدة', data['opening_inventory']),
-      _dataRow('المشتريات', data['purchases_net']),
-      _dataRow('مخزون آخر المدة', data['closing_inventory'], negative: true),
-      _dataRow('تكلفة البضاعة المباعة', data['cogs'], bold: true),
-      _divider(),
+      _dataRow('تكلفة البضاعة المباعة', data['cogs'], negative: true),
       _dataRow('مجمل الربح', data['gross_profit'], bold: true, color: AC.success),
-      _dataRow('مصروفات إدارية', data['admin_expenses'], negative: true),
-      _dataRow('مصروفات بيع وتوزيع', data['sales_expenses'], negative: true),
-      _dataRow('EBIT', data['ebit'], bold: true),
+      _divider(),
+      _dataRow('م. إدارية وعمومية', data['admin_expenses'], negative: true),
+      _dataRow('م. بيع وتسويق', data['selling_expenses'], negative: true),
+      _dataRow('الربح التشغيلي', data['operating_profit'], bold: true),
       _dataRow('EBITDA', data['ebitda']),
-      _dataRow('تكاليف تمويل', data['interest'], negative: true),
-      _dataRow('زكاة وضرائب', data['tax'], negative: true),
+      _divider(),
+      _dataRow('إيرادات أخرى', data['other_income']),
+      _dataRow('مصروفات أخرى', data['other_expenses'], negative: true),
+      _dataRow('تكاليف تمويل', data['finance_cost'], negative: true),
+      _dataRow('زكاة وضرائب', data['zakat_tax'], negative: true),
       _divider(),
       _dataRow('صافي الربح', data['net_profit'], bold: true, color: AC.gold),
     ]);
   }
 
-  // ═══ الميزانية ═══
+  // ═══ الميزانية — v2 ═══
   Widget _balanceCard(Map<String, dynamic> data) {
+    final ca = data['current_assets'] ?? {};
+    final nca = data['non_current_assets'] ?? {};
+    final cl = data['current_liabilities'] ?? {};
+    final ncl = data['non_current_liabilities'] ?? {};
+    final eq = data['equity'] ?? {};
+
     return _dataCard([
-      _dataRow('النقدية', data['cash']),
-      _dataRow('ذمم مدينة تجارية', data['trade_receivables']),
-      _dataRow('ذمم مدينة أخرى', data['other_receivables']),
-      _dataRow('المخزون', data['closing_inventory']),
-      _dataRow('مصروفات مدفوعة مقدماً', data['prepaid']),
-      _dataRow('الأصول المتداولة', data['current_assets'], bold: true, color: AC.cyan),
-      _divider(),
-      _dataRow('أصول ثابتة (إجمالي)', data['fixed_assets_gross']),
-      _dataRow('مجمع الإهلاك', data['depreciation'], negative: true),
-      _dataRow('صافي الأصول الثابتة', data['fixed_assets_net'], bold: true),
+      _dataRow('الأصول المتداولة', ca['total'], bold: true, color: AC.cyan),
+      _dataRow('الأصول غير المتداولة', nca['total']),
       _divider(),
       _dataRow('إجمالي الأصول', data['total_assets'], bold: true, color: AC.gold),
       _divider(),
-      _dataRow('ذمم دائنة تجارية', data['trade_payables']),
-      _dataRow('قروض متداولة', data['loans_current']),
-      _dataRow('رواتب مستحقة', data['wages_payable']),
-      _dataRow('ضريبة مستحقة', data['tax_payable']),
-      _dataRow('مستحقات أخرى', data['accrued']),
+      _dataRow('التزامات متداولة', cl['total']),
+      _dataRow('التزامات غير متداولة', ncl['total']),
       _dataRow('إجمالي الالتزامات', data['total_liabilities'], bold: true, color: AC.warning),
       _divider(),
-      _dataRow('رأس المال', data['equity_capital']),
-      _dataRow('الاحتياطي', data['equity_reserve']),
-      _dataRow('أرباح مبقاة', data['retained_earnings']),
-      _dataRow('ربح العام', data['net_profit_year']),
-      _dataRow('إجمالي حقوق الملكية', data['total_equity'], bold: true, color: AC.success),
+      _dataRow('حقوق الملكية', eq['total'], bold: true, color: AC.success),
       _divider(),
       _dataRow('فحص التوازن', data['balance_check'], bold: true,
           color: (data['balance_check'] ?? 0).abs() < 1 ? AC.success : AC.danger),
+      _dataRow('الميزانية متوازنة', null, bold: true,
+          color: data['is_balanced'] == true ? AC.success : AC.danger,
+          customValue: data['is_balanced'] == true ? '✓ نعم' : '✗ لا'),
     ]);
   }
 
-  // ═══ النسب المالية ═══
-  Widget _ratiosCard(Map<String, dynamic> data) {
+  // ═══ النسب المالية — v2 ═══
+  Widget _ratiosCard(Map<String, dynamic> prof, Map<String, dynamic> liq, Map<String, dynamic> lev, Map<String, dynamic> eff) {
     return _dataCard([
-      _ratioBar('هامش مجمل الربح', '${data['gross_margin_pct'] ?? 0}%', (data['gross_margin_pct'] ?? 0) / 100),
-      _ratioBar('هامش صافي الربح', '${data['net_margin_pct'] ?? 0}%', (data['net_margin_pct'] ?? 0) / 100),
-      _ratioBar('هامش EBITDA', '${data['ebitda_margin_pct'] ?? 0}%', (data['ebitda_margin_pct'] ?? 0) / 100),
-      _ratioBar('نسبة التداول', '${data['current_ratio'] ?? 0}', ((data['current_ratio'] ?? 0) / 3).clamp(0.0, 1.0)),
-      _ratioBar('نسبة السيولة السريعة', '${data['quick_ratio'] ?? 0}', ((data['quick_ratio'] ?? 0) / 3).clamp(0.0, 1.0)),
-      _ratioBar('الدين / الأصول', '${data['debt_to_assets_pct'] ?? 0}%', (data['debt_to_assets_pct'] ?? 0) / 100),
-      _ratioBar('العائد على الأصول ROA', '${data['roa_pct'] ?? 0}%', (data['roa_pct'] ?? 0).abs() / 50),
-      _ratioBar('العائد على الملكية ROE', '${data['roe_pct'] ?? 0}%', (data['roe_pct'] ?? 0).abs() / 50),
-      _ratioBar('دوران الأصول', '${data['asset_turnover'] ?? 0}', ((data['asset_turnover'] ?? 0) / 3).clamp(0.0, 1.0)),
-      _ratioBar('دوران المخزون', '${data['inventory_turnover'] ?? 0}', ((data['inventory_turnover'] ?? 0) / 15).clamp(0.0, 1.0)),
+      _ratioBar('هامش مجمل الربح', '${prof['gross_margin_pct'] ?? 0}%', ((prof['gross_margin_pct'] ?? 0) / 100).clamp(0.0, 1.0)),
+      _ratioBar('هامش صافي الربح', '${prof['net_margin_pct'] ?? 0}%', ((prof['net_margin_pct'] ?? 0) / 100).clamp(0.0, 1.0)),
+      _ratioBar('هامش EBITDA', '${prof['ebitda_margin_pct'] ?? 0}%', ((prof['ebitda_margin_pct'] ?? 0) / 100).clamp(0.0, 1.0)),
+      _ratioBar('نسبة التداول', '${liq['current_ratio'] ?? 0}', ((liq['current_ratio'] ?? 0) / 3).clamp(0.0, 1.0)),
+      _ratioBar('النسبة السريعة', '${liq['quick_ratio'] ?? 0}', ((liq['quick_ratio'] ?? 0) / 3).clamp(0.0, 1.0)),
+      _ratioBar('الدين/الأصول', '${lev['debt_to_assets_pct'] ?? 0}%', ((lev['debt_to_assets_pct'] ?? 0) / 100).clamp(0.0, 1.0)),
+      _ratioBar('ROA', '${prof['roa_pct'] ?? 0}%', ((prof['roa_pct'] ?? 0).abs() / 50).clamp(0.0, 1.0)),
+      _ratioBar('ROE', '${prof['roe_pct'] ?? 0}%', ((prof['roe_pct'] ?? 0).abs() / 100).clamp(0.0, 1.0)),
+      _ratioBar('دوران الأصول', '${eff['asset_turnover'] ?? 0}', ((eff['asset_turnover'] ?? 0) / 3).clamp(0.0, 1.0)),
+      _ratioBar('DSO (أيام التحصيل)', '${eff['dso'] ?? "-"}', ((eff['dso'] ?? 0) / 90).clamp(0.0, 1.0)),
+      _ratioBar('أيام المخزون', '${eff['days_in_inventory'] ?? "-"}', ((eff['days_in_inventory'] ?? 0) / 120).clamp(0.0, 1.0)),
     ]);
   }
 
-  // ═══ بطاقة AI ═══
+  // ═══ بطاقة AI — v2 ═══
   Widget _aiCard(Map<String, dynamic> ai) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold.withOpacity(0.3))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        // المنصة المستخدمة
+        Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            child: Text('${ai['platform'] ?? ''}', style: const TextStyle(fontSize: 10, color: AC.cyan, fontFamily: 'Tajawal')),
+          ),
+        ]),
+        const SizedBox(height: 8),
+
         // الملخص التنفيذي
         if (ai['executive_summary'] != null) ...[
           const Text('الملخص التنفيذي', textDirection: TextDirection.rtl,
@@ -590,13 +556,21 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
           const SizedBox(height: 12),
         ],
 
+        // نقاط الضعف
+        if (ai['weaknesses'] != null) ...[
+          _aiSubTitle('نقاط الضعف', Icons.trending_down_rounded, AC.danger),
+          const SizedBox(height: 6),
+          ...((ai['weaknesses'] as List).map((s) => _bulletItem(s.toString(), AC.danger))),
+          const SizedBox(height: 12),
+        ],
+
         // المخاطر
         if (ai['risks'] != null) ...[
           _aiSubTitle('المخاطر', Icons.warning_amber_rounded, AC.warning),
           const SizedBox(height: 6),
           ...((ai['risks'] as List).map((r) {
             if (r is Map) {
-              return _bulletItem('${r['risk']} (${r['severity']}) — ${r['action']}', AC.warning);
+              return _bulletItem('[${r['severity']}] ${r['risk']} — ${r['impact']}', AC.warning);
             }
             return _bulletItem(r.toString(), AC.warning);
           })),
@@ -609,18 +583,19 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
           const SizedBox(height: 6),
           ...((ai['recommendations'] as List).map((r) {
             if (r is Map) {
-              return _bulletItem('${r['action']} (${r['priority']}) — ${r['timeline']}', AC.cyan);
+              return _bulletItem('[${r['priority']}] ${r['action']} — ${r['timeline']}', AC.cyan);
             }
             return _bulletItem(r.toString(), AC.cyan);
           })),
           const SizedBox(height: 12),
         ],
 
-        // خطة التحسين
-        if (ai['improvement_plan'] != null) ...[
-          _aiSubTitle('خطة التحسين', Icons.rocket_launch_rounded, AC.gold),
+        // رسالة الإدارة
+        if (ai['management_letter'] != null) ...[
+          _aiSubTitle('رسالة الإدارة', Icons.mail_outline_rounded, AC.gold),
           const SizedBox(height: 6),
-          ...((ai['improvement_plan'] as List).map((s) => _bulletItem(s.toString(), AC.gold))),
+          Text(ai['management_letter'], textDirection: TextDirection.rtl,
+            style: const TextStyle(fontSize: 12, color: AC.textSecondary, fontFamily: 'Tajawal', height: 1.5)),
         ],
       ]),
     );
@@ -639,13 +614,13 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
     child: Column(children: children),
   );
 
-  Widget _dataRow(String label, dynamic value, {bool bold = false, bool negative = false, Color? color}) {
-    final num = (value ?? 0).toDouble();
-    final formatted = _formatNum(num);
+  Widget _dataRow(String label, dynamic value, {bool bold = false, bool negative = false, Color? color, String? customValue}) {
+    final display = customValue ?? (value != null ? _formatNum((value).toDouble()) : '-');
+    final num = value != null ? (value).toDouble() : 0.0;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(formatted, style: TextStyle(
+        Text(display, style: TextStyle(
           fontSize: bold ? 14 : 13,
           fontWeight: bold ? FontWeight.w700 : FontWeight.w400,
           color: color ?? (num < 0 ? AC.danger : AC.textPrimary),
@@ -761,7 +736,3 @@ class _RingPainter extends CustomPainter {
   @override
   bool shouldRepaint(_) => false;
 }
-
-
-
-
