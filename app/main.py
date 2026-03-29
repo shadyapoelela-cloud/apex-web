@@ -13,6 +13,14 @@ import os
 
 from app.services.orchestrator import AnalysisOrchestrator
 
+# ─── Knowledge Brain ───
+try:
+    from app.knowledge_brain.api.routes.knowledge_routes import router as kb_router
+    from app.knowledge_brain.models.db_models import init_db
+    KB_AVAILABLE = True
+except Exception:
+    KB_AVAILABLE = False
+
 # ─── App Setup ───────────────────────────────────────────────────────────────
 
 app = FastAPI(
@@ -40,12 +48,25 @@ def root():
         "version": "2.0.0",
         "status": "running",
         "engine": "Financial Engine v2 — modular architecture",
+        "knowledge_brain": "active" if KB_AVAILABLE else "disabled",
         "endpoints": {
             "تحليل ميزان المراجعة": "POST /analyze",
             "تصنيف الحسابات فقط": "POST /classify",
+            "العقل المعرفي": "GET /knowledge/stats",
             "التوثيق": "GET /docs",
         },
     }
+
+# Include Knowledge Brain routes
+if KB_AVAILABLE:
+    app.include_router(kb_router)
+    # Initialize DB on startup
+    @app.on_event("startup")
+    def startup_init_kb():
+        try:
+            init_db()
+        except Exception:
+            pass
 
 
 @app.get("/health")
