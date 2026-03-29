@@ -185,17 +185,40 @@ class TrialBalanceReader:
         return rows
 
     def _filter_summary_rows(self, rows: list) -> list:
-        """Remove total/summary rows."""
-        skip = ["إجمالي", "المجموع", "الإجمالي", "total", "مجموع",
-                "فحص التوازن", "balance check", "الفرق", "✓", "✗",
-                "متوازن", "غير متوازن"]
+        """Remove total/summary rows and category header rows."""
+        skip_name_keywords = [
+            "فحص التوازن", "balance check", "✓", "✗",
+            "متوازن", "غير متوازن",
+        ]
+
+        # Generic top-level tabs that are category headers, not real accounts
+        summary_tabs = [
+            "الأصول", "الالتزامات", "حقوق الملكية", "الإيرادات",
+            "تكلفة المبيعات", "المصروفات التشغيلية", "تكاليف التمويل",
+            "الزكاة والضرائب", "المصروفات", "الإيرادات الأخرى",
+        ]
+
         filtered = []
         for row in rows:
-            name = row.get("name", "").lower().strip()
-            if any(kw in name for kw in skip):
-                continue
+            name = row.get("name", "").strip()
+            tab = row.get("tab", "").strip()
+
             if not name:
                 continue
+
+            # Skip rows with name keywords
+            if any(kw in name.lower() for kw in skip_name_keywords):
+                continue
+
+            # Skip category header rows: tab is a generic label without " - "
+            # AND name contains "|" or ":" (looks like a category summary)
+            if tab in summary_tabs:
+                continue
+
+            # Skip rows where net_balance is exactly 0 and name contains numbering pattern
+            if "|" in name and ":" in name:
+                continue
+
             filtered.append(row)
         return filtered
 
