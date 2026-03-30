@@ -2148,7 +2148,12 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
   Future<void> _load() async {
     try {
       final r = await http.get(Uri.parse('$_api/task-types'));
-      if (r.statusCode == 200) _types = jsonDecode(r.body);
+      if (r.statusCode == 200) {
+        final data = jsonDecode(r.body);
+        if (data is List) { _types = data; }
+        else if (data is Map && data['task_types'] != null) { _types = data['task_types']; }
+        else { _types = []; }
+      }
     } catch (e) { /* handle */ }
     setState(() => _loading = false);
   }
@@ -2164,8 +2169,8 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
           itemCount: _types.length,
           itemBuilder: (c, i) {
             final tt = _types[i];
-            final inputs = tt['input_requirements'] as List? ?? [];
-            final outputs = tt['output_requirements'] as List? ?? [];
+            final inputs = tt['input_requirements'] ?? tt['input_documents'] ?? [] as List? ?? [];
+            final outputs = tt['output_requirements'] ?? tt['output_documents'] ?? [] as List? ?? [];
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12)),

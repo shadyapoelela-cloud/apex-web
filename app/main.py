@@ -56,7 +56,7 @@ except Exception as e: P6 = False; print(f"P6: {e}")
 
 # Phase 7 — Task Documents + Suspension + Result Details + Audit
 try:
-    from app.phase7.models.phase7_models import init_phase7_db
+    from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
     from app.phase7.routes.phase7_routes import router as p7r
     from app.phase7.services.seed_phase7 import seed_task_types
     HAS_P7 = True
@@ -110,7 +110,7 @@ def root():
 @app.get("/debug/p7")
 def debug_p7():
     try:
-        from app.phase7.models.phase7_models import init_phase7_db
+        from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
         return {"step1": "models OK"}
     except Exception as e1:
         try:
@@ -138,7 +138,7 @@ def reinit_db(secret: str = Query(...)):
         results["seed1"] = str(e)
     if HAS_P7:
         try:
-            from app.phase7.models.phase7_models import init_phase7_db
+            from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
             from app.phase7.services.seed_phase7 import seed_task_types
             results["phase7_tables"] = init_phase7_db()
             results["phase7_seed"] = seed_task_types()
