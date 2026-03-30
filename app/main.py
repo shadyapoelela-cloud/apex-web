@@ -182,12 +182,27 @@ async def promote_to_admin(username: str, secret: str = Query(...)):
     if secret != "apex-admin-2026":
         raise HTTPException(403, "Invalid secret")
     try:
-        with pool.connection() as conn:
-            conn.execute("UPDATE users SET role = 'admin' WHERE username = %s", (username,))
-            conn.commit()
-        return {"message": f"{username} promoted to admin"}
+        from app.phase1.models.platform_models import SessionLocal, User, UserRole, Role, RoleCode
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter(User.username == username).first()
+            if not user:
+                raise HTTPException(404, f"User {username} not found")
+            admin_role = db.query(Role).filter(Role.code == RoleCode.PLATFORM_ADMIN).first()
+            if not admin_role:
+                admin_role = db.query(Role).filter(Role.code == "platform_admin").first()
+            if admin_role:
+                existing = db.query(UserRole).filter(UserRole.user_id == user.id, UserRole.role_id == admin_role.id).first()
+                if not existing:
+                    db.add(UserRole(user_id=user.id, role_id=admin_role.id))
+                    db.commit()
+            return {"message": f"{username} promoted to admin", "user_id": str(user.id)}
+        finally:
+            db.close()
+    except HTTPException:
+        raise
     except Exception as e:
-        return {"message": f"Promoted (or role column may not exist): {username}", "note": str(e)}
+        return {"message": f"Error: {e}"}
 
 # Phase 7: Extended APIs (Execution Master compliance)
 # ============================================================
