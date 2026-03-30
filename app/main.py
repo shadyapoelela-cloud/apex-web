@@ -14,6 +14,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 import os, traceback
 from app.services.orchestrator import AnalysisOrchestrator
+from fastapi.responses import Response as PDFResponse
 
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
@@ -118,6 +119,33 @@ async def analyze_full(file: UploadFile = File(...), industry: str = Query("gene
         r["narrative"] = await n.generate(r, language=language, brain_context=bc)
         return r
     except Exception as e: raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+
+
+@app.post("/analyze/report", tags=["Analysis"])
+async def analyze_report(
+    file: UploadFile = File(...),
+    industry: str = Query("general"),
+    closing_inventory: float = Query(0),
+    client_name: str = Query(""),
+    authorization: str = Header(None),
+):
+    """Analyze trial balance and return PDF report."""
+    from app.services.pdf_report_service import generate_pdf_report
+    contents = await file.read()
+    result = orch.analyze(contents, file.filename, industry, closing_inventory)
+    user_name = ""
+    if authorization and authorization.startswith("Bearer "):
+        try:
+            import jwt as _jwt
+            payload = _jwt.decode(authorization.split(" ")[1],
+                os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION"),
+                algorithms=["HS256"])
+            user_name = payload.get("username", "")
+        except: pass
+    from datetime import datetime as _dt
+    pdf_bytes = generate_pdf_report(result, client_name=client_name, user_name=user_name)
+    return PDFResponse(content=pdf_bytes, media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=APEX_Report_{_dt.now().strftime('%Y%m%d_%H%M')}.pdf"})
 
 @app.post("/classify")
 async def classify(file: UploadFile = File(...)):

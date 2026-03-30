@@ -1,502 +1,1318 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'dart:html' as html;
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const _api = 'https://apex-api-ootk.onrender.com';
 void main() => runApp(const ApexApp());
 
-// ═══════ Design System — Luxury Financial Theme ═══════
-class C {
-  static const bg = Color(0xFF060D18);
-  static const surface = Color(0xFF0C1525);
-  static const card = Color(0xFF111D30);
-  static const cardHover = Color(0xFF162240);
-  static const gold = Color(0xFFD4A84B);
-  static const goldDim = Color(0xFF8B7332);
-  static const accent = Color(0xFF00BCD4);
-  static const text = Color(0xFFF2EDE4);
-  static const textDim = Color(0xFF8C8577);
-  static const ok = Color(0xFF2ECC71);
-  static const warn = Color(0xFFE67E22);
-  static const err = Color(0xFFE74C3C);
-  static const border = Color(0x20D4A84B);
-  static const glow = Color(0x12D4A84B);
+// ═══════════════════════════════════════════════════
+// Design System
+// ═══════════════════════════════════════════════════
+class AC {
+  static const gold = Color(0xFFC9A84C);
+  static const navy = Color(0xFF050D1A);
+  static const navy2 = Color(0xFF080F1F);
+  static const navy3 = Color(0xFF0D1829);
+  static const navy4 = Color(0xFF0F2040);
+  static const cyan = Color(0xFF00C2E0);
+  static const tp = Color(0xFFF0EDE6);
+  static const ts = Color(0xFF8A8880);
+  static const ok = Color(0xFF2ECC8A);
+  static const warn = Color(0xFFF0A500);
+  static const err = Color(0xFFE05050);
+  static const bdr = Color(0x26C9A84C);
 }
 
-// ═══════ State ═══════
 class S {
-  static String? token, uid, uname, dname, plan;
+  static String? token, uid, uname, dname, plan, email;
   static List<String> roles = [];
-  static Map<String, String> h() => {'Authorization': 'Bearer ${token ?? ""}', 'Content-Type': 'application/json'};
-  static void clear() { token = null; uid = null; uname = null; dname = null; plan = null; roles = []; }
+  static Map<String,String> h() => {'Authorization':'Bearer ${token??""}'};
+  static Map<String,String> hj() => {'Authorization':'Bearer ${token??""}',' Content-Type':'application/json'};
+  static void clear() { token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[]; }
   static String planAr() {
-    const m = {'free':'مجاني','pro':'احترافي','business':'أعمال','expert':'خبير','enterprise':'مؤسسي'};
-    return m[plan] ?? plan ?? 'مجاني';
+    const m = {'free':'\u0645\u062c\u0627\u0646\u064a','pro':'\u0627\u062d\u062a\u0631\u0627\u0641\u064a','business':'\u0623\u0639\u0645\u0627\u0644','expert':'\u062e\u0628\u064a\u0631','enterprise':'\u0645\u0624\u0633\u0633\u064a'};
+    return m[plan] ?? plan ?? '\u0645\u062c\u0627\u0646\u064a';
   }
 }
 
-// ═══════ Shared Widgets ═══════
-InputDecoration _dec(String label, [IconData? icon]) => InputDecoration(
-  labelText: label, labelStyle: const TextStyle(color: C.textDim, fontFamily: 'Tajawal'),
-  prefixIcon: icon != null ? Icon(icon, color: C.gold, size: 20) : null,
-  filled: true, fillColor: C.surface, contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: C.border)),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: C.gold, width: 1.5)));
+Widget _card(String t, List<Widget> c, {Color? accent}) => Container(
+  margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
+  decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
+    border: Border.all(color: accent ?? AC.bdr)),
+  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    Text(t, style: TextStyle(color: accent ?? AC.gold, fontWeight: FontWeight.bold, fontSize: 15)),
+    const Divider(color: AC.bdr, height: 18), ...c]));
 
-Widget _card(Widget child, {EdgeInsets? margin, EdgeInsets? padding}) => Container(
-  margin: margin ?? const EdgeInsets.only(bottom: 14), padding: padding ?? const EdgeInsets.all(18),
-  decoration: BoxDecoration(color: C.card, borderRadius: BorderRadius.circular(16),
-    border: Border.all(color: C.border), boxShadow: [BoxShadow(color: C.glow, blurRadius: 20, offset: const Offset(0, 4))]),
-  child: child);
-
-Widget _kv(String k, String v, {Color? vc, bool bold = false}) => Padding(padding: const EdgeInsets.only(bottom: 8),
+Widget _kv(String k, String v, {Color? vc}) => Padding(padding: const EdgeInsets.only(bottom: 5),
   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-    Text(k, style: const TextStyle(color: C.textDim, fontSize: 13, fontFamily: 'Tajawal')),
-    Text(v, style: TextStyle(color: vc ?? C.text, fontSize: 14, fontWeight: bold ? FontWeight.bold : FontWeight.normal, fontFamily: 'Tajawal'))]));
+    Text(k, style: const TextStyle(color: AC.ts, fontSize: 13)),
+    Flexible(child: Text(v, style: TextStyle(color: vc ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
 
-Widget _badge(String text, Color color) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withOpacity(0.3))),
-  child: Text(text, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600, fontFamily: 'Tajawal')));
+Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+  decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+  child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
-Widget _sectionTitle(String title) => Padding(padding: const EdgeInsets.only(bottom: 12, top: 8),
-  child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: C.text, fontFamily: 'Tajawal')));
+InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
+  labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
+  filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)));
 
-// ═══════ App ═══════
+// ═══════════════════════════════════════════════════
+// App Root
+// ═══════════════════════════════════════════════════
 class ApexApp extends StatelessWidget {
   const ApexApp({super.key});
   @override Widget build(BuildContext context) => MaterialApp(
     title: 'APEX', debugShowCheckedModeBanner: false,
-    locale: const Locale('ar'), builder: (c, w) => Directionality(textDirection: TextDirection.rtl, child: w!),
-    theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: C.bg, appBarTheme: const AppBarTheme(backgroundColor: C.surface, elevation: 0, centerTitle: true),
-      elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(backgroundColor: C.gold, foregroundColor: C.bg,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'Tajawal')))),
+    theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: AC.navy,
+      appBarTheme: const AppBarTheme(backgroundColor: AC.navy2, elevation: 0, centerTitle: true),
+      elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
+        backgroundColor: AC.gold, foregroundColor: AC.navy,
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))))),
     home: const LoginScreen());
 }
 
-// ═══════ LOGIN ═══════
-class LoginScreen extends StatefulWidget { const LoginScreen({super.key}); @override State<LoginScreen> createState() => _LoginS(); }
+// ═══════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+  @override State<LoginScreen> createState() => _LoginS();
+}
 class _LoginS extends State<LoginScreen> {
-  final _u = TextEditingController(), _p = TextEditingController();
-  bool _l = false; String? _e;
+  final _u=TextEditingController(), _p=TextEditingController();
+  bool _l=false; String? _e;
   Future<void> _go() async {
-    setState(() { _l = true; _e = null; });
+    setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/auth/login'), headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username_or_email': _u.text.trim(), 'password': _p.text}));
+      final r = await http.post(Uri.parse('$_api/auth/login'),
+        headers:{'Content-Type':'application/json'},
+        body: jsonEncode({'username_or_email':_u.text.trim(),'password':_p.text}));
       final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
-        S.token = d['tokens']['access_token']; S.uid = d['user']['id']; S.uname = d['user']['username'];
-        S.dname = d['user']['display_name']; S.plan = d['user']['plan']; S.roles = List<String>.from(d['user']['roles'] ?? []);
-        if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainNav()));
-      } else { setState(() => _e = d['detail'] ?? d['error'] ?? 'خطأ في الدخول'); }
-    } catch (e) { setState(() => _e = 'خطأ في الاتصال بالخادم'); }
-    finally { if (mounted) setState(() => _l = false); }
+      if(r.statusCode==200 && d['success']==true) {
+        S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
+        S.uname=d['user']['username']; S.dname=d['user']['display_name'];
+        S.plan=d['user']['plan']; S.email=d['user']['email'];
+        S.roles=List<String>.from(d['user']['roles']??[]);
+        if(mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=>const MainNav()));
+      } else { setState(()=> _e=d['detail']??d['error']??'\u062e\u0637\u0623'); }
+    } catch(e){ setState(()=> _e='\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0627\u0644\u062e\u0627\u062f\u0645'); }
+    finally { if(mounted) setState(()=> _l=false); }
   }
-  @override Widget build(BuildContext context) => Scaffold(body: Container(
-    decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [C.surface, C.bg])),
-    child: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(32),
-    child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 420), child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const SizedBox(height: 40),
-      Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: C.gold.withOpacity(0.3), width: 2)),
-        child: const Icon(Icons.account_balance, color: C.gold, size: 40)),
-      const SizedBox(height: 20),
-      const Text('APEX', style: TextStyle(fontSize: 42, fontWeight: FontWeight.w900, color: C.gold, letterSpacing: 10, fontFamily: 'Tajawal')),
+  @override Widget build(BuildContext c) => Scaffold(body: Center(child: SingleChildScrollView(
+    padding: const EdgeInsets.all(32), child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 400),
+    child: Column(mainAxisSize: MainAxisSize.min, children: [
+      Container(width: 80, height: 80, decoration: BoxDecoration(shape: BoxShape.circle,
+        gradient: LinearGradient(colors: [AC.gold, AC.gold.withOpacity(0.6)])),
+        child: const Icon(Icons.account_balance, color: AC.navy, size: 40)),
+      const SizedBox(height: 16),
+      const Text('APEX', style: TextStyle(fontSize: 42, fontWeight: FontWeight.w900, color: AC.gold, letterSpacing: 10)),
       const SizedBox(height: 6),
-      const Text('منصة التحليل المالي الذكية', style: TextStyle(color: C.textDim, fontSize: 14, fontFamily: 'Tajawal')),
-      const SizedBox(height: 48),
-      TextField(controller: _u, style: const TextStyle(fontFamily: 'Tajawal'), decoration: _dec('البريد أو اسم المستخدم', Icons.person_outline)),
+      const Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0627\u0644\u0630\u0643\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
+      const SizedBox(height: 40),
+      TextField(controller:_u, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u0623\u0648 \u0627\u0644\u0628\u0631\u064a\u062f', ic: Icons.person_outline)),
       const SizedBox(height: 14),
-      TextField(controller: _p, obscureText: true, style: const TextStyle(fontFamily: 'Tajawal'), decoration: _dec('كلمة المرور', Icons.lock_outline), onSubmitted: (_) => _go()),
-      if (_e != null) Padding(padding: const EdgeInsets.only(top: 14), child: Container(padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: C.err.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-        child: Row(children: [const Icon(Icons.error_outline, color: C.err, size: 18), const SizedBox(width: 8),
-          Expanded(child: Text(_e!, style: const TextStyle(color: C.err, fontSize: 13, fontFamily: 'Tajawal')))]))),
-      const SizedBox(height: 28),
-      SizedBox(width: double.infinity, height: 52, child: ElevatedButton(onPressed: _l ? null : _go,
-        child: _l ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: C.bg)) : const Text('تسجيل الدخول'))),
-      const SizedBox(height: 18),
-      TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegScreen())),
-        child: const Text('ليس لديك حساب؟ سجّل الآن', style: TextStyle(color: C.gold, fontFamily: 'Tajawal'))),
-    ]))))));
+      TextField(controller:_p, obscureText:true, decoration:_inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', ic: Icons.lock_outline), onSubmitted:(_)=>_go()),
+      if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child: Container(padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+        child: Row(children: [const Icon(Icons.error_outline, color:AC.err, size:18), const SizedBox(width:8),
+          Expanded(child: Text(_e!, style:const TextStyle(color:AC.err, fontSize:12)))]))),
+      const SizedBox(height: 22),
+      SizedBox(width: double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
+        child: _l ? const SizedBox(height:20,width:20, child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(fontWeight: FontWeight.bold)))),
+      const SizedBox(height: 12),
+      TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const RegScreen())),
+        child: const Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f \u0633\u062c\u0651\u0644 \u0627\u0644\u0622\u0646', style: TextStyle(color: AC.gold))),
+    ])))));
 }
 
-// ═══════ REGISTER ═══════
-class RegScreen extends StatefulWidget { const RegScreen({super.key}); @override State<RegScreen> createState() => _RegS(); }
+// ═══════════════════════════════════════════════════
+// REGISTER
+// ═══════════════════════════════════════════════════
+class RegScreen extends StatefulWidget {
+  const RegScreen({super.key});
+  @override State<RegScreen> createState() => _RegS();
+}
 class _RegS extends State<RegScreen> {
-  final _un = TextEditingController(), _em = TextEditingController(), _dn = TextEditingController(), _pw = TextEditingController();
-  bool _l = false; String? _e;
+  final _un=TextEditingController(),_em=TextEditingController(),_dn=TextEditingController(),_pw=TextEditingController();
+  bool _l=false; String? _e;
   Future<void> _go() async {
-    setState(() { _l = true; _e = null; });
+    setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/auth/register'), headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username': _un.text.trim(), 'email': _em.text.trim(), 'display_name': _dn.text.trim(), 'password': _pw.text}));
+      final r = await http.post(Uri.parse('$_api/auth/register'), headers:{'Content-Type':'application/json'},
+        body: jsonEncode({'username':_un.text.trim(),'email':_em.text.trim(),'display_name':_dn.text.trim(),'password':_pw.text}));
       final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
-        S.token = d['tokens']['access_token']; S.uid = d['user']['id']; S.uname = d['user']['username'];
-        S.dname = d['user']['display_name']; S.plan = d['user']['plan'];
-        if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainNav()));
-      } else { setState(() => _e = d['detail'] ?? d['error'] ?? 'خطأ'); }
-    } catch (e) { setState(() => _e = 'خطأ في الاتصال'); }
-    finally { if (mounted) setState(() => _l = false); }
+      if(r.statusCode==200 && d['success']==true) {
+        S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
+        S.uname=d['user']['username']; S.dname=d['user']['display_name'];
+        S.plan=d['user']['plan']; S.email=d['user']['email'];
+        if(mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=>const MainNav()));
+      } else { setState(()=> _e=d['detail']??d['error']??'\u062e\u0637\u0623'); }
+    } catch(e){ setState(()=> _e='$e'); }
+    finally { if(mounted) setState(()=> _l=false); }
   }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('إنشاء حساب جديد', style: TextStyle(fontFamily: 'Tajawal'))),
-    body: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(32), child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 420),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextField(controller: _un, style: const TextStyle(fontFamily: 'Tajawal'), decoration: _dec('اسم المستخدم *', Icons.alternate_email)),
-        const SizedBox(height: 12), TextField(controller: _em, style: const TextStyle(fontFamily: 'Tajawal'), decoration: _dec('البريد الإلكتروني *', Icons.email_outlined)),
-        const SizedBox(height: 12), TextField(controller: _dn, style: const TextStyle(fontFamily: 'Tajawal'), decoration: _dec('الاسم الظاهر *', Icons.badge_outlined)),
-        const SizedBox(height: 12), TextField(controller: _pw, obscureText: true, style: const TextStyle(fontFamily: 'Tajawal'), decoration: _dec('كلمة المرور *', Icons.lock_outline)),
-        if (_e != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(_e!, style: const TextStyle(color: C.err, fontSize: 13, fontFamily: 'Tajawal'))),
-        const SizedBox(height: 28),
-        SizedBox(width: double.infinity, height: 52, child: ElevatedButton(onPressed: _l ? null : _go,
-          child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('إنشاء الحساب'))),
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold))),
+    body: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(28), child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 400), child: Column(mainAxisSize: MainAxisSize.min, children: [
+        TextField(controller:_un, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 *', ic: Icons.alternate_email)),
+        const SizedBox(height:12), TextField(controller:_em, decoration:_inp('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a *', ic: Icons.email_outlined)),
+        const SizedBox(height:12), TextField(controller:_dn, decoration:_inp('\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0638\u0627\u0647\u0631 *', ic: Icons.badge_outlined)),
+        const SizedBox(height:12), TextField(controller:_pw, obscureText:true, decoration:_inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 *', ic: Icons.lock_outline)),
+        if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child:Text(_e!, style:const TextStyle(color:AC.err, fontSize:12))),
+        const SizedBox(height:22),
+        SizedBox(width:double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
+          child: _l ? const CircularProgressIndicator(strokeWidth:2) : const Text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628'))),
       ])))));
 }
 
-// ═══════ MAIN NAV — 6 تابات ═══════
-class MainNav extends StatefulWidget { const MainNav({super.key}); @override State<MainNav> createState() => _MainNavS(); }
+// ═══════════════════════════════════════════════════
+// MAIN NAVIGATION — 6 tabs
+// ═══════════════════════════════════════════════════
+class MainNav extends StatefulWidget {
+  const MainNav({super.key});
+  @override State<MainNav> createState() => _MainNavS();
+}
 class _MainNavS extends State<MainNav> {
   int _i = 0;
-  @override Widget build(BuildContext context) => Scaffold(
-    body: [const DashTab(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab()][_i],
-    bottomNavigationBar: Container(decoration: const BoxDecoration(border: Border(top: BorderSide(color: C.border))),
-      child: BottomNavigationBar(currentIndex: _i, onTap: (i) => setState(() => _i = i),
-        type: BottomNavigationBarType.fixed, backgroundColor: C.surface, selectedItemColor: C.gold, unselectedItemColor: C.textDim,
-        selectedFontSize: 11, unselectedFontSize: 10, selectedLabelStyle: const TextStyle(fontFamily: 'Tajawal'), unselectedLabelStyle: const TextStyle(fontFamily: 'Tajawal'),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: 'الرئيسية'),
-          BottomNavigationBarItem(icon: Icon(Icons.business_rounded), label: 'العملاء'),
-          BottomNavigationBarItem(icon: Icon(Icons.analytics_rounded), label: 'التحليل'),
-          BottomNavigationBarItem(icon: Icon(Icons.store_rounded), label: 'المعرض'),
-          BottomNavigationBarItem(icon: Icon(Icons.work_rounded), label: 'مقدم خدمة'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'حسابي'),
-        ])));
+  @override Widget build(BuildContext c) => Scaffold(
+    body: [const DashTab(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()][_i],
+    bottomNavigationBar: BottomNavigationBar(currentIndex:_i, onTap:(i)=>setState(()=>_i=i),
+      type: BottomNavigationBarType.fixed, backgroundColor: AC.navy2,
+      selectedItemColor: AC.gold, unselectedItemColor: AC.ts, selectedFontSize: 11, unselectedFontSize: 10,
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629'),
+        BottomNavigationBarItem(icon: Icon(Icons.business_rounded), label: '\u0627\u0644\u0639\u0645\u0644\u0627\u0621'),
+        BottomNavigationBarItem(icon: Icon(Icons.analytics_rounded), label: '\u0627\u0644\u062a\u062d\u0644\u064a\u0644'),
+        BottomNavigationBarItem(icon: Icon(Icons.store_rounded), label: '\u0627\u0644\u0645\u0639\u0631\u0636'),
+        BottomNavigationBarItem(icon: Icon(Icons.work_rounded), label: '\u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629'),
+        BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: '\u062d\u0633\u0627\u0628\u064a'),
+        BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings_rounded), label: '\u0625\u062f\u0627\u0631\u0629'),
+      ]));
 }
 
-// ═══════ الرئيسية ═══════
-class DashTab extends StatefulWidget { const DashTab({super.key}); @override State<DashTab> createState() => _DashS(); }
+// ═══════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════
+class DashTab extends StatefulWidget { const DashTab({super.key}); @override State<DashTab> createState()=>_DashS(); }
 class _DashS extends State<DashTab> {
-  Map<String, dynamic>? _sub; List _plans = []; bool _ld = true;
+  Map<String,dynamic>? _sub; List _plans=[]; bool _ld=true; int _notifCount=0;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
       final r1 = await http.get(Uri.parse('$_api/subscriptions/me'), headers: S.h());
       final r2 = await http.get(Uri.parse('$_api/plans'));
-      if (mounted) setState(() { _sub = jsonDecode(r1.body); _plans = jsonDecode(r2.body); _ld = false; });
-    } catch (_) { if (mounted) setState(() => _ld = false); }
+      final r3 = await http.get(Uri.parse('$_api/notifications'), headers: S.h());
+      if(mounted) setState(() {
+        _sub = jsonDecode(r1.body); _plans = jsonDecode(r2.body);
+        try { final nots = jsonDecode(r3.body); if(nots is List) _notifCount = nots.where((n)=>n['is_read']!=true).length; } catch(_){}
+        _ld = false;
+      });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text('مرحباً ${S.dname ?? ""}', style: const TextStyle(color: C.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.bold))),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: C.gold)) : ListView(padding: const EdgeInsets.all(16), children: [
-      _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: C.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.workspace_premium, color: C.gold, size: 24)), const SizedBox(width: 14),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('خطتك الحالية', style: TextStyle(color: C.textDim, fontSize: 12, fontFamily: 'Tajawal')),
-            Text(_sub?['plan_name_ar'] ?? 'مجاني', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: C.gold, fontFamily: 'Tajawal'))])]),
-        const SizedBox(height: 16), const Divider(color: C.border),
-        ...(_sub?['entitlements'] as Map<String, dynamic>? ?? {}).entries.map((e) => Padding(padding: const EdgeInsets.only(bottom: 6),
-          child: Row(children: [Icon(e.value['value'] == 'true' || e.value['value'] == 'unlimited' ? Icons.check_circle_rounded : e.value['value'] == 'false' ? Icons.cancel_rounded : Icons.info_rounded,
-            color: e.value['value'] == 'true' || e.value['value'] == 'unlimited' ? C.ok : e.value['value'] == 'false' ? C.err : C.accent, size: 16),
-            const SizedBox(width: 10), Expanded(child: Text('${e.key}: ${e.value["value"]}', style: const TextStyle(color: C.textDim, fontSize: 12, fontFamily: 'Tajawal')))]))),
-      ])),
-      _sectionTitle('الخطط المتاحة'),
-      ..._plans.map((p) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: C.card, borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: p['code'] == _sub?['plan'] ? C.gold : C.border, width: p['code'] == _sub?['plan'] ? 1.5 : 1)),
-        child: Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(p['name_ar'] ?? '', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: p['code'] == _sub?['plan'] ? C.gold : C.text, fontFamily: 'Tajawal')),
-          const SizedBox(height: 2),
-          Text(p['target_user_ar'] ?? '', style: const TextStyle(color: C.textDim, fontSize: 11, fontFamily: 'Tajawal'))])),
-          _badge(p['price_monthly_sar'] == 0 ? 'مجاني' : '${p["price_monthly_sar"]} ر.س', p['code'] == _sub?['plan'] ? C.gold : C.accent)]))),
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(
+      title: Text('\u0645\u0631\u062d\u0628\u0627\u064b ${S.dname??""} \u{1F44B}', style: const TextStyle(color: AC.gold, fontSize: 18)),
+      actions: [
+        Stack(children: [
+          IconButton(icon: const Icon(Icons.notifications_outlined, color: AC.tp),
+            onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const NotificationsScreen()))),
+          if(_notifCount>0) Positioned(right:8,top:8, child: Container(padding: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(color: AC.err, shape: BoxShape.circle),
+            child: Text('$_notifCount', style: const TextStyle(color: Colors.white, fontSize: 10))))]),
+      ]),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(16), children: [
+        // Current Plan Card
+        _card('\u062e\u0637\u062a\u0643 \u0627\u0644\u062d\u0627\u0644\u064a\u0629', [
+          Row(children: [const Icon(Icons.workspace_premium, color: AC.gold, size: 28), const SizedBox(width: 10),
+            Text(_sub?['plan_name_ar'] ?? S.planAr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AC.tp)),
+            const Spacer(), _badge(_sub?['status']??'active', AC.ok)]),
+          const SizedBox(height: 14),
+          ...(_sub?['entitlements'] as Map<String,dynamic>? ?? {}).entries.take(6).map((e) => Padding(
+            padding: const EdgeInsets.only(bottom: 4), child: Row(children: [
+              Icon(e.value['value']=='true'||e.value['value']=='unlimited' ? Icons.check_circle : e.value['value']=='false' ? Icons.cancel : Icons.info_outline,
+                color: e.value['value']=='true'||e.value['value']=='unlimited' ? AC.ok : e.value['value']=='false' ? AC.err : AC.cyan, size: 15),
+              const SizedBox(width: 8),
+              Expanded(child: Text('${e.key}: ${e.value['value']}', style: const TextStyle(color: AC.ts, fontSize: 11)))]))),
+          const SizedBox(height: 10),
+          SizedBox(width: double.infinity, child: OutlinedButton.icon(
+            onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>UpgradePlanScreen(plans: _plans, currentPlan: _sub?['plan']))),
+            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
+            icon: const Icon(Icons.upgrade, color: AC.gold, size: 18),
+            label: const Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold)))),
+        ]),
+        // Plans Grid
+        const Text('\u0627\u0644\u062e\u0637\u0637 \u0627\u0644\u0645\u062a\u0627\u062d\u0629', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AC.tp)),
+        const SizedBox(height: 8),
+        ..._plans.map((p) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: p['code']==_sub?['plan'] ? AC.gold : AC.bdr, width: p['code']==_sub?['plan'] ? 2 : 1)),
+          child: Row(children: [
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [Text(p['name_ar']??'', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold,
+                color: p['code']==_sub?['plan'] ? AC.gold : AC.tp)),
+                if(p['code']==_sub?['plan']) ...[const SizedBox(width:8), _badge('\u0627\u0644\u062d\u0627\u0644\u064a\u0629', AC.gold)]]),
+              const SizedBox(height: 4),
+              Text(p['target_user_ar']??'', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+            Text(p['price_monthly_sar']==0 ? '\u0645\u062c\u0627\u0646\u064a' : '${p['price_monthly_sar']} \u0631.\u0633/\u0634\u0647\u0631',
+              style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold))]))),
+      ])));
+}
+
+// ═══════════════════════════════════════════════════
+// NOTIFICATIONS SCREEN (NEW)
+// ═══════════════════════════════════════════════════
+class NotificationsScreen extends StatefulWidget {
+  const NotificationsScreen({super.key});
+  @override State<NotificationsScreen> createState() => _NotifS();
+}
+class _NotifS extends State<NotificationsScreen> {
+  List _nots = []; bool _ld = true;
+  @override void initState() { super.initState(); _load(); }
+  Future<void> _load() async {
+    try { final r = await http.get(Uri.parse('$_api/notifications'), headers: S.h());
+      if(mounted) setState(() { try { _nots = jsonDecode(r.body); } catch(_) { _nots = []; } _ld = false; });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
+  }
+  Future<void> _markAllRead() async {
+    await http.post(Uri.parse('$_api/notifications/read-all'), headers: S.h());
+    _load();
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.gold)),
+      actions: [TextButton(onPressed: _markAllRead, child: const Text('\u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0643\u0644', style: TextStyle(color: AC.cyan, fontSize: 12)))]),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      _nots.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(Icons.notifications_off_outlined, color: AC.ts, size: 60),
+        const SizedBox(height: 12),
+        const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.ts, fontSize: 16))])) :
+      ListView.builder(padding: const EdgeInsets.all(12), itemCount: _nots.length, itemBuilder: (_, i) {
+        final n = _nots[i];
+        final isRead = n['is_read'] == true;
+        return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(color: isRead ? AC.navy3 : AC.navy4, borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: isRead ? AC.bdr : AC.gold.withOpacity(0.3))),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(_notifIcon(n['type']??''), color: isRead ? AC.ts : AC.gold, size: 22),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(n['title']??n['message']??'', style: TextStyle(color: isRead ? AC.ts : AC.tp, fontWeight: isRead ? FontWeight.normal : FontWeight.bold, fontSize: 13)),
+              if(n['body']!=null) Padding(padding: const EdgeInsets.only(top: 4),
+                child: Text(n['body'], style: const TextStyle(color: AC.ts, fontSize: 11))),
+              Padding(padding: const EdgeInsets.only(top: 6),
+                child: Text(n['created_at']?.toString().substring(0,16)??'', style: const TextStyle(color: AC.ts, fontSize: 10)))])),
+            if(!isRead) Container(width: 8, height: 8, decoration: const BoxDecoration(color: AC.gold, shape: BoxShape.circle))]));
+      }));
+
+  IconData _notifIcon(String t) {
+    if(t.contains('task')) return Icons.assignment;
+    if(t.contains('plan')||t.contains('subscription')) return Icons.workspace_premium;
+    if(t.contains('provider')) return Icons.verified_user;
+    if(t.contains('knowledge')) return Icons.psychology;
+    return Icons.notifications;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// UPGRADE PLAN SCREEN (NEW)
+// ═══════════════════════════════════════════════════
+class UpgradePlanScreen extends StatelessWidget {
+  final List plans; final String? currentPlan;
+  const UpgradePlanScreen({super.key, required this.plans, this.currentPlan});
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold))),
+    body: ListView(padding: const EdgeInsets.all(16), children: [
+      const Text('\u0627\u062e\u062a\u0631 \u0627\u0644\u062e\u0637\u0629 \u0627\u0644\u0645\u0646\u0627\u0633\u0628\u0629', style: TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 16),
+      ...plans.map((p) {
+        final isCurrent = p['code'] == currentPlan;
+        final features = (p['features'] as Map<String,dynamic>?)?.entries.toList() ?? [];
+        return Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: isCurrent ? AC.gold : AC.bdr, width: isCurrent ? 2 : 1)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [Text(p['name_ar']??'', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isCurrent ? AC.gold : AC.tp)),
+              const Spacer(),
+              if(isCurrent) _badge('\u0627\u0644\u062d\u0627\u0644\u064a\u0629', AC.gold)
+              else _badge(p['price_monthly_sar']==0?'\u0645\u062c\u0627\u0646\u064a':'${p['price_monthly_sar']} \u0631.\u0633', AC.cyan)]),
+            const SizedBox(height: 6),
+            Text(p['target_user_ar']??'', style: const TextStyle(color: AC.ts, fontSize: 12)),
+            const SizedBox(height: 12),
+            ...features.take(8).map((f) => Padding(padding: const EdgeInsets.only(bottom: 3),
+              child: Row(children: [
+                Icon(f.value['value']=='true'||f.value['value']=='unlimited'?Icons.check_circle:Icons.cancel,
+                  color: f.value['value']=='true'||f.value['value']=='unlimited'?AC.ok:AC.err.withOpacity(0.5), size: 14),
+                const SizedBox(width: 8),
+                Expanded(child: Text(f.value['name_ar']??f.key, style: const TextStyle(color: AC.ts, fontSize: 11)))]))),
+            if(!isCurrent) ...[const SizedBox(height: 12),
+              SizedBox(width: double.infinity, child: ElevatedButton(
+                onPressed: () { ScaffoldMessenger.of(c).showSnackBar(SnackBar(
+                  content: Text('\u0633\u064a\u062a\u0645 \u062a\u0641\u0639\u064a\u0644 \u0628\u0648\u0627\u0628\u0629 \u0627\u0644\u062f\u0641\u0639 \u0642\u0631\u064a\u0628\u0627\u064b'),
+                  backgroundColor: AC.navy3)); },
+                child: const Text('\u062a\u0631\u0642\u064a\u0629')))],
+          ]));
+      }),
     ]));
 }
 
-// ═══════ العملاء ═══════
-class ClientsTab extends StatefulWidget { const ClientsTab({super.key}); @override State<ClientsTab> createState() => _ClientsS(); }
+// ═══════════════════════════════════════════════════
+// CLIENTS TAB
+// ═══════════════════════════════════════════════════
+class ClientsTab extends StatefulWidget { const ClientsTab({super.key}); @override State<ClientsTab> createState()=>_ClientsS(); }
 class _ClientsS extends State<ClientsTab> {
-  List _cl = []; bool _ld = true;
+  List _cl=[]; bool _ld=true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
-    try { final r = await http.get(Uri.parse('$_api/clients'), headers: S.h()); if (mounted) setState(() { _cl = jsonDecode(r.body); _ld = false; }); }
-    catch (_) { if (mounted) setState(() => _ld = false); }
+    try { final r = await http.get(Uri.parse('$_api/clients'), headers: S.h());
+      if(mounted) setState((){  _cl=jsonDecode(r.body); _ld=false; });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('العملاء', style: TextStyle(color: C.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.bold))),
-    floatingActionButton: FloatingActionButton(backgroundColor: C.gold, elevation: 4, onPressed: () async {
-      await Navigator.push(context, MaterialPageRoute(builder: (_) => const NewClientScreen())); _load(); },
-      child: const Icon(Icons.add, color: C.bg)),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: C.gold)) :
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.gold))),
+    floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: const Icon(Icons.add, color: AC.navy),
+      onPressed: () async { await Navigator.push(c, MaterialPageRoute(builder:(_)=>const NewClientScreen())); _load(); }),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       _cl.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.business_outlined, color: C.textDim.withOpacity(0.3), size: 64), const SizedBox(height: 16),
-        const Text('لا يوجد عملاء بعد', style: TextStyle(color: C.textDim, fontSize: 16, fontFamily: 'Tajawal')),
-        const SizedBox(height: 8), const Text('اضغط + لإنشاء عميل جديد', style: TextStyle(color: C.textDim, fontSize: 13, fontFamily: 'Tajawal'))])) :
-      ListView.builder(padding: const EdgeInsets.all(16), itemCount: _cl.length, itemBuilder: (_, i) { final c = _cl[i];
-        return _card(Row(children: [CircleAvatar(backgroundColor: C.surface, radius: 22,
-          child: Text((c['name_ar'] ?? '?')[0], style: const TextStyle(color: C.gold, fontWeight: FontWeight.bold, fontFamily: 'Tajawal'))),
-          const SizedBox(width: 14), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(c['name_ar'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, color: C.text, fontSize: 15, fontFamily: 'Tajawal')),
-            const SizedBox(height: 2),
-            Text('${c["client_type"] ?? ""} • ${c["your_role"] ?? ""}', style: const TextStyle(color: C.textDim, fontSize: 12, fontFamily: 'Tajawal'))])),
-          if (c['knowledge_mode'] == true) Container(padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: C.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-            child: const Icon(Icons.psychology, color: C.accent, size: 18))])); }));
+        const Icon(Icons.business_outlined, color: AC.ts, size: 60), const SizedBox(height: 12),
+        const Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621 \u0628\u0639\u062f', style: TextStyle(color: AC.ts))])) :
+      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
+        padding: const EdgeInsets.all(14), itemCount: _cl.length, itemBuilder: (_, i) {
+          final c2 = _cl[i];
+          return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+            child: Row(children: [
+              CircleAvatar(backgroundColor: AC.navy4, radius: 22, child: Text((c2['name_ar']??'?')[0], style: const TextStyle(color: AC.gold, fontSize: 18))),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(c2['name_ar']??'', style: const TextStyle(fontWeight: FontWeight.bold, color: AC.tp, fontSize: 14)),
+                const SizedBox(height: 3),
+                Text('${c2['client_type']??''} \u2022 ${c2['your_role']??''}', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+              if(c2['knowledge_mode']==true) const Icon(Icons.psychology, color: AC.cyan, size: 22)]));
+        })));
 }
 
-class NewClientScreen extends StatefulWidget { const NewClientScreen({super.key}); @override State<NewClientScreen> createState() => _NewCS(); }
+class NewClientScreen extends StatefulWidget { const NewClientScreen({super.key}); @override State<NewClientScreen> createState()=>_NewCS(); }
 class _NewCS extends State<NewClientScreen> {
-  final _n = TextEditingController(); List _types = []; String? _t; bool _l = false; String? _e;
-  @override void initState() { super.initState(); http.get(Uri.parse('$_api/client-types')).then((r) { if (mounted) setState(() => _types = jsonDecode(r.body)); }); }
+  final _n=TextEditingController(); List _types=[]; String? _t; bool _l=false; String? _e;
+  @override void initState() { super.initState(); http.get(Uri.parse('$_api/client-types')).then((r){ if(mounted) setState(()=> _types=jsonDecode(r.body)); }); }
   Future<void> _go() async {
-    if (_n.text.trim().isEmpty || _t == null) { setState(() => _e = 'الاسم ونوع العميل مطلوبان'); return; }
-    setState(() { _l = true; _e = null; });
+    if(_n.text.trim().isEmpty||_t==null){ setState(()=> _e='\u0627\u0644\u0627\u0633\u0645 \u0648\u0627\u0644\u0646\u0648\u0639 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
+    setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/clients'), headers: S.h(), body: jsonEncode({'name_ar': _n.text.trim(), 'client_type_code': _t}));
-      if (jsonDecode(r.body)['success'] == true) { if (mounted) Navigator.pop(context); } else { setState(() => _e = jsonDecode(r.body)['detail']); }
-    } catch (e) { setState(() => _e = '$e'); } finally { if (mounted) setState(() => _l = false); }
+      final r = await http.post(Uri.parse('$_api/clients'), headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        body: jsonEncode({'name_ar':_n.text.trim(),'client_type_code':_t}));
+      if(jsonDecode(r.body)['success']==true) { if(mounted) Navigator.pop(context); }
+      else { setState(()=> _e=jsonDecode(r.body)['detail']); }
+    } catch(e){ setState(()=> _e='$e'); }
+    finally { if(mounted) setState(()=> _l=false); }
   }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('إنشاء عميل جديد', style: TextStyle(fontFamily: 'Tajawal'))),
-    body: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      TextField(controller: _n, style: const TextStyle(fontFamily: 'Tajawal'), decoration: _dec('اسم المنشأة *', Icons.business)),
-      const SizedBox(height: 20), const Text('نوع العميل *', style: TextStyle(color: C.textDim, fontFamily: 'Tajawal')), const SizedBox(height: 8),
-      ..._types.map((t) => GestureDetector(onTap: () => setState(() => _t = t['code']),
-        child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: _t == t['code'] ? C.gold.withOpacity(0.08) : C.card, borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _t == t['code'] ? C.gold : C.border)),
-          child: Row(children: [Icon(_t == t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _t == t['code'] ? C.gold : C.textDim, size: 20),
-            const SizedBox(width: 12), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(t['name_ar'] ?? '', style: TextStyle(color: _t == t['code'] ? C.gold : C.text, fontWeight: FontWeight.w600, fontFamily: 'Tajawal')),
-              if (t['knowledge_mode_eligible'] == true) Row(children: [const Icon(Icons.psychology, color: C.accent, size: 14), const SizedBox(width: 4),
-                const Text('وضع المعرفة', style: TextStyle(color: C.accent, fontSize: 11, fontFamily: 'Tajawal'))])
-              else Text(t['name_en'] ?? '', style: const TextStyle(color: C.textDim, fontSize: 11))]))])))),
-      if (_e != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(_e!, style: const TextStyle(color: C.err, fontFamily: 'Tajawal'))),
-      const SizedBox(height: 24),
-      SizedBox(width: double.infinity, height: 52, child: ElevatedButton(onPressed: _l ? null : _go,
-        child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('إنشاء العميل')))])));
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold))),
+    body: SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      TextField(controller:_n, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629 *', ic: Icons.business)),
+      const SizedBox(height: 18), const Text('\u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644 *', style: TextStyle(color: AC.ts, fontSize: 14)),
+      const SizedBox(height: 8),
+      ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_t=t['code']),
+        child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: _t==t['code'] ? AC.gold.withOpacity(0.1) : AC.navy3,
+            borderRadius: BorderRadius.circular(10), border: Border.all(color: _t==t['code'] ? AC.gold : AC.bdr)),
+          child: Row(children: [
+            Icon(_t==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _t==t['code'] ? AC.gold : AC.ts, size: 20),
+            const SizedBox(width: 10),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t['name_ar']??'', style: TextStyle(color: _t==t['code'] ? AC.gold : AC.tp, fontWeight: FontWeight.w600, fontSize: 13)),
+              if(t['knowledge_mode_eligible']==true) const Text('\u0648\u0636\u0639 \u0627\u0644\u0645\u0639\u0631\u0641\u0629', style: TextStyle(color: AC.cyan, fontSize: 10))]))]))))  ,
+      if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child:Text(_e!, style:const TextStyle(color:AC.err))),
+      const SizedBox(height: 20),
+      SizedBox(width:double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
+        child: _l ? const CircularProgressIndicator(strokeWidth:2) : const Text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644')))])));
 }
 
-// ═══════ التحليل المالي ═══════
-class AnalysisTab extends StatefulWidget { const AnalysisTab({super.key}); @override State<AnalysisTab> createState() => _AnalysisS(); }
+// ═══════════════════════════════════════════════════
+// ANALYSIS TAB — with Result Details Panel (!)
+// ═══════════════════════════════════════════════════
+class AnalysisTab extends StatefulWidget { const AnalysisTab({super.key}); @override State<AnalysisTab> createState()=>_AnalysisS(); }
 class _AnalysisS extends State<AnalysisTab> {
-  PlatformFile? _f; List<int>? _fb; bool _a = false; Map<String, dynamic>? _r; String? _e;
+  PlatformFile? _f; List<int>? _fb; bool _a=false; Map<String,dynamic>? _r; String? _e;
   Future<void> _pick() async {
-    final r = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['xlsx', 'xls'], withData: true);
-    if (r != null && r.files.isNotEmpty) setState(() { _f = r.files.first; _fb = r.files.first.bytes?.toList(); _r = null; _e = null; });
+    final r = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions:['xlsx','xls'], withData:true);
+    if(r!=null && r.files.isNotEmpty) setState((){  _f=r.files.first; _fb=r.files.first.bytes?.toList(); _r=null; _e=null; });
   }
   Future<void> _run() async {
-    if (_fb == null) return; setState(() { _a = true; _e = null; });
+    if(_fb==null) return; setState((){ _a=true; _e=null; });
     try {
       final req = http.MultipartRequest('POST', Uri.parse('$_api/analyze?industry=retail'));
-      req.headers['Authorization'] = 'Bearer ${S.token}';
-      req.files.add(http.MultipartFile.fromBytes('file', _fb!, filename: 'tb.xlsx'));
+      req.headers['Authorization']='Bearer ${S.token}';
+      req.files.add(http.MultipartFile.fromBytes('file', _fb!, filename:'tb.xlsx'));
       final res = await req.send(); final body = await res.stream.bytesToString();
-      setState(() { _r = jsonDecode(body); _a = false; });
-    } catch (e) { setState(() { _e = 'خطأ في التحليل: $e'; _a = false; }); }
+      setState((){ _r=jsonDecode(body); _a=false; });
+    } catch(e){ setState((){ _e='$e'; _a=false; }); }
   }
-  String _fmt(dynamic v) { if (v == null) return '—'; final d = (v is int) ? v.toDouble() : (v is double) ? v : 0.0;
-    if (d.abs() >= 1e6) return '${(d/1e6).toStringAsFixed(2)}M'; if (d.abs() >= 1e3) return '${(d/1e3).toStringAsFixed(1)}K'; return d.toStringAsFixed(2); }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('التحليل المالي', style: TextStyle(color: C.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.bold))),
+  String _fmt(dynamic v) { if(v==null) return '-'; final d=(v is int)?v.toDouble():(v is double)?v:0.0;
+    if(d.abs()>=1e6) return '${(d/1e6).toStringAsFixed(2)}M'; if(d.abs()>=1e3) return '${(d/1e3).toStringAsFixed(1)}K'; return d.toStringAsFixed(2); }
+
+  void _showDetail(BuildContext c, String title, Map<String,dynamic> data) {
+    showModalBottomSheet(context: c, backgroundColor: AC.navy2, isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => DraggableScrollableSheet(expand: false, initialChildSize: 0.6, maxChildSize: 0.9,
+        builder: (_, sc) => ListView(controller: sc, padding: const EdgeInsets.all(20), children: [
+          Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AC.ts, borderRadius: BorderRadius.circular(2)))),
+          const SizedBox(height: 16),
+          Text(title, style: const TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
+          const Divider(color: AC.bdr, height: 24),
+          ...data.entries.map((e) => _kv(e.key, '${e.value}')),
+          if(_r?['knowledge_brain']?['rules_applied']!=null) ...[
+            const SizedBox(height: 12),
+            const Text('\u0627\u0644\u0642\u0648\u0627\u0639\u062f \u0627\u0644\u0645\u0637\u0628\u0642\u0629', style: TextStyle(color: AC.cyan, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            ...(_r!['knowledge_brain']['rules_applied'] as List? ?? []).map((r) =>
+              Padding(padding: const EdgeInsets.only(bottom: 4), child: Row(children: [
+                const Icon(Icons.rule, color: AC.cyan, size: 14), const SizedBox(width: 8),
+                Expanded(child: Text('$r', style: const TextStyle(color: AC.ts, fontSize: 11)))])))],
+          if(_r?['warnings']!=null && (_r!['warnings'] as List).isNotEmpty) ...[
+            const SizedBox(height: 12),
+            const Text('\u062a\u062d\u0630\u064a\u0631\u0627\u062a', style: TextStyle(color: AC.warn, fontWeight: FontWeight.bold)),
+            ...(_r!['warnings'] as List).map((w) => Padding(padding: const EdgeInsets.only(bottom: 4),
+              child: Row(children: [const Icon(Icons.warning_amber, color: AC.warn, size: 14), const SizedBox(width: 8),
+                Expanded(child: Text('$w', style: const TextStyle(color: AC.ts, fontSize: 11)))])))],
+        ])));
+  }
+
+  Widget _resultRow(BuildContext c, String label, String value, Map<String,dynamic> detailData) =>
+    InkWell(onTap: ()=> _showDetail(c, label, detailData),
+      child: Padding(padding: const EdgeInsets.only(bottom: 7), child: Row(children: [
+        Expanded(child: Text(label, style: const TextStyle(color: AC.ts, fontSize: 13))),
+        Text(value, style: const TextStyle(color: AC.tp, fontSize: 14)),
+        const SizedBox(width: 6),
+        Container(width: 22, height: 22, decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), shape: BoxShape.circle),
+          child: const Icon(Icons.info_outline, color: AC.gold, size: 14))])));
+
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', style: TextStyle(color: AC.gold))),
     body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(children: [
-      GestureDetector(onTap: _pick, child: Container(width: double.infinity, height: 130,
-        decoration: BoxDecoration(color: C.card, borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: _f != null ? C.gold : C.border, width: _f != null ? 2 : 1),
-          boxShadow: _f != null ? [BoxShadow(color: C.gold.withOpacity(0.1), blurRadius: 20)] : null),
+      GestureDetector(onTap: _pick, child: Container(width: double.infinity, height: 110,
+        decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: _f!=null ? AC.gold : AC.bdr)),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(_f != null ? Icons.check_circle_rounded : Icons.cloud_upload_rounded, color: _f != null ? C.ok : C.gold, size: 40),
-          const SizedBox(height: 10), Text(_f?.name ?? 'اضغط لرفع ميزان المراجعة', style: TextStyle(color: _f != null ? C.text : C.textDim, fontFamily: 'Tajawal', fontSize: 14))]))),
-      const SizedBox(height: 16),
-      if (_f != null && _r == null) SizedBox(width: double.infinity, height: 52, child: ElevatedButton(onPressed: _a ? null : _run,
-        child: _a ? Row(mainAxisSize: MainAxisSize.min, children: [const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2.5, color: C.bg)),
-          const SizedBox(width: 12), const Text('جاري التحليل...')]) : const Text('بدء التحليل'))),
-      if (_e != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(_e!, style: const TextStyle(color: C.err, fontFamily: 'Tajawal'))),
-      if (_r != null && _r!['success'] == true) ...[
-        const SizedBox(height: 20),
-        _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const Text('الثقة', style: TextStyle(color: C.gold, fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'Tajawal')), const Spacer(),
-            _badge('${((_r!['confidence']?['overall'] ?? 0) * 100).toStringAsFixed(1)}%', C.ok)]),
-          const SizedBox(height: 8), _kv('التقييم', _r!['confidence']?['label'] ?? '')])),
-        _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('قائمة الدخل', style: TextStyle(color: C.gold, fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'Tajawal')),
-          const SizedBox(height: 10), const Divider(color: C.border),
-          _kv('صافي الإيرادات', _fmt(_r!['income_statement']?['net_revenue'])),
-          _kv('تكلفة المبيعات', _fmt(_r!['income_statement']?['cogs'])),
-          _kv('مجمل الربح', _fmt(_r!['income_statement']?['gross_profit'])),
-          _kv('صافي الربح', _fmt(_r!['income_statement']?['net_profit']), vc: C.gold, bold: true)])),
-        _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('الميزانية العمومية', style: TextStyle(color: C.gold, fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'Tajawal')),
-          const SizedBox(height: 10), const Divider(color: C.border),
-          _kv('إجمالي الأصول', _fmt(_r!['balance_sheet']?['total_assets'])),
-          _kv('إجمالي الالتزامات', _fmt(_r!['balance_sheet']?['total_liabilities'])),
-          _kv('متوازنة', _r!['balance_sheet']?['is_balanced'] == true ? 'نعم ✓' : 'لا ✗', vc: _r!['balance_sheet']?['is_balanced'] == true ? C.ok : C.err)])),
-        const SizedBox(height: 12),
-        SizedBox(width: double.infinity, child: OutlinedButton(onPressed: () => setState(() { _f = null; _fb = null; _r = null; }),
-          style: OutlinedButton.styleFrom(side: const BorderSide(color: C.gold), padding: const EdgeInsets.symmetric(vertical: 14)),
-          child: const Text('تحليل ملف آخر', style: TextStyle(color: C.gold, fontFamily: 'Tajawal')))),
-      ]])));
-}
-
-// ═══════ المعرض ═══════
-class MarketTab extends StatefulWidget { const MarketTab({super.key}); @override State<MarketTab> createState() => _MarketS(); }
-class _MarketS extends State<MarketTab> {
-  List _prov = []; List _reqs = []; bool _ld = true;
-  @override void initState() { super.initState(); _load(); }
-  Future<void> _load() async {
-    try {
-      final r1 = await http.get(Uri.parse('$_api/marketplace/providers'));
-      final r2 = await http.get(Uri.parse('$_api/marketplace/requests'), headers: S.h());
-      if (mounted) setState(() { _prov = jsonDecode(r1.body); _reqs = jsonDecode(r2.body); _ld = false; });
-    } catch (_) { if (mounted) setState(() => _ld = false); }
-  }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('المعرض', style: TextStyle(color: C.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.bold))),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: C.gold)) : ListView(padding: const EdgeInsets.all(16), children: [
-      _sectionTitle('مقدمو الخدمات المعتمدون'),
-      if (_prov.isEmpty) _card(Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.people_outline, color: C.textDim.withOpacity(0.3), size: 40), const SizedBox(height: 8),
-        const Text('لا يوجد مقدمو خدمات معتمدون بعد', style: TextStyle(color: C.textDim, fontFamily: 'Tajawal'))])))
-      else ..._prov.map((p) => _card(Row(children: [
-        CircleAvatar(backgroundColor: p['is_premium'] == true ? C.gold.withOpacity(0.15) : C.surface, child: Icon(Icons.person, color: p['is_premium'] == true ? C.gold : C.textDim)),
-        const SizedBox(width: 14), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Text(p['display_name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, color: C.text, fontFamily: 'Tajawal')),
-            if (p['badge'] != null) ...[const SizedBox(width: 6), const Icon(Icons.verified, color: C.gold, size: 16)]]),
-          Text(p['category'] ?? '', style: const TextStyle(color: C.textDim, fontSize: 12, fontFamily: 'Tajawal')),
-          if (p['scopes'] != null) Text((p['scopes'] as List).join(' • '), style: const TextStyle(color: C.accent, fontSize: 11, fontFamily: 'Tajawal'))])),
-        if (p['rating'] != null) Column(children: [const Icon(Icons.star_rounded, color: C.gold, size: 20), Text('${p["rating"]}', style: const TextStyle(color: C.gold, fontSize: 13))])]))),
-      const SizedBox(height: 16), _sectionTitle('طلبات الخدمة'),
-      if (_reqs.isEmpty) _card(Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.inbox_outlined, color: C.textDim.withOpacity(0.3), size: 40), const SizedBox(height: 8),
-        const Text('لا توجد طلبات خدمة بعد', style: TextStyle(color: C.textDim, fontFamily: 'Tajawal'))])))
-      else ..._reqs.map((r) => _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Expanded(child: Text(r['title'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, color: C.text, fontFamily: 'Tajawal'))),
-          _badge(r['status'] ?? '', r['status'] == 'completed' ? C.ok : r['status'] == 'open' ? C.accent : C.warn)]),
+          Icon(_f!=null ? Icons.check_circle : Icons.cloud_upload_outlined, color: _f!=null ? AC.ok : AC.gold, size: 34),
+          const SizedBox(height: 6),
+          Text(_f?.name ?? '\u0627\u0636\u063a\u0637 \u0644\u0631\u0641\u0639 \u0645\u064a\u0632\u0627\u0646 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: _f!=null?AC.tp:AC.ts, fontSize: 13))]))),
+      const SizedBox(height: 14),
+      if(_f!=null && _r==null) SizedBox(width: double.infinity, child: ElevatedButton.icon(
+        onPressed: _a?null:_run, icon: _a ? const SizedBox(height:18,width:18, child: CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Icon(Icons.play_arrow),
+        label: Text(_a ? '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0644\u064a\u0644...' : '\u0628\u062f\u0621 \u0627\u0644\u062a\u062d\u0644\u064a\u0644'))),
+      if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child:Text(_e!, style:const TextStyle(color:AC.err))),
+      // RESULTS with ! icon
+      if(_r!=null && _r!['success']==true) ...[
+        const SizedBox(height: 18),
+        _card('\u0627\u0644\u062b\u0642\u0629', [
+          _resultRow(c, '\u0627\u0644\u0646\u0633\u0628\u0629', '${((_r!['confidence']?['overall']??0)*100).toStringAsFixed(1)}%',
+            _r!['confidence'] is Map ? Map<String,dynamic>.from(_r!['confidence']) : {}),
+          _resultRow(c, '\u0627\u0644\u062a\u0642\u064a\u064a\u0645', _r!['confidence']?['label']??'',
+            {'overall': _r!['confidence']?['overall'], 'label': _r!['confidence']?['label']}),
+        ], accent: _getConfidenceColor(_r!['confidence']?['overall'])),
+        _card('\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062f\u062e\u0644', [
+          _resultRow(c, '\u0635\u0627\u0641\u064a \u0627\u0644\u0625\u064a\u0631\u0627\u062f\u0627\u062a', _fmt(_r!['income_statement']?['net_revenue']),
+            _r!['income_statement'] is Map ? Map<String,dynamic>.from(_r!['income_statement']) : {}),
+          _resultRow(c, '\u062a\u0643\u0644\u0641\u0629 \u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a', _fmt(_r!['income_statement']?['cogs']),
+            {'cogs': _r!['income_statement']?['cogs'], 'method': _r!['income_statement']?['cogs_method']??'N/A'}),
+          _resultRow(c, '\u0645\u062c\u0645\u0644 \u0627\u0644\u0631\u0628\u062d', _fmt(_r!['income_statement']?['gross_profit']),
+            {'gross_profit': _r!['income_statement']?['gross_profit'], 'margin': _r!['income_statement']?['gross_margin']}),
+          _resultRow(c, '\u0635\u0627\u0641\u064a \u0627\u0644\u0631\u0628\u062d', _fmt(_r!['income_statement']?['net_profit']),
+            {'net_profit': _r!['income_statement']?['net_profit'], 'margin': _r!['income_statement']?['net_margin']}),
+        ]),
+        _card('\u0627\u0644\u0645\u064a\u0632\u0627\u0646\u064a\u0629 \u0627\u0644\u0639\u0645\u0648\u0645\u064a\u0629', [
+          _resultRow(c, '\u0627\u0644\u0623\u0635\u0648\u0644', _fmt(_r!['balance_sheet']?['total_assets']),
+            _r!['balance_sheet'] is Map ? Map<String,dynamic>.from(_r!['balance_sheet']) : {}),
+          _resultRow(c, '\u0627\u0644\u0627\u0644\u062a\u0632\u0627\u0645\u0627\u062a', _fmt(_r!['balance_sheet']?['total_liabilities']),
+            {'total_liabilities': _r!['balance_sheet']?['total_liabilities']}),
+          _resultRow(c, '\u0645\u062a\u0648\u0627\u0632\u0646\u0629', _r!['balance_sheet']?['is_balanced']==true?'\u0646\u0639\u0645 \u2713':'\u0644\u0627 \u2717',
+            {'is_balanced': _r!['balance_sheet']?['is_balanced'], 'difference': _r!['balance_sheet']?['difference']}),
+        ]),
+        if(_r!['knowledge_brain']!=null) _card('\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', [
+          _resultRow(c, '\u0627\u0644\u0642\u0648\u0627\u0639\u062f', '${_r!['knowledge_brain']?['rules_triggered']??0}/${_r!['knowledge_brain']?['rules_evaluated']??0}',
+            _r!['knowledge_brain'] is Map ? Map<String,dynamic>.from(_r!['knowledge_brain']) : {}),
+        ], accent: AC.cyan),
+        const SizedBox(height: 14),
+        Row(children: [
+          Expanded(child: OutlinedButton.icon(onPressed: ()=>setState((){ _f=null; _fb=null; _r=null; }),
+            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
+            icon: const Icon(Icons.refresh, color: AC.gold, size: 18),
+            label: const Text('\u062a\u062d\u0644\u064a\u0644 \u0622\u062e\u0631', style: TextStyle(color: AC.gold)))),
+          const SizedBox(width: 10),
+          Expanded(child: OutlinedButton.icon(onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>KnowledgeFeedbackScreen(resultId: _r?['result_id']))),
+            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.cyan)),
+            icon: const Icon(Icons.feedback_outlined, color: AC.cyan, size: 18),
+            label: const Text('\u0645\u0644\u0627\u062d\u0638\u0629 \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.cyan)))),
+        ]),
         const SizedBox(height: 10),
-        if (r['budget'] != null) _kv('الميزانية', '${r["budget"]} ر.س'),
-        if (r['deadline'] != null) _kv('الموعد النهائي', (r['deadline'] as String).substring(0, 10))]))),
-    ]));
+        SizedBox(width: double.infinity, child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: const EdgeInsets.symmetric(vertical: 14)),
+          onPressed: () async {
+            try {
+              final req = http.MultipartRequest('POST', Uri.parse('$_api/analyze/report?industry=retail'));
+              req.headers['Authorization'] = 'Bearer ${S.token}';
+              req.files.add(http.MultipartFile.fromBytes('file', _fb!, filename: 'tb.xlsx'));
+              final res = await req.send();
+              final bytes = await res.stream.toBytes();
+              if (res.statusCode == 200) {
+                final blob = html.Blob([bytes], 'application/pdf');
+                final url = html.Url.createObjectUrlFromBlob(blob);
+                html.AnchorElement(href: url)..setAttribute('download', 'APEX_Report.pdf')..click();
+                html.Url.revokeObjectUrl(url);
+              }
+            } catch (e) {
+              ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u062e\u0637\u0623: $e'), backgroundColor: AC.navy3));
+            }
+          },
+          icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+          label: const Text('\u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u062a\u0642\u0631\u064a\u0631 PDF', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
+      ]])));
+
+  Color _getConfidenceColor(dynamic v) {
+    if(v==null) return AC.ts; final d = (v is num) ? v.toDouble() : 0.0;
+    if(d >= 0.85) return AC.ok; if(d >= 0.65) return AC.warn; return AC.err;
+  }
 }
 
-// ═══════ مقدم خدمة ═══════
-class ProviderTab extends StatefulWidget { const ProviderTab({super.key}); @override State<ProviderTab> createState() => _ProviderS(); }
-class _ProviderS extends State<ProviderTab> {
-  Map<String, dynamic>? _profile; bool _ld = true; bool _notProv = false;
-  String? _cat; bool _reg = false; String? _e;
-  final _cats = [('accountant','محاسب'),('senior_accountant','محاسب أول'),('tax_consultant','مستشار ضرائب'),('zakat_vat_consultant','مستشار زكاة وض.ق.م'),
-    ('audit_consultant','مستشار تدقيق'),('bookkeeping_specialist','متخصص مسك دفاتر'),('hr_consultant','مستشار موارد بشرية'),('legal_consultant','مستشار قانوني')];
+// ═══════════════════════════════════════════════════
+// KNOWLEDGE FEEDBACK (NEW)
+// ═══════════════════════════════════════════════════
+class KnowledgeFeedbackScreen extends StatefulWidget {
+  final String? resultId;
+  const KnowledgeFeedbackScreen({super.key, this.resultId});
+  @override State<KnowledgeFeedbackScreen> createState() => _KFS();
+}
+class _KFS extends State<KnowledgeFeedbackScreen> {
+  final _title = TextEditingController(), _desc = TextEditingController();
+  String _type = 'classification_correction'; bool _l = false; String? _e; bool _done = false;
+  final _types = [
+    {'code':'classification_correction','ar':'\u062a\u0635\u062d\u064a\u062d \u062a\u0628\u0648\u064a\u0628'},
+    {'code':'new_rule_suggestion','ar':'\u0627\u0642\u062a\u0631\u0627\u062d \u0642\u0627\u0639\u062f\u0629 \u062c\u062f\u064a\u062f\u0629'},
+    {'code':'data_quality_issue','ar':'\u0645\u0634\u0643\u0644\u0629 \u062c\u0648\u062f\u0629 \u0628\u064a\u0627\u0646\u0627\u062a'},
+    {'code':'explanation_improvement','ar':'\u062a\u062d\u0633\u064a\u0646 \u0627\u0644\u0634\u0631\u062d'},
+  ];
+  Future<void> _submit() async {
+    if(_title.text.trim().isEmpty) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0645\u0637\u0644\u0648\u0628'); return; }
+    setState((){ _l=true; _e=null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/knowledge-feedback'),
+        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        body: jsonEncode({'feedback_type':_type,'title':_title.text.trim(),'description':_desc.text.trim()}));
+      if(jsonDecode(r.body)['success']==true) setState(()=> _done=true);
+      else setState(()=> _e=jsonDecode(r.body)['detail']);
+    } catch(e){ setState(()=> _e='$e'); }
+    finally { if(mounted) setState(()=> _l=false); }
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0645\u0644\u0627\u062d\u0638\u0629 \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.gold))),
+    body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
+      const Text('\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629 \u0628\u0646\u062c\u0627\u062d', style: TextStyle(color: AC.tp, fontSize: 18)),
+      const SizedBox(height: 8),
+      const Text('\u0633\u062a\u062e\u0636\u0639 \u0644\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.ts)),
+      const SizedBox(height: 20),
+      ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
+    SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const Text('\u0646\u0648\u0639 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629', style: TextStyle(color: AC.ts, fontSize: 14)),
+      const SizedBox(height: 8),
+      ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_type=t['code']!),
+        child: Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(color: _type==t['code'] ? AC.gold.withOpacity(0.1) : AC.navy3,
+            borderRadius: BorderRadius.circular(10), border: Border.all(color: _type==t['code'] ? AC.gold : AC.bdr)),
+          child: Row(children: [
+            Icon(_type==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _type==t['code'] ? AC.gold : AC.ts, size: 18),
+            const SizedBox(width: 10), Text(t['ar']!, style: TextStyle(color: _type==t['code'] ? AC.gold : AC.tp, fontSize: 13))])))),
+      const SizedBox(height: 16),
+      TextField(controller: _title, decoration: _inp('\u0627\u0644\u0639\u0646\u0648\u0627\u0646 *', ic: Icons.title)),
+      const SizedBox(height: 12),
+      TextField(controller: _desc, maxLines: 4, decoration: _inp('\u0627\u0644\u0648\u0635\u0641 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a')),
+      if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child:Text(_e!, style:const TextStyle(color:AC.err))),
+      const SizedBox(height: 20),
+      SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: _l?null:_submit,
+        icon: _l ? const SizedBox(height:18,width:18,child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Icon(Icons.send),
+        label: Text(_l ? '\u062c\u0627\u0631\u064a \u0627\u0644\u0625\u0631\u0633\u0627\u0644...' : '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629')))])));
+}
+
+// ═══════════════════════════════════════════════════
+// MARKETPLACE TAB
+// ═══════════════════════════════════════════════════
+class MarketTab extends StatefulWidget { const MarketTab({super.key}); @override State<MarketTab> createState()=>_MarketS(); }
+class _MarketS extends State<MarketTab> {
+  List _provs=[], _reqs=[]; bool _ld=true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/service-providers/me'), headers: S.h());
-      final d = jsonDecode(r.body);
-      if (d['success'] == true) { if (mounted) setState(() { _profile = d; _ld = false; }); }
-      else { if (mounted) setState(() { _notProv = true; _ld = false; }); }
-    } catch (_) { if (mounted) setState(() { _notProv = true; _ld = false; }); }
+      final r1 = await http.get(Uri.parse('$_api/marketplace/providers'), headers: S.h());
+      final r2 = await http.get(Uri.parse('$_api/marketplace/my-requests'), headers: S.h());
+      if(mounted) setState(() {
+        try { _provs = jsonDecode(r1.body); } catch(_) { _provs = []; }
+        try { _reqs = jsonDecode(r2.body); } catch(_) { _reqs = []; }
+        _ld = false;
+      });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
-  Future<void> _doReg() async {
-    if (_cat == null) { setState(() => _e = 'اختر التخصص'); return; }
-    setState(() { _reg = true; _e = null; });
-    try {
-      final r = await http.post(Uri.parse('$_api/service-providers/register'), headers: S.h(), body: jsonEncode({'category': _cat}));
-      final d = jsonDecode(r.body);
-      if (d['success'] == true) { setState(() { _notProv = false; }); _load(); } else { setState(() => _e = d['detail'] ?? d['error']); }
-    } catch (e) { setState(() => _e = '$e'); } finally { if (mounted) setState(() => _reg = false); }
-  }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('مقدم خدمة', style: TextStyle(color: C.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.bold))),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: C.gold)) : _notProv ? _regView() : _profView());
-
-  Widget _regView() => SingleChildScrollView(padding: const EdgeInsets.all(24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: C.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(14)),
-      child: const Icon(Icons.work_outline_rounded, color: C.gold, size: 40)),
-    const SizedBox(height: 18),
-    const Text('كن مقدم خدمة معتمد', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: C.text, fontFamily: 'Tajawal')),
-    const SizedBox(height: 6), const Text('سجّل لتقديم خدماتك المهنية في معرض APEX', style: TextStyle(color: C.textDim, fontFamily: 'Tajawal')),
-    const SizedBox(height: 24), const Text('اختر التخصص *', style: TextStyle(color: C.textDim, fontFamily: 'Tajawal')), const SizedBox(height: 10),
-    ..._cats.map((c) => GestureDetector(onTap: () => setState(() => _cat = c.$1),
-      child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: _cat == c.$1 ? C.gold.withOpacity(0.08) : C.card, borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _cat == c.$1 ? C.gold : C.border)),
-        child: Row(children: [Icon(_cat == c.$1 ? Icons.radio_button_checked : Icons.radio_button_off, color: _cat == c.$1 ? C.gold : C.textDim, size: 20),
-          const SizedBox(width: 12), Text(c.$2, style: TextStyle(color: _cat == c.$1 ? C.gold : C.text, fontWeight: FontWeight.w600, fontFamily: 'Tajawal'))])))),
-    if (_e != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(_e!, style: const TextStyle(color: C.err, fontFamily: 'Tajawal'))),
-    const SizedBox(height: 24),
-    SizedBox(width: double.infinity, height: 52, child: ElevatedButton(onPressed: _reg ? null : _doReg,
-      child: _reg ? const CircularProgressIndicator(strokeWidth: 2) : const Text('التسجيل كمقدم خدمة')))]));
-
-  Widget _profView() {
-    final p = _profile?['provider'] ?? {}; final docs = _profile?['documents'] as List? ?? [];
-    final scopes = _profile?['scopes'] as List? ?? []; final reqDocs = _profile?['required_documents'] as List? ?? [];
-    final catAr = _cats.firstWhere((c) => c.$1 == p['category'], orElse: () => ('','غير محدد')).$2;
-    return ListView(padding: const EdgeInsets.all(16), children: [
-      _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: C.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.verified_user_rounded, color: C.gold, size: 24)), const SizedBox(width: 14),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(catAr, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: C.text, fontFamily: 'Tajawal')),
-            const SizedBox(height: 2), _badge(p['verification_status'] ?? 'pending', p['verification_status'] == 'approved' ? C.ok : C.warn)])]),
-        const SizedBox(height: 16), const Divider(color: C.border),
-        _kv('العمولة', '${p["commission_rate"] ?? 20}% للمنصة'),
-        _kv('المهام المكتملة', '${p["completed_tasks"] ?? 0}'),
-        if (p['rating_average'] != null) _kv('التقييم', '${p["rating_average"]} / 5', vc: C.gold)])),
-      _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('نطاقات الخدمة', style: TextStyle(color: C.gold, fontWeight: FontWeight.bold, fontFamily: 'Tajawal')), const SizedBox(height: 10),
-        ...scopes.map((s) => Padding(padding: const EdgeInsets.only(bottom: 6),
-          child: Row(children: [Icon(s['is_approved'] == true ? Icons.check_circle_rounded : Icons.pending_rounded, color: s['is_approved'] == true ? C.ok : C.warn, size: 16),
-            const SizedBox(width: 10), Text(s['name_ar'] ?? '', style: const TextStyle(color: C.text, fontSize: 13, fontFamily: 'Tajawal'))])))])),
-      _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('المستندات المطلوبة', style: TextStyle(color: C.gold, fontWeight: FontWeight.bold, fontFamily: 'Tajawal')), const SizedBox(height: 10),
-        ...reqDocs.map((d) { final ok = docs.any((doc) => doc['type'] == d);
-          return Padding(padding: const EdgeInsets.only(bottom: 6), child: Row(children: [
-            Icon(ok ? Icons.check_circle_rounded : Icons.upload_file_rounded, color: ok ? C.ok : C.textDim, size: 16),
-            const SizedBox(width: 10), Text('$d', style: TextStyle(color: ok ? C.text : C.textDim, fontSize: 13, fontFamily: 'Tajawal'))])); })])),
-    ]);
-  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0627\u0644\u0645\u0639\u0631\u0636', style: TextStyle(color: AC.gold))),
+    floatingActionButton: FloatingActionButton.extended(backgroundColor: AC.gold,
+      onPressed: ()=> Navigator.push(c, MaterialPageRoute(builder: (_) => const NewServiceRequestScreen())),
+      icon: const Icon(Icons.add, color: AC.navy), label: const Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.navy))),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      ListView(padding: const EdgeInsets.all(14), children: [
+        _card('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0639\u062a\u0645\u062f\u0648\u0646', [
+          if(_provs.isEmpty) const Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0642\u062f\u0645\u0648 \u062e\u062f\u0645\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
+          else ..._provs.take(5).map((p) => Padding(padding: const EdgeInsets.only(bottom: 8),
+            child: Row(children: [CircleAvatar(backgroundColor: AC.navy4, radius: 18,
+              child: Text((p['display_name']??'?')[0], style: const TextStyle(color: AC.gold))),
+              const SizedBox(width: 10),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(p['display_name']??'', style: const TextStyle(color: AC.tp, fontSize: 13)),
+                Text(p['category']??'', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+              if(p['rating']!=null) Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.star, color: AC.gold, size: 14),
+                Text('${p['rating']}', style: const TextStyle(color: AC.gold, fontSize: 12))])]))),
+        ]),
+        _card('\u0637\u0644\u0628\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0629', [
+          if(_reqs.isEmpty) const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0637\u0644\u0628\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
+          else ..._reqs.take(5).map((r) => Padding(padding: const EdgeInsets.only(bottom: 8),
+            child: Row(children: [
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(r['title']??'', style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
+                Text('${r['urgency']??''} \u2022 ${r['budget_sar']??0} \u0631.\u0633', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+              _badge(r['status']??'open', r['status']=='completed'?AC.ok:r['status']=='matched'?AC.cyan:AC.warn)]))),
+        ]),
+      ]));
 }
 
-// ═══════ حسابي ═══════
-class AccountTab extends StatefulWidget { const AccountTab({super.key}); @override State<AccountTab> createState() => _AccountS(); }
-class _AccountS extends State<AccountTab> {
-  Map<String, dynamic>? _p, _s; bool _ld = true;
+// ═══════════════════════════════════════════════════
+// NEW SERVICE REQUEST (NEW)
+// ═══════════════════════════════════════════════════
+class NewServiceRequestScreen extends StatefulWidget {
+  const NewServiceRequestScreen({super.key});
+  @override State<NewServiceRequestScreen> createState() => _NSRS();
+}
+class _NSRS extends State<NewServiceRequestScreen> {
+  final _title=TextEditingController(), _desc=TextEditingController(), _budget=TextEditingController();
+  String _urgency='medium'; List _clients=[]; String? _clientId, _e; bool _l=false, _done=false;
+  @override void initState() { super.initState();
+    http.get(Uri.parse('$_api/clients'), headers: S.h()).then((r){ if(mounted) setState(()=> _clients=jsonDecode(r.body)); }); }
+  Future<void> _go() async {
+    if(_title.text.isEmpty||_clientId==null) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0639\u0645\u064a\u0644 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
+    setState((){ _l=true; _e=null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/marketplace/requests'),
+        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        body: jsonEncode({'client_id':_clientId,'title':_title.text.trim(),'description':_desc.text.trim(),
+          'urgency':_urgency,'budget_sar':double.tryParse(_budget.text)??0,'deadline_days':14}));
+      if(jsonDecode(r.body)['success']==true) setState(()=> _done=true);
+      else setState(()=> _e=jsonDecode(r.body)['detail']);
+    } catch(e){ setState(()=> _e='$e'); }
+    finally { if(mounted) setState(()=> _l=false); }
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold))),
+    body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
+      const Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629', style: TextStyle(color: AC.tp, fontSize: 18)),
+      const SizedBox(height: 20),
+      ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
+    SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if(_clients.isNotEmpty) ...[
+        const Text('\u0627\u062e\u062a\u0631 \u0627\u0644\u0639\u0645\u064a\u0644', style: TextStyle(color: AC.ts, fontSize: 13)),
+        const SizedBox(height: 6),
+        ..._clients.map((cl) => GestureDetector(onTap: ()=>setState(()=>_clientId=cl['id']),
+          child: Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: _clientId==cl['id']?AC.gold.withOpacity(0.1):AC.navy3,
+              borderRadius: BorderRadius.circular(8), border: Border.all(color: _clientId==cl['id']?AC.gold:AC.bdr)),
+            child: Text(cl['name_ar']??'', style: TextStyle(color: _clientId==cl['id']?AC.gold:AC.tp, fontSize: 13))))),
+        const SizedBox(height: 12)],
+      TextField(controller: _title, decoration: _inp('\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0637\u0644\u0628 *')),
+      const SizedBox(height: 12),
+      TextField(controller: _desc, maxLines: 3, decoration: _inp('\u0648\u0635\u0641 \u0627\u0644\u0637\u0644\u0628')),
+      const SizedBox(height: 12),
+      TextField(controller: _budget, keyboardType: TextInputType.number, decoration: _inp('\u0627\u0644\u0645\u064a\u0632\u0627\u0646\u064a\u0629 (\u0631.\u0633)', ic: Icons.attach_money)),
+      const SizedBox(height: 12),
+      const Text('\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
+      const SizedBox(height: 6),
+      Row(children: ['low','medium','high'].map((u) => Expanded(child: GestureDetector(onTap: ()=>setState(()=>_urgency=u),
+        child: Container(margin: const EdgeInsets.symmetric(horizontal: 3), padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok).withOpacity(0.15) : AC.navy3,
+            borderRadius: BorderRadius.circular(8), border: Border.all(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok) : AC.bdr)),
+          child: Center(child: Text(u=='high'?'\u0639\u0627\u0644\u064a\u0629':u=='medium'?'\u0645\u062a\u0648\u0633\u0637\u0629':'\u0645\u0646\u062e\u0641\u0636\u0629',
+            style: TextStyle(color: _urgency==u ? AC.tp : AC.ts, fontSize: 12))))))).toList()),
+      if(_e!=null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_e!, style: const TextStyle(color: AC.err))),
+      const SizedBox(height: 20),
+      SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_go,
+        child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0637\u0644\u0628')))])));
+}
+
+// ═══════════════════════════════════════════════════
+// PROVIDER TAB
+// ═══════════════════════════════════════════════════
+class ProviderTab extends StatefulWidget { const ProviderTab({super.key}); @override State<ProviderTab> createState()=>_ProvS(); }
+class _ProvS extends State<ProviderTab> {
+  Map<String,dynamic>? _p; bool _ld=true; bool _notProvider=false;
+  final _cats = [
+    {'code':'accountant','ar':'\u0645\u062d\u0627\u0633\u0628'},{'code':'tax_consultant','ar':'\u0645\u0633\u062a\u0634\u0627\u0631 \u0636\u0631\u0627\u0626\u0628'},
+    {'code':'auditor','ar':'\u0645\u062f\u0642\u0642'},{'code':'financial_controller','ar':'\u0645\u0631\u0627\u0642\u0628 \u0645\u0627\u0644\u064a'},
+    {'code':'bookkeeping_specialist','ar':'\u0623\u062e\u0635\u0627\u0626\u064a \u0645\u0633\u0643 \u062f\u0641\u0627\u062a\u0631'},
+    {'code':'hr_consultant','ar':'\u0645\u0633\u062a\u0634\u0627\u0631 \u0645\u0648\u0627\u0631\u062f \u0628\u0634\u0631\u064a\u0629'},
+    {'code':'legal_consultant','ar':'\u0645\u0633\u062a\u0634\u0627\u0631 \u0642\u0627\u0646\u0648\u0646\u064a'},
+    {'code':'marketing_consultant','ar':'\u0645\u0633\u062a\u0634\u0627\u0631 \u062a\u0633\u0648\u064a\u0642'},
+  ];
+  @override void initState() { super.initState(); _load(); }
+  Future<void> _load() async {
+    try { final r = await http.get(Uri.parse('$_api/service-providers/me'), headers: S.h());
+      if(r.statusCode==200) { if(mounted) setState((){ _p=jsonDecode(r.body); _ld=false; }); }
+      else { if(mounted) setState((){ _notProvider=true; _ld=false; }); }
+    } catch(_) { if(mounted) setState((){ _notProvider=true; _ld=false; }); }
+  }
+  String? _sel;
+  Future<void> _register() async {
+    if(_sel==null) return;
+    final r = await http.post(Uri.parse('$_api/service-providers/register'),
+      headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+      body: jsonEncode({'category':_sel}));
+    if(r.statusCode==200) _load();
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.gold))),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      _notProvider ? SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(children: [
+        const Icon(Icons.verified_user_outlined, color: AC.gold, size: 60), const SizedBox(height: 16),
+        const Text('\u0643\u0646 \u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629 \u0645\u0639\u062a\u0645\u062f', style: TextStyle(color: AC.tp, fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 20),
+        ..._cats.map((cat) => GestureDetector(onTap: ()=>setState(()=>_sel=cat['code']),
+          child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: _sel==cat['code']?AC.gold.withOpacity(0.1):AC.navy3,
+              borderRadius: BorderRadius.circular(10), border: Border.all(color: _sel==cat['code']?AC.gold:AC.bdr)),
+            child: Row(children: [
+              Icon(_sel==cat['code']?Icons.radio_button_checked:Icons.radio_button_off, color: _sel==cat['code']?AC.gold:AC.ts, size: 18),
+              const SizedBox(width: 10), Text(cat['ar']!, style: TextStyle(color: _sel==cat['code']?AC.gold:AC.tp, fontSize: 13))])))),
+        const SizedBox(height: 16),
+        SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _sel!=null?_register:null,
+          child: const Text('\u0627\u0644\u062a\u0633\u062c\u064a\u0644 \u0643\u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629')))])) :
+      ListView(padding: const EdgeInsets.all(16), children: [
+        _card('\u0645\u0644\u0641 \u0645\u0642\u062f\u0645 \u0627\u0644\u062e\u062f\u0645\u0629', [
+          _kv('\u0627\u0644\u062a\u062e\u0635\u0635', _p?['category']??''),
+          _kv('\u0627\u0644\u062d\u0627\u0644\u0629', _p?['verification_status']??'',
+            vc: _p?['verification_status']=='approved'?AC.ok:AC.warn),
+          _kv('\u0627\u0644\u0639\u0645\u0648\u0644\u0629', '20% \u0645\u0646\u0635\u0629 / 80% \u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629'),
+        ]),
+        if(_p?['service_scopes']!=null) _card('\u0646\u0637\u0627\u0642\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0629', [
+          ...(_p!['service_scopes'] as List).map((s) => Padding(padding: const EdgeInsets.only(bottom: 4),
+            child: Row(children: [const Icon(Icons.check, color: AC.ok, size: 14), const SizedBox(width: 8),
+              Text(s['name_ar']??s['code']??'', style: const TextStyle(color: AC.tp, fontSize: 12))])))]),
+        if(_p?['required_documents']!=null) _card('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a', [
+          ...(_p!['required_documents'] as List).map((d) => Padding(padding: const EdgeInsets.only(bottom: 4),
+            child: Row(children: [const Icon(Icons.description_outlined, color: AC.warn, size: 14), const SizedBox(width: 8),
+              Text('$d', style: const TextStyle(color: AC.tp, fontSize: 12)),
+              const Spacer(), _badge('\u0645\u0637\u0644\u0648\u0628', AC.warn)])))]),
+      ]));
+}
+
+// ═══════════════════════════════════════════════════
+// ACCOUNT TAB — with Profile Editing
+// ═══════════════════════════════════════════════════
+class AccountTab extends StatefulWidget { const AccountTab({super.key}); @override State<AccountTab> createState()=>_AccS(); }
+class _AccS extends State<AccountTab> {
+  Map<String,dynamic>? _p, _s; bool _ld=true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
       final r1 = await http.get(Uri.parse('$_api/users/me'), headers: S.h());
       final r2 = await http.get(Uri.parse('$_api/users/me/security'), headers: S.h());
-      if (mounted) setState(() { _p = jsonDecode(r1.body); _s = jsonDecode(r2.body); _ld = false; });
-    } catch (_) { if (mounted) setState(() => _ld = false); }
+      if(mounted) setState((){ _p=jsonDecode(r1.body); _s=jsonDecode(r2.body); _ld=false; });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   void _logout() { http.post(Uri.parse('$_api/auth/logout'), headers: S.h()); S.clear();
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); }
-  @override Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('حسابي', style: TextStyle(color: C.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.bold)),
-      actions: [IconButton(onPressed: _logout, icon: const Icon(Icons.logout, color: C.err))]),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: C.gold)) : ListView(padding: const EdgeInsets.all(16), children: [
-      _card(Column(children: [
-        Container(padding: const EdgeInsets.all(3), decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: C.gold.withOpacity(0.4), width: 2)),
-          child: CircleAvatar(radius: 36, backgroundColor: C.surface, child: Text((_p?['user']?['display_name'] ?? '?')[0],
-            style: const TextStyle(fontSize: 30, color: C.gold, fontWeight: FontWeight.bold, fontFamily: 'Tajawal')))),
-        const SizedBox(height: 14), Text(_p?['user']?['display_name'] ?? '', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: C.text, fontFamily: 'Tajawal')),
-        const SizedBox(height: 4), Text('@${_p?["user"]?["username"] ?? ""}', style: const TextStyle(color: C.textDim, fontFamily: 'Tajawal')),
-        const SizedBox(height: 6), Text(_p?['user']?['email'] ?? '', style: const TextStyle(color: C.textDim, fontSize: 13, fontFamily: 'Tajawal'))])),
-      _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [const Icon(Icons.shield_rounded, color: C.gold, size: 20), const SizedBox(width: 8),
-          const Text('الأمان', style: TextStyle(color: C.gold, fontWeight: FontWeight.bold, fontFamily: 'Tajawal'))]),
-        const SizedBox(height: 12),
-        _kv('الجلسات النشطة', '${_s?["active_sessions"] ?? 0}'),
-        _kv('عدد مرات الدخول', '${_s?["login_count"] ?? 0}'),
-        _kv('آخر دخول', _s?['last_login'] ?? '—')])),
-      _menuItem(Icons.workspace_premium_rounded, 'الخطة الحالية: ${S.planAr()}', C.gold),
-      _menuItem(Icons.notifications_rounded, 'الإشعارات', C.accent),
-      _menuItem(Icons.lock_rounded, 'تغيير كلمة المرور', C.warn),
-    ]));
-  Widget _menuItem(IconData i, String l, Color c) => Container(margin: const EdgeInsets.only(bottom: 8),
-    decoration: BoxDecoration(color: C.card, borderRadius: BorderRadius.circular(14), border: Border.all(color: C.border)),
-    child: ListTile(leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: c.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-      child: Icon(i, color: c, size: 20)), title: Text(l, style: const TextStyle(color: C.text, fontFamily: 'Tajawal')),
-      trailing: const Icon(Icons.chevron_left, color: C.textDim)));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=>const LoginScreen())); }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u062d\u0633\u0627\u0628\u064a', style: TextStyle(color: AC.gold)),
+      actions: [IconButton(onPressed: _logout, icon: const Icon(Icons.logout, color: AC.err))]),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(16), children: [
+        // Profile Card
+        Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: AC.navy3,
+          borderRadius: BorderRadius.circular(16), border: Border.all(color: AC.bdr)),
+          child: Column(children: [
+            CircleAvatar(radius: 36, backgroundColor: AC.navy4,
+              child: Text((_p?['user']?['display_name']??'?')[0], style: const TextStyle(fontSize: 28, color: AC.gold))),
+            const SizedBox(height: 12),
+            Text(_p?['user']?['display_name']??'', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AC.tp)),
+            Text('@${_p?['user']?['username']??''}', style: const TextStyle(color: AC.ts)),
+            const SizedBox(height: 4),
+            Text(_p?['user']?['email']??'', style: const TextStyle(color: AC.ts, fontSize: 12)),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(onPressed: ()=> Navigator.push(c, MaterialPageRoute(builder:(_)=>EditProfileScreen(profile: _p))),
+              style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
+              icon: const Icon(Icons.edit, color: AC.gold, size: 16),
+              label: const Text('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a', style: TextStyle(color: AC.gold, fontSize: 12)))])),
+        const SizedBox(height: 14),
+        // Security
+        _card('\u0627\u0644\u0623\u0645\u0627\u0646', [
+          _kv('\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0646\u0634\u0637\u0629', '${_s?['active_sessions']??0}'),
+          _kv('\u0639\u062f\u062f \u0645\u0631\u0627\u062a \u0627\u0644\u062f\u062e\u0648\u0644', '${_s?['login_count']??0}'),
+          _kv('\u0622\u062e\u0631 \u062f\u062e\u0648\u0644', _s?['last_login']?.toString().substring(0,16)??'-'),
+        ]),
+        // Menu Items
+        _mi(Icons.workspace_premium, '\u0627\u0644\u062e\u0637\u0629 \u0627\u0644\u062d\u0627\u0644\u064a\u0629: ${S.planAr()}', AC.gold, (){}),
+        _mi(Icons.notifications_outlined, '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', AC.cyan,
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const NotificationsScreen()))),
+        _mi(Icons.lock_outlined, '\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', AC.warn,
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ChangePasswordScreen()))),
+        _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const CloseAccountScreen()))),
+      ])));
+  Widget _mi(IconData i, String l, Color c, VoidCallback onTap) => GestureDetector(onTap: onTap,
+    child: Container(margin: const EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
+      child: ListTile(leading: Icon(i, color: c), title: Text(l, style: const TextStyle(color: AC.tp, fontSize: 14)),
+        trailing: const Icon(Icons.chevron_left, color: AC.ts))));
+}
+
+// ═══════════════════════════════════════════════════
+// EDIT PROFILE (NEW)
+// ═══════════════════════════════════════════════════
+class EditProfileScreen extends StatefulWidget {
+  final Map<String,dynamic>? profile;
+  const EditProfileScreen({super.key, this.profile});
+  @override State<EditProfileScreen> createState() => _EditPS();
+}
+class _EditPS extends State<EditProfileScreen> {
+  late TextEditingController _dn, _org, _job, _city;
+  bool _l=false; String? _e; bool _done=false;
+  @override void initState() { super.initState();
+    _dn=TextEditingController(text: widget.profile?['user']?['display_name']??'');
+    _org=TextEditingController(text: widget.profile?['profile']?['organization_name']??'');
+    _job=TextEditingController(text: widget.profile?['profile']?['job_title']??'');
+    _city=TextEditingController(text: widget.profile?['profile']?['city']??'');
+  }
+  Future<void> _save() async {
+    setState((){ _l=true; _e=null; });
+    try {
+      final r = await http.put(Uri.parse('$_api/users/me'),
+        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        body: jsonEncode({'display_name':_dn.text.trim(),'organization_name':_org.text.trim(),'job_title':_job.text.trim(),'city':_city.text.trim()}));
+      if(r.statusCode==200) { S.dname=_dn.text.trim(); setState(()=> _done=true); }
+      else { setState(()=> _e=jsonDecode(r.body)['detail']); }
+    } catch(e){ setState(()=> _e='$e'); }
+    finally { if(mounted) setState(()=> _l=false); }
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a', style: TextStyle(color: AC.gold))),
+    body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
+      const Text('\u062a\u0645 \u0627\u0644\u062d\u0641\u0638 \u0628\u0646\u062c\u0627\u062d', style: TextStyle(color: AC.tp, fontSize: 18)),
+      const SizedBox(height: 16),
+      ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
+    SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(children: [
+      TextField(controller: _dn, decoration: _inp('\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0638\u0627\u0647\u0631', ic: Icons.person)),
+      const SizedBox(height: 14),
+      TextField(controller: _org, decoration: _inp('\u0627\u0644\u0645\u0646\u0638\u0645\u0629', ic: Icons.business)),
+      const SizedBox(height: 14),
+      TextField(controller: _job, decoration: _inp('\u0627\u0644\u0645\u0633\u0645\u0649 \u0627\u0644\u0648\u0638\u064a\u0641\u064a', ic: Icons.work)),
+      const SizedBox(height: 14),
+      TextField(controller: _city, decoration: _inp('\u0627\u0644\u0645\u062f\u064a\u0646\u0629', ic: Icons.location_city)),
+      if(_e!=null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_e!, style: const TextStyle(color: AC.err))),
+      const SizedBox(height: 22),
+      SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_save,
+        child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062d\u0641\u0638 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a')))])));
+}
+
+// ═══════════════════════════════════════════════════
+// CHANGE PASSWORD (NEW)
+// ═══════════════════════════════════════════════════
+class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
+  @override State<ChangePasswordScreen> createState() => _ChPwS();
+}
+class _ChPwS extends State<ChangePasswordScreen> {
+  final _cur=TextEditingController(), _new1=TextEditingController(), _new2=TextEditingController();
+  bool _l=false; String? _e; bool _done=false;
+  Future<void> _go() async {
+    if(_new1.text!=_new2.text) { setState(()=> _e='\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646'); return; }
+    setState((){ _l=true; _e=null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/auth/change-password'),
+        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        body: jsonEncode({'current_password':_cur.text,'new_password':_new1.text}));
+      if(r.statusCode==200) setState(()=> _done=true);
+      else setState(()=> _e=jsonDecode(r.body)['detail']);
+    } catch(e){ setState(()=> _e='$e'); }
+    finally { if(mounted) setState(()=> _l=false); }
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', style: TextStyle(color: AC.gold))),
+    body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
+      const Text('\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', style: TextStyle(color: AC.tp, fontSize: 18)),
+      const SizedBox(height: 16),
+      ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
+    SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(children: [
+      TextField(controller: _cur, obscureText: true, decoration: _inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062d\u0627\u0644\u064a\u0629', ic: Icons.lock)),
+      const SizedBox(height: 14),
+      TextField(controller: _new1, obscureText: true, decoration: _inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629', ic: Icons.lock_outline)),
+      const SizedBox(height: 14),
+      TextField(controller: _new2, obscureText: true, decoration: _inp('\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', ic: Icons.lock_outline)),
+      if(_e!=null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_e!, style: const TextStyle(color: AC.err))),
+      const SizedBox(height: 22),
+      SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_go,
+        child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062a\u063a\u064a\u064a\u0631')))])));
+}
+
+// ═══════════════════════════════════════════════════
+// CLOSE ACCOUNT (NEW)
+// ═══════════════════════════════════════════════════
+class CloseAccountScreen extends StatefulWidget {
+  const CloseAccountScreen({super.key});
+  @override State<CloseAccountScreen> createState() => _CloseAS();
+}
+class _CloseAS extends State<CloseAccountScreen> {
+  String _type = 'temporary'; String? _e; bool _l=false, _done=false;
+  Future<void> _go() async {
+    setState((){ _l=true; _e=null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/account/closure'),
+        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        body: jsonEncode({'closure_type':_type}));
+      if(r.statusCode==200) setState(()=> _done=true);
+      else setState(()=> _e=jsonDecode(r.body)['detail']??'\u062e\u0637\u0623');
+    } catch(e){ setState(()=> _e='$e'); }
+    finally { if(mounted) setState(()=> _l=false); }
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', style: TextStyle(color: AC.err))),
+    body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
+      const Text('\u062a\u0645 \u062a\u0642\u062f\u064a\u0645 \u0637\u0644\u0628 \u0627\u0644\u0625\u063a\u0644\u0627\u0642', style: TextStyle(color: AC.tp, fontSize: 18)),
+      const SizedBox(height: 16),
+      ElevatedButton(onPressed: (){ S.clear(); Navigator.pushReplacement(c, MaterialPageRoute(builder:(_)=>const LoginScreen())); },
+        child: const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c'))])) :
+    SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+        child: const Row(children: [Icon(Icons.warning, color: AC.err), SizedBox(width: 10),
+          Expanded(child: Text('\u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621 \u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646\u0647 \u0628\u0633\u0647\u0648\u0644\u0629', style: TextStyle(color: AC.err, fontSize: 13)))])),
+      const SizedBox(height: 20),
+      const Text('\u0646\u0648\u0639 \u0627\u0644\u0625\u063a\u0644\u0627\u0642', style: TextStyle(color: AC.ts, fontSize: 14)),
+      const SizedBox(height: 10),
+      GestureDetector(onTap: ()=>setState(()=>_type='temporary'),
+        child: Container(padding: const EdgeInsets.all(14), margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(color: _type=='temporary'?AC.warn.withOpacity(0.1):AC.navy3,
+            borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='temporary'?AC.warn:AC.bdr)),
+          child: Row(children: [Icon(_type=='temporary'?Icons.radio_button_checked:Icons.radio_button_off,
+            color: _type=='temporary'?AC.warn:AC.ts, size: 18), const SizedBox(width: 10),
+            const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('\u0645\u0624\u0642\u062a', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+              Text('\u064a\u0645\u0643\u0646\u0643 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0641\u0639\u064a\u0644 \u0644\u0627\u062d\u0642\u0627\u064b', style: TextStyle(color: AC.ts, fontSize: 11))]))]))),
+      GestureDetector(onTap: ()=>setState(()=>_type='permanent'),
+        child: Container(padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(color: _type=='permanent'?AC.err.withOpacity(0.1):AC.navy3,
+            borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='permanent'?AC.err:AC.bdr)),
+          child: Row(children: [Icon(_type=='permanent'?Icons.radio_button_checked:Icons.radio_button_off,
+            color: _type=='permanent'?AC.err:AC.ts, size: 18), const SizedBox(width: 10),
+            const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('\u062f\u0627\u0626\u0645', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+              Text('\u0633\u064a\u062a\u0645 \u062d\u0630\u0641 \u062d\u0633\u0627\u0628\u0643 \u0646\u0647\u0627\u0626\u064a\u0627\u064b', style: TextStyle(color: AC.ts, fontSize: 11))]))]))),
+      if(_e!=null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_e!, style: const TextStyle(color: AC.err))),
+      const SizedBox(height: 24),
+      SizedBox(width: double.infinity, child: ElevatedButton(
+        style: ElevatedButton.styleFrom(backgroundColor: AC.err),
+        onPressed: _l?null:_go,
+        child: _l ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white) :
+          const Text('\u062a\u0623\u0643\u064a\u062f \u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', style: TextStyle(color: Colors.white))))])));
+}
+
+
+// ═══════════════════════════════════════════════════
+// ADMIN TAB — Platform Dashboard
+// ═══════════════════════════════════════════════════
+class AdminTab extends StatefulWidget { const AdminTab({super.key}); @override State<AdminTab> createState()=>_AdminS(); }
+class _AdminS extends State<AdminTab> {
+  Map<String,dynamic> _stats = {}; List _users = []; bool _ld = true;
+  @override void initState() { super.initState(); _load(); }
+  Future<void> _load() async {
+    try {
+      final r1 = await http.get(Uri.parse('$_api/admin/stats'), headers: S.h());
+      final r2 = await http.get(Uri.parse('$_api/admin/users'), headers: S.h());
+      if(mounted) setState(() {
+        try { _stats = jsonDecode(r1.body); } catch(_) {}
+        try { _users = jsonDecode(r2.body); } catch(_) { _users = []; }
+        _ld = false;
+      });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0644\u0648\u062d\u0629 \u0627\u0644\u0625\u062f\u0627\u0631\u0629', style: TextStyle(color: AC.gold)),
+      actions: [
+        IconButton(icon: const Icon(Icons.rate_review, color: AC.cyan),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ReviewerConsoleScreen()))),
+        IconButton(icon: const Icon(Icons.verified_user, color: AC.ok),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderVerificationScreen()))),
+      ]),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(14), children: [
+        // Stats Grid
+        GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.6,
+          children: [
+            _statCard('\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u0648\u0646', '${_stats['total_users']??_users.length}', Icons.people, AC.gold),
+            _statCard('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', '${_stats['total_clients']??0}', Icons.business, AC.cyan),
+            _statCard('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', '${_stats['total_providers']??0}', Icons.work, AC.ok),
+            _statCard('\u0627\u0644\u0637\u0644\u0628\u0627\u062a', '${_stats['total_requests']??0}', Icons.assignment, AC.warn),
+            _statCard('\u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a', '${_stats['total_feedback']??0}', Icons.feedback, Colors.purple),
+            _statCard('\u0627\u0644\u062a\u062d\u0644\u064a\u0644\u0627\u062a', '${_stats['total_analyses']??0}', Icons.analytics, Colors.teal),
+          ]),
+        const SizedBox(height: 16),
+        // Quick Actions
+        _card('\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0633\u0631\u064a\u0639\u0629', [
+          _actionTile('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0639\u0631\u0641\u064a\u0629', Icons.rate_review, AC.cyan,
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ReviewerConsoleScreen()))),
+          _actionTile('\u062a\u062d\u0642\u0642 \u0645\u0642\u062f\u0645\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', Icons.verified_user, AC.ok,
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderVerificationScreen()))),
+          _actionTile('\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', Icons.policy, AC.warn,
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const PolicyManagementScreen()))),
+        ]),
+        const SizedBox(height: 16),
+        // Users List
+        _card('\u0622\u062e\u0631 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u064a\u0646', [
+          if(_users.isEmpty) const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u064a\u0627\u0646\u0627\u062a', style: TextStyle(color: AC.ts))
+          else ..._users.take(10).map((u) => Padding(padding: const EdgeInsets.only(bottom: 8),
+            child: Row(children: [
+              CircleAvatar(backgroundColor: AC.navy4, radius: 16,
+                child: Text((u['display_name']??u['username']??'?')[0], style: const TextStyle(color: AC.gold, fontSize: 12))),
+              const SizedBox(width: 10),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(u['display_name']??u['username']??'', style: const TextStyle(color: AC.tp, fontSize: 13)),
+                Text('${u['email']??''} \u2022 ${u['plan']??'free'}', style: const TextStyle(color: AC.ts, fontSize: 10))])),
+              _badge(u['status']??'active', u['status']=='active'?AC.ok:AC.err)])))
+        ]),
+      ])));
+
+  Widget _statCard(String label, String value, IconData icon, Color color) => Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: color.withOpacity(0.3))),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+      Row(children: [Icon(icon, color: color, size: 22), const Spacer(),
+        Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold))]),
+      const SizedBox(height: 6),
+      Text(label, style: const TextStyle(color: AC.ts, fontSize: 11))]));
+
+  Widget _actionTile(String label, IconData icon, Color color, VoidCallback onTap) =>
+    GestureDetector(onTap: onTap, child: Padding(padding: const EdgeInsets.only(bottom: 8),
+      child: Row(children: [
+        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+          child: Icon(icon, color: color, size: 18)),
+        const SizedBox(width: 12),
+        Expanded(child: Text(label, style: const TextStyle(color: AC.tp, fontSize: 14))),
+        const Icon(Icons.chevron_left, color: AC.ts, size: 20)])));
+}
+
+// ═══════════════════════════════════════════════════
+// REVIEWER CONSOLE — Knowledge Feedback Review
+// ═══════════════════════════════════════════════════
+class ReviewerConsoleScreen extends StatefulWidget {
+  const ReviewerConsoleScreen({super.key});
+  @override State<ReviewerConsoleScreen> createState() => _RevCS();
+}
+class _RevCS extends State<ReviewerConsoleScreen> {
+  List _items = []; bool _ld = true; String _filter = 'all';
+  @override void initState() { super.initState(); _load(); }
+  Future<void> _load() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/admin/knowledge-feedback'), headers: S.h());
+      if(mounted) setState(() { try { _items = jsonDecode(r.body); } catch(_) { _items = []; } _ld = false; });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
+  }
+  Future<void> _review(String id, String decision) async {
+    await http.post(Uri.parse('$_api/admin/knowledge-feedback/$id/review'),
+      headers: {'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+      body: jsonEncode({'decision': decision}));
+    _load();
+  }
+  List get _filtered => _filter == 'all' ? _items : _items.where((i) => i['status'] == _filter).toList();
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.gold))),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      Column(children: [
+        // Filter chips
+        SingleChildScrollView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.all(12),
+          child: Row(children: ['all','submitted','under_review','accepted','rejected'].map((f) =>
+            Padding(padding: const EdgeInsets.only(left: 6), child: FilterChip(
+              selected: _filter == f, onSelected: (_) => setState(()=> _filter = f),
+              label: Text(f == 'all' ? '\u0627\u0644\u0643\u0644' : f == 'submitted' ? '\u0645\u0642\u062f\u0645\u0629' : f == 'under_review' ? '\u0642\u064a\u062f \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629' : f == 'accepted' ? '\u0645\u0642\u0628\u0648\u0644\u0629' : '\u0645\u0631\u0641\u0648\u0636\u0629',
+                style: TextStyle(color: _filter == f ? AC.navy : AC.tp, fontSize: 12)),
+              selectedColor: AC.gold, backgroundColor: AC.navy3,
+              side: BorderSide(color: _filter == f ? AC.gold : AC.bdr)))).toList())),
+        // Items list
+        Expanded(child: _filtered.isEmpty ?
+          Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.inbox_outlined, color: AC.ts, size: 50), const SizedBox(height: 10),
+            const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0644\u0627\u062d\u0638\u0627\u062a', style: TextStyle(color: AC.ts))])) :
+          RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12), itemCount: _filtered.length,
+            itemBuilder: (_, i) {
+              final item = _filtered[i];
+              final status = item['status'] ?? 'submitted';
+              return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Expanded(child: Text(item['title']??'', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14))),
+                    _badge(status == 'submitted' ? '\u0645\u0642\u062f\u0645\u0629' : status == 'accepted' ? '\u0645\u0642\u0628\u0648\u0644\u0629' : status == 'rejected' ? '\u0645\u0631\u0641\u0648\u0636\u0629' : status,
+                      status == 'accepted' ? AC.ok : status == 'rejected' ? AC.err : AC.warn)]),
+                  const SizedBox(height: 6),
+                  Text(item['feedback_type']??'', style: const TextStyle(color: AC.cyan, fontSize: 11)),
+                  if(item['description']!=null && item['description'].toString().isNotEmpty)
+                    Padding(padding: const EdgeInsets.only(top: 6),
+                      child: Text(item['description'], style: const TextStyle(color: AC.ts, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis)),
+                  Text('\u0628\u0648\u0627\u0633\u0637\u0629: ${item['submitted_by_name']??item['submitted_by']??''}', style: const TextStyle(color: AC.ts, fontSize: 10)),
+                  if(status == 'submitted') ...[
+                    const SizedBox(height: 10),
+                    Row(children: [
+                      Expanded(child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: const EdgeInsets.symmetric(vertical: 8)),
+                        onPressed: ()=> _review(item['id']??item['feedback_id']??'', 'accepted'),
+                        icon: const Icon(Icons.check, size: 16), label: const Text('\u0642\u0628\u0648\u0644', style: TextStyle(fontSize: 12)))),
+                      const SizedBox(width: 8),
+                      Expanded(child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(backgroundColor: AC.err, padding: const EdgeInsets.symmetric(vertical: 8)),
+                        onPressed: ()=> _review(item['id']??item['feedback_id']??'', 'rejected'),
+                        icon: const Icon(Icons.close, size: 16), label: const Text('\u0631\u0641\u0636', style: TextStyle(fontSize: 12)))),
+                    ])],
+                ]));
+            })))
+      ]));
+}
+
+// ═══════════════════════════════════════════════════
+// PROVIDER VERIFICATION QUEUE
+// ═══════════════════════════════════════════════════
+class ProviderVerificationScreen extends StatefulWidget {
+  const ProviderVerificationScreen({super.key});
+  @override State<ProviderVerificationScreen> createState() => _PVS();
+}
+class _PVS extends State<ProviderVerificationScreen> {
+  List _provs = []; bool _ld = true;
+  @override void initState() { super.initState(); _load(); }
+  Future<void> _load() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/admin/providers'), headers: S.h());
+      if(mounted) setState(() { try { _provs = jsonDecode(r.body); } catch(_) { _provs = []; } _ld = false; });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
+  }
+  Future<void> _action(String id, String action) async {
+    await http.post(Uri.parse('$_api/admin/providers/$id/$action'), headers: S.h());
+    _load();
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u062a\u062d\u0642\u0642 \u0645\u0642\u062f\u0645\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.gold))),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      _provs.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.verified_user_outlined, color: AC.ts, size: 50), const SizedBox(height: 10),
+        const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0637\u0644\u0628\u0627\u062a \u062a\u062d\u0642\u0642', style: TextStyle(color: AC.ts))])) :
+      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
+        padding: const EdgeInsets.all(12), itemCount: _provs.length,
+        itemBuilder: (_, i) {
+          final p = _provs[i];
+          final vStatus = p['verification_status'] ?? 'pending';
+          return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                CircleAvatar(backgroundColor: AC.navy4, radius: 20,
+                  child: Text((p['display_name']??p['username']??'?')[0], style: const TextStyle(color: AC.gold, fontSize: 16))),
+                const SizedBox(width: 12),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(p['display_name']??p['username']??'', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(p['category']??'', style: const TextStyle(color: AC.cyan, fontSize: 11))])),
+                _badge(vStatus == 'approved' ? '\u0645\u0639\u062a\u0645\u062f' : vStatus == 'pending' ? '\u0642\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631' : vStatus,
+                  vStatus == 'approved' ? AC.ok : vStatus == 'rejected' ? AC.err : AC.warn)]),
+              if(p['service_scopes']!=null) ...[
+                const SizedBox(height: 8),
+                Wrap(spacing: 6, runSpacing: 4, children: (p['service_scopes'] as List).map((s) =>
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                    child: Text(s['name_ar']??s['code']??'', style: const TextStyle(color: AC.cyan, fontSize: 10)))).toList())],
+              if(p['required_documents']!=null) ...[
+                const SizedBox(height: 6),
+                Text('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a: ${(p['required_documents'] as List).join(", ")}', style: const TextStyle(color: AC.ts, fontSize: 10))],
+              if(vStatus == 'pending') ...[
+                const SizedBox(height: 10),
+                Row(children: [
+                  Expanded(child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: const EdgeInsets.symmetric(vertical: 8)),
+                    onPressed: ()=> _action(p['provider_id']??p['id']??'', 'approve'),
+                    icon: const Icon(Icons.check, size: 16), label: const Text('\u0627\u0639\u062a\u0645\u0627\u062f', style: TextStyle(fontSize: 12)))),
+                  const SizedBox(width: 8),
+                  Expanded(child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(backgroundColor: AC.err, padding: const EdgeInsets.symmetric(vertical: 8)),
+                    onPressed: ()=> _action(p['provider_id']??p['id']??'', 'reject'),
+                    icon: const Icon(Icons.close, size: 16), label: const Text('\u0631\u0641\u0636', style: TextStyle(fontSize: 12)))),
+                ])],
+            ]));
+        })));
+}
+
+// ═══════════════════════════════════════════════════
+// POLICY MANAGEMENT
+// ═══════════════════════════════════════════════════
+class PolicyManagementScreen extends StatefulWidget {
+  const PolicyManagementScreen({super.key});
+  @override State<PolicyManagementScreen> createState() => _PMS();
+}
+class _PMS extends State<PolicyManagementScreen> {
+  List _policies = []; bool _ld = true;
+  @override void initState() { super.initState(); _load(); }
+  Future<void> _load() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/legal/policies'), headers: S.h());
+      if(mounted) setState(() { try { _policies = jsonDecode(r.body); } catch(_) { _policies = []; } _ld = false; });
+    } catch(_) { if(mounted) setState(()=> _ld=false); }
+  }
+  @override Widget build(BuildContext c) => Scaffold(
+    appBar: AppBar(title: const Text('\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.gold))),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      _policies.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.policy_outlined, color: AC.ts, size: 50), const SizedBox(height: 10),
+        const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.ts))])) :
+      ListView.builder(padding: const EdgeInsets.all(14), itemCount: _policies.length,
+        itemBuilder: (_, i) {
+          final p = _policies[i];
+          return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Icon(_policyIcon(p['policy_type']??''), color: AC.gold, size: 24),
+                const SizedBox(width: 12),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(p['title_ar']??p['title']??p['policy_type']??'', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text('\u0627\u0644\u0625\u0635\u062f\u0627\u0631: ${p['version']??'1.0'}', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+                _badge(p['is_active']==true?'\u0641\u0639\u0627\u0644':'\u063a\u064a\u0631 \u0641\u0639\u0627\u0644', p['is_active']==true?AC.ok:AC.ts)]),
+              if(p['summary_ar']!=null || p['content_preview']!=null) ...[
+                const SizedBox(height: 8),
+                Text(p['summary_ar']??p['content_preview']??'', style: const TextStyle(color: AC.ts, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis)],
+              const SizedBox(height: 8),
+              Row(children: [
+                const Icon(Icons.calendar_today, color: AC.ts, size: 12), const SizedBox(width: 4),
+                Text(p['effective_date']?.toString().substring(0,10)??p['created_at']?.toString().substring(0,10)??'', style: const TextStyle(color: AC.ts, fontSize: 10)),
+                const Spacer(),
+                if(p['acceptance_count']!=null) Text('\u0645\u0648\u0627\u0641\u0642\u0627\u062a: ${p['acceptance_count']}', style: const TextStyle(color: AC.ts, fontSize: 10)),
+              ]),
+            ]));
+        }));
+
+  IconData _policyIcon(String t) {
+    if(t.contains('terms')) return Icons.description;
+    if(t.contains('privacy')) return Icons.privacy_tip;
+    if(t.contains('provider')) return Icons.work;
+    if(t.contains('acceptable')) return Icons.rule;
+    return Icons.policy;
+  }
 }
