@@ -5,6 +5,7 @@ Generates professional Arabic PDF reports from analysis results.
 Uses ReportLab with arabic_reshaper + python-bidi for RTL support.
 """
 
+import os
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.units import cm, mm
@@ -14,6 +15,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+import os
 import arabic_reshaper
 from bidi.algorithm import get_display
 from io import BytesIO
@@ -59,7 +61,6 @@ def ensure_arabic_font():
     except:
         FONT_REGISTERED = True
 from datetime import datetime
-import os
 
 
 def ar(text):
