@@ -53,6 +53,17 @@ try:
     P6 = True
 except Exception as e: P6 = False; print(f"P6: {e}")
 
+
+# Phase 7 — Task Documents + Suspension + Result Details + Audit
+try:
+    from app.phase7.models.phase7_models import init_phase7_db
+    from app.phase7.routes.phase7_routes import router as p7r
+    from app.phase7.services.seed_phase7 import seed_task_types
+    HAS_P7 = True
+except Exception as e:
+    print(f"Phase 7 import warning: {e}")
+    HAS_P7 = False
+
 app = FastAPI(title="APEX Financial Platform API", description="منصة أبكس للتحليل المالي — النسخة النهائية", version="3.5.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
@@ -60,8 +71,10 @@ from fastapi.responses import JSONResponse
 import traceback as _tb
 
 @app.exception_handler(Exception)
-async def debug_exception_handler(request, exc):
-    return JSONResponse(status_code=500, content={"error": str(exc), "traceback": _tb.format_exc()})
+async def global_exception_handler(request, exc):
+    import logging
+    logging.error(f"Unhandled: {exc}")
+    return JSONResponse(status_code=500, content={"detail": "خطأ داخلي في الخادم"})
 
 
 @app.on_event("startup")
@@ -80,6 +93,10 @@ for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r 
                 (P3, p3r if P3 else None), (P4, p4r if P4 else None), (P5, p5r if P5 else None),
                 (P6, p6r if P6 else None)]:
     if flag and r: app.include_router(r)
+
+# Phase 7 router
+if HAS_P7:
+    app.include_router(p7r, prefix="", tags=["Phase 7"])
 
 @app.get("/")
 def root():
@@ -202,6 +219,15 @@ async def promote_to_admin(username: str, secret: str = Query(...)):
     except HTTPException:
         raise
     except Exception as e:
+
+    # Phase 7 init
+    if HAS_P7:
+        try:
+            t7 = init_phase7_db()
+            print(f"Phase 7: {len(t7)} tables")
+            print(f"Task types seed: {seed_task_types()}")
+        except Exception as e:
+            print(f"Phase 7 init warning: {e}")
         return {"message": f"Error: {e}"}
 
 # Phase 7: Extended APIs (Execution Master compliance)

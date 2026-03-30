@@ -1057,7 +1057,9 @@ class _AdminS extends State<AdminTab> {
         IconButton(icon: const Icon(Icons.verified_user, color: AC.ok),
           onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderVerificationScreen()))),
         IconButton(icon: const Icon(Icons.upload_file, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderDocumentUploadScreen()))),
-        IconButton(icon: const Icon(Icons.shield, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderComplianceScreen()))),
+        IconButton(icon: const Icon(Icons.shield, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderComplianceScreen()),
+        IconButton(icon: const Icon(Icons.psychology, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const KnowledgeDeveloperConsole()))),
+        IconButton(icon: const Icon(Icons.security, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const AuditLogScreen()))))),
       ]),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(14), children: [
@@ -1878,3 +1880,474 @@ class ActivityHistoryScreen extends StatelessWidget {
 }
 
 
+
+
+// ═══════════════════════════════════════════════════════
+// Result Detail Panel — ! icon explanation (Execution §6)
+// ═══════════════════════════════════════════════════════
+class ResultDetailPanel extends StatefulWidget {
+  final String analysisId;
+  final String resultKey;
+  const ResultDetailPanel({super.key, required this.analysisId, required this.resultKey});
+  @override State<ResultDetailPanel> createState() => _ResultDetailPanelS();
+}
+class _ResultDetailPanelS extends State<ResultDetailPanel> {
+  Map<String, dynamic>? _detail;
+  bool _loading = true;
+  
+  @override void initState() { super.initState(); _load(); }
+  
+  Future<void> _load() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/results/${widget.analysisId}/details'),
+        headers: S.h());
+      if (r.statusCode == 200) {
+        final data = jsonDecode(r.body);
+        final details = data['details'] as List? ?? [];
+        for (var d in details) {
+          if (d['result_key'] == widget.resultKey) {
+            setState(() { _detail = d; _loading = false; });
+            return;
+          }
+        }
+      }
+      setState(() => _loading = false);
+    } catch (e) { setState(() => _loading = false); }
+  }
+  
+  @override Widget build(BuildContext c) => Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12)),
+    child: _loading 
+      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      : _detail == null 
+        ? const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062a\u0641\u0627\u0635\u064a\u0644 \u0645\u062a\u0627\u062d\u0629', style: TextStyle(color: AC.tp))
+        : Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+            Row(children: [
+              const Icon(Icons.info_outline, color: AC.gold, size: 20),
+              const SizedBox(width: 8),
+              Expanded(child: Text(_detail!['summary_ar'] ?? _detail!['result_key'] ?? '',
+                style: const TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold))),
+            ]),
+            const SizedBox(height: 12),
+            if (_detail!['source_rows'] != null) ...[
+              const Text('\u0627\u0644\u0635\u0641\u0648\u0641 \u0627\u0644\u0645\u0635\u062f\u0631\u064a\u0629:', style: TextStyle(color: AC.cyan, fontSize: 13)),
+              const SizedBox(height: 4),
+              Text(_detail!['source_rows'], style: const TextStyle(color: AC.tp, fontSize: 12)),
+              const SizedBox(height: 8),
+            ],
+            if (_detail!['applied_rules'] != null) ...[
+              const Text('\u0627\u0644\u0642\u0648\u0627\u0639\u062f \u0627\u0644\u0645\u0637\u0628\u0642\u0629:', style: TextStyle(color: AC.cyan, fontSize: 13)),
+              const SizedBox(height: 4),
+              Text(_detail!['applied_rules'], style: const TextStyle(color: AC.tp, fontSize: 12)),
+              const SizedBox(height: 8),
+            ],
+            Row(children: [
+              _chip('\u0627\u0644\u062b\u0642\u0629: ${((_detail!['confidence'] ?? 0) * 100).toStringAsFixed(0)}%', AC.ok),
+              const SizedBox(width: 8),
+              if (_detail!['feedback_count'] != null && _detail!['feedback_count'] > 0)
+                _chip('\u0645\u0644\u0627\u062d\u0638\u0627\u062a: ${_detail!['feedback_count']}', AC.cyan),
+            ]),
+            if (_detail!['warnings'] != null) ...[
+              const SizedBox(height: 8),
+              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(
+                color: const Color(0x33F39C12), borderRadius: BorderRadius.circular(8)),
+                child: Row(children: [
+                  const Icon(Icons.warning_amber, color: Color(0xFFF39C12), size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(_detail!['warnings'], style: const TextStyle(color: Color(0xFFF39C12), fontSize: 12))),
+                ])),
+            ],
+          ]),
+  );
+  
+  Widget _chip(String t, Color c) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+    child: Text(t, style: TextStyle(color: c, fontSize: 11)));
+}
+
+// Result Detail Dialog — triggered by ! icon
+void showResultDetail(BuildContext context, String analysisId, String resultKey) {
+  showModalBottomSheet(
+    context: context, backgroundColor: AC.navy2,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+    builder: (c) => Padding(
+      padding: const EdgeInsets.all(16),
+      child: ResultDetailPanel(analysisId: analysisId, resultKey: resultKey),
+    ),
+  );
+}
+
+
+// ═══════════════════════════════════════════════════════
+// Task Document Management (Execution §8)
+// ═══════════════════════════════════════════════════════
+class TaskDocumentManagementScreen extends StatefulWidget {
+  final String taskId;
+  final String taskTypeCode;
+  const TaskDocumentManagementScreen({super.key, required this.taskId, required this.taskTypeCode});
+  @override State<TaskDocumentManagementScreen> createState() => _TaskDocMgmtS();
+}
+class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
+  Map<String, dynamic>? _taskType;
+  List<dynamic> _submissions = [];
+  bool _loading = true;
+  
+  @override void initState() { super.initState(); _load(); }
+  
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      // Load task type requirements
+      final r1 = await http.get(Uri.parse('$_api/task-types/${widget.taskTypeCode}'));
+      if (r1.statusCode == 200) _taskType = jsonDecode(r1.body);
+      
+      // Load existing submissions
+      final r2 = await http.get(Uri.parse('$_api/task-submissions/${widget.taskId}'),
+        headers: S.h());
+      if (r2.statusCode == 200) _submissions = jsonDecode(r2.body);
+    } catch (e) { /* handle */ }
+    setState(() => _loading = false);
+  }
+  
+  bool _isUploaded(String reqId) => _submissions.any((s) => s['requirement_id'] == reqId && s['status'] == 'uploaded');
+  
+  Future<void> _upload(String reqId, String docName) async {
+    // Simulate upload — in production, use file picker
+    try {
+      final r = await http.post(Uri.parse('$_api/task-submissions'),
+        headers: {...S.h(), 'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'service_task_id': widget.taskId,
+          'requirement_id': reqId,
+          'file_name': '$docName.pdf',
+        }));
+      if (r.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('\u062a\u0645 \u0631\u0641\u0639 $docName'), backgroundColor: const Color(0xFF2ECC8A)));
+        _load();
+      }
+    } catch (e) { /* handle */ }
+  }
+  
+  @override Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(title: const Text('\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0627\u0644\u0645\u0647\u0645\u0629', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy2, iconTheme: const IconThemeData(color: AC.gold)),
+    body: _loading 
+      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      : _taskType == null
+        ? const Center(child: Text('\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0646\u0648\u0639 \u0627\u0644\u0645\u0647\u0645\u0629', style: TextStyle(color: AC.tp)))
+        : ListView(padding: const EdgeInsets.all(16), children: [
+            // Task type header
+            Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(
+              color: AC.navy2, borderRadius: BorderRadius.circular(12)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(_taskType!['name_ar'] ?? '', style: const TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(_taskType!['code'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 12)),
+              ])),
+            const SizedBox(height: 16),
+            
+            // Input Requirements
+            const Text('\u0627\u0644\u0645\u062f\u062e\u0644\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629', style: TextStyle(color: AC.cyan, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ...(_taskType!['input_requirements'] as List? ?? []).map((req) => _docTile(req, true)),
+            
+            const SizedBox(height: 20),
+            
+            // Output Requirements
+            const Text('\u0627\u0644\u0645\u062e\u0631\u062c\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629', style: TextStyle(color: Color(0xFFF39C12), fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ...(_taskType!['output_requirements'] as List? ?? []).map((req) => _docTile(req, false)),
+            
+            const SizedBox(height: 20),
+            
+            // Progress
+            _progressCard(),
+          ]),
+  );
+  
+  Widget _docTile(dynamic req, bool isInput) {
+    final uploaded = _isUploaded(req['id']);
+    final mandatory = req['is_mandatory'] == true;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AC.navy3, borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: uploaded ? const Color(0xFF2ECC8A) : (mandatory ? const Color(0x33F39C12) : AC.navy4))),
+      child: Row(children: [
+        Icon(uploaded ? Icons.check_circle : (isInput ? Icons.upload_file : Icons.download),
+          color: uploaded ? const Color(0xFF2ECC8A) : AC.gold, size: 24),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(req['name_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 14)),
+          if (mandatory) const Text('* \u0625\u0644\u0632\u0627\u0645\u064a', style: TextStyle(color: Color(0xFFF39C12), fontSize: 11)),
+        ])),
+        if (!uploaded)
+          ElevatedButton(onPressed: () => _upload(req['id'], req['name_ar'] ?? 'doc'),
+            style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+            child: const Text('\u0631\u0641\u0639', style: TextStyle(fontSize: 12)))
+        else
+          const Text('\u2713 \u062a\u0645', style: TextStyle(color: Color(0xFF2ECC8A), fontSize: 12, fontWeight: FontWeight.bold)),
+      ]),
+    );
+  }
+  
+  Widget _progressCard() {
+    final totalInputs = (_taskType!['input_requirements'] as List? ?? []).where((r) => r['is_mandatory'] == true).length;
+    final totalOutputs = (_taskType!['output_requirements'] as List? ?? []).where((r) => r['is_mandatory'] == true).length;
+    final uploadedInputs = (_taskType!['input_requirements'] as List? ?? []).where((r) => _isUploaded(r['id']) && r['is_mandatory'] == true).length;
+    final uploadedOutputs = (_taskType!['output_requirements'] as List? ?? []).where((r) => _isUploaded(r['id']) && r['is_mandatory'] == true).length;
+    final total = totalInputs + totalOutputs;
+    final done = uploadedInputs + uploadedOutputs;
+    final progress = total > 0 ? done / total : 0.0;
+    
+    return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(
+      color: AC.navy2, borderRadius: BorderRadius.circular(12)),
+      child: Column(children: [
+        Text('\u0627\u0644\u062a\u0642\u062f\u0645: $done / $total \u0645\u0633\u062a\u0646\u062f \u0625\u0644\u0632\u0627\u0645\u064a',
+          style: const TextStyle(color: AC.tp, fontSize: 14)),
+        const SizedBox(height: 8),
+        LinearProgressIndicator(value: progress, backgroundColor: AC.navy4,
+          valueColor: AlwaysStoppedAnimation(progress >= 1.0 ? const Color(0xFF2ECC8A) : AC.gold)),
+        const SizedBox(height: 8),
+        if (progress >= 1.0)
+          ElevatedButton.icon(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.check, size: 18),
+            label: const Text('\u062c\u0645\u064a\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0645\u0643\u062a\u0645\u0644\u0629'),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2ECC8A), foregroundColor: Colors.white)),
+      ]));
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════
+// Task Types Browser (shows all task types + requirements)
+// ═══════════════════════════════════════════════════════
+class TaskTypesBrowserScreen extends StatefulWidget {
+  const TaskTypesBrowserScreen({super.key});
+  @override State<TaskTypesBrowserScreen> createState() => _TaskTypesBrowserS();
+}
+class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
+  List<dynamic> _types = [];
+  bool _loading = true;
+  
+  @override void initState() { super.initState(); _load(); }
+  
+  Future<void> _load() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/task-types'));
+      if (r.statusCode == 200) _types = jsonDecode(r.body);
+    } catch (e) { /* handle */ }
+    setState(() => _loading = false);
+  }
+  
+  @override Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(title: const Text('\u0623\u0646\u0648\u0627\u0639 \u0627\u0644\u0645\u0647\u0627\u0645', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy2, iconTheme: const IconThemeData(color: AC.gold)),
+    body: _loading
+      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      : ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: _types.length,
+          itemBuilder: (c, i) {
+            final tt = _types[i];
+            final inputs = tt['input_requirements'] as List? ?? [];
+            final outputs = tt['output_requirements'] as List? ?? [];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12)),
+              child: ExpansionTile(
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                iconColor: AC.gold, collapsedIconColor: AC.ts,
+                title: Text(tt['name_ar'] ?? '', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+                subtitle: Text('${inputs.length} \u0645\u062f\u062e\u0644 \u2022 ${outputs.length} \u0645\u062e\u0631\u062c', style: const TextStyle(color: AC.ts, fontSize: 12)),
+                children: [
+                  Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    if (inputs.isNotEmpty) ...[
+                      const Text('\u0627\u0644\u0645\u062f\u062e\u0644\u0627\u062a:', style: TextStyle(color: AC.cyan, fontSize: 13, fontWeight: FontWeight.bold)),
+                      ...inputs.map((r) => Padding(padding: const EdgeInsets.only(right: 16, top: 4),
+                        child: Row(children: [
+                          Icon(r['is_mandatory'] == true ? Icons.star : Icons.star_border, size: 14,
+                            color: r['is_mandatory'] == true ? const Color(0xFFF39C12) : AC.ts),
+                          const SizedBox(width: 6),
+                          Text(r['name_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13)),
+                        ]))),
+                    ],
+                    if (outputs.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      const Text('\u0627\u0644\u0645\u062e\u0631\u062c\u0627\u062a:', style: TextStyle(color: Color(0xFFF39C12), fontSize: 13, fontWeight: FontWeight.bold)),
+                      ...outputs.map((r) => Padding(padding: const EdgeInsets.only(right: 16, top: 4),
+                        child: Row(children: [
+                          Icon(r['is_mandatory'] == true ? Icons.star : Icons.star_border, size: 14,
+                            color: r['is_mandatory'] == true ? const Color(0xFFF39C12) : AC.ts),
+                          const SizedBox(width: 6),
+                          Text(r['name_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13)),
+                        ]))),
+                    ],
+                  ])),
+                ],
+              ),
+            );
+          }),
+  );
+}
+
+
+// ═══════════════════════════════════════════════════════
+// Knowledge Developer Console (Zero-Ambiguity §8)
+// ═══════════════════════════════════════════════════════
+class KnowledgeDeveloperConsole extends StatefulWidget {
+  const KnowledgeDeveloperConsole({super.key});
+  @override State<KnowledgeDeveloperConsole> createState() => _KnowledgeDevConsoleS();
+}
+class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
+  List<dynamic> _feedbacks = [];
+  bool _loading = true;
+  String _filter = 'all';
+  
+  @override void initState() { super.initState(); _load(); }
+  
+  Future<void> _load() async {
+    try {
+      String url = '$_api/knowledge-feedback/review-queue?status=$_filter';
+      if (_filter == 'all') url = '$_api/knowledge-feedback/review-queue';
+      final r = await http.get(Uri.parse(url), headers: S.h());
+      if (r.statusCode == 200) {
+        final data = jsonDecode(r.body);
+        _feedbacks = data is List ? data : (data['items'] ?? []);
+      }
+    } catch (e) { /* handle */ }
+    setState(() => _loading = false);
+  }
+  
+  @override Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(
+      title: const Text('\u0648\u062d\u062f\u0629 \u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy2, iconTheme: const IconThemeData(color: AC.gold),
+      actions: [
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.filter_list, color: AC.gold),
+          onSelected: (v) { _filter = v; _load(); },
+          itemBuilder: (c) => [
+            const PopupMenuItem(value: 'all', child: Text('\u0627\u0644\u0643\u0644')),
+            const PopupMenuItem(value: 'submitted', child: Text('\u0645\u0631\u0633\u0644\u0629')),
+            const PopupMenuItem(value: 'under_review', child: Text('\u0642\u064a\u062f \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629')),
+            const PopupMenuItem(value: 'accepted', child: Text('\u0645\u0642\u0628\u0648\u0644\u0629')),
+            const PopupMenuItem(value: 'rejected', child: Text('\u0645\u0631\u0641\u0648\u0636\u0629')),
+          ],
+        ),
+      ],
+    ),
+    body: _loading
+      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      : _feedbacks.isEmpty
+        ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.psychology, color: AC.ts, size: 64),
+            const SizedBox(height: 16),
+            const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 16)),
+          ]))
+        : ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: _feedbacks.length,
+            itemBuilder: (c, i) {
+              final fb = _feedbacks[i];
+              final status = fb['status'] ?? 'submitted';
+              final statusColor = status == 'accepted' ? const Color(0xFF2ECC8A)
+                : status == 'rejected' ? const Color(0xFFE74C3C) 
+                : status == 'under_review' ? AC.cyan : AC.ts;
+              
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12),
+                  border: Border(right: BorderSide(color: statusColor, width: 3))),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Icon(Icons.lightbulb_outline, color: statusColor, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(fb['feedback_type'] ?? '\u0645\u0644\u0627\u062d\u0638\u0629',
+                      style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold))),
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                      child: Text(status, style: TextStyle(color: statusColor, fontSize: 11))),
+                  ]),
+                  const SizedBox(height: 8),
+                  Text(fb['content'] ?? fb['description'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13),
+                    maxLines: 3, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 6),
+                  Text(fb['created_at'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 11)),
+                ]),
+              );
+            }),
+  );
+}
+
+
+// ═══════════════════════════════════════════════════════
+// Audit Log Screen (Zero-Ambiguity §3)
+// ═══════════════════════════════════════════════════════
+class AuditLogScreen extends StatefulWidget {
+  const AuditLogScreen({super.key});
+  @override State<AuditLogScreen> createState() => _AuditLogS();
+}
+class _AuditLogS extends State<AuditLogScreen> {
+  List<dynamic> _events = [];
+  bool _loading = true;
+  
+  @override void initState() { super.initState(); _load(); }
+  
+  Future<void> _load() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/audit/events?limit=100'), headers: S.h());
+      if (r.statusCode == 200) _events = jsonDecode(r.body);
+    } catch (e) { /* handle */ }
+    setState(() => _loading = false);
+  }
+  
+  IconData _actionIcon(String action) {
+    if (action.contains('upload')) return Icons.upload_file;
+    if (action.contains('login')) return Icons.login;
+    if (action.contains('suspend')) return Icons.block;
+    if (action.contains('compliance')) return Icons.gavel;
+    if (action.contains('promote')) return Icons.arrow_upward;
+    return Icons.event_note;
+  }
+  
+  @override Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(title: const Text('\u0633\u062c\u0644 \u0627\u0644\u062a\u062f\u0642\u064a\u0642', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy2, iconTheme: const IconThemeData(color: AC.gold)),
+    body: _loading
+      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      : _events.isEmpty
+        ? const Center(child: Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0623\u062d\u062f\u0627\u062b', style: TextStyle(color: AC.ts)))
+        : ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: _events.length,
+            itemBuilder: (c, i) {
+              final e = _events[i];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(10)),
+                child: Row(children: [
+                  Icon(_actionIcon(e['action'] ?? ''), color: AC.cyan, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(e['action'] ?? '', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
+                    if (e['details'] != null) Text(e['details'], style: const TextStyle(color: AC.ts, fontSize: 12), maxLines: 2),
+                    Text(e['created_at'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 10)),
+                  ])),
+                ]),
+              );
+            }),
+  );
+}
