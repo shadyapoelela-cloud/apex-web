@@ -138,9 +138,7 @@ def reinit_db(secret: str = Query(...)):
         results["seed1"] = str(e)
     if HAS_P7:
         try:
-            from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
             from app.phase7.services.seed_phase7 import seed_task_types
-            results["phase7_tables"] = init_phase7_db()
             results["phase7_seed"] = seed_task_types()
         except Exception as e:
             results["phase7"] = str(e)
