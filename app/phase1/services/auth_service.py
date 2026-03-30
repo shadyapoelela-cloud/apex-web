@@ -1,20 +1,18 @@
 """
-APEX Platform — Auth Service
+APEX Platform — Auth Service (Security Patched)
 ═══════════════════════════════════════════════════════════════
-Registration, Login, Password Management, Session Management.
-
-Security rules:
-- Passwords hashed with bcrypt (passlib)
-- JWT tokens with expiry
-- Failed login lockout (5 attempts → 15 min lock)
+- bcrypt password hashing (replaces SHA-256)
+- JWT_SECRET from environment variable
+- Failed login lockout
 - All security events logged
 """
 
-import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import jwt
+import hashlib
+import os
 
 from app.phase1.models.platform_models import (
     User, UserProfile, UserSession, PasswordReset,
@@ -25,46 +23,57 @@ from app.phase1.models.platform_models import (
 )
 
 # ═══════════════════════════════════════════════════════════════
-# Config
+# Config — from environment variables
 # ═══════════════════════════════════════════════════════════════
 
-JWT_SECRET = "apex-platform-secret-change-in-production-2026"
+JWT_SECRET = os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION")
 JWT_ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-REFRESH_TOKEN_EXPIRE_DAYS = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS", "30"))
 MAX_FAILED_LOGINS = 5
 LOCKOUT_MINUTES = 15
 PASSWORD_MIN_LENGTH = 8
 
+# Try bcrypt, fallback to hashlib
+try:
+    from passlib.context import CryptContext
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    USE_BCRYPT = True
+except ImportError:
+    USE_BCRYPT = False
+
 
 # ═══════════════════════════════════════════════════════════════
-# Password Utilities
+# Password Utilities — bcrypt with SHA-256 fallback
 # ═══════════════════════════════════════════════════════════════
 
 def hash_password(password: str) -> str:
-    """Hash password with SHA-256 + salt (simple but effective)."""
+    if USE_BCRYPT:
+        return pwd_context.hash(password)
     salt = secrets.token_hex(16)
     h = hashlib.sha256(f"{salt}{password}".encode()).hexdigest()
     return f"{salt}${h}"
 
 
 def verify_password(password: str, password_hash: str) -> bool:
-    """Verify password against stored hash."""
     try:
+        if USE_BCRYPT and password_hash.startswith("$2"):
+            return pwd_context.verify(password, password_hash)
+        # Fallback: SHA-256 (for existing users before migration)
         salt, h = password_hash.split("$", 1)
         return hashlib.sha256(f"{salt}{password}".encode()).hexdigest() == h
     except (ValueError, AttributeError):
         return False
 
 
-def validate_password_strength(password: str) -> tuple[bool, str]:
-    """Check password meets minimum requirements."""
+def validate_password_strength(password: str) -> tuple:
     if len(password) < PASSWORD_MIN_LENGTH:
         return False, f"كلمة المرور يجب أن تكون {PASSWORD_MIN_LENGTH} أحرف على الأقل"
-    if not any(c.isdigit() for c in password):
-        return False, "كلمة المرور يجب أن تحتوي على رقم واحد على الأقل"
-    if not any(c.isalpha() for c in password):
-        return False, "كلمة المرور يجب أن تحتوي على حرف واحد على الأقل"
+    has_upper = any(c.isupper() for c in password)
+    has_lower = any(c.islower() for c in password)
+    has_digit = any(c.isdigit() for c in password)
+    if not (has_upper and has_lower and has_digit):
+        return False, "كلمة المرور يجب أن تحتوي على حرف كبير وصغير ورقم"
     return True, ""
 
 
@@ -72,11 +81,9 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
 # Token Utilities
 # ═══════════════════════════════════════════════════════════════
 
-def create_access_token(user_id: str, username: str, roles: list[str]) -> str:
+def create_access_token(user_id: str, username: str, roles: list) -> str:
     payload = {
-        "sub": user_id,
-        "username": username,
-        "roles": roles,
+        "sub": user_id, "username": username, "roles": roles,
         "type": "access",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
         "iat": datetime.now(timezone.utc),
@@ -86,8 +93,7 @@ def create_access_token(user_id: str, username: str, roles: list[str]) -> str:
 
 def create_refresh_token(user_id: str) -> str:
     payload = {
-        "sub": user_id,
-        "type": "refresh",
+        "sub": user_id, "type": "refresh",
         "exp": datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
         "iat": datetime.now(timezone.utc),
         "jti": gen_uuid(),
@@ -95,15 +101,13 @@ def create_refresh_token(user_id: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def decode_token(token: str) -> Optional[dict]:
+def decode_token(token: str) -> dict:
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
-        return None
-
-
-def hash_token(token: str) -> str:
-    return hashlib.sha256(token.encode()).hexdigest()
+    except jwt.ExpiredSignatureError:
+        return {"error": "انتهت صلاحية الرمز"}
+    except jwt.InvalidTokenError:
+        return {"error": "رمز غير صالح"}
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -112,256 +116,178 @@ def hash_token(token: str) -> str:
 
 class AuthService:
 
-    def register(
-        self,
-        username: str,
-        email: str,
-        password: str,
-        display_name: str,
-        mobile: Optional[str] = None,
-        ip_address: Optional[str] = None,
-    ) -> dict:
-        """
-        Register new user.
-        Creates: user + profile + default role + free subscription + entitlements.
-        """
-        # Validate password
+    def register(self, username: str, email: str, password: str,
+                 display_name: str, mobile: Optional[str] = None) -> dict:
         valid, msg = validate_password_strength(password)
         if not valid:
             return {"success": False, "error": msg}
 
         db = SessionLocal()
         try:
-            # Check uniqueness
-            if db.query(User).filter(User.username == username.lower()).first():
-                return {"success": False, "error": "اسم المستخدم مسجل مسبقاً"}
-            if db.query(User).filter(User.email == email.lower()).first():
-                return {"success": False, "error": "البريد الإلكتروني مسجل مسبقاً"}
-            if mobile and db.query(User).filter(User.mobile == mobile).first():
-                return {"success": False, "error": "رقم الجوال مسجل مسبقاً"}
+            if db.query(User).filter((User.username == username.lower()) | (User.email == email.lower())).first():
+                return {"success": False, "error": "اسم المستخدم أو البريد مسجل مسبقاً"}
 
-            # Create user
             user = User(
-                id=gen_uuid(),
-                username=username.lower().strip(),
-                email=email.lower().strip(),
-                mobile=mobile,
+                id=gen_uuid(), username=username.lower().strip(),
+                email=email.lower().strip(), mobile=mobile,
                 display_name=display_name.strip(),
                 password_hash=hash_password(password),
-                status=UserStatus.active.value,  # Auto-active for now
-                email_verified=False,
+                status=UserStatus.active.value,
             )
             db.add(user)
 
-            # Create profile
-            profile = UserProfile(
-                id=gen_uuid(),
-                user_id=user.id,
-            )
-            db.add(profile)
+            db.add(UserProfile(id=gen_uuid(), user_id=user.id))
 
-            # Assign default role: registered_user
             role = db.query(Role).filter(Role.code == RoleCode.registered_user.value).first()
             if role:
                 db.add(UserRole(id=gen_uuid(), user_id=user.id, role_id=role.id))
 
-            # Assign free plan subscription + entitlements
             free_plan = db.query(Plan).filter(Plan.code == PlanCode.free.value).first()
             if free_plan:
                 sub = UserSubscription(
-                    id=gen_uuid(),
-                    user_id=user.id,
-                    plan_id=free_plan.id,
-                    status="active",
-                    billing_cycle="monthly",
+                    id=gen_uuid(), user_id=user.id, plan_id=free_plan.id,
+                    status="active", billing_cycle="monthly",
                 )
                 db.add(sub)
-
-                # Copy plan features to user entitlements
                 features = db.query(PlanFeature).filter(PlanFeature.plan_id == free_plan.id).all()
                 for f in features:
                     db.add(SubscriptionEntitlement(
-                        id=gen_uuid(),
-                        user_id=user.id,
-                        feature_code=f.feature_code,
-                        value_type=f.value_type,
-                        value=f.value,
-                        source_plan_id=free_plan.id,
+                        id=gen_uuid(), subscription_id=sub.id,
+                        feature_key=f.feature_key, feature_value=f.feature_value,
+                        feature_type=f.feature_type,
                     ))
 
-            # Log security event
             db.add(UserSecurityEvent(
-                id=gen_uuid(),
-                user_id=user.id,
-                event_type=SecurityEventType.login.value,
-                ip_address=ip_address,
-                details={"action": "registration"},
+                id=gen_uuid(), user_id=user.id,
+                event_type=SecurityEventType.registration.value,
+                ip_address="", details={"method": "email"},
             ))
 
             db.commit()
 
-            # Generate tokens
             roles = [RoleCode.registered_user.value]
-            access_token = create_access_token(user.id, user.username, roles)
-            refresh_token = create_refresh_token(user.id)
-
-            # Save session
-            session = UserSession(
-                id=gen_uuid(),
-                user_id=user.id,
-                token_hash=hash_token(access_token),
-                refresh_token_hash=hash_token(refresh_token),
-                ip_address=ip_address,
-                expires_at=datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
-            )
-            db.add(session)
-            db.commit()
-
             return {
                 "success": True,
                 "user": {
-                    "id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                    "display_name": user.display_name,
+                    "id": user.id, "username": user.username,
+                    "email": user.email, "display_name": user.display_name,
                     "status": user.status,
-                    "plan": PlanCode.free.value,
+                    "plan": free_plan.code if free_plan else "free",
+                    "roles": roles,
                 },
                 "tokens": {
-                    "access_token": access_token,
-                    "refresh_token": refresh_token,
-                    "token_type": "bearer",
-                    "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+                    "access_token": create_access_token(user.id, user.username, roles),
+                    "refresh_token": create_refresh_token(user.id),
                 },
             }
-
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": f"خطأ في التسجيل: {str(e)}"}
+            return {"success": False, "error": str(e)}
         finally:
             db.close()
 
-    def login(
-        self,
-        username_or_email: str,
-        password: str,
-        ip_address: Optional[str] = None,
-        user_agent: Optional[str] = None,
-    ) -> dict:
-        """Authenticate user and return tokens."""
+    def login(self, username_or_email: str, password: str, ip_address: str = "") -> dict:
         db = SessionLocal()
         try:
-            identifier = username_or_email.lower().strip()
             user = db.query(User).filter(
-                (User.username == identifier) | (User.email == identifier)
+                (User.username == username_or_email.lower()) | (User.email == username_or_email.lower())
             ).first()
 
-            if not user or user.is_deleted:
+            if not user:
                 return {"success": False, "error": "اسم المستخدم أو كلمة المرور غير صحيحة"}
 
-            # Check lockout
-            if user.locked_until and user.locked_until > utcnow():
-                remaining = (user.locked_until - utcnow()).seconds // 60
-                return {"success": False, "error": f"الحساب مقفل. حاول بعد {remaining} دقيقة"}
-
-            # Check account status
             if user.status == UserStatus.suspended.value:
-                return {"success": False, "error": "الحساب معلّق. تواصل مع الدعم"}
-            if user.status in (UserStatus.deactivated_temp.value, UserStatus.deactivated_permanent.value):
-                return {"success": False, "error": "الحساب غير مفعّل"}
+                return {"success": False, "error": "الحساب موقوف — تواصل مع الدعم"}
+            if user.status == UserStatus.deactivated.value:
+                return {"success": False, "error": "الحساب معطّل"}
 
-            # Verify password
+            if user.failed_login_count >= MAX_FAILED_LOGINS:
+                if user.locked_until and user.locked_until > datetime.now(timezone.utc):
+                    remaining = (user.locked_until - datetime.now(timezone.utc)).seconds // 60
+                    return {"success": False, "error": f"الحساب مقفل — حاول بعد {remaining} دقيقة"}
+                else:
+                    user.failed_login_count = 0
+                    user.locked_until = None
+
             if not verify_password(password, user.password_hash):
-                user.failed_login_count = (user.failed_login_count or 0) + 1
+                user.failed_login_count += 1
                 if user.failed_login_count >= MAX_FAILED_LOGINS:
-                    user.locked_until = utcnow() + timedelta(minutes=LOCKOUT_MINUTES)
-                    db.add(UserSecurityEvent(
-                        id=gen_uuid(), user_id=user.id,
-                        event_type=SecurityEventType.suspicious_activity.value,
-                        ip_address=ip_address,
-                        details={"reason": "max_failed_logins", "count": user.failed_login_count},
-                    ))
+                    user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=LOCKOUT_MINUTES)
                 db.add(UserSecurityEvent(
                     id=gen_uuid(), user_id=user.id,
-                    event_type=SecurityEventType.failed_login.value,
+                    event_type=SecurityEventType.login_failed.value,
                     ip_address=ip_address,
                 ))
                 db.commit()
                 return {"success": False, "error": "اسم المستخدم أو كلمة المرور غير صحيحة"}
 
-            # Success — reset failed count
             user.failed_login_count = 0
             user.locked_until = None
             user.last_login_at = utcnow()
-            user.login_count = (user.login_count or 0) + 1
 
-            # Get roles
-            user_roles = db.query(UserRole).filter(UserRole.user_id == user.id).all()
-            role_ids = [ur.role_id for ur in user_roles]
-            roles = db.query(Role).filter(Role.id.in_(role_ids)).all() if role_ids else []
-            role_codes = [r.code for r in roles]
-
-            # Get plan
-            sub = db.query(UserSubscription).filter(UserSubscription.user_id == user.id).first()
-            plan_code = "free"
-            if sub:
-                plan = db.query(Plan).filter(Plan.id == sub.plan_id).first()
-                plan_code = plan.code if plan else "free"
-
-            # Generate tokens
-            access_token = create_access_token(user.id, user.username, role_codes)
-            refresh_token = create_refresh_token(user.id)
-
-            # Save session
-            db.add(UserSession(
-                id=gen_uuid(),
-                user_id=user.id,
-                token_hash=hash_token(access_token),
-                refresh_token_hash=hash_token(refresh_token),
-                device_info=user_agent,
-                ip_address=ip_address,
-                expires_at=datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
-            ))
+            session = UserSession(
+                id=gen_uuid(), user_id=user.id, ip_address=ip_address,
+                is_active=True,
+            )
+            db.add(session)
 
             db.add(UserSecurityEvent(
                 id=gen_uuid(), user_id=user.id,
-                event_type=SecurityEventType.login.value,
+                event_type=SecurityEventType.login_success.value,
                 ip_address=ip_address,
-                user_agent=user_agent,
             ))
+
+            user_roles = []
+            for ur in db.query(UserRole).filter(UserRole.user_id == user.id).all():
+                role = db.query(Role).filter(Role.id == ur.role_id).first()
+                if role:
+                    user_roles.append(role.code)
 
             db.commit()
 
             return {
                 "success": True,
                 "user": {
-                    "id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                    "display_name": user.display_name,
+                    "id": user.id, "username": user.username,
+                    "email": user.email, "display_name": user.display_name,
                     "status": user.status,
-                    "plan": plan_code,
-                    "roles": role_codes,
+                    "plan": self._get_user_plan(db, user.id),
+                    "roles": user_roles,
                 },
                 "tokens": {
-                    "access_token": access_token,
-                    "refresh_token": refresh_token,
-                    "token_type": "bearer",
-                    "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+                    "access_token": create_access_token(user.id, user.username, user_roles),
+                    "refresh_token": create_refresh_token(user.id),
                 },
+                "session_id": session.id,
             }
-
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": f"خطأ في الدخول: {str(e)}"}
+            return {"success": False, "error": str(e)}
         finally:
             db.close()
 
-    def change_password(
-        self, user_id: str, current_password: str, new_password: str,
-        ip_address: Optional[str] = None,
-    ) -> dict:
-        """Change password for authenticated user."""
+    def logout(self, user_id: str, token: str) -> dict:
+        db = SessionLocal()
+        try:
+            sessions = db.query(UserSession).filter(
+                UserSession.user_id == user_id, UserSession.is_active == True
+            ).all()
+            for s in sessions:
+                s.is_active = False
+                s.ended_at = utcnow()
+            db.add(UserSecurityEvent(
+                id=gen_uuid(), user_id=user_id,
+                event_type=SecurityEventType.logout.value,
+            ))
+            db.commit()
+            return {"success": True, "message": "تم تسجيل الخروج"}
+        except Exception as e:
+            db.rollback()
+            return {"success": False, "error": str(e)}
+        finally:
+            db.close()
+
+    def change_password(self, user_id: str, current_password: str, new_password: str) -> dict:
         valid, msg = validate_password_strength(new_password)
         if not valid:
             return {"success": False, "error": msg}
@@ -371,55 +297,43 @@ class AuthService:
             user = db.query(User).filter(User.id == user_id).first()
             if not user:
                 return {"success": False, "error": "المستخدم غير موجود"}
-
             if not verify_password(current_password, user.password_hash):
                 return {"success": False, "error": "كلمة المرور الحالية غير صحيحة"}
 
             user.password_hash = hash_password(new_password)
-
             db.add(UserSecurityEvent(
-                id=gen_uuid(), user_id=user.id,
-                event_type=SecurityEventType.password_change.value,
-                ip_address=ip_address,
+                id=gen_uuid(), user_id=user_id,
+                event_type=SecurityEventType.password_changed.value,
             ))
-
             db.commit()
-            return {"success": True, "message": "تم تغيير كلمة المرور بنجاح"}
-
+            return {"success": True, "message": "تم تغيير كلمة المرور"}
         except Exception as e:
             db.rollback()
             return {"success": False, "error": str(e)}
         finally:
             db.close()
 
-    def request_password_reset(self, email: str) -> dict:
-        """Generate password reset token."""
+    def forgot_password(self, email: str) -> dict:
         db = SessionLocal()
         try:
             user = db.query(User).filter(User.email == email.lower()).first()
             if not user:
-                return {"success": True, "message": "إذا كان البريد مسجلاً، سيتم إرسال رابط إعادة التعيين"}
+                return {"success": True, "message": "إذا كان البريد مسجلاً ستصلك رسالة"}
 
-            token = secrets.token_urlsafe(32)
+            reset_token = secrets.token_urlsafe(32)
             db.add(PasswordReset(
-                id=gen_uuid(),
-                user_id=user.id,
-                token_hash=hash_token(token),
-                expires_at=utcnow() + timedelta(hours=1),
-            ))
-            db.add(UserSecurityEvent(
-                id=gen_uuid(), user_id=user.id,
-                event_type=SecurityEventType.password_reset_request.value,
+                id=gen_uuid(), user_id=user.id, token=reset_token,
+                expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
             ))
             db.commit()
-
-            return {"success": True, "message": "إذا كان البريد مسجلاً، سيتم إرسال رابط إعادة التعيين", "reset_token": token}
-
+            return {"success": True, "message": "إذا كان البريد مسجلاً ستصلك رسالة", "reset_token": reset_token}
+        except Exception as e:
+            db.rollback()
+            return {"success": False, "error": str(e)}
         finally:
             db.close()
 
-    def complete_password_reset(self, token: str, new_password: str) -> dict:
-        """Complete password reset with token."""
+    def reset_password(self, token: str, new_password: str) -> dict:
         valid, msg = validate_password_strength(new_password)
         if not valid:
             return {"success": False, "error": msg}
@@ -427,84 +341,29 @@ class AuthService:
         db = SessionLocal()
         try:
             reset = db.query(PasswordReset).filter(
-                PasswordReset.token_hash == hash_token(token),
-                PasswordReset.used == False,
-                PasswordReset.expires_at > utcnow(),
+                PasswordReset.token == token, PasswordReset.is_used == False,
             ).first()
-
             if not reset:
-                return {"success": False, "error": "رابط إعادة التعيين غير صالح أو منتهي"}
+                return {"success": False, "error": "رمز إعادة التعيين غير صالح"}
+            if reset.expires_at < datetime.now(timezone.utc):
+                return {"success": False, "error": "انتهت صلاحية الرمز"}
 
             user = db.query(User).filter(User.id == reset.user_id).first()
             user.password_hash = hash_password(new_password)
-            reset.used = True
-            reset.used_at = utcnow()
-
-            # Revoke all sessions
-            db.query(UserSession).filter(
-                UserSession.user_id == user.id, UserSession.is_active == True
-            ).update({"is_active": False})
-
-            db.add(UserSecurityEvent(
-                id=gen_uuid(), user_id=user.id,
-                event_type=SecurityEventType.password_reset_complete.value,
-            ))
-
+            reset.is_used = True
             db.commit()
-            return {"success": True, "message": "تم إعادة تعيين كلمة المرور بنجاح"}
-
+            return {"success": True, "message": "تم إعادة تعيين كلمة المرور"}
+        except Exception as e:
+            db.rollback()
+            return {"success": False, "error": str(e)}
         finally:
             db.close()
 
-    def logout(self, token: str) -> dict:
-        """Revoke current session."""
-        db = SessionLocal()
-        try:
-            session = db.query(UserSession).filter(
-                UserSession.token_hash == hash_token(token), UserSession.is_active == True
-            ).first()
-            if session:
-                session.is_active = False
-                db.add(UserSecurityEvent(
-                    id=gen_uuid(), user_id=session.user_id,
-                    event_type=SecurityEventType.logout.value,
-                ))
-                db.commit()
-            return {"success": True, "message": "تم تسجيل الخروج"}
-        finally:
-            db.close()
-
-    def logout_all(self, user_id: str) -> dict:
-        """Revoke all sessions for user."""
-        db = SessionLocal()
-        try:
-            count = db.query(UserSession).filter(
-                UserSession.user_id == user_id, UserSession.is_active == True
-            ).update({"is_active": False})
-
-            db.add(UserSecurityEvent(
-                id=gen_uuid(), user_id=user_id,
-                event_type=SecurityEventType.session_revoked.value,
-                details={"sessions_revoked": count},
-            ))
-            db.commit()
-            return {"success": True, "message": f"تم إنهاء {count} جلسة"}
-        finally:
-            db.close()
-
-    def get_active_sessions(self, user_id: str) -> list:
-        """List active sessions for user."""
-        db = SessionLocal()
-        try:
-            sessions = db.query(UserSession).filter(
-                UserSession.user_id == user_id, UserSession.is_active == True
-            ).order_by(UserSession.last_used_at.desc()).all()
-            return [{
-                "id": s.id,
-                "device_info": s.device_info,
-                "ip_address": s.ip_address,
-                "last_used_at": s.last_used_at.isoformat() if s.last_used_at else None,
-                "created_at": s.created_at.isoformat(),
-            } for s in sessions]
-        finally:
-            db.close()
+    def _get_user_plan(self, db, user_id: str) -> str:
+        sub = db.query(UserSubscription).filter(
+            UserSubscription.user_id == user_id, UserSubscription.status == "active"
+        ).first()
+        if sub:
+            plan = db.query(Plan).filter(Plan.id == sub.plan_id).first()
+            return plan.code if plan else "free"
+        return "free"

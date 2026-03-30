@@ -28,11 +28,14 @@ import os
 # Database Setup
 # ═══════════════════════════════════════════════════════════════
 
-DB_PATH = os.environ.get("DATABASE_URL", "sqlite:///apex_platform.db")
-if DB_PATH.startswith("sqlite"):
-    engine = create_engine(DB_PATH, connect_args={"check_same_thread": False}, echo=False)
+DB_URL = os.environ.get("DATABASE_URL", "sqlite:///apex_platform.db")
+# Render PostgreSQL fix: postgres:// -> postgresql://
+if DB_URL.startswith("postgres://"):
+    DB_URL = DB_URL.replace("postgres://", "postgresql://", 1)
+if DB_URL.startswith("sqlite"):
+    engine = create_engine(DB_URL, connect_args={"check_same_thread": False}, echo=False)
 else:
-    engine = create_engine(DB_PATH, echo=False)
+    engine = create_engine(DB_URL, pool_size=10, max_overflow=20, pool_pre_ping=True, echo=False)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
