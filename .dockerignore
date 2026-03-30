@@ -1,0 +1,5 @@
+﻿apex_finance/
+*.pyc
+__pycache__
+.git
+*.md
