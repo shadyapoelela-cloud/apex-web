@@ -116,17 +116,16 @@ async def analyze_trial_balance(
 @app.post("/analyze/full")
 async def analyze_with_narrative(
     file: UploadFile = File(...),
-    industry: str = Query("general"),
-    language: str = Query("ar"),
-    closing_inventory: float = Query(None),
-    closing_inventory_form: str = Form(None),
+    industry: str = Form("general"),
+    language: str = Form("ar"),
+    closing_inventory: str = Form(None),
 ):
-    """تحليل شامل + تقرير AI. closing_inventory من Query أو Form field."""
-    # Accept from either query param or form field
-    ci = closing_inventory
-    if ci is None and closing_inventory_form:
+    """تحليل شامل + تقرير AI. كل القيم ترسل كـ Form fields."""
+    # Parse closing_inventory
+    ci = None
+    if closing_inventory:
         try:
-            ci = float(closing_inventory_form)
+            ci = float(closing_inventory.replace(",", "").strip())
         except (ValueError, TypeError):
             ci = None
 

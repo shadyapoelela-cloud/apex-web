@@ -93,18 +93,18 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
     setState(() { _step = 3; _loading = true; _progress = 0; _currentStage = 0; });
     try {
       _animateProgress(0, 0.2, 1000); setState(() => _currentStage = 0);
-      var url = '$_api/analyze/full?industry=retail&language=ar';
+      var url = '$_api/analyze/full';
       final invText = _closingInvCtrl.text.trim().replaceAll(',', '').replaceAll(' ', '');
       final invClean = invText.contains('.') ? invText.split('.')[0] : invText;
-      if (invClean.isNotEmpty) url += '&closing_inventory=$invClean';
-      print('DEBUG URL: $url');
-      print('DEBUG invText: [$invText] invClean: [$invClean]');
+      print('DEBUG invClean: [$invClean]');
       print('DEBUG fileBytes length: ${_fileBytes?.length ?? 0}');
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('bytes: ${_fileBytes?.length ?? 0} | inv: $invClean'), duration: const Duration(seconds: 5)));
       final uri = Uri.parse(url);
       final req = http.MultipartRequest('POST', uri);
       req.files.add(http.MultipartFile.fromBytes('file', _fileBytes!, filename: 'trial_balance.xlsx'));
+      req.fields['industry'] = 'retail';
+      req.fields['language'] = 'ar';
       if (invClean.isNotEmpty) req.fields['closing_inventory'] = invClean;
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('inv: $invClean | bytes: ${_fileBytes?.length ?? 0}'), duration: const Duration(seconds: 5)));
       _animateProgress(0.2, 0.5, 2000); setState(() => _currentStage = 1);
       final streamed = await req.send().timeout(const Duration(seconds: 300));
       _animateProgress(0.5, 0.8, 1000); setState(() => _currentStage = 2);
