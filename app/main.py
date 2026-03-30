@@ -127,21 +127,12 @@ async def analyze_report(
     industry: str = Query("general"),
     closing_inventory: float = Query(0),
     client_name: str = Query(""),
-    authorization: str = Header(None),
 ):
     """Analyze trial balance and return PDF report."""
     from app.services.pdf_report_service import generate_pdf_report
     contents = await file.read()
     result = orch.analyze_bytes(file_bytes=contents, filename=file.filename, industry=industry)
     user_name = ""
-    if authorization and authorization.startswith("Bearer "):
-        try:
-            import jwt as _jwt
-            payload = _jwt.decode(authorization.split(" ")[1],
-                os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION"),
-                algorithms=["HS256"])
-            user_name = payload.get("username", "")
-        except: pass
     from datetime import datetime as _dt
     pdf_bytes = generate_pdf_report(result, client_name=client_name, user_name=user_name)
     return PDFResponse(content=pdf_bytes, media_type="application/pdf",
