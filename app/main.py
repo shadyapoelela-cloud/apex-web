@@ -117,8 +117,15 @@ async def analyze_trial_balance(
 async def analyze_with_narrative(request: Request):
     """تحليل شامل + تقرير AI."""
     form = await request.form()
-    industry = form.get("industry", "general")
-    language = form.get("language", "ar")
+
+    # Extract file bytes FIRST before anything else
+    file_field = form["file"]
+    content = await file_field.read()
+    filename = file_field.filename
+
+    # Then extract other fields
+    industry = str(form.get("industry", "general"))
+    language = str(form.get("language", "ar"))
     ci_raw = form.get("closing_inventory") or request.query_params.get("closing_inventory")
 
     ci = None
@@ -128,21 +135,17 @@ async def analyze_with_narrative(request: Request):
         except (ValueError, TypeError):
             ci = None
 
-    file = form.get("file")
-    if not file:
-        raise HTTPException(status_code=400, detail="لم يتم رفع ملف")
-    if not file.filename.endswith(('.xlsx', '.xls')):
-        raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
+    print(f"APEX: ci={ci}, file_size={len(content)}, filename={filename}")
 
-    print(f"APEX: ci={ci}, industry={industry}, filename={file.filename}")
+    if not filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
 
     try:
         from app.services.ai.narrative_service import NarrativeService
 
-        content = await file.read()
         result = orchestrator.analyze_bytes(
             file_bytes=content,
-            filename=file.filename,
+            filename=filename,
             industry=industry,
             closing_inventory=ci,
         )
