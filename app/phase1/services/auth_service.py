@@ -220,12 +220,10 @@ class AuthService:
             user.locked_until = None
             user.last_login_at = utcnow()
 
-            access_tok = create_access_token(user.id, user.username, user_roles)
-            refresh_tok = create_refresh_token(user.id)
             session = UserSession(
                 id=gen_uuid(), user_id=user.id, ip_address=ip_address,
-                token_hash=hashlib.sha256(access_tok.encode()).hexdigest(),
-                refresh_token_hash=hashlib.sha256(refresh_tok.encode()).hexdigest(),
+                token_hash="pending",
+                refresh_token_hash=None,
                 device_info=user_agent,
                 is_active=True,
                 expires_at=datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -243,6 +241,13 @@ class AuthService:
                 role = db.query(Role).filter(Role.id == ur.role_id).first()
                 if role:
                     user_roles.append(role.code)
+
+            access_tok = create_access_token(user.id, user.username, user_roles)
+            refresh_tok = create_refresh_token(user.id)
+
+            # Update session with token hashes
+            session.token_hash = hashlib.sha256(access_tok.encode()).hexdigest()
+            session.refresh_token_hash = hashlib.sha256(refresh_tok.encode()).hexdigest()
 
             db.commit()
 
