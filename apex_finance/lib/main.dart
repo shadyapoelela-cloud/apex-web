@@ -869,6 +869,8 @@ class _AccS extends State<AccountTab> {
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const CloseAccountScreen()))),
           _mi(Icons.history, 'سجل النشاط', const Color(0xFF9C27B0),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ActivityHistoryScreen()))),
+          _mi(Icons.assignment, 'أنواع المهام', AC.cyan,
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const TaskTypesBrowserScreen()))),
           _mi(Icons.description, 'الشروط والأحكام', const Color(0xFF607D8B),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalAcceptanceScreen(onAccepted: ()=>Navigator.pop(c))))),
       ])));
@@ -1056,10 +1058,14 @@ class _AdminS extends State<AdminTab> {
           onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ReviewerConsoleScreen()))),
         IconButton(icon: const Icon(Icons.verified_user, color: AC.ok),
           onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderVerificationScreen()))),
-        IconButton(icon: const Icon(Icons.upload_file, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderDocumentUploadScreen()))),
-        IconButton(icon: const Icon(Icons.shield, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderComplianceScreen()),
-        IconButton(icon: const Icon(Icons.psychology, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const KnowledgeDeveloperConsole()))),
-        IconButton(icon: const Icon(Icons.security, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const AuditLogScreen()))))),
+        IconButton(icon: const Icon(Icons.upload_file, color: AC.gold),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderDocumentUploadScreen()))),
+        IconButton(icon: const Icon(Icons.shield, color: AC.gold),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderComplianceScreen()))),
+        IconButton(icon: const Icon(Icons.psychology, color: AC.gold),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const KnowledgeDeveloperConsole()))),
+        IconButton(icon: const Icon(Icons.security, color: AC.gold),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const AuditLogScreen()))),
       ]),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(14), children: [
