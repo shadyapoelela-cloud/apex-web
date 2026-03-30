@@ -132,7 +132,7 @@ async def analyze_report(
     """Analyze trial balance and return PDF report."""
     from app.services.pdf_report_service import generate_pdf_report
     contents = await file.read()
-    result = orch.analyze(contents, file.filename, industry, closing_inventory)
+    result = orch.analyze(contents, file.filename, industry)
     user_name = ""
     if authorization and authorization.startswith("Bearer "):
         try:
