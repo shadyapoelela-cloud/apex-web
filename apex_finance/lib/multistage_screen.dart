@@ -109,8 +109,19 @@ class _MultistageScreenState extends State<MultistageScreen> with TickerProvider
       final streamed = await req.send().timeout(const Duration(seconds: 300));
       _animateProgress(0.5, 0.8, 1000); setState(() => _currentStage = 2);
       final resp = await http.Response.fromStream(streamed);
-      print('DEBUG response status: ${resp.statusCode}');
-      print('DEBUG response size: ${resp.bodyBytes.length}');
+      final rawBody = utf8.decode(resp.bodyBytes);
+      print('DEBUG status: ${resp.statusCode} size: ${resp.bodyBytes.length}');
+      print('DEBUG RAW[0:300]: ${rawBody.substring(0, 300.clamp(0, rawBody.length))}');
+      final cogsIdx = rawBody.indexOf('"cogs"');
+      if (cogsIdx > 0) {
+        print('DEBUG COGS_RAW: ${rawBody.substring(cogsIdx, (cogsIdx + 60).clamp(0, rawBody.length))}');
+      } else {
+        print('DEBUG: NO cogs FOUND in response!');
+        // Search for income_statement
+        final isIdx = rawBody.indexOf('income_statement');
+        if (isIdx > 0) print('DEBUG IS_RAW: ${rawBody.substring(isIdx, (isIdx + 100).clamp(0, rawBody.length))}');
+        else print('DEBUG: NO income_statement in response!');
+      }
       _animateProgress(0.8, 0.95, 500); setState(() => _currentStage = 3);
       if (resp.statusCode == 200) {
         final data = json.decode(utf8.decode(resp.bodyBytes));

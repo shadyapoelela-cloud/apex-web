@@ -114,30 +114,24 @@ async def analyze_trial_balance(
 # ─── Full Analysis with AI Narrative ─────────────────────────────────────
 
 @app.post("/analyze/full")
-async def analyze_with_narrative(request: Request):
+async def analyze_with_narrative(
+    file: UploadFile = File(...),
+    industry: str = Form("general"),
+    language: str = Form("ar"),
+    closing_inventory: str = Form(""),
+):
     """تحليل شامل + تقرير AI."""
-    form = await request.form()
-
-    # Extract file bytes FIRST before anything else
-    file_field = form["file"]
-    content = await file_field.read()
-    filename = file_field.filename
-
-    # Then extract other fields
-    industry = str(form.get("industry", "general"))
-    language = str(form.get("language", "ar"))
-    ci_raw = form.get("closing_inventory") or request.query_params.get("closing_inventory")
-
     ci = None
-    if ci_raw:
+    if closing_inventory and closing_inventory.strip():
         try:
-            ci = float(str(ci_raw).replace(",", "").strip())
+            ci = float(closing_inventory.replace(",", "").strip())
         except (ValueError, TypeError):
             ci = None
 
-    print(f"APEX: ci={ci}, file_size={len(content)}, filename={filename}")
+    content = await file.read()
+    print(f"APEX: ci={ci}, file_size={len(content)}, filename={file.filename}")
 
-    if not filename.endswith(('.xlsx', '.xls')):
+    if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
 
     try:
@@ -145,7 +139,7 @@ async def analyze_with_narrative(request: Request):
 
         result = orchestrator.analyze_bytes(
             file_bytes=content,
-            filename=filename,
+            filename=file.filename,
             industry=industry,
             closing_inventory=ci,
         )
