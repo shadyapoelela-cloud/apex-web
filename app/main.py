@@ -6,7 +6,7 @@ Clean API with modular financial engine.
 AI does NOT modify any numbers.
 """
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
@@ -116,14 +116,20 @@ async def analyze_trial_balance(
 @app.post("/analyze/full")
 async def analyze_with_narrative(
     file: UploadFile = File(...),
-    industry: str = Query("general", description="القطاع"),
-    language: str = Query("ar", description="لغة التقرير: ar أو en"),
-    closing_inventory: float = Query(None, description="مخزون آخر المدة الفعلي (من الجرد)"),
+    industry: str = Query("general"),
+    language: str = Query("ar"),
+    closing_inventory: float = Query(None),
+    closing_inventory_form: str = Form(None),
 ):
-    """
-    تحليل شامل + تقرير AI.
-    المحرك المالي يحسب الأرقام → AI يشرح ويوصي بدون تغيير أي رقم.
-    """
+    """تحليل شامل + تقرير AI. closing_inventory من Query أو Form field."""
+    # Accept from either query param or form field
+    ci = closing_inventory
+    if ci is None and closing_inventory_form:
+        try:
+            ci = float(closing_inventory_form)
+        except (ValueError, TypeError):
+            ci = None
+
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
 
@@ -137,7 +143,7 @@ async def analyze_with_narrative(
             file_bytes=content,
             filename=file.filename,
             industry=industry,
-            closing_inventory=closing_inventory,
+            closing_inventory=ci,
         )
 
         if not result.get("success"):
