@@ -127,7 +127,7 @@ class AuthService:
                 email=email.lower().strip(), mobile=mobile,
                 display_name=display_name.strip(),
                 password_hash=hash_password(password),
-                status=UserStatus.active.value,
+                status="active",
             )
             db.add(user)
 
@@ -191,9 +191,9 @@ class AuthService:
             if not user:
                 return {"success": False, "error": "اسم المستخدم أو كلمة المرور غير صحيحة"}
 
-            if user.status == UserStatus.suspended.value:
+            if user.status == "suspended":
                 return {"success": False, "error": "الحساب موقوف — تواصل مع الدعم"}
-            if user.status == UserStatus.deactivated.value:
+            if user.status in ("deactivated_temp", "deactivated_permanent"):
                 return {"success": False, "error": "الحساب معطّل"}
 
             if user.failed_login_count >= MAX_FAILED_LOGINS:
