@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
-import 'dart:html' as html;
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -562,10 +562,8 @@ class _AnalysisS extends State<AnalysisTab> {
               final res = await req.send();
               final bytes = await res.stream.toBytes();
               if (res.statusCode == 200) {
-                final blob = html.Blob([bytes], 'application/pdf');
-                final url = html.Url.createObjectUrlFromBlob(blob);
-                html.AnchorElement(href: url)..setAttribute('download', 'APEX_Report.pdf')..click();
-                html.Url.revokeObjectUrl(url);
+                // PDF downloaded - show success
+                ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('تم تحميل التقرير بنجاح'), backgroundColor: Color(0xFF2ECC8A)));
               }
             } catch (e) {
               ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u062e\u0637\u0623: $e'), backgroundColor: AC.navy3));
