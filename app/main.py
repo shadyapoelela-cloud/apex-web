@@ -109,8 +109,8 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "3.5.0",
-            "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6},
-            "all_phases_active": all([P1, P2, P3, P4, P5, P6])}
+            "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7},
+            "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7])}
 
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...), industry: str = Query("general"), closing_inventory: float = Query(None)):
