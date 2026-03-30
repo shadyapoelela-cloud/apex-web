@@ -17,6 +17,47 @@ from reportlab.pdfbase.ttfonts import TTFont
 import arabic_reshaper
 from bidi.algorithm import get_display
 from io import BytesIO
+import urllib.request
+
+# Register Arabic font (Amiri)
+FONT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "fonts")
+FONT_REGISTERED = False
+
+def ensure_arabic_font():
+    global FONT_REGISTERED
+    if FONT_REGISTERED:
+        return
+    os.makedirs(FONT_DIR, exist_ok=True)
+    font_path = os.path.join(FONT_DIR, "Amiri-Regular.ttf")
+    font_bold_path = os.path.join(FONT_DIR, "Amiri-Bold.ttf")
+    
+    if not os.path.exists(font_path):
+        try:
+            urllib.request.urlretrieve(
+                "https://github.com/aliftype/amiri/releases/download/1.000/Amiri-Regular.ttf",
+                font_path)
+        except:
+            # Fallback: use without custom font
+            FONT_REGISTERED = True
+            return
+    
+    if not os.path.exists(font_bold_path):
+        try:
+            urllib.request.urlretrieve(
+                "https://github.com/aliftype/amiri/releases/download/1.000/Amiri-Bold.ttf",
+                font_bold_path)
+        except:
+            pass
+    
+    try:
+        pdfmetrics.registerFont(TTFont('Amiri', font_path))
+        if os.path.exists(font_bold_path):
+            pdfmetrics.registerFont(TTFont('Amiri-Bold', font_bold_path))
+        else:
+            pdfmetrics.registerFont(TTFont('Amiri-Bold', font_path))
+        FONT_REGISTERED = True
+    except:
+        FONT_REGISTERED = True
 from datetime import datetime
 import os
 
@@ -59,6 +100,9 @@ WARN = colors.HexColor("#F0A500")
 
 def generate_pdf_report(result: dict, client_name: str = "", user_name: str = "") -> bytes:
     """Generate a professional Arabic PDF financial report."""
+    ensure_arabic_font()
+    FONT = "Amiri" if FONT_REGISTERED else "Helvetica"
+    FONT_B = "Amiri-Bold" if FONT_REGISTERED else "Helvetica-Bold"
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4,
         rightMargin=1.5*cm, leftMargin=1.5*cm,
@@ -71,26 +115,26 @@ def generate_pdf_report(result: dict, client_name: str = "", user_name: str = ""
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle('ATitle', parent=styles['Title'],
-        fontName='Helvetica-Bold', fontSize=22, alignment=TA_CENTER,
+        fontName=FONT_B, fontSize=22, alignment=TA_CENTER,
         textColor=GOLD, spaceAfter=6)
 
     subtitle_style = ParagraphStyle('ASub', parent=styles['Normal'],
-        fontName='Helvetica', fontSize=11, alignment=TA_CENTER,
+        fontName=FONT, fontSize=11, alignment=TA_CENTER,
         textColor=GRAY, spaceAfter=20)
 
     heading_style = ParagraphStyle('AHead', parent=styles['Heading2'],
-        fontName='Helvetica-Bold', fontSize=14, alignment=TA_RIGHT,
+        fontName=FONT_B, fontSize=14, alignment=TA_RIGHT,
         textColor=GOLD, spaceBefore=16, spaceAfter=8,
         borderWidth=0, borderPadding=0)
 
     normal_r = ParagraphStyle('NR', parent=styles['Normal'],
-        fontName='Helvetica', fontSize=10, alignment=TA_RIGHT,
+        fontName=FONT, fontSize=10, alignment=TA_RIGHT,
         textColor=colors.black)
 
     # ─── Header ───
     story.append(Paragraph("APEX", title_style))
     story.append(Paragraph(ar("تقرير التحليل المالي"), ParagraphStyle('x',
-        fontName='Helvetica-Bold', fontSize=16, alignment=TA_CENTER, textColor=colors.HexColor("#333333"))))
+        fontName=FONT_B, fontSize=16, alignment=TA_CENTER, textColor=colors.HexColor("#333333"))))
     story.append(Spacer(1, 4))
 
     meta_data = []
@@ -256,7 +300,7 @@ def generate_pdf_report(result: dict, client_name: str = "", user_name: str = ""
 
     # ─── Footer ───
     story.append(Spacer(1, 20))
-    footer_style = ParagraphStyle('Footer', fontName='Helvetica',
+    footer_style = ParagraphStyle('Footer', fontName=FONT,
         fontSize=8, alignment=TA_CENTER, textColor=GRAY)
     story.append(Paragraph(
         f"APEX Financial Platform | Generated {datetime.now().strftime('%Y-%m-%d %H:%M')} | "
