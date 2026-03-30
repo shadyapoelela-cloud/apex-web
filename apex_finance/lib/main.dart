@@ -869,6 +869,10 @@ class _AccS extends State<AccountTab> {
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ChangePasswordScreen()))),
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const CloseAccountScreen()))),
+          _mi(Icons.history, 'سجل النشاط', const Color(0xFF9C27B0),
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ActivityHistoryScreen()))),
+          _mi(Icons.description, 'الشروط والأحكام', const Color(0xFF607D8B),
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalAcceptanceScreen(onAccepted: ()=>Navigator.pop(c))))),
       ])));
   Widget _mi(IconData i, String l, Color c, VoidCallback onTap) => GestureDetector(onTap: onTap,
     child: Container(margin: const EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
@@ -1054,6 +1058,8 @@ class _AdminS extends State<AdminTab> {
           onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ReviewerConsoleScreen()))),
         IconButton(icon: const Icon(Icons.verified_user, color: AC.ok),
           onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderVerificationScreen()))),
+        IconButton(icon: const Icon(Icons.upload_file, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderDocumentUploadScreen()))),
+        IconButton(icon: const Icon(Icons.shield, color: AC.gold), onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderComplianceScreen()))),
       ]),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(14), children: [
@@ -1339,13 +1345,13 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
     if (!_allAccepted) return;
     setState(() => _loading = true);
     try {
-      await http.post(Uri.parse('${S.api}/legal/accept'),
+      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'terms', 'version': '1.0'}));
-      await http.post(Uri.parse('${S.api}/legal/accept'),
+      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'privacy', 'version': '1.0'}));
-      await http.post(Uri.parse('${S.api}/legal/accept'),
+      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'acceptable_use', 'version': '1.0'}));
       widget.onAccepted();
@@ -1358,7 +1364,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AC.bg,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(title: const Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -1470,7 +1476,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AC.bg,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(title: const Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
@@ -1560,7 +1566,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
     final uploadedRequired = _docs.where((d) => d['required'] == true && d['uploaded'] == true).length;
 
     return Scaffold(
-      backgroundColor: AC.bg,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(title: const Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
@@ -1672,7 +1678,7 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
     final outputsDone = _outputs.where((d) => d['uploaded'] == true).length;
 
     return Scaffold(
-      backgroundColor: AC.bg,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text('مستندات المهمة'),
         backgroundColor: AC.navy, foregroundColor: Colors.white,
@@ -1756,7 +1762,7 @@ class ProviderComplianceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AC.bg,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(title: const Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -1842,7 +1848,7 @@ class ActivityHistoryScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AC.bg,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(title: const Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
