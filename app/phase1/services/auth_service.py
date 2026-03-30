@@ -35,12 +35,7 @@ LOCKOUT_MINUTES = 15
 PASSWORD_MIN_LENGTH = 8
 
 # Try bcrypt, fallback to hashlib
-try:
-    import bcrypt as _bcrypt
-    # using bcrypt directly
-    USE_BCRYPT = True
-except ImportError:
-    USE_BCRYPT = False
+USE_BCRYPT = False  # Using SHA-256 until bcrypt confirmed on Render
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -66,7 +61,7 @@ def verify_password(password: str, password_hash: str) -> bool:
         return False
 
 
-def validate_password_strength(password: str) -> tuple:
+def validate_password_strength(password: str):
     if len(password) < PASSWORD_MIN_LENGTH:
         return False, f"كلمة المرور يجب أن تكون {PASSWORD_MIN_LENGTH} أحرف على الأقل"
     has_upper = any(c.isupper() for c in password)
