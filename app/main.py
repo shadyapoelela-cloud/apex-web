@@ -10,7 +10,7 @@ All 6 Phases Complete:
   P6: Admin Dashboard + Reviewer Tooling
 + Financial Engine v2 + Knowledge Brain
 """
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 import os, traceback
 from app.services.orchestrator import AnalysisOrchestrator
