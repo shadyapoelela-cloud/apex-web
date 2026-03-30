@@ -148,8 +148,8 @@ class AuthService:
                 for f in features:
                     db.add(SubscriptionEntitlement(
                         id=gen_uuid(), subscription_id=sub.id,
-                        feature_key=f.feature_key, feature_value=f.feature_value,
-                        feature_type=f.feature_type,
+                        feature_key=f.feature_code, feature_value=f.value,
+                        feature_type=f.value_type,
                     ))
 
             db.add(UserSecurityEvent(
