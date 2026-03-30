@@ -220,9 +220,15 @@ class AuthService:
             user.locked_until = None
             user.last_login_at = utcnow()
 
+            access_tok = create_access_token(user.id, user.username, user_roles)
+            refresh_tok = create_refresh_token(user.id)
             session = UserSession(
                 id=gen_uuid(), user_id=user.id, ip_address=ip_address,
+                token_hash=hashlib.sha256(access_tok.encode()).hexdigest(),
+                refresh_token_hash=hashlib.sha256(refresh_tok.encode()).hexdigest(),
+                device_info=user_agent,
                 is_active=True,
+                expires_at=datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
             )
             db.add(session)
 
@@ -250,8 +256,8 @@ class AuthService:
                     "roles": user_roles,
                 },
                 "tokens": {
-                    "access_token": create_access_token(user.id, user.username, user_roles),
-                    "refresh_token": create_refresh_token(user.id),
+                    "access_token": access_tok,
+                    "refresh_token": refresh_tok,
                 },
                 "session_id": session.id,
             }
