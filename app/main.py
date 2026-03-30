@@ -119,6 +119,33 @@ def debug_p7():
         except Exception as e2:
             return {"step1_err": str(e1), "step2_err": str(e2)}
 
+
+@app.get("/admin/reinit-db")
+def reinit_db(secret: str = Query(...)):
+    if secret != "apex-admin-2026":
+        raise HTTPException(403, "Invalid secret")
+    results = {}
+    try:
+        from app.phase1.models.platform_models import Base, engine
+        Base.metadata.create_all(bind=engine)
+        results["phase1"] = "OK"
+    except Exception as e:
+        results["phase1"] = str(e)
+    try:
+        from app.phase1.services.seed_data import seed_all
+        results["seed1"] = seed_all()
+    except Exception as e:
+        results["seed1"] = str(e)
+    if HAS_P7:
+        try:
+            from app.phase7.models.phase7_models import init_phase7_db
+            from app.phase7.services.seed_phase7 import seed_task_types
+            results["phase7_tables"] = init_phase7_db()
+            results["phase7_seed"] = seed_task_types()
+        except Exception as e:
+            results["phase7"] = str(e)
+    return results
+
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "3.5.0",
