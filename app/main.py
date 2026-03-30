@@ -116,23 +116,16 @@ async def analyze_trial_balance(
 @app.post("/analyze/full")
 async def analyze_with_narrative(
     file: UploadFile = File(...),
-    industry: str = Form("general"),
-    language: str = Form("ar"),
-    closing_inventory: str = Form(""),
+    industry: str = Query("general"),
+    language: str = Query("ar"),
+    closing_inventory: float = Query(None),
 ):
     """تحليل شامل + تقرير AI."""
-    ci = None
-    if closing_inventory and closing_inventory.strip():
-        try:
-            ci = float(closing_inventory.replace(",", "").strip())
-        except (ValueError, TypeError):
-            ci = None
-
-    content = await file.read()
-    print(f"APEX: ci={ci}, file_size={len(content)}, filename={file.filename}")
-
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
+
+    content = await file.read()
+    print(f"APEX: ci={closing_inventory}, file_size={len(content)}")
 
     try:
         from app.services.ai.narrative_service import NarrativeService
@@ -141,7 +134,7 @@ async def analyze_with_narrative(
             file_bytes=content,
             filename=file.filename,
             industry=industry,
-            closing_inventory=ci,
+            closing_inventory=closing_inventory,
         )
 
         if not result.get("success"):
