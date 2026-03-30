@@ -154,7 +154,7 @@ class AuthService:
 
             db.add(UserSecurityEvent(
                 id=gen_uuid(), user_id=user.id,
-                event_type=SecurityEventType.registration.value,
+                event_type="registration",
                 ip_address="", details={"method": "email"},
             ))
 
@@ -210,7 +210,7 @@ class AuthService:
                     user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=LOCKOUT_MINUTES)
                 db.add(UserSecurityEvent(
                     id=gen_uuid(), user_id=user.id,
-                    event_type=SecurityEventType.login_failed.value,
+                    event_type="failed_login",
                     ip_address=ip_address,
                 ))
                 db.commit()
@@ -228,7 +228,7 @@ class AuthService:
 
             db.add(UserSecurityEvent(
                 id=gen_uuid(), user_id=user.id,
-                event_type=SecurityEventType.login_success.value,
+                event_type="login",
                 ip_address=ip_address,
             ))
 
@@ -298,7 +298,7 @@ class AuthService:
             user.password_hash = hash_password(new_password)
             db.add(UserSecurityEvent(
                 id=gen_uuid(), user_id=user_id,
-                event_type=SecurityEventType.password_changed.value,
+                event_type="password_change",
             ))
             db.commit()
             return {"success": True, "message": "تم تغيير كلمة المرور"}
