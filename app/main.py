@@ -106,6 +106,19 @@ def root():
                 {"engine": True, "kb": KB, "p1_identity": P1, "p2_clients": P2, "p3_knowledge": P3,
                  "p4_providers": P4, "p5_marketplace": P5, "p6_admin": P6}.items()}}
 
+
+@app.get("/debug/p7")
+def debug_p7():
+    try:
+        from app.phase7.models.phase7_models import init_phase7_db
+        return {"step1": "models OK"}
+    except Exception as e1:
+        try:
+            from app.phase7.routes.phase7_routes import router
+            return {"step1_err": str(e1), "step2": "routes OK"}
+        except Exception as e2:
+            return {"step1_err": str(e1), "step2_err": str(e2)}
+
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "3.5.0",
