@@ -1,315 +1,255 @@
-"""
-APEX Platform — PDF Financial Report Generator
-═══════════════════════════════════════════════════
-Generates professional Arabic PDF reports from analysis results.
-Uses ReportLab with arabic_reshaper + python-bidi for RTL support.
-"""
-
 import os
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.lib.units import cm, mm
-from reportlab.pdfgen import canvas
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
-from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-import os
-import arabic_reshaper
-from bidi.algorithm import get_display
-from io import BytesIO
+import io
+import tempfile
 import urllib.request
-
-# Register Arabic font (Amiri)
-FONT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "fonts")
-FONT_REGISTERED = False
-
-def ensure_arabic_font():
-    global FONT_REGISTERED
-    if FONT_REGISTERED:
-        return
-    os.makedirs(FONT_DIR, exist_ok=True)
-    font_path = os.path.join(FONT_DIR, "Amiri-Regular.ttf")
-    font_bold_path = os.path.join(FONT_DIR, "Amiri-Bold.ttf")
-    
-    if not os.path.exists(font_path):
-        try:
-            urllib.request.urlretrieve(
-                "https://github.com/aliftype/amiri/releases/download/1.000/Amiri-Regular.ttf",
-                font_path)
-        except:
-            # Fallback: use without custom font
-            FONT_REGISTERED = True
-            return
-    
-    if not os.path.exists(font_bold_path):
-        try:
-            urllib.request.urlretrieve(
-                "https://github.com/aliftype/amiri/releases/download/1.000/Amiri-Bold.ttf",
-                font_bold_path)
-        except:
-            pass
-    
-    try:
-        pdfmetrics.registerFont(TTFont('Amiri', font_path))
-        if os.path.exists(font_bold_path):
-            pdfmetrics.registerFont(TTFont('Amiri-Bold', font_bold_path))
-        else:
-            pdfmetrics.registerFont(TTFont('Amiri-Bold', font_path))
-        FONT_REGISTERED = True
-    except:
-        FONT_REGISTERED = True
 from datetime import datetime
 
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import mm, cm
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
-def ar(text):
-    """Reshape and reorder Arabic text for PDF rendering."""
+# --- Font Setup ---
+FONT_DIR = os.path.join(tempfile.gettempdir(), "apex_fonts")
+os.makedirs(FONT_DIR, exist_ok=True)
+
+AMIRI_URL = "https://github.com/google/fonts/raw/main/ofl/amiri/Amiri-Regular.ttf"
+AMIRI_BOLD_URL = "https://github.com/google/fonts/raw/main/ofl/amiri/Amiri-Bold.ttf"
+AMIRI_PATH = os.path.join(FONT_DIR, "Amiri-Regular.ttf")
+AMIRI_BOLD_PATH = os.path.join(FONT_DIR, "Amiri-Bold.ttf")
+
+_font_registered = False
+
+def _ensure_fonts():
+    global _font_registered
+    if _font_registered:
+        return True
+    try:
+        for url, path in [(AMIRI_URL, AMIRI_PATH), (AMIRI_BOLD_URL, AMIRI_BOLD_PATH)]:
+            if not os.path.exists(path):
+                urllib.request.urlretrieve(url, path)
+        pdfmetrics.registerFont(TTFont("Amiri", AMIRI_PATH))
+        pdfmetrics.registerFont(TTFont("Amiri-Bold", AMIRI_BOLD_PATH))
+        _font_registered = True
+        return True
+    except Exception as e:
+        print(f"Font download failed: {e}")
+        return False
+
+def _ar(text):
+    \"\"\"Reshape Arabic text for RTL PDF rendering.\"\"\"
     if not text:
         return ""
     try:
+        import arabic_reshaper
+        from bidi.algorithm import get_display
         reshaped = arabic_reshaper.reshape(str(text))
         return get_display(reshaped)
-    except:
+    except ImportError:
         return str(text)
 
-
-def fmt(v):
-    """Format number with commas."""
-    if v is None:
-        return "-"
-    try:
-        d = float(v)
-        if abs(d) >= 1e6:
-            return f"{d/1e6:,.2f}M"
-        return f"{d:,.2f}"
-    except:
-        return str(v)
-
-
-# Gold/Navy color scheme matching Flutter app
-NAVY = colors.HexColor("#050D1A")
-NAVY2 = colors.HexColor("#0D1829")
-GOLD = colors.HexColor("#C9A84C")
-CYAN = colors.HexColor("#00C2E0")
-WHITE = colors.HexColor("#F0EDE6")
-GRAY = colors.HexColor("#8A8880")
+# --- Colors ---
+NAVY = colors.HexColor("#1B2A4A")
+GOLD = colors.HexColor("#D4A843")
+LIGHT_GOLD = colors.HexColor("#FFF8E7")
+WHITE = colors.white
 GREEN = colors.HexColor("#2ECC8A")
-RED = colors.HexColor("#E05050")
-WARN = colors.HexColor("#F0A500")
+RED = colors.HexColor("#E74C3C")
+GRAY = colors.HexColor("#F5F5F5")
 
+def generate_pdf_report(analysis_result: dict, client_name: str = "", user_name: str = "") -> bytes:
+    \"\"\"Generate professional Arabic PDF report from analysis results.\"\"\"
+    has_arabic = _ensure_fonts()
+    font_name = "Amiri" if has_arabic else "Helvetica"
+    font_bold = "Amiri-Bold" if has_arabic else "Helvetica-Bold"
 
-def generate_pdf_report(result: dict, client_name: str = "", user_name: str = "") -> bytes:
-    """Generate a professional Arabic PDF financial report."""
-    ensure_arabic_font()
-    FONT = "Amiri" if FONT_REGISTERED else "Helvetica"
-    FONT_B = "Amiri-Bold" if FONT_REGISTERED else "Helvetica-Bold"
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4,
-        rightMargin=1.5*cm, leftMargin=1.5*cm,
-        topMargin=2*cm, bottomMargin=2*cm)
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=2*cm, bottomMargin=2*cm,
+                           leftMargin=2*cm, rightMargin=2*cm)
 
-    story = []
-    w, h = A4
-
-    # ─── Styles ───
     styles = getSampleStyleSheet()
+    title_style = ParagraphStyle("TitleAR", parent=styles["Title"],
+        fontName=font_bold, fontSize=22, textColor=NAVY, alignment=TA_CENTER, spaceAfter=10)
+    subtitle_style = ParagraphStyle("SubtitleAR", parent=styles["Normal"],
+        fontName=font_name, fontSize=12, textColor=GOLD, alignment=TA_CENTER, spaceAfter=20)
+    heading_style = ParagraphStyle("HeadingAR", parent=styles["Heading2"],
+        fontName=font_bold, fontSize=14, textColor=NAVY, alignment=TA_RIGHT, spaceAfter=8,
+        spaceBefore=16)
+    body_style = ParagraphStyle("BodyAR", parent=styles["Normal"],
+        fontName=font_name, fontSize=10, alignment=TA_RIGHT, leading=16)
+    cell_style_r = ParagraphStyle("CellR", parent=styles["Normal"],
+        fontName=font_name, fontSize=9, alignment=TA_RIGHT)
+    cell_style_l = ParagraphStyle("CellL", parent=styles["Normal"],
+        fontName=font_name, fontSize=9, alignment=TA_LEFT)
 
-    title_style = ParagraphStyle('ATitle', parent=styles['Title'],
-        fontName=FONT_B, fontSize=22, alignment=TA_CENTER,
-        textColor=GOLD, spaceAfter=6)
+    elements = []
 
-    subtitle_style = ParagraphStyle('ASub', parent=styles['Normal'],
-        fontName=FONT, fontSize=11, alignment=TA_CENTER,
-        textColor=GRAY, spaceAfter=20)
+    # --- Header ---
+    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    elements.append(Paragraph(_ar("APEX"), title_style))
+    elements.append(Paragraph(_ar("تقرير التحليل المالي"), subtitle_style))
+    elements.append(Spacer(1, 5*mm))
 
-    heading_style = ParagraphStyle('AHead', parent=styles['Heading2'],
-        fontName=FONT_B, fontSize=14, alignment=TA_RIGHT,
-        textColor=GOLD, spaceBefore=16, spaceAfter=8,
-        borderWidth=0, borderPadding=0)
-
-    normal_r = ParagraphStyle('NR', parent=styles['Normal'],
-        fontName=FONT, fontSize=10, alignment=TA_RIGHT,
-        textColor=colors.black)
-
-    # ─── Header ───
-    story.append(Paragraph("APEX", title_style))
-    story.append(Paragraph(ar("تقرير التحليل المالي"), ParagraphStyle('x',
-        fontName=FONT_B, fontSize=16, alignment=TA_CENTER, textColor=colors.HexColor("#333333"))))
-    story.append(Spacer(1, 4))
-
-    meta_data = []
+    # Info table
+    info_data = []
     if client_name:
-        meta_data.append(f"{ar('العميل')}: {ar(client_name)}")
+        info_data.append([_ar(client_name), _ar("العميل")])
     if user_name:
-        meta_data.append(f"{ar('المحلل')}: {ar(user_name)}")
-    meta_data.append(f"{ar('التاريخ')}: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+        info_data.append([_ar(user_name), _ar("المحلل")])
+    info_data.append([now, _ar("التاريخ")])
 
-    story.append(Paragraph(" | ".join(meta_data), subtitle_style))
-    story.append(Spacer(1, 10))
+    confidence = analysis_result.get("confidence", 0)
+    conf_color = GREEN if confidence >= 70 else (GOLD if confidence >= 50 else RED)
+    info_data.append([f"{confidence:.1f}%", _ar("مستوى الثقة")])
 
-    # ─── Confidence ───
-    conf = result.get("confidence", {})
-    overall = conf.get("overall", 0)
-    label = conf.get("label", "")
-    pct = f"{overall * 100:.1f}%" if isinstance(overall, (int, float)) else str(overall)
+    if info_data:
+        info_table = Table(info_data, colWidths=[300, 150])
+        info_table.setStyle(TableStyle([
+            ("FONTNAME", (0, 0), (-1, -1), font_name),
+            ("FONTSIZE", (0, 0), (-1, -1), 10),
+            ("TEXTCOLOR", (0, 0), (-1, -1), NAVY),
+            ("ALIGN", (0, 0), (0, -1), "LEFT"),
+            ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("LINEBELOW", (0, 0), (-1, -2), 0.5, colors.HexColor("#E0E0E0")),
+        ]))
+        elements.append(info_table)
+        elements.append(Spacer(1, 10*mm))
 
-    conf_color = GREEN if overall >= 0.85 else WARN if overall >= 0.65 else RED
+    # --- Financial Statements ---
+    statements = analysis_result.get("statements", {})
 
-    story.append(Paragraph(ar("مستوى الثقة"), heading_style))
+    for stmt_key, stmt_title in [
+        ("income_statement", "قائمة الدخل"),
+        ("balance_sheet", "الميزانية العمومية"),
+    ]:
+        stmt = statements.get(stmt_key, {})
+        if not stmt:
+            continue
 
-    conf_table = Table([
-        [ar("النسبة"), pct],
-        [ar("التقييم"), ar(label)],
-    ], colWidths=[10*cm, 7*cm])
-    conf_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#F8F6F0")),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#E0DDD5")),
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 11),
-        ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-        ('TEXTCOLOR', (1, 0), (1, 0), conf_color),
-        ('FONTNAME', (1, 0), (1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (1, 0), (1, 0), 14),
-        ('PADDING', (0, 0), (-1, -1), 8),
-    ]))
-    story.append(conf_table)
-    story.append(Spacer(1, 12))
+        elements.append(Paragraph(_ar(stmt_title), heading_style))
 
-    # ─── Income Statement ───
-    inc = result.get("income_statement", {})
-    story.append(Paragraph(ar("قائمة الدخل"), heading_style))
+        items = stmt.get("items", [])
+        if items:
+            header = [_ar("المبلغ"), _ar("البند")]
+            table_data = [header]
+            for item in items:
+                label = item.get("label", item.get("name", ""))
+                value = item.get("value", item.get("amount", 0))
+                if isinstance(value, (int, float)):
+                    formatted = f"{value:,.2f}"
+                else:
+                    formatted = str(value)
+                table_data.append([formatted, _ar(str(label))])
 
-    inc_rows = [
-        [ar("البند"), ar("المبلغ (ر.س)")],
-        [ar("صافي الإيرادات"), fmt(inc.get("net_revenue"))],
-        [ar("تكلفة المبيعات"), fmt(inc.get("cogs"))],
-        [ar("مجمل الربح"), fmt(inc.get("gross_profit"))],
-        [ar("المصروفات التشغيلية"), fmt(inc.get("total_operating_expenses"))],
-        [ar("الربح التشغيلي"), fmt(inc.get("operating_profit"))],
-        [ar("صافي الربح"), fmt(inc.get("net_profit"))],
-    ]
+            t = Table(table_data, colWidths=[150, 300])
+            t.setStyle(TableStyle([
+                ("FONTNAME", (0, 0), (-1, -1), font_name),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+                ("TEXTCOLOR", (0, 0), (-1, 0), GOLD),
+                ("FONTNAME", (0, 0), (-1, 0), font_bold),
+                ("ALIGN", (0, 0), (0, -1), "LEFT"),
+                ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [WHITE, LIGHT_GOLD]),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#D0D0D0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("LEFTPADDING", (0, 0), (-1, -1), 8),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+            ]))
+            elements.append(t)
+            elements.append(Spacer(1, 8*mm))
 
-    inc_table = Table(inc_rows, colWidths=[10*cm, 7*cm])
-    inc_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), GOLD),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#E0DDD5")),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#FAFAF8")),
-        ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-        ('PADDING', (0, 0), (-1, -1), 7),
-        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor("#F0EDE6")),
-        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-    ]))
-    story.append(inc_table)
-    story.append(Spacer(1, 12))
+        # Totals
+        totals = {k: v for k, v in stmt.items() if k != "items" and isinstance(v, (int, float))}
+        if totals:
+            total_data = [[f"{v:,.2f}", _ar(str(k))] for k, v in totals.items()]
+            tt = Table(total_data, colWidths=[150, 300])
+            tt.setStyle(TableStyle([
+                ("FONTNAME", (0, 0), (-1, -1), font_bold),
+                ("FONTSIZE", (0, 0), (-1, -1), 10),
+                ("TEXTCOLOR", (0, 0), (-1, -1), NAVY),
+                ("ALIGN", (0, 0), (0, -1), "LEFT"),
+                ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+                ("LINEABOVE", (0, 0), (-1, 0), 1, GOLD),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]))
+            elements.append(tt)
+            elements.append(Spacer(1, 5*mm))
 
-    # ─── Balance Sheet ───
-    bs = result.get("balance_sheet", {})
-    story.append(Paragraph(ar("الميزانية العمومية"), heading_style))
-
-    balanced = bs.get("is_balanced", False)
-    balanced_text = ar("نعم") if balanced else ar("لا")
-    balanced_color = GREEN if balanced else RED
-
-    bs_rows = [
-        [ar("البند"), ar("المبلغ (ر.س)")],
-        [ar("إجمالي الأصول"), fmt(bs.get("total_assets"))],
-        [ar("إجمالي الالتزامات"), fmt(bs.get("total_liabilities"))],
-        [ar("حقوق الملكية"), fmt(bs.get("total_equity"))],
-        [ar("متوازنة"), balanced_text],
-    ]
-
-    bs_table = Table(bs_rows, colWidths=[10*cm, 7*cm])
-    bs_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0D1829")),
-        ('TEXTCOLOR', (0, 0), (-1, 0), GOLD),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#E0DDD5")),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#FAFAF8")),
-        ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-        ('PADDING', (0, 0), (-1, -1), 7),
-        ('TEXTCOLOR', (1, -1), (1, -1), balanced_color),
-        ('FONTNAME', (1, -1), (1, -1), 'Helvetica-Bold'),
-    ]))
-    story.append(bs_table)
-    story.append(Spacer(1, 12))
-
-    # ─── Financial Ratios ───
-    ratios = result.get("ratios", {})
+    # --- Financial Ratios ---
+    ratios = analysis_result.get("ratios", analysis_result.get("financial_ratios", {}))
     if ratios:
-        story.append(Paragraph(ar("النسب المالية"), heading_style))
-        ratio_rows = [[ar("النسبة"), ar("القيمة")]]
-        ratio_names = {
-            "current_ratio": "النسبة الجارية",
-            "quick_ratio": "النسبة السريعة",
-            "debt_to_equity": "الدين إلى حقوق الملكية",
-            "gross_margin": "هامش الربح الإجمالي",
-            "net_margin": "هامش صافي الربح",
-            "roa": "العائد على الأصول",
-            "roe": "العائد على حقوق الملكية",
-        }
+        elements.append(Paragraph(_ar("النسب المالية"), heading_style))
+        ratio_data = [[_ar("القيمة"), _ar("النسبة")]]
         for k, v in ratios.items():
-            name = ratio_names.get(k, k)
-            val = f"{v:.2%}" if isinstance(v, float) and abs(v) < 100 else fmt(v)
-            ratio_rows.append([ar(name), val])
+            if isinstance(v, (int, float)):
+                ratio_data.append([f"{v:.2f}", _ar(str(k))])
+        if len(ratio_data) > 1:
+            rt = Table(ratio_data, colWidths=[150, 300])
+            rt.setStyle(TableStyle([
+                ("FONTNAME", (0, 0), (-1, -1), font_name),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+                ("TEXTCOLOR", (0, 0), (-1, 0), GOLD),
+                ("FONTNAME", (0, 0), (-1, 0), font_bold),
+                ("ALIGN", (0, 0), (0, -1), "LEFT"),
+                ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [WHITE, GRAY]),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#D0D0D0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ]))
+            elements.append(rt)
+            elements.append(Spacer(1, 8*mm))
 
-        ratio_table = Table(ratio_rows, colWidths=[10*cm, 7*cm])
-        ratio_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), CYAN),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#E0DDD5")),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#FAFAF8")),
-            ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-            ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-            ('PADDING', (0, 0), (-1, -1), 7),
-        ]))
-        story.append(ratio_table)
-        story.append(Spacer(1, 12))
-
-    # ─── Knowledge Brain ───
-    kb = result.get("knowledge_brain", {})
+    # --- Knowledge Brain ---
+    kb = analysis_result.get("knowledge_brain", analysis_result.get("kb", {}))
     if kb:
-        story.append(Paragraph(ar("العقل المعرفي"), heading_style))
-        kb_rows = [
-            [ar("القواعد المُقيّمة"), str(kb.get("rules_evaluated", 0))],
-            [ar("القواعد المُفعّلة"), str(kb.get("rules_triggered", 0))],
-        ]
-        kb_table = Table(kb_rows, colWidths=[10*cm, 7*cm])
-        kb_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#F0F8FF")),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#D0E8F0")),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-            ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-            ('PADDING', (0, 0), (-1, -1), 7),
-        ]))
-        story.append(kb_table)
-        story.append(Spacer(1, 12))
+        elements.append(Paragraph(_ar("العقل المعرفي"), heading_style))
+        kb_items = []
+        rules_applied = kb.get("rules_applied", kb.get("matched", 0))
+        rules_total = kb.get("rules_total", kb.get("total", 0))
+        kb_items.append([f"{rules_applied} / {rules_total}", _ar("القواعد المطبقة")])
+        if kb.get("suggestions"):
+            for s in kb["suggestions"][:5]:
+                kb_items.append([_ar(str(s)), _ar("اقتراح")])
+        if kb_items:
+            kbt = Table(kb_items, colWidths=[250, 200])
+            kbt.setStyle(TableStyle([
+                ("FONTNAME", (0, 0), (-1, -1), font_name),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("TEXTCOLOR", (0, 0), (-1, -1), NAVY),
+                ("ALIGN", (0, 0), (0, -1), "LEFT"),
+                ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LINEBELOW", (0, 0), (-1, -2), 0.5, colors.HexColor("#E0E0E0")),
+            ]))
+            elements.append(kbt)
 
-    # ─── Footer ───
-    story.append(Spacer(1, 20))
-    footer_style = ParagraphStyle('Footer', fontName=FONT,
-        fontSize=8, alignment=TA_CENTER, textColor=GRAY)
-    story.append(Paragraph(
-        f"APEX Financial Platform | Generated {datetime.now().strftime('%Y-%m-%d %H:%M')} | "
-        f"{ar('هذا التقرير للأغراض التحليلية فقط')}",
-        footer_style))
+    # --- Warnings ---
+    warnings = analysis_result.get("warnings", [])
+    if warnings:
+        elements.append(Spacer(1, 8*mm))
+        elements.append(Paragraph(_ar("التحذيرات"), heading_style))
+        for w in warnings[:10]:
+            elements.append(Paragraph(f"• {_ar(str(w))}", body_style))
 
-    # Build
-    doc.build(story)
+    # --- Footer ---
+    elements.append(Spacer(1, 15*mm))
+    footer_style = ParagraphStyle("Footer", parent=styles["Normal"],
+        fontName=font_name, fontSize=8, textColor=colors.HexColor("#999999"),
+        alignment=TA_CENTER)
+    elements.append(Paragraph(_ar("تم إنشاء هذا التقرير بواسطة منصة APEX للتحليل المالي المعرفي"), footer_style))
+    elements.append(Paragraph(f"Generated: {now}", footer_style))
+
+    doc.build(elements)
     return buffer.getvalue()
-
-# v2

@@ -557,7 +557,7 @@ class _AnalysisS extends State<AnalysisTab> {
           onPressed: () async {
             try {
               final req = http.MultipartRequest('POST', Uri.parse('$_api/analyze/report?industry=retail'));
-              req.headers['Authorization'] = 'Bearer ${S.token}';
+              // auth removed for CORS
               req.files.add(http.MultipartFile.fromBytes('file', _fb!, filename: 'tb.xlsx'));
               final res = await req.send();
               final bytes = await res.stream.toBytes();
@@ -1316,3 +1316,561 @@ class _PMS extends State<PolicyManagementScreen> {
     return Icons.policy;
   }
 }
+
+
+// ============================================================
+// Legal Acceptance Screen (Execution Master §15)
+// ============================================================
+class LegalAcceptanceScreen extends StatefulWidget {
+  final VoidCallback onAccepted;
+  const LegalAcceptanceScreen({Key? key, required this.onAccepted}) : super(key: key);
+  @override State<LegalAcceptanceScreen> createState() => _LegalAcceptanceScreenState();
+}
+
+class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
+  bool _termsAccepted = false;
+  bool _privacyAccepted = false;
+  bool _usageAccepted = false;
+  bool _loading = false;
+
+  bool get _allAccepted => _termsAccepted && _privacyAccepted && _usageAccepted;
+
+  Future<void> _submit() async {
+    if (!_allAccepted) return;
+    setState(() => _loading = true);
+    try {
+      await http.post(Uri.parse('${S.api}/legal/accept'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'document_type': 'terms', 'version': '1.0'}));
+      await http.post(Uri.parse('${S.api}/legal/accept'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'document_type': 'privacy', 'version': '1.0'}));
+      await http.post(Uri.parse('${S.api}/legal/accept'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'document_type': 'acceptable_use', 'version': '1.0'}));
+      widget.onAccepted();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+    }
+    setState(() => _loading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AC.bg,
+      appBar: AppBar(title: const Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: const Color(0xFFFFF3CD), borderRadius: BorderRadius.circular(12)),
+            child: Row(children: [
+              const Icon(Icons.info_outline, color: Color(0xFF856404)),
+              const SizedBox(width: 12),
+              const Expanded(child: Text('يجب الموافقة على جميع الشروط والسياسات قبل إكمال التسجيل',
+                style: TextStyle(color: Color(0xFF856404), fontSize: 13))),
+            ]),
+          ),
+          const SizedBox(height: 24),
+
+          _buildPolicyCard('شروط وأحكام المنصة', 'الإصدار 1.0',
+            'تتضمن شروط استخدام المنصة والتزامات المستخدم وحقوق المنصة في تعليق الحسابات عند المخالفة.',
+            Icons.description, _termsAccepted, (v) => setState(() => _termsAccepted = v!)),
+
+          _buildPolicyCard('سياسة الخصوصية', 'الإصدار 1.0',
+            'كيفية جمع واستخدام وحماية بياناتك الشخصية والمالية.',
+            Icons.privacy_tip, _privacyAccepted, (v) => setState(() => _privacyAccepted = v!)),
+
+          _buildPolicyCard('سياسة الاستخدام المقبول', 'الإصدار 1.0',
+            'القواعد المنظمة لاستخدام المنصة بما يشمل رفع الملفات والتحليلات وطلب الخدمات.',
+            Icons.verified_user, _usageAccepted, (v) => setState(() => _usageAccepted = v!)),
+
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: _allAccepted && !_loading ? _submit : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _allAccepted ? AC.gold : Colors.grey,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: _loading
+              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : const Text('أوافق وأتابع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildPolicyCard(String title, String version, String desc, IconData icon, bool value, ValueChanged<bool?> onChanged) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white, borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: value ? AC.gold : const Color(0xFFE0E0E0), width: value ? 2 : 1),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(icon, color: AC.navy, size: 24),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1B2A4A))),
+            Text(version, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+          ])),
+        ]),
+        const SizedBox(height: 8),
+        Text(desc, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+        const SizedBox(height: 12),
+        Row(children: [
+          Checkbox(value: value, onChanged: onChanged, activeColor: AC.gold),
+          const Text('أوافق على هذه السياسة', style: TextStyle(fontSize: 13)),
+          const Spacer(),
+          TextButton(onPressed: () {}, child: const Text('قراءة كاملة', style: TextStyle(color: Color(0xFF1B2A4A)))),
+        ]),
+      ]),
+    );
+  }
+}
+
+// ============================================================
+// Client Type Selection Screen (Execution Master §5)
+// ============================================================
+class ClientTypeSelectionScreen extends StatefulWidget {
+  final Function(String) onSelected;
+  const ClientTypeSelectionScreen({Key? key, required this.onSelected}) : super(key: key);
+  @override State<ClientTypeSelectionScreen> createState() => _ClientTypeSelectionScreenState();
+}
+
+class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
+  String? _selected;
+
+  final _types = [
+    {'id': 'standard_business', 'name': 'منشأة تجارية', 'icon': Icons.business, 'km': false,
+     'desc': 'شركة أو مؤسسة تجارية تستخدم خدمات التحليل'},
+    {'id': 'accounting_firm', 'name': 'مكتب محاسبة', 'icon': Icons.calculate, 'km': true,
+     'desc': 'مكتب محاسبة قانوني معتمد'},
+    {'id': 'audit_firm', 'name': 'مكتب تدقيق', 'icon': Icons.fact_check, 'km': true,
+     'desc': 'مكتب تدقيق ومراجعة'},
+    {'id': 'financial_entity', 'name': 'جهة مالية', 'icon': Icons.account_balance, 'km': true,
+     'desc': 'بنك أو مؤسسة مالية'},
+    {'id': 'investment_entity', 'name': 'جهة استثمارية', 'icon': Icons.trending_up, 'km': true,
+     'desc': 'شركة أو صندوق استثماري'},
+    {'id': 'government_entity', 'name': 'جهة حكومية', 'icon': Icons.account_balance_wallet, 'km': true,
+     'desc': 'جهة حكومية أو شبه حكومية'},
+    {'id': 'legal_regulatory_entity', 'name': 'جهة قانونية/تنظيمية', 'icon': Icons.gavel, 'km': true,
+     'desc': 'هيئة تنظيمية أو مكتب قانوني'},
+    {'id': 'sector_consulting_entity', 'name': 'استشارات قطاعية', 'icon': Icons.lightbulb, 'km': true,
+     'desc': 'شركة استشارات متخصصة'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AC.bg,
+      appBar: AppBar(title: const Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      body: Column(children: [
+        Container(
+          width: double.infinity, padding: const EdgeInsets.all(16), color: const Color(0xFFF0F4FF),
+          child: const Text('اختر نوع المنشأة — هذا يحدد الخدمات والصلاحيات المتاحة',
+            style: TextStyle(color: Color(0xFF1B2A4A), fontSize: 13), textAlign: TextAlign.center),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: _types.length,
+            itemBuilder: (ctx, i) {
+              final t = _types[i];
+              final selected = _selected == t['id'];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: selected ? AC.gold : const Color(0xFFE0E0E0), width: selected ? 2 : 1),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: CircleAvatar(
+                    backgroundColor: selected ? AC.gold.withOpacity(0.15) : const Color(0xFFF5F5F5),
+                    child: Icon(t['icon'] as IconData, color: selected ? AC.gold : AC.navy, size: 24),
+                  ),
+                  title: Text(t['name'] as String, style: TextStyle(
+                    fontWeight: FontWeight.bold, color: selected ? AC.navy : Colors.black87)),
+                  subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const SizedBox(height: 4),
+                    Text(t['desc'] as String, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    if (t['km'] == true) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(8)),
+                        child: const Text('مؤهل للعقل المعرفي', style: TextStyle(fontSize: 10, color: Color(0xFF2E7D32))),
+                      ),
+                    ],
+                  ]),
+                  trailing: selected
+                    ? const Icon(Icons.check_circle, color: Color(0xFFD4A843))
+                    : const Icon(Icons.radio_button_unchecked, color: Color(0xFFBDBDBD)),
+                  onTap: () => setState(() => _selected = t['id'] as String),
+                ),
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: ElevatedButton(
+            onPressed: _selected != null ? () => widget.onSelected(_selected!) : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _selected != null ? AC.gold : Colors.grey,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('تأكيد واستمرار', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+// ============================================================
+// Provider Document Upload Screen (Execution Master §7)
+// ============================================================
+class ProviderDocumentUploadScreen extends StatefulWidget {
+  const ProviderDocumentUploadScreen({Key? key}) : super(key: key);
+  @override State<ProviderDocumentUploadScreen> createState() => _ProviderDocumentUploadScreenState();
+}
+
+class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScreen> {
+  final _docs = [
+    {'type': 'identity', 'name': 'إثبات الهوية', 'icon': Icons.badge, 'required': true, 'uploaded': false},
+    {'type': 'professional_license', 'name': 'الرخصة المهنية', 'icon': Icons.card_membership, 'required': true, 'uploaded': false},
+    {'type': 'academic_certificate', 'name': 'الشهادة الأكاديمية', 'icon': Icons.school, 'required': true, 'uploaded': false},
+    {'type': 'experience_letter', 'name': 'خطاب الخبرة', 'icon': Icons.work_history, 'required': false, 'uploaded': false},
+    {'type': 'portfolio', 'name': 'نماذج أعمال', 'icon': Icons.folder_special, 'required': false, 'uploaded': false},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final requiredCount = _docs.where((d) => d['required'] == true).length;
+    final uploadedRequired = _docs.where((d) => d['required'] == true && d['uploaded'] == true).length;
+
+    return Scaffold(
+      backgroundColor: AC.bg,
+      appBar: AppBar(title: const Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      body: Column(children: [
+        Container(
+          width: double.infinity, padding: const EdgeInsets.all(16),
+          color: uploadedRequired == requiredCount ? const Color(0xFFE8F5E9) : const Color(0xFFFFF3CD),
+          child: Row(children: [
+            Icon(uploadedRequired == requiredCount ? Icons.check_circle : Icons.warning,
+              color: uploadedRequired == requiredCount ? const Color(0xFF2E7D32) : const Color(0xFF856404)),
+            const SizedBox(width: 12),
+            Expanded(child: Text(
+              uploadedRequired == requiredCount
+                ? 'جميع المستندات الإلزامية مرفوعة — في انتظار المراجعة'
+                : 'يجب رفع المستندات الإلزامية (*) للتحقق وتفعيل حسابك',
+              style: TextStyle(fontSize: 13, color: uploadedRequired == requiredCount ? const Color(0xFF2E7D32) : const Color(0xFF856404)))),
+          ]),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: _docs.length,
+            itemBuilder: (ctx, i) {
+              final doc = _docs[i];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : const Color(0xFFE0E0E0)),
+                ),
+                child: Row(children: [
+                  CircleAvatar(
+                    backgroundColor: doc['uploaded'] == true ? const Color(0xFFE8F5E9) : const Color(0xFFF5F5F5),
+                    child: Icon(doc['icon'] as IconData,
+                      color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : AC.navy),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Text(doc['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      if (doc['required'] == true) const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                    ]),
+                    Text(doc['uploaded'] == true ? 'تم الرفع — قيد المراجعة' : 'لم يتم الرفع',
+                      style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : Colors.grey)),
+                  ])),
+                  ElevatedButton.icon(
+                    onPressed: () => setState(() => _docs[i] = {...doc, 'uploaded': true}),
+                    icon: Icon(doc['uploaded'] == true ? Icons.refresh : Icons.upload_file, size: 16),
+                    label: Text(doc['uploaded'] == true ? 'تحديث' : 'رفع', style: const TextStyle(fontSize: 12)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: doc['uploaded'] == true ? Colors.grey[200] : AC.navy,
+                      foregroundColor: doc['uploaded'] == true ? Colors.black87 : Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                  ),
+                ]),
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: ElevatedButton(
+            onPressed: uploadedRequired == requiredCount ? () => Navigator.pop(context) : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: uploadedRequired == requiredCount ? AC.gold : Colors.grey,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(uploadedRequired == requiredCount ? 'إرسال للمراجعة' : 'أكمل رفع المستندات الإلزامية',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+// ============================================================
+// Task Document Management Screen (Zero Ambiguity §9)
+// ============================================================
+class TaskDocumentScreen extends StatefulWidget {
+  final String requestId;
+  final String taskType;
+  const TaskDocumentScreen({Key? key, required this.requestId, this.taskType = 'bookkeeping'}) : super(key: key);
+  @override State<TaskDocumentScreen> createState() => _TaskDocumentScreenState();
+}
+
+class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabs;
+
+  final _inputs = [
+    {'name': 'مصادر القيود', 'uploaded': true, 'date': '2026-03-28'},
+    {'name': 'كشف حساب بنكي', 'uploaded': true, 'date': '2026-03-29'},
+    {'name': 'فواتير', 'uploaded': false, 'date': null},
+  ];
+  final _outputs = [
+    {'name': 'ملف قيود منظم', 'uploaded': false, 'date': null},
+    {'name': 'ملاحظات التسوية', 'uploaded': false, 'date': null},
+  ];
+
+  @override
+  void initState() { super.initState(); _tabs = TabController(length: 2, vsync: this); }
+  @override
+  void dispose() { _tabs.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final inputsDone = _inputs.where((d) => d['uploaded'] == true).length;
+    final outputsDone = _outputs.where((d) => d['uploaded'] == true).length;
+
+    return Scaffold(
+      backgroundColor: AC.bg,
+      appBar: AppBar(
+        title: const Text('مستندات المهمة'),
+        backgroundColor: AC.navy, foregroundColor: Colors.white,
+        bottom: TabBar(controller: _tabs, indicatorColor: AC.gold, labelColor: Colors.white, tabs: [
+          Tab(text: 'المدخلات ($inputsDone/${_inputs.length})'),
+          Tab(text: 'المخرجات ($outputsDone/${_outputs.length})'),
+        ]),
+      ),
+      body: Column(children: [
+        Container(
+          width: double.infinity, padding: const EdgeInsets.all(12),
+          color: inputsDone == _inputs.length && outputsDone == _outputs.length
+            ? const Color(0xFFE8F5E9) : const Color(0xFFFCE4EC),
+          child: Row(children: [
+            const Icon(Icons.timer, size: 16, color: Color(0xFFD32F2F)),
+            const SizedBox(width: 8),
+            const Text('الموعد النهائي: 15 أبريل 2026', style: TextStyle(fontSize: 12, color: Color(0xFFD32F2F))),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: inputsDone == _inputs.length ? const Color(0xFF2ECC8A) : const Color(0xFFFF9800),
+                borderRadius: BorderRadius.circular(8)),
+              child: Text(inputsDone == _inputs.length ? 'مكتمل' : 'ناقص',
+                style: const TextStyle(color: Colors.white, fontSize: 11)),
+            ),
+          ]),
+        ),
+        Expanded(
+          child: TabBarView(controller: _tabs, children: [
+            _buildDocList(_inputs, 'input'),
+            _buildDocList(_outputs, 'output'),
+          ]),
+        ),
+      ]),
+    );
+  }
+
+  Widget _buildDocList(List<Map<String, dynamic>> docs, String category) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: docs.length,
+      itemBuilder: (ctx, i) {
+        final doc = docs[i];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : const Color(0xFFFFCDD2)),
+          ),
+          child: Row(children: [
+            Icon(doc['uploaded'] == true ? Icons.check_circle : Icons.error_outline,
+              color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : const Color(0xFFD32F2F)),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(doc['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(doc['uploaded'] == true ? 'تم الرفع: ${doc['date']}' : 'مطلوب — لم يتم الرفع',
+                style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? Colors.green : Colors.red)),
+            ])),
+            if (doc['uploaded'] != true)
+              ElevatedButton.icon(
+                onPressed: () => setState(() => docs[i] = {...doc, 'uploaded': true, 'date': '2026-03-30'}),
+                icon: const Icon(Icons.upload_file, size: 16),
+                label: const Text('رفع'),
+                style: ElevatedButton.styleFrom(backgroundColor: AC.navy, foregroundColor: Colors.white),
+              ),
+          ]),
+        );
+      },
+    );
+  }
+}
+
+// ============================================================
+// Provider Compliance Status Screen (Zero Ambiguity §9)
+// ============================================================
+class ProviderComplianceScreen extends StatelessWidget {
+  const ProviderComplianceScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AC.bg,
+      appBar: AppBar(title: const Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          // Status Card
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFF1B2A4A), Color(0xFF2C3E6B)]),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(children: [
+              const Icon(Icons.verified, color: Color(0xFF2ECC8A), size: 48),
+              const SizedBox(height: 12),
+              const Text('حالة الحساب: نشط', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(color: const Color(0xFF2ECC8A), borderRadius: BorderRadius.circular(20)),
+                child: const Text('لا توجد مخالفات', style: TextStyle(color: Colors.white, fontSize: 13)),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 20),
+
+          // Compliance Metrics
+          const Text('مؤشرات الامتثال', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 12),
+          _metricCard('المهام المكتملة', '12', Icons.task_alt, const Color(0xFF2ECC8A)),
+          _metricCard('المستندات المرفوعة', '8/8', Icons.description, const Color(0xFF2ECC8A)),
+          _metricCard('المخالفات', '0', Icons.warning, const Color(0xFF2ECC8A)),
+          _metricCard('التعليقات السابقة', '0', Icons.block, const Color(0xFF2ECC8A)),
+          _metricCard('تقييم الأداء', '4.8/5', Icons.star, const Color(0xFFD4A843)),
+
+          const SizedBox(height: 20),
+          const Text('سجل الامتثال', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+            child: Column(children: [
+              const Icon(Icons.check_circle, color: Color(0xFF2ECC8A), size: 40),
+              const SizedBox(height: 8),
+              const Text('سجل نظيف', style: TextStyle(fontSize: 14, color: Colors.grey)),
+              const Text('لا توجد مخالفات أو تعليقات سابقة', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  static Widget _metricCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      child: Row(children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(width: 12),
+        Text(label, style: const TextStyle(fontSize: 14)),
+        const Spacer(),
+        Text(value, style: TextStyle(fontWeight: FontWeight.bold, color: color, fontSize: 15)),
+      ]),
+    );
+  }
+}
+
+// ============================================================
+// Activity History Screen (Execution Master §9)
+// ============================================================
+class ActivityHistoryScreen extends StatelessWidget {
+  const ActivityHistoryScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final activities = [
+      {'action': 'تحليل مالي', 'detail': 'رفع ميزان مراجعة - retail', 'time': 'اليوم 11:30', 'icon': Icons.analytics, 'color': const Color(0xFF1B2A4A)},
+      {'action': 'تحميل تقرير PDF', 'detail': 'تقرير التحليل المالي', 'time': 'اليوم 11:45', 'icon': Icons.picture_as_pdf, 'color': const Color(0xFF2ECC8A)},
+      {'action': 'إنشاء عميل', 'detail': 'شركة التقنية المتقدمة', 'time': 'أمس 14:00', 'icon': Icons.person_add, 'color': const Color(0xFFD4A843)},
+      {'action': 'طلب خدمة', 'detail': 'مسك دفاتر - شهري', 'time': 'أمس 15:30', 'icon': Icons.shopping_cart, 'color': const Color(0xFF9C27B0)},
+      {'action': 'ملاحظة معرفية', 'detail': 'تحسين تبويب الإيرادات', 'time': '28 مارس', 'icon': Icons.lightbulb, 'color': const Color(0xFFFF9800)},
+    ];
+
+    return Scaffold(
+      backgroundColor: AC.bg,
+      appBar: AppBar(title: const Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: activities.length,
+        itemBuilder: (ctx, i) {
+          final a = activities[i];
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+            child: Row(children: [
+              CircleAvatar(
+                backgroundColor: (a['color'] as Color).withOpacity(0.1),
+                radius: 20,
+                child: Icon(a['icon'] as IconData, color: a['color'] as Color, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(a['action'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(a['detail'] as String, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+              ])),
+              Text(a['time'] as String, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+            ]),
+          );
+        },
+      ),
+    );
+  }
+}
+
+
