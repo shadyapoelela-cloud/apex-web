@@ -1,6 +1,14 @@
 """
-APEX Financial Platform — FastAPI Backend v3.4
-Phases 1-5: Identity + Clients + Knowledge + Providers + Marketplace
+APEX Financial Platform — FastAPI Backend v3.5 (FINAL)
+═══════════════════════════════════════════════════════════════
+All 6 Phases Complete:
+  P1: Identity + Auth + Plans + Legal
+  P2: Clients + COA + Results + Explanations
+  P3: Knowledge Governance + Review Queue
+  P4: Provider Onboarding + Verification
+  P5: Marketplace + Compliance + Suspension
+  P6: Admin Dashboard + Reviewer Tooling
++ Financial Engine v2 + Knowledge Brain
 """
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,14 +16,14 @@ import os, traceback
 from app.services.orchestrator import AnalysisOrchestrator
 
 try:
-    from app.knowledge_brain.api.routes.knowledge_routes import router as kb_router
-    from app.knowledge_brain.models.db_models import init_db as init_kb_db
+    from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
+    from app.knowledge_brain.models.db_models import init_db as init_kb
     KB = True
 except: KB = False
 try:
     from app.phase1.models.platform_models import init_platform_db
     from app.phase1.routes.phase1_routes import router as p1r
-    from app.phase1.services.seed_data import seed_all as seed_p1
+    from app.phase1.services.seed_data import seed_all as seed1
     P1 = True
 except Exception as e: P1 = False; print(f"P1: {e}")
 try:
@@ -39,39 +47,45 @@ try:
     from app.phase5.routes.phase5_routes import router as p5r
     P5 = True
 except Exception as e: P5 = False; print(f"P5: {e}")
+try:
+    from app.phase6.routes.phase6_routes import router as p6r
+    P6 = True
+except Exception as e: P6 = False; print(f"P6: {e}")
 
-app = FastAPI(title="APEX Financial Platform API", version="3.4.0")
+app = FastAPI(title="APEX Financial Platform API", description="منصة أبكس للتحليل المالي — النسخة النهائية", version="3.5.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 orch = AnalysisOrchestrator()
 
 @app.on_event("startup")
 def startup():
     if KB:
-        try: init_kb_db()
+        try: init_kb()
         except: pass
     if P1:
-        try: t = init_platform_db(); print(f"APEX: {len(t)} tables"); print(f"Seed: {seed_p1()}")
+        try: t = init_platform_db(); print(f"APEX: {len(t)} tables"); print(f"Seed: {seed1()}")
         except Exception as e: print(f"P1 err: {e}")
     if P2:
         try: print(f"P2: {seed_client_types()}")
         except Exception as e: print(f"P2 err: {e}")
 
-if KB: app.include_router(kb_router)
-if P1: app.include_router(p1r)
-if P2: app.include_router(p2r)
-if P3: app.include_router(p3r)
-if P4: app.include_router(p4r)
-if P5: app.include_router(p5r)
+for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
+                (P3, p3r if P3 else None), (P4, p4r if P4 else None), (P5, p5r if P5 else None),
+                (P6, p6r if P6 else None)]:
+    if flag and r: app.include_router(r)
 
 @app.get("/")
 def root():
-    return {"name": "APEX Financial Platform API", "version": "3.4.0", "status": "running",
+    return {"name": "APEX Financial Platform API", "version": "3.5.0", "status": "running",
+            "phases_active": sum([P1, P2, P3, P4, P5, P6]),
             "modules": {k: "active" if v else "disabled" for k, v in
-                {"engine": True, "kb": KB, "p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5}.items()}}
+                {"engine": True, "kb": KB, "p1_identity": P1, "p2_clients": P2, "p3_knowledge": P3,
+                 "p4_providers": P4, "p5_marketplace": P5, "p6_admin": P6}.items()}}
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "3.4.0", "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5}}
+    return {"status": "ok", "version": "3.5.0",
+            "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6},
+            "all_phases_active": all([P1, P2, P3, P4, P5, P6])}
 
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...), industry: str = Query("general"), closing_inventory: float = Query(None)):
