@@ -565,3 +565,5 @@ async def get_activity_history(limit: int = Query(20)):
     """Get user activity history: uploads, requests, feedback, approvals."""
     return {"activities": [], "total": 0}
 
+
+# v4.2
