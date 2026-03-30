@@ -181,7 +181,7 @@ class AuthService:
         finally:
             db.close()
 
-    def login(self, username_or_email: str, password: str, ip_address: str = "") -> dict:
+    def login(self, username_or_email: str, password: str, ip_address: str = "", user_agent: str = "") -> dict:
         db = SessionLocal()
         try:
             user = db.query(User).filter(
@@ -261,7 +261,7 @@ class AuthService:
         finally:
             db.close()
 
-    def logout(self, user_id: str, token: str) -> dict:
+    def logout(self, user_id: str, token: str = "", session_id: str = "") -> dict:
         db = SessionLocal()
         try:
             sessions = db.query(UserSession).filter(
