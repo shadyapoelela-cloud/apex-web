@@ -6,7 +6,7 @@ Clean API with modular financial engine.
 AI does NOT modify any numbers.
 """
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Form
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
@@ -115,19 +115,30 @@ async def analyze_trial_balance(
 
 @app.post("/analyze/full")
 async def analyze_with_narrative(
+    request: Request,
     file: UploadFile = File(...),
-    industry: str = Form("general"),
-    language: str = Form("ar"),
-    closing_inventory: str = Form(None),
 ):
-    """تحليل شامل + تقرير AI. كل القيم ترسل كـ Form fields."""
-    # Parse closing_inventory
+    """تحليل شامل + تقرير AI. يقرأ closing_inventory من form data أو query params."""
+    import logging
+    logger = logging.getLogger("apex")
+
+    # Read all form fields
+    form = await request.form()
+    industry = form.get("industry", "general")
+    language = form.get("language", "ar")
+    ci_raw = form.get("closing_inventory") or request.query_params.get("closing_inventory")
+
+    logger.warning(f"APEX DEBUG: ci_raw={ci_raw}, industry={industry}, form_keys={list(form.keys())}, query={dict(request.query_params)}")
+    print(f"APEX DEBUG: ci_raw={ci_raw}, industry={industry}, form_keys={list(form.keys())}, query={dict(request.query_params)}")
+
     ci = None
-    if closing_inventory:
+    if ci_raw:
         try:
-            ci = float(closing_inventory.replace(",", "").strip())
+            ci = float(str(ci_raw).replace(",", "").strip())
         except (ValueError, TypeError):
             ci = None
+
+    print(f"APEX DEBUG: ci_parsed={ci}")
 
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
