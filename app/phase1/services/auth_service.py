@@ -36,8 +36,8 @@ PASSWORD_MIN_LENGTH = 8
 
 # Try bcrypt, fallback to hashlib
 try:
-    from passlib.context import CryptContext
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    import bcrypt as _bcrypt
+    # using bcrypt directly
     USE_BCRYPT = True
 except ImportError:
     USE_BCRYPT = False
@@ -49,7 +49,7 @@ except ImportError:
 
 def hash_password(password: str) -> str:
     if USE_BCRYPT:
-        return pwd_context.hash(password)
+        return _bcrypt.hashpw(password.encode(), _bcrypt.gensalt()).decode()
     salt = secrets.token_hex(16)
     h = hashlib.sha256(f"{salt}{password}".encode()).hexdigest()
     return f"{salt}${h}"
@@ -58,7 +58,7 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, password_hash: str) -> bool:
     try:
         if USE_BCRYPT and password_hash.startswith("$2"):
-            return pwd_context.verify(password, password_hash)
+            return _bcrypt.checkpw(password.encode(), password_hash.encode())
         # Fallback: SHA-256 (for existing users before migration)
         salt, h = password_hash.split("$", 1)
         return hashlib.sha256(f"{salt}{password}".encode()).hexdigest() == h
