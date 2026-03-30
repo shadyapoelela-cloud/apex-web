@@ -114,22 +114,12 @@ async def analyze_trial_balance(
 # ─── Full Analysis with AI Narrative ─────────────────────────────────────
 
 @app.post("/analyze/full")
-async def analyze_with_narrative(
-    request: Request,
-    file: UploadFile = File(...),
-):
-    """تحليل شامل + تقرير AI. يقرأ closing_inventory من form data أو query params."""
-    import logging
-    logger = logging.getLogger("apex")
-
-    # Read all form fields
+async def analyze_with_narrative(request: Request):
+    """تحليل شامل + تقرير AI."""
     form = await request.form()
     industry = form.get("industry", "general")
     language = form.get("language", "ar")
     ci_raw = form.get("closing_inventory") or request.query_params.get("closing_inventory")
-
-    logger.warning(f"APEX DEBUG: ci_raw={ci_raw}, industry={industry}, form_keys={list(form.keys())}, query={dict(request.query_params)}")
-    print(f"APEX DEBUG: ci_raw={ci_raw}, industry={industry}, form_keys={list(form.keys())}, query={dict(request.query_params)}")
 
     ci = None
     if ci_raw:
@@ -138,17 +128,18 @@ async def analyze_with_narrative(
         except (ValueError, TypeError):
             ci = None
 
-    print(f"APEX DEBUG: ci_parsed={ci}")
-
+    file = form.get("file")
+    if not file:
+        raise HTTPException(status_code=400, detail="لم يتم رفع ملف")
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
+
+    print(f"APEX: ci={ci}, industry={industry}, filename={file.filename}")
 
     try:
         from app.services.ai.narrative_service import NarrativeService
 
         content = await file.read()
-
-        # Step 1: Financial Engine (locked numbers)
         result = orchestrator.analyze_bytes(
             file_bytes=content,
             filename=file.filename,
