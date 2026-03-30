@@ -10,3 +10,4 @@ reportlab
 arabic_reshaper
 python-bidi
 sqlalchemy
+pyjwt

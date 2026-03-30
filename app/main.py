@@ -1,32 +1,45 @@
 """
-APEX Financial Platform — FastAPI Backend v2
-═════════════════════════════════════════════
+APEX Financial Platform — FastAPI Backend v3
+═══════════════════════════════════════════════════════════════
 
-Clean API with modular financial engine.
+Phase 1: Identity + Account + Plans + Entitlements + Legal
++ Existing: Financial Engine v2 + Knowledge Brain
+
 AI does NOT modify any numbers.
 """
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Form, Request
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import os
+import os, traceback
 
 from app.services.orchestrator import AnalysisOrchestrator
 
-# ─── Knowledge Brain ───
+# ─── Knowledge Brain (existing) ───
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_router
-    from app.knowledge_brain.models.db_models import init_db
+    from app.knowledge_brain.models.db_models import init_db as init_kb_db
     KB_AVAILABLE = True
 except Exception:
     KB_AVAILABLE = False
 
-# ─── App Setup ───────────────────────────────────────────────────────────────
+# ─── Phase 1: Platform Core ───
+try:
+    from app.phase1.models.platform_models import init_platform_db
+    from app.phase1.routes.phase1_routes import router as phase1_router
+    from app.phase1.services.seed_data import seed_all as seed_phase1
+    PHASE1_AVAILABLE = True
+except Exception as e:
+    PHASE1_AVAILABLE = False
+    print(f"Phase 1 load error: {e}")
+
+# ═══════════════════════════════════════════════════════════════
+# App Setup
+# ═══════════════════════════════════════════════════════════════
 
 app = FastAPI(
     title="APEX Financial Platform API",
-    description="منصة أبكس للتحليل المالي — محرك مالي محاسبي مع ذكاء اصطناعي",
-    version="2.0.0",
+    description="منصة أبكس للتحليل المالي — محرك مالي محاسبي + ذكاء اصطناعي + عقل معرفي + نظام حسابات",
+    version="3.0.0",
 )
 
 app.add_middleware(
@@ -39,57 +52,91 @@ app.add_middleware(
 orchestrator = AnalysisOrchestrator()
 
 
-# ─── Health ──────────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════
+# Startup: Initialize DBs + Seed
+# ═══════════════════════════════════════════════════════════════
+
+@app.on_event("startup")
+def startup():
+    # Knowledge Brain DB
+    if KB_AVAILABLE:
+        try:
+            init_kb_db()
+        except Exception:
+            pass
+
+    # Phase 1 Platform DB
+    if PHASE1_AVAILABLE:
+        try:
+            tables = init_platform_db()
+            print(f"APEX Phase 1: {len(tables)} tables created")
+            # Auto-seed on first startup
+            result = seed_phase1()
+            print(f"APEX Seed: {result}")
+        except Exception as e:
+            print(f"Phase 1 init error: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════
+# Include Routers
+# ═══════════════════════════════════════════════════════════════
+
+if KB_AVAILABLE:
+    app.include_router(kb_router)
+
+if PHASE1_AVAILABLE:
+    app.include_router(phase1_router)
+
+
+# ═══════════════════════════════════════════════════════════════
+# Root / Health
+# ═══════════════════════════════════════════════════════════════
 
 @app.get("/")
 def root():
     return {
         "name": "APEX Financial Platform API",
-        "version": "2.0.0",
+        "version": "3.0.0",
         "status": "running",
-        "engine": "Financial Engine v2 — modular architecture",
-        "knowledge_brain": "active" if KB_AVAILABLE else "disabled",
+        "modules": {
+            "financial_engine": "active",
+            "knowledge_brain": "active" if KB_AVAILABLE else "disabled",
+            "platform_core": "active" if PHASE1_AVAILABLE else "disabled",
+        },
         "endpoints": {
             "تحليل ميزان المراجعة": "POST /analyze",
-            "تصنيف الحسابات فقط": "POST /classify",
+            "تصنيف الحسابات": "POST /classify",
+            "التسجيل": "POST /auth/register",
+            "الدخول": "POST /auth/login",
+            "الخطط": "GET /plans",
+            "حسابي": "GET /users/me",
             "العقل المعرفي": "GET /knowledge/stats",
             "التوثيق": "GET /docs",
         },
     }
 
-# Include Knowledge Brain routes
-if KB_AVAILABLE:
-    app.include_router(kb_router)
-    # Initialize DB on startup
-    @app.on_event("startup")
-    def startup_init_kb():
-        try:
-            init_db()
-        except Exception:
-            pass
-
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "2.0.0"}
+    return {
+        "status": "ok",
+        "version": "3.0.0",
+        "knowledge_brain": KB_AVAILABLE,
+        "platform_core": PHASE1_AVAILABLE,
+    }
 
 
-# ─── Main Analysis ──────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════
+# Financial Analysis Endpoints (existing — preserved as-is)
+# ═══════════════════════════════════════════════════════════════
 
 @app.post("/analyze")
 async def analyze_trial_balance(
     file: UploadFile = File(...),
-    industry: str = Query("general", description="القطاع: general, retail, manufacturing, services, construction, food_beverage"),
-    closing_inventory: float = Query(None, description="مخزون آخر المدة الفعلي (من الجرد) — مطلوب للجرد الدوري"),
+    industry: str = Query("general"),
+    closing_inventory: float = Query(None),
 ):
-    """
-    تحليل شامل لميزان المراجعة.
-
-    يشمل: قائمة الدخل + الميزانية + التدفقات + النسب + الجاهزية + التحققات + مراجعة التبويب.
-    المحرك المالي يحسب كل شي — AI لا يغيّر أي رقم.
-
-    للشركات التي تستخدم الجرد الدوري: أرسل closing_inventory مع قيمة المخزون الفعلي في نهاية الفترة.
-    """
+    """تحليل شامل لميزان المراجعة."""
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
 
@@ -102,16 +149,9 @@ async def analyze_trial_balance(
             closing_inventory=closing_inventory,
         )
         return result
-
     except Exception as e:
-        import traceback
-        raise HTTPException(
-            status_code=500,
-            detail=f"خطأ في التحليل: {str(e)}\n{traceback.format_exc()}"
-        )
+        raise HTTPException(status_code=500, detail=f"خطأ في التحليل: {str(e)}\n{traceback.format_exc()}")
 
-
-# ─── Full Analysis with AI Narrative ─────────────────────────────────────
 
 @app.post("/analyze/full")
 async def analyze_with_narrative(
@@ -125,7 +165,7 @@ async def analyze_with_narrative(
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
 
     content = await file.read()
-    print(f"APEX: ci={closing_inventory}, file_size={len(content)}")
+    print(f"APEX: ci={closing_inventory}, file_size={len(content)}, filename={file.filename}")
 
     try:
         from app.services.ai.narrative_service import NarrativeService
@@ -140,10 +180,8 @@ async def analyze_with_narrative(
         if not result.get("success"):
             return result
 
-        # Step 2: AI Narrative with Brain context (does NOT modify numbers)
         narrator = NarrativeService()
 
-        # Get brain context for AI
         brain_context = ""
         try:
             from app.knowledge_brain.services.brain_service import KnowledgeBrainService
@@ -154,34 +192,21 @@ async def analyze_with_narrative(
             pass
 
         narrative = await narrator.generate(result, language=language, brain_context=brain_context)
-
-        # Merge narrative into result
         result["narrative"] = narrative
-
         return result
 
     except Exception as e:
-        import traceback
-        raise HTTPException(
-            status_code=500,
-            detail=f"خطأ: {str(e)}\n{traceback.format_exc()}"
-        )
+        raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
 
-
-# ─── Classification Only ────────────────────────────────────────────────────
 
 @app.post("/classify")
 async def classify_accounts(file: UploadFile = File(...)):
-    """
-    تصنيف حسابات ميزان المراجعة فقط — بدون بناء القوائم.
-    مفيد لمراجعة التبويب قبل التحليل الكامل.
-    """
+    """تصنيف حسابات ميزان المراجعة فقط."""
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="يُقبل فقط ملفات Excel (.xlsx)")
 
     try:
         content = await file.read()
-
         import tempfile
         suffix = os.path.splitext(file.filename)[1]
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
@@ -191,10 +216,8 @@ async def classify_accounts(file: UploadFile = File(...)):
         try:
             read_result = orchestrator.reader.read(tmp_path)
         finally:
-            try:
-                os.unlink(tmp_path)
-            except OSError:
-                pass
+            try: os.unlink(tmp_path)
+            except: pass
 
         raw_rows = read_result["rows"]
         if not raw_rows:
@@ -223,27 +246,25 @@ async def classify_accounts(file: UploadFile = File(...)):
                 for r in classified
             ],
         }
-
     except Exception as e:
-        import traceback
         raise HTTPException(status_code=500, detail=f"خطأ: {str(e)}\n{traceback.format_exc()}")
 
 
-# ─── Template Downloads ─────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════
+# Template Downloads (existing)
+# ═══════════════════════════════════════════════════════════════
 
 @app.get("/templates/ar")
 async def download_template_ar():
-    """تحميل نموذج ميزان المراجعة المعتمد — عربي"""
     from starlette.responses import FileResponse
     path = os.path.join(os.path.dirname(__file__), "data", "templates", "APEX_Template_AR.xlsx")
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="النموذج غير متاح")
-    return FileResponse(path, filename="APEX_نموذج_ميزان_المراجعة_المعتمد.xlsx")
+    return FileResponse(path, filename="APEX_نموذج_ميزان_المراجعة.xlsx")
 
 
 @app.get("/templates/en")
 async def download_template_en():
-    """Download approved trial balance template — English"""
     from starlette.responses import FileResponse
     path = os.path.join(os.path.dirname(__file__), "data", "templates", "APEX_Template_EN.xlsx")
     if not os.path.exists(path):
@@ -251,7 +272,9 @@ async def download_template_en():
     return FileResponse(path, filename="APEX_Trial_Balance_Template.xlsx")
 
 
-# ─── Run ─────────────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════
+# Run
+# ═══════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
     import uvicorn
