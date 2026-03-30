@@ -30,6 +30,10 @@ class S {
   static List<String> roles = [];
   static Map<String, String> h() => {'Authorization': 'Bearer ${token ?? ""}', 'Content-Type': 'application/json'};
   static void clear() { token = null; uid = null; uname = null; dname = null; plan = null; roles = []; }
+  static String planAr() {
+    const m = {'free':'مجاني','pro':'احترافي','business':'أعمال','expert':'خبير','enterprise':'مؤسسي'};
+    return m[plan] ?? plan ?? 'مجاني';
+  }
 }
 
 // ═══════ Shared Widgets ═══════
@@ -470,7 +474,7 @@ class _AccountS extends State<AccountTab> {
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen())); }
   @override Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('حسابي', style: TextStyle(color: C.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.bold)),
-      actions: [IconButton(onPressed: _logout, icon: const Icon(Icons.logout_rounded, color: C.err))]),
+      actions: [IconButton(onPressed: _logout, icon: const Icon(Icons.logout, color: C.err))]),
     body: _ld ? const Center(child: CircularProgressIndicator(color: C.gold)) : ListView(padding: const EdgeInsets.all(16), children: [
       _card(Column(children: [
         Container(padding: const EdgeInsets.all(3), decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: C.gold.withOpacity(0.4), width: 2)),
@@ -486,7 +490,7 @@ class _AccountS extends State<AccountTab> {
         _kv('الجلسات النشطة', '${_s?["active_sessions"] ?? 0}'),
         _kv('عدد مرات الدخول', '${_s?["login_count"] ?? 0}'),
         _kv('آخر دخول', _s?['last_login'] ?? '—')])),
-      _menuItem(Icons.workspace_premium_rounded, 'خطتي: ${S.plan ?? "مجاني"}', C.gold),
+      _menuItem(Icons.workspace_premium_rounded, 'الخطة الحالية: ${S.planAr()}', C.gold),
       _menuItem(Icons.notifications_rounded, 'الإشعارات', C.accent),
       _menuItem(Icons.lock_rounded, 'تغيير كلمة المرور', C.warn),
     ]));
@@ -494,5 +498,5 @@ class _AccountS extends State<AccountTab> {
     decoration: BoxDecoration(color: C.card, borderRadius: BorderRadius.circular(14), border: Border.all(color: C.border)),
     child: ListTile(leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: c.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
       child: Icon(i, color: c, size: 20)), title: Text(l, style: const TextStyle(color: C.text, fontFamily: 'Tajawal')),
-      trailing: const Icon(Icons.chevron_left_rounded, color: C.textDim)));
+      trailing: const Icon(Icons.chevron_left, color: C.textDim)));
 }
