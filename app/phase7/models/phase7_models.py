@@ -52,6 +52,7 @@ class SuspensionStatus(str, enum.Enum):
 # ═══════════════════════════════════════════════════════
 class TaskType(Base):
     __tablename__ = "task_types"
+    __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
     code = Column(String(50), unique=True, nullable=False, index=True)
     name_ar = Column(String(200), nullable=False)
@@ -64,6 +65,7 @@ class TaskType(Base):
 
 class TaskDocumentRequirement(Base):
     __tablename__ = "task_document_requirements"
+    __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
     task_type_id = Column(String(36), ForeignKey("task_types.id"), nullable=False)
     requirement_type = Column(SAEnum(DocRequirementType), nullable=False)
@@ -76,6 +78,7 @@ class TaskDocumentRequirement(Base):
 
 class TaskSubmission(Base):
     __tablename__ = "task_submissions"
+    __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
     service_task_id = Column(String(36), nullable=False, index=True)
     requirement_id = Column(String(36), ForeignKey("task_document_requirements.id"), nullable=False)
@@ -94,6 +97,7 @@ class TaskSubmission(Base):
 # ═══════════════════════════════════════════════════════
 class ProviderComplianceFlag(Base):
     __tablename__ = "provider_compliance_flags"
+    __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
     provider_id = Column(String(36), nullable=False, index=True)
     service_task_id = Column(String(36))
@@ -106,6 +110,7 @@ class ProviderComplianceFlag(Base):
 
 class ProviderSuspension(Base):
     __tablename__ = "provider_suspensions"
+    __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
     provider_id = Column(String(36), nullable=False, index=True)
     suspension_type = Column(SAEnum(SuspensionType), nullable=False)
@@ -122,6 +127,7 @@ class ProviderSuspension(Base):
 # ═══════════════════════════════════════════════════════
 class AuditEvent(Base):
     __tablename__ = "audit_events"
+    __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
     user_id = Column(String(36), index=True)
     action = Column(String(100), nullable=False, index=True)
@@ -136,6 +142,7 @@ class AuditEvent(Base):
 # ═══════════════════════════════════════════════════════
 class ResultExplanation(Base):
     __tablename__ = "result_explanations"
+    __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
     analysis_id = Column(String(36), nullable=False, index=True)
     result_key = Column(String(100), nullable=False)
