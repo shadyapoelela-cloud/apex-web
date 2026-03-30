@@ -112,7 +112,7 @@ def decode_token(token: str) -> dict:
 class AuthService:
 
     def register(self, username: str, email: str, password: str,
-                 display_name: str, mobile: Optional[str] = None) -> dict:
+                 display_name: str, mobile: Optional[str] = None, ip_address: str = '') -> dict:
         valid, msg = validate_password_strength(password)
         if not valid:
             return {"success": False, "error": msg}
