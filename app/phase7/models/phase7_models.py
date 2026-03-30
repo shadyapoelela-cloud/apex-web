@@ -3,7 +3,6 @@ APEX Phase 7 — Task Document Requirements & Provider Suspension
 Per Execution Master §8 + Zero-Ambiguity §4 migrations 12-13
 """
 from sqlalchemy import Column, String, Integer, Float, Boolean, Text, DateTime, ForeignKey, Enum as SAEnum
-from sqlalchemy.orm import relationship
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 import enum
 
@@ -62,7 +61,6 @@ class TaskType(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=utcnow)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
-    requirements = relationship("TaskDocumentRequirement", back_populates="task_type")
 
 class TaskDocumentRequirement(Base):
     __tablename__ = "task_document_requirements"
@@ -75,7 +73,6 @@ class TaskDocumentRequirement(Base):
     is_mandatory = Column(Boolean, default=True)
     sort_order = Column(Integer, default=0)
     created_at = Column(DateTime, default=utcnow)
-    task_type = relationship("TaskType", back_populates="requirements")
 
 class TaskSubmission(Base):
     __tablename__ = "task_submissions"
