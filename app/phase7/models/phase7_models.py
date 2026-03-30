@@ -140,7 +140,7 @@ class AuditEvent(Base):
 # ═══════════════════════════════════════════════════════
 # Tables — Result Explanations (Migration #7)
 # ═══════════════════════════════════════════════════════
-class ResultExplanation(Base):
+class P7ResultExplanation(Base):
     __tablename__ = "result_explanations"
     __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)

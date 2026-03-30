@@ -264,9 +264,9 @@ async def get_result_details(analysis_id: str, user=Depends(get_current_user)):
     """Get detailed explanations for analysis results — the ! icon panel"""
     db = SessionLocal()
     try:
-        from app.phase7.models.phase7_models import ResultExplanation
-        explanations = db.query(ResultExplanation).filter(
-            ResultExplanation.analysis_id == analysis_id
+        from app.phase7.models.phase7_models import P7ResultExplanation
+        explanations = db.query(P7ResultExplanation).filter(
+            P7ResultExplanation.analysis_id == analysis_id
         ).all()
         
         if not explanations:
@@ -291,7 +291,7 @@ async def generate_result_explanation(analysis_id: str, user=Depends(get_current
     """Auto-generate explanations for analysis results"""
     db = SessionLocal()
     try:
-        from app.phase7.models.phase7_models import ResultExplanation
+        from app.phase7.models.phase7_models import P7ResultExplanation
         # Generate standard explanation entries for common result types
         result_keys = [
             ("current_ratio", "نسبة التداول", "Current ratio analysis based on current assets / current liabilities"),
@@ -305,12 +305,12 @@ async def generate_result_explanation(analysis_id: str, user=Depends(get_current
         
         count = 0
         for key, summary_ar, summary_en in result_keys:
-            existing = db.query(ResultExplanation).filter(
-                ResultExplanation.analysis_id == analysis_id,
-                ResultExplanation.result_key == key
+            existing = db.query(P7ResultExplanation).filter(
+                P7ResultExplanation.analysis_id == analysis_id,
+                P7ResultExplanation.result_key == key
             ).first()
             if not existing:
-                db.add(ResultExplanation(
+                db.add(P7ResultExplanation(
                     id=gen_uuid(), analysis_id=analysis_id,
                     result_key=key, summary_ar=summary_ar, summary_en=summary_en,
                     confidence=0.85, warnings=None
