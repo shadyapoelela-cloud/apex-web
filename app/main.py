@@ -188,7 +188,7 @@ async def promote_to_admin(username: str, secret: str = Query(...)):
             user = db.query(User).filter(User.username == username).first()
             if not user:
                 raise HTTPException(404, f"User {username} not found")
-            admin_role = db.query(Role).filter(Role.code == RoleCode.PLATFORM_ADMIN).first()
+            admin_role = db.query(Role).filter(Role.code == 'platform_admin').first()
             if not admin_role:
                 admin_role = db.query(Role).filter(Role.code == "platform_admin").first()
             if admin_role:
