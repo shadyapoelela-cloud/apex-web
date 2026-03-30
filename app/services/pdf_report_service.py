@@ -310,3 +310,5 @@ def generate_pdf_report(result: dict, client_name: str = "", user_name: str = ""
     # Build
     doc.build(story)
     return buffer.getvalue()
+
+# v2
