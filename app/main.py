@@ -219,16 +219,16 @@ async def promote_to_admin(username: str, secret: str = Query(...)):
     except HTTPException:
         raise
     except Exception as e:
+        return {"message": f"Error: {e}"}
 
-    # Phase 7 init
+    # Phase 7 init — runs at startup
     if HAS_P7:
         try:
             t7 = init_phase7_db()
             print(f"Phase 7: {len(t7)} tables")
             print(f"Task types seed: {seed_task_types()}")
-        except Exception as e:
-            print(f"Phase 7 init warning: {e}")
-        return {"message": f"Error: {e}"}
+        except Exception as e2:
+            print(f"Phase 7 init warning: {e2}")
 
 # Phase 7: Extended APIs (Execution Master compliance)
 # ============================================================
