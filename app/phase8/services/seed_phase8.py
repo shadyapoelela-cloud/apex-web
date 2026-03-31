@@ -178,17 +178,7 @@ def upgrade_user_plan(user_id, new_plan_name):
     from app.phase8.models.phase8_models import P8EntitlementAuditLog
     db = SessionLocal()
     try:
-        # Find current subscription
-        current = db.query(UserSubscription).filter_by(user_id=user_id, status="active").first()
-        
-        # Find old plan name
-        old_plan_name = "None"
-        if current:
-            old_plan = db.query(Plan).filter_by(id=current.plan_id).first()
-            old_plan_name = old_plan.name_en if old_plan else "None"
-            current.status = "replaced"
-        
-        # Find new plan
+        # Find new plan first
         new_plan = db.query(Plan).filter(
             (Plan.name_en == new_plan_name) | (Plan.code == new_plan_name.lower())
         ).first()
@@ -196,14 +186,24 @@ def upgrade_user_plan(user_id, new_plan_name):
         if not new_plan:
             return {"status": "error", "detail": f"Plan not found: {new_plan_name}"}
         
-        # Create new subscription
-        sub = UserSubscription(
-            id=gen_uuid(),
-            user_id=user_id,
-            plan_id=new_plan.id,
-            status="active",
-        )
-        db.add(sub)
+        # Find current subscription
+        current = db.query(UserSubscription).filter_by(user_id=user_id, status="active").first()
+        
+        old_plan_name = "None"
+        if current:
+            old_plan = db.query(Plan).filter_by(id=current.plan_id).first()
+            old_plan_name = old_plan.name_en if old_plan else "None"
+            # UPDATE existing subscription (unique constraint on user_id)
+            current.plan_id = new_plan.id
+        else:
+            # Create new subscription
+            sub = UserSubscription(
+                id=gen_uuid(),
+                user_id=user_id,
+                plan_id=new_plan.id,
+                status="active",
+            )
+            db.add(sub)
         
         # Audit log
         audit = P8EntitlementAuditLog(
