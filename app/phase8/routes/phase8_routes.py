@@ -11,7 +11,7 @@ APIs:
 - GET /entitlements/check/{feature} — check specific entitlement
 - GET /plans/compare — compare all plans side by side
 """
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Header
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase8.middleware.entitlement_middleware import (
     get_user_subscription, get_all_user_entitlements, check_entitlement, check_usage_count
@@ -27,6 +27,9 @@ def get_current_user_id(authorization: str = None):
     """Extract user_id from JWT — simplified"""
     if not authorization:
         return None
+    # Clean up Bearer prefix if doubled
+    if authorization.startswith("Bearer Bearer "):
+        authorization = authorization.replace("Bearer Bearer ", "Bearer ")
     try:
         import jwt
         token = authorization.replace("Bearer ", "")
@@ -37,11 +40,11 @@ def get_current_user_id(authorization: str = None):
 
 # ─── GET /subscriptions/me ────────────────────────────────
 @router.get("/subscriptions/me")
-def get_my_subscription(authorization: str = None):
+def get_my_subscription(authorization: str = None, x_token: str = Header(None, alias="Authorization")):
     """Get current subscription for logged-in user"""
     from fastapi import Header
     # Simple auth extraction
-    user_id = get_current_user_id(authorization)
+    user_id = get_current_user_id(authorization or x_token)
     if not user_id:
         raise HTTPException(401, "يجب تسجيل الدخول")
     
@@ -98,9 +101,9 @@ def list_available_plans():
 
 # ─── POST /subscriptions/upgrade ──────────────────────────
 @router.post("/subscriptions/upgrade")
-def upgrade_subscription(plan_name: str = Query(...), authorization: str = None):
+def upgrade_subscription(plan_name: str = Query(...), authorization: str = None, x_token: str = Header(None, alias="Authorization")):
     """Upgrade to a new plan"""
-    user_id = get_current_user_id(authorization)
+    user_id = get_current_user_id(authorization or x_token)
     if not user_id:
         raise HTTPException(401, "يجب تسجيل الدخول")
     
@@ -116,9 +119,9 @@ def upgrade_subscription(plan_name: str = Query(...), authorization: str = None)
 
 # ─── POST /subscriptions/downgrade ────────────────────────
 @router.post("/subscriptions/downgrade")
-def downgrade_subscription(plan_name: str = Query(...), authorization: str = None):
+def downgrade_subscription(plan_name: str = Query(...), authorization: str = None, x_token: str = Header(None, alias="Authorization")):
     """Downgrade to a lower plan"""
-    user_id = get_current_user_id(authorization)
+    user_id = get_current_user_id(authorization or x_token)
     if not user_id:
         raise HTTPException(401, "يجب تسجيل الدخول")
     
@@ -134,9 +137,9 @@ def downgrade_subscription(plan_name: str = Query(...), authorization: str = Non
 
 # ─── GET /entitlements/me ─────────────────────────────────
 @router.get("/entitlements/me")
-def get_my_entitlements(authorization: str = None):
+def get_my_entitlements(authorization: str = None, x_token: str = Header(None, alias="Authorization")):
     """Get all entitlements for current user"""
-    user_id = get_current_user_id(authorization)
+    user_id = get_current_user_id(authorization or x_token)
     if not user_id:
         raise HTTPException(401, "يجب تسجيل الدخول")
     
@@ -154,9 +157,9 @@ def get_my_entitlements(authorization: str = None):
 
 # ─── GET /entitlements/check/{feature} ────────────────────
 @router.get("/entitlements/check/{feature}")
-def check_my_entitlement(feature: str, authorization: str = None):
+def check_my_entitlement(feature: str, authorization: str = None, x_token: str = Header(None, alias="Authorization")):
     """Check if current user has entitlement for a specific feature"""
-    user_id = get_current_user_id(authorization)
+    user_id = get_current_user_id(authorization or x_token)
     if not user_id:
         raise HTTPException(401, "يجب تسجيل الدخول")
     
