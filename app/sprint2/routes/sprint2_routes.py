@@ -14,7 +14,7 @@ def _get_db():
         db.close()
 
 # ── POST /coa/uploads/{upload_id}/classify ──
-@router.post("/coa/uploads/{upload_id}/classify")
+@router.post("/coa/classify/{upload_id}")
 def classify_upload(upload_id: str):
     """Run classification engine on all parsed accounts for this upload."""
     from app.phase1.models.platform_models import SessionLocal
@@ -141,7 +141,7 @@ def classify_upload(upload_id: str):
         db.close()
 
 # ── GET /coa/uploads/{upload_id}/mapping ──
-@router.get("/coa/uploads/{upload_id}/mapping")
+@router.get("/coa/mapping/{upload_id}")
 def get_mapping_preview(
     upload_id: str,
     page: int = 1,
@@ -247,7 +247,7 @@ def get_mapping_preview(
         db.close()
 
 # ── PUT /coa/accounts/{account_id} ──
-@router.put("/coa/accounts/{account_id}")
+@router.put("/coa/account/{account_id}")
 def edit_account_classification(account_id: str, body: dict):
     """Edit classification for a single account."""
     from app.phase1.models.platform_models import SessionLocal
@@ -289,7 +289,7 @@ def edit_account_classification(account_id: str, body: dict):
         db.close()
 
 # ── POST /coa/accounts/{account_id}/approve ──
-@router.post("/coa/accounts/{account_id}/approve")
+@router.post("/coa/approve/{account_id}")
 def approve_account(account_id: str):
     """Approve classification for a single account."""
     from app.phase1.models.platform_models import SessionLocal
@@ -316,7 +316,7 @@ def approve_account(account_id: str):
         db.close()
 
 # ── POST /coa/uploads/{upload_id}/bulk-approve ──
-@router.post("/coa/uploads/{upload_id}/bulk-approve")
+@router.post("/coa/bulk-approve/{upload_id}")
 def bulk_approve(upload_id: str, body: dict = {}):
     """Bulk approve accounts by IDs or confidence threshold."""
     from app.phase1.models.platform_models import SessionLocal
@@ -375,7 +375,7 @@ def bulk_approve(upload_id: str, body: dict = {}):
         db.close()
 
 # ── GET /coa/uploads/{upload_id}/classification-summary ──
-@router.get("/coa/uploads/{upload_id}/classification-summary")
+@router.get("/coa/classification-summary/{upload_id}")
 def classification_summary(upload_id: str):
     """Get classification summary statistics."""
     from app.phase1.models.platform_models import SessionLocal
