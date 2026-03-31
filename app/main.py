@@ -107,6 +107,8 @@ for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r 
 # Phase 7 router
 if HAS_P7:
     app.include_router(p7r, prefix="", tags=["Phase 7"])
+if HAS_P8:
+    app.include_router(p8r, prefix="", tags=["Phase 8"])
 
 @app.get("/")
 def root():

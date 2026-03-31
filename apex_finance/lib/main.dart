@@ -861,6 +861,10 @@ class _AccS extends State<AccountTab> {
         ]),
         // Menu Items
         _mi(Icons.workspace_premium, '\u0627\u0644\u062e\u0637\u0629 \u0627\u0644\u062d\u0627\u0644\u064a\u0629: ${S.planAr()}', AC.gold, (){}),
+        _mi(Icons.workspace_premium, '\u062e\u0637\u062a\u064a \u0648\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643', AC.gold,
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SubscriptionScreen()))),
+        _mi(Icons.workspace_premium, '\u062e\u0637\u062a\u064a \u0648\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643', AC.gold,
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SubscriptionScreen()))),
         _mi(Icons.notifications_outlined, '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', AC.cyan,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const NotificationsScreen()))),
         _mi(Icons.lock_outlined, '\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', AC.warn,
