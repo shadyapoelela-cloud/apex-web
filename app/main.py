@@ -103,6 +103,15 @@ except Exception as e:
     HAS_S1 = False
     print(f"Sprint 1 disabled: {e}")
 
+# Sprint 2 — COA Classification Engine
+try:
+    from app.sprint2.models.sprint2_models import init_sprint2_db
+    from app.sprint2.routes.sprint2_routes import router as s2r
+    HAS_S2 = True
+except Exception as e:
+    HAS_S2 = False
+    print(f"Sprint 2 disabled: {e}")
+
 
 # Phase 11 — Legal Acceptance
 try:
@@ -161,6 +170,8 @@ if HAS_P11:
     app.include_router(p11r, tags=["Phase 11"])
 if HAS_S1:
     app.include_router(s1r, tags=["Sprint 1 COA"])
+if HAS_S2:
+    app.include_router(s2r, tags=["Sprint 2 Classification"])
 
 @app.get("/")
 def root():
