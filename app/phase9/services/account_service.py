@@ -1,46 +1,43 @@
 """
 APEX Phase 9 — Account Center Services
-Handles: forgot-password, reset-password, sessions, profile update, closure
+Uses Phase 1 PasswordReset + UserSession models
 """
 import secrets, hashlib
 from datetime import datetime, timedelta
-from app.phase1.models.platform_models import SessionLocal, User, gen_uuid, utcnow
-from app.phase9.models.phase9_models import PasswordReset, UserSession, AccountAction
+from app.phase1.models.platform_models import SessionLocal, User, gen_uuid, utcnow, PasswordReset, UserSession
+from app.phase9.models.phase9_models import AccountAction
 
-# ─── Password Reset ──────────────────────────────────────
+# --- Password Reset ---
 def create_password_reset(email: str):
-    """Generate a reset token for the given email."""
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.email == email).first()
         if not user:
-            # Don't reveal whether email exists
-            return {"status": "ok", "message": "إذا كان البريد مسجلاً، سيتم إرسال رابط إعادة التعيين"}
+            return {"status": "ok", "message": "\u0625\u0630\u0627 \u0643\u0627\u0646 \u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062c\u0644\u0627\u064b\u060c \u0633\u064a\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0627\u0628\u0637 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646"}
 
-        # Generate secure token
-        token = secrets.token_urlsafe(48)
+        raw_token = secrets.token_urlsafe(48)
+        token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
+
         reset = PasswordReset(
             id=gen_uuid(),
             user_id=user.id,
-            email=email,
-            reset_token=token,
+            token_hash=token_hash,
             expires_at=datetime.utcnow() + timedelta(hours=1),
         )
         db.add(reset)
 
-        # Log action
         action = AccountAction(
             id=gen_uuid(), user_id=user.id,
             action_type="password_reset_requested",
-            action_details=f"Reset requested for {email}",
+            action_details=f"Reset for {email}",
         )
         db.add(action)
         db.commit()
 
         return {
             "status": "ok",
-            "message": "إذا كان البريد مسجلاً، سيتم إرسال رابط إعادة التعيين",
-            "reset_token": token,  # In production: send via email, don't return
+            "message": "\u0625\u0630\u0627 \u0643\u0627\u0646 \u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062c\u0644\u0627\u064b\u060c \u0633\u064a\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0627\u0628\u0637 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646",
+            "reset_token": raw_token,
             "expires_in_minutes": 60,
         }
     except Exception as e:
@@ -49,90 +46,84 @@ def create_password_reset(email: str):
     finally:
         db.close()
 
-def execute_password_reset(token: str, new_password: str):
-    """Reset password using a valid token."""
+def execute_password_reset(raw_token: str, new_password: str):
     db = SessionLocal()
     try:
+        token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
         reset = db.query(PasswordReset).filter(
-            PasswordReset.reset_token == token,
-            PasswordReset.is_used == False,
+            PasswordReset.token_hash == token_hash,
+            PasswordReset.used == False,
         ).first()
 
         if not reset:
-            return {"status": "error", "detail": "رمز إعادة التعيين غير صالح"}
+            return {"status": "error", "detail": "\u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d"}
 
         if datetime.utcnow() > reset.expires_at:
-            return {"status": "error", "detail": "انتهت صلاحية رمز إعادة التعيين"}
+            return {"status": "error", "detail": "\u0627\u0646\u062a\u0647\u062a \u0635\u0644\u0627\u062d\u064a\u0629 \u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646"}
 
-        # Update password
         user = db.query(User).filter(User.id == reset.user_id).first()
         if not user:
-            return {"status": "error", "detail": "المستخدم غير موجود"}
+            return {"status": "error", "detail": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
 
         user.password_hash = hashlib.sha256(new_password.encode()).hexdigest()
-
-        # Mark token as used
-        reset.is_used = True
+        reset.used = True
         reset.used_at = datetime.utcnow()
 
-        # Log action
         action = AccountAction(
             id=gen_uuid(), user_id=user.id,
             action_type="password_reset_completed",
-            action_details="Password reset via token",
         )
         db.add(action)
         db.commit()
 
-        return {"status": "ok", "message": "تم تغيير كلمة المرور بنجاح"}
+        return {"status": "ok", "message": "\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0628\u0646\u062c\u0627\u062d"}
     except Exception as e:
         db.rollback()
         return {"status": "error", "detail": str(e)}
     finally:
         db.close()
 
-# ─── Sessions ─────────────────────────────────────────────
-def create_session(user_id: str, device_info: str = None, ip_address: str = None):
-    """Create a new session record on login."""
+# --- Sessions ---
+def create_session(user_id, device_info=None, ip_address=None):
     db = SessionLocal()
     try:
-        token = secrets.token_urlsafe(32)
+        raw_token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
         session = UserSession(
             id=gen_uuid(), user_id=user_id,
-            session_token=token,
+            token_hash=token_hash,
             device_info=device_info or "unknown",
             ip_address=ip_address or "unknown",
+            expires_at=datetime.utcnow() + timedelta(days=30),
         )
         db.add(session)
         db.commit()
-        return {"session_id": session.id, "session_token": token}
+        return {"session_id": session.id, "session_token": raw_token}
     except Exception as e:
         db.rollback()
         return None
     finally:
         db.close()
 
-def get_user_sessions(user_id: str):
-    """Get all active sessions for a user."""
+def get_user_sessions(user_id):
     db = SessionLocal()
     try:
         sessions = db.query(UserSession).filter(
             UserSession.user_id == user_id,
             UserSession.is_active == True,
-        ).order_by(UserSession.last_activity.desc()).all()
+        ).order_by(UserSession.last_used_at.desc()).all()
 
         return [{
             "id": s.id,
             "device_info": s.device_info,
             "ip_address": s.ip_address,
-            "last_activity": str(s.last_activity) if s.last_activity else None,
+            "last_activity": str(s.last_used_at) if s.last_used_at else None,
             "created_at": str(s.created_at) if s.created_at else None,
         } for s in sessions]
     finally:
         db.close()
 
-def logout_all_sessions(user_id: str, except_current: str = None):
-    """Terminate all active sessions for a user."""
+def logout_all_sessions(user_id, except_current=None):
     db = SessionLocal()
     try:
         query = db.query(UserSession).filter(
@@ -145,7 +136,6 @@ def logout_all_sessions(user_id: str, except_current: str = None):
         count = 0
         for s in query.all():
             s.is_active = False
-            s.ended_at = datetime.utcnow()
             count += 1
 
         action = AccountAction(
@@ -162,8 +152,7 @@ def logout_all_sessions(user_id: str, except_current: str = None):
     finally:
         db.close()
 
-def logout_session(user_id: str, session_id: str):
-    """Terminate a specific session."""
+def logout_session(user_id, session_id):
     db = SessionLocal()
     try:
         s = db.query(UserSession).filter(
@@ -172,41 +161,34 @@ def logout_session(user_id: str, session_id: str):
             UserSession.is_active == True,
         ).first()
         if not s:
-            return {"status": "error", "detail": "الجلسة غير موجودة"}
+            return {"status": "error", "detail": "\u0627\u0644\u062c\u0644\u0633\u0629 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f\u0629"}
         s.is_active = False
-        s.ended_at = datetime.utcnow()
         db.commit()
-        return {"status": "ok", "message": "تم إنهاء الجلسة"}
+        return {"status": "ok", "message": "\u062a\u0645 \u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u062c\u0644\u0633\u0629"}
     except Exception as e:
         db.rollback()
         return {"status": "error", "detail": str(e)}
     finally:
         db.close()
 
-# ─── Profile Update ───────────────────────────────────────
-def update_profile(user_id: str, display_name: str = None, email: str = None, mobile: str = None):
-    """Update user profile fields."""
+# --- Profile Update ---
+def update_profile(user_id, display_name=None, email=None, mobile=None):
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            return {"status": "error", "detail": "المستخدم غير موجود"}
+            return {"status": "error", "detail": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
 
         changes = []
         if display_name and display_name != getattr(user, "display_name", None):
             user.display_name = display_name
-            changes.append(f"display_name→{display_name}")
+            changes.append(f"display_name={display_name}")
         if email and email != user.email:
-            # Check uniqueness
             existing = db.query(User).filter(User.email == email, User.id != user_id).first()
             if existing:
-                return {"status": "error", "detail": "البريد الإلكتروني مستخدم بالفعل"}
+                return {"status": "error", "detail": "\u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062a\u062e\u062f\u0645 \u0628\u0627\u0644\u0641\u0639\u0644"}
             user.email = email
-            changes.append(f"email→{email}")
-        if mobile is not None:
-            if hasattr(user, "mobile"):
-                user.mobile = mobile
-                changes.append(f"mobile→{mobile}")
+            changes.append(f"email={email}")
 
         if changes:
             action = AccountAction(
@@ -224,53 +206,43 @@ def update_profile(user_id: str, display_name: str = None, email: str = None, mo
     finally:
         db.close()
 
-# ─── Account Closure ──────────────────────────────────────
-def request_account_closure(user_id: str, closure_type: str = "temporary", reason: str = ""):
-    """Request temporary or permanent account closure."""
+# --- Account Closure ---
+def request_account_closure(user_id, closure_type="temporary", reason=""):
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            return {"status": "error", "detail": "المستخدم غير موجود"}
+            return {"status": "error", "detail": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
 
         if closure_type == "temporary":
             user.is_active = False
-            action_type = "account_suspended_temporary"
-            message = "تم تعطيل الحساب مؤقتاً. يمكنك إعادة التفعيل بتسجيل الدخول."
+            msg = "\u062a\u0645 \u062a\u0639\u0637\u064a\u0644 \u0627\u0644\u062d\u0633\u0627\u0628 \u0645\u0624\u0642\u062a\u0627\u064b"
         elif closure_type == "permanent":
             user.is_active = False
-            action_type = "account_closure_permanent_requested"
-            message = "تم طلب إغلاق الحساب نهائياً. سيتم مراجعة الطلب خلال 30 يوماً."
+            msg = "\u062a\u0645 \u0637\u0644\u0628 \u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628 \u0646\u0647\u0627\u0626\u064a\u0627\u064b"
         else:
-            return {"status": "error", "detail": "نوع الإغلاق غير صالح"}
+            return {"status": "error", "detail": "\u0646\u0648\u0639 \u0625\u063a\u0644\u0627\u0642 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d"}
 
-        # Terminate all sessions
-        sessions = db.query(UserSession).filter(
-            UserSession.user_id == user_id,
-            UserSession.is_active == True
-        ).all()
-        for s in sessions:
+        # End all sessions
+        for s in db.query(UserSession).filter(UserSession.user_id == user_id, UserSession.is_active == True).all():
             s.is_active = False
-            s.ended_at = datetime.utcnow()
 
         action = AccountAction(
             id=gen_uuid(), user_id=user_id,
-            action_type=action_type,
-            action_details=f"type={closure_type}, reason={reason}",
+            action_type=f"account_closure_{closure_type}",
+            action_details=f"reason={reason}",
         )
         db.add(action)
         db.commit()
-
-        return {"status": "ok", "closure_type": closure_type, "message": message}
+        return {"status": "ok", "closure_type": closure_type, "message": msg}
     except Exception as e:
         db.rollback()
         return {"status": "error", "detail": str(e)}
     finally:
         db.close()
 
-# ─── Activity History ─────────────────────────────────────
-def get_account_activity(user_id: str, limit: int = 50):
-    """Get recent account actions for audit trail."""
+# --- Activity History ---
+def get_account_activity(user_id, limit=50):
     db = SessionLocal()
     try:
         actions = db.query(AccountAction).filter(
