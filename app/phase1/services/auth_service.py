@@ -147,9 +147,9 @@ class AuthService:
                 features = db.query(PlanFeature).filter(PlanFeature.plan_id == free_plan.id).all()
                 for f in features:
                     db.add(SubscriptionEntitlement(
-                        id=gen_uuid(), subscription_id=sub.id,
-                        feature_key=f.feature_code, feature_value=f.value,
-                        feature_type=f.value_type,
+                        id=gen_uuid(), user_id=user.id,
+                        feature_code=f.feature_code, value=f.value,
+                        value_type=f.value_type,
                     ))
 
             db.add(UserSecurityEvent(

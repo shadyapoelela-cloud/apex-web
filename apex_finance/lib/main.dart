@@ -107,13 +107,9 @@ class _LoginS extends State<LoginScreen> {
   @override Widget build(BuildContext c) => Scaffold(body: Center(child: SingleChildScrollView(
     padding: const EdgeInsets.all(32), child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 400),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Container(width: 80, height: 80, decoration: BoxDecoration(shape: BoxShape.circle,
-        gradient: LinearGradient(colors: [AC.gold, AC.gold.withOpacity(0.6)])),
-        child: const Icon(Icons.account_balance, color: AC.navy, size: 40)),
-      const SizedBox(height: 16),
-      const Text('APEX', style: TextStyle(fontSize: 42, fontWeight: FontWeight.w900, color: AC.gold, letterSpacing: 10)),
-      const SizedBox(height: 6),
-      const Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0627\u0644\u0630\u0643\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
+      Image.asset('assets/apex_logo.png', width: 280, height: 280, fit: BoxFit.contain),
+      
+
       const SizedBox(height: 40),
       TextField(controller:_u, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u0623\u0648 \u0627\u0644\u0628\u0631\u064a\u062f', ic: Icons.person_outline)),
       const SizedBox(height: 14),
