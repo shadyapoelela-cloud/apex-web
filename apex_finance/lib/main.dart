@@ -2385,17 +2385,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final token = _prefs?.getString('token') ?? '';
+      final token = S.token ?? '';
       final h = {'Authorization': 'Bearer $token'};
       
       // Load current subscription
-      final r1 = await http.get(Uri.parse('$_baseUrl/subscriptions/me?authorization=Bearer $token'));
+      final r1 = await http.get(Uri.parse('$_api/subscriptions/me?authorization=Bearer $token'));
       if (r1.statusCode == 200) {
         _sub = jsonDecode(r1.body);
       }
       
       // Load available plans
-      final r2 = await http.get(Uri.parse('$_baseUrl/subscriptions/plans'));
+      final r2 = await http.get(Uri.parse('$_api/subscriptions/plans'));
       if (r2.statusCode == 200) {
         _plans = jsonDecode(r2.body)['plans'] ?? [];
       }
@@ -2406,9 +2406,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Future<void> _upgrade(String planName) async {
-    final token = _prefs?.getString('token') ?? '';
+    final token = S.token ?? '';
     final r = await http.post(
-      Uri.parse('$_baseUrl/subscriptions/upgrade?plan_name=$planName&authorization=Bearer $token')
+      Uri.parse('$_api/subscriptions/upgrade?plan_name=$planName&authorization=Bearer $token')
     );
     if (r.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -2426,9 +2426,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     final features = _sub?['plan_features'] as List<dynamic>? ?? [];
     
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(title: const Text('خطتي والاشتراك'), backgroundColor: AC.bg2,
+      appBar: AppBar(title: const Text('خطتي والاشتراك'), backgroundColor: const Color(0xFF1E1E2E),
         iconTheme: const IconThemeData(color: AC.gold)),
-      backgroundColor: AC.bg,
+      backgroundColor: const Color(0xFF0D0D1A),
       body: _loading 
         ? const Center(child: CircularProgressIndicator(color: AC.gold))
         : _error != null
@@ -2447,14 +2447,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     const Icon(Icons.workspace_premium, color: AC.gold, size: 32),
                     const SizedBox(width: 12),
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text('الخطة الحالية', style: TextStyle(color: AC.sub, fontSize: 12)),
+                      const Text('الخطة الحالية', style: TextStyle(color: Colors.grey, fontSize: 12)),
                       Text(currentPlan, style: const TextStyle(color: AC.gold, fontSize: 24, fontWeight: FontWeight.bold)),
                     ]),
                   ]),
                   const SizedBox(height: 16),
                   const Divider(color: Colors.white12),
                   const SizedBox(height: 12),
-                  const Text('الميزات المتاحة:', style: TextStyle(color: AC.sub, fontSize: 13)),
+                  const Text('الميزات المتاحة:', style: TextStyle(color: Colors.grey, fontSize: 13)),
                   const SizedBox(height: 8),
                   ...features.map<Widget>((f) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 3),
@@ -2463,9 +2463,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         color: f['is_available'] == true ? AC.ok : AC.err, size: 18),
                       const SizedBox(width: 8),
                       Expanded(child: Text(f['name_ar'] ?? f['key'], 
-                        style: const TextStyle(color: AC.txt, fontSize: 13))),
+                        style: const TextStyle(color: Colors.white, fontSize: 13))),
                       Text(f['display_value'] ?? f['value'], 
-                        style: TextStyle(color: f['is_available'] == true ? AC.ok : AC.sub, fontSize: 12)),
+                        style: TextStyle(color: f['is_available'] == true ? AC.ok : Colors.grey, fontSize: 12)),
                     ]),
                   )),
                 ]),
@@ -2487,7 +2487,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isCurrent ? AC.gold.withOpacity(0.1) : AC.bg2,
+                    color: isCurrent ? AC.gold.withOpacity(0.1) : const Color(0xFF1E1E2E),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: isCurrent ? AC.gold : Colors.white12),
                   ),
@@ -2495,7 +2495,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
                         Text(name, style: TextStyle(
-                          color: isCurrent ? AC.gold : AC.txt, fontSize: 16, fontWeight: FontWeight.bold)),
+                          color: isCurrent ? AC.gold : Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                         if (isCurrent) ...[
                           const SizedBox(width: 8),
                           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -2505,8 +2505,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       ]),
                       const SizedBox(height: 4),
                       Text(price > 0 ? '$price ر.س/شهرياً' : (note ?? 'مجاني'),
-                        style: const TextStyle(color: AC.sub, fontSize: 12)),
-                      Text('$featureCount ميزة متاحة', style: const TextStyle(color: AC.sub, fontSize: 11)),
+                        style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text('$featureCount ميزة متاحة', style: const TextStyle(color: Colors.grey, fontSize: 11)),
                     ])),
                     if (!isCurrent)
                       ElevatedButton(
@@ -2555,7 +2555,7 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   @override void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
-    final r = await http.get(Uri.parse('$_baseUrl/plans/compare'));
+    final r = await http.get(Uri.parse('$_api/plans/compare'));
     if (r.statusCode == 200) {
       final data = jsonDecode(r.body);
       _comparison = data['comparison'] ?? [];
@@ -2567,21 +2567,21 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   @override
   Widget build(BuildContext context) {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(title: const Text('مقارنة الخطط'), backgroundColor: AC.bg2,
+      appBar: AppBar(title: const Text('مقارنة الخطط'), backgroundColor: const Color(0xFF1E1E2E),
         iconTheme: const IconThemeData(color: AC.gold)),
-      backgroundColor: AC.bg,
+      backgroundColor: const Color(0xFF0D0D1A),
       body: _loading
         ? const Center(child: CircularProgressIndicator(color: AC.gold))
         : SingleChildScrollView(scrollDirection: Axis.horizontal, child: SingleChildScrollView(child:
             DataTable(
-              headingRowColor: WidgetStateProperty.all(AC.bg2),
+              headingRowColor: WidgetStateProperty.all(const Color(0xFF1E1E2E)),
               columns: [
                 const DataColumn(label: Text('الميزة', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
                 ..._planNames.map((p) => DataColumn(
                   label: Text(p, style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold)))),
               ],
               rows: _comparison.map<DataRow>((row) => DataRow(cells: [
-                DataCell(Text(row['name_ar'] ?? '', style: const TextStyle(color: AC.txt, fontSize: 12))),
+                DataCell(Text(row['name_ar'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 12))),
                 ..._planNames.map((p) => DataCell(
                   Text(_formatCellValue(row[p] ?? 'N/A'), 
                     style: TextStyle(color: _cellColor(row[p] ?? ''), fontSize: 11)))),
@@ -2602,6 +2602,6 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   Color _cellColor(String v) {
     if (v == 'true' || v == 'unlimited') return AC.ok;
     if (v == 'false' || v == 'none') return AC.err;
-    return AC.txt;
+    return Colors.white;
   }
 }

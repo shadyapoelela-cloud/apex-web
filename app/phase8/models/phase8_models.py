@@ -13,7 +13,7 @@ from sqlalchemy.orm import relationship
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 # ─── User Subscription (1 active per user) ───────────────
-class UserSubscription(Base):
+class P8UserSubscription(Base):
     __tablename__ = "user_subscriptions"
     __table_args__ = {"extend_existing": True}
     
@@ -32,7 +32,7 @@ class UserSubscription(Base):
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
 # ─── Plan Limits (per plan feature flags + limits) ───────
-class PlanLimit(Base):
+class P8PlanLimit(Base):
     __tablename__ = "plan_limits"
     __table_args__ = {"extend_existing": True}
     
@@ -45,7 +45,7 @@ class PlanLimit(Base):
     created_at = Column(DateTime, default=utcnow)
 
 # ─── Subscription Entitlements (resolved per user) ───────
-class SubscriptionEntitlement(Base):
+class P8SubscriptionEntitlement(Base):
     __tablename__ = "subscription_entitlements"
     __table_args__ = {"extend_existing": True}
     
@@ -60,7 +60,7 @@ class SubscriptionEntitlement(Base):
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
 # ─── Entitlement Audit Log ────────────────────────────────
-class EntitlementAuditLog(Base):
+class P8EntitlementAuditLog(Base):
     __tablename__ = "entitlement_audit_log"
     __table_args__ = {"extend_existing": True}
     
