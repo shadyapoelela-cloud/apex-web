@@ -83,6 +83,17 @@ except Exception as e:
     HAS_P9 = False
     print(f"Phase 9 disabled: {e}")
 
+# Phase 10 — Notification System
+try:
+    from app.phase10.models.phase10_models import init_phase10_db
+    from app.phase10.routes.phase10_routes import router as p10r
+    from app.phase10.services.notification_service import seed_welcome_notification
+    HAS_P10 = True
+except Exception as e:
+    HAS_P10 = False
+    print(f"Phase 10 disabled: {e}")
+
+
 
 app = FastAPI(title="APEX Financial Platform API", description="منصة أبكس للتحليل المالي — النسخة النهائية", version="5.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
@@ -121,6 +132,8 @@ if HAS_P8:
     app.include_router(p8r, prefix="", tags=["Phase 8"])
 if HAS_P9:
     app.include_router(p9r, tags=["Phase 9"])
+if HAS_P10:
+    app.include_router(p10r, tags=["Phase 10"])
 
 @app.get("/")
 def root():

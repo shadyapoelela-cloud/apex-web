@@ -161,7 +161,14 @@ class AuthService:
             db.commit()
 
             roles = [RoleCode.registered_user.value]
-            return {
+            
+        # Phase 10: Welcome notification
+        try:
+            from app.phase10.services.notification_service import seed_welcome_notification
+            seed_welcome_notification(user.id)
+        except:
+            pass
+        return {
                 "success": True,
                 "user": {
                     "id": user.id, "username": user.username,
