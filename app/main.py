@@ -93,6 +93,17 @@ except Exception as e:
     HAS_P10 = False
     print(f"Phase 10 disabled: {e}")
 
+
+# Sprint 1 — COA First Workflow
+try:
+    from app.sprint1.models.sprint1_models import init_sprint1_db
+    from app.sprint1.routes.sprint1_routes import router as s1r
+    HAS_S1 = True
+except Exception as e:
+    HAS_S1 = False
+    print(f"Sprint 1 disabled: {e}")
+
+
 # Phase 11 — Legal Acceptance
 try:
     from app.phase11.models.phase11_models import init_phase11_db
@@ -129,6 +140,9 @@ def startup():
         except Exception as e: print(f"P1 err: {e}")
     if P2:
         try: print(f"P2: {seed_client_types()}")
+    if HAS_S1:
+        try: print(f"S1: {init_sprint1_db()}")
+        except Exception as e: print(f"S1 err: {e}")
         except Exception as e: print(f"P2 err: {e}")
 
 for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
@@ -147,6 +161,8 @@ if HAS_P10:
     app.include_router(p10r, tags=["Phase 10"])
 if HAS_P11:
     app.include_router(p11r, tags=["Phase 11"])
+if HAS_S1:
+    app.include_router(s1r, tags=["Sprint 1 COA"])
 
 @app.get("/")
 def root():
