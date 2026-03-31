@@ -172,9 +172,11 @@ if HAS_P10:
 if HAS_P11:
     app.include_router(p11r, tags=["Phase 11"])
 if HAS_S1:
-    app.include_router(s1r, tags=["Sprint 1 COA"])
+    
 if HAS_S2:
     app.include_router(s2r, tags=["Sprint 2 Classification"])
+    print(f"[STARTUP] S2 registered: {len(s2r.routes)} routes")
+app.include_router(s1r, tags=["Sprint 1 COA"])
 
 @app.get("/")
 def root():
