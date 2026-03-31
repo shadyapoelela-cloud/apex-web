@@ -108,9 +108,12 @@ try:
     from app.sprint2.models.sprint2_models import init_sprint2_db
     from app.sprint2.routes.sprint2_routes import router as s2r
     HAS_S2 = True
+    print(f"Sprint 2 loaded: {len(s2r.routes)} routes")
 except Exception as e:
     HAS_S2 = False
+    import traceback
     print(f"Sprint 2 disabled: {e}")
+    traceback.print_exc()
 
 
 # Phase 11 — Legal Acceptance
