@@ -107,7 +107,7 @@ class _LoginS extends State<LoginScreen> {
   @override Widget build(BuildContext c) => Scaffold(body: Center(child: SingleChildScrollView(
     padding: const EdgeInsets.all(32), child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 400),
     child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Image.asset('assets/apex_logo.png', width: 280, height: 280, fit: BoxFit.contain),
+      Image.asset('assets/apex_logo.png', width: 316, height: 316, fit: BoxFit.contain),
       
 
       const SizedBox(height: 40),
