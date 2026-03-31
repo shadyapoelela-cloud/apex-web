@@ -220,19 +220,19 @@ async def list_plans():
 # [DISABLED] 
 # [DISABLED] # ─── Notifications APIs ─────────────────────────────────────
 # [DISABLED] 
-@router.get("/notifications", tags=["Notifications"])
-async def get_notifications(unread_only: bool = False, limit: int = 50, user: dict = Depends(get_current_user)):
-    return account_service.get_notifications(user["sub"], unread_only=unread_only, limit=limit)
+# [DISABLED-P10] @router.get("/notifications", tags=["Notifications"])
+# [DISABLED-P10] async def get_notifications(unread_only: bool = False, limit: int = 50, user: dict = Depends(get_current_user)):
+# [DISABLED-P10]     return account_service.get_notifications(user["sub"], unread_only=unread_only, limit=limit)
 
 
-@router.post("/notifications/{notification_id}/read", tags=["Notifications"])
-async def mark_read(notification_id: str, user: dict = Depends(get_current_user)):
-    return account_service.mark_notification_read(user["sub"], notification_id)
+# [DISABLED-P10] @router.post("/notifications/{notification_id}/read", tags=["Notifications"])
+# [DISABLED-P10] async def mark_read(notification_id: str, user: dict = Depends(get_current_user)):
+# [DISABLED-P10]     return account_service.mark_notification_read(user["sub"], notification_id)
 
 
-@router.post("/notifications/read-all", tags=["Notifications"])
-async def mark_all_read(user: dict = Depends(get_current_user)):
-    return account_service.mark_all_read(user["sub"])
+# [DISABLED-P10] @router.post("/notifications/read-all", tags=["Notifications"])
+# [DISABLED-P10] async def mark_all_read(user: dict = Depends(get_current_user)):
+# [DISABLED-P10]     return account_service.mark_all_read(user["sub"])
 
 
 # ─── Legal / Policy APIs ────────────────────────────────────

@@ -77,6 +77,6 @@ async def get_audit_log(user_id: Optional[str] = None, action: Optional[str] = N
 
 # ─── Notifications Stats ────────────────────────────────────
 
-@router.get("/notifications/stats")
-async def notification_stats(user: dict = Depends(require_admin)):
-    return admin.get_notification_stats()
+# [DISABLED-P10] @router.get("/notifications/stats")
+# [DISABLED-P10] async def notification_stats(user: dict = Depends(require_admin)):
+# [DISABLED-P10]     return admin.get_notification_stats()

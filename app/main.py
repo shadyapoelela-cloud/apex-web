@@ -405,40 +405,40 @@ async def list_plans():
     ]}
 
 # --- Notifications ---
-@app.get("/notifications", tags=["Notifications"])
-async def list_notifications(limit: int = Query(20), unread_only: bool = Query(False)):
-    """List notifications for current user."""
-    return {"notifications": [], "unread_count": 0, "total": 0}
+# [DISABLED-P10] @app.get("/notifications", tags=["Notifications"])
+# [DISABLED-P10] async def list_notifications(limit: int = Query(20), unread_only: bool = Query(False)):
+# [DISABLED-P10]     """List notifications for current user."""
+# [DISABLED-P10]     return {"notifications": [], "unread_count": 0, "total": 0}
 
-@app.post("/notifications/{notif_id}/read", tags=["Notifications"])
-async def mark_notification_read(notif_id: str):
-    """Mark a notification as read."""
-    return {"message": "Notification marked as read", "id": notif_id}
+# [DISABLED-P10] @app.post("/notifications/{notif_id}/read", tags=["Notifications"])
+# [DISABLED-P10] async def mark_notification_read(notif_id: str):
+# [DISABLED-P10]     """Mark a notification as read."""
+# [DISABLED-P10]     return {"message": "Notification marked as read", "id": notif_id}
 
-@app.post("/notifications/read-all", tags=["Notifications"])
-async def mark_all_notifications_read():
-    """Mark all notifications as read."""
-    return {"message": "All notifications marked as read", "count": 0}
+# [DISABLED-P10] @app.post("/notifications/read-all", tags=["Notifications"])
+# [DISABLED-P10] async def mark_all_notifications_read():
+# [DISABLED-P10]     """Mark all notifications as read."""
+# [DISABLED-P10]     return {"message": "All notifications marked as read", "count": 0}
 
-@app.get("/notifications/preferences", tags=["Notifications"])
-async def get_notification_preferences():
-    """Get notification preferences."""
-    return {
-        "email_enabled": True,
-        "push_enabled": True,
-        "categories": {
-            "task_alerts": True,
-            "payment_alerts": True,
-            "knowledge_review": True,
-            "policy_updates": True,
-            "subscription_alerts": True
-        }
-    }
+# [DISABLED-P10] @app.get("/notifications/preferences", tags=["Notifications"])
+# [DISABLED-P10] async def get_notification_preferences():
+# [DISABLED-P10]     """Get notification preferences."""
+# [DISABLED-P10]     return {
+# [DISABLED-P10]         "email_enabled": True,
+# [DISABLED-P10]         "push_enabled": True,
+# [DISABLED-P10]         "categories": {
+# [DISABLED-P10]             "task_alerts": True,
+# [DISABLED-P10]             "payment_alerts": True,
+# [DISABLED-P10]             "knowledge_review": True,
+# [DISABLED-P10]             "policy_updates": True,
+# [DISABLED-P10]             "subscription_alerts": True
+# [DISABLED-P10]         }
+# [DISABLED-P10]     }
 
-@app.put("/notifications/preferences", tags=["Notifications"])
-async def update_notification_preferences(body: dict):
-    """Update notification preferences."""
-    return {"message": "Preferences updated", "preferences": body}
+# [DISABLED-P10] @app.put("/notifications/preferences", tags=["Notifications"])
+# [DISABLED-P10] async def update_notification_preferences(body: dict):
+# [DISABLED-P10]     """Update notification preferences."""
+# [DISABLED-P10]     return {"message": "Preferences updated", "preferences": body}
 
 # --- Legal / Policies ---
 @app.get("/legal/terms", tags=["Legal"])

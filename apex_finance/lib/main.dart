@@ -880,7 +880,8 @@ class _AccS extends State<AccountTab> {
           _mi(Icons.description, 'الشروط والأحكام', const Color(0xFF607D8B),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalAcceptanceScreen(onAccepted: ()=>Navigator.pop(c))))),
       ])));
-  Widget _mi(IconData i, String l, Color c, VoidCallback onTap) => GestureDetector(onTap: onTap,
+  Widget _mi(Icons.devices, 'الجلسات النشطة', AC.cyan,
+    ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SessionsScreen()))) => GestureDetector(onTap: onTap,
     child: Container(margin: const EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
       child: ListTile(leading: Icon(i, color: c), title: Text(l, style: const TextStyle(color: AC.tp, fontSize: 14)),
         trailing: const Icon(Icons.chevron_left, color: AC.ts))));
@@ -3014,8 +3015,95 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
-  @override State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  @override State<ForgotPasswordScreen> createState() => _FPState();
 }
+class _FPState extends State<ForgotPasswordScreen> {
+  final _eC = TextEditingController();
+  final _pC = TextEditingController();
+  bool _ld = false, _sent = false, _rst = false;
+  String? _token, _err, _ok;
+
+  Future<void> _send() async {
+    setState(() { _ld = true; _err = null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/account/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': _eC.text.trim()}));
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200 && d['status'] == 'ok') {
+        setState(() { _sent = true; _token = d['reset_token']; _ok = d['message'] ?? 'تم إرسال الرابط'; });
+      } else { setState(() { _err = d['detail'] ?? 'حدث خطأ'; }); }
+    } catch (e) { setState(() { _err = 'خطأ في الاتصال'; }); }
+    finally { setState(() { _ld = false; }); }
+  }
+
+  Future<void> _doReset() async {
+    if (_token == null || _pC.text.length < 6) {
+      setState(() { _err = 'كلمة المرور 6 أحرف على الأقل'; }); return;
+    }
+    setState(() { _rst = true; _err = null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/account/reset-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'token': _token, 'new_password': _pC.text}));
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200 && d['status'] == 'ok') {
+        setState(() { _ok = 'تم تغيير كلمة المرور بنجاح!'; _token = null; _sent = false; });
+      } else { setState(() { _err = d['detail'] ?? 'فشل'; }); }
+    } catch (e) { setState(() { _err = 'خطأ: $e'; }); }
+    finally { setState(() { _rst = false; }); }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(backgroundColor: AC.navy,
+      appBar: AppBar(title: const Text('استعادة كلمة المرور')),
+      body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const Icon(Icons.lock_reset, size: 64, color: AC.gold), const SizedBox(height: 16),
+          if (_ok != null) Container(padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: Colors.green.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            child: Text(_ok!, style: const TextStyle(color: Colors.greenAccent, fontSize: 14), textAlign: TextAlign.center)),
+          if (_err != null) Container(padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
+          const SizedBox(height: 12),
+          if (!_sent) ...[
+            const Text('أدخل بريدك الإلكتروني', style: TextStyle(color: Colors.white70), textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            TextField(controller: _eC, style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(labelText: 'البريد', labelStyle: const TextStyle(color: Colors.white54),
+                prefixIcon: const Icon(Icons.email, color: AC.gold),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+                focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12)))),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: _ld ? null : _send,
+              child: _ld ? const SizedBox(height:20,width:20,child:CircularProgressIndicator(strokeWidth:2,color:AC.navy))
+                : const Text('إرسال رابط الاستعادة', style: TextStyle(fontWeight: FontWeight.bold))),
+          ],
+          if (_sent && _token != null) ...[
+            const Text('تم إرسال الرمز! أدخل كلمة المرور الجديدة:', style: TextStyle(color: Colors.white70), textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            TextField(controller: _pC, obscureText: true, style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(labelText: 'كلمة المرور الجديدة', labelStyle: const TextStyle(color: Colors.white54),
+                prefixIcon: const Icon(Icons.lock_outline, color: AC.gold),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+                focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12)))),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: _rst ? null : _doReset,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              child: _rst ? const SizedBox(height:20,width:20,child:CircularProgressIndicator(strokeWidth:2))
+                : const Text('إعادة تعيين كلمة المرور', style: TextStyle(fontWeight:FontWeight.bold, color:Colors.white))),
+          ],
+          if (!_sent && _token == null && _ok != null) ...[
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: () => Navigator.pop(context),
+              child: const Text('العودة لتسجيل الدخول', style: TextStyle(fontWeight: FontWeight.bold))),
+          ],
+        ]))));
+  }
+}
+
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailC = TextEditingController();
   String? _msg;
