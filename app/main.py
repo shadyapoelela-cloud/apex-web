@@ -185,23 +185,23 @@ def reinit_db(secret: str = Query(...)):
     try:
         if HAS_P9 if 'HAS_P9' in globals() else False:
             init_phase9_db()
-            result["phase9"] = "OK"
+            results["phase9"] = "OK"
     except Exception as e:
-        result["phase9"] = str(e)[:80]
+        results["phase9"] = str(e)[:80]
     try:
         if HAS_P10 if 'HAS_P10' in globals() else False:
             init_phase10_db()
-            result["phase10"] = "OK"
+            results["phase10"] = "OK"
     except Exception as e:
-        result["phase10"] = str(e)[:80]
+        results["phase10"] = str(e)[:80]
     try:
         if HAS_P11 if 'HAS_P11' in globals() else False:
             init_phase11_db()
             from app.phase11.services.legal_service import seed_legal_documents
             seed_result = seed_legal_documents()
-            result["phase11"] = f"OK - {seed_result}"
+            results["phase11"] = f"OK - {seed_result}"
     except Exception as e:
-        result["phase11"] = str(e)[:80]
+        results["phase11"] = str(e)[:80]
 
     return results
 
