@@ -5,7 +5,8 @@ Per Execution Master §4 + Zero Ambiguity §5, §10
 Plans: Free, Pro, Business, Expert, Enterprise
 Feature Keys per plan with limits
 """
-from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
+from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow, UserSubscription, SubscriptionEntitlement
+from app.phase8.models.phase8_models import P8PlanLimit, P8EntitlementAuditLog
 
 # ─── Plan Limits Matrix (Execution Master §4 + Zero Ambiguity §10) ─────
 PLAN_LIMITS = {

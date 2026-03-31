@@ -15,7 +15,7 @@ from app.phase1.models.platform_models import SessionLocal
 
 def get_user_entitlement(user_id: str, feature_key: str):
     """Get a specific entitlement value for a user"""
-    from app.phase8.models.phase8_models import SubscriptionEntitlement
+    from app.phase1.models.platform_models import SubscriptionEntitlement
     db = SessionLocal()
     try:
         ent = db.query(SubscriptionEntitlement).filter_by(
@@ -29,7 +29,7 @@ def get_user_entitlement(user_id: str, feature_key: str):
 
 def get_all_user_entitlements(user_id: str):
     """Get all entitlements for a user as a dict"""
-    from app.phase8.models.phase8_models import SubscriptionEntitlement
+    from app.phase1.models.platform_models import SubscriptionEntitlement
     db = SessionLocal()
     try:
         ents = db.query(SubscriptionEntitlement).filter_by(user_id=user_id).all()
@@ -39,7 +39,7 @@ def get_all_user_entitlements(user_id: str):
 
 def get_user_subscription(user_id: str):
     """Get active subscription for a user"""
-    from app.phase8.models.phase8_models import UserSubscription
+    from app.phase1.models.platform_models import UserSubscription
     db = SessionLocal()
     try:
         sub = db.query(UserSubscription).filter_by(user_id=user_id, status="active").first()
