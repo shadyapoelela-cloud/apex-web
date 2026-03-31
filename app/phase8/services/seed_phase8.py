@@ -133,7 +133,7 @@ def seed_plan_limits():
 
 def create_user_subscription(user_id, plan_name="Free"):
     """Create a default subscription for a new user"""
-    from app.phase8.models.phase8_models import UserSubscription, SubscriptionEntitlement
+    from app.phase1.models.platform_models import UserSubscription
     db = SessionLocal()
     try:
         # Check if user already has subscription
@@ -173,59 +173,54 @@ def create_user_subscription(user_id, plan_name="Free"):
 
 
 def upgrade_user_plan(user_id, new_plan_name):
-    """Upgrade/downgrade user plan and re-resolve entitlements"""
-    from app.phase8.models.phase8_models import UserSubscription, SubscriptionEntitlement, EntitlementAuditLog
+    """Upgrade/downgrade user plan using Phase 1 models"""
+    from app.phase1.models.platform_models import UserSubscription, Plan
+    from app.phase8.models.phase8_models import P8EntitlementAuditLog
     db = SessionLocal()
     try:
+        # Find current subscription
         current = db.query(UserSubscription).filter_by(user_id=user_id, status="active").first()
-        old_plan = current.plan_name if current else "None"
         
+        # Find old plan name
+        old_plan_name = "None"
         if current:
+            old_plan = db.query(Plan).filter_by(id=current.plan_id).first()
+            old_plan_name = old_plan.name_en if old_plan else "None"
             current.status = "replaced"
-            current.cancelled_at = utcnow()
+        
+        # Find new plan
+        new_plan = db.query(Plan).filter(
+            (Plan.name_en == new_plan_name) | (Plan.code == new_plan_name.lower())
+        ).first()
+        
+        if not new_plan:
+            return {"status": "error", "detail": f"Plan not found: {new_plan_name}"}
         
         # Create new subscription
         sub = UserSubscription(
             id=gen_uuid(),
             user_id=user_id,
-            plan_id=new_plan_name.lower(),
-            plan_name=new_plan_name,
+            plan_id=new_plan.id,
             status="active",
-            previous_plan_id=current.id if current else None,
         )
         db.add(sub)
         
-        # Delete old entitlements
-        db.query(SubscriptionEntitlement).filter_by(user_id=user_id, source="plan").delete()
-        
-        # Create new entitlements
-        limits = PLAN_LIMITS.get(new_plan_name, PLAN_LIMITS["Free"])
-        for feature_key, feature_value in limits.items():
-            ent = SubscriptionEntitlement(
-                id=gen_uuid(),
-                user_id=user_id,
-                feature_key=feature_key,
-                feature_value=feature_value,
-                source="plan",
-            )
-            db.add(ent)
-        
         # Audit log
-        audit = EntitlementAuditLog(
+        audit = P8EntitlementAuditLog(
             id=gen_uuid(),
             user_id=user_id,
             action="plan_changed",
-            old_plan=old_plan,
+            old_plan=old_plan_name,
             new_plan=new_plan_name,
-            details={"entitlements_count": len(limits)},
             performed_by=user_id,
         )
         db.add(audit)
         
         db.commit()
-        return {"status": "upgraded", "old_plan": old_plan, "new_plan": new_plan_name}
+        return {"status": "upgraded", "old_plan": old_plan_name, "new_plan": new_plan_name}
     except Exception as e:
         db.rollback()
         return {"status": "error", "detail": str(e)}
     finally:
         db.close()
+

@@ -2390,7 +2390,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       final h = {'Authorization': 'Bearer $token'};
       
       // Load current subscription
-      final r1 = await http.get(Uri.parse('$_api/subscriptions/me?authorization=Bearer $token'));
+      final r1 = await http.get(Uri.parse('$_api/subscriptions/me'), headers: {'Authorization': 'Bearer $token'});
       if (r1.statusCode == 200) {
         _sub = jsonDecode(r1.body);
       }
@@ -2409,7 +2409,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Future<void> _upgrade(String planName) async {
     final token = S.token ?? '';
     final r = await http.post(
-      Uri.parse('$_api/subscriptions/upgrade?plan_name=$planName&authorization=Bearer $token')
+      Uri.parse('$_api/subscriptions/upgrade?plan_name=$planName'),
+      headers: {'Authorization': 'Bearer $token'},
     );
     if (r.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
