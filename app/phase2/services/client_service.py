@@ -1,3 +1,4 @@
+import json
 """
 APEX Platform — Client Service
 ═══════════════════════════════════════════════════════════════
@@ -76,7 +77,7 @@ class ClientService:
             db.add(AuditEvent(
                 id=gen_uuid(), user_id=user_id,
                 action="client_created", resource_type="client", resource_id=client.id,
-                details={"type": client_type_code, "knowledge_mode": knowledge_mode},
+                details=json.dumps({"type": client_type_code, "knowledge_mode": knowledge_mode}),
             ))
 
             db.add(Notification(
