@@ -39,6 +39,25 @@ def get_current_user_id(authorization: str = None):
         return None
 
 # ─── GET /subscriptions/me ────────────────────────────────
+
+@router.get("/subscriptions/debug")
+def debug_subscription(authorization: str = None):
+    """Debug endpoint to trace errors"""
+    import traceback
+    result = {}
+    try:
+        result["step1_auth"] = authorization[:50] if authorization else "None"
+        uid = get_current_user_id(authorization)
+        result["step2_user_id"] = uid
+        sub = get_user_subscription(uid) if uid else None
+        result["step3_subscription"] = sub
+        ents = get_all_user_entitlements(uid) if uid else None
+        result["step4_entitlements"] = ents
+    except Exception as e:
+        result["error"] = str(e)
+        result["traceback"] = traceback.format_exc()
+    return result
+
 @router.get("/subscriptions/me")
 def get_my_subscription(authorization: str = None, x_token: str = Header(None, alias="Authorization")):
     """Get current subscription for logged-in user"""
