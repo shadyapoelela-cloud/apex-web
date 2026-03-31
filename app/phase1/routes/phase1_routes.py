@@ -184,42 +184,42 @@ async def list_plans():
     return subscription_service.get_plans()
 
 
-@router.get("/subscriptions/me", tags=["Subscriptions"])
-async def get_my_subscription(user: dict = Depends(get_current_user)):
-    return subscription_service.get_user_subscription(user["sub"])
-
-
-@router.get("/entitlements/me", tags=["Subscriptions"])
-async def get_my_entitlements(user: dict = Depends(get_current_user)):
-    sub = subscription_service.get_user_subscription(user["sub"])
-    return {"entitlements": sub.get("entitlements", {})}
-
-
-@router.post("/subscriptions/upgrade", tags=["Subscriptions"])
-async def upgrade_plan(req: UpgradePlanRequest, user: dict = Depends(get_current_user)):
-    result = subscription_service.upgrade_plan(user["sub"], req.plan_code)
-    if not result["success"]:
-        raise HTTPException(status_code=400, detail=result["error"])
-    return result
-
-
-@router.post("/subscriptions/downgrade", tags=["Subscriptions"])
-async def downgrade_plan(req: UpgradePlanRequest, user: dict = Depends(get_current_user)):
-    result = subscription_service.downgrade_plan(user["sub"], req.plan_code)
-    if not result["success"]:
-        raise HTTPException(status_code=400, detail=result["error"])
-    return result
-
-
-# ─── Entitlement Check API ──────────────────────────────────
-
-@router.get("/entitlements/check", tags=["Subscriptions"])
-async def check_entitlement(feature_code: str, user: dict = Depends(get_current_user)):
-    return entitlement_engine.check_entitlement(user["sub"], feature_code)
-
-
-# ─── Notifications APIs ─────────────────────────────────────
-
+# [DISABLED - moved to Phase 8] @router.get("/subscriptions/me", tags=["Subscriptions"])
+# [DISABLED] async def get_my_subscription(user: dict = Depends(get_current_user)):
+# [DISABLED]     return subscription_service.get_user_subscription(user["sub"])
+# [DISABLED] 
+# [DISABLED] 
+# [DISABLED - moved to Phase 8] @router.get("/entitlements/me", tags=["Subscriptions"])
+# [DISABLED] async def get_my_entitlements(user: dict = Depends(get_current_user)):
+# [DISABLED]     sub = subscription_service.get_user_subscription(user["sub"])
+# [DISABLED]     return {"entitlements": sub.get("entitlements", {})}
+# [DISABLED] 
+# [DISABLED] 
+# [DISABLED - moved to Phase 8] @router.post("/subscriptions/upgrade", tags=["Subscriptions"])
+# [DISABLED] async def upgrade_plan(req: UpgradePlanRequest, user: dict = Depends(get_current_user)):
+# [DISABLED]     result = subscription_service.upgrade_plan(user["sub"], req.plan_code)
+# [DISABLED]     if not result["success"]:
+# [DISABLED]         raise HTTPException(status_code=400, detail=result["error"])
+# [DISABLED]     return result
+# [DISABLED] 
+# [DISABLED] 
+# [DISABLED - moved to Phase 8] @router.post("/subscriptions/downgrade", tags=["Subscriptions"])
+# [DISABLED] async def downgrade_plan(req: UpgradePlanRequest, user: dict = Depends(get_current_user)):
+# [DISABLED]     result = subscription_service.downgrade_plan(user["sub"], req.plan_code)
+# [DISABLED]     if not result["success"]:
+# [DISABLED]         raise HTTPException(status_code=400, detail=result["error"])
+# [DISABLED]     return result
+# [DISABLED] 
+# [DISABLED] 
+# [DISABLED] # ─── Entitlement Check API ──────────────────────────────────
+# [DISABLED] 
+# [DISABLED - moved to Phase 8] @router.get("/entitlements/check", tags=["Subscriptions"])
+# [DISABLED] async def check_entitlement(feature_code: str, user: dict = Depends(get_current_user)):
+# [DISABLED]     return entitlement_engine.check_entitlement(user["sub"], feature_code)
+# [DISABLED] 
+# [DISABLED] 
+# [DISABLED] # ─── Notifications APIs ─────────────────────────────────────
+# [DISABLED] 
 @router.get("/notifications", tags=["Notifications"])
 async def get_notifications(unread_only: bool = False, limit: int = 50, user: dict = Depends(get_current_user)):
     return account_service.get_notifications(user["sub"], unread_only=unread_only, limit=limit)

@@ -298,26 +298,27 @@ async def change_password(body: dict):
     return {"message": "Password changed successfully"}
 
 # --- Entitlements ---
-@app.get("/entitlements/me", tags=["Subscriptions"])
-async def get_my_entitlements():
-    """Get current user entitlements based on subscription plan."""
-    return {
-        "plan": "free",
-        "entitlements": {
-            "coa_uploads_limit": 2,
-            "analysis_runs_limit": 5,
-            "result_details_access": "basic",
-            "knowledge_mode_access": False,
-            "marketplace_access": "browse",
-            "provider_registration_access": True,
-            "priority_support": False,
-            "reviewer_console_access": False,
-            "api_access": False,
-            "enterprise_controls": False,
-            "exports": "limited"
-        }
-    }
-
+# [DISABLED - moved to Phase 8]
+# @app.get("/entitlements/me", tags=["Subscriptions"])
+# async def get_my_entitlements():
+#     """Get current user entitlements based on subscription plan."""
+#     return {
+#         "plan": "free",
+#         "entitlements": {
+#             "coa_uploads_limit": 2,
+#             "analysis_runs_limit": 5,
+#             "result_details_access": "basic",
+#             "knowledge_mode_access": False,
+#             "marketplace_access": "browse",
+#             "provider_registration_access": True,
+#             "priority_support": False,
+#             "reviewer_console_access": False,
+#             "api_access": False,
+#             "enterprise_controls": False,
+#             "exports": "limited"
+#         }
+#     }
+# 
 # --- Plans ---
 @app.get("/plans", tags=["Subscriptions"])
 async def list_plans():
