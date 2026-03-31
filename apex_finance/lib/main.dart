@@ -125,7 +125,10 @@ class _LoginS extends State<LoginScreen> {
       const SizedBox(height: 22),
       SizedBox(width: double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
         child: _l ? const SizedBox(height:20,width:20, child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(fontWeight: FontWeight.bold)))),
-      const SizedBox(height: 12),
+      const SizedBox(height: 8),
+      TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ForgotPasswordScreen())),
+        child: const Text('نسيت كلمة المرور؟', style: TextStyle(color: AC.warn, fontSize: 13))),
+      const SizedBox(height: 4),
       TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const RegScreen())),
         child: const Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f \u0633\u062c\u0651\u0644 \u0627\u0644\u0622\u0646', style: TextStyle(color: AC.gold))),
     ])))));
