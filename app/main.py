@@ -239,6 +239,16 @@ def health():
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9 if "HAS_P9" in globals() else False, "p10": HAS_P10 if "HAS_P10" in globals() else False, "p11": HAS_P11 if "HAS_P11" in globals() else False},
             "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
 
+@app.get("/debug/s2")
+def debug_s2():
+    try:
+        from app.sprint2.routes.sprint2_routes import router as _s2r
+        routes = [{"method": list(r.methods), "path": r.path} for r in _s2r.routes]
+        return {"s2_loaded": True, "routes": routes, "count": len(routes)}
+    except Exception as e:
+        import traceback
+        return {"s2_loaded": False, "error": str(e), "traceback": traceback.format_exc()}
+
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...), industry: str = Query("general"), closing_inventory: float = Query(None)):
     if not file.filename.endswith(('.xlsx', '.xls')): raise HTTPException(400, "Excel only")
