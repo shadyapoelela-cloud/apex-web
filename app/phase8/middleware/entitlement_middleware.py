@@ -39,17 +39,23 @@ def get_all_user_entitlements(user_id: str):
 
 def get_user_subscription(user_id: str):
     """Get active subscription for a user"""
-    from app.phase1.models.platform_models import UserSubscription
+    from app.phase1.models.platform_models import UserSubscription, Plan
     db = SessionLocal()
     try:
         sub = db.query(UserSubscription).filter_by(user_id=user_id, status="active").first()
         if sub:
+            # Get plan name from plans table
+            plan = db.query(Plan).filter_by(id=sub.plan_id).first()
+            plan_name = plan.name_en if plan else "Free"
             return {
                 "id": sub.id,
-                "plan_name": sub.plan_name,
+                "plan_id": sub.plan_id,
+                "plan_name": plan_name,
+                "plan_name_ar": plan.name_ar if plan else "مجاني",
                 "status": sub.status,
+                "billing_cycle": getattr(sub, "billing_cycle", "monthly"),
                 "started_at": str(sub.started_at) if sub.started_at else None,
-                "expires_at": str(sub.expires_at) if sub.expires_at else None,
+                "expires_at": str(getattr(sub, "expires_at", None)) if getattr(sub, "expires_at", None) else None,
             }
         return None
     finally:
