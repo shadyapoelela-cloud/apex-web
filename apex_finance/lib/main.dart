@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:html' as html;
 
 const _api = 'https://apex-api-ootk.onrender.com';
 void main() => runApp(const ApexApp());
@@ -859,6 +860,8 @@ class _AccS extends State<AccountTab> {
           _kv('\u0622\u062e\u0631 \u062f\u062e\u0648\u0644', _s?['last_login']?.toString().substring(0,16)??'-'),
         ]),
         // Menu Items
+                _mi(Icons.account_tree, 'شجرة الحسابات COA', AC.cyan,
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ClientListScreen()))),
         _mi(Icons.workspace_premium, '\u062e\u0637\u062a\u064a \u0648\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643', AC.gold,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SubscriptionScreen()))),
         _mi(Icons.notifications_outlined, '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', AC.cyan,
@@ -3338,3 +3341,719 @@ class _SessionsScreenState extends State<SessionsScreen> {
 }
 
 
+// ═══════════════════════════════════════════════════════════
+// SPRINT 1 — COA FIRST WORKFLOW SCREENS
+// ═══════════════════════════════════════════════════════════
+
+// ── 1. Client List Screen ──
+class ClientListScreen extends StatefulWidget {
+  const ClientListScreen({super.key});
+  @override State<ClientListScreen> createState() => _ClientListS();
+}
+class _ClientListS extends State<ClientListScreen> {
+  List<dynamic> _clients = [];
+  bool _ld = true;
+
+  @override void initState() { super.initState(); _load(); }
+
+  Future<void> _load() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/clients'), headers: S.h());
+      if (r.statusCode == 200) {
+        final d = jsonDecode(r.body);
+        setState(() {
+          _clients = d is List ? d : (d['clients'] ?? []);
+          _ld = false;
+        });
+      } else { setState(() => _ld = false); }
+    } catch (_) { setState(() => _ld = false); }
+  }
+
+  @override
+  Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(title: const Text('العملاء', style: TextStyle(color: AC.gold)),
+      actions: [IconButton(icon: const Icon(Icons.add_circle, color: AC.gold),
+        onPressed: () async {
+          final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen()));
+          if (created == true) _load();
+        })]),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      : _clients.isEmpty
+        ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.business, size: 64, color: AC.ts),
+            const SizedBox(height: 16),
+            const Text('لا يوجد عملاء بعد', style: TextStyle(color: AC.ts, fontSize: 16)),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.add),
+              label: const Text('إنشاء عميل جديد'),
+              onPressed: () async {
+                final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen()));
+                if (created == true) _load();
+              }),
+          ]))
+        : RefreshIndicator(onRefresh: _load, color: AC.gold,
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: _clients.length,
+            itemBuilder: (_, i) {
+              final cl = _clients[i];
+              final km = cl['knowledge_mode'] == true;
+              return Card(
+                color: AC.navy3,
+                margin: const EdgeInsets.only(bottom: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: ListTile(
+                  leading: CircleAvatar(backgroundColor: km ? AC.gold : AC.navy4,
+                    child: Icon(Icons.business, color: km ? AC.navy : AC.ts)),
+                  title: Text(cl['name_ar'] ?? cl['name'] ?? '—', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+                  subtitle: Row(children: [
+                    Text(cl['client_type'] ?? cl['client_type_code'] ?? '', style: TextStyle(color: AC.ts, fontSize: 12)),
+                    if (km) ...[const SizedBox(width: 8),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                        child: const Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)))],
+                  ]),
+                  trailing: const Icon(Icons.chevron_left, color: AC.ts),
+                  onTap: () => Navigator.push(c, MaterialPageRoute(
+                    builder: (_) => CoaUploadScreen(clientId: cl['id'], clientName: cl['name_ar'] ?? cl['name'] ?? ''))),
+                ),
+              );
+            },
+          )),
+  );
+}
+
+// ── 2. Client Create Screen ──
+class ClientCreateScreen extends StatefulWidget {
+  const ClientCreateScreen({super.key});
+  @override State<ClientCreateScreen> createState() => _ClientCreateS();
+}
+class _ClientCreateS extends State<ClientCreateScreen> {
+  final _nameC = TextEditingController();
+  String _type = 'standard_business';
+  List<dynamic> _types = [];
+  bool _ld = false, _loadingTypes = true;
+  String? _err;
+
+  static const _typeLabels = {
+    'standard_business': 'شركة تجارية عادية',
+    'financial_entity': 'جهة مالية',
+    'financing_entity': 'جهة تمويلية',
+    'accounting_firm': 'مكتب محاسبة',
+    'audit_firm': 'مكتب مراجعة',
+    'investment_entity': 'جهة استثمارية',
+    'sector_consulting_entity': 'جهة استشارية',
+    'government_entity': 'جهة حكومية',
+    'legal_regulatory_entity': 'جهة قانونية/تنظيمية',
+  };
+
+  @override void initState() { super.initState(); _loadTypes(); }
+
+  Future<void> _loadTypes() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/client-types'), headers: S.h());
+      if (r.statusCode == 200) {
+        final d = jsonDecode(r.body);
+        setState(() { _types = d is List ? d : []; _loadingTypes = false; });
+      } else { setState(() => _loadingTypes = false); }
+    } catch (_) { setState(() => _loadingTypes = false); }
+  }
+
+  bool get _isKnowledgeEligible {
+    const eligible = {'accounting_firm','audit_firm','government_entity','legal_regulatory_entity','investment_entity','financial_entity','financing_entity','sector_consulting_entity'};
+    return eligible.contains(_type);
+  }
+
+  Future<void> _create() async {
+    if (_nameC.text.trim().isEmpty) { setState(() => _err = 'أدخل اسم العميل'); return; }
+    setState(() { _ld = true; _err = null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/clients'), headers: {...S.h(), 'Content-Type': 'application/json'},
+        body: jsonEncode({'name_ar': _nameC.text.trim(), 'client_type_code': _type}));
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200 && d['success'] == true) {
+        if (mounted) Navigator.pop(context, true);
+      } else { setState(() { _err = d['detail'] ?? d['error'] ?? 'فشل الإنشاء'; _ld = false; }); }
+    } catch (e) { setState(() { _err = 'خطأ: $e'; _ld = false; }); }
+  }
+
+  @override
+  Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(title: const Text('إنشاء عميل جديد', style: TextStyle(color: AC.gold))),
+    body: _loadingTypes ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      : SingleChildScrollView(padding: const EdgeInsets.all(24), child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const Icon(Icons.business, size: 56, color: AC.gold),
+          const SizedBox(height: 20),
+          if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            child: Text(_err!, style: const TextStyle(color: Colors.redAccent), textAlign: TextAlign.center)),
+          TextField(controller: _nameC, style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(labelText: 'اسم العميل / المنشأة', labelStyle: const TextStyle(color: Colors.white54),
+              prefixIcon: const Icon(Icons.business, color: AC.gold),
+              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12)))),
+          const SizedBox(height: 20),
+          const Text('نوع العميل', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 14)),
+          const SizedBox(height: 8),
+          ...(_typeLabels.entries.map((e) => RadioListTile<String>(
+            value: e.key, groupValue: _type, title: Text(e.value, style: const TextStyle(color: AC.tp, fontSize: 14)),
+            subtitle: _isKnowledgeEligibleFor(e.key)
+              ? const Text('مؤهل للمساهمة في العقل المعرفي', style: TextStyle(color: AC.gold, fontSize: 11))
+              : null,
+            activeColor: AC.gold, tileColor: AC.navy3,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            onChanged: (v) => setState(() => _type = v!),
+          )).toList()),
+          const SizedBox(height: 16),
+          if (_isKnowledgeEligible) Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+            child: Row(children: [
+              const Icon(Icons.psychology, color: AC.gold),
+              const SizedBox(width: 8),
+              const Expanded(child: Text('وضع المعرفة سيُفعّل تلقائياً لهذا النوع', style: TextStyle(color: AC.gold, fontSize: 13))),
+            ])),
+          const SizedBox(height: 24),
+          SizedBox(height: 52, child: ElevatedButton(
+            onPressed: _ld ? null : _create,
+            style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            child: _ld ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
+              : const Text('إنشاء العميل', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16)))),
+        ])),
+  );
+
+  bool _isKnowledgeEligibleFor(String type) {
+    const eligible = {'accounting_firm','audit_firm','government_entity','legal_regulatory_entity','investment_entity','financial_entity','financing_entity','sector_consulting_entity'};
+    return eligible.contains(type);
+  }
+}
+
+// ── 3. COA Upload Screen ──
+class CoaUploadScreen extends StatefulWidget {
+  final String clientId;
+  final String clientName;
+  const CoaUploadScreen({super.key, required this.clientId, required this.clientName});
+  @override State<CoaUploadScreen> createState() => _CoaUploadS();
+}
+class _CoaUploadS extends State<CoaUploadScreen> {
+  bool _uploading = false;
+  Map<String, dynamic>? _uploadResult;
+  String? _err;
+
+  Future<void> _pickAndUpload() async {
+    setState(() { _uploading = true; _err = null; });
+    try {
+      final input = html.FileUploadInputElement()..accept = '.csv,.xlsx,.xls';
+      input.click();
+      await input.onChange.first;
+      if (input.files == null || input.files!.isEmpty) { setState(() => _uploading = false); return; }
+      final file = input.files!.first;
+      final reader = html.FileReader();
+      reader.readAsArrayBuffer(file);
+      await reader.onLoadEnd.first;
+      final bytes = reader.result as List<int>;
+
+      final uri = Uri.parse('$_api/clients/${widget.clientId}/coa/upload');
+      final request = http.MultipartRequest('POST', uri);
+      request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: file.name));
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      final d = jsonDecode(body);
+
+      if (response.statusCode == 200) {
+        setState(() { _uploadResult = d; _uploading = false; });
+      } else {
+        setState(() { _err = d['detail']?.toString() ?? d['message'] ?? 'فشل الرفع'; _uploading = false; });
+      }
+    } catch (e) { setState(() { _err = 'خطأ: $e'; _uploading = false; }); }
+  }
+
+  @override
+  Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(title: Text('رفع شجرة الحسابات — ${widget.clientName}', style: const TextStyle(color: AC.gold, fontSize: 14))),
+    body: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        // Step indicator
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          _stepDot('رفع', 1, true), _stepLine(), _stepDot('أعمدة', 2, _uploadResult != null),
+          _stepLine(), _stepDot('تحليل', 3, false), _stepLine(), _stepDot('معاينة', 4, false),
+        ]),
+        const SizedBox(height: 32),
+        if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+          child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 13), textAlign: TextAlign.center)),
+
+        if (_uploadResult == null) ...[
+          Container(
+            padding: const EdgeInsets.all(40),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AC.gold.withOpacity(0.3), width: 2, style: BorderStyle.solid)),
+            child: Column(children: [
+              Icon(_uploading ? Icons.hourglass_top : Icons.cloud_upload, size: 64, color: AC.gold),
+              const SizedBox(height: 16),
+              Text(_uploading ? 'جاري رفع الملف...' : 'اختر ملف شجرة الحسابات',
+                style: const TextStyle(color: AC.tp, fontSize: 16)),
+              const SizedBox(height: 8),
+              const Text('CSV / Excel (.xlsx / .xls)', style: TextStyle(color: AC.ts, fontSize: 13)),
+              const SizedBox(height: 8),
+              const Text('الحد الأقصى: 15 ميجابايت', style: TextStyle(color: AC.ts, fontSize: 12)),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.file_upload),
+                label: Text(_uploading ? 'جاري الرفع...' : 'اختيار ملف'),
+                onPressed: _uploading ? null : _pickAndUpload,
+                style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14))),
+            ])),
+        ] else ...[
+          // Upload success — show detection results
+          Container(padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+            child: Row(children: [
+              const Icon(Icons.check_circle, color: Colors.greenAccent),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('تم رفع: ${_uploadResult!['file_name']}', style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
+                Text('الأعمدة المكتشفة: ${(_uploadResult!['detected_columns'] as List?)?.length ?? 0}',
+                  style: const TextStyle(color: AC.ts, fontSize: 12)),
+              ])),
+            ])),
+          const SizedBox(height: 16),
+          if ((_uploadResult!['warnings'] as List?)?.isNotEmpty == true)
+            ...(_uploadResult!['warnings'] as List).map((w) => Container(
+              padding: const EdgeInsets.all(8), margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(color: AC.warn.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+              child: Text(w.toString(), style: const TextStyle(color: AC.warn, fontSize: 12)))),
+          const SizedBox(height: 16),
+          SizedBox(height: 52, child: ElevatedButton.icon(
+            icon: const Icon(Icons.table_chart),
+            label: const Text('مراجعة الأعمدة المكتشفة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            onPressed: () => Navigator.push(c, MaterialPageRoute(
+              builder: (_) => CoaColumnMappingScreen(
+                uploadId: _uploadResult!['upload_id'],
+                clientId: widget.clientId,
+                clientName: widget.clientName,
+                detectedColumns: List<String>.from(_uploadResult!['detected_columns'] ?? []),
+                suggestedMapping: Map<String, dynamic>.from(_uploadResult!['suggested_column_mapping'] ?? {}),
+                sampleRows: List<Map<String, dynamic>>.from(
+                  (_uploadResult!['sample_rows'] as List?)?.map((r) => Map<String, dynamic>.from(r)) ?? []),
+              ))),
+            style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy))),
+        ],
+      ])),
+  );
+
+  Widget _stepDot(String label, int num, bool active) => Column(mainAxisSize: MainAxisSize.min, children: [
+    Container(width: 32, height: 32,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: active ? AC.gold : AC.navy4,
+        border: Border.all(color: active ? AC.gold : AC.ts, width: 2)),
+      child: Center(child: Text('$num', style: TextStyle(color: active ? AC.navy : AC.ts, fontWeight: FontWeight.bold, fontSize: 13)))),
+    const SizedBox(height: 4),
+    Text(label, style: TextStyle(color: active ? AC.gold : AC.ts, fontSize: 11)),
+  ]);
+  Widget _stepLine() => Container(width: 30, height: 2, color: AC.ts.withOpacity(0.3), margin: const EdgeInsets.only(bottom: 16));
+}
+
+// ── 4. Column Mapping Screen ──
+class CoaColumnMappingScreen extends StatefulWidget {
+  final String uploadId, clientId, clientName;
+  final List<String> detectedColumns;
+  final Map<String, dynamic> suggestedMapping;
+  final List<Map<String, dynamic>> sampleRows;
+  const CoaColumnMappingScreen({super.key, required this.uploadId, required this.clientId, required this.clientName,
+    required this.detectedColumns, required this.suggestedMapping, required this.sampleRows});
+  @override State<CoaColumnMappingScreen> createState() => _CoaColMapS();
+}
+class _CoaColMapS extends State<CoaColumnMappingScreen> {
+  late Map<String, String?> _mapping;
+  bool _parsing = false;
+  String? _err;
+
+  static const _fieldLabels = {
+    'account_code': 'رقم الحساب',
+    'account_name': 'اسم الحساب ✱',
+    'parent_code': 'رقم الأب',
+    'parent_name': 'اسم الأب',
+    'level': 'المستوى',
+    'account_type': 'نوع الحساب',
+    'normal_balance': 'طبيعة الرصيد',
+    'active_flag': 'مفعل',
+    'notes': 'ملاحظات',
+  };
+
+  @override void initState() {
+    super.initState();
+    _mapping = {};
+    widget.suggestedMapping.forEach((k, v) { _mapping[k] = v?.toString(); });
+  }
+
+  Future<void> _parse() async {
+    if (_mapping['account_name'] == null || _mapping['account_name']!.isEmpty) {
+      setState(() => _err = 'حقل "اسم الحساب" إلزامي!');
+      return;
+    }
+    setState(() { _parsing = true; _err = null; });
+    try {
+      final cleanMapping = <String, String>{};
+      _mapping.forEach((k, v) { if (v != null && v.isNotEmpty) cleanMapping[k] = v; });
+
+      final r = await http.post(Uri.parse('$_api/coa/uploads/${widget.uploadId}/parse'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'column_mapping': cleanMapping}));
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200) {
+        if (mounted) Navigator.push(context, MaterialPageRoute(
+          builder: (_) => CoaParsedPreviewScreen(
+            uploadId: widget.uploadId, clientId: widget.clientId, clientName: widget.clientName, parseResult: d)));
+      } else {
+        setState(() { _err = d['detail']?.toString() ?? d['message'] ?? 'فشل التحليل'; _parsing = false; });
+      }
+    } catch (e) { setState(() { _err = 'خطأ: $e'; _parsing = false; }); }
+  }
+
+  @override
+  Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(title: const Text('ربط الأعمدة', style: TextStyle(color: AC.gold))),
+    body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          _stepDot('رفع', 1, true), _stepLine(), _stepDot('أعمدة', 2, true),
+          _stepLine(), _stepDot('تحليل', 3, false), _stepLine(), _stepDot('معاينة', 4, false),
+        ]),
+        const SizedBox(height: 20),
+        if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+          child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 13), textAlign: TextAlign.center)),
+        const Text('اربط كل عمود في ملفك بالحقل المناسب:', style: TextStyle(color: AC.ts, fontSize: 13)),
+        const SizedBox(height: 12),
+        ..._fieldLabels.entries.map((e) => Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
+          child: Row(children: [
+            SizedBox(width: 110, child: Text(e.value, style: TextStyle(color: e.key == 'account_name' ? AC.gold : AC.tp, fontSize: 13, fontWeight: FontWeight.bold))),
+            const Icon(Icons.arrow_back, color: AC.ts, size: 16),
+            const SizedBox(width: 8),
+            Expanded(child: DropdownButtonFormField<String>(
+              value: _mapping[e.key],
+              decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 8)),
+              dropdownColor: AC.navy3,
+              style: const TextStyle(color: AC.tp, fontSize: 13),
+              hint: const Text('— غير محدد —', style: TextStyle(color: AC.ts, fontSize: 12)),
+              items: [
+                const DropdownMenuItem(value: '', child: Text('— غير محدد —', style: TextStyle(color: AC.ts, fontSize: 12))),
+                ...widget.detectedColumns.map((col) => DropdownMenuItem(value: col, child: Text(col, style: const TextStyle(fontSize: 13)))),
+              ],
+              onChanged: (v) => setState(() => _mapping[e.key] = (v == '') ? null : v),
+            )),
+          ]))),
+        if (widget.sampleRows.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          const Text('عينة من البيانات:', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 13)),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(8)),
+            child: SingleChildScrollView(scrollDirection: Axis.horizontal,
+              child: DataTable(
+                headingRowColor: WidgetStateProperty.all(AC.navy4),
+                columns: widget.detectedColumns.map((col) => DataColumn(
+                  label: Text(col, style: const TextStyle(color: AC.gold, fontSize: 11, fontWeight: FontWeight.bold)))).toList(),
+                rows: widget.sampleRows.take(3).map((row) => DataRow(
+                  cells: widget.detectedColumns.map((col) => DataCell(
+                    Text((row[col] ?? '').toString(), style: const TextStyle(color: AC.tp, fontSize: 11)))).toList())).toList(),
+              ))),
+        ],
+        const SizedBox(height: 24),
+        SizedBox(height: 52, child: ElevatedButton.icon(
+          icon: Icon(_parsing ? Icons.hourglass_top : Icons.analytics),
+          label: Text(_parsing ? 'جاري التحليل...' : 'تحليل شجرة الحسابات', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          onPressed: _parsing ? null : _parse,
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade700, foregroundColor: Colors.white))),
+      ])),
+  );
+
+  Widget _stepDot(String label, int num, bool active) => Column(mainAxisSize: MainAxisSize.min, children: [
+    Container(width: 32, height: 32,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: active ? AC.gold : AC.navy4,
+        border: Border.all(color: active ? AC.gold : AC.ts, width: 2)),
+      child: Center(child: Text('$num', style: TextStyle(color: active ? AC.navy : AC.ts, fontWeight: FontWeight.bold, fontSize: 13)))),
+    const SizedBox(height: 4),
+    Text(label, style: TextStyle(color: active ? AC.gold : AC.ts, fontSize: 11)),
+  ]);
+  Widget _stepLine() => Container(width: 30, height: 2, color: AC.ts.withOpacity(0.3), margin: const EdgeInsets.only(bottom: 16));
+}
+
+// ── 5. COA Parsed Preview Screen ──
+class CoaParsedPreviewScreen extends StatefulWidget {
+  final String uploadId, clientId, clientName;
+  final Map<String, dynamic> parseResult;
+  const CoaParsedPreviewScreen({super.key, required this.uploadId, required this.clientId, required this.clientName, required this.parseResult});
+  @override State<CoaParsedPreviewScreen> createState() => _CoaParsedS();
+}
+class _CoaParsedS extends State<CoaParsedPreviewScreen> {
+  List<dynamic> _accounts = [];
+  int _total = 0, _page = 1;
+  String _filter = 'all';
+  bool _ld = false;
+
+  @override void initState() { super.initState(); _accounts = widget.parseResult['preview_rows'] ?? []; _total = widget.parseResult['total_rows_parsed'] ?? 0; }
+
+  Future<void> _loadPage({String? filter}) async {
+    setState(() { _ld = true; if (filter != null) _filter = filter; });
+    try {
+      String url = '$_api/coa/uploads/${widget.uploadId}/accounts?page=$_page&page_size=30';
+      if (_filter == 'issues') url += '&has_issues=true';
+      if (_filter == 'rejected') url += '&record_status=rejected';
+      final r = await http.get(Uri.parse(url));
+      if (r.statusCode == 200) {
+        final d = jsonDecode(r.body);
+        setState(() { _accounts = d['accounts'] ?? []; _total = d['total'] ?? 0; _ld = false; });
+      } else { setState(() => _ld = false); }
+    } catch (_) { setState(() => _ld = false); }
+  }
+
+  @override
+  Widget build(BuildContext c) {
+    final pr = widget.parseResult;
+    return Scaffold(
+      backgroundColor: AC.navy,
+      appBar: AppBar(title: const Text('نتائج التحليل', style: TextStyle(color: AC.gold)),
+        actions: [IconButton(icon: const Icon(Icons.feedback_outlined, color: AC.gold),
+          tooltip: 'ملاحظات معرفية',
+          onPressed: () => Navigator.push(c, MaterialPageRoute(
+            builder: (_) => CoaKnowledgeFeedbackScreen(clientId: widget.clientId, uploadId: widget.uploadId))))]),
+      body: Column(children: [
+        // Summary cards
+        Padding(padding: const EdgeInsets.all(12), child: Row(children: [
+          _card('المكتشفة', '${pr['total_rows_detected'] ?? 0}', AC.cyan),
+          const SizedBox(width: 8),
+          _card('المقبولة', '${pr['total_rows_parsed'] ?? 0}', Colors.greenAccent),
+          const SizedBox(width: 8),
+          _card('المرفوضة', '${pr['total_rows_rejected'] ?? 0}', AC.err),
+        ])),
+        // Warnings
+        if ((pr['warnings'] as List?)?.isNotEmpty == true)
+          Container(margin: const EdgeInsets.symmetric(horizontal: 12), padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: AC.warn.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+            child: Column(children: (pr['warnings'] as List).map((w) =>
+              Text(w.toString(), style: const TextStyle(color: AC.warn, fontSize: 12))).toList())),
+        // Filter tabs
+        Padding(padding: const EdgeInsets.all(12), child: Row(children: [
+          _filterChip('الكل', 'all'), const SizedBox(width: 8),
+          _filterChip('بها مشاكل', 'issues'), const SizedBox(width: 8),
+          _filterChip('مرفوضة', 'rejected'),
+        ])),
+        // Accounts list
+        Expanded(child: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
+          : _accounts.isEmpty ? const Center(child: Text('لا توجد نتائج', style: TextStyle(color: AC.ts)))
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: _accounts.length,
+              itemBuilder: (_, i) {
+                final a = _accounts[i];
+                final issues = (a['issues'] as List?) ?? [];
+                final hasIssue = issues.isNotEmpty;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10),
+                    border: hasIssue ? Border.all(color: AC.warn.withOpacity(0.5)) : null),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      if (a['account_code'] != null) Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(color: AC.cyan.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
+                        child: Text(a['account_code'], style: const TextStyle(color: AC.cyan, fontSize: 12, fontFamily: 'monospace'))),
+                      if (a['account_code'] != null) const SizedBox(width: 8),
+                      Expanded(child: Text(a['account_name_raw'] ?? '', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14))),
+                      if (a['account_level'] != null)
+                        Text('L${a['account_level']}', style: const TextStyle(color: AC.ts, fontSize: 11)),
+                    ]),
+                    if (a['normal_balance'] != null || a['account_type_raw'] != null)
+                      Padding(padding: const EdgeInsets.only(top: 4), child: Row(children: [
+                        if (a['normal_balance'] != null) Text(a['normal_balance'] == 'debit' ? 'مدين' : 'دائن',
+                          style: TextStyle(color: a['normal_balance'] == 'debit' ? AC.cyan : AC.gold, fontSize: 11)),
+                        if (a['account_type_raw'] != null) ...[const SizedBox(width: 8),
+                          Text(a['account_type_raw'], style: const TextStyle(color: AC.ts, fontSize: 11))],
+                      ])),
+                    if (hasIssue)
+                      Padding(padding: const EdgeInsets.only(top: 4), child: Wrap(spacing: 4,
+                        children: issues.map((iss) => Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(color: AC.warn.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
+                          child: Text(iss.toString(), style: const TextStyle(color: AC.warn, fontSize: 10)))).toList())),
+                  ]),
+                );
+              })),
+        // Pagination
+        Padding(padding: const EdgeInsets.all(12), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          IconButton(icon: const Icon(Icons.chevron_right, color: AC.ts),
+            onPressed: _page > 1 ? () { setState(() => _page--); _loadPage(); } : null),
+          Text('صفحة $_page', style: const TextStyle(color: AC.ts)),
+          IconButton(icon: const Icon(Icons.chevron_left, color: AC.ts),
+            onPressed: _total > _page * 30 ? () { setState(() => _page++); _loadPage(); } : null),
+        ])),
+      ]),
+    );
+  }
+
+  Widget _card(String label, String value, Color color) => Expanded(child: Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
+    child: Column(children: [
+      Text(value, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.bold)),
+      Text(label, style: const TextStyle(color: AC.ts, fontSize: 11)),
+    ])));
+
+  Widget _filterChip(String label, String value) => GestureDetector(
+    onTap: () { setState(() { _filter = value; _page = 1; }); _loadPage(); },
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: _filter == value ? AC.gold.withOpacity(0.2) : AC.navy3,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _filter == value ? AC.gold : Colors.transparent)),
+      child: Text(label, style: TextStyle(color: _filter == value ? AC.gold : AC.ts, fontSize: 12))));
+}
+
+// ── 6. Knowledge Feedback Screen ──
+class CoaKnowledgeFeedbackScreen extends StatefulWidget {
+  final String clientId;
+  final String? uploadId;
+  const CoaKnowledgeFeedbackScreen({super.key, required this.clientId, this.uploadId});
+  @override State<CoaKnowledgeFeedbackScreen> createState() => _KnowledgeFBS();
+}
+class _KnowledgeFBS extends State<CoaKnowledgeFeedbackScreen> {
+  final _textC = TextEditingController();
+  String _category = 'data_quality_note';
+  String? _severity;
+  List<dynamic> _feedbacks = [];
+  bool _ld = true, _sending = false;
+  String? _err, _ok;
+
+  static const _categories = {
+    'data_quality_note': 'ملاحظة جودة بيانات',
+    'taxonomy_note': 'ملاحظة تصنيفية',
+    'regulatory_note': 'ملاحظة تنظيمية',
+    'accounting_note': 'ملاحظة محاسبية',
+    'legal_note': 'ملاحظة قانونية',
+    'parsing_issue': 'مشكلة في القراءة',
+    'column_mapping_issue': 'مشكلة في ربط الأعمدة',
+    'suggested_classification': 'اقتراح تصنيف',
+  };
+
+  @override void initState() { super.initState(); _loadFeedbacks(); }
+
+  Future<void> _loadFeedbacks() async {
+    try {
+      String url = '$_api/coa/knowledge-feedback?client_id=${widget.clientId}';
+      if (widget.uploadId != null) url += '&coa_upload_id=${widget.uploadId}';
+      final r = await http.get(Uri.parse(url));
+      if (r.statusCode == 200) {
+        setState(() { _feedbacks = jsonDecode(r.body)['feedback'] ?? []; _ld = false; });
+      } else { setState(() => _ld = false); }
+    } catch (_) { setState(() => _ld = false); }
+  }
+
+  Future<void> _send() async {
+    if (_textC.text.trim().isEmpty) { setState(() => _err = 'أدخل نص الملاحظة'); return; }
+    setState(() { _sending = true; _err = null; _ok = null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/coa/knowledge-feedback'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'client_id': widget.clientId,
+          'coa_upload_id': widget.uploadId,
+          'feedback_category': _category,
+          'feedback_severity': _severity,
+          'feedback_text': _textC.text.trim(),
+        }));
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200) {
+        setState(() { _ok = 'تم حفظ الملاحظة بنجاح'; _textC.clear(); _sending = false; });
+        _loadFeedbacks();
+      } else { setState(() { _err = d['detail']?.toString() ?? 'فشل الإرسال'; _sending = false; }); }
+    } catch (e) { setState(() { _err = 'خطأ: $e'; _sending = false; }); }
+  }
+
+  @override
+  Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    appBar: AppBar(title: const Text('لوحة المعرفة', style: TextStyle(color: AC.gold))),
+    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      : SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const Icon(Icons.psychology, size: 48, color: AC.gold),
+          const SizedBox(height: 8),
+          const Text('أضف ملاحظة معرفية', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          const SizedBox(height: 16),
+          if (_ok != null) Container(padding: const EdgeInsets.all(10), margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(color: Colors.green.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            child: Text(_ok!, style: const TextStyle(color: Colors.greenAccent), textAlign: TextAlign.center)),
+          if (_err != null) Container(padding: const EdgeInsets.all(10), margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            child: Text(_err!, style: const TextStyle(color: Colors.redAccent), textAlign: TextAlign.center)),
+          DropdownButtonFormField<String>(
+            value: _category, dropdownColor: AC.navy3,
+            decoration: InputDecoration(labelText: 'نوع الملاحظة', labelStyle: const TextStyle(color: AC.ts),
+              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12))),
+            style: const TextStyle(color: AC.tp, fontSize: 14),
+            items: _categories.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+            onChanged: (v) => setState(() => _category = v!)),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: _severity, dropdownColor: AC.navy3,
+            decoration: InputDecoration(labelText: 'الأهمية (اختياري)', labelStyle: const TextStyle(color: AC.ts),
+              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12))),
+            style: const TextStyle(color: AC.tp, fontSize: 14),
+            items: const [
+              DropdownMenuItem(value: null, child: Text('— غير محدد —', style: TextStyle(color: AC.ts))),
+              DropdownMenuItem(value: 'low', child: Text('منخفضة')),
+              DropdownMenuItem(value: 'medium', child: Text('متوسطة')),
+              DropdownMenuItem(value: 'high', child: Text('عالية')),
+              DropdownMenuItem(value: 'critical', child: Text('حرجة')),
+            ],
+            onChanged: (v) => setState(() => _severity = v)),
+          const SizedBox(height: 12),
+          TextField(controller: _textC, maxLines: 4, style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(labelText: 'نص الملاحظة', labelStyle: const TextStyle(color: AC.ts),
+              hintText: 'اشرح الملاحظة أو التصحيح المقترح...', hintStyle: TextStyle(color: AC.ts.withOpacity(0.5)),
+              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12)))),
+          const SizedBox(height: 16),
+          SizedBox(height: 48, child: ElevatedButton.icon(
+            icon: Icon(_sending ? Icons.hourglass_top : Icons.send),
+            label: Text(_sending ? 'جاري الإرسال...' : 'إرسال الملاحظة'),
+            onPressed: _sending ? null : _send,
+            style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy))),
+          const SizedBox(height: 24),
+          if (_feedbacks.isNotEmpty) ...[
+            const Text('الملاحظات السابقة', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ..._feedbacks.map((f) => Container(
+              margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: AC.cyan.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
+                    child: Text(_categories[f['feedback_category']] ?? f['feedback_category'], style: const TextStyle(color: AC.cyan, fontSize: 10))),
+                  const Spacer(),
+                  Text(f['status'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 10)),
+                ]),
+                const SizedBox(height: 6),
+                Text(f['feedback_text'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13)),
+                Text(f['created_at']?.toString().substring(0, 16) ?? '', style: const TextStyle(color: AC.ts, fontSize: 10)),
+              ]))),
+          ],
+        ])),
+  );
+}
