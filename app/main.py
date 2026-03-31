@@ -140,9 +140,7 @@ def startup():
         except Exception as e: print(f"P1 err: {e}")
     if P2:
         try: print(f"P2: {seed_client_types()}")
-    if HAS_S1:
-        try: print(f"S1: {init_sprint1_db()}")
-        except Exception as e: print(f"S1 err: {e}")
+
         except Exception as e: print(f"P2 err: {e}")
 
 for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
