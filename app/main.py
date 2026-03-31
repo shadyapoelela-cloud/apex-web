@@ -93,6 +93,17 @@ except Exception as e:
     HAS_P10 = False
     print(f"Phase 10 disabled: {e}")
 
+# Phase 11 — Legal Acceptance
+try:
+    from app.phase11.models.phase11_models import init_phase11_db
+    from app.phase11.routes.phase11_routes import router as p11r
+    from app.phase11.services.legal_service import seed_legal_documents
+    HAS_P11 = True
+except Exception as e:
+    HAS_P11 = False
+    print(f"Phase 11 disabled: {e}")
+
+
 
 
 app = FastAPI(title="APEX Financial Platform API", description="منصة أبكس للتحليل المالي — النسخة النهائية", version="5.1.0")
@@ -134,6 +145,8 @@ if HAS_P9:
     app.include_router(p9r, tags=["Phase 9"])
 if HAS_P10:
     app.include_router(p10r, tags=["Phase 10"])
+if HAS_P11:
+    app.include_router(p11r, tags=["Phase 11"])
 
 @app.get("/")
 def root():
@@ -172,7 +185,7 @@ def reinit_db(secret: str = Query(...)):
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "6.0.0",
-            "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9 if "HAS_P9" in globals() else False, "p10": HAS_P10 if "HAS_P10" in globals() else False},
+            "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9 if "HAS_P9" in globals() else False, "p10": HAS_P10 if "HAS_P10" in globals() else False, "p11": HAS_P11 if "HAS_P11" in globals() else False},
             "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
 
 @app.post("/analyze")
