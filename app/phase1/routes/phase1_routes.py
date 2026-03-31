@@ -134,15 +134,6 @@ async def logout_all(user: dict = Depends(get_current_user)):
     return auth_service.logout_all(user["sub"])
 
 
-@router.post("/auth/change-password", tags=["Auth"])
-async def change_password(req: ChangePasswordRequest, request: Request, user: dict = Depends(get_current_user)):
-    return auth_service.change_password(
-        user_id=user["sub"],
-        current_password=req.current_password,
-        new_password=req.new_password,
-        ip_address=request.client.host if request.client else None,
-    )
-
 
 @router.post("/auth/forgot-password", tags=["Auth"])
 async def forgot_password(req: ForgotPasswordRequest):
@@ -277,3 +268,41 @@ async def request_closure(req: ClosureRequest, user: dict = Depends(get_current_
 @router.post("/account/reactivate", tags=["Account"])
 async def reactivate(user: dict = Depends(get_current_user)):
     return account_service.reactivate_account(user["sub"])
+
+@router.post("/auth/change-password", tags=["Auth"])
+async def api_change_password(request: Request):
+    import jwt, os, traceback
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer "):
+        raise HTTPException(401, "Missing token")
+    token = auth.replace("Bearer ", "")
+    secret = os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION")
+    try:
+        payload = jwt.decode(token, secret, algorithms=["HS256"])
+        user_id = payload.get("user_id") or payload.get("sub")
+    except Exception as e:
+        raise HTTPException(401, f"Token error: {e}")
+    body = await request.json()
+    current_pw = body.get("current_password", "")
+    new_pw = body.get("new_password", "")
+    if not current_pw or not new_pw:
+        raise HTTPException(400, "current_password and new_password required")
+    try:
+        from app.phase1.services.auth_service import verify_password, hash_password
+        from app.phase1.models.platform_models import SessionLocal, User
+        db = SessionLocal()
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            db.close()
+            raise HTTPException(404, "User not found")
+        if not verify_password(current_pw, user.password_hash):
+            db.close()
+            raise HTTPException(401, "Current password incorrect")
+        user.password_hash = hash_password(new_pw)
+        db.commit()
+        db.close()
+        return {"status": "ok", "message": "Password changed successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Error: {traceback.format_exc()}")
