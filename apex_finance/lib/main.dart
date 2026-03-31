@@ -2607,3 +2607,342 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
     return Colors.white;
   }
 }
+
+// ═══════════════════════════════════════════════════════════
+// ForgotPasswordScreen — استعادة كلمة المرور
+// Phase 9 Account Center §6
+// ═══════════════════════════════════════════════════════════
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+  @override State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _emailC = TextEditingController();
+  String? _msg;
+  String? _token;
+  bool _loading = false;
+  bool _sent = false;
+
+  Future<void> _submit() async {
+    if (_emailC.text.trim().isEmpty) {
+      setState(() => _msg = 'أدخل البريد الإلكتروني');
+      return;
+    }
+    setState(() { _loading = true; _msg = null; });
+    try {
+      final r = await http.post(
+        Uri.parse('$_api/account/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': _emailC.text.trim()}),
+      );
+      final data = jsonDecode(r.body);
+      if (r.statusCode == 200) {
+        setState(() {
+          _sent = true;
+          _msg = data['message'] ?? 'تم الإرسال';
+          _token = data['reset_token'];
+        });
+      } else {
+        setState(() => _msg = data['detail'] ?? 'حدث خطأ');
+      }
+    } catch (e) {
+      setState(() => _msg = 'خطأ في الاتصال');
+    }
+    setState(() => _loading = false);
+  }
+
+  void _goToReset() {
+    if (_token != null) {
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => ResetPasswordScreen(token: _token!),
+      ));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
+      backgroundColor: AC.navy,
+      appBar: AppBar(title: const Text('استعادة كلمة المرور'), backgroundColor: AC.navy2),
+      body: Padding(padding: const EdgeInsets.all(24), child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 40),
+          const Icon(Icons.lock_reset, color: AC.gold, size: 64),
+          const SizedBox(height: 24),
+          Text('أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AC.tp, fontSize: 16)),
+          const SizedBox(height: 24),
+          TextField(
+            controller: _emailC,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'البريد الإلكتروني',
+              labelStyle: TextStyle(color: AC.ts),
+              prefixIcon: const Icon(Icons.email, color: AC.gold),
+              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.bdr)),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold)),
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (_msg != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _sent ? AC.ok.withOpacity(0.15) : AC.err.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(_msg!, style: TextStyle(color: _sent ? AC.ok : AC.err)),
+            ),
+          const SizedBox(height: 20),
+          if (!_sent)
+            ElevatedButton(
+              onPressed: _loading ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AC.gold, foregroundColor: AC.navy,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: _loading
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Text('إرسال رابط إعادة التعيين', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          if (_sent && _token != null) ...[
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _goToReset,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AC.cyan, foregroundColor: AC.navy,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text('إعادة تعيين كلمة المرور الآن', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ],
+      )),
+    ));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ResetPasswordScreen — إعادة تعيين كلمة المرور
+// ═══════════════════════════════════════════════════════════
+class ResetPasswordScreen extends StatefulWidget {
+  final String token;
+  const ResetPasswordScreen({super.key, required this.token});
+  @override State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+}
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+  final _passC = TextEditingController();
+  final _confirmC = TextEditingController();
+  String? _msg;
+  bool _loading = false;
+  bool _success = false;
+
+  Future<void> _submit() async {
+    if (_passC.text.length < 6) {
+      setState(() => _msg = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      return;
+    }
+    if (_passC.text != _confirmC.text) {
+      setState(() => _msg = 'كلمتا المرور غير متطابقتين');
+      return;
+    }
+    setState(() { _loading = true; _msg = null; });
+    try {
+      final r = await http.post(
+        Uri.parse('$_api/account/reset-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'token': widget.token, 'new_password': _passC.text}),
+      );
+      final data = jsonDecode(r.body);
+      if (r.statusCode == 200) {
+        setState(() { _success = true; _msg = data['message'] ?? 'تم التغيير بنجاح'; });
+      } else {
+        setState(() => _msg = data['detail'] ?? 'حدث خطأ');
+      }
+    } catch (e) {
+      setState(() => _msg = 'خطأ في الاتصال');
+    }
+    setState(() => _loading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
+      backgroundColor: AC.navy,
+      appBar: AppBar(title: const Text('إعادة تعيين كلمة المرور'), backgroundColor: AC.navy2),
+      body: Padding(padding: const EdgeInsets.all(24), child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 40),
+          TextField(
+            controller: _passC, obscureText: true,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'كلمة المرور الجديدة', labelStyle: TextStyle(color: AC.ts),
+              prefixIcon: const Icon(Icons.lock, color: AC.gold),
+              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.bdr)),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold)),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _confirmC, obscureText: true,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'تأكيد كلمة المرور', labelStyle: TextStyle(color: AC.ts),
+              prefixIcon: const Icon(Icons.lock_outline, color: AC.gold),
+              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.bdr)),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold)),
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (_msg != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _success ? AC.ok.withOpacity(0.15) : AC.err.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(_msg!, style: TextStyle(color: _success ? AC.ok : AC.err)),
+            ),
+          const SizedBox(height: 20),
+          if (!_success)
+            ElevatedButton(
+              onPressed: _loading ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AC.gold, foregroundColor: AC.navy,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: _loading
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Text('تعيين كلمة المرور', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          if (_success)
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AC.ok, foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text('العودة لتسجيل الدخول', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+        ],
+      )),
+    ));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SessionsScreen — إدارة الجلسات النشطة
+// Phase 9 Account Center §6
+// ═══════════════════════════════════════════════════════════
+class SessionsScreen extends StatefulWidget {
+  const SessionsScreen({super.key});
+  @override State<SessionsScreen> createState() => _SessionsScreenState();
+}
+class _SessionsScreenState extends State<SessionsScreen> {
+  List<dynamic> _sessions = [];
+  bool _loading = true;
+
+  @override void initState() { super.initState(); _load(); }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final r = await http.get(
+        Uri.parse('$_api/account/sessions'),
+        headers: {'Authorization': 'Bearer ${S.token}'},
+      );
+      if (r.statusCode == 200) {
+        final data = jsonDecode(r.body);
+        setState(() => _sessions = data['sessions'] ?? []);
+      }
+    } catch (_) {}
+    setState(() => _loading = false);
+  }
+
+  Future<void> _logoutAll() async {
+    final r = await http.post(
+      Uri.parse('$_api/account/sessions/logout-all'),
+      headers: {'Authorization': 'Bearer ${S.token}'},
+    );
+    if (r.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم إنهاء جميع الجلسات'), backgroundColor: Colors.green));
+      _load();
+    }
+  }
+
+  Future<void> _logoutOne(String id) async {
+    final r = await http.post(
+      Uri.parse('$_api/account/sessions/$id/logout'),
+      headers: {'Authorization': 'Bearer ${S.token}'},
+    );
+    if (r.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم إنهاء الجلسة'), backgroundColor: Colors.green));
+      _load();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
+      backgroundColor: AC.navy,
+      appBar: AppBar(
+        title: const Text('الجلسات النشطة'), backgroundColor: AC.navy2,
+        actions: [
+          TextButton.icon(
+            onPressed: _logoutAll,
+            icon: const Icon(Icons.logout, color: AC.err, size: 18),
+            label: const Text('إنهاء الكل', style: TextStyle(color: AC.err, fontSize: 12)),
+          ),
+        ],
+      ),
+      body: _loading
+        ? const Center(child: CircularProgressIndicator(color: AC.gold))
+        : _sessions.isEmpty
+          ? Center(child: Text('لا توجد جلسات نشطة', style: TextStyle(color: AC.ts)))
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _sessions.length,
+              itemBuilder: (_, i) {
+                final s = _sessions[i];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AC.navy3, borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AC.bdr),
+                  ),
+                  child: Row(children: [
+                    const Icon(Icons.devices, color: AC.cyan, size: 32),
+                    const SizedBox(width: 12),
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(s['device_info'] ?? 'جهاز غير معروف',
+                          style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text('IP: ${s['ip_address'] ?? '—'}',
+                          style: TextStyle(color: AC.ts, fontSize: 12)),
+                        Text('آخر نشاط: ${s['last_activity']?.toString().substring(0, 16) ?? '—'}',
+                          style: TextStyle(color: AC.ts, fontSize: 12)),
+                      ],
+                    )),
+                    IconButton(
+                      onPressed: () => _logoutOne(s['id']),
+                      icon: const Icon(Icons.close, color: AC.err),
+                      tooltip: 'إنهاء الجلسة',
+                    ),
+                  ]),
+                );
+              },
+            ),
+    ));
+  }
+}
+
+

@@ -74,6 +74,16 @@ except Exception as e:
     print(f"Phase 8 import warning: {e}")
     HAS_P8 = False
 
+# Phase 9 — Account Center
+try:
+    from app.phase9.models.phase9_models import init_phase9_db
+    from app.phase9.routes.phase9_routes import router as p9r
+    HAS_P9 = True
+except Exception as e:
+    HAS_P9 = False
+    print(f"Phase 9 disabled: {e}")
+
+
 app = FastAPI(title="APEX Financial Platform API", description="منصة أبكس للتحليل المالي — النسخة النهائية", version="5.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
@@ -109,6 +119,8 @@ if HAS_P7:
     app.include_router(p7r, prefix="", tags=["Phase 7"])
 if HAS_P8:
     app.include_router(p8r, prefix="", tags=["Phase 8"])
+if HAS_P9:
+    app.include_router(p9r, tags=["Phase 9"])
 
 @app.get("/")
 def root():
