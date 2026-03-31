@@ -17,7 +17,7 @@ import jwt, os
 
 router = APIRouter(prefix="/account", tags=["Account Center"])
 
-JWT_SECRET = os.environ.get("JWT_SECRET", "apex-jwt-secret-2026")
+JWT_SECRET = os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION")
 
 def extract_user_id(authorization: str = None):
     """Extract user_id from JWT token in Authorization header."""
