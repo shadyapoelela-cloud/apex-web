@@ -65,7 +65,11 @@ def execute_password_reset(raw_token: str, new_password: str):
         if not user:
             return {"status": "error", "detail": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
 
-        user.password_hash = hashlib.sha256(new_password.encode()).hexdigest()
+        try:
+            from app.phase1.services.auth_service import hash_password
+            user.password_hash = hash_password(new_password)
+        except:
+            user.password_hash = hashlib.sha256(new_password.encode()).hexdigest()
         reset.used = True
         reset.used_at = datetime.utcnow()
 

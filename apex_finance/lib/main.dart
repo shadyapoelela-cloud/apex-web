@@ -858,7 +858,7 @@ class _AccS extends State<AccountTab> {
         const SizedBox(height: 14),
         // Security
         _card('\u0627\u0644\u0623\u0645\u0627\u0646', [
-          _kv('\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0646\u0634\u0637\u0629', '${_s?['active_sessions']??0}'),
+          InkWell(onTap:(){Navigator.push(c,MaterialPageRoute(builder:(_)=>const SessionsScreen()));},child:_kv('\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0646\u0634\u0637\u0629', '${_s?['active_sessions']??0}')),
           _kv('\u0639\u062f\u062f \u0645\u0631\u0627\u062a \u0627\u0644\u062f\u062e\u0648\u0644', '${_s?['login_count']??0}'),
           _kv('\u0622\u062e\u0631 \u062f\u062e\u0648\u0644', _s?['last_login']?.toString().substring(0,16)??'-'),
         ]),
@@ -878,13 +878,13 @@ class _AccS extends State<AccountTab> {
           _mi(Icons.assignment, 'أنواع المهام', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const TaskTypesBrowserScreen()))),
           _mi(Icons.description, 'الشروط والأحكام', const Color(0xFF607D8B),
-            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalAcceptanceScreen(onAccepted: ()=>Navigator.pop(c))))),
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalDocumentsScreenV2()))),
           _mi(Icons.devices, 'الجلسات النشطة', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SessionsScreen()))),
       ])));
-  Widget _mi(IconData i, String l, Color c, VoidCallback onTap) => GestureDetector(onTap: onTap,
+  Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) => GestureDetector(onTap: onTap,
     child: Container(margin: const EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
-      child: ListTile(leading: Icon(i, color: c), title: Text(l, style: const TextStyle(color: AC.tp, fontSize: 14)),
+      child: ListTile(leading: Icon(i, color: cl), title: Text(l, style: const TextStyle(color: AC.tp, fontSize: 14)),
         trailing: const Icon(Icons.chevron_left, color: AC.ts))));
 }
 
@@ -3162,6 +3162,7 @@ class _NewPwS extends State<NewPasswordScreen> {
       return;
     }
     setState(() { _ld = true; _err = null; });
+    print('TOKEN: [${widget.token}] LEN: ${widget.token.length}');
     try {
       final r = await http.post(Uri.parse('$_api/account/reset-password'),
         headers: {'Content-Type': 'application/json'},
