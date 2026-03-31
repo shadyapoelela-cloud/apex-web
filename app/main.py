@@ -64,7 +64,17 @@ except Exception as e:
     print(f"Phase 7 import warning: {e}")
     HAS_P7 = False
 
-app = FastAPI(title="APEX Financial Platform API", description="منصة أبكس للتحليل المالي — النسخة النهائية", version="3.5.0")
+# Phase 8 — Entitlements Engine + Subscription Management
+try:
+    from app.phase8.models.phase8_models import init_phase8_db
+    from app.phase8.routes.phase8_routes import router as p8r
+    from app.phase8.services.seed_phase8 import seed_plan_limits, create_user_subscription
+    HAS_P8 = True
+except Exception as e:
+    print(f"Phase 8 import warning: {e}")
+    HAS_P8 = False
+
+app = FastAPI(title="APEX Financial Platform API", description="منصة أبكس للتحليل المالي — النسخة النهائية", version="5.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
@@ -107,18 +117,6 @@ def root():
                  "p4_providers": P4, "p5_marketplace": P5, "p6_admin": P6}.items()}}
 
 
-@app.get("/debug/p7")
-def debug_p7():
-    try:
-        from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
-        return {"step1": "models OK"}
-    except Exception as e1:
-        try:
-            from app.phase7.routes.phase7_routes import router
-            return {"step1_err": str(e1), "step2": "routes OK"}
-        except Exception as e2:
-            return {"step1_err": str(e1), "step2_err": str(e2)}
-
 
 @app.get("/admin/reinit-db")
 def reinit_db(secret: str = Query(...)):
@@ -147,8 +145,8 @@ def reinit_db(secret: str = Query(...)):
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "3.5.0",
-            "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7},
-            "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7])}
+            "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7, "p8": HAS_P8},
+            "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
 
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...), industry: str = Query("general"), closing_inventory: float = Query(None)):
