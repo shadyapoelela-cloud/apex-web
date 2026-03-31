@@ -119,7 +119,7 @@ def get_activity(authorization: str = Header(None)):
     return {"activity": activity, "total": len(activity)}
 
 
-@router.post("/auth/change-password", tags=["Account"])
+# @router.post("/auth/change-password", tags=["Account"])
 async def change_password(request: Request):
     """Change password for logged-in user (requires current password)"""
     auth = request.headers.get("Authorization", "")
