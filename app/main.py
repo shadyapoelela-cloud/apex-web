@@ -173,7 +173,7 @@ def reinit_db(secret: str = Query(...)):
 def health():
     return {"status": "ok", "version": "6.0.0",
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9 if "HAS_P9" in dir() else False, "p10": HAS_P10 if "HAS_P10" in dir() else False},
-            "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}}
+            "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
 
 @app.post("/analyze")
 async def analyze(file: UploadFile = File(...), industry: str = Query("general"), closing_inventory: float = Query(None)):
