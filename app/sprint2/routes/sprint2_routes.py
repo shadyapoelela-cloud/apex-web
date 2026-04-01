@@ -1,10 +1,18 @@
 """Sprint 2 — COA Classification APIs"""
-from fastapi import APIRouter
-from sqlalchemy import text as sa_text, HTTPException
+from fastapi import APIRouter, HTTPException
 import json, uuid
 from datetime import datetime, timezone
 
 router = APIRouter()
+
+from sqlalchemy import text as _t
+
+def _exec(db, sql, params=None):
+    """Execute raw SQL with text() wrapper for SQLAlchemy 2.x compat."""
+    if params:
+        return _exec(db, _t(sql), params)
+    return _exec(db, _t(sql))
+
 
 def _get_db():
     from app.phase1.models.platform_models import SessionLocal
@@ -24,7 +32,8 @@ def classify_upload(upload_id: str):
     db = SessionLocal()
     try:
         # Get upload
-        row = db.execute(sa_text("SELECT id, upload_status, client_id FROM client_coa_uploads WHERE id = :uid"),
+        row = _exec(db, 
+            "SELECT id, upload_status, client_id FROM client_coa_uploads WHERE id = :uid",
             {"uid": upload_id}
         ).fetchone()
 
@@ -36,7 +45,8 @@ def classify_upload(upload_id: str):
             raise HTTPException(400, f"Upload must be parsed first. Current status: {status}")
 
         # Get all parsed accounts
-        accounts = db.execute(sa_text("")"SELECT id, account_code, account_name_raw, account_name_normalized,
+        accounts = _exec(db, 
+            """SELECT id, account_code, account_name_raw, account_name_normalized,
                       parent_code, parent_name, account_level, account_type_raw, 
                       normal_balance, source_row_number, issues_json
                FROM client_chart_of_accounts 
@@ -92,7 +102,8 @@ def classify_upload(upload_id: str):
             if ss:
                 section_dist[ss] = section_dist.get(ss, 0) + 1
 
-            db.execute(sa_text("")"UPDATE client_chart_of_accounts SET
+            _exec(db, 
+                """UPDATE client_chart_of_accounts SET
                     normalized_class = :nc,
                     statement_section = :ss,
                     subcategory = :sub,
@@ -179,7 +190,7 @@ def get_mapping_preview(
         where_sql = " AND ".join(where)
 
         # Count
-        count_row = db.execute(
+        count_row = _exec(db, 
             f"SELECT COUNT(*) FROM client_chart_of_accounts WHERE {where_sql}",
             params
         ).fetchone()
@@ -187,7 +198,8 @@ def get_mapping_preview(
 
         # Fetch page
         offset = (page - 1) * page_size
-        rows = db.execute(sa_text(f"""SELECT id, source_row_number, account_code, account_name_raw,
+        rows = _exec(db, 
+            f"""SELECT id, source_row_number, account_code, account_name_raw,
                        parent_code, account_level, account_type_raw, normal_balance,
                        normalized_class, statement_section, subcategory,
                        current_noncurrent, cashflow_role, sign_rule,
@@ -196,7 +208,7 @@ def get_mapping_preview(
                 FROM client_chart_of_accounts
                 WHERE {where_sql}
                 ORDER BY source_row_number
-                LIMIT :lim OFFSET :off"""),
+                LIMIT :lim OFFSET :off""",
             {**params, "lim": page_size, "off": offset}
         ).fetchall()
 
@@ -251,7 +263,8 @@ def edit_account_classification(account_id: str, body: dict):
 
     db = SessionLocal()
     try:
-        row = db.execute(sa_text("SELECT id FROM client_chart_of_accounts WHERE id = :aid"),
+        row = _exec(db, 
+            "SELECT id FROM client_chart_of_accounts WHERE id = :aid",
             {"aid": account_id}
         ).fetchone()
         if not row:
@@ -274,7 +287,7 @@ def edit_account_classification(account_id: str, body: dict):
         updates.append("mapping_confidence = 1.0")
         updates.append("review_status = 'manually_edited'")
 
-        db.execute(
+        _exec(db, 
             f"UPDATE client_chart_of_accounts SET {', '.join(updates)} WHERE id = :aid",
             params
         )
@@ -292,14 +305,16 @@ def approve_account(account_id: str):
 
     db = SessionLocal()
     try:
-        row = db.execute(sa_text("SELECT id, review_status FROM client_chart_of_accounts WHERE id = :aid"),
+        row = _exec(db, 
+            "SELECT id, review_status FROM client_chart_of_accounts WHERE id = :aid",
             {"aid": account_id}
         ).fetchone()
         if not row:
             raise HTTPException(404, "Account not found")
 
         now = datetime.now(timezone.utc).isoformat()
-        db.execute(sa_text("")"UPDATE client_chart_of_accounts SET
+        _exec(db, 
+            """UPDATE client_chart_of_accounts SET
                 review_status = 'approved', approved_at = :now
             WHERE id = :aid""",
             {"aid": account_id, "now": now}
@@ -326,13 +341,15 @@ def bulk_approve(upload_id: str, body: dict = {}):
             params = {f"id{i}": aid for i, aid in enumerate(account_ids)}
             params["now"] = now
             params["uid"] = upload_id
-            db.execute(sa_text(f"""UPDATE client_chart_of_accounts SET
+            _exec(db, 
+                f"""UPDATE client_chart_of_accounts SET
                     review_status = 'approved', approved_at = :now, mapping_source = 'bulk_approve'
-                WHERE coa_upload_id = :uid AND id IN ({placeholders})"""),
+                WHERE coa_upload_id = :uid AND id IN ({placeholders})""",
                 params
             )
         elif min_confidence is not None:
-            db.execute(sa_text("")"UPDATE client_chart_of_accounts SET
+            _exec(db, 
+                """UPDATE client_chart_of_accounts SET
                     review_status = 'approved', approved_at = :now, mapping_source = 'bulk_approve'
                 WHERE coa_upload_id = :uid 
                 AND mapping_confidence >= :mc
@@ -345,12 +362,14 @@ def bulk_approve(upload_id: str, body: dict = {}):
         db.commit()
 
         # Count approved
-        count = db.execute(sa_text("")"SELECT COUNT(*) FROM client_chart_of_accounts
+        count = _exec(db, 
+            """SELECT COUNT(*) FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND review_status = 'approved'""",
             {"uid": upload_id}
         ).fetchone()[0]
 
-        total = db.execute(sa_text("")"SELECT COUNT(*) FROM client_chart_of_accounts
+        total = _exec(db, 
+            """SELECT COUNT(*) FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status != 'rejected'""",
             {"uid": upload_id}
         ).fetchone()[0]
@@ -372,7 +391,8 @@ def classification_summary(upload_id: str):
 
     db = SessionLocal()
     try:
-        rows = db.execute(sa_text("")"SELECT normalized_class, statement_section, mapping_confidence, 
+        rows = _exec(db, 
+            """SELECT normalized_class, statement_section, mapping_confidence, 
                       review_status, mapping_source
                FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status != 'rejected'""",
@@ -428,7 +448,8 @@ def debug_classify(upload_id: str):
         db = SessionLocal()
         
         # Check upload exists
-        row = db.execute(sa_text("SELECT id, upload_status FROM client_coa_uploads WHERE id = :uid"),
+        row = _exec(db, 
+            "SELECT id, upload_status FROM client_coa_uploads WHERE id = :uid",
             {"uid": upload_id}
         ).fetchone()
         
@@ -436,7 +457,8 @@ def debug_classify(upload_id: str):
             return {"error": "Upload not found", "upload_id": upload_id}
         
         # Check accounts exist
-        accounts = db.execute(sa_text("SELECT id, account_code, account_name_raw, account_name_normalized, parent_code, normal_balance, account_level, account_type_raw FROM client_chart_of_accounts WHERE coa_upload_id = :uid AND record_status != 'rejected' LIMIT 3"),
+        accounts = _exec(db, 
+            "SELECT id, account_code, account_name_raw, account_name_normalized, parent_code, normal_balance, account_level, account_type_raw FROM client_chart_of_accounts WHERE coa_upload_id = :uid AND record_status != 'rejected' LIMIT 3",
             {"uid": upload_id}
         ).fetchall()
         
@@ -445,7 +467,7 @@ def debug_classify(upload_id: str):
         
         # Check columns exist
         try:
-            db.execute("SELECT normalized_class FROM client_chart_of_accounts LIMIT 1").fetchone()
+            _exec(db, "SELECT normalized_class FROM client_chart_of_accounts LIMIT 1").fetchone()
             cols_ok = True
         except Exception as ce:
             cols_ok = str(ce)
