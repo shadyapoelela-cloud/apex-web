@@ -523,6 +523,18 @@ def debug_flags():
     return flags
 
 
+
+@app.get("/admin/reset-postgres")
+def reset_postgres(secret: str = Query(...)):
+    if secret != "apex-admin-2026":
+        raise HTTPException(403, "Invalid secret")
+    from app.phase1.models.platform_models import Base, engine
+    try:
+        Base.metadata.drop_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
+        return {"status": "OK", "message": "All tables dropped and recreated"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)[:500]}
 @app.get("/admin/promote-user")
 def promote_user(secret: str = Query(...), username: str = Query(...), role: str = Query("platform_admin")):
     if secret != "apex-admin-2026":
@@ -1055,6 +1067,7 @@ async def get_activity_history(limit: int = Query(20)):
 # v4.2
 
 # force-deploy-p8-fix
+
 
 
 
