@@ -147,6 +147,15 @@ try:
 except Exception as e:
     print(f"Sprint 5 disabled: {e}")
 
+# --- Sprint 6: Official Source Registry + Eligibility ---
+HAS_S6 = False
+try:
+    from app.sprint6_registry.routes.registry_routes import router as s6r
+    HAS_S6 = True
+    print(f"Sprint 6 loaded: {len(s6r.routes)} routes")
+except Exception as e:
+    print(f"Sprint 6 disabled: {e}")
+
 
 # Phase 11 â€” Legal Acceptance
 try:
@@ -220,6 +229,10 @@ if HAS_S4_TB:
 if HAS_S5:
     app.include_router(s5r, tags=["Sprint 5 Analysis Trigger"])
     print(f"[STARTUP] S5 registered: {len(s5r.routes)} routes")
+
+if HAS_S6:
+    app.include_router(s6r, tags=["Sprint 6 Registry + Eligibility"])
+    print(f"[STARTUP] S6 registered: {len(s6r.routes)} routes")
     print(f"[STARTUP] S4 registered: {len(s4r.routes)} routes")
     print(f"[STARTUP] S2 registered: {len(s2r.routes)} routes")
 
@@ -317,6 +330,13 @@ def reinit_db(secret: str = Query(...)):
         results["sprint5_analysis"] = init_sprint5_analysis_db()
     except Exception as e:
         results["sprint5_analysis"] = str(e)
+
+    # Sprint 6 Registry + Eligibility tables
+    try:
+        from app.sprint6_registry.models.registry_models import init_sprint6_db
+        results["sprint6_registry"] = init_sprint6_db()
+    except Exception as e:
+        results["sprint6_registry"] = str(e)
 
     # Sprint 4 â€” Knowledge Brain tables
     try:
@@ -1011,6 +1031,9 @@ async def get_activity_history(limit: int = Query(20)):
 # v4.2
 
 # force-deploy-p8-fix
+
+
+
 
 
 
