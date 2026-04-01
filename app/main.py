@@ -240,6 +240,20 @@ def health():
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9 if "HAS_P9" in globals() else False, "p10": HAS_P10 if "HAS_P10" in globals() else False, "p11": HAS_P11 if "HAS_P11" in globals() else False},
             "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
 
+
+@app.get("/debug/flags")
+def debug_flags():
+    flags = {}
+    for name in ["HAS_S1", "HAS_S2", "HAS_P7", "HAS_P8", "HAS_P9", "HAS_P10", "HAS_P11"]:
+        flags[name] = globals().get(name, "NOT_DEFINED")
+    # Try importing S2 right now
+    try:
+        from app.sprint2.routes.sprint2_routes import router as _test
+        flags["s2_import_now"] = f"OK: {len(_test.routes)} routes"
+    except Exception as e:
+        flags["s2_import_now"] = f"FAIL: {e}"
+    return flags
+
 @app.get("/debug/s2")
 def debug_s2():
     try:
