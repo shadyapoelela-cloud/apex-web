@@ -231,7 +231,8 @@ def reinit_db(secret: str = Query(...)):
 
     # Sprint 2 classification columns
     try:
-        _db2 = SessionLocal()
+        from app.phase1.models.platform_models import SessionLocal as _SL2
+        _db2 = _SL2()
         _raw = _db2.bind.raw_connection()
         _cur = _raw.cursor()
         _cols = [("normalized_class","VARCHAR(100)"),("statement_section","VARCHAR(100)"),("subcategory","VARCHAR(200)"),("current_noncurrent","VARCHAR(20)"),("cashflow_role","VARCHAR(50)"),("sign_rule","VARCHAR(20)"),("mapping_confidence","REAL DEFAULT 0.0"),("mapping_source","VARCHAR(50)"),("review_status","VARCHAR(50) DEFAULT 'draft'"),("approved_by","VARCHAR(255)"),("approved_at","TIMESTAMP"),("classification_issues_json","TEXT DEFAULT '[]'")]
