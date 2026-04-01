@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -10,9 +10,9 @@ import 'dart:html' as html;
 const _api = 'https://apex-api-ootk.onrender.com';
 void main() => runApp(const ApexApp());
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // Design System
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AC {
   static const gold = Color(0xFFC9A84C);
   static const navy = Color(0xFF050D1A);
@@ -63,9 +63,9 @@ InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)));
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // App Root
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ApexApp extends StatelessWidget {
   const ApexApp({super.key});
   @override Widget build(BuildContext context) => MaterialApp(
@@ -79,9 +79,9 @@ class ApexApp extends StatelessWidget {
     home: const LoginScreen());
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // LOGIN
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override State<LoginScreen> createState() => _LoginS();
@@ -125,16 +125,16 @@ class _LoginS extends State<LoginScreen> {
         child: _l ? const SizedBox(height:20,width:20, child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(fontWeight: FontWeight.bold)))),
       const SizedBox(height: 8),
       TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ForgotPasswordScreen())),
-        child: const Text('نسيت كلمة المرور؟', style: TextStyle(color: AC.warn, fontSize: 13))),
+        child: const Text('ظ†ط³ظٹطھ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±طں', style: TextStyle(color: AC.warn, fontSize: 13))),
       const SizedBox(height: 4),
       TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const RegScreen())),
         child: const Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f \u0633\u062c\u0651\u0644 \u0627\u0644\u0622\u0646', style: TextStyle(color: AC.gold))),
     ])))));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // REGISTER
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class RegScreen extends StatefulWidget {
   const RegScreen({super.key});
   @override State<RegScreen> createState() => _RegS();
@@ -172,9 +172,9 @@ class _RegS extends State<RegScreen> {
       ])))));
 }
 
-// ═══════════════════════════════════════════════════
-// MAIN NAVIGATION — 6 tabs
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// MAIN NAVIGATION â€” 6 tabs
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class MainNav extends StatefulWidget {
   const MainNav({super.key});
   @override State<MainNav> createState() => _MainNavS();
@@ -197,9 +197,9 @@ class _MainNavS extends State<MainNav> {
       ]));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // DASHBOARD
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class DashTab extends StatefulWidget { const DashTab({super.key}); @override State<DashTab> createState()=>_DashS(); }
 class _DashS extends State<DashTab> {
   Map<String,dynamic>? _sub; List _plans=[]; bool _ld=true; int _notifCount=0;
@@ -266,9 +266,9 @@ class _DashS extends State<DashTab> {
       ])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // NOTIFICATIONS SCREEN (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
   @override State<NotificationsScreen> createState() => _NotifS();
@@ -320,9 +320,9 @@ class _NotifS extends State<NotificationsScreen> {
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // UPGRADE PLAN SCREEN (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class UpgradePlanScreen extends StatelessWidget {
   final List plans; final String? currentPlan;
   const UpgradePlanScreen({super.key, required this.plans, this.currentPlan});
@@ -362,9 +362,9 @@ class UpgradePlanScreen extends StatelessWidget {
     ]));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // CLIENTS TAB
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ClientsTab extends StatefulWidget { const ClientsTab({super.key}); @override State<ClientsTab> createState()=>_ClientsS(); }
 class _ClientsS extends State<ClientsTab> {
   List _cl=[]; bool _ld=true;
@@ -435,9 +435,9 @@ class _NewCS extends State<NewClientScreen> {
         child: _l ? const CircularProgressIndicator(strokeWidth:2) : const Text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644')))])));
 }
 
-// ═══════════════════════════════════════════════════
-// ANALYSIS TAB — with Result Details Panel (!)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// ANALYSIS TAB â€” with Result Details Panel (!)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AnalysisTab extends StatefulWidget { const AnalysisTab({super.key}); @override State<AnalysisTab> createState()=>_AnalysisS(); }
 class _AnalysisS extends State<AnalysisTab> {
   PlatformFile? _f; List<int>? _fb; bool _a=false; Map<String,dynamic>? _r; String? _e;
@@ -564,7 +564,7 @@ class _AnalysisS extends State<AnalysisTab> {
               final bytes = await res.stream.toBytes();
               if (res.statusCode == 200) {
                 // PDF downloaded - show success
-                ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('تم تحميل التقرير بنجاح'), backgroundColor: Color(0xFF2ECC8A)));
+                ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('طھظ… طھط­ظ…ظٹظ„ ط§ظ„طھظ‚ط±ظٹط± ط¨ظ†ط¬ط§ط­'), backgroundColor: Color(0xFF2ECC8A)));
               }
             } catch (e) {
               ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u062e\u0637\u0623: $e'), backgroundColor: AC.navy3));
@@ -580,9 +580,9 @@ class _AnalysisS extends State<AnalysisTab> {
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // KNOWLEDGE FEEDBACK (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class KnowledgeFeedbackScreen extends StatefulWidget {
   final String? resultId;
   const KnowledgeFeedbackScreen({super.key, this.resultId});
@@ -639,9 +639,9 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
         label: Text(_l ? '\u062c\u0627\u0631\u064a \u0627\u0644\u0625\u0631\u0633\u0627\u0644...' : '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629')))])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // MARKETPLACE TAB
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class MarketTab extends StatefulWidget { const MarketTab({super.key}); @override State<MarketTab> createState()=>_MarketS(); }
 class _MarketS extends State<MarketTab> {
   List _provs=[], _reqs=[]; bool _ld=true;
@@ -689,9 +689,9 @@ class _MarketS extends State<MarketTab> {
       ]));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // NEW SERVICE REQUEST (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class NewServiceRequestScreen extends StatefulWidget {
   const NewServiceRequestScreen({super.key});
   @override State<NewServiceRequestScreen> createState() => _NSRS();
@@ -751,9 +751,9 @@ class _NSRS extends State<NewServiceRequestScreen> {
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0637\u0644\u0628')))])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // PROVIDER TAB
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ProviderTab extends StatefulWidget { const ProviderTab({super.key}); @override State<ProviderTab> createState()=>_ProvS(); }
 class _ProvS extends State<ProviderTab> {
   Map<String,dynamic>? _p; bool _ld=true; bool _notProvider=false;
@@ -816,9 +816,9 @@ class _ProvS extends State<ProviderTab> {
       ]));
 }
 
-// ═══════════════════════════════════════════════════
-// ACCOUNT TAB — with Profile Editing
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// ACCOUNT TAB â€” with Profile Editing
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AccountTab extends StatefulWidget { const AccountTab({super.key}); @override State<AccountTab> createState()=>_AccS(); }
 class _AccS extends State<AccountTab> {
   Map<String,dynamic>? _p, _s; bool _ld=true;
@@ -861,7 +861,7 @@ class _AccS extends State<AccountTab> {
           _kv('\u0622\u062e\u0631 \u062f\u062e\u0648\u0644', _s?['last_login']?.toString().substring(0,16)??'-'),
         ]),
         // Menu Items
-                _mi(Icons.account_tree, 'شجرة الحسابات COA', AC.cyan,
+                _mi(Icons.account_tree, 'ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ COA', AC.cyan,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ClientListScreen()))),
         _mi(Icons.workspace_premium, '\u062e\u0637\u062a\u064a \u0648\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643', AC.gold,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SubscriptionScreen()))),
@@ -871,15 +871,15 @@ class _AccS extends State<AccountTab> {
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ChangePasswordScreen()))),
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const CloseAccountScreen()))),
-          _mi(Icons.history, 'سجل النشاط', const Color(0xFF9C27B0),
+          _mi(Icons.history, 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·', const Color(0xFF9C27B0),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ActivityHistoryScreen()))),
-          _mi(Icons.compare_arrows, 'مقارنة الخطط', AC.cyan,
+          _mi(Icons.compare_arrows, 'ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const PlanComparisonScreen()))),
-          _mi(Icons.assignment, 'أنواع المهام', AC.cyan,
+          _mi(Icons.assignment, 'ط£ظ†ظˆط§ط¹ ط§ظ„ظ…ظ‡ط§ظ…', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const TaskTypesBrowserScreen()))),
-          _mi(Icons.description, 'الشروط والأحكام', const Color(0xFF607D8B),
+          _mi(Icons.description, 'ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…', const Color(0xFF607D8B),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalDocumentsScreenV2()))),
-          _mi(Icons.devices, 'الجلسات النشطة', AC.cyan,
+          _mi(Icons.devices, 'ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SessionsScreen()))),
       ])));
   Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) => GestureDetector(onTap: onTap,
@@ -888,9 +888,9 @@ class _AccS extends State<AccountTab> {
         trailing: const Icon(Icons.chevron_left, color: AC.ts))));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // EDIT PROFILE (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class EditProfileScreen extends StatefulWidget {
   final Map<String,dynamic>? profile;
   const EditProfileScreen({super.key, this.profile});
@@ -937,9 +937,9 @@ class _EditPS extends State<EditProfileScreen> {
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062d\u0641\u0638 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a')))])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // CHANGE PASSWORD (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
   @override State<ChangePasswordScreen> createState() => _ChPwS();
@@ -978,9 +978,9 @@ class _ChPwS extends State<ChangePasswordScreen> {
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062a\u063a\u064a\u064a\u0631')))])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // CLOSE ACCOUNT (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class CloseAccountScreen extends StatefulWidget {
   const CloseAccountScreen({super.key});
   @override State<CloseAccountScreen> createState() => _CloseAS();
@@ -1041,9 +1041,9 @@ class _CloseAS extends State<CloseAccountScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════
-// ADMIN TAB — Platform Dashboard
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// ADMIN TAB â€” Platform Dashboard
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AdminTab extends StatefulWidget { const AdminTab({super.key}); @override State<AdminTab> createState()=>_AdminS(); }
 class _AdminS extends State<AdminTab> {
   Map<String,dynamic> _stats = {}; List _users = []; bool _ld = true;
@@ -1134,9 +1134,9 @@ class _AdminS extends State<AdminTab> {
         const Icon(Icons.chevron_left, color: AC.ts, size: 20)])));
 }
 
-// ═══════════════════════════════════════════════════
-// REVIEWER CONSOLE — Knowledge Feedback Review
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// REVIEWER CONSOLE â€” Knowledge Feedback Review
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ReviewerConsoleScreen extends StatefulWidget {
   const ReviewerConsoleScreen({super.key});
   @override State<ReviewerConsoleScreen> createState() => _RevCS();
@@ -1211,9 +1211,9 @@ class _RevCS extends State<ReviewerConsoleScreen> {
       ]));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // PROVIDER VERIFICATION QUEUE
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ProviderVerificationScreen extends StatefulWidget {
   const ProviderVerificationScreen({super.key});
   @override State<ProviderVerificationScreen> createState() => _PVS();
@@ -1280,9 +1280,9 @@ class _PVS extends State<ProviderVerificationScreen> {
         })));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // POLICY MANAGEMENT
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class PolicyManagementScreen extends StatefulWidget {
   const PolicyManagementScreen({super.key});
   @override State<PolicyManagementScreen> createState() => _PMS();
@@ -1339,7 +1339,7 @@ class _PMS extends State<PolicyManagementScreen> {
 
 
 // ============================================================
-// Legal Acceptance Screen (Execution Master §15)
+// Legal Acceptance Screen (Execution Master آ§15)
 // ============================================================
 class LegalAcceptanceScreen extends StatefulWidget {
   final VoidCallback onAccepted;
@@ -1370,7 +1370,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
         body: jsonEncode({'document_type': 'acceptable_use', 'version': '1.0'}));
       widget.onAccepted();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ط®ط·ط£: $e')));
     }
     setState(() => _loading = false);
   }
@@ -1379,7 +1379,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -1389,22 +1389,22 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
             child: Row(children: [
               const Icon(Icons.info_outline, color: Color(0xFF856404)),
               const SizedBox(width: 12),
-              const Expanded(child: Text('يجب الموافقة على جميع الشروط والسياسات قبل إكمال التسجيل',
+              const Expanded(child: Text('ظٹط¬ط¨ ط§ظ„ظ…ظˆط§ظپظ‚ط© ط¹ظ„ظ‰ ط¬ظ…ظٹط¹ ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط³ظٹط§ط³ط§طھ ظ‚ط¨ظ„ ط¥ظƒظ…ط§ظ„ ط§ظ„طھط³ط¬ظٹظ„',
                 style: TextStyle(color: Color(0xFF856404), fontSize: 13))),
             ]),
           ),
           const SizedBox(height: 24),
 
-          _buildPolicyCard('شروط وأحكام المنصة', 'الإصدار 1.0',
-            'تتضمن شروط استخدام المنصة والتزامات المستخدم وحقوق المنصة في تعليق الحسابات عند المخالفة.',
+          _buildPolicyCard('ط´ط±ظˆط· ظˆط£ط­ظƒط§ظ… ط§ظ„ظ…ظ†طµط©', 'ط§ظ„ط¥طµط¯ط§ط± 1.0',
+            'طھطھط¶ظ…ظ† ط´ط±ظˆط· ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ†طµط© ظˆط§ظ„طھط²ط§ظ…ط§طھ ط§ظ„ظ…ط³طھط®ط¯ظ… ظˆط­ظ‚ظˆظ‚ ط§ظ„ظ…ظ†طµط© ظپظٹ طھط¹ظ„ظٹظ‚ ط§ظ„ط­ط³ط§ط¨ط§طھ ط¹ظ†ط¯ ط§ظ„ظ…ط®ط§ظ„ظپط©.',
             Icons.description, _termsAccepted, (v) => setState(() => _termsAccepted = v!)),
 
-          _buildPolicyCard('سياسة الخصوصية', 'الإصدار 1.0',
-            'كيفية جمع واستخدام وحماية بياناتك الشخصية والمالية.',
+          _buildPolicyCard('ط³ظٹط§ط³ط© ط§ظ„ط®طµظˆطµظٹط©', 'ط§ظ„ط¥طµط¯ط§ط± 1.0',
+            'ظƒظٹظپظٹط© ط¬ظ…ط¹ ظˆط§ط³طھط®ط¯ط§ظ… ظˆط­ظ…ط§ظٹط© ط¨ظٹط§ظ†ط§طھظƒ ط§ظ„ط´ط®طµظٹط© ظˆط§ظ„ظ…ط§ظ„ظٹط©.',
             Icons.privacy_tip, _privacyAccepted, (v) => setState(() => _privacyAccepted = v!)),
 
-          _buildPolicyCard('سياسة الاستخدام المقبول', 'الإصدار 1.0',
-            'القواعد المنظمة لاستخدام المنصة بما يشمل رفع الملفات والتحليلات وطلب الخدمات.',
+          _buildPolicyCard('ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„', 'ط§ظ„ط¥طµط¯ط§ط± 1.0',
+            'ط§ظ„ظ‚ظˆط§ط¹ط¯ ط§ظ„ظ…ظ†ط¸ظ…ط© ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ†طµط© ط¨ظ…ط§ ظٹط´ظ…ظ„ ط±ظپط¹ ط§ظ„ظ…ظ„ظپط§طھ ظˆط§ظ„طھط­ظ„ظٹظ„ط§طھ ظˆط·ظ„ط¨ ط§ظ„ط®ط¯ظ…ط§طھ.',
             Icons.verified_user, _usageAccepted, (v) => setState(() => _usageAccepted = v!)),
 
           const SizedBox(height: 24),
@@ -1417,7 +1417,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
             ),
             child: _loading
               ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('أوافق وأتابع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              : const Text('ط£ظˆط§ظپظ‚ ظˆط£طھط§ط¨ط¹', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ]),
       ),
@@ -1447,9 +1447,9 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
         const SizedBox(height: 12),
         Row(children: [
           Checkbox(value: value, onChanged: onChanged, activeColor: AC.gold),
-          const Text('أوافق على هذه السياسة', style: TextStyle(fontSize: 13)),
+          const Text('ط£ظˆط§ظپظ‚ ط¹ظ„ظ‰ ظ‡ط°ظ‡ ط§ظ„ط³ظٹط§ط³ط©', style: TextStyle(fontSize: 13)),
           const Spacer(),
-          TextButton(onPressed: () {}, child: const Text('قراءة كاملة', style: TextStyle(color: Color(0xFF1B2A4A)))),
+          TextButton(onPressed: () {}, child: const Text('ظ‚ط±ط§ط،ط© ظƒط§ظ…ظ„ط©', style: TextStyle(color: Color(0xFF1B2A4A)))),
         ]),
       ]),
     );
@@ -1457,7 +1457,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
 }
 
 // ============================================================
-// Client Type Selection Screen (Execution Master §5)
+// Client Type Selection Screen (Execution Master آ§5)
 // ============================================================
 class ClientTypeSelectionScreen extends StatefulWidget {
   final Function(String) onSelected;
@@ -1469,33 +1469,33 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
   String? _selected;
 
   final _types = [
-    {'id': 'standard_business', 'name': 'منشأة تجارية', 'icon': Icons.business, 'km': false,
-     'desc': 'شركة أو مؤسسة تجارية تستخدم خدمات التحليل'},
-    {'id': 'accounting_firm', 'name': 'مكتب محاسبة', 'icon': Icons.calculate, 'km': true,
-     'desc': 'مكتب محاسبة قانوني معتمد'},
-    {'id': 'audit_firm', 'name': 'مكتب تدقيق', 'icon': Icons.fact_check, 'km': true,
-     'desc': 'مكتب تدقيق ومراجعة'},
-    {'id': 'financial_entity', 'name': 'جهة مالية', 'icon': Icons.account_balance, 'km': true,
-     'desc': 'بنك أو مؤسسة مالية'},
-    {'id': 'investment_entity', 'name': 'جهة استثمارية', 'icon': Icons.trending_up, 'km': true,
-     'desc': 'شركة أو صندوق استثماري'},
-    {'id': 'government_entity', 'name': 'جهة حكومية', 'icon': Icons.account_balance_wallet, 'km': true,
-     'desc': 'جهة حكومية أو شبه حكومية'},
-    {'id': 'legal_regulatory_entity', 'name': 'جهة قانونية/تنظيمية', 'icon': Icons.gavel, 'km': true,
-     'desc': 'هيئة تنظيمية أو مكتب قانوني'},
-    {'id': 'sector_consulting_entity', 'name': 'استشارات قطاعية', 'icon': Icons.lightbulb, 'km': true,
-     'desc': 'شركة استشارات متخصصة'},
+    {'id': 'standard_business', 'name': 'ظ…ظ†ط´ط£ط© طھط¬ط§ط±ظٹط©', 'icon': Icons.business, 'km': false,
+     'desc': 'ط´ط±ظƒط© ط£ظˆ ظ…ط¤ط³ط³ط© طھط¬ط§ط±ظٹط© طھط³طھط®ط¯ظ… ط®ط¯ظ…ط§طھ ط§ظ„طھط­ظ„ظٹظ„'},
+    {'id': 'accounting_firm', 'name': 'ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط©', 'icon': Icons.calculate, 'km': true,
+     'desc': 'ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط© ظ‚ط§ظ†ظˆظ†ظٹ ظ…ط¹طھظ…ط¯'},
+    {'id': 'audit_firm', 'name': 'ظ…ظƒطھط¨ طھط¯ظ‚ظٹظ‚', 'icon': Icons.fact_check, 'km': true,
+     'desc': 'ظ…ظƒطھط¨ طھط¯ظ‚ظٹظ‚ ظˆظ…ط±ط§ط¬ط¹ط©'},
+    {'id': 'financial_entity', 'name': 'ط¬ظ‡ط© ظ…ط§ظ„ظٹط©', 'icon': Icons.account_balance, 'km': true,
+     'desc': 'ط¨ظ†ظƒ ط£ظˆ ظ…ط¤ط³ط³ط© ظ…ط§ظ„ظٹط©'},
+    {'id': 'investment_entity', 'name': 'ط¬ظ‡ط© ط§ط³طھط«ظ…ط§ط±ظٹط©', 'icon': Icons.trending_up, 'km': true,
+     'desc': 'ط´ط±ظƒط© ط£ظˆ طµظ†ط¯ظˆظ‚ ط§ط³طھط«ظ…ط§ط±ظٹ'},
+    {'id': 'government_entity', 'name': 'ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط©', 'icon': Icons.account_balance_wallet, 'km': true,
+     'desc': 'ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط© ط£ظˆ ط´ط¨ظ‡ ط­ظƒظˆظ…ظٹط©'},
+    {'id': 'legal_regulatory_entity', 'name': 'ط¬ظ‡ط© ظ‚ط§ظ†ظˆظ†ظٹط©/طھظ†ط¸ظٹظ…ظٹط©', 'icon': Icons.gavel, 'km': true,
+     'desc': 'ظ‡ظٹط¦ط© طھظ†ط¸ظٹظ…ظٹط© ط£ظˆ ظ…ظƒطھط¨ ظ‚ط§ظ†ظˆظ†ظٹ'},
+    {'id': 'sector_consulting_entity', 'name': 'ط§ط³طھط´ط§ط±ط§طھ ظ‚ط·ط§ط¹ظٹط©', 'icon': Icons.lightbulb, 'km': true,
+     'desc': 'ط´ط±ظƒط© ط§ط³طھط´ط§ط±ط§طھ ظ…طھط®طµطµط©'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ط§ط®طھظٹط§ط± ظ†ظˆط¹ ط§ظ„ط¹ظ…ظٹظ„'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
           width: double.infinity, padding: const EdgeInsets.all(16), color: const Color(0xFFF0F4FF),
-          child: const Text('اختر نوع المنشأة — هذا يحدد الخدمات والصلاحيات المتاحة',
+          child: const Text('ط§ط®طھط± ظ†ظˆط¹ ط§ظ„ظ…ظ†ط´ط£ط© â€” ظ‡ط°ط§ ظٹط­ط¯ط¯ ط§ظ„ط®ط¯ظ…ط§طھ ظˆط§ظ„طµظ„ط§ط­ظٹط§طھ ط§ظ„ظ…طھط§ط­ط©',
             style: TextStyle(color: Color(0xFF1B2A4A), fontSize: 13), textAlign: TextAlign.center),
         ),
         Expanded(
@@ -1527,7 +1527,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(8)),
-                        child: const Text('مؤهل للعقل المعرفي', style: TextStyle(fontSize: 10, color: Color(0xFF2E7D32))),
+                        child: const Text('ظ…ط¤ظ‡ظ„ ظ„ظ„ط¹ظ‚ظ„ ط§ظ„ظ…ط¹ط±ظپظٹ', style: TextStyle(fontSize: 10, color: Color(0xFF2E7D32))),
                       ),
                     ],
                   ]),
@@ -1549,7 +1549,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('تأكيد واستمرار', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            child: const Text('طھط£ظƒظٹط¯ ظˆط§ط³طھظ…ط±ط§ط±', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ),
       ]),
@@ -1558,7 +1558,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
 }
 
 // ============================================================
-// Provider Document Upload Screen (Execution Master §7)
+// Provider Document Upload Screen (Execution Master آ§7)
 // ============================================================
 class ProviderDocumentUploadScreen extends StatefulWidget {
   const ProviderDocumentUploadScreen({Key? key}) : super(key: key);
@@ -1567,11 +1567,11 @@ class ProviderDocumentUploadScreen extends StatefulWidget {
 
 class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScreen> {
   final _docs = [
-    {'type': 'identity', 'name': 'إثبات الهوية', 'icon': Icons.badge, 'required': true, 'uploaded': false},
-    {'type': 'professional_license', 'name': 'الرخصة المهنية', 'icon': Icons.card_membership, 'required': true, 'uploaded': false},
-    {'type': 'academic_certificate', 'name': 'الشهادة الأكاديمية', 'icon': Icons.school, 'required': true, 'uploaded': false},
-    {'type': 'experience_letter', 'name': 'خطاب الخبرة', 'icon': Icons.work_history, 'required': false, 'uploaded': false},
-    {'type': 'portfolio', 'name': 'نماذج أعمال', 'icon': Icons.folder_special, 'required': false, 'uploaded': false},
+    {'type': 'identity', 'name': 'ط¥ط«ط¨ط§طھ ط§ظ„ظ‡ظˆظٹط©', 'icon': Icons.badge, 'required': true, 'uploaded': false},
+    {'type': 'professional_license', 'name': 'ط§ظ„ط±ط®طµط© ط§ظ„ظ…ظ‡ظ†ظٹط©', 'icon': Icons.card_membership, 'required': true, 'uploaded': false},
+    {'type': 'academic_certificate', 'name': 'ط§ظ„ط´ظ‡ط§ط¯ط© ط§ظ„ط£ظƒط§ط¯ظٹظ…ظٹط©', 'icon': Icons.school, 'required': true, 'uploaded': false},
+    {'type': 'experience_letter', 'name': 'ط®ط·ط§ط¨ ط§ظ„ط®ط¨ط±ط©', 'icon': Icons.work_history, 'required': false, 'uploaded': false},
+    {'type': 'portfolio', 'name': 'ظ†ظ…ط§ط°ط¬ ط£ط¹ظ…ط§ظ„', 'icon': Icons.folder_special, 'required': false, 'uploaded': false},
   ];
 
   @override
@@ -1581,7 +1581,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ظ…ط³طھظ†ط¯ط§طھ ط§ظ„طھط­ظ‚ظ‚'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
           width: double.infinity, padding: const EdgeInsets.all(16),
@@ -1592,8 +1592,8 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             const SizedBox(width: 12),
             Expanded(child: Text(
               uploadedRequired == requiredCount
-                ? 'جميع المستندات الإلزامية مرفوعة — في انتظار المراجعة'
-                : 'يجب رفع المستندات الإلزامية (*) للتحقق وتفعيل حسابك',
+                ? 'ط¬ظ…ظٹط¹ ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ط¥ظ„ط²ط§ظ…ظٹط© ظ…ط±ظپظˆط¹ط© â€” ظپظٹ ط§ظ†طھط¸ط§ط± ط§ظ„ظ…ط±ط§ط¬ط¹ط©'
+                : 'ظٹط¬ط¨ ط±ظپط¹ ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ط¥ظ„ط²ط§ظ…ظٹط© (*) ظ„ظ„طھط­ظ‚ظ‚ ظˆطھظپط¹ظٹظ„ ط­ط³ط§ط¨ظƒ',
               style: TextStyle(fontSize: 13, color: uploadedRequired == requiredCount ? const Color(0xFF2E7D32) : const Color(0xFF856404)))),
           ]),
         ),
@@ -1622,13 +1622,13 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
                       Text(doc['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
                       if (doc['required'] == true) const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                     ]),
-                    Text(doc['uploaded'] == true ? 'تم الرفع — قيد المراجعة' : 'لم يتم الرفع',
+                    Text(doc['uploaded'] == true ? 'طھظ… ط§ظ„ط±ظپط¹ â€” ظ‚ظٹط¯ ط§ظ„ظ…ط±ط§ط¬ط¹ط©' : 'ظ„ظ… ظٹطھظ… ط§ظ„ط±ظپط¹',
                       style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : Colors.grey)),
                   ])),
                   ElevatedButton.icon(
                     onPressed: () => setState(() => _docs[i] = {...doc, 'uploaded': true}),
                     icon: Icon(doc['uploaded'] == true ? Icons.refresh : Icons.upload_file, size: 16),
-                    label: Text(doc['uploaded'] == true ? 'تحديث' : 'رفع', style: const TextStyle(fontSize: 12)),
+                    label: Text(doc['uploaded'] == true ? 'طھط­ط¯ظٹط«' : 'ط±ظپط¹', style: const TextStyle(fontSize: 12)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: doc['uploaded'] == true ? Colors.grey[200] : AC.navy,
                       foregroundColor: doc['uploaded'] == true ? Colors.black87 : Colors.white,
@@ -1649,7 +1649,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: Text(uploadedRequired == requiredCount ? 'إرسال للمراجعة' : 'أكمل رفع المستندات الإلزامية',
+            child: Text(uploadedRequired == requiredCount ? 'ط¥ط±ط³ط§ظ„ ظ„ظ„ظ…ط±ط§ط¬ط¹ط©' : 'ط£ظƒظ…ظ„ ط±ظپط¹ ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ط¥ظ„ط²ط§ظ…ظٹط©',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ),
@@ -1659,7 +1659,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
 }
 
 // ============================================================
-// Task Document Management Screen (Zero Ambiguity §9)
+// Task Document Management Screen (Zero Ambiguity آ§9)
 // ============================================================
 class TaskDocumentScreen extends StatefulWidget {
   final String requestId;
@@ -1672,13 +1672,13 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
   late TabController _tabs;
 
   final _inputs = [
-    {'name': 'مصادر القيود', 'uploaded': true, 'date': '2026-03-28'},
-    {'name': 'كشف حساب بنكي', 'uploaded': true, 'date': '2026-03-29'},
-    {'name': 'فواتير', 'uploaded': false, 'date': null},
+    {'name': 'ظ…طµط§ط¯ط± ط§ظ„ظ‚ظٹظˆط¯', 'uploaded': true, 'date': '2026-03-28'},
+    {'name': 'ظƒط´ظپ ط­ط³ط§ط¨ ط¨ظ†ظƒظٹ', 'uploaded': true, 'date': '2026-03-29'},
+    {'name': 'ظپظˆط§طھظٹط±', 'uploaded': false, 'date': null},
   ];
   final _outputs = [
-    {'name': 'ملف قيود منظم', 'uploaded': false, 'date': null},
-    {'name': 'ملاحظات التسوية', 'uploaded': false, 'date': null},
+    {'name': 'ظ…ظ„ظپ ظ‚ظٹظˆط¯ ظ…ظ†ط¸ظ…', 'uploaded': false, 'date': null},
+    {'name': 'ظ…ظ„ط§ط­ط¸ط§طھ ط§ظ„طھط³ظˆظٹط©', 'uploaded': false, 'date': null},
   ];
 
   @override
@@ -1694,11 +1694,11 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: const Text('مستندات المهمة'),
+        title: const Text('ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ظ…ظ‡ظ…ط©'),
         backgroundColor: AC.navy, foregroundColor: Colors.white,
         bottom: TabBar(controller: _tabs, indicatorColor: AC.gold, labelColor: Colors.white, tabs: [
-          Tab(text: 'المدخلات ($inputsDone/${_inputs.length})'),
-          Tab(text: 'المخرجات ($outputsDone/${_outputs.length})'),
+          Tab(text: 'ط§ظ„ظ…ط¯ط®ظ„ط§طھ ($inputsDone/${_inputs.length})'),
+          Tab(text: 'ط§ظ„ظ…ط®ط±ط¬ط§طھ ($outputsDone/${_outputs.length})'),
         ]),
       ),
       body: Column(children: [
@@ -1709,14 +1709,14 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
           child: Row(children: [
             const Icon(Icons.timer, size: 16, color: Color(0xFFD32F2F)),
             const SizedBox(width: 8),
-            const Text('الموعد النهائي: 15 أبريل 2026', style: TextStyle(fontSize: 12, color: Color(0xFFD32F2F))),
+            const Text('ط§ظ„ظ…ظˆط¹ط¯ ط§ظ„ظ†ظ‡ط§ط¦ظٹ: 15 ط£ط¨ط±ظٹظ„ 2026', style: TextStyle(fontSize: 12, color: Color(0xFFD32F2F))),
             const Spacer(),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: inputsDone == _inputs.length ? const Color(0xFF2ECC8A) : const Color(0xFFFF9800),
                 borderRadius: BorderRadius.circular(8)),
-              child: Text(inputsDone == _inputs.length ? 'مكتمل' : 'ناقص',
+              child: Text(inputsDone == _inputs.length ? 'ظ…ظƒطھظ…ظ„' : 'ظ†ط§ظ‚طµ',
                 style: const TextStyle(color: Colors.white, fontSize: 11)),
             ),
           ]),
@@ -1750,14 +1750,14 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(doc['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(doc['uploaded'] == true ? 'تم الرفع: ${doc['date']}' : 'مطلوب — لم يتم الرفع',
+              Text(doc['uploaded'] == true ? 'طھظ… ط§ظ„ط±ظپط¹: ${doc['date']}' : 'ظ…ط·ظ„ظˆط¨ â€” ظ„ظ… ظٹطھظ… ط§ظ„ط±ظپط¹',
                 style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? Colors.green : Colors.red)),
             ])),
             if (doc['uploaded'] != true)
               ElevatedButton.icon(
                 onPressed: () => setState(() => docs[i] = {...doc, 'uploaded': true, 'date': '2026-03-30'}),
                 icon: const Icon(Icons.upload_file, size: 16),
-                label: const Text('رفع'),
+                label: const Text('ط±ظپط¹'),
                 style: ElevatedButton.styleFrom(backgroundColor: AC.navy, foregroundColor: Colors.white),
               ),
           ]),
@@ -1768,7 +1768,7 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
 }
 
 // ============================================================
-// Provider Compliance Status Screen (Zero Ambiguity §9)
+// Provider Compliance Status Screen (Zero Ambiguity آ§9)
 // ============================================================
 class ProviderComplianceScreen extends StatelessWidget {
   const ProviderComplianceScreen({Key? key}) : super(key: key);
@@ -1777,7 +1777,7 @@ class ProviderComplianceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ط­ط§ظ„ط© ط§ظ„ط§ظ…طھط«ط§ظ„'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -1791,28 +1791,28 @@ class ProviderComplianceScreen extends StatelessWidget {
             child: Column(children: [
               const Icon(Icons.verified, color: Color(0xFF2ECC8A), size: 48),
               const SizedBox(height: 12),
-              const Text('حالة الحساب: نشط', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text('ط­ط§ظ„ط© ط§ظ„ط­ط³ط§ط¨: ظ†ط´ط·', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(color: const Color(0xFF2ECC8A), borderRadius: BorderRadius.circular(20)),
-                child: const Text('لا توجد مخالفات', style: TextStyle(color: Colors.white, fontSize: 13)),
+                child: const Text('ظ„ط§ طھظˆط¬ط¯ ظ…ط®ط§ظ„ظپط§طھ', style: TextStyle(color: Colors.white, fontSize: 13)),
               ),
             ]),
           ),
           const SizedBox(height: 20),
 
           // Compliance Metrics
-          const Text('مؤشرات الامتثال', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('ظ…ط¤ط´ط±ط§طھ ط§ظ„ط§ظ…طھط«ط§ظ„', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
-          _metricCard('المهام المكتملة', '12', Icons.task_alt, const Color(0xFF2ECC8A)),
-          _metricCard('المستندات المرفوعة', '8/8', Icons.description, const Color(0xFF2ECC8A)),
-          _metricCard('المخالفات', '0', Icons.warning, const Color(0xFF2ECC8A)),
-          _metricCard('التعليقات السابقة', '0', Icons.block, const Color(0xFF2ECC8A)),
-          _metricCard('تقييم الأداء', '4.8/5', Icons.star, const Color(0xFFD4A843)),
+          _metricCard('ط§ظ„ظ…ظ‡ط§ظ… ط§ظ„ظ…ظƒطھظ…ظ„ط©', '12', Icons.task_alt, const Color(0xFF2ECC8A)),
+          _metricCard('ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ظ…ط±ظپظˆط¹ط©', '8/8', Icons.description, const Color(0xFF2ECC8A)),
+          _metricCard('ط§ظ„ظ…ط®ط§ظ„ظپط§طھ', '0', Icons.warning, const Color(0xFF2ECC8A)),
+          _metricCard('ط§ظ„طھط¹ظ„ظٹظ‚ط§طھ ط§ظ„ط³ط§ط¨ظ‚ط©', '0', Icons.block, const Color(0xFF2ECC8A)),
+          _metricCard('طھظ‚ظٹظٹظ… ط§ظ„ط£ط¯ط§ط،', '4.8/5', Icons.star, const Color(0xFFD4A843)),
 
           const SizedBox(height: 20),
-          const Text('سجل الامتثال', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('ط³ط¬ظ„ ط§ظ„ط§ظ…طھط«ط§ظ„', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(24),
@@ -1820,8 +1820,8 @@ class ProviderComplianceScreen extends StatelessWidget {
             child: Column(children: [
               const Icon(Icons.check_circle, color: Color(0xFF2ECC8A), size: 40),
               const SizedBox(height: 8),
-              const Text('سجل نظيف', style: TextStyle(fontSize: 14, color: Colors.grey)),
-              const Text('لا توجد مخالفات أو تعليقات سابقة', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const Text('ط³ط¬ظ„ ظ†ط¸ظٹظپ', style: TextStyle(fontSize: 14, color: Colors.grey)),
+              const Text('ظ„ط§ طھظˆط¬ط¯ ظ…ط®ط§ظ„ظپط§طھ ط£ظˆ طھط¹ظ„ظٹظ‚ط§طھ ط³ط§ط¨ظ‚ط©', style: TextStyle(fontSize: 12, color: Colors.grey)),
             ]),
           ),
         ]),
@@ -1846,7 +1846,7 @@ class ProviderComplianceScreen extends StatelessWidget {
 }
 
 // ============================================================
-// Activity History Screen (Execution Master §9)
+// Activity History Screen (Execution Master آ§9)
 // ============================================================
 class ActivityHistoryScreen extends StatelessWidget {
   const ActivityHistoryScreen({Key? key}) : super(key: key);
@@ -1854,16 +1854,16 @@ class ActivityHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activities = [
-      {'action': 'تحليل مالي', 'detail': 'رفع ميزان مراجعة - retail', 'time': 'اليوم 11:30', 'icon': Icons.analytics, 'color': const Color(0xFF1B2A4A)},
-      {'action': 'تحميل تقرير PDF', 'detail': 'تقرير التحليل المالي', 'time': 'اليوم 11:45', 'icon': Icons.picture_as_pdf, 'color': const Color(0xFF2ECC8A)},
-      {'action': 'إنشاء عميل', 'detail': 'شركة التقنية المتقدمة', 'time': 'أمس 14:00', 'icon': Icons.person_add, 'color': const Color(0xFFD4A843)},
-      {'action': 'طلب خدمة', 'detail': 'مسك دفاتر - شهري', 'time': 'أمس 15:30', 'icon': Icons.shopping_cart, 'color': const Color(0xFF9C27B0)},
-      {'action': 'ملاحظة معرفية', 'detail': 'تحسين تبويب الإيرادات', 'time': '28 مارس', 'icon': Icons.lightbulb, 'color': const Color(0xFFFF9800)},
+      {'action': 'طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹ', 'detail': 'ط±ظپط¹ ظ…ظٹط²ط§ظ† ظ…ط±ط§ط¬ط¹ط© - retail', 'time': 'ط§ظ„ظٹظˆظ… 11:30', 'icon': Icons.analytics, 'color': const Color(0xFF1B2A4A)},
+      {'action': 'طھط­ظ…ظٹظ„ طھظ‚ط±ظٹط± PDF', 'detail': 'طھظ‚ط±ظٹط± ط§ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ', 'time': 'ط§ظ„ظٹظˆظ… 11:45', 'icon': Icons.picture_as_pdf, 'color': const Color(0xFF2ECC8A)},
+      {'action': 'ط¥ظ†ط´ط§ط، ط¹ظ…ظٹظ„', 'detail': 'ط´ط±ظƒط© ط§ظ„طھظ‚ظ†ظٹط© ط§ظ„ظ…طھظ‚ط¯ظ…ط©', 'time': 'ط£ظ…ط³ 14:00', 'icon': Icons.person_add, 'color': const Color(0xFFD4A843)},
+      {'action': 'ط·ظ„ط¨ ط®ط¯ظ…ط©', 'detail': 'ظ…ط³ظƒ ط¯ظپط§طھط± - ط´ظ‡ط±ظٹ', 'time': 'ط£ظ…ط³ 15:30', 'icon': Icons.shopping_cart, 'color': const Color(0xFF9C27B0)},
+      {'action': 'ظ…ظ„ط§ط­ط¸ط© ظ…ط¹ط±ظپظٹط©', 'detail': 'طھط­ط³ظٹظ† طھط¨ظˆظٹط¨ ط§ظ„ط¥ظٹط±ط§ط¯ط§طھ', 'time': '28 ظ…ط§ط±ط³', 'icon': Icons.lightbulb, 'color': const Color(0xFFFF9800)},
     ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: activities.length,
@@ -1896,9 +1896,9 @@ class ActivityHistoryScreen extends StatelessWidget {
 
 
 
-// ═══════════════════════════════════════════════════════
-// Result Detail Panel — ! icon explanation (Execution §6)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// Result Detail Panel â€” ! icon explanation (Execution آ§6)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ResultDetailPanel extends StatefulWidget {
   final String analysisId;
   final String resultKey;
@@ -1981,7 +1981,7 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
     child: Text(t, style: TextStyle(color: c, fontSize: 11)));
 }
 
-// Result Detail Dialog — triggered by ! icon
+// Result Detail Dialog â€” triggered by ! icon
 void showResultDetail(BuildContext context, String analysisId, String resultKey) {
   showModalBottomSheet(
     context: context, backgroundColor: AC.navy2,
@@ -1994,9 +1994,9 @@ void showResultDetail(BuildContext context, String analysisId, String resultKey)
 }
 
 
-// ═══════════════════════════════════════════════════════
-// Task Document Management (Execution §8)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// Task Document Management (Execution آ§8)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class TaskDocumentManagementScreen extends StatefulWidget {
   final String taskId;
   final String taskTypeCode;
@@ -2028,7 +2028,7 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
   bool _isUploaded(String reqId) => _submissions.any((s) => s['requirement_id'] == reqId && s['status'] == 'uploaded');
   
   Future<void> _upload(String reqId, String docName) async {
-    // Simulate upload — in production, use file picker
+    // Simulate upload â€” in production, use file picker
     try {
       final r = await http.post(Uri.parse('$_api/task-submissions'),
         headers: {...S.h(), 'Content-Type': 'application/json'},
@@ -2140,9 +2140,9 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // Task Types Browser (shows all task types + requirements)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class TaskTypesBrowserScreen extends StatefulWidget {
   const TaskTypesBrowserScreen({super.key});
   @override State<TaskTypesBrowserScreen> createState() => _TaskTypesBrowserS();
@@ -2219,9 +2219,9 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════════
-// Knowledge Developer Console (Zero-Ambiguity §8)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// Knowledge Developer Console (Zero-Ambiguity آ§8)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class KnowledgeDeveloperConsole extends StatefulWidget {
   const KnowledgeDeveloperConsole({super.key});
   @override State<KnowledgeDeveloperConsole> createState() => _KnowledgeDevConsoleS();
@@ -2310,9 +2310,9 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
 }
 
 
-// ═══════════════════════════════════════════════════════
-// Audit Log Screen (Zero-Ambiguity §3)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// Audit Log Screen (Zero-Ambiguity آ§3)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AuditLogScreen extends StatefulWidget {
   const AuditLogScreen({super.key});
   @override State<AuditLogScreen> createState() => _AuditLogS();
@@ -2372,10 +2372,10 @@ class _AuditLogS extends State<AuditLogScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════════════
-// SubscriptionScreen — عرض الخطة الحالية + الترقية
-// Per Execution Master §4, §9 + Zero Ambiguity §5, §6
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// SubscriptionScreen â€” ط¹ط±ط¶ ط§ظ„ط®ط·ط© ط§ظ„ط­ط§ظ„ظٹط© + ط§ظ„طھط±ظ‚ظٹط©
+// Per Execution Master آ§4, آ§9 + Zero Ambiguity آ§5, آ§6
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
   @override State<SubscriptionScreen> createState() => _SubscriptionScreenState();
@@ -2419,11 +2419,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     );
     if (r.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تم الترقية إلى $planName بنجاح!'), backgroundColor: AC.ok));
+        SnackBar(content: Text('طھظ… ط§ظ„طھط±ظ‚ظٹط© ط¥ظ„ظ‰ $planName ط¨ظ†ط¬ط§ط­!'), backgroundColor: AC.ok));
       _load();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشل الترقية: ${r.body}'), backgroundColor: AC.err));
+        SnackBar(content: Text('ظپط´ظ„ ط§ظ„طھط±ظ‚ظٹط©: ${r.body}'), backgroundColor: AC.err));
     }
   }
 
@@ -2433,7 +2433,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     final features = _sub?['plan_features'] as List<dynamic>? ?? [];
     
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(title: const Text('خطتي والاشتراك'), backgroundColor: const Color(0xFF1E1E2E),
+      appBar: AppBar(title: const Text('ط®ط·طھظٹ ظˆط§ظ„ط§ط´طھط±ط§ظƒ'), backgroundColor: const Color(0xFF1E1E2E),
         iconTheme: const IconThemeData(color: AC.gold)),
       backgroundColor: const Color(0xFF0D0D1A),
       body: _loading 
@@ -2454,14 +2454,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     const Icon(Icons.workspace_premium, color: AC.gold, size: 32),
                     const SizedBox(width: 12),
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text('الخطة الحالية', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const Text('ط§ظ„ط®ط·ط© ط§ظ„ط­ط§ظ„ظٹط©', style: TextStyle(color: Colors.grey, fontSize: 12)),
                       Text(currentPlan, style: const TextStyle(color: AC.gold, fontSize: 24, fontWeight: FontWeight.bold)),
                     ]),
                   ]),
                   const SizedBox(height: 16),
                   const Divider(color: Colors.white12),
                   const SizedBox(height: 12),
-                  const Text('الميزات المتاحة:', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                  const Text('ط§ظ„ظ…ظٹط²ط§طھ ط§ظ„ظ…طھط§ط­ط©:', style: TextStyle(color: Colors.grey, fontSize: 13)),
                   const SizedBox(height: 8),
                   ...features.map<Widget>((f) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 3),
@@ -2479,7 +2479,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               ),
               
               const SizedBox(height: 24),
-              const Text('ترقية خطتك', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text('طھط±ظ‚ظٹط© ط®ط·طھظƒ', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               
               // Available Plans
@@ -2507,19 +2507,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           const SizedBox(width: 8),
                           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(color: AC.gold, borderRadius: BorderRadius.circular(8)),
-                            child: const Text('الحالية', style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold))),
+                            child: const Text('ط§ظ„ط­ط§ظ„ظٹط©', style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold))),
                         ],
                       ]),
                       const SizedBox(height: 4),
-                      Text(price > 0 ? '$price ر.س/شهرياً' : (note ?? 'مجاني'),
+                      Text(price > 0 ? '$price ط±.ط³/ط´ظ‡ط±ظٹط§ظ‹' : (note ?? 'ظ…ط¬ط§ظ†ظٹ'),
                         style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text('$featureCount ميزة متاحة', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                      Text('$featureCount ظ…ظٹط²ط© ظ…طھط§ط­ط©', style: const TextStyle(color: Colors.grey, fontSize: 11)),
                     ])),
                     if (!isCurrent)
                       ElevatedButton(
                         onPressed: () => _upgrade(name),
                         style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: Colors.black),
-                        child: Text(name == 'Enterprise' ? 'تواصل معنا' : 'ترقية'),
+                        child: Text(name == 'Enterprise' ? 'طھظˆط§طµظ„ ظ…ط¹ظ†ط§' : 'طھط±ظ‚ظٹط©'),
                       ),
                   ]),
                 );
@@ -2529,9 +2529,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-// EntitlementGateWidget — يغلق الميزات حسب الخطة
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// EntitlementGateWidget â€” ظٹط؛ظ„ظ‚ ط§ظ„ظ…ظٹط²ط§طھ ط­ط³ط¨ ط§ظ„ط®ط·ط©
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class EntitlementGate extends StatelessWidget {
   final String feature;
   final Widget child;
@@ -2542,14 +2542,14 @@ class EntitlementGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // This would check entitlements from cached user data
-    // For now, show child always — entitlement check happens on API side
+    // For now, show child always â€” entitlement check happens on API side
     return child;
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-// PlanComparisonScreen — مقارنة الخطط
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// PlanComparisonScreen â€” ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class PlanComparisonScreen extends StatefulWidget {
   const PlanComparisonScreen({super.key});
   @override State<PlanComparisonScreen> createState() => _PlanComparisonScreenState();
@@ -2574,7 +2574,7 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   @override
   Widget build(BuildContext context) {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(title: const Text('مقارنة الخطط'), backgroundColor: const Color(0xFF1E1E2E),
+      appBar: AppBar(title: const Text('ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·'), backgroundColor: const Color(0xFF1E1E2E),
         iconTheme: const IconThemeData(color: AC.gold)),
       backgroundColor: const Color(0xFF0D0D1A),
       body: _loading
@@ -2583,7 +2583,7 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
             DataTable(
               headingRowColor: WidgetStateProperty.all(const Color(0xFF1E1E2E)),
               columns: [
-                const DataColumn(label: Text('الميزة', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
+                const DataColumn(label: Text('ط§ظ„ظ…ظٹط²ط©', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
                 ..._planNames.map((p) => DataColumn(
                   label: Text(p, style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold)))),
               ],
@@ -2599,10 +2599,10 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   }
 
   String _formatCellValue(String v) {
-    if (v == 'true') return '✅';
-    if (v == 'false') return '❌';
-    if (v == 'unlimited') return '♾️';
-    if (v == 'none') return '—';
+    if (v == 'true') return 'âœ…';
+    if (v == 'false') return 'â‌Œ';
+    if (v == 'unlimited') return 'â™¾ï¸ڈ';
+    if (v == 'none') return 'â€”';
     return v;
   }
 
@@ -2613,15 +2613,15 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-// ForgotPasswordScreen — استعادة كلمة المرور
-// Phase 9 Account Center §6
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// ForgotPasswordScreen â€” ط§ط³طھط¹ط§ط¯ط© ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±
+// Phase 9 Account Center آ§6
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
-// ═══════════════════════════════════════════════════════════
-// NotificationCenterScreen — مركز الإشعارات (API-driven)
-// Phase 10 Notification System §13
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// NotificationCenterScreen â€” ظ…ط±ظƒط² ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ (API-driven)
+// Phase 10 Notification System آ§13
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class NotificationCenterScreenV2 extends StatefulWidget {
   const NotificationCenterScreenV2({super.key});
   @override State<NotificationCenterScreenV2> createState() => _NotifCenterV2State();
@@ -2710,13 +2710,13 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
-        title: Text('الإشعارات${_unread > 0 ? " ($_unread)" : ""}'),
+        title: Text('ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ${_unread > 0 ? " ($_unread)" : ""}'),
         backgroundColor: AC.navy2,
         actions: [
           if (_unread > 0)
             TextButton(
               onPressed: _markAllRead,
-              child: const Text('قراءة الكل', style: TextStyle(color: AC.gold, fontSize: 12)),
+              child: const Text('ظ‚ط±ط§ط،ط© ط§ظ„ظƒظ„', style: TextStyle(color: AC.gold, fontSize: 12)),
             ),
           IconButton(
             onPressed: () => Navigator.push(context,
@@ -2731,7 +2731,7 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
           ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
               const Icon(Icons.notifications_off, color: AC.ts, size: 48),
               const SizedBox(height: 12),
-              Text('لا توجد إشعارات', style: TextStyle(color: AC.ts)),
+              Text('ظ„ط§ طھظˆط¬ط¯ ط¥ط´ط¹ط§ط±ط§طھ', style: TextStyle(color: AC.ts)),
             ]))
           : RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
               padding: const EdgeInsets.all(12),
@@ -2785,9 +2785,9 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-// NotificationPrefsScreen — تفضيلات الإشعارات
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// NotificationPrefsScreen â€” طھظپط¶ظٹظ„ط§طھ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class NotificationPrefsScreen extends StatefulWidget {
   const NotificationPrefsScreen({super.key});
   @override State<NotificationPrefsScreen> createState() => _NotifPrefsState();
@@ -2832,7 +2832,7 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
   Widget build(BuildContext context) {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('تفضيلات الإشعارات'), backgroundColor: AC.navy2),
+      appBar: AppBar(title: const Text('طھظپط¶ظٹظ„ط§طھ ط§ظ„ط¥ط´ط¹ط§ط±ط§طھ'), backgroundColor: AC.navy2),
       body: _loading
         ? const Center(child: CircularProgressIndicator(color: AC.gold))
         : ListView.builder(
@@ -2848,11 +2848,11 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
                   Text(p['title_ar'] ?? p['type'], style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   Row(children: [
-                    _chip('داخل التطبيق', p['in_app'] == true, () => _toggle(p['type'], 'in_app', !(p['in_app'] == true))),
+                    _chip('ط¯ط§ط®ظ„ ط§ظ„طھط·ط¨ظٹظ‚', p['in_app'] == true, () => _toggle(p['type'], 'in_app', !(p['in_app'] == true))),
                     const SizedBox(width: 8),
-                    _chip('بريد إلكتروني', p['email'] == true, () => _toggle(p['type'], 'email', !(p['email'] == true))),
+                    _chip('ط¨ط±ظٹط¯ ط¥ظ„ظƒطھط±ظˆظ†ظٹ', p['email'] == true, () => _toggle(p['type'], 'email', !(p['email'] == true))),
                     const SizedBox(width: 8),
-                    _chip('رسالة SMS', p['sms'] == true, () => _toggle(p['type'], 'sms', !(p['sms'] == true))),
+                    _chip('ط±ط³ط§ظ„ط© SMS', p['sms'] == true, () => _toggle(p['type'], 'sms', !(p['sms'] == true))),
                   ]),
                 ]),
               );
@@ -2878,10 +2878,10 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════════════
-// LegalDocumentsScreen — الشروط والأحكام والسياسات
-// Phase 11 Legal Acceptance §12
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// LegalDocumentsScreen â€” ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ… ظˆط§ظ„ط³ظٹط§ط³ط§طھ
+// Phase 11 Legal Acceptance آ§12
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class LegalDocumentsScreenV2 extends StatefulWidget {
   const LegalDocumentsScreenV2({super.key});
   @override State<LegalDocumentsScreenV2> createState() => _LegalDocsV2State();
@@ -3025,7 +3025,7 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
 
   Future<void> _send() async {
     if (_eC.text.trim().isEmpty) {
-      setState(() { _err = 'أدخل البريد الإلكتروني'; });
+      setState(() { _err = 'ط£ط¯ط®ظ„ ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ'; });
       return;
     }
     setState(() { _ld = true; _err = null; _ok = null; });
@@ -3039,10 +3039,10 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
         Navigator.push(context, MaterialPageRoute(
           builder: (_) => VerifyResetCodeScreen(email: _eC.text.trim(), token: d['reset_token'] ?? '')));
       } else {
-        setState(() { _err = d['detail'] ?? d['message'] ?? 'حدث خطأ'; });
+        setState(() { _err = d['detail'] ?? d['message'] ?? 'ط­ط¯ط« ط®ط·ط£'; });
       }
     } catch (e) {
-      setState(() { _err = 'خطأ في الاتصال'; });
+      setState(() { _err = 'ط®ط·ط£ ظپظٹ ط§ظ„ط§طھطµط§ظ„'; });
     } finally {
       setState(() { _ld = false; });
     }
@@ -3051,13 +3051,13 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('استعادة كلمة المرور')),
+      appBar: AppBar(title: const Text('ط§ط³طھط¹ط§ط¯ط© ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±')),
       body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const SizedBox(height: 24),
           const Icon(Icons.lock_reset, size: 72, color: AC.gold),
           const SizedBox(height: 24),
-          const Text('أدخل بريدك الإلكتروني المسجل \nسنرسل لك رمز إعادة التعيين',
+          const Text('ط£ط¯ط®ظ„ ط¨ط±ظٹط¯ظƒ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ ط§ظ„ظ…ط³ط¬ظ„ \nط³ظ†ط±ط³ظ„ ظ„ظƒ ط±ظ…ط² ط¥ط¹ط§ط¯ط© ط§ظ„طھط¹ظٹظٹظ†',
             style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
           const SizedBox(height: 24),
           if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
@@ -3065,7 +3065,7 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
             child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
           TextField(controller: _eC, keyboardType: TextInputType.emailAddress,
             style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(labelText: 'البريد الإلكتروني',
+            decoration: InputDecoration(labelText: 'ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ',
               labelStyle: const TextStyle(color: Colors.white54),
               prefixIcon: const Icon(Icons.email_outlined, color: AC.gold),
               enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
@@ -3073,7 +3073,7 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
           const SizedBox(height: 24),
           SizedBox(height: 52, child: ElevatedButton(onPressed: _ld ? null : _send,
             child: _ld ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
-              : const Text('إرسال رمز التحقق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
+              : const Text('ط¥ط±ط³ط§ظ„ ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
         ]))));
   }
 }
@@ -3091,7 +3091,7 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
   void _verify() {
     final entered = _codeC.text.trim();
     if (entered.isEmpty) {
-      setState(() { _err = 'أدخل رمز التحقق'; });
+      setState(() { _err = 'ط£ط¯ط®ظ„ ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚'; });
       return;
     }
     // For now, since we have the token from API, we verify locally
@@ -3100,23 +3100,23 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
       Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (_) => NewPasswordScreen(token: widget.token, email: widget.email)));
     } else {
-      setState(() { _err = 'الرمز غير صحيح'; });
+      setState(() { _err = 'ط§ظ„ط±ظ…ط² ط؛ظٹط± طµط­ظٹط­'; });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('إدخال رمز التحقق')),
+      appBar: AppBar(title: const Text('ط¥ط¯ط®ط§ظ„ ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚')),
       body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const SizedBox(height: 24),
           const Icon(Icons.verified_user, size: 72, color: AC.gold),
           const SizedBox(height: 24),
-          Text('تم إرسال رمز التحقق إلى\n${widget.email}',
+          Text('طھظ… ط¥ط±ط³ط§ظ„ ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚ ط¥ظ„ظ‰\n${widget.email}',
             style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
           const SizedBox(height: 8),
-          const Text('أدخل الرمز الذي وصلك للمتابعة',
+          const Text('ط£ط¯ط®ظ„ ط§ظ„ط±ظ…ط² ط§ظ„ط°ظٹ ظˆطµظ„ظƒ ظ„ظ„ظ…طھط§ط¨ط¹ط©',
             style: TextStyle(color: Colors.white38, fontSize: 13), textAlign: TextAlign.center),
           const SizedBox(height: 24),
           if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
@@ -3125,17 +3125,17 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
           TextField(controller: _codeC, textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 4),
             decoration: InputDecoration(
-              hintText: 'رمز التحقق',
+              hintText: 'ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚',
               hintStyle: const TextStyle(color: Colors.white30, letterSpacing: 1),
               prefixIcon: const Icon(Icons.pin, color: AC.gold),
               enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
               focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
           const SizedBox(height: 24),
           SizedBox(height: 52, child: ElevatedButton(onPressed: _verify,
-            child: const Text('تحقق واستمر', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
+            child: const Text('طھط­ظ‚ظ‚ ظˆط§ط³طھظ…ط±', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
           const SizedBox(height: 16),
           TextButton(onPressed: () => Navigator.pop(context),
-            child: const Text('إعادة إرسال الرمز', style: TextStyle(color: AC.gold, fontSize: 14))),
+            child: const Text('ط¥ط¹ط§ط¯ط© ط¥ط±ط³ط§ظ„ ط§ظ„ط±ظ…ط²', style: TextStyle(color: AC.gold, fontSize: 14))),
         ]))));
   }
 }
@@ -3154,11 +3154,11 @@ class _NewPwS extends State<NewPasswordScreen> {
 
   Future<void> _resetPw() async {
     if (_pw1.text.length < 6) {
-      setState(() { _err = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'; });
+      setState(() { _err = 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ظٹط¬ط¨ ط£ظ† طھظƒظˆظ† 6 ط£ط­ط±ظپ ط¹ظ„ظ‰ ط§ظ„ط£ظ‚ظ„'; });
       return;
     }
     if (_pw1.text != _pw2.text) {
-      setState(() { _err = 'كلمتا المرور غير متطابقتين'; });
+      setState(() { _err = 'ظƒظ„ظ…طھط§ ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± ظ…طھط·ط§ط¨ظ‚طھظٹظ†'; });
       return;
     }
     setState(() { _ld = true; _err = null; });
@@ -3171,10 +3171,10 @@ class _NewPwS extends State<NewPasswordScreen> {
       if (r.statusCode == 200 && d['status'] == 'ok') {
         setState(() { _done = true; });
       } else {
-        setState(() { _err = d['detail'] ?? 'فشلت إعادة التعيين'; });
+        setState(() { _err = d['detail'] ?? 'ظپط´ظ„طھ ط¥ط¹ط§ط¯ط© ط§ظ„طھط¹ظٹظٹظ†'; });
       }
     } catch (e) {
-      setState(() { _err = 'خطأ في الاتصال'; });
+      setState(() { _err = 'ط®ط·ط£ ظپظٹ ط§ظ„ط§طھطµط§ظ„'; });
     } finally {
       setState(() { _ld = false; });
     }
@@ -3183,38 +3183,38 @@ class _NewPwS extends State<NewPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('كلمة المرور الجديدة')),
+      appBar: AppBar(title: const Text('ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط©')),
       body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const SizedBox(height: 24),
           Icon(_done ? Icons.check_circle : Icons.lock_outline, size: 72, color: _done ? Colors.greenAccent : AC.gold),
           const SizedBox(height: 24),
           if (_done) ...[
-            const Text('تم تغيير كلمة المرور بنجاح!',
+            const Text('طھظ… طھط؛ظٹظٹط± ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط¨ظ†ط¬ط§ط­!',
               style: TextStyle(color: Colors.greenAccent, fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            const Text('يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة',
+            const Text('ظٹظ…ظƒظ†ظƒ ط§ظ„ط¢ظ† طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„ ط¨ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط©',
               style: TextStyle(color: Colors.white70, fontSize: 14), textAlign: TextAlign.center),
             const SizedBox(height: 32),
             SizedBox(height: 52, child: ElevatedButton(
               onPressed: () { Navigator.of(context).popUntil((route) => route.isFirst); },
-              child: const Text('العودة لتسجيل الدخول', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
+              child: const Text('ط§ظ„ط¹ظˆط¯ط© ظ„طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
           ] else ...[
-            Text('أدخل كلمة المرور الجديدة لـ\n${widget.email}',
+            Text('ط£ط¯ط®ظ„ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط© ظ„ظ€\n${widget.email}',
               style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
             const SizedBox(height: 24),
             if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(color: Colors.red.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
               child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
             TextField(controller: _pw1, obscureText: true, style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(labelText: 'كلمة المرور الجديدة',
+              decoration: InputDecoration(labelText: 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط©',
                 labelStyle: const TextStyle(color: Colors.white54),
                 prefixIcon: const Icon(Icons.lock_outline, color: AC.gold),
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
                 focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
             const SizedBox(height: 16),
             TextField(controller: _pw2, obscureText: true, style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(labelText: 'تأكيد كلمة المرور',
+              decoration: InputDecoration(labelText: 'طھط£ظƒظٹط¯ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±',
                 labelStyle: const TextStyle(color: Colors.white54),
                 prefixIcon: const Icon(Icons.lock, color: AC.gold),
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
@@ -3223,17 +3223,17 @@ class _NewPwS extends State<NewPasswordScreen> {
             SizedBox(height: 52, child: ElevatedButton(onPressed: _ld ? null : _resetPw,
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade700),
               child: _ld ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Text('إعادة تعيين كلمة المرور', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)))),
+                : const Text('ط¥ط¹ط§ط¯ط© طھط¹ظٹظٹظ† ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)))),
           ],
         ]))));
   }
 }
 
 
-// ═══════════════════════════════════════════════════════════
-// SessionsScreen — إدارة الجلسات النشطة
-// Phase 9 Account Center §6
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// SessionsScreen â€” ط¥ط¯ط§ط±ط© ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©
+// Phase 9 Account Center آ§6
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class SessionsScreen extends StatefulWidget {
   const SessionsScreen({super.key});
   @override State<SessionsScreen> createState() => _SessionsScreenState();
@@ -3266,7 +3266,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
     );
     if (r.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إنهاء جميع الجلسات'), backgroundColor: Colors.green));
+        const SnackBar(content: Text('طھظ… ط¥ظ†ظ‡ط§ط، ط¬ظ…ظٹط¹ ط§ظ„ط¬ظ„ط³ط§طھ'), backgroundColor: Colors.green));
       _load();
     }
   }
@@ -3278,7 +3278,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
     );
     if (r.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إنهاء الجلسة'), backgroundColor: Colors.green));
+        const SnackBar(content: Text('طھظ… ط¥ظ†ظ‡ط§ط، ط§ظ„ط¬ظ„ط³ط©'), backgroundColor: Colors.green));
       _load();
     }
   }
@@ -3288,19 +3288,19 @@ class _SessionsScreenState extends State<SessionsScreen> {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
-        title: const Text('الجلسات النشطة'), backgroundColor: AC.navy2,
+        title: const Text('ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©'), backgroundColor: AC.navy2,
         actions: [
           TextButton.icon(
             onPressed: _logoutAll,
             icon: const Icon(Icons.logout, color: AC.err, size: 18),
-            label: const Text('إنهاء الكل', style: TextStyle(color: AC.err, fontSize: 12)),
+            label: const Text('ط¥ظ†ظ‡ط§ط، ط§ظ„ظƒظ„', style: TextStyle(color: AC.err, fontSize: 12)),
           ),
         ],
       ),
       body: _loading
         ? const Center(child: CircularProgressIndicator(color: AC.gold))
         : _sessions.isEmpty
-          ? Center(child: Text('لا توجد جلسات نشطة', style: TextStyle(color: AC.ts)))
+          ? Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ط¬ظ„ط³ط§طھ ظ†ط´ط·ط©', style: TextStyle(color: AC.ts)))
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: _sessions.length,
@@ -3319,19 +3319,19 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(s['device_info'] ?? 'جهاز غير معروف',
+                        Text(s['device_info'] ?? 'ط¬ظ‡ط§ط² ط؛ظٹط± ظ…ط¹ط±ظˆظپ',
                           style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
-                        Text('IP: ${s['ip_address'] ?? '—'}',
+                        Text('IP: ${s['ip_address'] ?? 'â€”'}',
                           style: TextStyle(color: AC.ts, fontSize: 12)),
-                        Text('آخر نشاط: ${s['last_activity']?.toString().substring(0, 16) ?? '—'}',
+                        Text('ط¢ط®ط± ظ†ط´ط§ط·: ${s['last_activity']?.toString().substring(0, 16) ?? 'â€”'}',
                           style: TextStyle(color: AC.ts, fontSize: 12)),
                       ],
                     )),
                     IconButton(
                       onPressed: () => _logoutOne(s['id']),
                       icon: const Icon(Icons.close, color: AC.err),
-                      tooltip: 'إنهاء الجلسة',
+                      tooltip: 'ط¥ظ†ظ‡ط§ط، ط§ظ„ط¬ظ„ط³ط©',
                     ),
                   ]),
                 );
@@ -3342,11 +3342,11 @@ class _SessionsScreenState extends State<SessionsScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════════════
-// SPRINT 1 — COA FIRST WORKFLOW SCREENS
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// SPRINT 1 â€” COA FIRST WORKFLOW SCREENS
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
-// ── 1. Client List Screen ──
+// â”€â”€ 1. Client List Screen â”€â”€
 class ClientListScreen extends StatefulWidget {
   const ClientListScreen({super.key});
   @override State<ClientListScreen> createState() => _ClientListS();
@@ -3373,7 +3373,7 @@ class _ClientListS extends State<ClientListScreen> {
   @override
   Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('العملاء', style: TextStyle(color: AC.gold)),
+    appBar: AppBar(title: const Text('ط§ظ„ط¹ظ…ظ„ط§ط،', style: TextStyle(color: AC.gold)),
       actions: [IconButton(icon: const Icon(Icons.add_circle, color: AC.gold),
         onPressed: () async {
           final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen()));
@@ -3384,11 +3384,11 @@ class _ClientListS extends State<ClientListScreen> {
         ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
             const Icon(Icons.business, size: 64, color: AC.ts),
             const SizedBox(height: 16),
-            const Text('لا يوجد عملاء بعد', style: TextStyle(color: AC.ts, fontSize: 16)),
+            const Text('ظ„ط§ ظٹظˆط¬ط¯ ط¹ظ…ظ„ط§ط، ط¨ط¹ط¯', style: TextStyle(color: AC.ts, fontSize: 16)),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               icon: const Icon(Icons.add),
-              label: const Text('إنشاء عميل جديد'),
+              label: const Text('ط¥ظ†ط´ط§ط، ط¹ظ…ظٹظ„ ط¬ط¯ظٹط¯'),
               onPressed: () async {
                 final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen()));
                 if (created == true) _load();
@@ -3408,13 +3408,13 @@ class _ClientListS extends State<ClientListScreen> {
                 child: ListTile(
                   leading: CircleAvatar(backgroundColor: km ? AC.gold : AC.navy4,
                     child: Icon(Icons.business, color: km ? AC.navy : AC.ts)),
-                  title: Text(cl['name_ar'] ?? cl['name'] ?? '—', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+                  title: Text(cl['name_ar'] ?? cl['name'] ?? 'â€”', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
                   subtitle: Row(children: [
                     Text(cl['client_type'] ?? cl['client_type_code'] ?? '', style: TextStyle(color: AC.ts, fontSize: 12)),
                     if (km) ...[const SizedBox(width: 8),
                       Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                        child: const Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)))],
+                        child: const Text('ظ…ط¹ط±ظپظٹ', style: TextStyle(color: AC.gold, fontSize: 10)))],
                   ]),
                   trailing: const Icon(Icons.chevron_left, color: AC.ts),
                   onTap: () => Navigator.push(c, MaterialPageRoute(
@@ -3426,7 +3426,7 @@ class _ClientListS extends State<ClientListScreen> {
   );
 }
 
-// ── 2. Client Create Screen ──
+// â”€â”€ 2. Client Create Screen â”€â”€
 class ClientCreateScreen extends StatefulWidget {
   const ClientCreateScreen({super.key});
   @override
@@ -3441,7 +3441,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
 
   Future<void> _create() async {
     if (_nameC.text.trim().isEmpty || _selectedType == null) {
-      setState(() => _err = 'ادخل اسم العميل واختر النوع');
+      setState(() => _err = 'ط§ط¯ط®ظ„ ط§ط³ظ… ط§ظ„ط¹ظ…ظٹظ„ ظˆط§ط®طھط± ط§ظ„ظ†ظˆط¹');
       return;
     }
     setState(() { _ld = true; _err = null; });
@@ -3453,7 +3453,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
       if (r.statusCode == 200 && d['success'] == true) {
         if (mounted) Navigator.pop(context, true);
       } else {
-        setState(() { _err = d['detail'] ?? 'فشل'; _ld = false; });
+        setState(() { _err = d['detail'] ?? 'ظپط´ظ„'; _ld = false; });
       }
     } catch (e) { setState(() { _err = e.toString(); _ld = false; }); }
   }
@@ -3465,7 +3465,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('عميل جديد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      appBar: AppBar(title: const Text('ط¹ظ…ظٹظ„ ط¬ط¯ظٹط¯', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
       body: Column(
         children: [
           Padding(
@@ -3476,7 +3476,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
                 controller: _nameC,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: 'اسم الشركة *',
+                  labelText: 'ط§ط³ظ… ط§ظ„ط´ط±ظƒط© *',
                   labelStyle: const TextStyle(color: Colors.white54),
                   prefixIcon: Icon(Icons.business, color: AC.gold),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
@@ -3498,7 +3498,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
               children: [
                 Icon(Icons.category, color: AC.gold, size: 20),
                 const SizedBox(width: 8),
-                Text('نوع العميل *', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 14)),
+                Text('ظ†ظˆط¹ ط§ظ„ط¹ظ…ظٹظ„ *', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 14)),
               ],
             ),
           ),
@@ -3507,15 +3507,15 @@ class _ClientCreateS extends State<ClientCreateScreen> {
               shrinkWrap: true,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-                _typeCard('standard_business', 'شركة تجارية عادية', Icons.business, false),
-                _typeCard('financial_entity', 'جهة مالية', Icons.account_balance, true),
-                _typeCard('financing_entity', 'جهة تمويلية', Icons.monetization_on, true),
-                _typeCard('accounting_firm', 'مكتب محاسبة', Icons.calculate, true),
-                _typeCard('audit_firm', 'مكتب مراجعة', Icons.verified_user, true),
-                _typeCard('investment_entity', 'جهة استثمارية', Icons.trending_up, true),
-                _typeCard('sector_consulting_entity', 'جهة استشارية', Icons.lightbulb, true),
-                _typeCard('government_entity', 'جهة حكومية', Icons.account_balance_wallet, true),
-                _typeCard('legal_regulatory_entity', 'جهة قانونية أو تنظيمية', Icons.gavel, true),
+                _typeCard('standard_business', 'ط´ط±ظƒط© طھط¬ط§ط±ظٹط© ط¹ط§ط¯ظٹط©', Icons.business, false),
+                _typeCard('financial_entity', 'ط¬ظ‡ط© ظ…ط§ظ„ظٹط©', Icons.account_balance, true),
+                _typeCard('financing_entity', 'ط¬ظ‡ط© طھظ…ظˆظٹظ„ظٹط©', Icons.monetization_on, true),
+                _typeCard('accounting_firm', 'ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط©', Icons.calculate, true),
+                _typeCard('audit_firm', 'ظ…ظƒطھط¨ ظ…ط±ط§ط¬ط¹ط©', Icons.verified_user, true),
+                _typeCard('investment_entity', 'ط¬ظ‡ط© ط§ط³طھط«ظ…ط§ط±ظٹط©', Icons.trending_up, true),
+                _typeCard('sector_consulting_entity', 'ط¬ظ‡ط© ط§ط³طھط´ط§ط±ظٹط©', Icons.lightbulb, true),
+                _typeCard('government_entity', 'ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط©', Icons.account_balance_wallet, true),
+                _typeCard('legal_regulatory_entity', 'ط¬ظ‡ط© ظ‚ط§ظ†ظˆظ†ظٹط© ط£ظˆ طھظ†ط¸ظٹظ…ظٹط©', Icons.gavel, true),
               ],
             ),
           ),
@@ -3532,7 +3532,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
                 ),
                 child: _ld
                     ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : Text('انشاء العميل', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16)),
+                    : Text('ط§ظ†ط´ط§ط، ط§ظ„ط¹ظ…ظٹظ„', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ),
           ),
@@ -3571,7 +3571,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                child: Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)),
+                child: Text('ظ…ط¹ط±ظپظٹ', style: TextStyle(color: AC.gold, fontSize: 10)),
               ),
           ],
         ),
@@ -3591,7 +3591,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
 
 
 
-// ── 3. COA Upload Screen ──
+// â”€â”€ 3. COA Upload Screen â”€â”€
 class CoaUploadScreen extends StatefulWidget {
   final String clientId;
   final String clientName;
@@ -3626,21 +3626,21 @@ class _CoaUploadS extends State<CoaUploadScreen> {
       if (response.statusCode == 200) {
         setState(() { _uploadResult = d; _uploading = false; });
       } else {
-        setState(() { _err = d['detail']?.toString() ?? d['message'] ?? 'فشل الرفع'; _uploading = false; });
+        setState(() { _err = d['detail']?.toString() ?? d['message'] ?? 'ظپط´ظ„ ط§ظ„ط±ظپط¹'; _uploading = false; });
       }
-    } catch (e) { setState(() { _err = 'خطأ: $e'; _uploading = false; }); }
+    } catch (e) { setState(() { _err = 'ط®ط·ط£: $e'; _uploading = false; }); }
   }
 
   @override
   Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('رفع شجرة الحسابات — ${widget.clientName}', style: const TextStyle(color: AC.gold, fontSize: 14))),
+    appBar: AppBar(title: Text('ط±ظپط¹ ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ â€” ${widget.clientName}', style: const TextStyle(color: AC.gold, fontSize: 14))),
     body: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         // Step indicator
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          _stepDot('رفع', 1, true), _stepLine(), _stepDot('أعمدة', 2, _uploadResult != null),
-          _stepLine(), _stepDot('تحليل', 3, false), _stepLine(), _stepDot('معاينة', 4, false),
+          _stepDot('ط±ظپط¹', 1, true), _stepLine(), _stepDot('ط£ط¹ظ…ط¯ط©', 2, _uploadResult != null),
+          _stepLine(), _stepDot('طھط­ظ„ظٹظ„', 3, false), _stepLine(), _stepDot('ظ…ط¹ط§ظٹظ†ط©', 4, false),
         ]),
         const SizedBox(height: 32),
         if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
@@ -3655,30 +3655,30 @@ class _CoaUploadS extends State<CoaUploadScreen> {
             child: Column(children: [
               Icon(_uploading ? Icons.hourglass_top : Icons.cloud_upload, size: 64, color: AC.gold),
               const SizedBox(height: 16),
-              Text(_uploading ? 'جاري رفع الملف...' : 'اختر ملف شجرة الحسابات',
+              Text(_uploading ? 'ط¬ط§ط±ظٹ ط±ظپط¹ ط§ظ„ظ…ظ„ظپ...' : 'ط§ط®طھط± ظ…ظ„ظپ ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ',
                 style: const TextStyle(color: AC.tp, fontSize: 16)),
               const SizedBox(height: 8),
               const Text('CSV / Excel (.xlsx / .xls)', style: TextStyle(color: AC.ts, fontSize: 13)),
               const SizedBox(height: 8),
-              const Text('الحد الأقصى: 15 ميجابايت', style: TextStyle(color: AC.ts, fontSize: 12)),
+              const Text('ط§ظ„ط­ط¯ ط§ظ„ط£ظ‚طµظ‰: 15 ظ…ظٹط¬ط§ط¨ط§ظٹطھ', style: TextStyle(color: AC.ts, fontSize: 12)),
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 icon: const Icon(Icons.file_upload),
-                label: Text(_uploading ? 'جاري الرفع...' : 'اختيار ملف'),
+                label: Text(_uploading ? 'ط¬ط§ط±ظٹ ط§ظ„ط±ظپط¹...' : 'ط§ط®طھظٹط§ط± ظ…ظ„ظپ'),
                 onPressed: _uploading ? null : _pickAndUpload,
                 style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy,
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14))),
             ])),
         ] else ...[
-          // Upload success — show detection results
+          // Upload success â€” show detection results
           Container(padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
             child: Row(children: [
               const Icon(Icons.check_circle, color: Colors.greenAccent),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('تم رفع: ${_uploadResult!['file_name']}', style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
-                Text('الأعمدة المكتشفة: ${(_uploadResult!['detected_columns'] as List?)?.length ?? 0}',
+                Text('طھظ… ط±ظپط¹: ${_uploadResult!['file_name']}', style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
+                Text('ط§ظ„ط£ط¹ظ…ط¯ط© ط§ظ„ظ…ظƒطھط´ظپط©: ${(_uploadResult!['detected_columns'] as List?)?.length ?? 0}',
                   style: const TextStyle(color: AC.ts, fontSize: 12)),
               ])),
             ])),
@@ -3691,7 +3691,7 @@ class _CoaUploadS extends State<CoaUploadScreen> {
           const SizedBox(height: 16),
           SizedBox(height: 52, child: ElevatedButton.icon(
             icon: const Icon(Icons.table_chart),
-            label: const Text('مراجعة الأعمدة المكتشفة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            label: const Text('ظ…ط±ط§ط¬ط¹ط© ط§ظ„ط£ط¹ظ…ط¯ط© ط§ظ„ظ…ظƒطھط´ظپط©', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             onPressed: () => Navigator.push(c, MaterialPageRoute(
               builder: (_) => CoaColumnMappingScreen(
                 uploadId: _uploadResult!['upload_id'],
@@ -3718,7 +3718,7 @@ class _CoaUploadS extends State<CoaUploadScreen> {
   Widget _stepLine() => Container(width: 30, height: 2, color: AC.ts.withOpacity(0.3), margin: const EdgeInsets.only(bottom: 16));
 }
 
-// ── 4. Column Mapping Screen ──
+// â”€â”€ 4. Column Mapping Screen â”€â”€
 class CoaColumnMappingScreen extends StatefulWidget {
   final String uploadId, clientId, clientName;
   final List<String> detectedColumns;
@@ -3734,15 +3734,15 @@ class _CoaColMapS extends State<CoaColumnMappingScreen> {
   String? _err;
 
   static const _fieldLabels = {
-    'account_code': 'رقم الحساب',
-    'account_name': 'اسم الحساب ✱',
-    'parent_code': 'رقم الأب',
-    'parent_name': 'اسم الأب',
-    'level': 'المستوى',
-    'account_type': 'نوع الحساب',
-    'normal_balance': 'طبيعة الرصيد',
-    'active_flag': 'مفعل',
-    'notes': 'ملاحظات',
+    'account_code': 'ط±ظ‚ظ… ط§ظ„ط­ط³ط§ط¨',
+    'account_name': 'ط§ط³ظ… ط§ظ„ط­ط³ط§ط¨ âœ±',
+    'parent_code': 'ط±ظ‚ظ… ط§ظ„ط£ط¨',
+    'parent_name': 'ط§ط³ظ… ط§ظ„ط£ط¨',
+    'level': 'ط§ظ„ظ…ط³طھظˆظ‰',
+    'account_type': 'ظ†ظˆط¹ ط§ظ„ط­ط³ط§ط¨',
+    'normal_balance': 'ط·ط¨ظٹط¹ط© ط§ظ„ط±طµظٹط¯',
+    'active_flag': 'ظ…ظپط¹ظ„',
+    'notes': 'ظ…ظ„ط§ط­ط¸ط§طھ',
   };
 
   @override void initState() {
@@ -3753,7 +3753,7 @@ class _CoaColMapS extends State<CoaColumnMappingScreen> {
 
   Future<void> _parse() async {
     if (_mapping['account_name'] == null || _mapping['account_name']!.isEmpty) {
-      setState(() => _err = 'حقل "اسم الحساب" إلزامي!');
+      setState(() => _err = 'ط­ظ‚ظ„ "ط§ط³ظ… ط§ظ„ط­ط³ط§ط¨" ط¥ظ„ط²ط§ظ…ظٹ!');
       return;
     }
     setState(() { _parsing = true; _err = null; });
@@ -3770,26 +3770,26 @@ class _CoaColMapS extends State<CoaColumnMappingScreen> {
           builder: (_) => CoaParsedPreviewScreen(
             uploadId: widget.uploadId, clientId: widget.clientId, clientName: widget.clientName, parseResult: d)));
       } else {
-        setState(() { _err = d['detail']?.toString() ?? d['message'] ?? 'فشل التحليل'; _parsing = false; });
+        setState(() { _err = d['detail']?.toString() ?? d['message'] ?? 'ظپط´ظ„ ط§ظ„طھط­ظ„ظٹظ„'; _parsing = false; });
       }
-    } catch (e) { setState(() { _err = 'خطأ: $e'; _parsing = false; }); }
+    } catch (e) { setState(() { _err = 'ط®ط·ط£: $e'; _parsing = false; }); }
   }
 
   @override
   Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('ربط الأعمدة', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: const Text('ط±ط¨ط· ط§ظ„ط£ط¹ظ…ط¯ط©', style: TextStyle(color: AC.gold))),
     body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          _stepDot('رفع', 1, true), _stepLine(), _stepDot('أعمدة', 2, true),
-          _stepLine(), _stepDot('تحليل', 3, false), _stepLine(), _stepDot('معاينة', 4, false),
+          _stepDot('ط±ظپط¹', 1, true), _stepLine(), _stepDot('ط£ط¹ظ…ط¯ط©', 2, true),
+          _stepLine(), _stepDot('طھط­ظ„ظٹظ„', 3, false), _stepLine(), _stepDot('ظ…ط¹ط§ظٹظ†ط©', 4, false),
         ]),
         const SizedBox(height: 20),
         if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
           child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 13), textAlign: TextAlign.center)),
-        const Text('اربط كل عمود في ملفك بالحقل المناسب:', style: TextStyle(color: AC.ts, fontSize: 13)),
+        const Text('ط§ط±ط¨ط· ظƒظ„ ط¹ظ…ظˆط¯ ظپظٹ ظ…ظ„ظپظƒ ط¨ط§ظ„ط­ظ‚ظ„ ط§ظ„ظ…ظ†ط§ط³ط¨:', style: TextStyle(color: AC.ts, fontSize: 13)),
         const SizedBox(height: 12),
         ..._fieldLabels.entries.map((e) => Container(
           margin: const EdgeInsets.only(bottom: 8),
@@ -3804,9 +3804,9 @@ class _CoaColMapS extends State<CoaColumnMappingScreen> {
               decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 8)),
               dropdownColor: AC.navy3,
               style: const TextStyle(color: AC.tp, fontSize: 13),
-              hint: const Text('— غير محدد —', style: TextStyle(color: AC.ts, fontSize: 12)),
+              hint: const Text('â€” ط؛ظٹط± ظ…ط­ط¯ط¯ â€”', style: TextStyle(color: AC.ts, fontSize: 12)),
               items: [
-                const DropdownMenuItem(value: '', child: Text('— غير محدد —', style: TextStyle(color: AC.ts, fontSize: 12))),
+                const DropdownMenuItem(value: '', child: Text('â€” ط؛ظٹط± ظ…ط­ط¯ط¯ â€”', style: TextStyle(color: AC.ts, fontSize: 12))),
                 ...widget.detectedColumns.map((col) => DropdownMenuItem(value: col, child: Text(col, style: const TextStyle(fontSize: 13)))),
               ],
               onChanged: (v) => setState(() => _mapping[e.key] = (v == '') ? null : v),
@@ -3814,7 +3814,7 @@ class _CoaColMapS extends State<CoaColumnMappingScreen> {
           ]))),
         if (widget.sampleRows.isNotEmpty) ...[
           const SizedBox(height: 16),
-          const Text('عينة من البيانات:', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 13)),
+          const Text('ط¹ظٹظ†ط© ظ…ظ† ط§ظ„ط¨ظٹط§ظ†ط§طھ:', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 13)),
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(8)),
@@ -3831,7 +3831,7 @@ class _CoaColMapS extends State<CoaColumnMappingScreen> {
         const SizedBox(height: 24),
         SizedBox(height: 52, child: ElevatedButton.icon(
           icon: Icon(_parsing ? Icons.hourglass_top : Icons.analytics),
-          label: Text(_parsing ? 'جاري التحليل...' : 'تحليل شجرة الحسابات', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          label: Text(_parsing ? 'ط¬ط§ط±ظٹ ط§ظ„طھط­ظ„ظٹظ„...' : 'طھط­ظ„ظٹظ„ ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           onPressed: _parsing ? null : _parse,
           style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade700, foregroundColor: Colors.white))),
       ])),
@@ -3848,7 +3848,7 @@ class _CoaColMapS extends State<CoaColumnMappingScreen> {
   Widget _stepLine() => Container(width: 30, height: 2, color: AC.ts.withOpacity(0.3), margin: const EdgeInsets.only(bottom: 16));
 }
 
-// ── 5. COA Parsed Preview Screen ──
+// â”€â”€ 5. COA Parsed Preview Screen â”€â”€
 class CoaParsedPreviewScreen extends StatefulWidget {
   final String uploadId, clientId, clientName;
   final Map<String, dynamic> parseResult;
@@ -3882,19 +3882,19 @@ class _CoaParsedS extends State<CoaParsedPreviewScreen> {
     final pr = widget.parseResult;
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('نتائج التحليل', style: TextStyle(color: AC.gold)),
+      appBar: AppBar(title: const Text('ظ†طھط§ط¦ط¬ ط§ظ„طھط­ظ„ظٹظ„', style: TextStyle(color: AC.gold)),
         actions: [IconButton(icon: const Icon(Icons.feedback_outlined, color: AC.gold),
-          tooltip: 'ملاحظات معرفية',
+          tooltip: 'ظ…ظ„ط§ط­ط¸ط§طھ ظ…ط¹ط±ظپظٹط©',
           onPressed: () => Navigator.push(c, MaterialPageRoute(
             builder: (_) => CoaKnowledgeFeedbackScreen(clientId: widget.clientId, uploadId: widget.uploadId))))]),
       body: Column(children: [
         // Summary cards
         Padding(padding: const EdgeInsets.all(12), child: Row(children: [
-          _card('المكتشفة', '${pr['total_rows_detected'] ?? 0}', AC.cyan),
+          _card('ط§ظ„ظ…ظƒطھط´ظپط©', '${pr['total_rows_detected'] ?? 0}', AC.cyan),
           const SizedBox(width: 8),
-          _card('المقبولة', '${pr['total_rows_parsed'] ?? 0}', Colors.greenAccent),
+          _card('ط§ظ„ظ…ظ‚ط¨ظˆظ„ط©', '${pr['total_rows_parsed'] ?? 0}', Colors.greenAccent),
           const SizedBox(width: 8),
-          _card('المرفوضة', '${pr['total_rows_rejected'] ?? 0}', AC.err),
+          _card('ط§ظ„ظ…ط±ظپظˆط¶ط©', '${pr['total_rows_rejected'] ?? 0}', AC.err),
         ])),
         // Warnings
         if ((pr['warnings'] as List?)?.isNotEmpty == true)
@@ -3904,13 +3904,13 @@ class _CoaParsedS extends State<CoaParsedPreviewScreen> {
               Text(w.toString(), style: const TextStyle(color: AC.warn, fontSize: 12))).toList())),
         // Filter tabs
         Padding(padding: const EdgeInsets.all(12), child: Row(children: [
-          _filterChip('الكل', 'all'), const SizedBox(width: 8),
-          _filterChip('بها مشاكل', 'issues'), const SizedBox(width: 8),
-          _filterChip('مرفوضة', 'rejected'),
+          _filterChip('ط§ظ„ظƒظ„', 'all'), const SizedBox(width: 8),
+          _filterChip('ط¨ظ‡ط§ ظ…ط´ط§ظƒظ„', 'issues'), const SizedBox(width: 8),
+          _filterChip('ظ…ط±ظپظˆط¶ط©', 'rejected'),
         ])),
         // Accounts list
         Expanded(child: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
-          : _accounts.isEmpty ? const Center(child: Text('لا توجد نتائج', style: TextStyle(color: AC.ts)))
+          : _accounts.isEmpty ? const Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ظ†طھط§ط¦ط¬', style: TextStyle(color: AC.ts)))
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               itemCount: _accounts.length,
@@ -3936,7 +3936,7 @@ class _CoaParsedS extends State<CoaParsedPreviewScreen> {
                     ]),
                     if (a['normal_balance'] != null || a['account_type_raw'] != null)
                       Padding(padding: const EdgeInsets.only(top: 4), child: Row(children: [
-                        if (a['normal_balance'] != null) Text(a['normal_balance'] == 'debit' ? 'مدين' : 'دائن',
+                        if (a['normal_balance'] != null) Text(a['normal_balance'] == 'debit' ? 'ظ…ط¯ظٹظ†' : 'ط¯ط§ط¦ظ†',
                           style: TextStyle(color: a['normal_balance'] == 'debit' ? AC.cyan : AC.gold, fontSize: 11)),
                         if (a['account_type_raw'] != null) ...[const SizedBox(width: 8),
                           Text(a['account_type_raw'], style: const TextStyle(color: AC.ts, fontSize: 11))],
@@ -3954,7 +3954,7 @@ class _CoaParsedS extends State<CoaParsedPreviewScreen> {
         Padding(padding: const EdgeInsets.all(12), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           IconButton(icon: const Icon(Icons.chevron_right, color: AC.ts),
             onPressed: _page > 1 ? () { setState(() => _page--); _loadPage(); } : null),
-          Text('صفحة $_page', style: const TextStyle(color: AC.ts)),
+          Text('طµظپط­ط© $_page', style: const TextStyle(color: AC.ts)),
           IconButton(icon: const Icon(Icons.chevron_left, color: AC.ts),
             onPressed: _total > _page * 30 ? () { setState(() => _page++); _loadPage(); } : null),
         ])),
@@ -3981,7 +3981,7 @@ class _CoaParsedS extends State<CoaParsedPreviewScreen> {
       child: Text(label, style: TextStyle(color: _filter == value ? AC.gold : AC.ts, fontSize: 12))));
 }
 
-// ── 6. Knowledge Feedback Screen ──
+// â”€â”€ 6. Knowledge Feedback Screen â”€â”€
 class CoaKnowledgeFeedbackScreen extends StatefulWidget {
   final String clientId;
   final String? uploadId;
@@ -3997,14 +3997,14 @@ class _KnowledgeFBS extends State<CoaKnowledgeFeedbackScreen> {
   String? _err, _ok;
 
   static const _categories = {
-    'data_quality_note': 'ملاحظة جودة بيانات',
-    'taxonomy_note': 'ملاحظة تصنيفية',
-    'regulatory_note': 'ملاحظة تنظيمية',
-    'accounting_note': 'ملاحظة محاسبية',
-    'legal_note': 'ملاحظة قانونية',
-    'parsing_issue': 'مشكلة في القراءة',
-    'column_mapping_issue': 'مشكلة في ربط الأعمدة',
-    'suggested_classification': 'اقتراح تصنيف',
+    'data_quality_note': 'ظ…ظ„ط§ط­ط¸ط© ط¬ظˆط¯ط© ط¨ظٹط§ظ†ط§طھ',
+    'taxonomy_note': 'ظ…ظ„ط§ط­ط¸ط© طھطµظ†ظٹظپظٹط©',
+    'regulatory_note': 'ظ…ظ„ط§ط­ط¸ط© طھظ†ط¸ظٹظ…ظٹط©',
+    'accounting_note': 'ظ…ظ„ط§ط­ط¸ط© ظ…ط­ط§ط³ط¨ظٹط©',
+    'legal_note': 'ظ…ظ„ط§ط­ط¸ط© ظ‚ط§ظ†ظˆظ†ظٹط©',
+    'parsing_issue': 'ظ…ط´ظƒظ„ط© ظپظٹ ط§ظ„ظ‚ط±ط§ط،ط©',
+    'column_mapping_issue': 'ظ…ط´ظƒظ„ط© ظپظٹ ط±ط¨ط· ط§ظ„ط£ط¹ظ…ط¯ط©',
+    'suggested_classification': 'ط§ظ‚طھط±ط§ط­ طھطµظ†ظٹظپ',
   };
 
   @override void initState() { super.initState(); _loadFeedbacks(); }
@@ -4021,7 +4021,7 @@ class _KnowledgeFBS extends State<CoaKnowledgeFeedbackScreen> {
   }
 
   Future<void> _send() async {
-    if (_textC.text.trim().isEmpty) { setState(() => _err = 'أدخل نص الملاحظة'); return; }
+    if (_textC.text.trim().isEmpty) { setState(() => _err = 'ط£ط¯ط®ظ„ ظ†طµ ط§ظ„ظ…ظ„ط§ط­ط¸ط©'); return; }
     setState(() { _sending = true; _err = null; _ok = null; });
     try {
       final r = await http.post(Uri.parse('$_api/coa/knowledge-feedback'),
@@ -4035,22 +4035,22 @@ class _KnowledgeFBS extends State<CoaKnowledgeFeedbackScreen> {
         }));
       final d = jsonDecode(r.body);
       if (r.statusCode == 200) {
-        setState(() { _ok = 'تم حفظ الملاحظة بنجاح'; _textC.clear(); _sending = false; });
+        setState(() { _ok = 'طھظ… ط­ظپط¸ ط§ظ„ظ…ظ„ط§ط­ط¸ط© ط¨ظ†ط¬ط§ط­'; _textC.clear(); _sending = false; });
         _loadFeedbacks();
-      } else { setState(() { _err = d['detail']?.toString() ?? 'فشل الإرسال'; _sending = false; }); }
-    } catch (e) { setState(() { _err = 'خطأ: $e'; _sending = false; }); }
+      } else { setState(() { _err = d['detail']?.toString() ?? 'ظپط´ظ„ ط§ظ„ط¥ط±ط³ط§ظ„'; _sending = false; }); }
+    } catch (e) { setState(() { _err = 'ط®ط·ط£: $e'; _sending = false; }); }
   }
 
   @override
   Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('لوحة المعرفة', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: const Text('ظ„ظˆط­ط© ط§ظ„ظ…ط¹ط±ظپط©', style: TextStyle(color: AC.gold))),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
       : SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const Icon(Icons.psychology, size: 48, color: AC.gold),
           const SizedBox(height: 8),
-          const Text('أضف ملاحظة معرفية', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          const Text('ط£ط¶ظپ ظ…ظ„ط§ط­ط¸ط© ظ…ط¹ط±ظپظٹط©', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
           const SizedBox(height: 16),
           if (_ok != null) Container(padding: const EdgeInsets.all(10), margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(color: Colors.green.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
@@ -4060,7 +4060,7 @@ class _KnowledgeFBS extends State<CoaKnowledgeFeedbackScreen> {
             child: Text(_err!, style: const TextStyle(color: Colors.redAccent), textAlign: TextAlign.center)),
           DropdownButtonFormField<String>(
             value: _category, dropdownColor: AC.navy3,
-            decoration: InputDecoration(labelText: 'نوع الملاحظة', labelStyle: const TextStyle(color: AC.ts),
+            decoration: InputDecoration(labelText: 'ظ†ظˆط¹ ط§ظ„ظ…ظ„ط§ط­ط¸ط©', labelStyle: const TextStyle(color: AC.ts),
               enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
               focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12))),
             style: const TextStyle(color: AC.tp, fontSize: 14),
@@ -4069,33 +4069,33 @@ class _KnowledgeFBS extends State<CoaKnowledgeFeedbackScreen> {
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             value: _severity, dropdownColor: AC.navy3,
-            decoration: InputDecoration(labelText: 'الأهمية (اختياري)', labelStyle: const TextStyle(color: AC.ts),
+            decoration: InputDecoration(labelText: 'ط§ظ„ط£ظ‡ظ…ظٹط© (ط§ط®طھظٹط§ط±ظٹ)', labelStyle: const TextStyle(color: AC.ts),
               enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
               focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12))),
             style: const TextStyle(color: AC.tp, fontSize: 14),
             items: const [
-              DropdownMenuItem(value: null, child: Text('— غير محدد —', style: TextStyle(color: AC.ts))),
-              DropdownMenuItem(value: 'low', child: Text('منخفضة')),
-              DropdownMenuItem(value: 'medium', child: Text('متوسطة')),
-              DropdownMenuItem(value: 'high', child: Text('عالية')),
-              DropdownMenuItem(value: 'critical', child: Text('حرجة')),
+              DropdownMenuItem(value: null, child: Text('â€” ط؛ظٹط± ظ…ط­ط¯ط¯ â€”', style: TextStyle(color: AC.ts))),
+              DropdownMenuItem(value: 'low', child: Text('ظ…ظ†ط®ظپط¶ط©')),
+              DropdownMenuItem(value: 'medium', child: Text('ظ…طھظˆط³ط·ط©')),
+              DropdownMenuItem(value: 'high', child: Text('ط¹ط§ظ„ظٹط©')),
+              DropdownMenuItem(value: 'critical', child: Text('ط­ط±ط¬ط©')),
             ],
             onChanged: (v) => setState(() => _severity = v)),
           const SizedBox(height: 12),
           TextField(controller: _textC, maxLines: 4, style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(labelText: 'نص الملاحظة', labelStyle: const TextStyle(color: AC.ts),
-              hintText: 'اشرح الملاحظة أو التصحيح المقترح...', hintStyle: TextStyle(color: AC.ts.withOpacity(0.5)),
+            decoration: InputDecoration(labelText: 'ظ†طµ ط§ظ„ظ…ظ„ط§ط­ط¸ط©', labelStyle: const TextStyle(color: AC.ts),
+              hintText: 'ط§ط´ط±ط­ ط§ظ„ظ…ظ„ط§ط­ط¸ط© ط£ظˆ ط§ظ„طھطµط­ظٹط­ ط§ظ„ظ…ظ‚طھط±ط­...', hintStyle: TextStyle(color: AC.ts.withOpacity(0.5)),
               enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
               focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12)))),
           const SizedBox(height: 16),
           SizedBox(height: 48, child: ElevatedButton.icon(
             icon: Icon(_sending ? Icons.hourglass_top : Icons.send),
-            label: Text(_sending ? 'جاري الإرسال...' : 'إرسال الملاحظة'),
+            label: Text(_sending ? 'ط¬ط§ط±ظٹ ط§ظ„ط¥ط±ط³ط§ظ„...' : 'ط¥ط±ط³ط§ظ„ ط§ظ„ظ…ظ„ط§ط­ط¸ط©'),
             onPressed: _sending ? null : _send,
             style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy))),
           const SizedBox(height: 24),
           if (_feedbacks.isNotEmpty) ...[
-            const Text('الملاحظات السابقة', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+            const Text('ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ ط§ظ„ط³ط§ط¨ظ‚ط©', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             ..._feedbacks.map((f) => Container(
               margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
@@ -4145,14 +4145,14 @@ class _CoaQualityReportS extends State<CoaQualityReportScreen> {
       r = await http.post(Uri.parse('$_api/coa/uploads/${widget.uploadId}/assess'), headers: S.h());
       d = jsonDecode(r.body);
       if (r.statusCode == 200 && d['success'] == true) { setState(() { _data = d['data']; _loading = false; }); }
-      else { setState(() { _error = d['detail'] ?? 'فشل التقييم'; _loading = false; }); }
+      else { setState(() { _error = d['detail'] ?? 'ظپط´ظ„ ط§ظ„طھظ‚ظٹظٹظ…'; _loading = false; }); }
     } catch (e) { setState(() { _error = e.toString(); _loading = false; }); }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('تقرير جودة شجرة الحسابات', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      appBar: AppBar(title: const Text('طھظ‚ط±ظٹط± ط¬ظˆط¯ط© ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
       body: _loading ? const Center(child: CircularProgressIndicator(color: AC.gold))
           : _error != null ? Center(child: Text(_error!, style: const TextStyle(color: Colors.redAccent)))
           : _buildReport());
@@ -4167,22 +4167,22 @@ class _CoaQualityReportS extends State<CoaQualityReportScreen> {
         decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.gold.withOpacity(0.2), AC.navy3]),
           borderRadius: BorderRadius.circular(16), border: Border.all(color: AC.gold.withOpacity(0.3))),
         child: Column(children: [
-          Text('التقييم العام', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('ط§ظ„طھظ‚ظٹظٹظ… ط§ظ„ط¹ط§ظ…', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           Text('${overall.toStringAsFixed(0)}%', style: TextStyle(
             color: overall >= 70 ? Colors.greenAccent : overall >= 40 ? Colors.orangeAccent : Colors.redAccent,
             fontSize: 48, fontWeight: FontWeight.bold)),
-          Text('${_data!['total_accounts'] ?? 0} حساب', style: TextStyle(color: AC.ts, fontSize: 13)),
+          Text('${_data!['total_accounts'] ?? 0} ط­ط³ط§ط¨', style: TextStyle(color: AC.ts, fontSize: 13)),
         ])),
       const SizedBox(height: 16),
-      _sc('الاكتمال', (_data!['completeness_score'] ?? 0).toDouble(), Icons.check_circle_outline),
-      _sc('التناسق', (_data!['consistency_score'] ?? 0).toDouble(), Icons.compare_arrows),
-      _sc('وضوح الاسماء', (_data!['naming_clarity_score'] ?? 0).toDouble(), Icons.text_fields),
-      _sc('خطر التكرار', (_data!['duplication_risk_score'] ?? 0).toDouble(), Icons.copy_all),
-      _sc('جاهزية التقارير', (_data!['reporting_readiness_score'] ?? 0).toDouble(), Icons.assessment),
+      _sc('ط§ظ„ط§ظƒطھظ…ط§ظ„', (_data!['completeness_score'] ?? 0).toDouble(), Icons.check_circle_outline),
+      _sc('ط§ظ„طھظ†ط§ط³ظ‚', (_data!['consistency_score'] ?? 0).toDouble(), Icons.compare_arrows),
+      _sc('ظˆط¶ظˆط­ ط§ظ„ط§ط³ظ…ط§ط،', (_data!['naming_clarity_score'] ?? 0).toDouble(), Icons.text_fields),
+      _sc('ط®ط·ط± ط§ظ„طھظƒط±ط§ط±', (_data!['duplication_risk_score'] ?? 0).toDouble(), Icons.copy_all),
+      _sc('ط¬ط§ظ‡ط²ظٹط© ط§ظ„طھظ‚ط§ط±ظٹط±', (_data!['reporting_readiness_score'] ?? 0).toDouble(), Icons.assessment),
       const SizedBox(height: 20),
       if (recs.isNotEmpty) ...[
-        Text('التوصيات', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('ط§ظ„طھظˆطµظٹط§طھ', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         ...recs.map((r) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white12)),
@@ -4193,7 +4193,7 @@ class _CoaQualityReportS extends State<CoaQualityReportScreen> {
       const SizedBox(height: 24),
       ElevatedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(
         builder: (_) => CoaReviewApprovalScreen(uploadId: widget.uploadId, clientId: widget.clientId))),
-        icon: const Icon(Icons.rate_review), label: const Text('مراجعة واعتماد'),
+        icon: const Icon(Icons.rate_review), label: const Text('ظ…ط±ط§ط¬ط¹ط© ظˆط§ط¹طھظ…ط§ط¯'),
         style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy,
           padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))),
     ]);
@@ -4235,7 +4235,7 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
       final r = await http.get(Uri.parse('$_api/coa/uploads/${widget.uploadId}/accounts?page_size=500'), headers: S.h());
       final d = jsonDecode(r.body);
       if (r.statusCode == 200) { setState(() { _accounts = d['data'] ?? d['accounts'] ?? d['rows'] ?? []; _loading = false; }); }
-      else { setState(() { _error = d['detail'] ?? 'فشل'; _loading = false; }); }
+      else { setState(() { _error = d['detail'] ?? 'ظپط´ظ„'; _loading = false; }); }
     } catch (e) { setState(() { _error = e.toString(); _loading = false; }); }
   }
 
@@ -4248,7 +4248,7 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
       final d = jsonDecode(r.body);
       if (r.statusCode == 200 && d['success'] == true) {
         setState(() => _selected.clear());
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم اعتماد ${d["data"]?["count"] ?? 0} حساب')));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('طھظ… ط§ط¹طھظ…ط§ط¯ ${d["data"]?["count"] ?? 0} ط­ط³ط§ط¨')));
         _load();
       }
     } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'))); }
@@ -4261,7 +4261,7 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
         body: jsonEncode({'approval_status': 'approved'}));
       final d = jsonDecode(r.body);
       if (r.statusCode == 200 && d['success'] == true && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم اعتماد الشجرة')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('طھظ… ط§ط¹طھظ…ط§ط¯ ط§ظ„ط´ط¬ط±ط©')));
         Navigator.pop(context, true);
       }
     } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'))); }
@@ -4275,16 +4275,16 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('مراجعة واعتماد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy,
+      appBar: AppBar(title: const Text('ظ…ط±ط§ط¬ط¹ط© ظˆط§ط¹طھظ…ط§ط¯', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy,
         actions: [if (_selected.isNotEmpty) TextButton.icon(onPressed: _bulkApprove,
           icon: const Icon(Icons.check_circle, color: Colors.greenAccent),
-          label: Text('اعتماد ${_selected.length}', style: const TextStyle(color: Colors.greenAccent)))]),
+          label: Text('ط§ط¹طھظ…ط§ط¯ ${_selected.length}', style: const TextStyle(color: Colors.greenAccent)))]),
       body: _loading ? const Center(child: CircularProgressIndicator(color: AC.gold))
           : _error != null ? Center(child: Text(_error!, style: const TextStyle(color: Colors.redAccent)))
           : Column(children: [
               Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), color: AC.navy3,
-                child: Row(children: [Text('${_filtered.length} حساب', style: TextStyle(color: AC.ts, fontSize: 12)),
-                  const Spacer(), _chip('الكل', 'all'), const SizedBox(width: 8), _chip('فيها مشاكل', 'has_issues')])),
+                child: Row(children: [Text('${_filtered.length} ط­ط³ط§ط¨', style: TextStyle(color: AC.ts, fontSize: 12)),
+                  const Spacer(), _chip('ط§ظ„ظƒظ„', 'all'), const SizedBox(width: 8), _chip('ظپظٹظ‡ط§ ظ…ط´ط§ظƒظ„', 'has_issues')])),
               Expanded(child: ListView.builder(padding: const EdgeInsets.all(8), itemCount: _filtered.length,
                 itemBuilder: (ctx, i) => _tile(_filtered[i]))),
               Container(padding: const EdgeInsets.all(16),
@@ -4306,7 +4306,7 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
                         });
                       },
                       style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold), padding: const EdgeInsets.symmetric(vertical: 14)),
-                      child: Text(_selected.length == _filtered.length ? 'الغاء' : 'تحديد الكل', style: TextStyle(color: AC.gold)),
+                      child: Text(_selected.length == _filtered.length ? 'ط§ظ„ط؛ط§ط،' : 'طھط­ط¯ظٹط¯ ط§ظ„ظƒظ„', style: TextStyle(color: AC.gold)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -4318,7 +4318,7 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
-                      child: const Text('اعتماد الشجرة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      child: const Text('ط§ط¹طھظ…ط§ط¯ ط§ظ„ط´ط¬ط±ط©', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -4355,3 +4355,627 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
         trailing: hasIssues ? Icon(Icons.warning_amber, color: Colors.orangeAccent, size: 18) : Icon(Icons.check_circle_outline, color: Colors.greenAccent.shade400, size: 18)));
   }
 }
+
+// ========================================================
+// Sprint 4 TB: Trial Balance Upload + Binding Review
+// ========================================================
+// ط£ط¶ظپ ظ‡ط°ط§ ط§ظ„ظƒظˆط¯ ظپظٹ ظ†ظ‡ط§ظٹط© ظ…ظ„ظپ app.dart ظ‚ط¨ظ„ ط§ظ„ظ‚ظˆط³ ط§ظ„ط£ط®ظٹط±
+// ط£ظˆ ظپظٹ ظ…ظ„ظپ ظ…ظ†ظپطµظ„ tb_screens.dart ظ…ط¹ import ط§ظ„ظ…ظ†ط§ط³ط¨
+//
+// ظٹطھط·ظ„ط¨: ظ†ظپط³ imports ط§ظ„ظ…ظˆط¬ظˆط¯ط© ظپظٹ app.dart
+//   import 'package:http/http.dart' as http;
+//   import 'dart:convert';
+// ========================================================
+
+// â”€â”€ TB Upload Screen â”€â”€
+class TbUploadScreen extends StatefulWidget {
+  final String clientId;
+  final String clientName;
+  final String? coaUploadId; // approved COA to bind against
+  const TbUploadScreen({super.key, required this.clientId, required this.clientName, this.coaUploadId});
+  @override
+  State<TbUploadScreen> createState() => _TbUploadS();
+}
+
+class _TbUploadS extends State<TbUploadScreen> {
+  bool _uploading = false, _binding = false;
+  String? _err, _tbUploadId;
+  Map<String, dynamic>? _uploadResult;
+  Map<String, dynamic>? _bindResult;
+  final _periodC = TextEditingController();
+
+  Future<void> _pickAndUpload() async {
+    // For web: use file_picker package
+    // For simplicity, using http multipart
+    setState(() { _uploading = true; _err = null; });
+    try {
+      // NOTE: In real Flutter, use file_picker to get the file
+      // This is the API call pattern:
+      // final picked = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['xlsx', 'xls']);
+      // if (picked == null) { setState(() => _uploading = false); return; }
+      // final bytes = picked.files.first.bytes!;
+      // final filename = picked.files.first.name;
+
+      // For now, show instructions
+      setState(() {
+        _err = 'ط§ط³طھط®ط¯ظ… file_picker ظ„ط§ط®طھظٹط§ط± ظ…ظ„ظپ Excel ط«ظ… ط§ط±ظپط¹ظ‡ ط¹ط¨ط± multipart POST';
+        _uploading = false;
+      });
+    } catch (e) {
+      setState(() { _err = '$e'; _uploading = false; });
+    }
+  }
+
+  // Called after successful upload with file_picker
+  Future<void> _uploadFile(List<int> bytes, String filename) async {
+    setState(() { _uploading = true; _err = null; });
+    try {
+      final uri = Uri.parse('$_api/clients/${widget.clientId}/tb/upload'
+          '?period_label=${Uri.encodeComponent(_periodC.text)}'
+          '${widget.coaUploadId != null ? "&coa_upload_id=${widget.coaUploadId}" : ""}');
+
+      final request = http.MultipartRequest('POST', uri);
+      request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: filename));
+      // Add auth headers if needed:
+      // request.headers.addAll(S.h());
+
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+      final d = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _uploadResult = d;
+          _tbUploadId = d['tb_upload_id'];
+          _uploading = false;
+        });
+      } else {
+        setState(() { _err = d['detail']?.toString() ?? 'ظپط´ظ„ ط§ظ„ط±ظپط¹'; _uploading = false; });
+      }
+    } catch (e) {
+      setState(() { _err = '$e'; _uploading = false; });
+    }
+  }
+
+  Future<void> _runBinding() async {
+    if (_tbUploadId == null) return;
+    setState(() { _binding = true; _err = null; });
+    try {
+      final r = await http.post(
+        Uri.parse('$_api/tb/uploads/$_tbUploadId/bind'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          if (widget.coaUploadId != null) 'coa_upload_id': widget.coaUploadId,
+        }),
+      );
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200) {
+        setState(() { _bindResult = d; _binding = false; });
+      } else {
+        setState(() { _err = d['detail']?.toString() ?? 'ظپط´ظ„ ط§ظ„ط±ط¨ط·'; _binding = false; });
+      }
+    } catch (e) {
+      setState(() { _err = '$e'; _binding = false; });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AC.navy,
+      appBar: AppBar(
+        title: const Text('ط±ظپط¹ ظ…ظٹط²ط§ظ† ط§ظ„ظ…ط±ط§ط¬ط¹ط©', style: TextStyle(color: AC.gold)),
+        backgroundColor: AC.navy,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          // Step indicator
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            _stepDot('ط±ظپط¹', 1, true),
+            _stepLine(),
+            _stepDot('ط±ط¨ط·', 2, _uploadResult != null),
+            _stepLine(),
+            _stepDot('ظ…ط±ط§ط¬ط¹ط©', 3, _bindResult != null),
+          ]),
+          const SizedBox(height: 20),
+
+          // Client info
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
+            child: Row(children: [
+              const Icon(Icons.business, color: AC.gold, size: 20),
+              const SizedBox(width: 8),
+              Text(widget.clientName, style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+              if (widget.coaUploadId != null) ...[
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(color: Colors.greenAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
+                  child: const Text('COA ظ…ط¹طھظ…ط¯ط© âœ“', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                ),
+              ],
+            ]),
+          ),
+          const SizedBox(height: 16),
+
+          // Error
+          if (_err != null)
+            Container(
+              padding: const EdgeInsets.all(10), margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+              child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 13), textAlign: TextAlign.center),
+            ),
+
+          // Period input
+          TextField(
+            controller: _periodC,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'ط§ظ„ظپطھط±ط© ط§ظ„ظ…ط§ظ„ظٹط© (ط§ط®طھظٹط§ط±ظٹ)',
+              labelStyle: const TextStyle(color: AC.ts),
+              hintText: 'ظ…ط«ط§ظ„: 2025-12 ط£ظˆ Q4 2025',
+              hintStyle: TextStyle(color: AC.ts.withOpacity(0.5)),
+              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Upload button
+          if (_uploadResult == null)
+            SizedBox(
+              height: 56,
+              child: ElevatedButton.icon(
+                icon: Icon(_uploading ? Icons.hourglass_top : Icons.upload_file, size: 24),
+                label: Text(
+                  _uploading ? 'ط¬ط§ط±ظٹ ط§ظ„ط±ظپط¹...' : 'ط§ط®طھط± ظ…ظ„ظپ ظ…ظٹط²ط§ظ† ط§ظ„ظ…ط±ط§ط¬ط¹ط© (Excel)',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                onPressed: _uploading ? null : _pickAndUpload,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AC.gold, foregroundColor: AC.navy,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+
+          // Upload result
+          if (_uploadResult != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.greenAccent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.greenAccent.withOpacity(0.3)),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Row(children: [
+                  Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
+                  SizedBox(width: 8),
+                  Text('طھظ… ط±ظپط¹ ط§ظ„ظ…ظ„ظپ ط¨ظ†ط¬ط§ط­', style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
+                ]),
+                const SizedBox(height: 12),
+                _infoRow('ط§ظ„ظ…ظ„ظپ', _uploadResult!['file_name'] ?? ''),
+                _infoRow('ط§ظ„ظ†ظˆط¹', _uploadResult!['file_format'] ?? ''),
+                _infoRow('ط§ظ„طµظپظˆظپ ط§ظ„ظ…ظ‚ط±ظˆط،ط©', '${_uploadResult!['total_rows_parsed'] ?? 0}'),
+                _infoRow('ط§ظ„ظ…طھط¬ط§ظ‡ظ„ط©', '${_uploadResult!['total_rows_skipped'] ?? 0}'),
+                if (_uploadResult!['company_name'] != null && _uploadResult!['company_name'] != '')
+                  _infoRow('ط§ظ„ط´ط±ظƒط©', _uploadResult!['company_name']),
+                if ((_uploadResult!['warnings'] as List?)?.isNotEmpty == true) ...[
+                  const SizedBox(height: 8),
+                  ...(_uploadResult!['warnings'] as List).map((w) =>
+                    Text('âڑ  $w', style: const TextStyle(color: AC.warn, fontSize: 11))),
+                ],
+              ]),
+            ),
+
+            // Bind button
+            const SizedBox(height: 16),
+            if (_bindResult == null)
+              SizedBox(
+                height: 52,
+                child: ElevatedButton.icon(
+                  icon: Icon(_binding ? Icons.hourglass_top : Icons.link, size: 22),
+                  label: Text(
+                    _binding ? 'ط¬ط§ط±ظٹ ط§ظ„ط±ط¨ط·...' : 'ط±ط¨ط· ط§ظ„ظ…ظٹط²ط§ظ† ط¨ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ ط§ظ„ظ…ط¹طھظ…ط¯ط©',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  onPressed: _binding ? null : _runBinding,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700, foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+          ],
+
+          // Bind result
+          if (_bindResult != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AC.navy3, borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: (_bindResult!['can_proceed_to_analysis'] == true)
+                    ? Colors.greenAccent.withOpacity(0.3) : Colors.orangeAccent.withOpacity(0.3)),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('ظ†طھط§ط¦ط¬ ط§ظ„ط±ط¨ط·', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                Row(children: [
+                  _statCard('ظ…ط·ط§ط¨ظ‚', '${_bindResult!['matched'] ?? 0}', Colors.greenAccent),
+                  const SizedBox(width: 8),
+                  _statCard('ط؛ظٹط± ظ…ط·ط§ط¨ظ‚', '${_bindResult!['unmatched'] ?? 0}', Colors.redAccent),
+                  const SizedBox(width: 8),
+                  _statCard('ط§ظ„ط«ظ‚ط©', '${((_bindResult!['avg_binding_confidence'] ?? 0) * 100).toStringAsFixed(0)}%', AC.cyan),
+                ]),
+                const SizedBox(height: 12),
+                if (_bindResult!['can_proceed_to_analysis'] == true)
+                  const Text('âœ“ ط¬ط§ظ‡ط² ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ', style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold))
+                else
+                  Text(_bindResult!['analysis_blocked_reason'] ?? 'ظٹظ„ط²ظ… ظ…ط·ط§ط¨ظ‚ط© ظٹط¯ظˆظٹط©',
+                    style: const TextStyle(color: Colors.orangeAccent, fontSize: 13)),
+              ]),
+            ),
+
+            // Navigate to binding review
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 52,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.rate_review),
+                label: const Text('ظ…ط±ط§ط¬ط¹ط© طھظپط§طµظٹظ„ ط§ظ„ط±ط¨ط·', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => TbBindingReviewScreen(tbUploadId: _tbUploadId!, clientId: widget.clientId))),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AC.gold, foregroundColor: AC.navy,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ],
+        ]),
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, String value) => Padding(
+    padding: const EdgeInsets.only(bottom: 4),
+    child: Row(children: [
+      Text('$label: ', style: const TextStyle(color: AC.ts, fontSize: 12)),
+      Text(value, style: const TextStyle(color: AC.tp, fontSize: 12, fontWeight: FontWeight.bold)),
+    ]),
+  );
+
+  Widget _statCard(String label, String value, Color color) => Expanded(
+    child: Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+      child: Column(children: [
+        Text(value, style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(color: AC.ts, fontSize: 11)),
+      ]),
+    ),
+  );
+
+  Widget _stepDot(String label, int num, bool active) => Column(mainAxisSize: MainAxisSize.min, children: [
+    Container(width: 32, height: 32,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: active ? AC.gold : AC.navy4,
+        border: Border.all(color: active ? AC.gold : AC.ts, width: 2)),
+      child: Center(child: Text('$num', style: TextStyle(color: active ? AC.navy : AC.ts, fontWeight: FontWeight.bold, fontSize: 13)))),
+    const SizedBox(height: 4),
+    Text(label, style: TextStyle(color: active ? AC.gold : AC.ts, fontSize: 11)),
+  ]);
+  Widget _stepLine() => Container(width: 30, height: 2, color: AC.ts.withOpacity(0.3), margin: const EdgeInsets.only(bottom: 16));
+}
+
+
+// â”€â”€ TB Binding Review Screen â”€â”€
+class TbBindingReviewScreen extends StatefulWidget {
+  final String tbUploadId;
+  final String clientId;
+  const TbBindingReviewScreen({super.key, required this.tbUploadId, required this.clientId});
+  @override
+  State<TbBindingReviewScreen> createState() => _TbBindingReviewS();
+}
+
+class _TbBindingReviewS extends State<TbBindingReviewScreen> {
+  List<dynamic> _results = [];
+  Map<String, dynamic>? _summary;
+  bool _loading = true, _approving = false;
+  String? _error;
+  String _filter = 'all'; // all, matched, unmatched, review
+  int _page = 1;
+  int _total = 0;
+
+  @override
+  void initState() { super.initState(); _load(); _loadSummary(); }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      String url = '$_api/tb/uploads/${widget.tbUploadId}/binding-results?page=$_page&page_size=50';
+      if (_filter == 'matched') url += '&matched_only=true';
+      if (_filter == 'unmatched') url += '&matched_only=false';
+      if (_filter == 'review') url += '&requires_review=true';
+
+      final r = await http.get(Uri.parse(url));
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200) {
+        setState(() { _results = d['results'] ?? []; _total = d['total'] ?? 0; _loading = false; });
+      } else {
+        setState(() { _error = d['detail'] ?? 'ظپط´ظ„'; _loading = false; });
+      }
+    } catch (e) { setState(() { _error = '$e'; _loading = false; }); }
+  }
+
+  Future<void> _loadSummary() async {
+    try {
+      final r = await http.get(Uri.parse('$_api/tb/uploads/${widget.tbUploadId}/binding-summary'));
+      if (r.statusCode == 200) {
+        setState(() => _summary = jsonDecode(r.body));
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _approveBinding() async {
+    setState(() => _approving = true);
+    try {
+      final r = await http.post(
+        Uri.parse('$_api/tb/uploads/${widget.tbUploadId}/approve-binding'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      );
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('طھظ… ط§ط¹طھظ…ط§ط¯ ط§ظ„ط±ط¨ط· â€” ط¬ط§ظ‡ط² ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ')),
+          );
+          Navigator.pop(context, true);
+        }
+      } else {
+        setState(() { _error = d['detail'] ?? 'ظپط´ظ„ ط§ظ„ط§ط¹طھظ…ط§ط¯'; _approving = false; });
+      }
+    } catch (e) { setState(() { _error = '$e'; _approving = false; }); }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AC.navy,
+      appBar: AppBar(
+        title: const Text('ظ…ط±ط§ط¬ط¹ط© ط±ط¨ط· ط§ظ„ظ…ظٹط²ط§ظ†', style: TextStyle(color: AC.gold)),
+        backgroundColor: AC.navy,
+      ),
+      body: Column(children: [
+        // Summary cards
+        if (_summary != null)
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(children: [
+              _card('ط§ظ„ط¥ط¬ظ…ط§ظ„ظٹ', '${_summary!['total_rows'] ?? 0}', AC.tp),
+              const SizedBox(width: 6),
+              _card('ظ…ط·ط§ط¨ظ‚', '${_summary!['matched'] ?? 0}', Colors.greenAccent),
+              const SizedBox(width: 6),
+              _card('ط؛ظٹط± ظ…ط·ط§ط¨ظ‚', '${_summary!['unmatched'] ?? 0}', Colors.redAccent),
+              const SizedBox(width: 6),
+              _card('ظ„ظ„ظ…ط±ط§ط¬ط¹ط©', '${_summary!['requires_review'] ?? 0}', Colors.orangeAccent),
+            ]),
+          ),
+
+        // Match percentage bar
+        if (_summary != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Column(children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Text('ظ†ط³ط¨ط© ط§ظ„ظ…ط·ط§ط¨ظ‚ط©', style: TextStyle(color: AC.ts, fontSize: 12)),
+                Text('${_summary!['match_percentage'] ?? 0}%',
+                  style: TextStyle(
+                    color: (_summary!['match_percentage'] ?? 0) >= 85 ? Colors.greenAccent : Colors.orangeAccent,
+                    fontWeight: FontWeight.bold, fontSize: 14)),
+              ]),
+              const SizedBox(height: 4),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: ((_summary!['match_percentage'] ?? 0) / 100).toDouble().clamp(0.0, 1.0),
+                  backgroundColor: Colors.white12,
+                  color: (_summary!['match_percentage'] ?? 0) >= 85 ? Colors.greenAccent : Colors.orangeAccent,
+                  minHeight: 6,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ]),
+          ),
+
+        // Error
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+              child: Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
+            ),
+          ),
+
+        // Filters
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(children: [
+            _filterChip('ط§ظ„ظƒظ„', 'all'),
+            const SizedBox(width: 6),
+            _filterChip('ظ…ط·ط§ط¨ظ‚', 'matched'),
+            const SizedBox(width: 6),
+            _filterChip('ط؛ظٹط± ظ…ط·ط§ط¨ظ‚', 'unmatched'),
+            const SizedBox(width: 6),
+            _filterChip('ظ„ظ„ظ…ط±ط§ط¬ط¹ط©', 'review'),
+          ]),
+        ),
+
+        // Results list
+        Expanded(
+          child: _loading
+            ? const Center(child: CircularProgressIndicator(color: AC.gold))
+            : _results.isEmpty
+              ? const Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ظ†طھط§ط¦ط¬', style: TextStyle(color: AC.ts)))
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: _results.length,
+                  itemBuilder: (_, i) => _bindingTile(_results[i]),
+                ),
+        ),
+
+        // Pagination
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_right, color: AC.ts),
+              onPressed: _page > 1 ? () { setState(() => _page--); _load(); } : null,
+            ),
+            Text('طµظپط­ط© $_page', style: const TextStyle(color: AC.ts)),
+            IconButton(
+              icon: const Icon(Icons.chevron_left, color: AC.ts),
+              onPressed: _total > _page * 50 ? () { setState(() => _page++); _load(); } : null,
+            ),
+          ]),
+        ),
+
+        // Approve binding button
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: AC.navy3, border: Border(top: BorderSide(color: Colors.white12))),
+          child: SizedBox(
+            height: 50,
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              icon: Icon(_approving ? Icons.hourglass_top : Icons.check_circle),
+              label: Text(
+                _approving ? 'ط¬ط§ط±ظٹ ط§ظ„ط§ط¹طھظ…ط§ط¯...' : 'ط§ط¹طھظ…ط§ط¯ ط§ظ„ط±ط¨ط· ظˆط§ظ„ط§ظ†طھظ‚ط§ظ„ ظ„ظ„طھط­ظ„ظٹظ„',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              onPressed: _approving ? null : _approveBinding,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.greenAccent.shade700, foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _bindingTile(dynamic b) {
+    final matched = b['matched'] == true;
+    final confidence = (b['confidence'] ?? 0).toDouble();
+    final needsReview = b['requires_review'] == true;
+
+    Color statusColor = matched
+        ? (confidence >= 0.85 ? Colors.greenAccent : Colors.orangeAccent)
+        : Colors.redAccent;
+    String statusText = matched
+        ? (confidence >= 0.85 ? 'ظ…ط·ط§ط¨ظ‚ âœ“' : 'ظ…ط·ط§ط¨ظ‚ (ط«ظ‚ط© ظ…ظ†ط®ظپط¶ط©)')
+        : 'ط؛ظٹط± ظ…ط·ط§ط¨ظ‚ âœ—';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AC.navy3, borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: needsReview ? Colors.orangeAccent.withOpacity(0.4) : Colors.white12),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          if (b['tb_account_code'] != null && b['tb_account_code'] != '')
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(color: AC.cyan.withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
+              child: Text(b['tb_account_code'], style: const TextStyle(color: AC.cyan, fontSize: 11, fontFamily: 'monospace')),
+            ),
+          if (b['tb_account_code'] != null && b['tb_account_code'] != '') const SizedBox(width: 8),
+          Expanded(
+            child: Text(b['tb_account_name'] ?? '', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(color: statusColor.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
+            child: Text(statusText, style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold)),
+          ),
+        ]),
+        const SizedBox(height: 6),
+        Row(children: [
+          Text('ظ…ط¯ظٹظ†: ${_fmt(b['tb_debit'])}', style: const TextStyle(color: AC.cyan, fontSize: 11)),
+          const SizedBox(width: 12),
+          Text('ط¯ط§ط¦ظ†: ${_fmt(b['tb_credit'])}', style: const TextStyle(color: AC.gold, fontSize: 11)),
+          const SizedBox(width: 12),
+          Text('طµط§ظپظٹ: ${_fmt(b['tb_net'])}', style: const TextStyle(color: AC.tp, fontSize: 11, fontWeight: FontWeight.bold)),
+        ]),
+        if (matched && b['coa_class'] != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Row(children: [
+              Text('ط§ظ„طھطµظ†ظٹظپ: ', style: TextStyle(color: AC.ts, fontSize: 11)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(color: Colors.greenAccent.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                child: Text(b['coa_class'] ?? '', style: const TextStyle(color: Colors.greenAccent, fontSize: 10)),
+              ),
+              if (b['match_type'] != null) ...[
+                const SizedBox(width: 8),
+                Text('(${b['match_type']})', style: TextStyle(color: AC.ts, fontSize: 10)),
+              ],
+            ]),
+          ),
+        if (!matched && b['mismatch_reason'] != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text('ط§ظ„ط³ط¨ط¨: ${b['mismatch_reason']}', style: const TextStyle(color: Colors.orangeAccent, fontSize: 11)),
+          ),
+      ]),
+    );
+  }
+
+  String _fmt(dynamic v) {
+    if (v == null) return '0';
+    final n = (v is num) ? v.toDouble() : double.tryParse(v.toString()) ?? 0;
+    if (n == 0) return '0';
+    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
+    return n.toStringAsFixed(0);
+  }
+
+  Widget _card(String label, String value, Color color) => Expanded(
+    child: Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(8)),
+      child: Column(children: [
+        Text(value, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(color: AC.ts, fontSize: 10)),
+      ]),
+    ),
+  );
+
+  Widget _filterChip(String label, String value) => GestureDetector(
+    onTap: () { setState(() { _filter = value; _page = 1; }); _load(); },
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: _filter == value ? AC.gold.withOpacity(0.2) : AC.navy3,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _filter == value ? AC.gold : Colors.transparent),
+      ),
+      child: Text(label, style: TextStyle(color: _filter == value ? AC.gold : AC.ts, fontSize: 12)),
+    ),
+  );
+}
+
+
+
+
