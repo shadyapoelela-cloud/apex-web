@@ -532,12 +532,15 @@ def reset_postgres(secret: str = Query(...)):
     from sqlalchemy import text as _txt
     try:
         with engine.connect() as conn:
-            conn.execute(_txt("DROP SCHEMA public CASCADE"))
-            conn.execute(_txt("CREATE SCHEMA public"))
-            conn.execute(_txt("GRANT ALL ON SCHEMA public TO public"))
+            tables = conn.execute(_txt("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")).fetchall()
+            for t in tables:
+                try:
+                    conn.execute(_txt(f'DROP TABLE IF EXISTS "{t[0]}" CASCADE'))
+                except:
+                    pass
             conn.commit()
         Base.metadata.create_all(bind=engine)
-        return {"status": "OK", "message": "Schema dropped and all tables recreated"}
+        return {"status": "OK", "message": f"Dropped {len(tables)} tables and recreated all"}
     except Exception as e:
         return {"status": "error", "message": str(e)[:500]}
 @app.get("/admin/promote-user")
@@ -1072,6 +1075,7 @@ async def get_activity_history(limit: int = Query(20)):
 # v4.2
 
 # force-deploy-p8-fix
+
 
 
 
