@@ -429,3 +429,60 @@ def classification_summary(upload_id: str):
         }
     finally:
         db.close()
+
+@router.post("/coa/debug-classify/{upload_id}")
+def debug_classify(upload_id: str):
+    """Debug classify with full traceback."""
+    import traceback
+    try:
+        from app.phase1.models.platform_models import SessionLocal
+        db = SessionLocal()
+        
+        # Check upload exists
+        row = db.execute(
+            "SELECT id, upload_status FROM client_coa_uploads WHERE id = :uid",
+            {"uid": upload_id}
+        ).fetchone()
+        
+        if not row:
+            return {"error": "Upload not found", "upload_id": upload_id}
+        
+        # Check accounts exist
+        accounts = db.execute(
+            "SELECT id, account_code, account_name_raw, account_name_normalized, parent_code, normal_balance, account_level, account_type_raw FROM client_chart_of_accounts WHERE coa_upload_id = :uid AND record_status != 'rejected' LIMIT 3",
+            {"uid": upload_id}
+        ).fetchall()
+        
+        if not accounts:
+            return {"error": "No accounts found", "upload_status": row[1]}
+        
+        # Check columns exist
+        try:
+            db.execute("SELECT normalized_class FROM client_chart_of_accounts LIMIT 1").fetchone()
+            cols_ok = True
+        except Exception as ce:
+            cols_ok = str(ce)
+        
+        # Try classify one account
+        from app.sprint2.services.coa_classifier import classify_account
+        sample = accounts[0]
+        cls_result = classify_account(
+            account_name_raw=sample[2],
+            account_name_normalized=sample[3],
+            account_code=sample[1],
+            normal_balance=sample[5],
+            account_level=sample[6],
+            account_type_raw=sample[7],
+        )
+        
+        db.close()
+        return {
+            "upload_found": True,
+            "upload_status": row[1],
+            "accounts_count": len(accounts),
+            "cols_exist": cols_ok,
+            "sample_account": sample[2],
+            "classification": cls_result,
+        }
+    except Exception as e:
+        return {"error": str(e), "traceback": traceback.format_exc()}
