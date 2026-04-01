@@ -410,7 +410,7 @@ def reinit_db(secret: str = Query(...)):
             "ALTER TABLE knowledge_concept_aliases ADD COLUMN reviewed_at TEXT",
             "ALTER TABLE knowledge_concept_aliases ADD COLUMN reviewer_notes TEXT",
             "ALTER TABLE source_system_profiles ADD COLUMN known_labels_json TEXT DEFAULT '{}'",
-            "ALTER TABLE source_system_profiles ADD COLUMN supported_languages TEXT DEFAULT '["ar","en"]'",
+            "ALTER TABLE source_system_profiles ADD COLUMN supported_languages TEXT DEFAULT '[ar,en]'",
         ]
         for _fix in _fix_cols:
             try: _cur4.execute(_fix)
