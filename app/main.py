@@ -110,6 +110,14 @@ try:
     print(f"Sprint 2 loaded: {len(s2r.routes)} routes")
 except Exception as e:
     HAS_S2 = False
+
+try:
+    from app.sprint4.routes.sprint4_routes import router as s4r
+    HAS_S4 = True
+    print(f"Sprint 4 loaded: {len(s4r.routes)} routes")
+except Exception as e:
+    HAS_S4 = False
+    print(f"Sprint 4 disabled: {e}")
     print(f"Sprint 2 disabled: {e}")
 
 
@@ -176,7 +184,7 @@ if HAS_S2:
 
 @app.get("/")
 def root():
-    return {"name": "APEX Financial Platform API", "version": "6.2.0", "status": "running",
+    return {"name": "APEX Financial Platform API", "version": "6.4.0", "status": "running",
             "phases_active": sum([P1, P2, P3, P4, P5, P6]),
             "modules": {k: "active" if v else "disabled" for k, v in
                 {"engine": True, "kb": KB, "p1_identity": P1, "p2_clients": P2, "p3_knowledge": P3,
@@ -248,11 +256,151 @@ def reinit_db(secret: str = Query(...)):
     except Exception as _e2:
         results["s2_cols"] = str(_e2)
 
+    # Sprint 4 — Knowledge Brain tables
+    try:
+        from app.phase1.models.platform_models import SessionLocal as _SL4
+        _db4 = _SL4()
+        _raw4 = _db4.bind.raw_connection()
+        _cur4 = _raw4.cursor()
+        _s4_tables = [
+            """CREATE TABLE IF NOT EXISTS knowledge_concepts (
+                id TEXT PRIMARY KEY,
+                canonical_name_ar TEXT NOT NULL,
+                canonical_name_en TEXT,
+                domain_pack TEXT NOT NULL DEFAULT 'accounting',
+                sector_scope TEXT,
+                jurisdiction_scope TEXT,
+                authority_level TEXT DEFAULT 'platform',
+                description_ar TEXT,
+                description_en TEXT,
+                effective_from TEXT,
+                effective_to TEXT,
+                last_verified_at TEXT,
+                validity_status TEXT DEFAULT 'active',
+                superseded_by TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS knowledge_concept_aliases (
+                id TEXT PRIMARY KEY,
+                concept_id TEXT,
+                alias_text TEXT NOT NULL,
+                language_code TEXT DEFAULT 'ar',
+                alias_type TEXT DEFAULT 'synonym',
+                source_system TEXT,
+                client_scope TEXT,
+                sector_scope TEXT,
+                confidence_weight REAL DEFAULT 1.0,
+                is_approved INTEGER DEFAULT 0,
+                review_status TEXT DEFAULT 'pending_review',
+                reviewed_at TEXT,
+                reviewer_notes TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS knowledge_alias_conflicts (
+                id TEXT PRIMARY KEY,
+                alias_text TEXT,
+                concept_id_1 TEXT,
+                concept_id_2 TEXT,
+                conflict_type TEXT,
+                conflict_status TEXT DEFAULT 'pending',
+                resolution_notes TEXT,
+                resolved_by TEXT,
+                resolved_at TEXT,
+                detected_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS knowledge_candidate_rules (
+                id TEXT PRIMARY KEY,
+                rule_name TEXT NOT NULL,
+                domain_pack TEXT NOT NULL,
+                rule_logic_json TEXT DEFAULT '{}',
+                authority_level TEXT DEFAULT 'ai',
+                source_type TEXT DEFAULT 'ai_suggestion',
+                description_ar TEXT,
+                submission_status TEXT DEFAULT 'pending_review',
+                reviewer_notes TEXT,
+                reviewed_at TEXT,
+                submitted_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS active_knowledge_rules (
+                id TEXT PRIMARY KEY,
+                rule_name TEXT NOT NULL,
+                domain_pack TEXT NOT NULL,
+                rule_logic_json TEXT DEFAULT '{}',
+                authority_level TEXT DEFAULT 'platform',
+                description_ar TEXT,
+                validity_status TEXT DEFAULT 'active',
+                effective_from TEXT,
+                effective_to TEXT,
+                superseded_by TEXT,
+                promoted_from_candidate_id TEXT,
+                promoted_at TEXT,
+                last_verified_at TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS knowledge_feedback_reviews (
+                id TEXT PRIMARY KEY,
+                feedback_event_id TEXT,
+                review_decision TEXT,
+                review_notes TEXT,
+                reviewer_id TEXT,
+                reviewed_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS source_system_profiles (
+                id TEXT PRIMARY KEY,
+                system_name TEXT NOT NULL,
+                system_version TEXT,
+                description_ar TEXT,
+                supported_languages TEXT DEFAULT '["ar","en"]',
+                known_labels_json TEXT DEFAULT '{}',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS result_explanations (
+                id TEXT PRIMARY KEY,
+                result_type TEXT NOT NULL,
+                result_id TEXT NOT NULL,
+                upload_id TEXT,
+                account_id TEXT,
+                explanation_ar TEXT,
+                confidence REAL,
+                risk_severity TEXT DEFAULT 'low',
+                boundary_status TEXT DEFAULT 'advisory',
+                source_rows_json TEXT DEFAULT '[]',
+                applied_rules_json TEXT DEFAULT '[]',
+                references_json TEXT DEFAULT '[]',
+                requires_human_review INTEGER DEFAULT 0,
+                human_review_reason TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS decision_accountability_ledger (
+                id TEXT PRIMARY KEY,
+                entity_type TEXT,
+                entity_id TEXT,
+                decision_type TEXT,
+                decision_by TEXT,
+                decision_at TEXT,
+                rationale TEXT,
+                authority_level TEXT,
+                audit_trail_json TEXT DEFAULT '{}',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+        ]
+        for stmt in _s4_tables:
+            try:
+                _cur4.execute(stmt)
+            except Exception:
+                pass
+        _raw4.commit()
+        _raw4.close()
+        _db4.close()
+        results["s4_tables"] = "OK - 9 tables"
+    except Exception as _e4:
+        results["s4_tables"] = str(_e4)
+
     return results
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "6.2.0",
+    return {"status": "ok", "version": "6.4.0",
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9 if "HAS_P9" in globals() else False, "p10": HAS_P10 if "HAS_P10" in globals() else False, "p11": HAS_P11 if "HAS_P11" in globals() else False},
             "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
 
