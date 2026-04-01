@@ -138,6 +138,15 @@ try:
 except Exception as e:
     print(f"Sprint 4 TB disabled: {e}")
 
+# --- Sprint 5: Analysis Trigger ---
+HAS_S5 = False
+try:
+    from app.sprint5_analysis.routes.analysis_routes import router as s5r
+    HAS_S5 = True
+    print(f"Sprint 5 loaded: {len(s5r.routes)} routes")
+except Exception as e:
+    print(f"Sprint 5 disabled: {e}")
+
 
 # Phase 11 â€” Legal Acceptance
 try:
@@ -207,6 +216,10 @@ if HAS_S3:
 if HAS_S4_TB:
     app.include_router(s4_tb_r, tags=["Sprint 4 TB Binding"])
     print(f"[STARTUP] S4-TB registered: {len(s4_tb_r.routes)} routes")
+
+if HAS_S5:
+    app.include_router(s5r, tags=["Sprint 5 Analysis Trigger"])
+    print(f"[STARTUP] S5 registered: {len(s5r.routes)} routes")
     print(f"[STARTUP] S4 registered: {len(s4r.routes)} routes")
     print(f"[STARTUP] S2 registered: {len(s2r.routes)} routes")
 
@@ -297,6 +310,13 @@ def reinit_db(secret: str = Query(...)):
         results["sprint4_tb"] = init_sprint4_tb_db()
     except Exception as e:
         results["sprint4_tb"] = str(e)
+
+    # Sprint 5 Analysis tables
+    try:
+        from app.sprint5_analysis.models.analysis_models import init_sprint5_analysis_db
+        results["sprint5_analysis"] = init_sprint5_analysis_db()
+    except Exception as e:
+        results["sprint5_analysis"] = str(e)
 
     # Sprint 4 â€” Knowledge Brain tables
     try:
@@ -991,6 +1011,9 @@ async def get_activity_history(limit: int = Query(20)):
 # v4.2
 
 # force-deploy-p8-fix
+
+
+
 
 
 
