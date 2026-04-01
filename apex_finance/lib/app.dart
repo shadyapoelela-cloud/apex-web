@@ -3502,8 +3502,9 @@ class _ClientCreateS extends State<ClientCreateScreen> {
               ],
             ),
           ),
-          Expanded(
+          Flexible(
             child: ListView(
+              shrinkWrap: true,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 _typeCard('standard_business', 'شركة تجارية عادية', Icons.business, false),

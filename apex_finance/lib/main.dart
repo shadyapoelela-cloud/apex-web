@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
 // DISABLED: import 'client_create_screen.dart';
+import 'client_create.dart';
 
 const _api = 'https://apex-api-ootk.onrender.com';
 void main() => runApp(const ApexApp());
@@ -377,7 +378,7 @@ class _ClientsS extends State<ClientsTab> {
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: const Text('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.gold))),
     floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: const Icon(Icons.add, color: AC.navy),
-      onPressed: () async { await Navigator.push(c, MaterialPageRoute(builder:(_)=>const NewClientScreen())); _load(); }),
+      onPressed: () async { await Navigator.push(c, MaterialPageRoute(builder:(_)=>const ClientCreateScreen2())); _load(); }),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       _cl.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.business_outlined, color: AC.ts, size: 60), const SizedBox(height: 12),
@@ -385,7 +386,10 @@ class _ClientsS extends State<ClientsTab> {
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
         padding: const EdgeInsets.all(14), itemCount: _cl.length, itemBuilder: (_, i) {
           final c2 = _cl[i];
-          return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
+          return InkWell(
+            onTap: () => Navigator.push(c, MaterialPageRoute(
+              builder: (_) => CoaUploadScreen(clientId: c2['id'], clientName: c2['name_ar'] ?? c2['name'] ?? ''))),
+            child: Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
             child: Row(children: [
               CircleAvatar(backgroundColor: AC.navy4, radius: 22, child: Text((c2['name_ar']??'?')[0], style: const TextStyle(color: AC.gold, fontSize: 18))),
@@ -394,7 +398,7 @@ class _ClientsS extends State<ClientsTab> {
                 Text(c2['name_ar']??'', style: const TextStyle(fontWeight: FontWeight.bold, color: AC.tp, fontSize: 14)),
                 const SizedBox(height: 3),
                 Text('${c2['client_type']??''} \u2022 ${c2['your_role']??''}', style: const TextStyle(color: AC.ts, fontSize: 11))])),
-              if(c2['knowledge_mode']==true) const Icon(Icons.psychology, color: AC.cyan, size: 22)]));
+              if(c2['knowledge_mode']==true) const Icon(Icons.psychology, color: AC.cyan, size: 22)])));
         })));
 }
 
@@ -3376,7 +3380,7 @@ class _ClientListS extends State<ClientListScreen> {
     appBar: AppBar(title: const Text('العملاء', style: TextStyle(color: AC.gold)),
       actions: [IconButton(icon: const Icon(Icons.add_circle, color: AC.gold),
         onPressed: () async {
-          final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen()));
+          final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen2()));
           if (created == true) _load();
         })]),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
@@ -3390,7 +3394,7 @@ class _ClientListS extends State<ClientListScreen> {
               icon: const Icon(Icons.add),
               label: const Text('إنشاء عميل جديد'),
               onPressed: () async {
-                final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen()));
+                final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen2()));
                 if (created == true) _load();
               }),
           ]))
@@ -3401,27 +3405,31 @@ class _ClientListS extends State<ClientListScreen> {
             itemBuilder: (_, i) {
               final cl = _clients[i];
               final km = cl['knowledge_mode'] == true;
-              return Card(
-                color: AC.navy3,
-                margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: ListTile(
-                  leading: CircleAvatar(backgroundColor: km ? AC.gold : AC.navy4,
-                    child: Icon(Icons.business, color: km ? AC.navy : AC.ts)),
-                  title: Text(cl['name_ar'] ?? cl['name'] ?? '—', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
-                  subtitle: Row(children: [
-                    Text(cl['client_type'] ?? cl['client_type_code'] ?? '', style: TextStyle(color: AC.ts, fontSize: 12)),
-                    if (km) ...[const SizedBox(width: 8),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                        child: const Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)))],
-                  ]),
-                  trailing: const Icon(Icons.chevron_left, color: AC.ts),
-                  onTap: () => Navigator.push(c, MaterialPageRoute(
-                    builder: (_) => CoaUploadScreen(clientId: cl['id'], clientName: cl['name_ar'] ?? cl['name'] ?? ''))),
+              return InkWell(
+              onTap: () => Navigator.push(c, MaterialPageRoute(
+                builder: (_) => CoaUploadScreen(clientId: cl['id'], clientName: cl['name_ar'] ?? cl['name'] ?? ''))),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AC.navy3,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white12),
                 ),
-              );
-            },
+                child: Row(children: [
+                  CircleAvatar(backgroundColor: AC.gold.withOpacity(0.2),
+                    child: Text((cl['name_ar'] ?? cl['name'] ?? '?')[0], style: TextStyle(color: AC.gold))),
+                  const SizedBox(width: 16),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(cl['name_ar'] ?? cl['name'] ?? '', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text('${cl['client_type_code'] ?? cl['client_type'] ?? ''} • ${cl['role'] ?? 'owner'}',
+                      style: TextStyle(color: AC.ts, fontSize: 12)),
+                  ])),
+                  const Icon(Icons.chevron_right, color: AC.ts),
+                ]),
+              ),
+            );            },
           )),
   );
 }
@@ -3502,8 +3510,9 @@ class _ClientCreateS extends State<ClientCreateScreen> {
               ],
             ),
           ),
-          Expanded(
+          Flexible(
             child: ListView(
+              shrinkWrap: true,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 _typeCard('standard_business', 'شركة تجارية عادية', Icons.business, false),
