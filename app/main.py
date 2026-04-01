@@ -395,7 +395,29 @@ def reinit_db(secret: str = Query(...)):
         _raw4.commit()
         _raw4.close()
         _db4.close()
-        results["s4_tables"] = "OK - 9 tables"
+        
+        # Fix missing columns if tables already exist
+        _fix_cols = [
+            "ALTER TABLE active_knowledge_rules ADD COLUMN validity_status TEXT DEFAULT 'active'",
+            "ALTER TABLE active_knowledge_rules ADD COLUMN effective_from TEXT",
+            "ALTER TABLE active_knowledge_rules ADD COLUMN effective_to TEXT",
+            "ALTER TABLE active_knowledge_rules ADD COLUMN superseded_by TEXT",
+            "ALTER TABLE active_knowledge_rules ADD COLUMN promoted_from_candidate_id TEXT",
+            "ALTER TABLE active_knowledge_rules ADD COLUMN promoted_at TEXT",
+            "ALTER TABLE active_knowledge_rules ADD COLUMN last_verified_at TEXT",
+            "ALTER TABLE knowledge_candidate_rules ADD COLUMN reviewer_notes TEXT",
+            "ALTER TABLE knowledge_candidate_rules ADD COLUMN reviewed_at TEXT",
+            "ALTER TABLE knowledge_concept_aliases ADD COLUMN reviewed_at TEXT",
+            "ALTER TABLE knowledge_concept_aliases ADD COLUMN reviewer_notes TEXT",
+            "ALTER TABLE source_system_profiles ADD COLUMN known_labels_json TEXT DEFAULT '{}'",
+            "ALTER TABLE source_system_profiles ADD COLUMN supported_languages TEXT DEFAULT '["ar","en"]'",
+        ]
+        for _fix in _fix_cols:
+            try: _cur4.execute(_fix)
+            except: pass
+        _raw4.commit()
+        
+        results["s4_tables"] = "OK - 9 tables + fixed cols"
     except Exception as _e4:
         results["s4_tables"] = str(_e4)
 
