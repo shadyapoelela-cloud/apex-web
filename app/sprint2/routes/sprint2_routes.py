@@ -10,8 +10,8 @@ from sqlalchemy import text as _t
 def _exec(db, sql, params=None):
     """Execute raw SQL with text() wrapper for SQLAlchemy 2.x compat."""
     if params:
-        return _exec(db, _t(sql), params)
-    return _exec(db, _t(sql))
+        return db.execute(_t(sql), params)
+    return db.execute(_t(sql))
 
 
 def _get_db():
