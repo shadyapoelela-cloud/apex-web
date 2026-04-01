@@ -179,7 +179,7 @@ if HAS_S2:
 
 @app.get("/")
 def root():
-    return {"name": "APEX Financial Platform API", "version": "6.0.0", "status": "running",
+    return {"name": "APEX Financial Platform API", "version": "6.2.0", "status": "running",
             "phases_active": sum([P1, P2, P3, P4, P5, P6]),
             "modules": {k: "active" if v else "disabled" for k, v in
                 {"engine": True, "kb": KB, "p1_identity": P1, "p2_clients": P2, "p3_knowledge": P3,
@@ -236,7 +236,7 @@ def reinit_db(secret: str = Query(...)):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "6.0.0",
+    return {"status": "ok", "version": "6.2.0",
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6, "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9 if "HAS_P9" in globals() else False, "p10": HAS_P10 if "HAS_P10" in globals() else False, "p11": HAS_P11 if "HAS_P11" in globals() else False},
             "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
 
