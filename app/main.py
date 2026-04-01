@@ -529,10 +529,15 @@ def reset_postgres(secret: str = Query(...)):
     if secret != "apex-admin-2026":
         raise HTTPException(403, "Invalid secret")
     from app.phase1.models.platform_models import Base, engine
+    from sqlalchemy import text as _txt
     try:
-        Base.metadata.drop_all(bind=engine)
+        with engine.connect() as conn:
+            conn.execute(_txt("DROP SCHEMA public CASCADE"))
+            conn.execute(_txt("CREATE SCHEMA public"))
+            conn.execute(_txt("GRANT ALL ON SCHEMA public TO public"))
+            conn.commit()
         Base.metadata.create_all(bind=engine)
-        return {"status": "OK", "message": "All tables dropped and recreated"}
+        return {"status": "OK", "message": "Schema dropped and all tables recreated"}
     except Exception as e:
         return {"status": "error", "message": str(e)[:500]}
 @app.get("/admin/promote-user")
@@ -1067,6 +1072,7 @@ async def get_activity_history(limit: int = Query(20)):
 # v4.2
 
 # force-deploy-p8-fix
+
 
 
 
