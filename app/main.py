@@ -180,6 +180,9 @@ if HAS_S1:
     app.include_router(s1r, tags=["Sprint 1 COA"])
 if HAS_S2:
     app.include_router(s2r, tags=["Sprint 2 Classification"])
+if HAS_S4:
+    app.include_router(s4r, tags=["Sprint 4 Knowledge Brain"])
+    print(f"[STARTUP] S4 registered: {len(s4r.routes)} routes")
     print(f"[STARTUP] S2 registered: {len(s2r.routes)} routes")
 
 @app.get("/")

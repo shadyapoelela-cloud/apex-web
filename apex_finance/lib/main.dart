@@ -4259,7 +4259,6 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 
