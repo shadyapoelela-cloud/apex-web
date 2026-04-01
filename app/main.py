@@ -531,8 +531,8 @@ def reset_postgres(secret: str = Query(...)):
     from app.phase1.models.platform_models import Base, engine
     from sqlalchemy import text as _txt
     try:
-        with engine.connect() as conn:
-            conn.execute(_txt("DO         with engine.connect() as conn:
+        with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
+            conn.execute(_txt("DO         with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
             tables = conn.execute(_txt("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")).fetchall()
             for t in tables:
                 try:
@@ -541,7 +541,7 @@ def reset_postgres(secret: str = Query(...)):
                     pass
             conn.commit()
         Base.metadata.create_all(bind=engine)
-        return {"status": "OK", "message": f"Dropped {len(tables)} tables and recreated all"} DECLARE r RECORD; BEGIN FOR r IN (SELECT indexname FROM pg_indexes WHERE schemaname = 'public') LOOP EXECUTE 'DROP INDEX IF EXISTS ' || quote_ident(r.indexname) || ' CASCADE'; END LOOP; END         with engine.connect() as conn:
+        return {"status": "OK", "message": f"Dropped {len(tables)} tables and recreated all"} DECLARE r RECORD; BEGIN FOR r IN (SELECT indexname FROM pg_indexes WHERE schemaname = 'public') LOOP EXECUTE 'DROP INDEX IF EXISTS ' || quote_ident(r.indexname) || ' CASCADE'; END LOOP; END         with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
             tables = conn.execute(_txt("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")).fetchall()
             for t in tables:
                 try:
@@ -551,7 +551,7 @@ def reset_postgres(secret: str = Query(...)):
             conn.commit()
         Base.metadata.create_all(bind=engine)
         return {"status": "OK", "message": f"Dropped {len(tables)} tables and recreated all"};"))
-            conn.execute(_txt("DO         with engine.connect() as conn:
+            conn.execute(_txt("DO         with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
             tables = conn.execute(_txt("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")).fetchall()
             for t in tables:
                 try:
@@ -560,7 +560,7 @@ def reset_postgres(secret: str = Query(...)):
                     pass
             conn.commit()
         Base.metadata.create_all(bind=engine)
-        return {"status": "OK", "message": f"Dropped {len(tables)} tables and recreated all"} DECLARE r RECORD; BEGIN FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE'; END LOOP; END         with engine.connect() as conn:
+        return {"status": "OK", "message": f"Dropped {len(tables)} tables and recreated all"} DECLARE r RECORD; BEGIN FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE'; END LOOP; END         with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
             tables = conn.execute(_txt("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")).fetchall()
             for t in tables:
                 try:
@@ -1107,6 +1107,7 @@ async def get_activity_history(limit: int = Query(20)):
 # v4.2
 
 # force-deploy-p8-fix
+
 
 
 
