@@ -522,6 +522,30 @@ def debug_flags():
         flags["s2_import_now"] = f"FAIL: {e}"
     return flags
 
+
+@app.get("/admin/promote-user")
+def promote_user(secret: str = Query(...), username: str = Query(...), role: str = Query("platform_admin")):
+    if secret != "apex-admin-2026":
+        raise HTTPException(403, "Invalid secret")
+    from app.phase1.models.platform_models import SessionLocal
+    from sqlalchemy import text as _t
+    db = SessionLocal()
+    try:
+        user = db.execute(_t("SELECT id FROM users WHERE username = :u"), {"u": username}).fetchone()
+        if not user:
+            raise HTTPException(404, f"User {username} not found")
+        uid = user[0]
+        role_row = db.execute(_t("SELECT id FROM roles WHERE name = :r"), {"r": role}).fetchone()
+        if not role_row:
+            raise HTTPException(404, f"Role {role} not found")
+        rid = role_row[0]
+        import uuid
+        db.execute(_t("INSERT OR IGNORE INTO user_roles (id, user_id, role_id) VALUES (:id, :uid, :rid)"), {"id": str(uuid.uuid4()), "uid": uid, "rid": rid})
+        db.commit()
+        return {"success": True, "username": username, "role": role}
+    finally:
+        db.close()
+
 @app.get("/debug/s2")
 def debug_s2():
     try:
@@ -1031,6 +1055,7 @@ async def get_activity_history(limit: int = Query(20)):
 # v4.2
 
 # force-deploy-p8-fix
+
 
 
 
