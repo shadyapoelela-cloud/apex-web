@@ -1,6 +1,6 @@
-"""
-APEX Financial Platform — FastAPI Backend v3.5 (FINAL)
-═══════════════════════════════════════════════════════════════
+﻿"""
+APEX Financial Platform â€” FastAPI Backend v3.5 (FINAL)
+â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 All 6 Phases Complete:
   P1: Identity + Auth + Plans + Legal
   P2: Clients + COA + Results + Explanations
@@ -54,7 +54,7 @@ try:
 except Exception as e: P6 = False; print(f"P6: {e}")
 
 
-# Phase 7 — Task Documents + Suspension + Result Details + Audit
+# Phase 7 â€” Task Documents + Suspension + Result Details + Audit
 try:
     from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
     from app.phase7.routes.phase7_routes import router as p7r
@@ -64,7 +64,7 @@ except Exception as e:
     print(f"Phase 7 import warning: {e}")
     HAS_P7 = False
 
-# Phase 8 — Entitlements Engine + Subscription Management
+# Phase 8 â€” Entitlements Engine + Subscription Management
 try:
     from app.phase8.models.phase8_models import init_phase8_db
     from app.phase8.routes.phase8_routes import router as p8r
@@ -74,7 +74,7 @@ except Exception as e:
     print(f"Phase 8 import warning: {e}")
     HAS_P8 = False
 
-# Phase 9 — Account Center
+# Phase 9 â€” Account Center
 try:
     from app.phase9.models.phase9_models import init_phase9_db
     from app.phase9.routes.phase9_routes import router as p9r
@@ -83,7 +83,7 @@ except Exception as e:
     HAS_P9 = False
     print(f"Phase 9 disabled: {e}")
 
-# Phase 10 — Notification System
+# Phase 10 â€” Notification System
 try:
     from app.phase10.models.phase10_models import init_phase10_db
     from app.phase10.routes.phase10_routes import router as p10r
@@ -94,7 +94,7 @@ except Exception as e:
     print(f"Phase 10 disabled: {e}")
 
 
-# Sprint 1 — COA First Workflow
+# Sprint 1 â€” COA First Workflow
 try:
     from app.sprint1.models.sprint1_models import init_sprint1_db
     from app.sprint1.routes.sprint1_routes import router as s1r
@@ -103,7 +103,7 @@ except Exception as e:
     HAS_S1 = False
     print(f"Sprint 1 disabled: {e}")
 
-# Sprint 2 — COA Classification Engine
+# Sprint 2 â€” COA Classification Engine
 try:
     from app.sprint2.routes.sprint2_routes import router as s2r
     HAS_S2 = True
@@ -120,8 +120,26 @@ except Exception as e:
     print(f"Sprint 4 disabled: {e}")
     print(f"Sprint 2 disabled: {e}")
 
+# --- Sprint 3: COA Quality + Review ---
+HAS_S3 = False
+try:
+    from app.sprint3.routes.sprint3_routes import router as s3r
+    HAS_S3 = True
+    print(f"Sprint 3 loaded: {len(s3r.routes)} routes")
+except Exception as e:
+    print(f"Sprint 3 disabled: {e}")
 
-# Phase 11 — Legal Acceptance
+# --- Sprint 4 TB: Trial Balance + Binding ---
+HAS_S4_TB = False
+try:
+    from app.sprint4_tb.routes.tb_routes import router as s4_tb_r
+    HAS_S4_TB = True
+    print(f"Sprint 4 TB loaded: {len(s4_tb_r.routes)} routes")
+except Exception as e:
+    print(f"Sprint 4 TB disabled: {e}")
+
+
+# Phase 11 â€” Legal Acceptance
 try:
     from app.phase11.models.phase11_models import init_phase11_db
     from app.phase11.routes.phase11_routes import router as p11r
@@ -134,7 +152,7 @@ except Exception as e:
 
 
 
-app = FastAPI(title="APEX Financial Platform API", description="منصة أبكس للتحليل المالي — النسخة النهائية", version="5.1.0")
+app = FastAPI(title="APEX Financial Platform API", description="ظ…ظ†طµط© ط£ط¨ظƒط³ ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ â€” ط§ظ„ظ†ط³ط®ط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط©", version="5.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
@@ -144,7 +162,7 @@ import traceback as _tb
 async def global_exception_handler(request, exc):
     import logging
     logging.error(f"Unhandled: {exc}")
-    return JSONResponse(status_code=500, content={"detail": "خطأ داخلي في الخادم"})
+    return JSONResponse(status_code=500, content={"detail": "ط®ط·ط£ ط¯ط§ط®ظ„ظٹ ظپظٹ ط§ظ„ط®ط§ط¯ظ…"})
 
 
 @app.on_event("startup")
@@ -182,6 +200,13 @@ if HAS_S2:
     app.include_router(s2r, tags=["Sprint 2 Classification"])
 if HAS_S4:
     app.include_router(s4r, tags=["Sprint 4 Knowledge Brain"])
+
+if HAS_S3:
+    app.include_router(s3r, tags=["Sprint 3 COA Quality"])
+    print(f"[STARTUP] S3 registered: {len(s3r.routes)} routes")
+if HAS_S4_TB:
+    app.include_router(s4_tb_r, tags=["Sprint 4 TB Binding"])
+    print(f"[STARTUP] S4-TB registered: {len(s4_tb_r.routes)} routes")
     print(f"[STARTUP] S4 registered: {len(s4r.routes)} routes")
     print(f"[STARTUP] S2 registered: {len(s2r.routes)} routes")
 
@@ -259,7 +284,21 @@ def reinit_db(secret: str = Query(...)):
     except Exception as _e2:
         results["s2_cols"] = str(_e2)
 
-    # Sprint 4 — Knowledge Brain tables
+    # Sprint 3 tables
+    try:
+        from app.sprint3.models.sprint3_models import init_sprint3_db
+        results["sprint3"] = init_sprint3_db()
+    except Exception as e:
+        results["sprint3"] = str(e)
+
+    # Sprint 4 TB tables
+    try:
+        from app.sprint4_tb.models.tb_models import init_sprint4_tb_db
+        results["sprint4_tb"] = init_sprint4_tb_db()
+    except Exception as e:
+        results["sprint4_tb"] = str(e)
+
+    # Sprint 4 â€” Knowledge Brain tables
     try:
         from app.phase1.models.platform_models import SessionLocal as _SL4
         _db4 = _SL4()
@@ -562,7 +601,7 @@ async def promote_to_admin(username: str, secret: str = Query(...)):
     except Exception as e:
         return {"message": f"Error: {e}"}
 
-    # Phase 7 init — runs at startup
+    # Phase 7 init â€” runs at startup
     if HAS_P7:
         try:
             t7 = init_phase7_db()
@@ -627,20 +666,20 @@ async def change_password(body: dict):
 async def list_plans():
     """List all subscription plans with features."""
     return {"plans": [
-        {"id": "free", "name": "Free", "name_ar": "مجاني", "price": 0, "currency": "SAR",
+        {"id": "free", "name": "Free", "name_ar": "ظ…ط¬ط§ظ†ظٹ", "price": 0, "currency": "SAR",
          "features": {"coa_uploads": 2, "analysis_runs": 5, "result_details": "basic",
                       "marketplace": "browse", "knowledge_mode": False, "exports": "limited"}},
-        {"id": "pro", "name": "Pro", "name_ar": "احترافي", "price": 99, "currency": "SAR",
+        {"id": "pro", "name": "Pro", "name_ar": "ط§ط­طھط±ط§ظپظٹ", "price": 99, "currency": "SAR",
          "features": {"coa_uploads": 20, "analysis_runs": 50, "result_details": "full",
                       "marketplace": "request", "knowledge_mode": "if_eligible", "exports": "full"}},
-        {"id": "business", "name": "Business", "name_ar": "أعمال", "price": 299, "currency": "SAR",
+        {"id": "business", "name": "Business", "name_ar": "ط£ط¹ظ…ط§ظ„", "price": 299, "currency": "SAR",
          "features": {"coa_uploads": 100, "analysis_runs": 200, "result_details": "full+export",
                       "marketplace": "request+manage", "knowledge_mode": "if_eligible", "exports": "full",
                       "team_members": 5}},
-        {"id": "expert", "name": "Expert", "name_ar": "خبير", "price": 499, "currency": "SAR",
+        {"id": "expert", "name": "Expert", "name_ar": "ط®ط¨ظٹط±", "price": 499, "currency": "SAR",
          "features": {"coa_uploads": "unlimited", "analysis_runs": "unlimited", "result_details": "full",
                       "marketplace": "provide", "knowledge_mode": False, "provider_priority": True}},
-        {"id": "enterprise", "name": "Enterprise", "name_ar": "مؤسسي", "price": "custom", "currency": "SAR",
+        {"id": "enterprise", "name": "Enterprise", "name_ar": "ظ…ط¤ط³ط³ظٹ", "price": "custom", "currency": "SAR",
          "features": {"coa_uploads": "unlimited", "analysis_runs": "unlimited", "result_details": "full+admin",
                       "marketplace": "custom", "knowledge_mode": "full+governance", "exports": "full",
                       "team_members": "unlimited", "api_access": True}}
@@ -689,7 +728,7 @@ async def get_current_terms():
     return {
         "version": "1.0",
         "effective_date": "2026-01-01",
-        "content_ar": "شروط وأحكام منصة APEX للتحليل المالي المعرفي...",
+        "content_ar": "ط´ط±ظˆط· ظˆط£ط­ظƒط§ظ… ظ…ظ†طµط© APEX ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ ط§ظ„ظ…ط¹ط±ظپظٹ...",
         "content_en": "APEX Platform Terms and Conditions...",
         "requires_acceptance": True
     }
@@ -700,7 +739,7 @@ async def get_privacy_policy():
     return {
         "version": "1.0",
         "effective_date": "2026-01-01",
-        "content_ar": "سياسة الخصوصية لمنصة APEX...",
+        "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط®طµظˆطµظٹط© ظ„ظ…ظ†طµط© APEX...",
         "content_en": "APEX Platform Privacy Policy..."
     }
 
@@ -710,19 +749,19 @@ async def get_provider_policy():
     return {
         "version": "1.0",
         "effective_date": "2026-01-01",
-        "content_ar": "سياسة مقدمي الخدمات - يلتزم مقدم الخدمة برفع المستندات المطلوبة لكل مهمة...",
+        "content_ar": "ط³ظٹط§ط³ط© ظ…ظ‚ط¯ظ…ظٹ ط§ظ„ط®ط¯ظ…ط§طھ - ظٹظ„طھط²ظ… ظ…ظ‚ط¯ظ… ط§ظ„ط®ط¯ظ…ط© ط¨ط±ظپط¹ ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ظ…ط·ظ„ظˆط¨ط© ظ„ظƒظ„ ظ…ظ‡ظ…ط©...",
         "obligations": [
-            "رفع مستندات التحقق قبل التفعيل",
-            "رفع مدخلات المهمة المطلوبة في الوقت المحدد",
-            "رفع مخرجات المهمة النهائية قبل إغلاق المهمة",
-            "العمل ضمن النطاق المعتمد فقط",
-            "قبول عمولة المنصة والسياسات"
+            "ط±ظپط¹ ظ…ط³طھظ†ط¯ط§طھ ط§ظ„طھط­ظ‚ظ‚ ظ‚ط¨ظ„ ط§ظ„طھظپط¹ظٹظ„",
+            "ط±ظپط¹ ظ…ط¯ط®ظ„ط§طھ ط§ظ„ظ…ظ‡ظ…ط© ط§ظ„ظ…ط·ظ„ظˆط¨ط© ظپظٹ ط§ظ„ظˆظ‚طھ ط§ظ„ظ…ط­ط¯ط¯",
+            "ط±ظپط¹ ظ…ط®ط±ط¬ط§طھ ط§ظ„ظ…ظ‡ظ…ط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط© ظ‚ط¨ظ„ ط¥ط؛ظ„ط§ظ‚ ط§ظ„ظ…ظ‡ظ…ط©",
+            "ط§ظ„ط¹ظ…ظ„ ط¶ظ…ظ† ط§ظ„ظ†ط·ط§ظ‚ ط§ظ„ظ…ط¹طھظ…ط¯ ظپظ‚ط·",
+            "ظ‚ط¨ظˆظ„ ط¹ظ…ظˆظ„ط© ط§ظ„ظ…ظ†طµط© ظˆط§ظ„ط³ظٹط§ط³ط§طھ"
         ],
         "suspension_triggers": [
-            "عدم رفع المدخلات المطلوبة",
-            "عدم رفع المخرجات النهائية",
-            "تجاوز الموعد النهائي",
-            "مخالفة جودة العمل"
+            "ط¹ط¯ظ… ط±ظپط¹ ط§ظ„ظ…ط¯ط®ظ„ط§طھ ط§ظ„ظ…ط·ظ„ظˆط¨ط©",
+            "ط¹ط¯ظ… ط±ظپط¹ ط§ظ„ظ…ط®ط±ط¬ط§طھ ط§ظ„ظ†ظ‡ط§ط¦ظٹط©",
+            "طھط¬ط§ظˆط² ط§ظ„ظ…ظˆط¹ط¯ ط§ظ„ظ†ظ‡ط§ط¦ظٹ",
+            "ظ…ط®ط§ظ„ظپط© ط¬ظˆط¯ط© ط§ظ„ط¹ظ…ظ„"
         ]
     }
 
@@ -732,7 +771,7 @@ async def get_acceptable_use():
     return {
         "version": "1.0",
         "effective_date": "2026-01-01",
-        "content_ar": "سياسة الاستخدام المقبول لمنصة APEX..."
+        "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„ ظ„ظ…ظ†طµط© APEX..."
     }
 
 @app.post("/legal/accept", tags=["Legal"])
@@ -820,37 +859,37 @@ async def list_task_types():
     return {"task_types": [
         {
             "id": "bookkeeping",
-            "name_ar": "مسك الدفاتر",
-            "input_documents": ["مصادر القيود", "كشف حساب بنكي", "فواتير", "شجرة حسابات"],
-            "output_documents": ["ملف قيود منظم", "ملاحظات التسوية"],
+            "name_ar": "ظ…ط³ظƒ ط§ظ„ط¯ظپط§طھط±",
+            "input_documents": ["ظ…طµط§ط¯ط± ط§ظ„ظ‚ظٹظˆط¯", "ظƒط´ظپ ط­ط³ط§ط¨ ط¨ظ†ظƒظٹ", "ظپظˆط§طھظٹط±", "ط´ط¬ط±ط© ط­ط³ط§ط¨ط§طھ"],
+            "output_documents": ["ظ…ظ„ظپ ظ‚ظٹظˆط¯ ظ…ظ†ط¸ظ…", "ظ…ظ„ط§ط­ط¸ط§طھ ط§ظ„طھط³ظˆظٹط©"],
             "deadline_days": 14
         },
         {
             "id": "financial_statement_preparation",
-            "name_ar": "إعداد القوائم المالية",
-            "input_documents": ["ميزان مراجعة", "سياسات محاسبية", "أرصدة افتتاحية"],
-            "output_documents": ["قوائم مالية", "إيضاحات", "ملخص"],
+            "name_ar": "ط¥ط¹ط¯ط§ط¯ ط§ظ„ظ‚ظˆط§ط¦ظ… ط§ظ„ظ…ط§ظ„ظٹط©",
+            "input_documents": ["ظ…ظٹط²ط§ظ† ظ…ط±ط§ط¬ط¹ط©", "ط³ظٹط§ط³ط§طھ ظ…ط­ط§ط³ط¨ظٹط©", "ط£ط±طµط¯ط© ط§ظپطھطھط§ط­ظٹط©"],
+            "output_documents": ["ظ‚ظˆط§ط¦ظ… ظ…ط§ظ„ظٹط©", "ط¥ظٹط¶ط§ط­ط§طھ", "ظ…ظ„ط®طµ"],
             "deadline_days": 21
         },
         {
             "id": "vat_review",
-            "name_ar": "مراجعة ضريبة القيمة المضافة",
-            "input_documents": ["ملفات ضريبية", "فواتير", "إقرارات سابقة"],
-            "output_documents": ["مذكرة المراجعة", "النتائج", "قائمة الإجراءات"],
+            "name_ar": "ظ…ط±ط§ط¬ط¹ط© ط¶ط±ظٹط¨ط© ط§ظ„ظ‚ظٹظ…ط© ط§ظ„ظ…ط¶ط§ظپط©",
+            "input_documents": ["ظ…ظ„ظپط§طھ ط¶ط±ظٹط¨ظٹط©", "ظپظˆط§طھظٹط±", "ط¥ظ‚ط±ط§ط±ط§طھ ط³ط§ط¨ظ‚ط©"],
+            "output_documents": ["ظ…ط°ظƒط±ط© ط§ظ„ظ…ط±ط§ط¬ط¹ط©", "ط§ظ„ظ†طھط§ط¦ط¬", "ظ‚ط§ط¦ظ…ط© ط§ظ„ط¥ط¬ط±ط§ط،ط§طھ"],
             "deadline_days": 10
         },
         {
             "id": "hr_policy_review",
-            "name_ar": "مراجعة سياسات الموارد البشرية",
-            "input_documents": ["سياسات حالية", "الهيكل التنظيمي", "العقود"],
-            "output_documents": ["تقرير المراجعة", "قائمة الفجوات"],
+            "name_ar": "ظ…ط±ط§ط¬ط¹ط© ط³ظٹط§ط³ط§طھ ط§ظ„ظ…ظˆط§ط±ط¯ ط§ظ„ط¨ط´ط±ظٹط©",
+            "input_documents": ["ط³ظٹط§ط³ط§طھ ط­ط§ظ„ظٹط©", "ط§ظ„ظ‡ظٹظƒظ„ ط§ظ„طھظ†ط¸ظٹظ…ظٹ", "ط§ظ„ط¹ظ‚ظˆط¯"],
+            "output_documents": ["طھظ‚ط±ظٹط± ط§ظ„ظ…ط±ط§ط¬ط¹ط©", "ظ‚ط§ط¦ظ…ط© ط§ظ„ظپط¬ظˆط§طھ"],
             "deadline_days": 14
         },
         {
             "id": "audit_support",
-            "name_ar": "دعم التدقيق",
-            "input_documents": ["قوائم مالية", "ميزان مراجعة", "مستندات داعمة"],
-            "output_documents": ["تقرير التدقيق", "ملاحظات", "خطاب الإدارة"],
+            "name_ar": "ط¯ط¹ظ… ط§ظ„طھط¯ظ‚ظٹظ‚",
+            "input_documents": ["ظ‚ظˆط§ط¦ظ… ظ…ط§ظ„ظٹط©", "ظ…ظٹط²ط§ظ† ظ…ط±ط§ط¬ط¹ط©", "ظ…ط³طھظ†ط¯ط§طھ ط¯ط§ط¹ظ…ط©"],
+            "output_documents": ["طھظ‚ط±ظٹط± ط§ظ„طھط¯ظ‚ظٹظ‚", "ظ…ظ„ط§ط­ط¸ط§طھ", "ط®ط·ط§ط¨ ط§ظ„ط¥ط¯ط§ط±ط©"],
             "deadline_days": 30
         }
     ]}
@@ -861,9 +900,9 @@ async def get_task_documents(request_id: str):
     return {
         "request_id": request_id,
         "task_type": "bookkeeping",
-        "required_inputs": ["مصادر القيود", "كشف حساب بنكي"],
+        "required_inputs": ["ظ…طµط§ط¯ط± ط§ظ„ظ‚ظٹظˆط¯", "ظƒط´ظپ ط­ط³ط§ط¨ ط¨ظ†ظƒظٹ"],
         "submitted_inputs": [],
-        "required_outputs": ["ملف قيود منظم"],
+        "required_outputs": ["ظ…ظ„ظپ ظ‚ظٹظˆط¯ ظ…ظ†ط¸ظ…"],
         "submitted_outputs": [],
         "compliance_status": "pending",
         "deadline": "2026-04-15"
@@ -925,15 +964,15 @@ async def unsuspend_provider(provider_id: str, body: dict):
 async def list_client_types():
     """List available client types with knowledge mode eligibility."""
     return {"client_types": [
-        {"id": "standard_business", "name_ar": "منشأة تجارية", "knowledge_mode": False},
-        {"id": "financial_entity", "name_ar": "جهة مالية", "knowledge_mode": True},
-        {"id": "financing_entity", "name_ar": "جهة تمويلية", "knowledge_mode": True},
-        {"id": "accounting_firm", "name_ar": "مكتب محاسبة", "knowledge_mode": True},
-        {"id": "audit_firm", "name_ar": "مكتب تدقيق", "knowledge_mode": True},
-        {"id": "investment_entity", "name_ar": "جهة استثمارية", "knowledge_mode": True},
-        {"id": "sector_consulting_entity", "name_ar": "استشارات قطاعية", "knowledge_mode": True},
-        {"id": "government_entity", "name_ar": "جهة حكومية", "knowledge_mode": True},
-        {"id": "legal_regulatory_entity", "name_ar": "جهة قانونية/تنظيمية", "knowledge_mode": True}
+        {"id": "standard_business", "name_ar": "ظ…ظ†ط´ط£ط© طھط¬ط§ط±ظٹط©", "knowledge_mode": False},
+        {"id": "financial_entity", "name_ar": "ط¬ظ‡ط© ظ…ط§ظ„ظٹط©", "knowledge_mode": True},
+        {"id": "financing_entity", "name_ar": "ط¬ظ‡ط© طھظ…ظˆظٹظ„ظٹط©", "knowledge_mode": True},
+        {"id": "accounting_firm", "name_ar": "ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط©", "knowledge_mode": True},
+        {"id": "audit_firm", "name_ar": "ظ…ظƒطھط¨ طھط¯ظ‚ظٹظ‚", "knowledge_mode": True},
+        {"id": "investment_entity", "name_ar": "ط¬ظ‡ط© ط§ط³طھط«ظ…ط§ط±ظٹط©", "knowledge_mode": True},
+        {"id": "sector_consulting_entity", "name_ar": "ط§ط³طھط´ط§ط±ط§طھ ظ‚ط·ط§ط¹ظٹط©", "knowledge_mode": True},
+        {"id": "government_entity", "name_ar": "ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط©", "knowledge_mode": True},
+        {"id": "legal_regulatory_entity", "name_ar": "ط¬ظ‡ط© ظ‚ط§ظ†ظˆظ†ظٹط©/طھظ†ط¸ظٹظ…ظٹط©", "knowledge_mode": True}
     ]}
 
 # --- Profile Update ---
@@ -952,4 +991,7 @@ async def get_activity_history(limit: int = Query(20)):
 # v4.2
 
 # force-deploy-p8-fix
+
+
+
 
