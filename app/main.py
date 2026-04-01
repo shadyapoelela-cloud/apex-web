@@ -225,9 +225,51 @@ def reinit_db(secret: str = Query(...)):
             init_phase11_db()
             from app.phase11.services.legal_service import seed_legal_documents
             seed_result = seed_legal_documents()
-            results["phase11"] = f"OK - {seed_result}"
+            
+    # Sprint 2 — add classification columns
+    try:
+        from app.sprint2.models.sprint2_models import CLASSIFICATION_COLUMNS
+        from app.phase1.models.platform_models import SessionLocal
+        _db = SessionLocal()
+        _conn = _db.bind.raw_connection()
+        _cur = _conn.cursor()
+        _added = 0
+        for col, ctype in CLASSIFICATION_COLUMNS.items():
+            try:
+                _cur.execute(f"ALTER TABLE client_chart_of_accounts ADD COLUMN {col} {ctype}")
+                _added += 1
+            except: pass
+        _conn.commit()
+        _conn.close()
+        _db.close()
+        results["sprint2_init"] = f"OK - {_added} columns added"
     except Exception as e:
-        results["phase11"] = str(e)[:80]
+        results["sprint2_init"] = f"ERR: {e}"
+    
+    results["phase11"] = f"OK - {seed_result}"
+    except Exception as e:
+        
+    # Sprint 2 — add classification columns
+    try:
+        from app.sprint2.models.sprint2_models import CLASSIFICATION_COLUMNS
+        from app.phase1.models.platform_models import SessionLocal
+        _db = SessionLocal()
+        _conn = _db.bind.raw_connection()
+        _cur = _conn.cursor()
+        _added = 0
+        for col, ctype in CLASSIFICATION_COLUMNS.items():
+            try:
+                _cur.execute(f"ALTER TABLE client_chart_of_accounts ADD COLUMN {col} {ctype}")
+                _added += 1
+            except: pass
+        _conn.commit()
+        _conn.close()
+        _db.close()
+        results["sprint2_init"] = f"OK - {_added} columns added"
+    except Exception as e:
+        results["sprint2_init"] = f"ERR: {e}"
+    
+    results["phase11"] = str(e)[:80]
 
     return results
 
