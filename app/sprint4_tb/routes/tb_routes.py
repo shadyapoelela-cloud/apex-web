@@ -407,3 +407,28 @@ def debug_bind(tb_upload_id: str, body: dict = {}):
         return result
     except Exception as e:
         return {"error": str(e), "traceback": traceback.format_exc()}
+
+
+@router.post("/tb/debug-bind/{tb_upload_id}")
+def debug_bind(tb_upload_id: str, body: dict = {}):
+    """Debug binding - returns full traceback"""
+    import traceback
+    try:
+        from app.sprint4_tb.services.tb_binding_engine import bind_tb_to_coa
+        db = _get_db()
+        row = db.execute(_t(
+            "SELECT client_id, coa_upload_id FROM trial_balance_uploads WHERE id = :uid"
+        ), {"uid": tb_upload_id}).fetchone()
+        db.close()
+        if not row:
+            return {"error": "TB not found"}
+        coa_id = body.get("coa_upload_id") or row[1]
+        result = bind_tb_to_coa(
+            tb_upload_id=tb_upload_id,
+            coa_upload_id=coa_id,
+            client_id=row[0],
+            fuzzy_threshold=0.80,
+        )
+        return result
+    except Exception as e:
+        return {"error": str(e), "traceback": traceback.format_exc()}
