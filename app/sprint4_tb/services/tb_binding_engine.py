@@ -342,7 +342,7 @@ def approve_binding(tb_upload_id: str, approved_by: str = None) -> Dict:
         unmatched_pct = round(unmatched / total * 100, 1)
 
         db.execute(_t(
-            "UPDATE trial_balance_uploads SET upload_status = 'approved', binding_approved = 1 WHERE id = :uid"
+            "UPDATE trial_balance_uploads SET upload_status = 'approved', binding_approved = true WHERE id = :uid"
         ), {"uid": tb_upload_id})
         db.commit()
 
