@@ -129,6 +129,15 @@ except Exception as e:
     HAS_S4TB = False
     print(f"Sprint 4 TB disabled: {e}")
 
+# Sprint 4 TB - Trial Balance Binding
+try:
+    from app.sprint4_tb.routes.tb_routes import router as s4tb
+    HAS_S4TB = True
+    print(f"Sprint 4 TB loaded: {len(s4tb.routes)} routes")
+except Exception as e:
+    HAS_S4TB = False
+    print(f"Sprint 4 TB disabled: {e}")
+
 try:
     from app.sprint4.routes.sprint4_routes import router as s4r
     HAS_S4 = True
@@ -202,6 +211,8 @@ if HAS_S3:
     app.include_router(s3r, tags=["Sprint 3 COA Quality"])
 if HAS_S4:
     app.include_router(s4r, tags=["Sprint 4 Knowledge Brain"])
+if HAS_S4TB:
+    app.include_router(s4tb, tags=["Sprint 4 TB Binding"])
 if HAS_S4TB:
     app.include_router(s4tb, tags=["Sprint 4 TB Binding"])
     print(f"[STARTUP] S4 registered: {len(s4r.routes)} routes")
