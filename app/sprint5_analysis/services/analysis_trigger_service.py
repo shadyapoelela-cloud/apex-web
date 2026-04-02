@@ -75,7 +75,7 @@ def get_bound_rows_as_classified(db, tb_upload_id: str) -> list[dict]:
     """
     rows = _exec(db,
         """SELECT
-              tp.account_code, tp.account_name,
+              tp.account_code, tp.account_name_raw,
               tp.debit_amount, tp.credit_amount, tp.net_balance,
               br.coa_account_id, br.match_strategy, br.confidence,
               ca.normalized_class, ca.statement_section,
@@ -87,7 +87,7 @@ def get_bound_rows_as_classified(db, tb_upload_id: str) -> list[dict]:
                AND br.tb_row_id = tp.id
            LEFT JOIN client_chart_of_accounts ca ON ca.id = br.coa_account_id
            WHERE tp.tb_upload_id = :tid
-           ORDER BY tp.row_number""",
+           ORDER BY tp.source_row_number""",
         {"tid": tb_upload_id}).fetchall()
 
     classified = []
