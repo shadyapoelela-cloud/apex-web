@@ -114,8 +114,8 @@ def seed_plan_limits():
                 limit = PlanLimit(
                     id=gen_uuid(),
                     plan_name=plan_name,
-                    feature_key=feature_key,
-                    feature_value=feature_value,
+                    feature_code=feature_key,
+                    value=feature_value,
                     description_ar=desc[0],
                     description_en=desc[1],
                 )
@@ -157,8 +157,8 @@ def create_user_subscription(user_id, plan_name="Free"):
             ent = SubscriptionEntitlement(
                 id=gen_uuid(),
                 user_id=user_id,
-                feature_key=feature_key,
-                feature_value=feature_value,
+                feature_code=feature_key,
+                value=feature_value,
                 source="plan",
             )
             db.add(ent)

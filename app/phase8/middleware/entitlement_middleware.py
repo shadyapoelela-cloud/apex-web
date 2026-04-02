@@ -19,10 +19,10 @@ def get_user_entitlement(user_id: str, feature_key: str):
     db = SessionLocal()
     try:
         ent = db.query(SubscriptionEntitlement).filter_by(
-            user_id=user_id, feature_key=feature_key
+            user_id=user_id, feature_code=feature_key
         ).first()
         if ent:
-            return ent.feature_value
+            return ent.value
         return None
     finally:
         db.close()
@@ -33,7 +33,7 @@ def get_all_user_entitlements(user_id: str):
     db = SessionLocal()
     try:
         ents = db.query(SubscriptionEntitlement).filter_by(user_id=user_id).all()
-        return {e.feature_key: e.feature_value for e in ents}
+        return {e.feature_code: e.value for e in ents}
     finally:
         db.close()
 
