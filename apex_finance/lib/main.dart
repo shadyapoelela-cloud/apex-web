@@ -4387,7 +4387,7 @@ class _TbUS extends State<TbUploadScreen> {
   Future<void> _bind() async {
     if (_tid == null) return; setState(() { _up = true; _err = null; });
     try {
-      final r = await http.post(Uri.parse('$_api/tb/uploads/$_tid/bind'), headers: {...S.h(), 'Content-Type': 'application/json'}, body: jsonEncode({}));
+      final r = await http.post(Uri.parse('$_api/tb/uploads/$_tid/bind'), headers: {...S.h(), 'Content-Type': 'application/json'}, body: jsonEncode(widget.coaUploadId != null ? {'coa_upload_id': widget.coaUploadId} : {}));
       if (r.statusCode == 200) { setState(() { _step = 3; _up = false; }); }
       else { final d = jsonDecode(r.body); setState(() { _err = (d['detail'] is String ? d['detail'] : d['detail']?.toString()) ?? 'fail'; _up = false; }); }
     } catch (e) { setState(() { _err = '$e'; _up = false; }); }
