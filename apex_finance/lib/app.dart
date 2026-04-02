@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
 // DISABLED: import 'client_create_screen.dart';
 
-const _api = 'https://apex-api-ootk.onrender.com';
+const _api = 'http://localhost:8080';
 void main() => runApp(const ApexApp());
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
@@ -3882,12 +3882,26 @@ class _CoaParsedS extends State<CoaParsedPreviewScreen> {
     final pr = widget.parseResult;
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('ظ†طھط§ط¦ط¬ ط§ظ„طھط­ظ„ظٹظ„', style: TextStyle(color: AC.gold)),
-        actions: [IconButton(icon: const Icon(Icons.feedback_outlined, color: AC.gold),
-          tooltip: 'ظ…ظ„ط§ط­ط¸ط§طھ ظ…ط¹ط±ظپظٹط©',
-          onPressed: () => Navigator.push(c, MaterialPageRoute(
-            builder: (_) => CoaKnowledgeFeedbackScreen(clientId: widget.clientId, uploadId: widget.uploadId))))]),
-      body: Column(children: [
+      appBar: AppBar(
+        title: const Text("نتائج التحليل", style: TextStyle(color: AC.gold)),
+        backgroundColor: AC.navy,
+        bottom: PreferredSize(preferredSize: const Size.fromHeight(52),
+          child: Padding(padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            child: Row(children: [
+              Expanded(child: SizedBox(height: 40, child: ElevatedButton.icon(
+                onPressed: () => Navigator.push(c, MaterialPageRoute(builder: (_) => CoaQualityReportScreen(uploadId: widget.uploadId, clientId: widget.clientId))),
+                icon: const Icon(Icons.assessment, size: 16),
+                label: const Text("تقييم الجودة", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(backgroundColor: AC.cyan, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))))),
+              const SizedBox(width: 8),
+              Expanded(child: SizedBox(height: 40, child: ElevatedButton.icon(
+                onPressed: () => Navigator.push(c, MaterialPageRoute(builder: (_) => CoaReviewApprovalScreen(uploadId: widget.uploadId, clientId: widget.clientId))),
+                icon: const Icon(Icons.rate_review, size: 16),
+                label: const Text("اعتماد الشجرة", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))))),
+            ]))),
+      ),
+      body: Column(children: [const Padding(padding: EdgeInsets.all(8), child: Text("TEST-BUTTONS-HERE", style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold))),
         // Summary cards
         Padding(padding: const EdgeInsets.all(12), child: Row(children: [
           _card('ط§ظ„ظ…ظƒطھط´ظپط©', '${pr['total_rows_detected'] ?? 0}', AC.cyan),
@@ -3952,6 +3966,19 @@ class _CoaParsedS extends State<CoaParsedPreviewScreen> {
               })),
         // Pagination
         Padding(padding: const EdgeInsets.all(12), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        // === Navigation Buttons ===
+        Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Column(children: [
+            SizedBox(width: double.infinity, height: 48, child: ElevatedButton.icon(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CoaQualityReportScreen(uploadId: widget.uploadId, clientId: widget.clientId))),
+              icon: const Icon(Icons.assessment), label: const Text("تقرير تقييم الجودة", style: TextStyle(fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(backgroundColor: AC.cyan, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))))),
+            const SizedBox(height: 8),
+            SizedBox(width: double.infinity, height: 48, child: ElevatedButton.icon(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CoaReviewApprovalScreen(uploadId: widget.uploadId, clientId: widget.clientId))),
+              icon: const Icon(Icons.rate_review), label: const Text("مراجعة واعتماد الشجرة", style: TextStyle(fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))))),
+          ])),
           IconButton(icon: const Icon(Icons.chevron_right, color: AC.ts),
             onPressed: _page > 1 ? () { setState(() => _page--); _loadPage(); } : null),
           Text('طµظپط­ط© $_page', style: const TextStyle(color: AC.ts)),
@@ -4262,7 +4289,7 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
       final d = jsonDecode(r.body);
       if (r.statusCode == 200 && d['success'] == true && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('طھظ… ط§ط¹طھظ…ط§ط¯ ط§ظ„ط´ط¬ط±ط©')));
-        Navigator.pop(context, true);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => TbUploadScreen(clientId: widget.clientId, clientName: "", coaUploadId: widget.uploadId)));
       }
     } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'))); }
   }
@@ -4735,7 +4762,7 @@ class _TbBindingReviewS extends State<TbBindingReviewScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('طھظ… ط§ط¹طھظ…ط§ط¯ ط§ظ„ط±ط¨ط· â€” ط¬ط§ظ‡ط² ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ')),
           );
-          Navigator.pop(context, true);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AnalysisRunScreen(clientId: widget.clientId, tbUploadId: widget.tbUploadId)));
         }
       } else {
         setState(() { _error = d['detail'] ?? 'ظپط´ظ„ ط§ظ„ط§ط¹طھظ…ط§ط¯'; _approving = false; });
@@ -4982,4 +5009,157 @@ class _TbBindingReviewS extends State<TbBindingReviewScreen> {
 
 
 
+
+
+
+
+
+
+
+
+// ========================================================
+// Sprint 5: Analysis Run Screen - Final Analysis Output
+// ========================================================
+class AnalysisRunScreen extends StatefulWidget {
+  final String clientId;
+  final String tbUploadId;
+  const AnalysisRunScreen({super.key, required this.clientId, required this.tbUploadId});
+  @override State<AnalysisRunScreen> createState() => _AnalysisRunS();
+}
+class _AnalysisRunS extends State<AnalysisRunScreen> {
+  bool _running = true, _failed = false;
+  String? _error;
+  Map<String, dynamic>? _result;
+  final List<String> _exp = [];
+  @override void initState() { super.initState(); _run(); }
+  Future<void> _run() async {
+    try {
+      final vUrl = '$_api/analysis/validate/${widget.clientId}/${widget.tbUploadId}';
+      final vr = await http.get(Uri.parse(vUrl), headers: S.h());
+      if (vr.statusCode != 200) { final vd = jsonDecode(vr.body); setState(() { _running = false; _failed = true; _error = vd['detail'] ?? 'readiness fail'; }); return; }
+      final rUrl = '$_api/analysis/run';
+      final r = await http.post(Uri.parse(rUrl), headers: {...S.h(), 'Content-Type': 'application/json'}, body: jsonEncode({'client_id': widget.clientId, 'tb_upload_id': widget.tbUploadId}));
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200 && d['success'] == true) { await _loadReport(); }
+      else { setState(() { _running = false; _failed = true; _error = d['detail'] ?? d['error'] ?? 'fail'; }); }
+    } catch (e) { setState(() { _running = false; _failed = true; _error = e.toString(); }); }
+  }
+  Future<void> _loadReport() async {
+    try {
+      final rpUrl = '$_api/analysis/client/${widget.clientId}/full-report';
+      final r = await http.get(Uri.parse(rpUrl), headers: S.h());
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200) { setState(() { _result = d; _running = false; }); }
+      else { setState(() { _running = false; _failed = true; _error = d['detail'] ?? 'fail'; }); }
+    } catch (e) { setState(() { _running = false; _failed = true; _error = e.toString(); }); }
+  }
+  void _tog(String k) { setState(() { _exp.contains(k) ? _exp.remove(k) : _exp.add(k); }); }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(backgroundColor: AC.navy,
+      appBar: AppBar(title: const Text('التحليل المالي الكامل', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy,
+        actions: [if (_result != null) IconButton(icon: const Icon(Icons.refresh, color: AC.gold), onPressed: () { setState(() { _running = true; _failed = false; _error = null; _result = null; }); _run(); })]),
+      body: _running ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const CircularProgressIndicator(color: AC.gold), const SizedBox(height: 24),
+            const Text('جارٍ تشغيل التحليل...', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('يتم بناء القوائم من الشجرة المعتمدة والميزان المربوط', style: TextStyle(color: AC.ts, fontSize: 13))]))
+        : _failed ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.error_outline, color: Colors.redAccent, size: 48), const SizedBox(height: 16),
+              Text(_error ?? '', style: const TextStyle(color: Colors.redAccent, fontSize: 13), textAlign: TextAlign.center),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(onPressed: () { setState(() { _running = true; _failed = false; }); _run(); },
+                icon: const Icon(Icons.replay), label: const Text('إعادة المحاولة'),
+                style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy))])))
+        : _result != null ? _buildReport() : const SizedBox());
+  }
+  Widget _buildReport() {
+    final rp = _result!;
+    return SingleChildScrollView(padding: const EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(width: double.infinity, padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.gold.withOpacity(0.15), AC.cyan.withOpacity(0.1)]),
+          borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.gold.withOpacity(0.3))),
+        child: Row(children: [const Icon(Icons.analytics, color: AC.gold, size: 28), const SizedBox(width: 10),
+          const Expanded(child: Text('نتائج التحليل المالي', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)))])),
+      const SizedBox(height: 16),
+      _sec('income', 'قائمة الدخل', Icons.trending_up, Colors.greenAccent, rp['income_statement'] ?? {}, () => _tbl(rp['income_statement'] ?? {})),
+      _sec('balance', 'الميزانية العمومية', Icons.account_balance, AC.cyan, rp['balance_sheet'] ?? {}, () => _tbl(rp['balance_sheet'] ?? {})),
+      _sec('ratios', 'النسب المالية', Icons.pie_chart, AC.gold, rp['ratios'] ?? {}, () => _ratW(rp['ratios'] ?? {})),
+      _sec('validations', 'التحذيرات', Icons.warning_amber, Colors.orangeAccent, rp['validations'] ?? {}, () => _valW(rp['validations'] ?? {})),
+      _sec('readiness', 'درجة الجاهزية', Icons.speed, Colors.purpleAccent, rp['readiness'] ?? {}, () => _rdyW(rp['readiness'] ?? {})),
+      const SizedBox(height: 24),
+      SizedBox(width: double.infinity, height: 48, child: OutlinedButton.icon(onPressed: () => Navigator.pop(context),
+        icon: const Icon(Icons.arrow_back), label: const Text('رجوع'),
+        style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold), foregroundColor: AC.gold))),
+    ]));
+  }
+  Widget _sec(String k, String t, IconData ic, Color c, dynamic d, Widget Function() b) {
+    final ex = _exp.contains(k); final has = d != null && (d is Map ? d.isNotEmpty : true);
+    return Container(margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: ex ? c.withOpacity(0.4) : Colors.white12)),
+      child: Column(children: [
+        InkWell(onTap: () => _tog(k), borderRadius: BorderRadius.circular(12),
+          child: Padding(padding: const EdgeInsets.all(14), child: Row(children: [
+            Icon(ic, color: c, size: 22), const SizedBox(width: 12),
+            Expanded(child: Text(t, style: TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
+            if (!has) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(8)),
+              child: const Text('لا توجد بيانات', style: TextStyle(color: AC.ts, fontSize: 10))),
+            Icon(ex ? Icons.expand_less : Icons.expand_more, color: AC.ts)]))),
+        if (ex && has) Padding(padding: const EdgeInsets.fromLTRB(14, 0, 14, 14), child: b())]));
+  }
+  Widget _tbl(Map<String, dynamic> d) {
+    final e = d.entries.where((x) => x.value is num || x.value is String).toList();
+    if (e.isEmpty) return const Text('لا توجد بيانات', style: TextStyle(color: AC.ts));
+    return Column(children: e.map((x) => Padding(padding: const EdgeInsets.only(bottom: 6),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Flexible(child: Text(x.key, style: const TextStyle(color: AC.ts, fontSize: 12))),
+        Text(x.value is num ? _fn(x.value) : x.value.toString(),
+          style: TextStyle(color: x.value is num && (x.value as num) < 0 ? Colors.redAccent : AC.tp, fontSize: 13, fontWeight: FontWeight.bold))]))).toList());
+  }
+  Widget _ratW(Map<String, dynamic> d) {
+    return Column(children: d.entries.map((e) {
+      final v = (e.value is num ? e.value.toDouble() : double.tryParse(e.value.toString()) ?? 0);
+      return Padding(padding: const EdgeInsets.only(bottom: 8), child: Row(children: [
+        Expanded(child: Text(e.key, style: const TextStyle(color: AC.ts, fontSize: 12))),
+        SizedBox(width: 80, child: ClipRRect(borderRadius: BorderRadius.circular(3),
+          child: LinearProgressIndicator(value: (v / 100).clamp(0.0, 1.0), backgroundColor: Colors.white12,
+            color: v >= 50 ? Colors.greenAccent : Colors.orangeAccent, minHeight: 6))),
+        const SizedBox(width: 8),
+        SizedBox(width: 50, child: Text('${v.toStringAsFixed(1)}%', style: const TextStyle(color: AC.tp, fontSize: 12, fontWeight: FontWeight.bold), textAlign: TextAlign.left))]));
+    }).toList());
+  }
+  Widget _valW(Map<String, dynamic> d) {
+    final w = d['warnings'] ?? d['issues'] ?? [];
+    if (w is List && w.isNotEmpty) {
+      return Column(children: w.map<Widget>((x) => Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: Colors.orangeAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Icon(Icons.warning_amber, color: Colors.orangeAccent, size: 16), const SizedBox(width: 8),
+          Expanded(child: Text(x.toString(), style: const TextStyle(color: AC.tp, fontSize: 12)))]))).toList());
+    }
+    return _tbl(d);
+  }
+  Widget _rdyW(Map<String, dynamic> d) {
+    final s = (d['overall_score'] ?? d['readiness_score'] ?? 0).toDouble();
+    final c = s >= 70 ? Colors.greenAccent : s >= 40 ? Colors.orangeAccent : Colors.redAccent;
+    return Column(children: [
+      Text('${s.toStringAsFixed(0)}%', style: TextStyle(color: c, fontSize: 36, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 8),
+      ClipRRect(borderRadius: BorderRadius.circular(6),
+        child: LinearProgressIndicator(value: (s / 100).clamp(0.0, 1.0), backgroundColor: Colors.white12, color: c, minHeight: 10)),
+      const SizedBox(height: 12),
+      ...d.entries.where((e) => e.key != 'overall_score' && e.key != 'readiness_score').map((e) =>
+        Padding(padding: const EdgeInsets.only(bottom: 4), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(e.key, style: const TextStyle(color: AC.ts, fontSize: 12)),
+          Text(e.value.toString(), style: const TextStyle(color: AC.tp, fontSize: 12, fontWeight: FontWeight.bold))])))]);
+  }
+  String _fn(dynamic v) {
+    if (v == null) return '0'; final n = (v is num) ? v.toDouble() : 0.0;
+    if (n == 0) return '0'; final a = n.abs(); final s = n < 0 ? '-' : '';
+    if (a >= 1e6) return '$s${(a/1e6).toStringAsFixed(1)}M';
+    if (a >= 1e3) return '$s${(a/1e3).toStringAsFixed(1)}K';
+    return n.toStringAsFixed(0);
+  }
+}
 

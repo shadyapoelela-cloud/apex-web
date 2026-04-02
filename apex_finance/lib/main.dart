@@ -3894,7 +3894,7 @@ class _CoaParsedS extends State<CoaParsedPreviewScreen> {
         actions: [IconButton(icon: const Icon(Icons.feedback_outlined, color: AC.gold),
           tooltip: 'ملاحظات معرفية',
           onPressed: () => Navigator.push(c, MaterialPageRoute(
-            builder: (_) => CoaKnowledgeFeedbackScreen(clientId: widget.clientId, uploadId: widget.uploadId))))]),
+            builder: (_) => CoaKnowledgeFeedbackScreen(clientId: widget.clientId, uploadId: widget.uploadId))))], bottom: PreferredSize(preferredSize: const Size.fromHeight(52), child: Padding(padding: const EdgeInsets.fromLTRB(12, 0, 12, 8), child: Row(children: [Expanded(child: SizedBox(height: 40, child: ElevatedButton.icon(onPressed: () => Navigator.push(c, MaterialPageRoute(builder: (_) => CoaQualityReportScreen(uploadId: widget.uploadId, clientId: widget.clientId))), icon: const Icon(Icons.assessment, size: 16), label: const Text('تقييم الجودة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), style: ElevatedButton.styleFrom(backgroundColor: AC.cyan, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))))), const SizedBox(width: 8), Expanded(child: SizedBox(height: 40, child: ElevatedButton.icon(onPressed: () => Navigator.push(c, MaterialPageRoute(builder: (_) => CoaReviewApprovalScreen(uploadId: widget.uploadId, clientId: widget.clientId))), icon: const Icon(Icons.rate_review, size: 16), label: const Text('اعتماد الشجرة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))))))])))),
       body: Column(children: [
         // Summary cards
         Padding(padding: const EdgeInsets.all(12), child: Row(children: [
@@ -4240,7 +4240,7 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
 
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/coa/uploads/${widget.uploadId}/accounts?page_size=500'), headers: S.h());
+      final r = await http.get(Uri.parse('$_api/coa/uploads/${widget.uploadId}/accounts?page_size=200'), headers: S.h());
       final d = jsonDecode(r.body);
       if (r.statusCode == 200) { setState(() { _accounts = d['data'] ?? d['accounts'] ?? d['rows'] ?? []; _loading = false; }); }
       else { setState(() { _error = d['detail'] ?? 'فشل'; _loading = false; }); }
@@ -4264,14 +4264,15 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
 
   Future<void> _approveAll() async {
     try {
-      final r = await http.post(Uri.parse('$_api/coa/uploads/${widget.uploadId}/approve'),
+      final ids = _accounts.map((a) => a['id']?.toString()).where((id) => id != null && id.isNotEmpty).toList(); if (ids.isNotEmpty) { await http.post(Uri.parse('$_api/coa/bulk-approve/${widget.uploadId}'), headers: {...S.h(), 'Content-Type': 'application/json'}, body: jsonEncode({'account_ids': ids, 'review_status': 'approved'})); }
+      final r = await http.post(Uri.parse('$_api/coa/uploads/${widget.uploadId}/approve-coa'),
         headers: {...S.h(), 'Content-Type': 'application/json'},
-        body: jsonEncode({'approval_status': 'approved'}));
+        body: jsonEncode({}));
       final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true && mounted) {
+      if (r.statusCode == 200 && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم اعتماد الشجرة')));
-        Navigator.pop(context, true);
-      }
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => TbUploadScreen(clientId: widget.clientId, clientName: '', coaUploadId: widget.uploadId)));
+      } else if (mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: ' + ((d['detail'] is String ? d['detail'] : d['detail']?.toString()) ?? r.statusCode.toString())), backgroundColor: Colors.redAccent)); }
     } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'))); }
   }
 
@@ -4361,5 +4362,93 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
           child: Icon(sel ? Icons.check_box : Icons.check_box_outline_blank, color: sel ? AC.gold : Colors.white38, size: 22)),
         title: Text('$code - $name', style: TextStyle(color: AC.tp, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
         trailing: hasIssues ? Icon(Icons.warning_amber, color: Colors.orangeAccent, size: 18) : Icon(Icons.check_circle_outline, color: Colors.greenAccent.shade400, size: 18)));
+  }
+}
+class TbUploadScreen extends StatefulWidget {
+  final String clientId, clientName;
+  final String? coaUploadId;
+  const TbUploadScreen({super.key, required this.clientId, required this.clientName, this.coaUploadId});
+  @override State<TbUploadScreen> createState() => _TbUS();
+}
+class _TbUS extends State<TbUploadScreen> {
+  bool _up = false; String? _err, _tid; int _step = 1;
+  Future<void> _pick() async {
+    final p = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['xlsx','xls','csv']);
+    if (p == null) return; setState(() { _up = true; _err = null; });
+    try {
+      final req = http.MultipartRequest('POST', Uri.parse('$_api/clients/${widget.clientId}/tb/upload'));
+      req.headers.addAll(S.h()); if (widget.coaUploadId != null) req.fields['coa_upload_id'] = widget.coaUploadId!;
+      req.files.add(http.MultipartFile.fromBytes('file', p.files.first.bytes!, filename: p.files.first.name));
+      final resp = await req.send(); final d = jsonDecode(await resp.stream.bytesToString());
+      if (resp.statusCode == 200 || resp.statusCode == 201) { setState(() { _tid = d['tb_upload_id'] ?? d['id']; _step = 2; _up = false; }); }
+      else { setState(() { _err = (d['detail'] is String ? d['detail'] : d['detail']?.toString()) ?? 'fail'; _up = false; }); }
+    } catch (e) { setState(() { _err = '$e'; _up = false; }); }
+  }
+  Future<void> _bind() async {
+    if (_tid == null) return; setState(() { _up = true; _err = null; });
+    try {
+      final r = await http.post(Uri.parse('$_api/tb/uploads/$_tid/bind'), headers: {...S.h(), 'Content-Type': 'application/json'}, body: jsonEncode({}));
+      if (r.statusCode == 200) { setState(() { _step = 3; _up = false; }); }
+      else { final d = jsonDecode(r.body); setState(() { _err = (d['detail'] is String ? d['detail'] : d['detail']?.toString()) ?? 'fail'; _up = false; }); }
+    } catch (e) { setState(() { _err = '$e'; _up = false; }); }
+  }
+  @override Widget build(BuildContext c) {
+    return Scaffold(backgroundColor: AC.navy, appBar: AppBar(title: const Text('رفع ميزان المراجعة', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)), child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 13))),
+        if (_step == 1) Container(padding: const EdgeInsets.all(32), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(16), border: Border.all(color: AC.gold.withOpacity(0.3))), child: Column(children: [Icon(Icons.cloud_upload, color: AC.gold, size: 48), const SizedBox(height: 16), const Text('اختر ملف ميزان المراجعة', style: TextStyle(color: AC.tp, fontSize: 16)), const SizedBox(height: 20), SizedBox(height: 48, width: double.infinity, child: ElevatedButton.icon(onPressed: _up ? null : _pick, icon: const Icon(Icons.upload_file), label: Text(_up ? 'جارٍ الرفع...' : 'اختر الملف وارفعه'), style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy)))])),
+        if (_step == 2) ...[Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.greenAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Text('تم رفع الميزان بنجاح', style: TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold))), const SizedBox(height: 16), SizedBox(height: 48, width: double.infinity, child: ElevatedButton.icon(onPressed: _up ? null : _bind, icon: const Icon(Icons.link), label: Text(_up ? 'جارٍ الربط...' : 'ربط الميزان بشجرة الحسابات'), style: ElevatedButton.styleFrom(backgroundColor: AC.cyan, foregroundColor: Colors.white)))],
+        if (_step == 3) ...[Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.greenAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Text('تم الربط', style: TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold))), const SizedBox(height: 16), SizedBox(height: 48, width: double.infinity, child: ElevatedButton.icon(onPressed: () => Navigator.push(c, MaterialPageRoute(builder: (_) => TbBindingReviewScreen(tbUploadId: _tid!, clientId: widget.clientId))), icon: const Icon(Icons.rate_review), label: const Text('مراجعة تفاصيل الربط'), style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy)))],
+      ])));
+  }
+}
+class TbBindingReviewScreen extends StatefulWidget {
+  final String tbUploadId, clientId;
+  const TbBindingReviewScreen({super.key, required this.tbUploadId, required this.clientId});
+  @override State<TbBindingReviewScreen> createState() => _TbBS();
+}
+class _TbBS extends State<TbBindingReviewScreen> {
+  bool _ld = true, _ap = false; String? _err; List<dynamic> _rows = [];
+  @override void initState() { super.initState(); _load(); }
+  Future<void> _load() async {
+    try { final r = await http.get(Uri.parse('$_api/tb/uploads/${widget.tbUploadId}/binding-results'), headers: S.h()); final d = jsonDecode(r.body);
+      if (r.statusCode == 200) { setState(() { _rows = d['rows'] ?? d['data'] ?? d['results'] ?? []; _ld = false; }); }
+      else { setState(() { _err = (d['detail'] is String ? d['detail'] : d['detail']?.toString()) ?? 'fail'; _ld = false; }); }
+    } catch (e) { setState(() { _err = '$e'; _ld = false; }); }
+  }
+  Future<void> _approve() async {
+    setState(() => _ap = true);
+    try { final r = await http.post(Uri.parse('$_api/tb/uploads/${widget.tbUploadId}/approve-binding'), headers: {...S.h(), 'Content-Type': 'application/json'}, body: jsonEncode({}));
+      if (r.statusCode == 200 && mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم اعتماد الربط'))); Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AnalysisRunScreen(clientId: widget.clientId, tbUploadId: widget.tbUploadId))); }
+      else { final d = jsonDecode(r.body); setState(() { _err = (d['detail'] is String ? d['detail'] : d['detail']?.toString()) ?? 'fail'; _ap = false; }); }
+    } catch (e) { setState(() { _err = '$e'; _ap = false; }); }
+  }
+  @override Widget build(BuildContext c) {
+    return Scaffold(backgroundColor: AC.navy, appBar: AppBar(title: const Text('مراجعة ربط الميزان', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) : _err != null ? Center(child: Text(_err!, style: const TextStyle(color: Colors.redAccent)))
+        : Column(children: [Expanded(child: ListView.builder(itemCount: _rows.length, padding: const EdgeInsets.all(8), itemBuilder: (ctx, i) { final r = _rows[i]; return Container(margin: const EdgeInsets.only(bottom: 4), padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(8)), child: Text((r['tb_account_name'] ?? r['account_name'] ?? '').toString(), style: const TextStyle(color: AC.tp, fontSize: 13))); })),
+          Container(padding: const EdgeInsets.all(12), child: SizedBox(height: 48, width: double.infinity, child: ElevatedButton.icon(onPressed: _ap ? null : _approve, icon: const Icon(Icons.check_circle), label: Text(_ap ? 'جارٍ...' : 'اعتماد الربط والانتقال للتحليل'), style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent.shade700, foregroundColor: Colors.white))))]));
+  }
+}
+class AnalysisRunScreen extends StatefulWidget {
+  final String clientId, tbUploadId;
+  const AnalysisRunScreen({super.key, required this.clientId, required this.tbUploadId});
+  @override State<AnalysisRunScreen> createState() => _ARS();
+}
+class _ARS extends State<AnalysisRunScreen> {
+  bool _run = true, _fail = false; String? _err; Map<String, dynamic>? _res;
+  @override void initState() { super.initState(); _go(); }
+  Future<void> _go() async {
+    try { final r = await http.post(Uri.parse('$_api/analysis/run'), headers: {...S.h(), 'Content-Type': 'application/json'}, body: jsonEncode({'client_id': widget.clientId, 'tb_upload_id': widget.tbUploadId}));
+      if (r.statusCode == 200) { final rp = await http.get(Uri.parse('$_api/analysis/client/${widget.clientId}/full-report'), headers: S.h()); setState(() { _res = jsonDecode(rp.body); _run = false; }); }
+      else { final d = jsonDecode(r.body); setState(() { _run = false; _fail = true; _err = (d['detail'] is String ? d['detail'] : d['detail']?.toString()) ?? 'fail'; }); }
+    } catch (e) { setState(() { _run = false; _fail = true; _err = '$e'; }); }
+  }
+  @override Widget build(BuildContext c) {
+    return Scaffold(backgroundColor: AC.navy, appBar: AppBar(title: const Text('التحليل المالي', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      body: _run ? const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [CircularProgressIndicator(color: AC.gold), SizedBox(height: 24), Text('جارٍ التحليل...', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold))]))
+        : _fail ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.error_outline, color: Colors.redAccent, size: 48), SizedBox(height: 16), Text(_err ?? '', style: TextStyle(color: Colors.redAccent)), SizedBox(height: 24), ElevatedButton(onPressed: () { setState(() { _run = true; _fail = false; }); _go(); }, style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy), child: Text('إعادة المحاولة'))]))
+        : _res != null ? SingleChildScrollView(padding: const EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.gold.withOpacity(0.15), AC.cyan.withOpacity(0.1)]), borderRadius: BorderRadius.circular(12)), child: const Text('نتائج التحليل المالي', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold))), const SizedBox(height: 16), ..._res!.entries.where((e) => e.value is Map).map((e) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(e.key, style: const TextStyle(color: AC.gold, fontSize: 15, fontWeight: FontWeight.bold)), const SizedBox(height: 8), ...(e.value as Map).entries.map((kv) => Padding(padding: const EdgeInsets.only(bottom: 4), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Flexible(child: Text(kv.key.toString(), style: const TextStyle(color: AC.ts, fontSize: 12))), Text(kv.value.toString(), style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold))])))])))]))
+        : const SizedBox());
   }
 }
