@@ -91,7 +91,7 @@ def approve_upload(
                (id, coa_upload_id, client_id, action, approved_by, notes,
                 total_accounts, approved_accounts, overall_quality_score, avg_confidence, is_current, created_at)
                VALUES (:id, :uid, :cid, 'approved', :by, :notes,
-                       :total, :approved, :qs, :ac, 1, :now)"""
+                       :total, :approved, :qs, :ac, true, :now)"""
         ), {
             "id": gen_uuid(), "uid": upload_id, "cid": client_id,
             "by": approved_by, "notes": notes,
@@ -140,7 +140,7 @@ def reject_upload(upload_id: str, client_id: str, rejected_by: str = None, notes
         db.execute(_t(
             """INSERT INTO coa_approval_records
                (id, coa_upload_id, client_id, action, approved_by, notes, is_current, created_at)
-               VALUES (:id, :uid, :cid, 'returned_for_review', :by, :notes, 1, :now)"""
+               VALUES (:id, :uid, :cid, 'returned_for_review', :by, :notes, true, :now)"""
         ), {"id": gen_uuid(), "uid": upload_id, "cid": client_id, "by": rejected_by, "notes": notes, "now": now})
 
         db.execute(_t(
