@@ -30,7 +30,7 @@ def get_approved_coa_for_client(db, client_id: str) -> dict | None:
         """SELECT ca.coa_upload_id, ca.id as approval_id, ca.overall_quality_score,
                   ca.approved_accounts, ca.total_accounts
            FROM coa_approval_records ca
-           WHERE ca.client_id = :cid AND ca.action = 'approved' AND ca.is_current = 1
+           WHERE ca.client_id = :cid AND ca.action = 'approved' AND ca.is_current = true
            ORDER BY ca.created_at DESC LIMIT 1""",
         {"cid": client_id}).fetchone()
     if not row:

@@ -82,7 +82,7 @@ def approve_upload(
 
         # Mark previous approvals as not current
         db.execute(_t(
-            "UPDATE coa_approval_records SET is_current = 0 WHERE coa_upload_id = :uid"
+            "UPDATE coa_approval_records SET is_current = false WHERE coa_upload_id = :uid"
         ), {"uid": upload_id})
 
         # Create approval record
@@ -134,7 +134,7 @@ def reject_upload(upload_id: str, client_id: str, rejected_by: str = None, notes
         now = _utcnow().isoformat()
 
         db.execute(_t(
-            "UPDATE coa_approval_records SET is_current = 0 WHERE coa_upload_id = :uid"
+            "UPDATE coa_approval_records SET is_current = false WHERE coa_upload_id = :uid"
         ), {"uid": upload_id})
 
         db.execute(_t(
