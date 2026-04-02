@@ -388,7 +388,7 @@ def deactivate_rule(rule_id: str):
         if not row:
             raise HTTPException(404, "Rule not found")
 
-        db.execute(_t("UPDATE client_coa_rules SET is_active = 0 WHERE id = :rid"), {"rid": rule_id})
+        db.execute(_t("UPDATE client_coa_rules SET is_active = false WHERE id = :rid"), {"rid": rule_id})
         db.commit()
         return {"id": rule_id, "status": "deactivated"}
     finally:

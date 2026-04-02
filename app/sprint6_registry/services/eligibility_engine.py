@@ -85,11 +85,11 @@ def assess_funding_eligibility(db, client_id: str, program_id: str | None = None
     # Get programs
     if program_id:
         programs = _exec(db,
-            "SELECT * FROM funding_programs WHERE id = :id AND is_active = 1",
+            "SELECT * FROM funding_programs WHERE id = :id AND is_active = true",
             {"id": program_id}).fetchall()
     else:
         programs = _exec(db,
-            "SELECT * FROM funding_programs WHERE is_active = 1 ORDER BY name_ar").fetchall()
+            "SELECT * FROM funding_programs WHERE is_active = true ORDER BY name_ar").fetchall()
 
     if not programs:
         return [{"message": "لا توجد برامج تمويلية متاحة حالياً"}]
@@ -113,11 +113,11 @@ def assess_support_eligibility(db, client_id: str, program_id: str | None = None
 
     if program_id:
         programs = _exec(db,
-            "SELECT * FROM support_programs WHERE id = :id AND is_active = 1",
+            "SELECT * FROM support_programs WHERE id = :id AND is_active = true",
             {"id": program_id}).fetchall()
     else:
         programs = _exec(db,
-            "SELECT * FROM support_programs WHERE is_active = 1 ORDER BY name_ar").fetchall()
+            "SELECT * FROM support_programs WHERE is_active = true ORDER BY name_ar").fetchall()
 
     if not programs:
         return [{"message": "لا توجد برامج دعم متاحة حالياً"}]
@@ -141,11 +141,11 @@ def assess_license_eligibility(db, client_id: str, license_id: str | None = None
 
     if license_id:
         licenses = _exec(db,
-            "SELECT * FROM license_registry WHERE id = :id AND is_active = 1",
+            "SELECT * FROM license_registry WHERE id = :id AND is_active = true",
             {"id": license_id}).fetchall()
     else:
         licenses = _exec(db,
-            "SELECT * FROM license_registry WHERE is_active = 1 ORDER BY name_ar").fetchall()
+            "SELECT * FROM license_registry WHERE is_active = true ORDER BY name_ar").fetchall()
 
     if not licenses:
         return [{"message": "لا توجد تراخيص متاحة حالياً"}]

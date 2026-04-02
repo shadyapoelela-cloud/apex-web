@@ -205,7 +205,7 @@ def list_client_rules(client_id: str, active_only: bool = True) -> Dict:
         where = "client_id = :cid"
         params = {"cid": client_id}
         if active_only:
-            where += " AND is_active = 1"
+            where += " AND is_active = true"
 
         rows = db.execute(_t(
             f"""SELECT id, rule_name, rule_type, condition_json, action_json,

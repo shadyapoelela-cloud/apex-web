@@ -84,7 +84,7 @@ def bind_tb_to_coa(
         try:
             rule_rows = db.execute(_t(
                 """SELECT condition_json, action_json FROM client_coa_rules
-                   WHERE client_id = :cid AND is_active = 1 ORDER BY priority DESC"""
+                   WHERE client_id = :cid AND is_active = true ORDER BY priority DESC"""
             ), {"cid": client_id}).fetchall()
             for rr in rule_rows:
                 cond = rr[0] if isinstance(rr[0], dict) else json.loads(rr[0] or "{}")
@@ -98,7 +98,7 @@ def bind_tb_to_coa(
             """SELECT id, account_code, account_name_raw, account_name_normalized,
                       close_debit, close_credit, net_balance
                FROM tb_parsed_rows
-               WHERE tb_upload_id = :uid AND is_summary_row = 0
+               WHERE tb_upload_id = :uid AND is_summary_row = false
                ORDER BY source_row_number"""
         ), {"uid": tb_upload_id}).fetchall()
 

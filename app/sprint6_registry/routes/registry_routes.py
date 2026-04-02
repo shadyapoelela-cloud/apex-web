@@ -34,7 +34,7 @@ def list_authorities(domain: Optional[str] = None, jurisdiction: Optional[str] =
     """List official reference authorities."""
     db = _db()
     try:
-        where = "WHERE is_active = 1"
+        where = "WHERE is_active = true"
         params = {}
         if domain:
             where += " AND domain_pack = :dom"
@@ -223,7 +223,7 @@ def list_funding_programs(active_only: bool = True):
     """List available funding programs."""
     db = _db()
     try:
-        where = "WHERE is_active = 1" if active_only else ""
+        where = "WHERE is_active = true" if active_only else ""
         rows = _exec(db,
             f"""SELECT id, name_ar, name_en, provider_name_ar,
                        program_type, jurisdiction, validity_status,
@@ -244,7 +244,7 @@ def list_support_programs(active_only: bool = True):
     """List available support programs."""
     db = _db()
     try:
-        where = "WHERE is_active = 1" if active_only else ""
+        where = "WHERE is_active = true" if active_only else ""
         rows = _exec(db,
             f"""SELECT id, name_ar, name_en, provider_name_ar,
                        support_type, jurisdiction, validity_status,
@@ -265,7 +265,7 @@ def list_licenses(active_only: bool = True):
     """List available license types."""
     db = _db()
     try:
-        where = "WHERE is_active = 1" if active_only else ""
+        where = "WHERE is_active = true" if active_only else ""
         rows = _exec(db,
             f"""SELECT id, name_ar, name_en, license_type,
                        issuing_authority_ar, jurisdiction,
