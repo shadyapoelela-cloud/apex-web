@@ -315,7 +315,7 @@ def approve_account(account_id: str):
         now = datetime.now(timezone.utc).isoformat()
         _exec(db, 
             """UPDATE client_chart_of_accounts SET
-                review_status = 'approved', approved_at = :now
+                record_status = 'approved', approved_at = :now
             WHERE id = :aid""",
             {"aid": account_id, "now": now}
         )
@@ -343,14 +343,14 @@ def bulk_approve(upload_id: str, body: dict = {}):
             params["uid"] = upload_id
             _exec(db, 
                 f"""UPDATE client_chart_of_accounts SET
-                    review_status = 'approved', approved_at = :now, mapping_source = 'bulk_approve'
+                    record_status = 'approved'
                 WHERE coa_upload_id = :uid AND id IN ({placeholders})""",
                 params
             )
         elif min_confidence is not None:
             _exec(db, 
                 """UPDATE client_chart_of_accounts SET
-                    review_status = 'approved', approved_at = :now, mapping_source = 'bulk_approve'
+                    record_status = 'approved'
                 WHERE coa_upload_id = :uid 
                 AND mapping_confidence >= :mc
                 AND record_status != 'rejected'""",
@@ -364,7 +364,7 @@ def bulk_approve(upload_id: str, body: dict = {}):
         # Count approved
         count = _exec(db, 
             """SELECT COUNT(*) FROM client_chart_of_accounts
-               WHERE coa_upload_id = :uid AND review_status = 'approved'""",
+               WHERE coa_upload_id = :uid AND record_status = 'approved'""",
             {"uid": upload_id}
         ).fetchone()[0]
 
