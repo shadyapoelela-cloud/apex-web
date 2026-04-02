@@ -76,7 +76,7 @@ def get_bound_rows_as_classified(db, tb_upload_id: str) -> list[dict]:
     rows = _exec(db,
         """SELECT
               tp.account_code, tp.account_name_raw,
-              tp.debit_amount, tp.credit_amount, tp.net_balance,
+              tp.close_debit, tp.close_credit, tp.net_balance,
               br.coa_account_id, br.match_strategy, br.confidence,
               ca.normalized_class, ca.statement_section,
               ca.subcategory, ca.current_noncurrent,
