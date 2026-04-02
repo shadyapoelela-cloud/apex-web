@@ -163,7 +163,7 @@ import traceback as _tb
 async def global_exception_handler(request, exc):
     import logging
     logging.error(f"Unhandled: {exc}")
-    return JSONResponse(status_code=500, content={"detail": "خطأ داخلي في الخادم"})
+    import traceback; tb_str = traceback.format_exc(); return JSONResponse(status_code=500, content={"detail": f"{exc}\n{tb_str}"})
 
 
 @app.on_event("startup")
