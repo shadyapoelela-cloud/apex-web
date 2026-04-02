@@ -48,7 +48,7 @@ def get_approved_tb_binding(db, tb_upload_id: str) -> dict | None:
     """Check if TB binding is approved."""
     row = _exec(db,
         """SELECT id, upload_status, client_id, coa_upload_id,
-                  total_rows_parsed, total_matched, untotal_matched, binding_confidence_avg
+                  total_rows_parsed, total_matched, total_unmatched, binding_confidence_avg
            FROM trial_balance_uploads
            WHERE id = :tid""",
         {"tid": tb_upload_id}).fetchone()
@@ -61,7 +61,7 @@ def get_approved_tb_binding(db, tb_upload_id: str) -> dict | None:
         "coa_upload_id": row[3],
         "total_rows": row[4],
         "total_matched": row[5],
-        "untotal_matched": row[6],
+        "total_unmatched": row[6],
         "binding_confidence_avg": row[7],
     }
 
