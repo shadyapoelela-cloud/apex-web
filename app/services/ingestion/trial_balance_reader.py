@@ -26,8 +26,15 @@ class TrialBalanceReader:
         else:
             rows = self._read_v1_format(ws, warnings)
 
-        wb.close()
         rows = self._filter_summary_rows(rows)
+
+        # Fallback to generic reader if no rows found
+        if not rows:
+            rows = self._read_generic_format(ws, warnings)
+            if rows:
+                format_type = 'generic'
+
+        wb.close()
 
         return {
             "rows": rows,
@@ -221,6 +228,93 @@ class TrialBalanceReader:
 
             filtered.append(row)
         return filtered
+
+
+    def _read_generic_format(self, ws, warnings: list) -> list:
+        """
+        Generic TB reader: auto-detect header row and columns.
+        Works with Odoo, SAP, QuickBooks, and any standard TB export.
+        """
+        # Find header row by looking for keywords
+        header_keywords = {
+            'name': ['account', 'name', 'description', 'اسم', 'الحساب', 'اسم الحساب', 'البيان'],
+            'code': ['code', 'number', 'رقم', 'كود', 'رقم الحساب'],
+            'debit': ['debit', 'مدين', 'مدينة', 'dr'],
+            'credit': ['credit', 'دائن', 'دائنة', 'cr'],
+            'balance': ['balance', 'net', 'رصيد', 'صافي', 'الرصيد'],
+        }
+
+        header_row_idx = None
+        col_map = {}
+
+        for row_idx, row_data in enumerate(ws.iter_rows(min_row=1, max_row=15, values_only=True), start=1):
+            if not row_data:
+                continue
+            cells = [str(c).strip().lower() if c else '' for c in row_data]
+            matches = 0
+            temp_map = {}
+            for ci, cell_text in enumerate(cells):
+                if not cell_text:
+                    continue
+                for field, keywords in header_keywords.items():
+                    if field not in temp_map:
+                        for kw in keywords:
+                            if kw in cell_text:
+                                temp_map[field] = ci
+                                matches += 1
+                                break
+            if matches >= 2 and 'name' in temp_map:
+                header_row_idx = row_idx
+                col_map = temp_map
+                break
+
+        if not header_row_idx or 'name' not in col_map:
+            warnings.append("Could not detect TB header row automatically")
+            return []
+
+        rows = []
+        for row_data in ws.iter_rows(min_row=header_row_idx + 1, values_only=True):
+            if not row_data:
+                continue
+            name_val = row_data[col_map['name']] if col_map['name'] < len(row_data) else None
+            if not name_val or not str(name_val).strip():
+                continue
+
+            code_val = ''
+            if 'code' in col_map and col_map['code'] < len(row_data):
+                code_val = str(row_data[col_map['code']] or '').strip()
+                if code_val.endswith('.0'):
+                    code_val = code_val[:-2]
+
+            dr = 0.0
+            cr = 0.0
+            bal = 0.0
+            if 'debit' in col_map and col_map['debit'] < len(row_data):
+                dr = self._to_float(row_data[col_map['debit']])
+            if 'credit' in col_map and col_map['credit'] < len(row_data):
+                cr = self._to_float(row_data[col_map['credit']])
+            if 'balance' in col_map and col_map['balance'] < len(row_data):
+                bal = self._to_float(row_data[col_map['balance']])
+
+            net = bal if bal != 0 else (dr - cr)
+
+            rows.append({
+                "code": code_val,
+                "tab": "",
+                "sub_tab": "",
+                "name": str(name_val).strip(),
+                "open_debit": 0.0,
+                "open_credit": 0.0,
+                "movement_debit": 0.0,
+                "movement_credit": 0.0,
+                "close_debit": dr,
+                "close_credit": cr,
+                "net_balance": net,
+            })
+
+        if not rows:
+            warnings.append("Generic reader found no data rows")
+        return rows
 
     @staticmethod
     def _to_float(v) -> float:
