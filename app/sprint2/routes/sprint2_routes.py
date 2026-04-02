@@ -380,6 +380,10 @@ def bulk_approve(upload_id: str, body: dict = {}):
             "total_accounts": total,
             "approval_percentage": round(count / total * 100, 1) if total > 0 else 0,
         }
+    except Exception as e:
+        db.rollback()
+        import traceback
+        raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
     finally:
         db.close()
 
