@@ -111,6 +111,15 @@ try:
 except Exception as e:
     HAS_S2 = False
 
+# Sprint 3 - COA Quality + Review + Approve
+try:
+    from app.sprint3.routes.sprint3_routes import router as s3r
+    HAS_S3 = True
+    print(f"Sprint 3 loaded: {len(s3r.routes)} routes")
+except Exception as e:
+    HAS_S3 = False
+    print(f"Sprint 3 disabled: {e}")
+
 try:
     from app.sprint4.routes.sprint4_routes import router as s4r
     HAS_S4 = True
@@ -180,6 +189,8 @@ if HAS_S1:
     app.include_router(s1r, tags=["Sprint 1 COA"])
 if HAS_S2:
     app.include_router(s2r, tags=["Sprint 2 Classification"])
+if HAS_S3:
+    app.include_router(s3r, tags=["Sprint 3 COA Quality"])
 if HAS_S4:
     app.include_router(s4r, tags=["Sprint 4 Knowledge Brain"])
     print(f"[STARTUP] S4 registered: {len(s4r.routes)} routes")
