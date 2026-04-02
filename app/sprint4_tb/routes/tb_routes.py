@@ -180,7 +180,8 @@ def bind_tb(tb_upload_id: str, body: dict = {}):
     finally:
         db.close()
 
-    result = bind_tb_to_coa(
+    try:
+      result = bind_tb_to_coa(
         tb_upload_id=tb_upload_id,
         coa_upload_id=coa_upload_id,
         client_id=client_id,
@@ -190,6 +191,11 @@ def bind_tb(tb_upload_id: str, body: dict = {}):
     if not result.get("success"):
         raise HTTPException(400, result.get("error", "Binding failed"))
     return result
+except HTTPException:
+    raise
+except Exception as e:
+    import traceback
+    raise HTTPException(500, f"Bind error: {e}\n{traceback.format_exc()}")
 
 
 # ═══════════════════════════════════════════════════════════
