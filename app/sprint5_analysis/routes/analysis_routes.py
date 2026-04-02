@@ -36,6 +36,11 @@ def validate_analysis(client_id: str, tb_upload_id: str):
         )
         result = validate_analysis_preconditions(db, client_id, tb_upload_id)
         return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback as tb
+        raise HTTPException(500, f"{e}\n{tb.format_exc()}")
     finally:
         db.close()
 
