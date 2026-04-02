@@ -164,7 +164,7 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
     """
     Main entry point: run financial analysis using approved COA + TB binding.
     """
-    from .analysis_models import AnalysisRun
+    from app.sprint5_analysis.models.analysis_models import AnalysisRun
     import uuid
 
     # Step 1: Validate preconditions
