@@ -55,7 +55,7 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
                       parent_code, parent_name, account_level, account_type_raw,
                       normal_balance, normalized_class, statement_section, subcategory,
                       current_noncurrent, cashflow_role, sign_rule,
-                      mapping_confidence, mapping_source, review_status,
+                      mapping_confidence, mapping_source, record_status,
                       issues_json, classification_issues_json
                FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status != 'rejected'
@@ -76,7 +76,7 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
                 "statement_section": r[10], "subcategory": r[11],
                 "current_noncurrent": r[12], "cashflow_role": r[13],
                 "sign_rule": r[14], "mapping_confidence": r[15] or 0,
-                "mapping_source": r[16], "review_status": r[17],
+                "mapping_source": r[16], "record_status": r[17],
             })
 
         # Run assessment
