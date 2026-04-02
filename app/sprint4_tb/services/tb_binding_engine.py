@@ -300,9 +300,9 @@ def manually_match_tb_row(binding_id: str, coa_account_id: str, matched_by: str 
         now = datetime.now(timezone.utc).isoformat()
         db.execute(_t(
             """UPDATE tb_binding_results SET
-                coa_account_id = :cid, matched = 1,
+                coa_account_id = :cid, matched = true,
                 match_type = 'manual', binding_confidence = 1.0,
-                mismatch_reason = NULL, requires_review = 0,
+                mismatch_reason = NULL, requires_review = false,
                 coa_normalized_class = :nc, coa_statement_section = :ss,
                 coa_cashflow_role = :cf,
                 review_status = 'manually_matched',
@@ -329,7 +329,7 @@ def approve_binding(tb_upload_id: str, approved_by: str = None) -> Dict:
     db = SessionLocal()
     try:
         unmatched = db.execute(_t(
-            "SELECT COUNT(*) FROM tb_binding_results WHERE tb_upload_id = :uid AND matched = 0"
+            "SELECT COUNT(*) FROM tb_binding_results WHERE tb_upload_id = :uid AND matched = false"
         ), {"uid": tb_upload_id}).fetchone()[0]
 
         total = db.execute(_t(

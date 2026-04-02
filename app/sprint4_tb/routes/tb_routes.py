@@ -217,14 +217,14 @@ def get_binding_results(
         params = {"uid": tb_upload_id}
 
         if matched_only is True:
-            where.append("matched = 1")
+            where.append("matched = true")
         elif matched_only is False:
-            where.append("matched = 0")
+            where.append("matched = false")
 
         if requires_review is True:
-            where.append("requires_review = 1")
+            where.append("requires_review = true")
         elif requires_review is False:
-            where.append("requires_review = 0")
+            where.append("requires_review = false")
 
         if search:
             where.append("(tb_account_name_raw LIKE :srch OR tb_account_code LIKE :srch)")
