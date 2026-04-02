@@ -47,8 +47,8 @@ def get_approved_coa_for_client(db, client_id: str) -> dict | None:
 def get_approved_tb_binding(db, tb_upload_id: str) -> dict | None:
     """Check if TB binding is approved."""
     row = _exec(db,
-        """SELECT id, binding_status, client_id, coa_upload_id,
-                  total_rows, matched_rows, unmatched_rows, match_rate
+        """SELECT id, upload_status, client_id, coa_upload_id,
+                  total_rows_parsed, total_matched, untotal_matched, binding_confidence_avg
            FROM trial_balance_uploads
            WHERE id = :tid""",
         {"tid": tb_upload_id}).fetchone()
@@ -56,13 +56,13 @@ def get_approved_tb_binding(db, tb_upload_id: str) -> dict | None:
         return None
     return {
         "id": row[0],
-        "binding_status": row[1],
+        "upload_status": row[1],
         "client_id": row[2],
         "coa_upload_id": row[3],
         "total_rows": row[4],
-        "matched_rows": row[5],
-        "unmatched_rows": row[6],
-        "match_rate": row[7],
+        "total_matched": row[5],
+        "untotal_matched": row[6],
+        "binding_confidence_avg": row[7],
     }
 
 
@@ -135,12 +135,12 @@ def validate_analysis_preconditions(db, client_id: str, tb_upload_id: str) -> di
     tb = get_approved_tb_binding(db, tb_upload_id)
     if not tb:
         errors.append("ميزان المراجعة غير موجود.")
-    elif tb["binding_status"] != "approved":
-        errors.append(f"ربط الميزان غير معتمد بعد. الحالة الحالية: {tb['binding_status']}")
+    elif tb["upload_status"] != "approved":
+        errors.append(f"ربط الميزان غير معتمد بعد. الحالة الحالية: {tb['upload_status']}")
     else:
         context["tb"] = tb
-        if tb["match_rate"] and tb["match_rate"] < 85:
-            warnings.append(f"نسبة المطابقة منخفضة ({tb['match_rate']:.0f}%). قد تكون هناك حسابات غير مربوطة.")
+        if tb["binding_confidence_avg"] and tb["binding_confidence_avg"] < 85:
+            warnings.append(f"نسبة المطابقة منخفضة ({tb['binding_confidence_avg']:.0f}%). قد تكون هناك حسابات غير مربوطة.")
 
     # 3. Verify COA and TB belong to same client
     if coa and tb:
@@ -304,7 +304,7 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
                 "total": len(classified_rows),
                 "matched": sum(1 for r in classified_rows if r.get("coa_account_id")),
                 "unmatched": sum(1 for r in classified_rows if not r.get("coa_account_id")),
-                "bq": validation["context"].get("tb", {}).get("match_rate"),
+                "bq": validation["context"].get("tb", {}).get("binding_confidence_avg"),
                 "is_j": json.dumps(income, ensure_ascii=False, default=str),
                 "bs_j": json.dumps(balance, ensure_ascii=False, default=str),
                 "cf_j": json.dumps(cash_flow, ensure_ascii=False, default=str),
@@ -362,12 +362,12 @@ def _calc_run_confidence(cls_summary, validations, classified_rows, precondition
 
     # Boost for binding quality
     tb_info = precondition.get("context", {}).get("tb", {})
-    match_rate = tb_info.get("match_rate", 0) or 0
-    if match_rate >= 95:
+    binding_confidence_avg = tb_info.get("binding_confidence_avg", 0) or 0
+    if binding_confidence_avg >= 95:
         score += 15
-    elif match_rate >= 85:
+    elif binding_confidence_avg >= 85:
         score += 10
-    elif match_rate >= 70:
+    elif binding_confidence_avg >= 70:
         score += 5
 
     # Boost for COA quality
