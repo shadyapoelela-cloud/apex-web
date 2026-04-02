@@ -78,11 +78,15 @@ def approve_upload(
             db.rollback()
 
         # Get avg confidence
-        conf_row = db.execute(_t(
-            """SELECT AVG(mapping_confidence) FROM client_chart_of_accounts
+        try:
+            conf_row = db.execute(_t(
+                """SELECT AVG(mapping_confidence) FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status != 'rejected'"""
-        ), {"uid": upload_id}).fetchone()
-        avg_conf = round(conf_row[0], 3) if conf_row and conf_row[0] else 0
+            ), {"uid": upload_id}).fetchone()
+            avg_conf = round(float(conf_row[0] or 0), 3)
+        except:
+            avg_conf = 0
+            db.rollback()
 
         # Mark previous approvals as not current
         db.execute(_t(
