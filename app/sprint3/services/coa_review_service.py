@@ -47,7 +47,7 @@ def approve_upload(
         approved_count = db.execute(_t(
             """SELECT COUNT(*) FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status != 'rejected'
-               AND (record_status = 'approved' OR mapping_confidence >= :mc)"""
+               AND record_status = 'approved'"""
         ), {"uid": upload_id, "mc": min_confidence}).fetchone()[0]
 
         total_count = db.execute(_t(
