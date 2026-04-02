@@ -135,7 +135,7 @@ def validate_analysis_preconditions(db, client_id: str, tb_upload_id: str) -> di
     tb = get_approved_tb_binding(db, tb_upload_id)
     if not tb:
         errors.append("ميزان المراجعة غير موجود.")
-    elif tb["upload_status"] != "approved":
+    elif tb["upload_status"] not in ("approved", "bound", "bound_with_issues"):
         errors.append(f"ربط الميزان غير معتمد بعد. الحالة الحالية: {tb['upload_status']}")
     else:
         context["tb"] = tb
