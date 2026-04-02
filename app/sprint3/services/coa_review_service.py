@@ -68,10 +68,14 @@ def approve_upload(
             }
 
         # Get quality score if exists
-        quality_row = db.execute(_t(
-            "SELECT overall_score FROM client_coa_assessments WHERE coa_upload_id = :uid"
-        ), {"uid": upload_id}).fetchone()
-        quality_score = quality_row[0] if quality_row else None
+        try:
+            quality_row = db.execute(_t(
+                "SELECT overall_score FROM client_coa_assessments WHERE coa_upload_id = :uid"
+            ), {"uid": upload_id}).fetchone()
+            quality_score = quality_row[0] if quality_row else None
+        except:
+            quality_score = None
+            db.rollback()
 
         # Get avg confidence
         conf_row = db.execute(_t(
