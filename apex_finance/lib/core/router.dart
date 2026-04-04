@@ -8,6 +8,9 @@ import '../screens/dashboard/enhanced_dashboard.dart';
 import '../screens/providers/provider_kanban_screen.dart';
 import '../screens/settings/enhanced_settings_screen.dart';
 import '../screens/coa/coa_tree_screen.dart';
+import '../screens/legal/legal_acceptance_screen.dart';
+import '../screens/compliance/provider_compliance_detail.dart';
+import '../widgets/copilot_widgets.dart';
 import '../screens/shared/result_detail_panel.dart';
 import '../main.dart' hide S;
 import '../screens/extracted/subscription_screens.dart';
@@ -72,6 +75,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/providers/compliance', builder: (c, s) => const ProviderComplianceScreen()),
     GoRoute(path: '/admin/policies', builder: (c, s) => const PolicyManagementScreen()),
     GoRoute(path: '/provider-kanban', builder: (c, s) => const ProviderKanbanScreen()),
+    GoRoute(path: '/legal-acceptance', builder: (c, s) => const LegalAcceptanceLogger()),
+    GoRoute(path: '/compliance-detail', builder: (c, s) => const ProviderComplianceDetailScreen()),
     GoRoute(path: '/coa-tree', builder: (c, s) => const CoaTreeScreen()),
     GoRoute(path: '/settings', builder: (c, s) => const EnhancedSettingsScreen()),
     GoRoute(path: '/dashboard', builder: (c, s) => const EnhancedDashboard()),
