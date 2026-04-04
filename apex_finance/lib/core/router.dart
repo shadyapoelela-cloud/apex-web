@@ -35,7 +35,7 @@ final authNotifier = AuthNotifier();
 final appRouter = GoRouter(
   refreshListenable: authNotifier,
   initialLocation: '/login',
-  redirect: (context, state) { final loggedIn = S.token != null; final loggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/register' || state.matchedLocation == '/forgot-password'; if (!loggedIn && !loggingIn) return '/login'; if (loggedIn && loggingIn) return '/home'; return null; },
+  // redirect: disabled for now - auth handled in login screen,
     routes: [
     // Auth
     GoRoute(path: '/login', builder: (c, s) => const LoginScreen()),
