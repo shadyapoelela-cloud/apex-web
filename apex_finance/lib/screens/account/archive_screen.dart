@@ -36,8 +36,8 @@ class _ArchiveS extends State<ArchiveScreen> {
     setState(() => _loading = true);
     try {
       final url = widget.clientId != null
-        ? '$_api/api/v1/clients/${widget.clientId}/archive?page=$_page'
-        : '$_api/api/v1/account/archive?page=$_page';
+        ? '$_api/clients/${widget.clientId}/archive?page=$_page'
+        : '$_api/account/archive?page=$_page';
       final r = await http.get(Uri.parse(url), headers: _h);
       if (r.statusCode == 200) {
         final d = jsonDecode(utf8.decode(r.bodyBytes));
@@ -106,7 +106,7 @@ class _ArchiveS extends State<ArchiveScreen> {
 
   Future<void> _deleteItem(String id) async {
     try {
-      final r = await http.delete(Uri.parse('$_api/api/v1/archive/items/$id'), headers: _h);
+      final r = await http.delete(Uri.parse('$_api/archive/items/$id'), headers: _h);
       if (r.statusCode == 200) { _load(); if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم الحذف'))); }
     } catch (_) {}
   }

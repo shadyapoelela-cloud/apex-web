@@ -71,13 +71,13 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
   Future<void> _loadAll() async {
     setState(() => _loading = true);
     try {
-      final tR = await http.get(Uri.parse('$_api/api/v1/audit/templates'), headers: _h);
+      final tR = await http.get(Uri.parse('$_api/audit/templates'), headers: _h);
       if (tR.statusCode == 200) _templates = jsonDecode(tR.body)['data'] ?? [];
-      final sR = await http.get(Uri.parse('$_api/api/v1/audit/cases/${widget.caseId}/samples'), headers: _h);
+      final sR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/samples'), headers: _h);
       if (sR.statusCode == 200) _samples = jsonDecode(sR.body)['data'] ?? [];
-      final wR = await http.get(Uri.parse('$_api/api/v1/audit/cases/${widget.caseId}/workpapers'), headers: _h);
+      final wR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/workpapers'), headers: _h);
       if (wR.statusCode == 200) _workpapers = jsonDecode(wR.body)['data'] ?? [];
-      final fR = await http.get(Uri.parse('$_api/api/v1/audit/cases/${widget.caseId}/findings'), headers: _h);
+      final fR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/findings'), headers: _h);
       if (fR.statusCode == 200) _findings = jsonDecode(fR.body)['data'] ?? [];
     } catch (_) {}
     if (mounted) setState(() => _loading = false);
