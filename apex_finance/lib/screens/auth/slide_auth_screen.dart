@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../main.dart' show AC, S;
+import '../../main.dart' show AC, S, MainNav;
 
 const _api = 'https://apex-api-ootk.onrender.com';
 
@@ -46,7 +46,7 @@ class _SlideAuthState extends State<SlideAuthScreen> {
         S.uname = d['user']['username']; S.dname = d['user']['display_name'];
         S.plan = d['user']['plan']; S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
-        if (mounted) context.go('/home');
+        if (mounted) Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const MainNav()), (r) => false);
       } else { setState(() { _le = d['detail'] ?? 'خطأ في الدخول'; _ll = false; }); }
     } catch (e) { setState(() { _le = e.toString(); _ll = false; }); }
   }
@@ -94,7 +94,7 @@ class _SlideAuthState extends State<SlideAuthScreen> {
             ),
             const SizedBox(height: 20),
             // Slides
-            SizedBox(height: _pg == 0 ? 320 : 480, child: PageView(controller: _pc, onPageChanged: (i) => setState(() => _pg = i), children: [_loginSlide(), _registerSlide()])),
+            SizedBox(height: _pg == 0 ? 340 : 520, child: PageView(physics: const NeverScrollableScrollPhysics(),controller: _pc, onPageChanged: (i) => setState(() => _pg = i), children: [_loginSlide(), _registerSlide()])),
           ]),
         ),
       ]))),
@@ -106,7 +106,7 @@ class _SlideAuthState extends State<SlideAuthScreen> {
       decoration: BoxDecoration(color: _pg == i ? AC.gold : Colors.transparent, borderRadius: BorderRadius.circular(10)),
       child: Center(child: Text(l, style: TextStyle(color: _pg == i ? AC.navy : AC.ts, fontSize: 13, fontWeight: FontWeight.bold))))));
 
-  Widget _loginSlide() => SingleChildScrollView(child: Column(children: [
+  Widget _loginSlide() => Column(children: [
     if (_le != null) _err(_le!),
     _inp(_lu, 'البريد أو اسم المستخدم', Icons.email_outlined, ltr: true),
     const SizedBox(height: 12),
@@ -115,9 +115,9 @@ class _SlideAuthState extends State<SlideAuthScreen> {
     const SizedBox(height: 6),
     _bt('تسجيل الدخول', _ll, _login),
     const SizedBox(height: 14), _or(), const SizedBox(height: 10), _soc(),
-  ]));
+  ]);
 
-  Widget _registerSlide() => SingleChildScrollView(child: Column(children: [
+  Widget _registerSlide() => Column(children: [
     if (_rerr != null) _err(_rerr!),
     _inp(_rn, 'الاسم الكامل', Icons.person_outline),
     const SizedBox(height: 10),
@@ -147,7 +147,7 @@ class _SlideAuthState extends State<SlideAuthScreen> {
     const SizedBox(height: 14),
     _bt('إنشاء حساب', _rl, _register),
     const SizedBox(height: 14), _or(), const SizedBox(height: 10), _soc(),
-  ]));
+  ]);
 
   Widget _inp(TextEditingController c, String l, IconData ic, {bool ltr = false}) => TextField(controller: c, style: const TextStyle(color: AC.tp), textDirection: ltr ? TextDirection.ltr : null,
     decoration: InputDecoration(labelText: l, prefixIcon: Icon(ic, color: AC.gold, size: 20), filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts), isDense: true, contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
