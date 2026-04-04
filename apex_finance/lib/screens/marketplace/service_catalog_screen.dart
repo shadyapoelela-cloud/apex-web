@@ -116,6 +116,12 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
     child: Text(text, style: TextStyle(color: color, fontSize: 10)));
 
   Future<void> _startService(String code) async {
+    if (widget.clientId == null || widget.clientId!.isEmpty) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('يرجى اختيار عميل أولاً من تبويب العملاء'),
+        backgroundColor: Colors.orange));
+      return;
+    }
     try {
       final r = await http.post(Uri.parse('$_api/services/cases'), headers: _h,
         body: jsonEncode({'client_id': widget.clientId ?? '', 'service_code': code}));

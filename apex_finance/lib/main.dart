@@ -238,7 +238,7 @@ class _DashS extends ConsumerState<DashTab> {
   }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(
-      title: Text('\u0645\u0631\u062d\u0628\u0627\u064b ${S.dname??""} \u{1F44B}', style: const TextStyle(color: AC.gold, fontSize: 18)),
+      title: Text('\u0645\u0631\u062d\u0628\u0627\u064b ${(S.dname != null && S.dname!.contains('?') ? S.uname : S.dname)??""} \u{1F44B}', style: const TextStyle(color: AC.gold, fontSize: 18)),
       actions: [
         Stack(children: [
           IconButton(icon: const Icon(Icons.notifications_outlined, color: AC.tp),

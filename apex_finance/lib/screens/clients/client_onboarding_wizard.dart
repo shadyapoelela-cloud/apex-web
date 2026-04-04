@@ -93,11 +93,11 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
       // Load entity types
       final et = await http.get(Uri.parse('$_api/legal-entity-types'));
-      if (et.statusCode == 200) _entityTypes = jsonDecode(et.body)['data'] ?? [];
+      if (et.statusCode == 200) _entityTypes = jsonDecode(utf8.decode(et.bodyBytes))['data'] ?? [];
 
       // Load sectors
       final sc = await http.get(Uri.parse('$_api/sectors'));
-      if (sc.statusCode == 200) _sectors = jsonDecode(sc.body)['data'] ?? [];
+      if (sc.statusCode == 200) _sectors = jsonDecode(utf8.decode(sc.bodyBytes))['data'] ?? [];
 
       // Load sub sectors if sector selected
       if (_selectedSector != null) await _loadSubSectors(_selectedSector!);
