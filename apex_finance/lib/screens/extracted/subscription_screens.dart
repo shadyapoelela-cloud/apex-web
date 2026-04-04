@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
 import '../../core/session.dart';
+import '../../core/shared_constants.dart';
+
+final _api = apiBase;
 
 // Per Execution Master §4, §9 + Zero Ambiguity §5, §6
 // ═══════════════════════════════════════════════════════════
@@ -244,7 +247,6 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
 }
 
 // ═══════════════════════════════════════════════════════════
-// ForgotPasswordScreen — استعادة كلمة المرور
 // Phase 9 Account Center §6
 // ═══════════════════════════════════════════════════════════
 

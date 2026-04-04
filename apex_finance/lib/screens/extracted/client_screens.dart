@@ -3,7 +3,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
 import '../../core/session.dart';
+import '../../core/shared_constants.dart';
+import '../../client_create.dart';
+import 'coa_screens.dart';
 
+final _api = apiBase;
 
 // ── 1. Client List Screen ──
 class ClientListScreen extends StatefulWidget {

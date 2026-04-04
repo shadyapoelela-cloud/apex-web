@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'dart:html' as html;
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
 import '../../core/session.dart';
+import '../../core/shared_constants.dart';
 
+final _api = apiBase;
 
 // ── 3. COA Upload Screen ──
 class CoaUploadScreen extends StatefulWidget {

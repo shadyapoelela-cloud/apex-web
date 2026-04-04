@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
 import '../../core/session.dart';
+import '../../core/shared_constants.dart';
+
+final _api = apiBase;
 
 // Phase 11 Legal Acceptance §12
 // ═══════════════════════════════════════════════════════════

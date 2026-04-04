@@ -20,6 +20,7 @@ import 'screens/extracted/notification_screens_v2.dart';
 import 'screens/extracted/legal_screens_v2.dart';
 import 'screens/extracted/client_screens.dart';
 import 'screens/extracted/coa_screens.dart';
+import 'screens/auth/forgot_password_flow.dart';
 const _api = 'https://apex-api-ootk.onrender.com';
 
 void main() => runApp(const ProviderScope(child: ApexApp()));
@@ -2390,71 +2391,6 @@ class _AuditLogS extends State<AuditLogScreen> {
   );
 }
 
-
-// ═══════════════════════════════════════════════════════════
-// SubscriptionScreen — عرض الخطة الحالية + الترقية
-// [P3] Extracted to screens/extracted/ - see separate file
-  @override State<ForgotPasswordScreen> createState() => _ForgotPwS();
-}
-class _ForgotPwS extends State<ForgotPasswordScreen> {
-  final _eC = TextEditingController();
-  bool _ld = false;
-  String? _err, _ok;
-
-  Future<void> _send() async {
-    if (_eC.text.trim().isEmpty) {
-      setState(() { _err = 'أدخل البريد الإلكتروني'; });
-      return;
-    }
-    setState(() { _ld = true; _err = null; _ok = null; });
-    try {
-      final r = await http.post(Uri.parse('$_api/account/forgot-password'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': _eC.text.trim()}));
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['status'] == 'ok') {
-        if (!mounted) return;
-        Navigator.push(context, MaterialPageRoute(
-          builder: (_) => VerifyResetCodeScreen(email: _eC.text.trim(), token: d['reset_token'] ?? '')));
-      } else {
-        setState(() { _err = d['detail'] ?? d['message'] ?? 'حدث خطأ'; });
-      }
-    } catch (e) {
-      setState(() { _err = 'خطأ في الاتصال'; });
-    } finally {
-      setState(() { _ld = false; });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('استعادة كلمة المرور')),
-      body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          const SizedBox(height: 24),
-          const Icon(Icons.lock_reset, size: 72, color: AC.gold),
-          const SizedBox(height: 24),
-          const Text('أدخل بريدك الإلكتروني المسجل \nسنرسل لك رمز إعادة التعيين',
-            style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
-          const SizedBox(height: 24),
-          if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(color: Colors.red.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
-            child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
-          TextField(controller: _eC, keyboardType: TextInputType.emailAddress,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(labelText: 'البريد الإلكتروني',
-              labelStyle: const TextStyle(color: Colors.white54),
-              prefixIcon: const Icon(Icons.email_outlined, color: AC.gold),
-              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
-              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
-          const SizedBox(height: 24),
-          SizedBox(height: 52, child: ElevatedButton(onPressed: _ld ? null : _send,
-            child: _ld ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
-              : const Text('إرسال رمز التحقق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
-        ]))));
-  }
-}
 
 class VerifyResetCodeScreen extends StatefulWidget {
   final String email;
