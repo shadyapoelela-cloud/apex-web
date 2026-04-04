@@ -163,10 +163,10 @@ class _LoginS extends State<LoginScreen> {
       SizedBox(width: double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
         child: _l ? const SizedBox(height:20,width:20, child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(fontWeight: FontWeight.bold)))),
       const SizedBox(height: 8),
-      TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ForgotPasswordScreen())),
+      TextButton(onPressed:()=>context.go('/forgot-password'),
         child: const Text('ظ†ط³ظٹطھ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±طں', style: TextStyle(color: AC.warn, fontSize: 13))),
       const SizedBox(height: 4),
-      TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const RegScreen())),
+      TextButton(onPressed:()=>context.go('/register'),
         child: const Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f \u0633\u062c\u0651\u0644 \u0627\u0644\u0622\u0646', style: TextStyle(color: AC.gold))),
     ])))));
 }
@@ -1020,20 +1020,20 @@ class _AccS extends ConsumerState<AccountTab> {
         _mi(Icons.notifications_outlined, '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', AC.cyan,
           ()=>context.go('/notifications')),
         _mi(Icons.lock_outlined, '\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', AC.warn,
-          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ChangePasswordScreen()))),
+          ()=>context.go('/password/change')),
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
-          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const CloseAccountScreen()))),
+          ()=>context.go('/account/close')),
           _mi(Icons.archive, 'ط§ظ„ط£ط±ط´ظٹظپ', AC.cyan, () => Navigator.push(context, MaterialPageRoute(builder: (_) => archive.ArchiveScreen(token: S.token)))),
             _mi(Icons.history, 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·', const Color(0xFF9C27B0),
-            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ActivityHistoryScreen()))),
+            ()=>context.go('/account/activity')),
           _mi(Icons.compare_arrows, 'ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·', AC.cyan,
             ()=>context.go('/plans/compare')),
           _mi(Icons.assignment, 'ط£ظ†ظˆط§ط¹ ط§ظ„ظ…ظ‡ط§ظ…', AC.cyan,
             ()=>context.go('/tasks/types')),
           _mi(Icons.description, 'ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…', const Color(0xFF607D8B),
-            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalDocumentsScreenV2()))),
+            ()=>context.go('/legal')),
           _mi(Icons.devices, 'ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©', AC.cyan,
-            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SessionsScreen()))),
+            ()=>context.go('/account/sessions')),
       ])));
   Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) => GestureDetector(onTap: onTap,
     child: Container(margin: const EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
@@ -1220,7 +1220,7 @@ class _AdminS extends ConsumerState<AdminTab> {
         IconButton(icon: const Icon(Icons.verified_user, color: AC.ok),
           onPressed: ()=>context.go('/admin/providers/verify')),
         IconButton(icon: const Icon(Icons.upload_file, color: AC.gold),
-          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderDocumentUploadScreen()))),
+          onPressed: ()=>context.go('/admin/providers/documents')),
         IconButton(icon: const Icon(Icons.shield, color: AC.gold),
           onPressed: ()=>context.go('/admin/providers/compliance')),
         IconButton(icon: const Icon(Icons.psychology, color: AC.gold),
@@ -2544,8 +2544,7 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
     // For now, since we have the token from API, we verify locally
     // In production, this would be a server-side verification
     if (entered == widget.token || entered.length >= 6) {
-      Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (_) => NewPasswordScreen(token: widget.token, email: widget.email)));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => NewPasswordScreen(token: widget.token, email: widget.email)));
     } else {
       setState(() { _err = 'ط§ظ„ط±ظ…ط² ط؛ظٹط± طµط­ظٹط­'; });
     }
