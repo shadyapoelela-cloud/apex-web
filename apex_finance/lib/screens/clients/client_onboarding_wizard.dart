@@ -74,7 +74,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
       // Load draft
       final dr = await http.get(Uri.parse('$_api/api/v1/onboarding/draft'), headers: _h);
       if (dr.statusCode == 200) {
-        final d = jsonDecode(dr.body);
+        final d = jsonDecode(utf8.decode(dr.bodyBytes));
         if (d['success'] == true && d['data'] != null) {
           final data = d['data']['draft_data'] ?? {};
           _step = d['data']['step_completed'] ?? 0;
@@ -111,7 +111,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
   Future<void> _loadSubSectors(String mainCode) async {
     try {
       final r = await http.get(Uri.parse('$_api/api/v1/sectors/$mainCode/sub'));
-      if (r.statusCode == 200) _subSectors = jsonDecode(r.body)['data'] ?? [];
+      if (r.statusCode == 200) _subSectors = jsonDecode(utf8.decode(r.bodyBytes))['data'] ?? [];
     } catch (_) {}
   }
 
@@ -121,7 +121,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
       try {
         final r = await http.get(Uri.parse('$_api/api/v1/stage-notes/client_onboarding/${stages[_step]}'));
         if (r.statusCode == 200) {
-          final d = jsonDecode(r.body);
+          final d = jsonDecode(utf8.decode(r.bodyBytes));
           if (d['success'] == true) _stageNote = d['data'];
         }
       } catch (_) {}
@@ -182,7 +182,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
           'tax_number': _taxC.text.trim(),
           'city': _cityC.text.trim(),
         }));
-      final d = jsonDecode(r.body);
+      final d = jsonDecode(utf8.decode(r.bodyBytes));
       if (mounted) {
         if (r.statusCode == 200 && d['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(

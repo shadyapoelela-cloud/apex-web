@@ -40,7 +40,7 @@ class _ArchiveS extends State<ArchiveScreen> {
         : '$_api/api/v1/account/archive?page=$_page';
       final r = await http.get(Uri.parse(url), headers: _h);
       if (r.statusCode == 200) {
-        final d = jsonDecode(r.body);
+        final d = jsonDecode(utf8.decode(r.bodyBytes));
         setState(() { _items = d['data'] ?? []; _total = d['total'] ?? 0; _loading = false; });
       } else { setState(() => _loading = false); }
     } catch (_) { setState(() => _loading = false); }

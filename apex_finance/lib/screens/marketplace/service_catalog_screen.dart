@@ -44,7 +44,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
       if (_selectedCategory != null) url += '?category=$_selectedCategory';
       final r = await http.get(Uri.parse(url));
       if (r.statusCode == 200) {
-        final d = jsonDecode(r.body);
+        final d = jsonDecode(utf8.decode(r.bodyBytes));
         setState(() { _services = d['data'] ?? []; _loading = false; });
       } else { setState(() => _loading = false); }
     } catch (_) { setState(() => _loading = false); }
@@ -122,7 +122,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
       if (r.statusCode == 200) {
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم بدء الخدمة بنجاح'), backgroundColor: Colors.green));
       } else {
-        final d = jsonDecode(r.body);
+        final d = jsonDecode(utf8.decode(r.bodyBytes));
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(d['detail'] ?? 'فشل'), backgroundColor: Colors.red));
       }
     } catch (e) {
