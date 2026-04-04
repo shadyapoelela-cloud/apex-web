@@ -55,7 +55,7 @@ class _SlideAuthState extends State<SlideAuthScreen> {
     if (_rp.text != _rp2.text) { setState(() => _rerr = 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± ظ…طھط·ط§ط¨ظ‚ط©'); return; }
     setState(() { _rl = true; _rerr = null; });
     try {
-      final phone = '$_countryCode\${_rph.text.trim()}';
+      final phone = '$_countryCode${_rph.text.trim()}';
       final r = await http.post(Uri.parse('$_api/auth/register'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'username': _ru.text.trim(), 'email': _re2.text.trim(), 'password': _rp.text, 'display_name': _rn.text.trim(), 'phone': phone}));
       final d = jsonDecode(r.body);
       if (r.statusCode == 200 || r.statusCode == 201) {
