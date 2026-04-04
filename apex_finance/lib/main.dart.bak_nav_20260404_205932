@@ -263,7 +263,7 @@ class _DashS extends ConsumerState<DashTab> {
       actions: [
         Stack(children: [
           IconButton(icon: const Icon(Icons.notifications_outlined, color: AC.tp),
-            onPressed: ()=>context.go('/notifications')),
+            onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const NotificationCenterScreenV2()))),
           if(_notifCount>0) Positioned(right:8,top:8, child: Container(padding: const EdgeInsets.all(4),
             decoration: const BoxDecoration(color: AC.err, shape: BoxShape.circle),
             child: Text('$_notifCount', style: const TextStyle(color: Colors.white, fontSize: 10))))]),
@@ -303,7 +303,7 @@ class _DashS extends ConsumerState<DashTab> {
             border: Border.all(color: AC.gold.withOpacity(0.3)),
           ),
           child: InkWell(
-            onTap: () => context.go('/copilot'),
+            onTap: () => Navigator.push(c, MaterialPageRoute(builder: (_) => const CopilotScreen())),
             borderRadius: BorderRadius.circular(14),
             child: Row(children: [
               Container(
@@ -963,11 +963,11 @@ class _AccS extends ConsumerState<AccountTab> {
         ]),
         // Menu Items
                 _mi(Icons.account_tree, 'ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ COA', AC.cyan,
-          ()=>context.go('/clients')),
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ClientListScreen()))),
         _mi(Icons.workspace_premium, '\u062e\u0637\u062a\u064a \u0648\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643', AC.gold,
-          ()=>context.go('/subscription')),
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SubscriptionScreen()))),
         _mi(Icons.notifications_outlined, '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', AC.cyan,
-          ()=>context.go('/notifications')),
+          ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const NotificationCenterScreenV2()))),
         _mi(Icons.lock_outlined, '\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', AC.warn,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ChangePasswordScreen()))),
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
@@ -976,9 +976,9 @@ class _AccS extends ConsumerState<AccountTab> {
             _mi(Icons.history, 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·', const Color(0xFF9C27B0),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ActivityHistoryScreen()))),
           _mi(Icons.compare_arrows, 'ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·', AC.cyan,
-            ()=>context.go('/plans/compare')),
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const PlanComparisonScreen()))),
           _mi(Icons.assignment, 'ط£ظ†ظˆط§ط¹ ط§ظ„ظ…ظ‡ط§ظ…', AC.cyan,
-            ()=>context.go('/tasks/types')),
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const TaskTypesBrowserScreen()))),
           _mi(Icons.description, 'ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…', const Color(0xFF607D8B),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalDocumentsScreenV2()))),
           _mi(Icons.devices, 'ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©', AC.cyan,
@@ -1165,17 +1165,17 @@ class _AdminS extends ConsumerState<AdminTab> {
     appBar: AppBar(title: const Text('\u0644\u0648\u062d\u0629 \u0627\u0644\u0625\u062f\u0627\u0631\u0629', style: TextStyle(color: AC.gold)),
       actions: [
         IconButton(icon: const Icon(Icons.rate_review, color: AC.cyan),
-          onPressed: ()=>context.go('/admin/reviewer')),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ReviewerConsoleScreen()))),
         IconButton(icon: const Icon(Icons.verified_user, color: AC.ok),
-          onPressed: ()=>context.go('/admin/providers/verify')),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderVerificationScreen()))),
         IconButton(icon: const Icon(Icons.upload_file, color: AC.gold),
           onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderDocumentUploadScreen()))),
         IconButton(icon: const Icon(Icons.shield, color: AC.gold),
-          onPressed: ()=>context.go('/admin/providers/compliance')),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderComplianceScreen()))),
         IconButton(icon: const Icon(Icons.psychology, color: AC.gold),
-          onPressed: ()=>context.go('/knowledge/console')),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const KnowledgeDeveloperConsole()))),
         IconButton(icon: const Icon(Icons.security, color: AC.gold),
-          onPressed: ()=>context.go('/admin/audit')),
+          onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const AuditLogScreen()))),
       ]),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(14), children: [
@@ -1194,11 +1194,11 @@ class _AdminS extends ConsumerState<AdminTab> {
         // Quick Actions
         _card('\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0633\u0631\u064a\u0639\u0629', [
           _actionTile('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0639\u0631\u0641\u064a\u0629', Icons.rate_review, AC.cyan,
-            ()=>context.go('/admin/reviewer')),
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ReviewerConsoleScreen()))),
           _actionTile('\u062a\u062d\u0642\u0642 \u0645\u0642\u062f\u0645\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', Icons.verified_user, AC.ok,
-            ()=>context.go('/admin/providers/verify')),
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ProviderVerificationScreen()))),
           _actionTile('\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', Icons.policy, AC.warn,
-            ()=>context.go('/admin/policies')),
+            ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const PolicyManagementScreen()))),
         ]),
         const SizedBox(height: 16),
         // Users List
