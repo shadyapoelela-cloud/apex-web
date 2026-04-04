@@ -144,9 +144,9 @@ class _LoginS extends State<LoginScreen> {
         S.uname = d['user']['username']; S.dname = d['user']['display_name'];
         S.plan = d['user']['plan']; S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
-        if (mounted) context.go('/home');
+        if (mounted) { debugPrint('LOGIN OK - navigating...'); context.go('/home'); }
       } else { setState(() { _e = d['detail'] ?? '\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u062f\u062e\u0648\u0644'; _l = false; }); }
-    } catch (e) { setState(() { _e = ''; _l = false; }); }
+    } catch (e) { setState(() { _e = '\u062e\u0637\u0623 \u0627\u0644\u0627\u062a\u0635\u0627\u0644: $e'; _l = false; }); }
   }
 
   @override
