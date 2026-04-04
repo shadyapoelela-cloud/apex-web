@@ -17,9 +17,9 @@ class AC {
 }
 
 class ServiceCatalogScreen extends StatefulWidget {
-  final String clientId;
+  final String? clientId;
   final String? token;
-  const ServiceCatalogScreen({super.key, required this.clientId, this.token});
+  const ServiceCatalogScreen({super.key, this.clientId, this.token});
   @override State<ServiceCatalogScreen> createState() => _ServiceCatalogS();
 }
 
@@ -118,7 +118,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   Future<void> _startService(String code) async {
     try {
       final r = await http.post(Uri.parse('$_api/services/cases'), headers: _h,
-        body: jsonEncode({'client_id': widget.clientId, 'service_code': code}));
+        body: jsonEncode({'client_id': widget.clientId ?? '', 'service_code': code}));
       if (r.statusCode == 200) {
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم بدء الخدمة بنجاح'), backgroundColor: Colors.green));
       } else {
