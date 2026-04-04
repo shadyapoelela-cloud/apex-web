@@ -1,6 +1,6 @@
-"""
-APEX Platform — Auth Service (Security Patched)
-═══════════════════════════════════════════════════════════════
+﻿"""
+APEX Platform â€” Auth Service (Security Patched)
+â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 - bcrypt password hashing (replaces SHA-256)
 - JWT_SECRET from environment variable
 - Failed login lockout
@@ -22,9 +22,9 @@ from app.phase1.models.platform_models import (
     SessionLocal, gen_uuid, utcnow,
 )
 
-# ═══════════════════════════════════════════════════════════════
-# Config — from environment variables
-# ═══════════════════════════════════════════════════════════════
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Config â€” from environment variables
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 JWT_SECRET = os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION")
 JWT_ALGORITHM = "HS256"
@@ -38,9 +38,9 @@ PASSWORD_MIN_LENGTH = 8
 USE_BCRYPT = False  # Using SHA-256 until bcrypt confirmed on Render
 
 
-# ═══════════════════════════════════════════════════════════════
-# Password Utilities — bcrypt with SHA-256 fallback
-# ═══════════════════════════════════════════════════════════════
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Password Utilities â€” bcrypt with SHA-256 fallback
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 def hash_password(password: str) -> str:
     if USE_BCRYPT:
@@ -63,18 +63,18 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 def validate_password_strength(password: str):
     if len(password) < PASSWORD_MIN_LENGTH:
-        return False, f"كلمة المرور يجب أن تكون {PASSWORD_MIN_LENGTH} أحرف على الأقل"
+        return False, f"ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ظٹط¬ط¨ ط£ظ† طھظƒظˆظ† {PASSWORD_MIN_LENGTH} ط£ط­ط±ظپ ط¹ظ„ظ‰ ط§ظ„ط£ظ‚ظ„"
     has_upper = any(c.isupper() for c in password)
     has_lower = any(c.islower() for c in password)
     has_digit = any(c.isdigit() for c in password)
     if not (has_upper and has_lower and has_digit):
-        return False, "كلمة المرور يجب أن تحتوي على حرف كبير وصغير ورقم"
+        return False, "ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ظٹط¬ط¨ ط£ظ† طھط­طھظˆظٹ ط¹ظ„ظ‰ ط­ط±ظپ ظƒط¨ظٹط± ظˆطµط؛ظٹط± ظˆط±ظ‚ظ…"
     return True, ""
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 # Token Utilities
-# ═══════════════════════════════════════════════════════════════
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 def create_access_token(user_id: str, username: str, roles: list) -> str:
     payload = {
@@ -100,14 +100,14 @@ def decode_token(token: str) -> dict:
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     except jwt.ExpiredSignatureError:
-        return {"error": "انتهت صلاحية الرمز"}
+        return {"error": "ط§ظ†طھظ‡طھ طµظ„ط§ط­ظٹط© ط§ظ„ط±ظ…ط²"}
     except jwt.InvalidTokenError:
-        return {"error": "رمز غير صالح"}
+        return {"error": "ط±ظ…ط² ط؛ظٹط± طµط§ظ„ط­"}
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 # Auth Service
-# ═══════════════════════════════════════════════════════════════
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 class AuthService:
 
@@ -120,7 +120,7 @@ class AuthService:
         db = SessionLocal()
         try:
             if db.query(User).filter((User.username == username.lower()) | (User.email == email.lower())).first():
-                return {"success": False, "error": "اسم المستخدم أو البريد مسجل مسبقاً"}
+                return {"success": False, "error": "ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ط£ظˆ ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ ظ…ط³ط¨ظ‚ط§ظ‹"}
 
             user = User(
                 id=gen_uuid(), username=username.lower().strip(),
@@ -196,17 +196,17 @@ class AuthService:
             ).first()
 
             if not user:
-                return {"success": False, "error": "اسم المستخدم أو كلمة المرور غير صحيحة"}
+                return {"success": False, "error": "ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©"}
 
             if user.status == "suspended":
-                return {"success": False, "error": "الحساب موقوف — تواصل مع الدعم"}
+                return {"success": False, "error": "ط§ظ„ط­ط³ط§ط¨ ظ…ظˆظ‚ظˆظپ â€” طھظˆط§طµظ„ ظ…ط¹ ط§ظ„ط¯ط¹ظ…"}
             if user.status in ("deactivated_temp", "deactivated_permanent"):
-                return {"success": False, "error": "الحساب معطّل"}
+                return {"success": False, "error": "ط§ظ„ط­ط³ط§ط¨ ظ…ط¹ط·ظ‘ظ„"}
 
             if user.failed_login_count >= MAX_FAILED_LOGINS:
                 if user.locked_until and user.locked_until > datetime.now(timezone.utc):
                     remaining = (user.locked_until - datetime.now(timezone.utc)).seconds // 60
-                    return {"success": False, "error": f"الحساب مقفل — حاول بعد {remaining} دقيقة"}
+                    return {"success": False, "error": f"ط§ظ„ط­ط³ط§ط¨ ظ…ظ‚ظپظ„ â€” ط­ط§ظˆظ„ ط¨ط¹ط¯ {remaining} ط¯ظ‚ظٹظ‚ط©"}
                 else:
                     user.failed_login_count = 0
                     user.locked_until = None
@@ -221,7 +221,7 @@ class AuthService:
                     ip_address=ip_address,
                 ))
                 db.commit()
-                return {"success": False, "error": "اسم المستخدم أو كلمة المرور غير صحيحة"}
+                return {"success": False, "error": "ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©"}
 
             user.failed_login_count = 0
             user.locked_until = None
@@ -293,7 +293,7 @@ class AuthService:
                 event_type=SecurityEventType.logout.value,
             ))
             db.commit()
-            return {"success": True, "message": "تم تسجيل الخروج"}
+            return {"success": True, "message": "طھظ… طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬"}
         except Exception as e:
             db.rollback()
             return {"success": False, "error": str(e)}
@@ -309,9 +309,9 @@ class AuthService:
         try:
             user = db.query(User).filter(User.id == user_id).first()
             if not user:
-                return {"success": False, "error": "المستخدم غير موجود"}
+                return {"success": False, "error": "ط§ظ„ظ…ط³طھط®ط¯ظ… ط؛ظٹط± ظ…ظˆط¬ظˆط¯"}
             if not verify_password(current_password, user.password_hash):
-                return {"success": False, "error": "كلمة المرور الحالية غير صحيحة"}
+                return {"success": False, "error": "ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط­ط§ظ„ظٹط© ط؛ظٹط± طµط­ظٹط­ط©"}
 
             user.password_hash = hash_password(new_password)
             db.add(UserSecurityEvent(
@@ -319,7 +319,7 @@ class AuthService:
                 event_type="password_change",
             ))
             db.commit()
-            return {"success": True, "message": "تم تغيير كلمة المرور"}
+            return {"success": True, "message": "طھظ… طھط؛ظٹظٹط± ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"}
         except Exception as e:
             db.rollback()
             return {"success": False, "error": str(e)}
@@ -331,7 +331,7 @@ class AuthService:
         try:
             user = db.query(User).filter(User.email == email.lower()).first()
             if not user:
-                return {"success": True, "message": "إذا كان البريد مسجلاً ستصلك رسالة"}
+                return {"success": True, "message": "ط¥ط°ط§ ظƒط§ظ† ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ط§ظ‹ ط³طھطµظ„ظƒ ط±ط³ط§ظ„ط©"}
 
             reset_token = secrets.token_urlsafe(32)
             db.add(PasswordReset(
@@ -339,7 +339,7 @@ class AuthService:
                 expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
             ))
             db.commit()
-            return {"success": True, "message": "إذا كان البريد مسجلاً ستصلك رسالة", "reset_token": reset_token}
+            return {"success": True, "message": "ط¥ط°ط§ ظƒط§ظ† ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ط§ظ‹ ط³طھطµظ„ظƒ ط±ط³ط§ظ„ط©", "reset_token": reset_token}
         except Exception as e:
             db.rollback()
             return {"success": False, "error": str(e)}
@@ -357,15 +357,15 @@ class AuthService:
                 PasswordReset.token == token, PasswordReset.is_used == False,
             ).first()
             if not reset:
-                return {"success": False, "error": "رمز إعادة التعيين غير صالح"}
+                return {"success": False, "error": "ط±ظ…ط² ط¥ط¹ط§ط¯ط© ط§ظ„طھط¹ظٹظٹظ† ط؛ظٹط± طµط§ظ„ط­"}
             if reset.expires_at < datetime.now(timezone.utc):
-                return {"success": False, "error": "انتهت صلاحية الرمز"}
+                return {"success": False, "error": "ط§ظ†طھظ‡طھ طµظ„ط§ط­ظٹط© ط§ظ„ط±ظ…ط²"}
 
             user = db.query(User).filter(User.id == reset.user_id).first()
             user.password_hash = hash_password(new_password)
             reset.is_used = True
             db.commit()
-            return {"success": True, "message": "تم إعادة تعيين كلمة المرور"}
+            return {"success": True, "message": "طھظ… ط¥ط¹ط§ط¯ط© طھط¹ظٹظٹظ† ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"}
         except Exception as e:
             db.rollback()
             return {"success": False, "error": str(e)}
@@ -380,3 +380,25 @@ class AuthService:
             plan = db.query(Plan).filter(Plan.id == sub.plan_id).first()
             return plan.code if plan else "free"
         return "free"
+
+
+    def get_active_sessions(self, user_id: str) -> dict:
+        """Get active sessions for a user."""
+        from app.phase1.models.platform_models import SessionLocal, UserSession
+        db = SessionLocal()
+        try:
+            sessions = db.query(UserSession).filter_by(user_id=user_id, is_active=True).all()
+            return {
+                "sessions": [{
+                    "id": s.id,
+                    "ip_address": getattr(s, 'ip_address', ''),
+                    "user_agent": getattr(s, 'user_agent', ''),
+                    "created_at": str(s.created_at) if hasattr(s, 'created_at') else '',
+                    "last_active": str(getattr(s, 'last_active', '')),
+                } for s in sessions],
+                "total": len(sessions)
+            }
+        except Exception:
+            return {"sessions": [], "total": 0}
+        finally:
+            db.close()
