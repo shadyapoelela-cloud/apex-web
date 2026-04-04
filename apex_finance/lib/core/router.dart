@@ -29,7 +29,11 @@ import '../screens/account/archive_screen.dart' as archive;
 import '../screens/tasks/audit_service_screen.dart' as audit;
 import '../core/session.dart' show S;
 
+class AuthNotifier extends ChangeNotifier { void notify() => notifyListeners(); }
+final authNotifier = AuthNotifier();
+
 final appRouter = GoRouter(
+  refreshListenable: authNotifier,
   initialLocation: '/login',
   redirect: (context, state) { final loggedIn = S.token != null; final loggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/register' || state.matchedLocation == '/forgot-password'; if (!loggedIn && !loggingIn) return '/login'; if (loggedIn && loggingIn) return '/home'; return null; },
     routes: [
