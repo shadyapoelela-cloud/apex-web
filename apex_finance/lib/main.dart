@@ -118,7 +118,7 @@ class _LoginS extends State<LoginScreen> {
         S.uname=d['user']['username']; S.dname=d['user']['display_name'];
         S.plan=d['user']['plan']; S.email=d['user']['email'];
         S.roles=List<String>.from(d['user']['roles']??[]);
-        if(mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=>const MainNav()));
+        if(mounted) context.go('/home');
       } else { setState(()=> _e=d['detail']??d['error']??'\u062e\u0637\u0623'); }
     } catch(e){ setState(()=> _e='\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0627\u0644\u062e\u0627\u062f\u0645'); }
     finally { if(mounted) setState(()=> _l=false); }
@@ -169,7 +169,7 @@ class _RegS extends State<RegScreen> {
         S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
         S.uname=d['user']['username']; S.dname=d['user']['display_name'];
         S.plan=d['user']['plan']; S.email=d['user']['email'];
-        if(mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=>const MainNav()));
+        if(mounted) context.go('/home');
       } else { setState(()=> _e=d['detail']??d['error']??'\u062e\u0637\u0623'); }
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
