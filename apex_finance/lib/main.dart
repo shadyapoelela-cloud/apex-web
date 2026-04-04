@@ -217,8 +217,8 @@ class _MainNavS extends State<MainNav> {
 // ═══════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════
-class DashTab extends StatefulWidget { const DashTab({super.key}); @override State<DashTab> createState()=>_DashS(); }
-class _DashS extends State<DashTab> {
+class DashTab extends ConsumerStatefulWidget { const DashTab({super.key}); @override ConsumerState<DashTab> createState()=>_DashS(); }
+class _DashS extends ConsumerState<DashTab> {
   Map<String,dynamic>? _sub; List _plans=[]; bool _ld=true; int _notifCount=0;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
@@ -286,11 +286,11 @@ class _DashS extends State<DashTab> {
 // ═══════════════════════════════════════════════════
 // NOTIFICATIONS SCREEN (NEW)
 // ═══════════════════════════════════════════════════
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
-  @override State<NotificationsScreen> createState() => _NotifS();
+  @override ConsumerState<NotificationsScreen> createState() => _NotifS();
 }
-class _NotifS extends State<NotificationsScreen> {
+class _NotifS extends ConsumerState<NotificationsScreen> {
   List _nots = []; bool _ld = true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
@@ -382,8 +382,8 @@ class UpgradePlanScreen extends StatelessWidget {
 // ═══════════════════════════════════════════════════
 // CLIENTS TAB
 // ═══════════════════════════════════════════════════
-class ClientsTab extends StatefulWidget { const ClientsTab({super.key}); @override State<ClientsTab> createState()=>_ClientsS(); }
-class _ClientsS extends State<ClientsTab> {
+class ClientsTab extends ConsumerStatefulWidget { const ClientsTab({super.key}); @override ConsumerState<ClientsTab> createState()=>_ClientsS(); }
+class _ClientsS extends ConsumerState<ClientsTab> {
   List _cl=[]; bool _ld=true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
@@ -458,8 +458,8 @@ class _NewCS extends State<NewClientScreen> {
 // ═══════════════════════════════════════════════════
 // ANALYSIS TAB — with Result Details Panel (!)
 // ═══════════════════════════════════════════════════
-class AnalysisTab extends StatefulWidget { const AnalysisTab({super.key}); @override State<AnalysisTab> createState()=>_AnalysisS(); }
-class _AnalysisS extends State<AnalysisTab> {
+class AnalysisTab extends ConsumerStatefulWidget { const AnalysisTab({super.key}); @override ConsumerState<AnalysisTab> createState()=>_AnalysisS(); }
+class _AnalysisS extends ConsumerState<AnalysisTab> {
   PlatformFile? _f; List<int>? _fb; bool _a=false; Map<String,dynamic>? _r; String? _e;
   Future<void> _pick() async {
     final r = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions:['xlsx','xls'], withData:true);
@@ -662,8 +662,8 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
 // ═══════════════════════════════════════════════════
 // MARKETPLACE TAB
 // ═══════════════════════════════════════════════════
-class MarketTab extends StatefulWidget { const MarketTab({super.key}); @override State<MarketTab> createState()=>_MarketS(); }
-class _MarketS extends State<MarketTab> {
+class MarketTab extends ConsumerStatefulWidget { const MarketTab({super.key}); @override ConsumerState<MarketTab> createState()=>_MarketS(); }
+class _MarketS extends ConsumerState<MarketTab> {
   List _provs=[], _reqs=[]; bool _ld=true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
@@ -840,8 +840,8 @@ class _ProvS extends State<ProviderTab> {
 // ═══════════════════════════════════════════════════
 // ACCOUNT TAB — with Profile Editing
 // ═══════════════════════════════════════════════════
-class AccountTab extends StatefulWidget { const AccountTab({super.key}); @override State<AccountTab> createState()=>_AccS(); }
-class _AccS extends State<AccountTab> {
+class AccountTab extends ConsumerStatefulWidget { const AccountTab({super.key}); @override ConsumerState<AccountTab> createState()=>_AccS(); }
+class _AccS extends ConsumerState<AccountTab> {
   Map<String,dynamic>? _p, _s; bool _ld=true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
@@ -1066,8 +1066,8 @@ class _CloseAS extends State<CloseAccountScreen> {
 // ═══════════════════════════════════════════════════
 // ADMIN TAB — Platform Dashboard
 // ═══════════════════════════════════════════════════
-class AdminTab extends StatefulWidget { const AdminTab({super.key}); @override State<AdminTab> createState()=>_AdminS(); }
-class _AdminS extends State<AdminTab> {
+class AdminTab extends ConsumerStatefulWidget { const AdminTab({super.key}); @override ConsumerState<AdminTab> createState()=>_AdminS(); }
+class _AdminS extends ConsumerState<AdminTab> {
   Map<String,dynamic> _stats = {}; List _users = []; bool _ld = true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
