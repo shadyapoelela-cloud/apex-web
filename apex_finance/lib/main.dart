@@ -135,7 +135,7 @@ class _LoginS extends State<LoginScreen> {
   Future<void> _go() async {
     setState(() { _l = true; _e = null; });
     try {
-      final r = await http.post(Uri.parse('/auth/login'),
+      final r = await http.post(Uri.parse('$_api/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username_or_email': _u.text.trim(), 'password': _p.text}));
       final d = jsonDecode(r.body);
