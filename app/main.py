@@ -223,7 +223,7 @@ app.include_router(onboarding_r, tags=["Onboarding"])
 app.include_router(archive_r, tags=["Archive"])
 app.include_router(catalog_r, tags=["Service Catalog"])
 app.include_router(social_auth_r, tags=["Social Auth"])
-    print(f"[STARTUP] S6 registered: {len(s6r.routes)} routes")
+print(f"[STARTUP] S6 registered: {len(s6r.routes)} routes")
 
 @app.get("/")
 def root():
