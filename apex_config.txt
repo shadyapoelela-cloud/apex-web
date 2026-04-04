@@ -1,0 +1,374 @@
+﻿
+
+====FILE: \apex_finance\pubspec.yaml LINES: 99====
+name: apex_finance
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.2
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  file_picker: ^10.3.10
+  http: ^1.6.0
+  url_launcher: ^6.3.2
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.8.1
+  shared_preferences: ^2.3.4
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^5.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  assets:
+    - assets/apex_logo.png
+
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
+
+
+====FILE: \tests\test_core.py LINES: 118====
+"""
+APEX Platform - Core Tests
+Tests for critical paths: models, services, APIs
+"""
+
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+def test_imports():
+    print("Test 1: Imports...")
+    from app.phase1.models.platform_models import User, Base, engine, SessionLocal
+    from app.phase2.models.phase2_models import Client, ClientTypeRef
+    from app.phase2.models.onboarding_models import LegalEntityType, SectorMain, SectorSub, StageNote
+    from app.phase2.models.archive_models import ArchiveItem, ArchivePolicy
+    from app.phase2.models.service_catalog_models import ServiceCatalog, AuditWorkpaper
+    print("  PASS: All models import successfully")
+
+def test_seed_data():
+    print("Test 2: Seed data...")
+    from app.phase2.services.seed_onboarding import get_legal_entity_types, get_sector_main, get_sector_sub, get_stage_notes
+    assert len(get_legal_entity_types()) == 13, "Expected 13 entity types"
+    assert len(get_sector_main()) == 14, "Expected 14 main sectors"
+    assert len(get_sector_sub()) >= 18, "Expected 18+ sub sectors"
+    assert len(get_stage_notes()) >= 9, "Expected 9+ stage notes"
+    print("  PASS: Seed data counts correct")
+
+def test_enums():
+    print("Test 3: Enums...")
+    from app.phase2.models.phase2_models import ClientType, KNOWLEDGE_MODE_ELIGIBLE_TYPES
+    assert "accounting_firm" in KNOWLEDGE_MODE_ELIGIBLE_TYPES
+    assert "audit_firm" in KNOWLEDGE_MODE_ELIGIBLE_TYPES
+    assert "standard_business" not in KNOWLEDGE_MODE_ELIGIBLE_TYPES
+    print("  PASS: Knowledge mode eligibility correct")
+
+def test_user_fields():
+    print("Test 4: User model fields...")
+    from app.phase1.models.platform_models import User
+    cols = [c.name for c in User.__table__.columns]
+    assert "auth_provider" in cols, "Missing auth_provider"
+    assert "mobile_country_code" in cols, "Missing mobile_country_code"
+    assert "mobile_number" in cols, "Missing mobile_number"
+    print("  PASS: User has social auth + mobile fields")
+
+def test_client_fields():
+    print("Test 5: Client model fields...")
+    from app.phase2.models.phase2_models import Client
+    cols = [c.name for c in Client.__table__.columns]
+    assert "legal_entity_type" in cols, "Missing legal_entity_type"
+    assert "sector_main_code" in cols, "Missing sector_main_code"
+    assert "sector_sub_code" in cols, "Missing sector_sub_code"
+    assert "registration_status" in cols, "Missing registration_status"
+    assert "onboarding_step" in cols, "Missing onboarding_step"
+    print("  PASS: Client has onboarding fields")
+
+def test_table_names():
+    print("Test 6: New tables exist in metadata...")
+    from app.phase1.models.platform_models import Base
+    # Import all models to register them
+    from app.phase2.models.onboarding_models import LegalEntityType, SectorMain, SectorSub
+    from app.phase2.models.archive_models import ArchiveItem
+    from app.phase2.models.service_catalog_models import ServiceCatalog, AuditWorkpaper
+    tables = Base.metadata.tables.keys()
+    required = ["legal_entity_types", "sector_main", "sector_sub", "stage_notes",
+                "client_required_documents", "client_onboarding_drafts",
+                "archive_items", "archive_links", "archive_policies",
+                "service_catalog", "service_workflow_stages", "service_cases",
+                "audit_program_templates", "audit_samples", "audit_workpapers", "audit_findings"]
+    missing = [t for t in required if t not in tables]
+    assert not missing, f"Missing tables: {missing}"
+    print(f"  PASS: All 17 new tables registered ({len(required)} checked)")
+
+def test_routes_exist():
+    print("Test 7: Route files exist...")
+    routes = [
+        "app/phase1/routes/social_auth_routes.py",
+        "app/phase2/routes/onboarding_routes.py",
+        "app/phase2/routes/archive_routes.py",
+        "app/phase2/routes/service_catalog_routes.py",
+    ]
+    for r in routes:
+        assert os.path.exists(r), f"Missing: {r}"
+    print("  PASS: All new route files exist")
+
+def test_flutter_files():
+    print("Test 8: Flutter files exist...")
+    files = [
+        "apex_finance/lib/main.dart",
+        "apex_finance/lib/core/router.dart",
+        "apex_finance/lib/core/theme.dart",
+        "apex_finance/lib/widgets/auth_widgets.dart",
+        "apex_finance/lib/screens/clients/client_onboarding_wizard.dart",
+        "apex_finance/lib/screens/marketplace/service_catalog_screen.dart",
+        "apex_finance/lib/screens/account/archive_screen.dart",
+        "apex_finance/lib/screens/tasks/audit_service_screen.dart",
+    ]
+    for f in files:
+        assert os.path.exists(f), f"Missing: {f}"
+    print("  PASS: All critical Flutter files exist")
+
+
+if __name__ == "__main__":
+    print("=" * 50)
+    print("APEX PLATFORM - CORE TESTS")
+    print("=" * 50)
+    tests = [test_imports, test_seed_data, test_enums, test_user_fields,
+             test_client_fields, test_table_names, test_routes_exist, test_flutter_files]
+    passed = 0
+    failed = 0
+    for t in tests:
+        try:
+            t()
+            passed += 1
+        except Exception as e:
+            print(f"  FAIL: {e}")
+            failed += 1
+    print("=" * 50)
+    print(f"Results: {passed} passed, {failed} failed, {len(tests)} total")
+    print("=" * 50)
+
+====FILE: \alembic.ini LINES: 150====
+# A generic, single database configuration.
+
+[alembic]
+# path to migration scripts.
+# this is typically a path given in POSIX (e.g. forward slashes)
+# format, relative to the token %(here)s which refers to the location of this
+# ini file
+script_location = %(here)s/alembic
+
+# template used to generate migration file names; The default value is %%(rev)s_%%(slug)s
+# Uncomment the line below if you want the files to be prepended with date and time
+# see https://alembic.sqlalchemy.org/en/latest/tutorial.html#editing-the-ini-file
+# for all available tokens
+# file_template = %%(year)d_%%(month).2d_%%(day).2d_%%(hour).2d%%(minute).2d-%%(rev)s_%%(slug)s
+# Or organize into date-based subdirectories (requires recursive_version_locations = true)
+# file_template = %%(year)d/%%(month).2d/%%(day).2d_%%(hour).2d%%(minute).2d_%%(second).2d_%%(rev)s_%%(slug)s
+
+# sys.path path, will be prepended to sys.path if present.
+# defaults to the current working directory.  for multiple paths, the path separator
+# is defined by "path_separator" below.
+prepend_sys_path = .
+
+
+# timezone to use when rendering the date within the migration file
+# as well as the filename.
+# If specified, requires the tzdata library which can be installed by adding
+# `alembic[tz]` to the pip requirements.
+# string value is passed to ZoneInfo()
+# leave blank for localtime
+# timezone =
+
+# max length of characters to apply to the "slug" field
+# truncate_slug_length = 40
+
+# set to 'true' to run the environment during
+# the 'revision' command, regardless of autogenerate
+# revision_environment = false
+
+# set to 'true' to allow .pyc and .pyo files without
+# a source .py file to be detected as revisions in the
+# versions/ directory
+# sourceless = false
+
+# version location specification; This defaults
+# to <script_location>/versions.  When using multiple version
+# directories, initial revisions must be specified with --version-path.
+# The path separator used here should be the separator specified by "path_separator"
+# below.
+# version_locations = %(here)s/bar:%(here)s/bat:%(here)s/alembic/versions
+
+# path_separator; This indicates what character is used to split lists of file
+# paths, including version_locations and prepend_sys_path within configparser
+# files such as alembic.ini.
+# The default rendered in new alembic.ini files is "os", which uses os.pathsep
+# to provide os-dependent path splitting.
+#
+# Note that in order to support legacy alembic.ini files, this default does NOT
+# take place if path_separator is not present in alembic.ini.  If this
+# option is omitted entirely, fallback logic is as follows:
+#
+# 1. Parsing of the version_locations option falls back to using the legacy
+#    "version_path_separator" key, which if absent then falls back to the legacy
+#    behavior of splitting on spaces and/or commas.
+# 2. Parsing of the prepend_sys_path option falls back to the legacy
+#    behavior of splitting on spaces, commas, or colons.
+#
+# Valid values for path_separator are:
+#
+# path_separator = :
+# path_separator = ;
+# path_separator = space
+# path_separator = newline
+#
+# Use os.pathsep. Default configuration used for new projects.
+path_separator = os
+
+# set to 'true' to search source files recursively
+# in each "version_locations" directory
+# new in Alembic version 1.10
+# recursive_version_locations = false
+
+# the output encoding used when revision files
+# are written from script.py.mako
+# output_encoding = utf-8
+
+# database URL.  This is consumed by the user-maintained env.py script only.
+# other means of configuring database URLs may be customized within the env.py
+# file.
+sqlalchemy.url = sqlite:///apex_platform.db
+
+
+[post_write_hooks]
+# post_write_hooks defines scripts or Python functions that are run
+# on newly generated revision scripts.  See the documentation for further
+# detail and examples
+
+# format using "black" - use the console_scripts runner, against the "black" entrypoint
+# hooks = black
+# black.type = console_scripts
+# black.entrypoint = black
+# black.options = -l 79 REVISION_SCRIPT_FILENAME
+
+# lint with attempts to fix using "ruff" - use the module runner, against the "ruff" module
+# hooks = ruff
+# ruff.type = module
+# ruff.module = ruff
+# ruff.options = check --fix REVISION_SCRIPT_FILENAME
+
+# Alternatively, use the exec runner to execute a binary found on your PATH
+# hooks = ruff
+# ruff.type = exec
+# ruff.executable = ruff
+# ruff.options = check --fix REVISION_SCRIPT_FILENAME
+
+# Logging configuration.  This is also consumed by the user-maintained
+# env.py script only.
+[loggers]
+keys = root,sqlalchemy,alembic
+
+[handlers]
+keys = console
+
+[formatters]
+keys = generic
+
+[logger_root]
+level = WARNING
+handlers = console
+qualname =
+
+[logger_sqlalchemy]
+level = WARNING
+handlers =
+qualname = sqlalchemy.engine
+
+[logger_alembic]
+level = INFO
+handlers =
+qualname = alembic
+
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+
+[formatter_generic]
+format = %(levelname)-5.5s [%(name)s] %(message)s
+datefmt = %H:%M:%S
+

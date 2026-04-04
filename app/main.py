@@ -473,6 +473,15 @@ def reinit_db(secret: str = Query(...)):
     return results
 
 
+
+@app.get("/admin/seed-all", tags=["Admin"])
+def seed_all_data(secret: str = Query(...)):
+    if secret != os.environ.get("ADMIN_SECRET", "apex2025"):
+        raise HTTPException(status_code=403, detail="Invalid secret")
+    from app.seed_runner import seed_all
+    seed_all()
+    return {"status": "OK", "message": "All seed data loaded"}
+
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "6.5.0",
@@ -887,5 +896,9 @@ async def get_activity_history(limit: int = Query(20)):
 
 if __name__ == "__main__":
     import uvicorn; uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
+
+
+
 
 

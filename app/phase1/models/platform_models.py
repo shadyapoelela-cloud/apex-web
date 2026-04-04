@@ -157,6 +157,13 @@ class User(Base):
     timezone = Column(String(50), default="Asia/Riyadh")
 
     # Soft delete
+    # Social Auth + Mobile (Doc v5 Section 5)
+    auth_provider = Column(String(20), nullable=True)  # local, google, apple
+    google_sub = Column(String(100), nullable=True)
+    apple_sub = Column(String(100), nullable=True)
+    mobile_country_code = Column(String(10), nullable=True, default='+966')
+    mobile_number = Column(String(20), nullable=True)
+    mobile_verified = Column(Boolean, default=False)
     is_deleted = Column(Boolean, default=False)
     deleted_at = Column(DateTime, nullable=True)
 
@@ -529,4 +536,5 @@ def init_platform_db():
     Base.metadata.create_all(bind=engine)
     print(f"APEX Platform DB initialized: {len(Base.metadata.tables)} tables")
     return list(Base.metadata.tables.keys())
+
 

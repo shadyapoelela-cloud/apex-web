@@ -1,4 +1,4 @@
-"""
+﻿"""
 APEX Platform — Phase 2 Models
 ═══════════════════════════════════════════════════════════════
 Clients + COA + Analysis Results + Result Explanations
@@ -109,6 +109,16 @@ class Client(Base):
     inventory_system = Column(String(20), default="unknown")  # periodic, perpetual, unknown
     created_by = Column(String(36), ForeignKey("users.id"), nullable=False)
 
+    # ── New fields (Architecture Doc v5 Section 29) ──
+    legal_entity_type = Column(String(50), nullable=True, index=True)  # links to legal_entity_types.code
+    sector_main_code = Column(String(50), nullable=True, index=True)   # links to sector_main.code
+    sector_sub_code = Column(String(50), nullable=True, index=True)    # links to sector_sub.code
+    commercial_name = Column(String(200), nullable=True)               # trade name
+    legal_name = Column(String(200), nullable=True)                    # official legal name
+    national_address = Column(Text, nullable=True)                     # full address
+    registration_status = Column(String(30), default="draft")          # draft, pending_review, active, suspended
+    onboarding_step = Column(Integer, default=0)                       # wizard progress 0-7
+    onboarding_completed = Column(Boolean, default=False)
     is_deleted = Column(Boolean, default=False)
     deleted_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
@@ -328,3 +338,6 @@ class ResultWarning(Base):
     source_metric = Column(String(80), nullable=True)
     details = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
+

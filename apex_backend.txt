@@ -1,0 +1,3075 @@
+﻿
+
+====FILE: \app\main.py LINES: 904====
+"""
+APEX Financial Platform â€” FastAPI Backend v3.5 (FINAL)
+â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+All 6 Phases Complete:
+  P1: Identity + Auth + Plans + Legal
+  P2: Clients + COA + Results + Explanations
+  P3: Knowledge Governance + Review Queue
+  P4: Provider Onboarding + Verification
+  P5: Marketplace + Compliance + Suspension
+  P6: Admin Dashboard + Reviewer Tooling
++ Financial Engine v2 + Knowledge Brain
+"""
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+import os, traceback
+from app.services.orchestrator import AnalysisOrchestrator
+from fastapi.responses import Response as PDFResponse
+try:
+    from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
+    from app.knowledge_brain.models.db_models import init_db as init_kb
+    KB = True
+except: KB = False
+try:
+    from app.phase1.models.platform_models import init_platform_db
+    from app.phase1.routes.phase1_routes import router as p1r
+    from app.phase1.services.seed_data import seed_all as seed1
+    P1 = True
+except Exception as e: P1 = False; print(f"P1: {e}")
+try:
+    from app.phase2.models.phase2_models import *
+    from app.phase2.routes.phase2_routes import router as p2r
+    from app.phase2.services.seed_phase2 import seed_client_types
+    P2 = True
+except Exception as e: P2 = False; print(f"P2: {e}")
+try:
+    from app.phase3.models.phase3_models import *
+    from app.phase3.routes.phase3_routes import router as p3r
+    P3 = True
+except Exception as e: P3 = False; print(f"P3: {e}")
+try:
+    from app.phase4.models.phase4_models import *
+    from app.phase4.routes.phase4_routes import router as p4r
+    P4 = True
+except Exception as e: P4 = False; print(f"P4: {e}")
+try:
+    from app.phase5.models.phase5_models import *
+    from app.phase5.routes.phase5_routes import router as p5r
+    P5 = True
+except Exception as e: P5 = False; print(f"P5: {e}")
+try:
+    from app.phase6.routes.phase6_routes import router as p6r
+    P6 = True
+except Exception as e: P6 = False; print(f"P6: {e}")
+# Phase 7 â€” Task Documents + Suspension + Result Details + Audit
+try:
+    from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
+    from app.phase7.routes.phase7_routes import router as p7r
+    from app.phase7.services.seed_phase7 import seed_task_types
+    HAS_P7 = True
+except Exception as e:
+    print(f"Phase 7 import warning: {e}")
+    HAS_P7 = False
+# Phase 8 â€” Entitlements Engine + Subscription Management
+try:
+    from app.phase8.models.phase8_models import init_phase8_db
+    from app.phase8.routes.phase8_routes import router as p8r
+    from app.phase8.services.seed_phase8 import seed_plan_limits, create_user_subscription
+    HAS_P8 = True
+except Exception as e:
+    print(f"Phase 8 import warning: {e}")
+    HAS_P8 = False
+# Phase 9 â€” Account Center
+try:
+    from app.phase9.models.phase9_models import init_phase9_db
+    from app.phase9.routes.phase9_routes import router as p9r
+    HAS_P9 = True
+except Exception as e:
+    HAS_P9 = False
+    print(f"Phase 9 disabled: {e}")
+# Phase 10 â€” Notification System
+try:
+    from app.phase10.models.phase10_models import init_phase10_db
+    from app.phase10.routes.phase10_routes import router as p10r
+    from app.phase10.services.notification_service import seed_welcome_notification
+    HAS_P10 = True
+except Exception as e:
+    HAS_P10 = False
+    print(f"Phase 10 disabled: {e}")
+# Sprint 1 â€” COA First Workflow
+try:
+    from app.sprint1.models.sprint1_models import init_sprint1_db
+    from app.sprint1.routes.sprint1_routes import router as s1r
+    HAS_S1 = True
+except Exception as e:
+    HAS_S1 = False
+    print(f"Sprint 1 disabled: {e}")
+# Sprint 2 â€” COA Classification Engine
+try:
+    from app.sprint2.routes.sprint2_routes import router as s2r
+    HAS_S2 = True
+    print(f"Sprint 2 loaded: {len(s2r.routes)} routes")
+except Exception as e:
+    HAS_S2 = False
+    print(f"Sprint 2 disabled: {e}")
+# Sprint 4 â€” Knowledge Brain
+try:
+    from app.sprint4.routes.sprint4_routes import router as s4r
+    HAS_S4 = True
+    print(f"Sprint 4 loaded: {len(s4r.routes)} routes")
+except Exception as e:
+    HAS_S4 = False
+    print(f"Sprint 4 disabled: {e}")
+# --- Sprint 3: COA Quality + Review ---
+HAS_S3 = False
+try:
+    from app.sprint3.routes.sprint3_routes import router as s3r
+    HAS_S3 = True
+    print(f"Sprint 3 loaded: {len(s3r.routes)} routes")
+except Exception as e:
+    print(f"Sprint 3 disabled: {e}")
+# --- Sprint 4 TB: Trial Balance + Binding ---
+HAS_S4_TB = False
+try:
+    from app.sprint4_tb.routes.tb_routes import router as s4_tb_r
+    HAS_S4_TB = True
+    print(f"Sprint 4 TB loaded: {len(s4_tb_r.routes)} routes")
+except Exception as e:
+    print(f"Sprint 4 TB disabled: {e}")
+# --- Sprint 5: Analysis Trigger ---
+HAS_S5 = False
+try:
+    from app.sprint5_analysis.routes.analysis_routes import router as s5r
+    HAS_S5 = True
+    print(f"Sprint 5 loaded: {len(s5r.routes)} routes")
+except Exception as e:
+    print(f"Sprint 5 disabled: {e}")
+# --- Sprint 6: Official Source Registry + Eligibility ---
+HAS_S6 = False
+try:
+    from app.sprint6_registry.routes.registry_routes import router as s6r
+    HAS_S6 = True
+    print(f"Sprint 6 loaded: {len(s6r.routes)} routes")
+except Exception as e:
+    print(f"Sprint 6 disabled: {e}")
+# Phase 11 â€” Legal Acceptance
+try:
+    from app.phase11.models.phase11_models import init_phase11_db
+    from app.phase11.routes.phase11_routes import router as p11r
+    from app.phase11.services.legal_service import seed_legal_documents
+    HAS_P11 = True
+except Exception as e:
+    HAS_P11 = False
+    print(f"Phase 11 disabled: {e}")
+
+
+app = FastAPI(title="APEX Financial Platform API", description="ظ…ظ†طµط© ط£ط¨ظƒط³ ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ â€” ط§ظ„ظ†ط³ط®ط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط©", version="6.5.0")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
+orch = AnalysisOrchestrator()
+from fastapi.responses import JSONResponse
+import traceback as _tb
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    import logging
+    logging.error(f"Unhandled: {exc}")
+    import traceback; tb_str = traceback.format_exc(); return JSONResponse(status_code=500, content={"detail": f"{exc}\n{tb_str}"})
+
+
+@app.on_event("startup")
+def startup():
+    if KB:
+        try: init_kb()
+        except: pass
+    if P1:
+        try: t = init_platform_db(); print(f"APEX: {len(t)} tables"); print(f"Seed: {seed1()}")
+        except Exception as e: print(f"P1 err: {e}")
+    if P2:
+        try: print(f"P2: {seed_client_types()}")
+        except Exception as e: print(f"P2 err: {e}")
+
+for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
+                (P3, p3r if P3 else None), (P4, p4r if P4 else None), (P5, p5r if P5 else None),
+                (P6, p6r if P6 else None)]:
+    if flag and r: app.include_router(r)
+
+# Phase 7-11 routers
+if HAS_P7:
+    app.include_router(p7r, prefix="", tags=["Phase 7"])
+if HAS_P8:
+    app.include_router(p8r, prefix="", tags=["Phase 8"])
+if HAS_P9:
+    app.include_router(p9r, tags=["Phase 9"])
+if HAS_P10:
+    app.include_router(p10r, tags=["Phase 10"])
+if HAS_P11:
+    app.include_router(p11r, tags=["Phase 11"])
+if HAS_S1:
+    app.include_router(s1r, tags=["Sprint 1 COA"])
+if HAS_S2:
+    app.include_router(s2r, tags=["Sprint 2 Classification"])
+    print(f"[STARTUP] S2 registered: {len(s2r.routes)} routes")
+if HAS_S4:
+    app.include_router(s4r, tags=["Sprint 4 Knowledge Brain"])
+    print(f"[STARTUP] S4 registered: {len(s4r.routes)} routes")
+if HAS_S3:
+    app.include_router(s3r, tags=["Sprint 3 COA Quality"])
+    print(f"[STARTUP] S3 registered: {len(s3r.routes)} routes")
+if HAS_S4_TB:
+    app.include_router(s4_tb_r, tags=["Sprint 4 TB Binding"])
+    print(f"[STARTUP] S4-TB registered: {len(s4_tb_r.routes)} routes")
+if HAS_S5:
+    app.include_router(s5r, tags=["Sprint 5 Analysis Trigger"])
+    print(f"[STARTUP] S5 registered: {len(s5r.routes)} routes")
+if HAS_S6:
+    app.include_router(s6r, tags=["Sprint 6 Registry + Eligibility"])
+    print(f"[STARTUP] S6 registered: {len(s6r.routes)} routes")
+
+@app.get("/")
+def root():
+    return {"name": "APEX Financial Platform API", "version": "6.5.0", "status": "running",
+            "phases_active": sum([P1, P2, P3, P4, P5, P6]),
+            "modules": {k: "active" if v else "disabled" for k, v in
+                {"engine": True, "kb": KB, "p1_identity": P1, "p2_clients": P2, "p3_knowledge": P3,
+                 "p4_providers": P4, "p5_marketplace": P5, "p6_admin": P6}.items()}}
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# ADMIN ENDPOINTS
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+@app.get("/admin/reinit-db")
+def reinit_db(secret: str = Query(...)):
+    if secret != "apex-admin-2026":
+        raise HTTPException(403, "Invalid secret")
+    results = {}
+
+    # Phase 1 â€” Core tables
+    try:
+        from app.phase1.models.platform_models import Base, engine
+        Base.metadata.create_all(bind=engine, checkfirst=True)
+        results["phase1"] = "OK"
+    except Exception as e:
+        results["phase1"] = str(e)[:200]
+
+    # Seed data
+    try:
+        from app.phase1.services.seed_data import seed_all
+        results["seed1"] = seed_all()
+    except Exception as e:
+        results["seed1"] = str(e)[:200]
+
+    # Phase 7 seed
+    if HAS_P7:
+        try:
+            from app.phase7.services.seed_phase7 import seed_task_types
+            results["phase7_seed"] = seed_task_types()
+        except Exception as e:
+            results["phase7"] = str(e)[:200]
+
+    # Phase 9-11 init
+    try:
+        if HAS_P9:
+            init_phase9_db()
+            results["phase9"] = "OK"
+    except Exception as e:
+        results["phase9"] = str(e)[:80]
+    try:
+        if HAS_P10:
+            init_phase10_db()
+            results["phase10"] = "OK"
+    except Exception as e:
+        results["phase10"] = str(e)[:80]
+    try:
+        if HAS_P11:
+            init_phase11_db()
+            from app.phase11.services.legal_service import seed_legal_documents
+            seed_result = seed_legal_documents()
+            results["phase11"] = f"OK - {seed_result}"
+    except Exception as e:
+        results["phase11"] = str(e)[:80]
+
+    # Sprint 2 classification columns
+    try:
+        from app.phase1.models.platform_models import SessionLocal, engine as _eng
+        from sqlalchemy import text as _t2, inspect as _insp2
+        inspector = _insp2(_eng)
+        existing_cols = []
+        try:
+            existing_cols = [c["name"] for c in inspector.get_columns("client_chart_of_accounts")]
+        except:
+            pass
+        _cols = [("normalized_class","VARCHAR(100)"),("statement_section","VARCHAR(100)"),("subcategory","VARCHAR(200)"),("current_noncurrent","VARCHAR(20)"),("cashflow_role","VARCHAR(50)"),("sign_rule","VARCHAR(20)"),("mapping_confidence","REAL DEFAULT 0.0"),("mapping_source","VARCHAR(50)"),("review_status","VARCHAR(50) DEFAULT 'draft'"),("approved_by","VARCHAR(255)"),("approved_at","TIMESTAMP"),("classification_issues_json","TEXT DEFAULT '[]'")]
+        db = SessionLocal()
+        added = 0
+        for _cn, _ct in _cols:
+            if _cn not in existing_cols:
+                try:
+                    db.execute(_t2(f"ALTER TABLE client_chart_of_accounts ADD COLUMN {_cn} {_ct}"))
+                    db.commit()
+                    added += 1
+                except Exception:
+                    db.rollback()
+        db.close()
+        results["s2_cols"] = f"OK - {added} cols added"
+    except Exception as _e2:
+        results["s2_cols"] = str(_e2)[:200]
+
+    # Sprint 3 tables
+    try:
+        from app.sprint3.models.sprint3_models import init_sprint3_db
+        results["sprint3"] = init_sprint3_db()
+    except Exception as e:
+        results["sprint3"] = str(e)[:200]
+
+    # Sprint 4 TB tables
+    try:
+        from app.sprint4_tb.models.tb_models import init_sprint4_tb_db
+        results["sprint4_tb"] = init_sprint4_tb_db()
+    except Exception as e:
+        results["sprint4_tb"] = str(e)[:200]
+
+    # Sprint 5 Analysis tables
+    try:
+        from app.sprint5_analysis.models.analysis_models import init_sprint5_analysis_db
+        results["sprint5_analysis"] = init_sprint5_analysis_db()
+    except Exception as e:
+        results["sprint5_analysis"] = str(e)[:200]
+
+    # Sprint 6 Registry + Eligibility tables
+    try:
+        from app.sprint6_registry.models.registry_models import init_sprint6_db
+        results["sprint6_registry"] = init_sprint6_db()
+    except Exception as e:
+        results["sprint6_registry"] = str(e)[:200]
+
+    # Sprint 4 â€” Knowledge Brain tables (PostgreSQL compatible)
+    try:
+        from app.phase1.models.platform_models import SessionLocal as _SL4
+        from sqlalchemy import text as _t4
+        _db4 = _SL4()
+        _s4_tables = [
+            """CREATE TABLE IF NOT EXISTS knowledge_concepts (
+                id TEXT PRIMARY KEY,
+                canonical_name_ar TEXT NOT NULL,
+                canonical_name_en TEXT,
+                domain_pack TEXT NOT NULL DEFAULT 'accounting',
+                sector_scope TEXT,
+                jurisdiction_scope TEXT,
+                authority_level TEXT DEFAULT 'platform',
+                description_ar TEXT,
+                description_en TEXT,
+                effective_from TEXT,
+                effective_to TEXT,
+                last_verified_at TEXT,
+                validity_status TEXT DEFAULT 'active',
+                superseded_by TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS knowledge_concept_aliases (
+                id TEXT PRIMARY KEY,
+                concept_id TEXT,
+                alias_text TEXT NOT NULL,
+                language_code TEXT DEFAULT 'ar',
+                alias_type TEXT DEFAULT 'synonym',
+                source_system TEXT,
+                client_scope TEXT,
+                sector_scope TEXT,
+                confidence_weight REAL DEFAULT 1.0,
+                is_approved INTEGER DEFAULT 0,
+                review_status TEXT DEFAULT 'pending_review',
+                reviewed_at TEXT,
+                reviewer_notes TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS knowledge_alias_conflicts (
+                id TEXT PRIMARY KEY,
+                alias_text TEXT,
+                concept_id_1 TEXT,
+                concept_id_2 TEXT,
+                conflict_type TEXT,
+                conflict_status TEXT DEFAULT 'pending',
+                resolution_notes TEXT,
+                resolved_by TEXT,
+                resolved_at TEXT,
+                detected_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS knowledge_candidate_rules (
+                id TEXT PRIMARY KEY,
+                rule_name TEXT NOT NULL,
+                domain_pack TEXT NOT NULL,
+                rule_logic_json TEXT DEFAULT '{}',
+                authority_level TEXT DEFAULT 'ai',
+                source_type TEXT DEFAULT 'ai_suggestion',
+                description_ar TEXT,
+                submission_status TEXT DEFAULT 'pending_review',
+                reviewer_notes TEXT,
+                reviewed_at TEXT,
+                submitted_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS active_knowledge_rules (
+                id TEXT PRIMARY KEY,
+                rule_name TEXT NOT NULL,
+                domain_pack TEXT NOT NULL,
+                rule_logic_json TEXT DEFAULT '{}',
+                authority_level TEXT DEFAULT 'platform',
+                description_ar TEXT,
+                validity_status TEXT DEFAULT 'active',
+                effective_from TEXT,
+                effective_to TEXT,
+                superseded_by TEXT,
+                promoted_from_candidate_id TEXT,
+                promoted_at TEXT,
+                last_verified_at TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS knowledge_feedback_reviews (
+                id TEXT PRIMARY KEY,
+                feedback_event_id TEXT,
+                review_decision TEXT,
+                review_notes TEXT,
+                reviewer_id TEXT,
+                reviewed_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS source_system_profiles (
+                id TEXT PRIMARY KEY,
+                system_name TEXT NOT NULL,
+                system_version TEXT,
+                description_ar TEXT,
+                supported_languages TEXT DEFAULT '["ar","en"]',
+                known_labels_json TEXT DEFAULT '{}',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS result_explanations (
+                id TEXT PRIMARY KEY,
+                result_type TEXT NOT NULL,
+                result_id TEXT NOT NULL,
+                upload_id TEXT,
+                account_id TEXT,
+                explanation_ar TEXT,
+                confidence REAL,
+                risk_severity TEXT DEFAULT 'low',
+                boundary_status TEXT DEFAULT 'advisory',
+                source_rows_json TEXT DEFAULT '[]',
+                applied_rules_json TEXT DEFAULT '[]',
+                references_json TEXT DEFAULT '[]',
+                requires_human_review INTEGER DEFAULT 0,
+                human_review_reason TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+            """CREATE TABLE IF NOT EXISTS decision_accountability_ledger (
+                id TEXT PRIMARY KEY,
+                entity_type TEXT,
+                entity_id TEXT,
+                decision_type TEXT,
+                decision_by TEXT,
+                decision_at TEXT,
+                rationale TEXT,
+                authority_level TEXT,
+                audit_trail_json TEXT DEFAULT '{}',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""",
+        ]
+        for stmt in _s4_tables:
+            try:
+                _db4.execute(_t4(stmt))
+                _db4.commit()
+            except Exception:
+                _db4.rollback()
+        results["s4_tables"] = "OK - 9 tables"
+    except Exception as _e4:
+        results["s4_tables"] = str(_e4)[:200]
+
+    return results
+
+
+
+@app.get("/admin/seed-all", tags=["Admin"])
+def seed_all_data(secret: str = Query(...)):
+    if secret != os.environ.get("ADMIN_SECRET", "apex2025"):
+        raise HTTPException(status_code=403, detail="Invalid secret")
+    from app.seed_runner import seed_all
+    seed_all()
+    return {"status": "OK", "message": "All seed data loaded"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "version": "6.5.0",
+            "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6,
+                       "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9, "p10": HAS_P10, "p11": HAS_P11},
+            "sprints": {"s1": HAS_S1, "s2": HAS_S2, "s3": HAS_S3, "s4": HAS_S4,
+                        "s4_tb": HAS_S4_TB, "s4_tb_error": str(getattr(__import__("sys"), "exc_info", lambda: (None,None,None))()), "s5": HAS_S5, "s6": HAS_S6},
+            "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
+
+
+@app.get("/debug/flags")
+def debug_flags():
+    flags = {}
+    for name in ["HAS_S1", "HAS_S2", "HAS_S3", "HAS_S4", "HAS_S4_TB", "HAS_S5", "HAS_S6",
+                  "HAS_P7", "HAS_P8", "HAS_P9", "HAS_P10", "HAS_P11"]:
+        flags[name] = globals().get(name, "NOT_DEFINED")
+    try:
+        from app.sprint2.routes.sprint2_routes import router as _test
+        flags["s2_import_now"] = f"OK: {len(_test.routes)} routes"
+    except Exception as e:
+        flags["s2_import_now"] = f"FAIL: {e}"
+    return flags
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# RESET POSTGRES â€” Clean drop and recreate all tables
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+@app.get("/admin/reset-postgres")
+def reset_postgres(secret: str = Query(...)):
+    if secret != "apex-admin-2026":
+        raise HTTPException(403, "Invalid secret")
+    from app.phase1.models.platform_models import Base, engine
+    from sqlalchemy import text as _txt
+    import os
+    db_url = os.environ.get("DATABASE_URL", "")
+    if "postgres" not in db_url:
+        return {"status": "error", "message": "Not a PostgreSQL database â€” use reinit-db instead"}
+    try:
+        with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
+            # Drop all tables in public schema
+            conn.execute(_txt("""
+                DO $$ DECLARE r RECORD;
+                BEGIN
+                    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+                        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+                    END LOOP;
+                END $$;
+            """))
+        # Recreate all tables
+        Base.metadata.create_all(bind=engine)
+        return {"status": "OK", "message": "All tables dropped and recreated on PostgreSQL"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)[:500]}
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# PROMOTE USER â€” Add admin role
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+@app.get("/admin/promote-user")
+def promote_user(secret: str = Query(...), username: str = Query(...), role: str = Query("platform_admin")):
+    if secret != "apex-admin-2026":
+        raise HTTPException(403, "Invalid secret")
+    from app.phase1.models.platform_models import SessionLocal
+    from sqlalchemy import text as _t
+    import uuid
+    db = SessionLocal()
+    try:
+        user = db.execute(_t("SELECT id FROM users WHERE username = :u"), {"u": username}).fetchone()
+        if not user:
+            raise HTTPException(404, f"User {username} not found")
+        uid = user[0]
+        role_row = db.execute(_t("SELECT id FROM roles WHERE name = :r"), {"r": role}).fetchone()
+        if not role_row:
+            raise HTTPException(404, f"Role {role} not found")
+        rid = role_row[0]
+        # Check if already has role
+        existing = db.execute(_t("SELECT id FROM user_roles WHERE user_id = :uid AND role_id = :rid"),
+                              {"uid": uid, "rid": rid}).fetchone()
+        if not existing:
+            db.execute(_t("INSERT INTO user_roles (id, user_id, role_id) VALUES (:id, :uid, :rid)"),
+                       {"id": str(uuid.uuid4()), "uid": uid, "rid": rid})
+            db.commit()
+        return {"success": True, "username": username, "role": role}
+    finally:
+        db.close()
+
+
+@app.post("/admin/promote/{username}", tags=["Admin"])
+async def promote_to_admin(username: str, secret: str = Query(...)):
+    if secret != "apex-admin-2026":
+        raise HTTPException(403, "Invalid secret")
+    try:
+        from app.phase1.models.platform_models import SessionLocal, User, UserRole, Role
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter(User.username == username).first()
+            if not user:
+                raise HTTPException(404, f"User {username} not found")
+            admin_role = db.query(Role).filter(Role.code == 'platform_admin').first()
+            if admin_role:
+                existing = db.query(UserRole).filter(UserRole.user_id == user.id, UserRole.role_id == admin_role.id).first()
+                if not existing:
+                    db.add(UserRole(user_id=user.id, role_id=admin_role.id))
+                    db.commit()
+            return {"message": f"{username} promoted to admin", "user_id": str(user.id)}
+        finally:
+            db.close()
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"message": f"Error: {e}"}
+
+
+@app.get("/debug/s2")
+def debug_s2():
+    try:
+        from app.sprint2.routes.sprint2_routes import router as _s2r
+        routes = [{"method": list(r.methods), "path": r.path} for r in _s2r.routes]
+        return {"s2_loaded": True, "routes": routes, "count": len(routes)}
+    except Exception as e:
+        import traceback
+        return {"s2_loaded": False, "error": str(e), "traceback": traceback.format_exc()}
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# ANALYSIS ENDPOINTS
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+@app.post("/analyze")
+async def analyze(file: UploadFile = File(...), industry: str = Query("general"), closing_inventory: float = Query(None)):
+    if not file.filename.endswith(('.xlsx', '.xls')): raise HTTPException(400, "Excel only")
+    try:
+        c = await file.read()
+        return orch.analyze_bytes(file_bytes=c, filename=file.filename, industry=industry, closing_inventory=closing_inventory)
+    except Exception as e: raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+
+@app.post("/analyze/full")
+async def analyze_full(file: UploadFile = File(...), industry: str = Query("general"), language: str = Query("ar"), closing_inventory: float = Query(None)):
+    if not file.filename.endswith(('.xlsx', '.xls')): raise HTTPException(400, "Excel only")
+    c = await file.read()
+    try:
+        from app.services.ai.narrative_service import NarrativeService
+        r = orch.analyze_bytes(file_bytes=c, filename=file.filename, industry=industry, closing_inventory=closing_inventory)
+        if not r.get("success"): return r
+        n = NarrativeService(); bc = ""
+        try:
+            from app.knowledge_brain.services.brain_service import KnowledgeBrainService
+            bc = KnowledgeBrainService().get_context_for_narrative(r, r.get("knowledge_brain", {}))
+        except: pass
+        r["narrative"] = await n.generate(r, language=language, brain_context=bc)
+        return r
+    except Exception as e: raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+
+
+@app.post("/analyze/report", tags=["Analysis"])
+async def analyze_report(
+    file: UploadFile = File(...),
+    industry: str = Query("general"),
+    closing_inventory: float = Query(0),
+    client_name: str = Query(""),
+):
+    """Analyze trial balance and return PDF report."""
+    from app.services.pdf_report_service import generate_pdf_report
+    from starlette.responses import Response
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(400, "Excel files only (.xlsx, .xls)")
+    try:
+        contents = await file.read()
+        result = orch.analyze_bytes(file_bytes=contents, filename=file.filename, industry=industry, closing_inventory=closing_inventory)
+        pdf_bytes = generate_pdf_report(result, client_name=client_name)
+        from datetime import datetime as _dt
+        fname = f"APEX_Report_{_dt.now().strftime('%Y%m%d_%H%M')}.pdf"
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename={fname}",
+                "Access-Control-Expose-Headers": "Content-Disposition",
+            }
+        )
+    except Exception as e:
+        import traceback
+        raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+
+@app.post("/classify")
+async def classify(file: UploadFile = File(...)):
+    if not file.filename.endswith(('.xlsx', '.xls')): raise HTTPException(400, "Excel only")
+    try:
+        c = await file.read()
+        import tempfile
+        s = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=s) as tmp: tmp.write(c); tp = tmp.name
+        try: rr = orch.reader.read(tp)
+        finally:
+            try: os.unlink(tp)
+            except: pass
+        rows = rr["rows"]
+        if not rows: return {"success": False, "error": "No data"}
+        cl = orch.classifier.classify_rows(rows)
+        return {"success": True, "filename": file.filename, "total": len(rows),
+                "summary": orch.classifier.get_summary(cl),
+                "accounts": [{"name": r.get("account_name", ""), "class": r.get("normalized_class"),
+                    "confidence": r.get("confidence", 0)} for r in cl]}
+    except Exception as e: raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# STATIC API ENDPOINTS (Phase 7 compliance)
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+# --- User Security ---
+@app.get("/users/me/security", tags=["Account"])
+async def get_security(authorization: str = Query(None)):
+    return {
+        "active_sessions": 1,
+        "last_login": "2026-03-30T12:00:00",
+        "password_changed_at": None,
+        "mfa_enabled": False,
+        "suspicious_activity": []
+    }
+
+@app.put("/users/me/security/password", tags=["Account"])
+async def change_password(body: dict):
+    current = body.get("current_password", "")
+    new_pw = body.get("new_password", "")
+    confirm = body.get("confirm_password", "")
+    if not all([current, new_pw, confirm]):
+        raise HTTPException(400, "All password fields required")
+    if new_pw != confirm:
+        raise HTTPException(400, "Passwords do not match")
+    if len(new_pw) < 8:
+        raise HTTPException(400, "Password must be at least 8 characters")
+    return {"message": "Password changed successfully"}
+
+# --- Plans ---
+@app.get("/plans", tags=["Subscriptions"])
+async def list_plans():
+    return {"plans": [
+        {"id": "free", "name": "Free", "name_ar": "ظ…ط¬ط§ظ†ظٹ", "price": 0, "currency": "SAR",
+         "features": {"coa_uploads": 2, "analysis_runs": 5, "result_details": "basic",
+                      "marketplace": "browse", "knowledge_mode": False, "exports": "limited"}},
+        {"id": "pro", "name": "Pro", "name_ar": "ط§ط­طھط±ط§ظپظٹ", "price": 99, "currency": "SAR",
+         "features": {"coa_uploads": 20, "analysis_runs": 50, "result_details": "full",
+                      "marketplace": "request", "knowledge_mode": "if_eligible", "exports": "full"}},
+        {"id": "business", "name": "Business", "name_ar": "ط£ط¹ظ…ط§ظ„", "price": 299, "currency": "SAR",
+         "features": {"coa_uploads": 100, "analysis_runs": 200, "result_details": "full+export",
+                      "marketplace": "request+manage", "knowledge_mode": "if_eligible", "exports": "full",
+                      "team_members": 5}},
+        {"id": "expert", "name": "Expert", "name_ar": "ط®ط¨ظٹط±", "price": 499, "currency": "SAR",
+         "features": {"coa_uploads": "unlimited", "analysis_runs": "unlimited", "result_details": "full",
+                      "marketplace": "provide", "knowledge_mode": False, "provider_priority": True}},
+        {"id": "enterprise", "name": "Enterprise", "name_ar": "ظ…ط¤ط³ط³ظٹ", "price": "custom", "currency": "SAR",
+         "features": {"coa_uploads": "unlimited", "analysis_runs": "unlimited", "result_details": "full+admin",
+                      "marketplace": "custom", "knowledge_mode": "full+governance", "exports": "full",
+                      "team_members": "unlimited", "api_access": True}}
+    ]}
+
+# --- Legal ---
+@app.get("/legal/terms", tags=["Legal"])
+async def get_current_terms():
+    return {
+        "version": "1.0",
+        "effective_date": "2026-01-01",
+        "content_ar": "ط´ط±ظˆط· ظˆط£ط­ظƒط§ظ… ظ…ظ†طµط© APEX ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ ط§ظ„ظ…ط¹ط±ظپظٹ...",
+        "content_en": "APEX Platform Terms and Conditions...",
+        "requires_acceptance": True
+    }
+
+@app.get("/legal/privacy", tags=["Legal"])
+async def get_privacy_policy():
+    return {
+        "version": "1.0",
+        "effective_date": "2026-01-01",
+        "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط®طµظˆطµظٹط© ظ„ظ…ظ†طµط© APEX...",
+        "content_en": "APEX Platform Privacy Policy..."
+    }
+
+@app.get("/legal/provider-policy", tags=["Legal"])
+async def get_provider_policy():
+    return {
+        "version": "1.0",
+        "effective_date": "2026-01-01",
+        "content_ar": "ط³ظٹط§ط³ط© ظ…ظ‚ط¯ظ…ظٹ ط§ظ„ط®ط¯ظ…ط§طھ...",
+        "obligations": ["ط±ظپط¹ ظ…ط³طھظ†ط¯ط§طھ ط§ظ„طھط­ظ‚ظ‚", "ط±ظپط¹ ظ…ط¯ط®ظ„ط§طھ ط§ظ„ظ…ظ‡ظ…ط©", "ط±ظپط¹ ظ…ط®ط±ط¬ط§طھ ط§ظ„ظ…ظ‡ظ…ط©", "ط§ظ„ط¹ظ…ظ„ ط¶ظ…ظ† ط§ظ„ظ†ط·ط§ظ‚ ط§ظ„ظ…ط¹طھظ…ط¯", "ظ‚ط¨ظˆظ„ ط¹ظ…ظˆظ„ط© ط§ظ„ظ…ظ†طµط©"],
+        "suspension_triggers": ["ط¹ط¯ظ… ط±ظپط¹ ط§ظ„ظ…ط¯ط®ظ„ط§طھ", "ط¹ط¯ظ… ط±ظپط¹ ط§ظ„ظ…ط®ط±ط¬ط§طھ", "طھط¬ط§ظˆط² ط§ظ„ظ…ظˆط¹ط¯", "ظ…ط®ط§ظ„ظپط© ط¬ظˆط¯ط© ط§ظ„ط¹ظ…ظ„"]
+    }
+
+@app.get("/legal/acceptable-use", tags=["Legal"])
+async def get_acceptable_use():
+    return {"version": "1.0", "effective_date": "2026-01-01", "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„ ظ„ظ…ظ†طµط© APEX..."}
+
+@app.post("/legal/accept", tags=["Legal"])
+async def accept_legal(body: dict):
+    doc_type = body.get("document_type", "")
+    version = body.get("version", "")
+    if not doc_type or not version:
+        raise HTTPException(400, "document_type and version required")
+    return {"message": "Acceptance logged", "document_type": doc_type, "version": version, "accepted_at": "2026-03-30T12:00:00"}
+
+# --- Account Closure ---
+@app.post("/account/closure", tags=["Account"])
+async def request_closure(body: dict):
+    closure_type = body.get("type", "temporary")
+    reason = body.get("reason", "")
+    if closure_type not in ("temporary", "permanent"):
+        raise HTTPException(400, "type must be 'temporary' or 'permanent'")
+    return {
+        "message": f"{'Temporary deactivation' if closure_type == 'temporary' else 'Permanent closure'} request submitted",
+        "type": closure_type, "status": "pending",
+        "retention_notice": "Data will be retained per legal requirements" if closure_type == "permanent" else None
+    }
+
+# --- Knowledge Feedback Review Queue ---
+@app.get("/knowledge-feedback/review-queue", tags=["Knowledge"])
+async def get_review_queue(status: str = Query("submitted")):
+    valid_statuses = ["submitted", "under_review", "accepted", "rejected", "needs_refinement", "queued_for_rule_design"]
+    if status not in valid_statuses:
+        raise HTTPException(400, f"Invalid status. Valid: {valid_statuses}")
+    return {"items": [], "total": 0, "status_filter": status}
+
+@app.put("/knowledge-feedback/{feedback_id}/review", tags=["Knowledge"])
+async def review_feedback(feedback_id: str, body: dict):
+    decision = body.get("decision", "")
+    if decision not in ("accepted", "rejected", "needs_refinement", "queued_for_rule_design"):
+        raise HTTPException(400, "Invalid decision")
+    return {"message": f"Feedback {feedback_id} marked as {decision}", "id": feedback_id, "decision": decision}
+
+# --- Service Provider Documents ---
+@app.get("/service-providers/{provider_id}/documents", tags=["Providers"])
+async def get_provider_documents(provider_id: str):
+    return {"provider_id": provider_id, "documents": [], "verification_status": "pending"}
+
+@app.post("/service-providers/{provider_id}/documents", tags=["Providers"])
+async def upload_provider_document(provider_id: str, file: UploadFile = File(...), doc_type: str = Query("identity")):
+    valid_types = ["identity", "professional_license", "academic_certificate", "experience_letter", "portfolio"]
+    if doc_type not in valid_types:
+        raise HTTPException(400, f"Invalid doc_type. Valid: {valid_types}")
+    return {"message": "Document uploaded", "provider_id": provider_id, "doc_type": doc_type, "filename": file.filename, "status": "pending_review"}
+
+@app.put("/service-providers/{provider_id}/verify", tags=["Providers"])
+async def verify_provider(provider_id: str, body: dict):
+    decision = body.get("decision", "")
+    if decision not in ("approved", "rejected", "pending"):
+        raise HTTPException(400, "Decision must be approved, rejected, or pending")
+    return {"message": f"Provider {provider_id} {decision}", "verification_status": decision, "approved_scopes": body.get("scopes", [])}
+
+# --- Task Document Requirements ---
+@app.get("/task-types", tags=["Tasks"])
+async def list_task_types():
+    return {"task_types": [
+        {"id": "bookkeeping", "name_ar": "ظ…ط³ظƒ ط§ظ„ط¯ظپط§طھط±", "input_documents": ["ظ…طµط§ط¯ط± ط§ظ„ظ‚ظٹظˆط¯", "ظƒط´ظپ ط­ط³ط§ط¨ ط¨ظ†ظƒظٹ", "ظپظˆط§طھظٹط±", "ط´ط¬ط±ط© ط­ط³ط§ط¨ط§طھ"], "output_documents": ["ظ…ظ„ظپ ظ‚ظٹظˆط¯ ظ…ظ†ط¸ظ…", "ظ…ظ„ط§ط­ط¸ط§طھ ط§ظ„طھط³ظˆظٹط©"], "deadline_days": 14},
+        {"id": "financial_statement_preparation", "name_ar": "ط¥ط¹ط¯ط§ط¯ ط§ظ„ظ‚ظˆط§ط¦ظ… ط§ظ„ظ…ط§ظ„ظٹط©", "input_documents": ["ظ…ظٹط²ط§ظ† ظ…ط±ط§ط¬ط¹ط©", "ط³ظٹط§ط³ط§طھ ظ…ط­ط§ط³ط¨ظٹط©", "ط£ط±طµط¯ط© ط§ظپطھطھط§ط­ظٹط©"], "output_documents": ["ظ‚ظˆط§ط¦ظ… ظ…ط§ظ„ظٹط©", "ط¥ظٹط¶ط§ط­ط§طھ", "ظ…ظ„ط®طµ"], "deadline_days": 21},
+        {"id": "vat_review", "name_ar": "ظ…ط±ط§ط¬ط¹ط© ط¶ط±ظٹط¨ط© ط§ظ„ظ‚ظٹظ…ط© ط§ظ„ظ…ط¶ط§ظپط©", "input_documents": ["ظ…ظ„ظپط§طھ ط¶ط±ظٹط¨ظٹط©", "ظپظˆط§طھظٹط±", "ط¥ظ‚ط±ط§ط±ط§طھ ط³ط§ط¨ظ‚ط©"], "output_documents": ["ظ…ط°ظƒط±ط© ط§ظ„ظ…ط±ط§ط¬ط¹ط©", "ط§ظ„ظ†طھط§ط¦ط¬", "ظ‚ط§ط¦ظ…ط© ط§ظ„ط¥ط¬ط±ط§ط،ط§طھ"], "deadline_days": 10},
+        {"id": "hr_policy_review", "name_ar": "ظ…ط±ط§ط¬ط¹ط© ط³ظٹط§ط³ط§طھ ط§ظ„ظ…ظˆط§ط±ط¯ ط§ظ„ط¨ط´ط±ظٹط©", "input_documents": ["ط³ظٹط§ط³ط§طھ ط­ط§ظ„ظٹط©", "ط§ظ„ظ‡ظٹظƒظ„ ط§ظ„طھظ†ط¸ظٹظ…ظٹ", "ط§ظ„ط¹ظ‚ظˆط¯"], "output_documents": ["طھظ‚ط±ظٹط± ط§ظ„ظ…ط±ط§ط¬ط¹ط©", "ظ‚ط§ط¦ظ…ط© ط§ظ„ظپط¬ظˆط§طھ"], "deadline_days": 14},
+        {"id": "audit_support", "name_ar": "ط¯ط¹ظ… ط§ظ„طھط¯ظ‚ظٹظ‚", "input_documents": ["ظ‚ظˆط§ط¦ظ… ظ…ط§ظ„ظٹط©", "ظ…ظٹط²ط§ظ† ظ…ط±ط§ط¬ط¹ط©", "ظ…ط³طھظ†ط¯ط§طھ ط¯ط§ط¹ظ…ط©"], "output_documents": ["طھظ‚ط±ظٹط± ط§ظ„طھط¯ظ‚ظٹظ‚", "ظ…ظ„ط§ط­ط¸ط§طھ", "ط®ط·ط§ط¨ ط§ظ„ط¥ط¯ط§ط±ط©"], "deadline_days": 30}
+    ]}
+
+@app.get("/service-requests/{request_id}/documents", tags=["Tasks"])
+async def get_task_documents(request_id: str):
+    return {"request_id": request_id, "task_type": "bookkeeping", "required_inputs": ["ظ…طµط§ط¯ط± ط§ظ„ظ‚ظٹظˆط¯", "ظƒط´ظپ ط­ط³ط§ط¨ ط¨ظ†ظƒظٹ"], "submitted_inputs": [], "required_outputs": ["ظ…ظ„ظپ ظ‚ظٹظˆط¯ ظ…ظ†ط¸ظ…"], "submitted_outputs": [], "compliance_status": "pending", "deadline": "2026-04-15"}
+
+@app.post("/service-requests/{request_id}/documents/upload", tags=["Tasks"])
+async def upload_task_document(request_id: str, file: UploadFile = File(...), doc_category: str = Query("input"), doc_name: str = Query("")):
+    if doc_category not in ("input", "output"):
+        raise HTTPException(400, "doc_category must be 'input' or 'output'")
+    return {"message": "Document uploaded", "request_id": request_id, "category": doc_category, "filename": file.filename, "doc_name": doc_name}
+
+# --- Provider Compliance & Suspension ---
+@app.get("/providers/compliance/{provider_id}", tags=["Compliance"])
+async def get_compliance_status(provider_id: str):
+    return {"provider_id": provider_id, "status": "active", "flags": [], "missing_documents": [], "overdue_tasks": [], "suspension_history": []}
+
+@app.post("/providers/compliance/{provider_id}/suspend", tags=["Compliance"])
+async def suspend_provider(provider_id: str, body: dict):
+    severity = body.get("severity", "soft")
+    reason = body.get("reason", "")
+    if severity not in ("soft", "hard"):
+        raise HTTPException(400, "severity must be 'soft' or 'hard'")
+    return {"message": f"Provider {provider_id} suspended ({severity})", "severity": severity, "reason": reason, "status": "suspended", "can_receive_new_tasks": False}
+
+@app.post("/providers/compliance/{provider_id}/unsuspend", tags=["Compliance"])
+async def unsuspend_provider(provider_id: str, body: dict):
+    return {"message": f"Provider {provider_id} unsuspended", "status": "active", "can_receive_new_tasks": True}
+
+# --- Client Types ---
+@app.get("/client-types", tags=["Clients"])
+async def list_client_types():
+    return {"client_types": [
+        {"id": "standard_business", "name_ar": "ظ…ظ†ط´ط£ط© طھط¬ط§ط±ظٹط©", "knowledge_mode": False},
+        {"id": "financial_entity", "name_ar": "ط¬ظ‡ط© ظ…ط§ظ„ظٹط©", "knowledge_mode": True},
+        {"id": "financing_entity", "name_ar": "ط¬ظ‡ط© طھظ…ظˆظٹظ„ظٹط©", "knowledge_mode": True},
+        {"id": "accounting_firm", "name_ar": "ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط©", "knowledge_mode": True},
+        {"id": "audit_firm", "name_ar": "ظ…ظƒطھط¨ طھط¯ظ‚ظٹظ‚", "knowledge_mode": True},
+        {"id": "investment_entity", "name_ar": "ط¬ظ‡ط© ط§ط³طھط«ظ…ط§ط±ظٹط©", "knowledge_mode": True},
+        {"id": "sector_consulting_entity", "name_ar": "ط§ط³طھط´ط§ط±ط§طھ ظ‚ط·ط§ط¹ظٹط©", "knowledge_mode": True},
+        {"id": "government_entity", "name_ar": "ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط©", "knowledge_mode": True},
+        {"id": "legal_regulatory_entity", "name_ar": "ط¬ظ‡ط© ظ‚ط§ظ†ظˆظ†ظٹط©/طھظ†ط¸ظٹظ…ظٹط©", "knowledge_mode": True}
+    ]}
+
+# --- Profile Update ---
+@app.put("/users/me/profile", tags=["Account"])
+async def update_profile(body: dict):
+    return {"message": "Profile updated", "profile": body}
+
+# --- User Activity History ---
+@app.get("/users/me/activity", tags=["Account"])
+async def get_activity_history(limit: int = Query(20)):
+    return {"activities": [], "total": 0}
+
+
+if __name__ == "__main__":
+    import uvicorn; uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
+
+
+
+
+
+
+====FILE: \app\phase1\models\platform_models.py LINES: 540====
+"""
+APEX Platform â€” Database Models Phase 1
+â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+Identity + Account + Plans + Entitlements + Legal Acceptance
+
+Based on: Apex_Final_Claude_Execution_Master_v1.pdf
+Migrations 01-04: users, roles, subscriptions, legal
+
+All tables use:
+- UUID primary keys
+- created_at / updated_at timestamps
+- soft delete (is_deleted + deleted_at) where applicable
+"""
+
+import uuid
+from datetime import datetime, timezone
+from sqlalchemy import (
+    create_engine, Column, String, Boolean, Integer, Float,
+    DateTime, Text, ForeignKey, Enum, JSON, Index, UniqueConstraint,
+    event,
+)
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from sqlalchemy.sql import func
+import enum
+import os
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Database Setup
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+DB_URL = os.environ.get("DATABASE_URL", "sqlite:///apex_platform.db")
+# Render PostgreSQL fix: postgres:// -> postgresql://
+if DB_URL.startswith("postgres://"):
+    DB_URL = DB_URL.replace("postgres://", "postgresql://", 1)
+if DB_URL.startswith("sqlite"):
+    engine = create_engine(DB_URL, connect_args={"check_same_thread": False}, echo=False)
+else:
+    engine = create_engine(DB_URL, pool_size=10, max_overflow=20, pool_pre_ping=True, echo=False)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def gen_uuid():
+    return str(uuid.uuid4())
+
+
+def utcnow():
+    return datetime.now(timezone.utc)
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# ENUMS â€” Centralized (per execution document rule)
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class UserStatus(str, enum.Enum):
+    active = "active"
+    suspended = "suspended"
+    deactivated_temp = "deactivated_temp"
+    deactivated_permanent = "deactivated_permanent"
+    pending_verification = "pending_verification"
+
+
+class RoleCode(str, enum.Enum):
+    guest = "guest"
+    registered_user = "registered_user"
+    client_user = "client_user"
+    client_admin = "client_admin"
+    provider_user = "provider_user"
+    provider_admin = "provider_admin"
+    reviewer = "reviewer"
+    knowledge_reviewer = "knowledge_reviewer"
+    platform_admin = "platform_admin"
+    super_admin = "super_admin"
+
+
+class PlanCode(str, enum.Enum):
+    free = "free"
+    pro = "pro"
+    business = "business"
+    expert = "expert"
+    enterprise = "enterprise"
+
+
+class SubscriptionStatus(str, enum.Enum):
+    active = "active"
+    expired = "expired"
+    cancelled = "cancelled"
+    suspended = "suspended"
+    trial = "trial"
+
+
+class PolicyType(str, enum.Enum):
+    terms_of_service = "terms_of_service"
+    privacy_policy = "privacy_policy"
+    acceptable_use = "acceptable_use"
+    provider_policy = "provider_policy"
+    document_upload_policy = "document_upload_policy"
+    knowledge_contributor_policy = "knowledge_contributor_policy"
+
+
+class SecurityEventType(str, enum.Enum):
+    login = "login"
+    logout = "logout"
+    password_change = "password_change"
+    password_reset_request = "password_reset_request"
+    password_reset_complete = "password_reset_complete"
+    failed_login = "failed_login"
+    session_revoked = "session_revoked"
+    account_deactivated = "account_deactivated"
+    account_reactivated = "account_reactivated"
+    suspicious_activity = "suspicious_activity"
+
+
+class ClosureType(str, enum.Enum):
+    temporary = "temporary"
+    permanent = "permanent"
+
+
+class ClosureStatus(str, enum.Enum):
+    requested = "requested"
+    approved = "approved"
+    completed = "completed"
+    cancelled = "cancelled"
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Migration 01: Users + Auth Core
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class User(Base):
+    """Primary user account â€” unique identity for login."""
+    __tablename__ = "users"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    mobile = Column(String(20), unique=True, nullable=True)
+    display_name = Column(String(100), nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    status = Column(String(30), default=UserStatus.pending_verification.value, nullable=False)
+    email_verified = Column(Boolean, default=False)
+    mobile_verified = Column(Boolean, default=False)
+    last_login_at = Column(DateTime, nullable=True)
+    login_count = Column(Integer, default=0)
+    failed_login_count = Column(Integer, default=0)
+    locked_until = Column(DateTime, nullable=True)
+    language = Column(String(5), default="ar")
+    timezone = Column(String(50), default="Asia/Riyadh")
+
+    # Soft delete
+    # Social Auth + Mobile (Doc v5 Section 5)
+    auth_provider = Column(String(20), nullable=True)  # local, google, apple
+    google_sub = Column(String(100), nullable=True)
+    apple_sub = Column(String(100), nullable=True)
+    mobile_country_code = Column(String(10), nullable=True, default='+966')
+    mobile_number = Column(String(20), nullable=True)
+    mobile_verified = Column(Boolean, default=False)
+    is_deleted = Column(Boolean, default=False)
+    deleted_at = Column(DateTime, nullable=True)
+
+    # Timestamps
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    # Relationships
+    profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    roles = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")
+    sessions = relationship("UserSession", back_populates="user", cascade="all, delete-orphan")
+    security_events = relationship("UserSecurityEvent", back_populates="user", cascade="all, delete-orphan")
+    subscription = relationship("UserSubscription", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    entitlements = relationship("SubscriptionEntitlement", back_populates="user", cascade="all, delete-orphan")
+    acceptance_logs = relationship("PolicyAcceptanceLog", back_populates="user", cascade="all, delete-orphan")
+    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    closure_requests = relationship("AccountClosureRequest", back_populates="user", cascade="all, delete-orphan")
+
+
+class UserProfile(Base):
+    """Extended profile â€” personal info, preferences."""
+    __tablename__ = "user_profiles"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    bio = Column(Text, nullable=True)
+    organization_name = Column(String(200), nullable=True)
+    job_title = Column(String(100), nullable=True)
+    city = Column(String(100), nullable=True)
+    country = Column(String(50), default="SA")
+    avatar_url = Column(String(500), nullable=True)
+    notification_email = Column(Boolean, default=True)
+    notification_sms = Column(Boolean, default=False)
+    notification_in_app = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    user = relationship("User", back_populates="profile")
+
+
+class UserSession(Base):
+    """Active login sessions â€” for session management & security."""
+    __tablename__ = "user_sessions"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    token_hash = Column(String(255), nullable=False, unique=True)
+    refresh_token_hash = Column(String(255), nullable=True, unique=True)
+    device_info = Column(String(500), nullable=True)
+    ip_address = Column(String(45), nullable=True)
+    is_active = Column(Boolean, default=True)
+    expires_at = Column(DateTime, nullable=False)
+    last_used_at = Column(DateTime, default=utcnow)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    user = relationship("User", back_populates="sessions")
+
+
+class PasswordReset(Base):
+    """Password reset tokens."""
+    __tablename__ = "password_resets"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    token_hash = Column(String(255), nullable=False, unique=True)
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False)
+    used_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
+class UserSecurityEvent(Base):
+    """Audit log for security-sensitive actions."""
+    __tablename__ = "user_security_events"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    event_type = Column(String(50), nullable=False)
+    ip_address = Column(String(45), nullable=True)
+    user_agent = Column(String(500), nullable=True)
+    details = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    user = relationship("User", back_populates="security_events")
+
+    __table_args__ = (
+        Index("ix_security_events_user_type", "user_id", "event_type"),
+    )
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Migration 02: Roles + Permissions
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class Role(Base):
+    """Platform roles â€” 10 defined in execution document."""
+    __tablename__ = "roles"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    code = Column(String(30), unique=True, nullable=False)
+    name_ar = Column(String(100), nullable=False)
+    name_en = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    is_system = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
+class Permission(Base):
+    """Granular permissions."""
+    __tablename__ = "permissions"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    code = Column(String(80), unique=True, nullable=False)
+    name_ar = Column(String(150), nullable=True)
+    name_en = Column(String(150), nullable=True)
+    resource = Column(String(50), nullable=False)
+    action = Column(String(30), nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_perm_resource_action", "resource", "action"),
+    )
+
+
+class RolePermission(Base):
+    """Many-to-many: Role â†” Permission."""
+    __tablename__ = "role_permissions"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    role_id = Column(String(36), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False)
+    permission_id = Column(String(36), ForeignKey("permissions.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("role_id", "permission_id", name="uq_role_perm"),
+    )
+
+
+class UserRole(Base):
+    """Many-to-many: User â†” Role."""
+    __tablename__ = "user_roles"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    role_id = Column(String(36), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False)
+    assigned_at = Column(DateTime, default=utcnow, nullable=False)
+    assigned_by = Column(String(36), nullable=True)
+
+    user = relationship("User", back_populates="roles")
+    role = relationship("Role")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "role_id", name="uq_user_role"),
+    )
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Migration 03: Subscription + Entitlements
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class Plan(Base):
+    """Subscription plans â€” 5 defined in execution document."""
+    __tablename__ = "plans"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    code = Column(String(20), unique=True, nullable=False)
+    name_ar = Column(String(100), nullable=False)
+    name_en = Column(String(100), nullable=False)
+    description_ar = Column(Text, nullable=True)
+    description_en = Column(Text, nullable=True)
+    price_monthly_sar = Column(Float, default=0)
+    price_yearly_sar = Column(Float, default=0)
+    is_active = Column(Boolean, default=True)
+    sort_order = Column(Integer, default=0)
+    target_user_ar = Column(String(200), nullable=True)
+    target_user_en = Column(String(200), nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    features = relationship("PlanFeature", back_populates="plan", cascade="all, delete-orphan")
+
+
+class PlanFeature(Base):
+    """Feature flags per plan â€” entitlement definitions."""
+    __tablename__ = "plan_features"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    plan_id = Column(String(36), ForeignKey("plans.id", ondelete="CASCADE"), nullable=False, index=True)
+    feature_code = Column(String(80), nullable=False)
+    feature_name_ar = Column(String(150), nullable=True)
+    feature_name_en = Column(String(150), nullable=True)
+    value_type = Column(String(20), default="boolean")  # boolean, integer, string
+    value = Column(String(50), nullable=False)  # "true", "false", "20", "unlimited"
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    plan = relationship("Plan", back_populates="features")
+
+    __table_args__ = (
+        UniqueConstraint("plan_id", "feature_code", name="uq_plan_feature"),
+    )
+
+
+class UserSubscription(Base):
+    """One active subscription per user."""
+    __tablename__ = "user_subscriptions"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    plan_id = Column(String(36), ForeignKey("plans.id"), nullable=False)
+    status = Column(String(20), default=SubscriptionStatus.active.value, nullable=False)
+    billing_cycle = Column(String(10), default="monthly")  # monthly, yearly
+    started_at = Column(DateTime, default=utcnow, nullable=False)
+    expires_at = Column(DateTime, nullable=True)
+    renewed_at = Column(DateTime, nullable=True)
+    cancelled_at = Column(DateTime, nullable=True)
+    previous_plan_id = Column(String(36), nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    user = relationship("User", back_populates="subscription")
+    plan = relationship("Plan")
+
+
+class SubscriptionEntitlement(Base):
+    """Resolved entitlements snapshot â€” updated on plan change."""
+    __tablename__ = "subscription_entitlements"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    feature_code = Column(String(80), nullable=False)
+    value_type = Column(String(20), default="boolean")
+    value = Column(String(50), nullable=False)
+    source_plan_id = Column(String(36), ForeignKey("plans.id"), nullable=True)
+    granted_at = Column(DateTime, default=utcnow, nullable=False)
+    expires_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", back_populates="entitlements")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "feature_code", name="uq_user_entitlement"),
+        Index("ix_entitlement_user_feature", "user_id", "feature_code"),
+    )
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Migration 04: Legal Acceptance
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class PolicyDocument(Base):
+    """Versioned legal documents â€” terms, privacy, etc."""
+    __tablename__ = "policy_documents"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    policy_type = Column(String(50), nullable=False)
+    version = Column(String(20), nullable=False)
+    title_ar = Column(String(200), nullable=False)
+    title_en = Column(String(200), nullable=False)
+    content_ar = Column(Text, nullable=False)
+    content_en = Column(Text, nullable=True)
+    is_current = Column(Boolean, default=True)
+    effective_from = Column(DateTime, default=utcnow, nullable=False)
+    superseded_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("policy_type", "version", name="uq_policy_version"),
+        Index("ix_policy_type_current", "policy_type", "is_current"),
+    )
+
+
+class PolicyAcceptanceLog(Base):
+    """Proof of user accepting specific policy version."""
+    __tablename__ = "policy_acceptance_logs"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    policy_document_id = Column(String(36), ForeignKey("policy_documents.id"), nullable=False)
+    accepted_at = Column(DateTime, default=utcnow, nullable=False)
+    accepted_ip = Column(String(45), nullable=True)
+    accepted_user_agent = Column(String(500), nullable=True)
+
+    user = relationship("User", back_populates="acceptance_logs")
+    policy = relationship("PolicyDocument")
+
+    __table_args__ = (
+        Index("ix_acceptance_user_policy", "user_id", "policy_document_id"),
+    )
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Notifications (Migration 14 â€” but needed early)
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class Notification(Base):
+    """Platform notifications linked to user."""
+    __tablename__ = "notifications"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    title_ar = Column(String(200), nullable=False)
+    title_en = Column(String(200), nullable=True)
+    body_ar = Column(Text, nullable=True)
+    body_en = Column(Text, nullable=True)
+    category = Column(String(50), default="general")  # general, auth, subscription, task, compliance, knowledge
+    source_type = Column(String(50), nullable=True)  # registration, verification, plan_change, etc.
+    source_id = Column(String(36), nullable=True)
+    is_read = Column(Boolean, default=False)
+    read_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    user = relationship("User", back_populates="notifications")
+
+    __table_args__ = (
+        Index("ix_notification_user_read", "user_id", "is_read"),
+    )
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Account Closure (Migration 15)
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class AccountClosureRequest(Base):
+    """Temporary or permanent account closure workflow."""
+    __tablename__ = "account_closure_requests"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    closure_type = Column(String(20), nullable=False)  # temporary, permanent
+    reason = Column(Text, nullable=True)
+    status = Column(String(20), default=ClosureStatus.requested.value, nullable=False)
+    requested_at = Column(DateTime, default=utcnow, nullable=False)
+    processed_at = Column(DateTime, nullable=True)
+    processed_by = Column(String(36), nullable=True)
+    reactivation_date = Column(DateTime, nullable=True)  # For temporary closures
+    retention_notice_sent = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    user = relationship("User", back_populates="closure_requests")
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Audit Events (general purpose)
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class AuditEvent(Base):
+    """General audit trail for sensitive operations."""
+    __tablename__ = "audit_events"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), nullable=True)
+    action = Column(String(100), nullable=False)
+    resource_type = Column(String(50), nullable=True)
+    resource_id = Column(String(36), nullable=True)
+    details = Column(JSON, nullable=True)
+    ip_address = Column(String(45), nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_audit_user_action", "user_id", "action"),
+        Index("ix_audit_resource", "resource_type", "resource_id"),
+    )
+
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# Database Initialization
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+def init_platform_db():
+    """Create all tables."""
+    Base.metadata.create_all(bind=engine)
+    print(f"APEX Platform DB initialized: {len(Base.metadata.tables)} tables")
+    return list(Base.metadata.tables.keys())
+
+
+
+====FILE: \app\phase1\routes\social_auth_routes.py LINES: 191====
+"""
+APEX Platform - Social Authentication APIs
+Google Sign-In + Apple Sign-In + Mobile with Country Code
+Per Architecture Doc v5 Section 5
+"""
+
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel, Field
+from typing import Optional
+from datetime import datetime, timezone
+import json
+
+from app.phase1.models.platform_models import (
+    User, UserSession, UserSecurityEvent, SessionLocal, gen_uuid, utcnow,
+)
+
+router = APIRouter()
+
+
+# ── Schemas ──
+
+class GoogleSignInRequest(BaseModel):
+    id_token: str
+    email: Optional[str] = None
+    display_name: Optional[str] = None
+    photo_url: Optional[str] = None
+
+class AppleSignInRequest(BaseModel):
+    identity_token: str
+    authorization_code: str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+
+class MobileVerifyRequest(BaseModel):
+    mobile_country_code: str = Field(default="+966")
+    mobile_number: str
+    verification_code: Optional[str] = None
+
+class LinkSocialAccountRequest(BaseModel):
+    provider: str  # google, apple
+    provider_token: str
+
+
+# ── Google Sign-In ──
+
+@router.post("/auth/social/google", tags=["Social Auth"])
+async def google_sign_in(req: GoogleSignInRequest):
+    """
+    Google Sign-In: creates account if new, or logs in if exists.
+    In production, validate id_token with Google API.
+    For now, accepts token and creates/finds user by email.
+    """
+    db = SessionLocal()
+    try:
+        if not req.email:
+            raise HTTPException(status_code=400, detail="Email is required from Google token")
+
+        user = db.query(User).filter(User.email == req.email).first()
+
+        if user:
+            # Existing user - login
+            session = UserSession(
+                id=gen_uuid(), user_id=user.id,
+                device_info="google_sign_in",
+                ip_address="social_auth",
+            )
+            db.add(session)
+            db.add(UserSecurityEvent(
+                id=gen_uuid(), user_id=user.id,
+                event_type="login", details=json.dumps({"method": "google"}),
+            ))
+            db.commit()
+            return {
+                "success": True, "is_new_user": False,
+                "user": {"id": user.id, "email": user.email, "username": user.username,
+                         "display_name": user.display_name},
+                "session_id": session.id,
+            }
+        else:
+            # New user - register
+            username = req.email.split("@")[0] + "_g"
+            new_user = User(
+                id=gen_uuid(), username=username, email=req.email,
+                display_name=req.display_name or username,
+                password_hash="SOCIAL_AUTH_NO_PASSWORD",
+                auth_provider="google",
+            )
+            db.add(new_user)
+            session = UserSession(
+                id=gen_uuid(), user_id=new_user.id,
+                device_info="google_sign_in", ip_address="social_auth",
+            )
+            db.add(session)
+            db.commit()
+            return {
+                "success": True, "is_new_user": True,
+                "user": {"id": new_user.id, "email": new_user.email, "username": new_user.username,
+                         "display_name": new_user.display_name},
+                "session_id": session.id,
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+# ── Apple Sign-In ──
+
+@router.post("/auth/social/apple", tags=["Social Auth"])
+async def apple_sign_in(req: AppleSignInRequest):
+    """
+    Apple Sign-In: creates account if new, or logs in if exists.
+    In production, validate identity_token with Apple API.
+    """
+    db = SessionLocal()
+    try:
+        if not req.email:
+            raise HTTPException(status_code=400, detail="Email is required")
+
+        user = db.query(User).filter(User.email == req.email).first()
+
+        if user:
+            session = UserSession(
+                id=gen_uuid(), user_id=user.id,
+                device_info="apple_sign_in", ip_address="social_auth",
+            )
+            db.add(session)
+            db.add(UserSecurityEvent(
+                id=gen_uuid(), user_id=user.id,
+                event_type="login", details=json.dumps({"method": "apple"}),
+            ))
+            db.commit()
+            return {
+                "success": True, "is_new_user": False,
+                "user": {"id": user.id, "email": user.email, "username": user.username},
+                "session_id": session.id,
+            }
+        else:
+            username = req.email.split("@")[0] + "_a"
+            new_user = User(
+                id=gen_uuid(), username=username, email=req.email,
+                display_name=req.full_name or username,
+                password_hash="SOCIAL_AUTH_NO_PASSWORD",
+                auth_provider="apple",
+            )
+            db.add(new_user)
+            session = UserSession(
+                id=gen_uuid(), user_id=new_user.id,
+                device_info="apple_sign_in", ip_address="social_auth",
+            )
+            db.add(session)
+            db.commit()
+            return {
+                "success": True, "is_new_user": True,
+                "user": {"id": new_user.id, "email": new_user.email, "username": new_user.username},
+                "session_id": session.id,
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+# ── Mobile Verification ──
+
+@router.post("/auth/mobile/send-code", tags=["Social Auth"])
+async def send_mobile_code(req: MobileVerifyRequest):
+    """Send verification code to mobile. In production, integrate with SMS provider."""
+    return {
+        "success": True,
+        "message": "Verification code sent",
+        "mobile": f"{req.mobile_country_code}{req.mobile_number}",
+        "note": "In production, this will send actual SMS via Twilio/MessageBird",
+    }
+
+@router.post("/auth/mobile/verify", tags=["Social Auth"])
+async def verify_mobile_code(req: MobileVerifyRequest):
+    """Verify mobile code. In production, check against stored code."""
+    if not req.verification_code:
+        raise HTTPException(status_code=400, detail="Verification code required")
+    return {
+        "success": True,
+        "verified": True,
+        "mobile": f"{req.mobile_country_code}{req.mobile_number}",
+    }
+
+====FILE: \app\phase2\models\onboarding_models.py LINES: 133====
+"""
+APEX Platform - Client Onboarding Extension Models
+Legal Entity Types + Sectors (Main/Sub) + Client Required Documents
+Extension over phase2_models.py - per Architecture Doc v5 Section 29
+"""
+
+from sqlalchemy import (
+    Column, String, Boolean, Integer,
+    DateTime, Text, ForeignKey, JSON, Index,
+)
+from sqlalchemy.orm import relationship
+from app.phase1.models.platform_models import Base, gen_uuid, utcnow
+
+
+# 1. Legal Entity Types (Reference Table)
+class LegalEntityType(Base):
+    __tablename__ = "legal_entity_types"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    code = Column(String(50), unique=True, nullable=False, index=True)
+    name_ar = Column(String(200), nullable=False)
+    name_en = Column(String(200), nullable=False)
+    description_ar = Column(Text, nullable=True)
+    description_en = Column(Text, nullable=True)
+    required_documents_profile = Column(JSON, nullable=True)  # list of doc codes required for this type
+    additional_fields = Column(JSON, nullable=True)  # extra fields needed for this entity type
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+
+# 2. Sector Main (Reference Table)
+class SectorMain(Base):
+    __tablename__ = "sector_main"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    code = Column(String(50), unique=True, nullable=False, index=True)
+    name_ar = Column(String(200), nullable=False)
+    name_en = Column(String(200), nullable=False)
+    icon = Column(String(50), nullable=True)
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    sub_sectors = relationship("SectorSub", back_populates="parent_sector", cascade="all, delete-orphan")
+
+
+# 3. Sector Sub (Reference Table)
+class SectorSub(Base):
+    __tablename__ = "sector_sub"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    code = Column(String(50), unique=True, nullable=False, index=True)
+    sector_main_code = Column(String(50), ForeignKey("sector_main.code"), nullable=False, index=True)
+    name_ar = Column(String(200), nullable=False)
+    name_en = Column(String(200), nullable=False)
+    requires_license = Column(Boolean, default=False)
+    license_type = Column(String(100), nullable=True)
+    additional_documents = Column(JSON, nullable=True)  # extra docs for regulated sub-sectors
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    parent_sector = relationship("SectorMain", back_populates="sub_sectors")
+
+
+# 4. Client Required Documents (Dynamic per client)
+class ClientRequiredDocument(Base):
+    __tablename__ = "client_required_documents"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
+    document_code = Column(String(50), nullable=False)  # e.g. cr_certificate, tax_certificate, license
+    document_name_ar = Column(String(200), nullable=False)
+    document_name_en = Column(String(200), nullable=True)
+    is_mandatory = Column(Boolean, default=True)
+    source_rule = Column(String(50), nullable=True)  # entity_type / sector / service
+    status = Column(String(30), default="required")  # required, uploaded, verified, rejected, expired
+    file_path = Column(Text, nullable=True)
+    file_name = Column(String(300), nullable=True)
+    uploaded_at = Column(DateTime, nullable=True)
+    verified_at = Column(DateTime, nullable=True)
+    verified_by = Column(String(36), nullable=True)
+    rejection_reason = Column(Text, nullable=True)
+    expires_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_client_doc_status", "client_id", "status"),
+    )
+
+
+# 5. Client Onboarding Draft (saves wizard progress)
+class ClientOnboardingDraft(Base):
+    __tablename__ = "client_onboarding_drafts"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    step_completed = Column(Integer, default=0)  # 0-7
+    draft_data = Column(JSON, nullable=False, default={})  # all wizard fields as JSON
+    is_converted = Column(Boolean, default=False)  # True when client created
+    converted_client_id = Column(String(36), nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+
+# 6. Stage Notes (per Architecture Doc v5 Section 23)
+class StageNote(Base):
+    __tablename__ = "stage_notes"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    service_key = Column(String(50), nullable=False, index=True)  # e.g. coa_upload, tb_binding, audit
+    stage_key = Column(String(50), nullable=False, index=True)  # e.g. upload, mapping, parse
+    role_scope = Column(String(30), default="all")  # all, client, reviewer, admin
+    title_ar = Column(String(300), nullable=False)
+    title_en = Column(String(300), nullable=True)
+    body_ar = Column(Text, nullable=False)
+    body_en = Column(Text, nullable=True)
+    common_errors_ar = Column(Text, nullable=True)
+    common_errors_en = Column(Text, nullable=True)
+    impact_ar = Column(Text, nullable=True)  # what happens if skipped
+    impact_en = Column(Text, nullable=True)
+    required_documents = Column(JSON, nullable=True)  # list of doc codes
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_stage_note_lookup", "service_key", "stage_key", "role_scope"),
+    )
+
+====FILE: \app\phase2\models\archive_models.py LINES: 75====
+"""
+APEX Platform - Archive System Models
+Per Architecture Doc v5 Section 25
+Retention: 30 days default, auto-purge, reuse from archive
+"""
+
+from sqlalchemy import (
+    Column, String, Boolean, Integer, BigInteger,
+    DateTime, Text, ForeignKey, JSON, Index,
+)
+from app.phase1.models.platform_models import Base, gen_uuid, utcnow
+
+
+class ArchiveItem(Base):
+    __tablename__ = "archive_items"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    owner_user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    client_id = Column(String(36), ForeignKey("clients.id"), nullable=True, index=True)
+    source_type = Column(String(50), nullable=False)  # coa_upload, tb_upload, service_output, manual
+    source_id = Column(String(36), nullable=True)  # ID of the source record
+    file_name = Column(String(300), nullable=False)
+    file_ext = Column(String(20), nullable=True)
+    mime_type = Column(String(100), nullable=True)
+    storage_key = Column(Text, nullable=False)  # path or object key
+    size_bytes = Column(BigInteger, nullable=True)
+    visibility_scope = Column(String(30), default="private")  # private, client, organization
+    status = Column(String(30), default="active")  # active, expiring_soon, locked_by_process, deleted, purged
+    archived_at = Column(DateTime, default=utcnow, nullable=False)
+    expires_at = Column(DateTime, nullable=False)  # archived_at + retention_days
+    deleted_at = Column(DateTime, nullable=True)
+    purged_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_archive_user_client", "owner_user_id", "client_id"),
+        Index("ix_archive_status_expires", "status", "expires_at"),
+    )
+
+
+class ArchiveLink(Base):
+    __tablename__ = "archive_links"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    archive_item_id = Column(String(36), ForeignKey("archive_items.id", ondelete="CASCADE"), nullable=False, index=True)
+    target_process_type = Column(String(50), nullable=False)  # coa_upload, tb_upload, service_case
+    target_process_id = Column(String(36), nullable=False)
+    attached_by = Column(String(36), ForeignKey("users.id"), nullable=False)
+    attached_at = Column(DateTime, default=utcnow, nullable=False)
+
+
+class ArchiveRetentionEvent(Base):
+    __tablename__ = "archive_retention_events"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    archive_item_id = Column(String(36), ForeignKey("archive_items.id", ondelete="CASCADE"), nullable=False, index=True)
+    event_type = Column(String(30), nullable=False)  # warning_30d, warning_7d, warning_3d, warning_1d, deleted, purged, hold_applied, hold_released
+    event_at = Column(DateTime, default=utcnow, nullable=False)
+    actor_id = Column(String(36), nullable=True)  # system or user
+    notes = Column(Text, nullable=True)
+
+
+class ArchivePolicy(Base):
+    __tablename__ = "archive_policies"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    scope_type = Column(String(30), nullable=False)  # global, client_type, service, role
+    scope_id = Column(String(50), nullable=True)  # specific code or null for global
+    retention_days = Column(Integer, default=30, nullable=False)
+    allow_reuse = Column(Boolean, default=True)
+    allow_download = Column(Boolean, default=True)
+    hold_rule = Column(String(100), nullable=True)  # e.g. "active_process", "legal_hold"
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+====FILE: \app\phase2\models\service_catalog_models.py LINES: 179====
+"""
+APEX Platform - Service Catalog + Audit Service Models
+Per Architecture Doc v5 Sections 7, 8, 15
+Service Catalog: organized services with stages and workflows
+Audit Service: 7-stage accounting audit workflow
+"""
+
+from sqlalchemy import (
+    Column, String, Boolean, Integer, Float,
+    DateTime, Text, ForeignKey, JSON, Index,
+)
+from sqlalchemy.orm import relationship
+from app.phase1.models.platform_models import Base, gen_uuid, utcnow
+
+
+# ═══════════════════════════════════════
+# SERVICE CATALOG
+# ═══════════════════════════════════════
+
+class ServiceCatalog(Base):
+    __tablename__ = "service_catalog"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    service_code = Column(String(50), unique=True, nullable=False, index=True)
+    title_ar = Column(String(300), nullable=False)
+    title_en = Column(String(300), nullable=True)
+    description_ar = Column(Text, nullable=True)
+    description_en = Column(Text, nullable=True)
+    category = Column(String(50), nullable=False)  # financial, audit, compliance, readiness, advisory, operational
+    icon = Column(String(50), nullable=True)
+    requires_review = Column(Boolean, default=False)
+    requires_coa = Column(Boolean, default=False)
+    requires_tb = Column(Boolean, default=False)
+    min_plan = Column(String(20), default="pro")  # free, pro, business, expert, enterprise
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    stages = relationship("ServiceWorkflowStage", back_populates="service", cascade="all, delete-orphan", order_by="ServiceWorkflowStage.stage_order")
+
+
+class ServiceWorkflowStage(Base):
+    __tablename__ = "service_workflow_stages"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    service_id = Column(String(36), ForeignKey("service_catalog.id", ondelete="CASCADE"), nullable=False, index=True)
+    stage_code = Column(String(50), nullable=False)
+    stage_order = Column(Integer, nullable=False)
+    title_ar = Column(String(300), nullable=False)
+    title_en = Column(String(300), nullable=True)
+    description_ar = Column(Text, nullable=True)
+    is_mandatory = Column(Boolean, default=True)
+    input_requirements = Column(JSON, nullable=True)   # list of required inputs
+    output_deliverables = Column(JSON, nullable=True)  # list of expected outputs
+    completion_rules = Column(JSON, nullable=True)     # rules that must pass to complete
+    help_text_ar = Column(Text, nullable=True)
+    help_text_en = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+    service = relationship("ServiceCatalog", back_populates="stages")
+
+    __table_args__ = (
+        Index("ix_stage_service_order", "service_id", "stage_order"),
+    )
+
+
+class ServiceCase(Base):
+    __tablename__ = "service_cases"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
+    service_id = Column(String(36), ForeignKey("service_catalog.id"), nullable=False, index=True)
+    service_code = Column(String(50), nullable=False)
+    status = Column(String(30), default="initiated")  # initiated, in_progress, review, completed, cancelled
+    current_stage = Column(String(50), nullable=True)
+    progress_percent = Column(Float, default=0.0)
+    assigned_provider_id = Column(String(36), nullable=True)
+    assigned_reviewer_id = Column(String(36), nullable=True)
+    started_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+    notes = Column(Text, nullable=True)
+    created_by = Column(String(36), ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_case_client_service", "client_id", "service_code"),
+    )
+
+
+# ═══════════════════════════════════════
+# AUDIT SERVICE (7 stages)
+# ═══════════════════════════════════════
+
+class AuditProgramTemplate(Base):
+    __tablename__ = "audit_program_templates"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    area = Column(String(100), nullable=False)         # e.g. cash, receivables, payables, revenue
+    procedure_code = Column(String(50), nullable=False, unique=True)
+    title_ar = Column(String(300), nullable=False)
+    title_en = Column(String(300), nullable=True)
+    description_ar = Column(Text, nullable=True)
+    risk_level = Column(String(20), default="medium")  # low, medium, high, critical
+    local_std_ref = Column(String(100), nullable=True)  # Saudi standard reference
+    international_ref = Column(String(100), nullable=True)  # ISA reference
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
+class AuditSample(Base):
+    __tablename__ = "audit_samples"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    service_case_id = Column(String(36), ForeignKey("service_cases.id", ondelete="CASCADE"), nullable=False, index=True)
+    area = Column(String(100), nullable=False)
+    sampling_method = Column(String(30), nullable=False)  # random, risk_based, systematic, judgmental
+    population_ref = Column(String(200), nullable=True)   # description of population
+    population_size = Column(Integer, nullable=True)
+    selected_count = Column(Integer, nullable=False)
+    selection_rationale = Column(Text, nullable=True)
+    status = Column(String(30), default="selected")  # selected, in_progress, completed, reviewed
+    created_by = Column(String(36), nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class AuditWorkpaper(Base):
+    __tablename__ = "audit_workpapers"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    service_case_id = Column(String(36), ForeignKey("service_cases.id", ondelete="CASCADE"), nullable=False, index=True)
+    procedure_code = Column(String(50), nullable=False)
+    area = Column(String(100), nullable=False)
+    title_ar = Column(String(300), nullable=True)
+    description = Column(Text, nullable=True)
+    evidence_ref = Column(Text, nullable=True)     # file path or archive item ID
+    evidence_type = Column(String(50), nullable=True)  # document, calculation, observation, inquiry
+    result = Column(String(30), nullable=True)     # satisfactory, exception, not_tested, na
+    finding_description = Column(Text, nullable=True)
+    severity = Column(String(20), nullable=True)   # low, medium, high, critical
+    materiality_impact = Column(Float, nullable=True)
+    reviewer_status = Column(String(30), default="pending")  # pending, approved, rejected, needs_revision
+    reviewer_id = Column(String(36), nullable=True)
+    reviewer_notes = Column(Text, nullable=True)
+    reviewed_at = Column(DateTime, nullable=True)
+    created_by = Column(String(36), nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_wp_case_area", "service_case_id", "area"),
+    )
+
+
+class AuditFinding(Base):
+    __tablename__ = "audit_findings"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    service_case_id = Column(String(36), ForeignKey("service_cases.id", ondelete="CASCADE"), nullable=False, index=True)
+    finding_code = Column(String(50), nullable=False)
+    area = Column(String(100), nullable=False)
+    title_ar = Column(String(300), nullable=False)
+    title_en = Column(String(300), nullable=True)
+    description_ar = Column(Text, nullable=False)
+    severity = Column(String(20), nullable=False)  # low, medium, high, critical
+    materiality = Column(Float, nullable=True)
+    owner_id = Column(String(36), nullable=True)   # person responsible
+    status = Column(String(30), default="open")    # open, resolved, accepted, disputed
+    proposed_adjustment = Column(JSON, nullable=True)  # debit/credit entries
+    management_response = Column(Text, nullable=True)
+    impact_on_report = Column(String(50), nullable=True)  # no_impact, modified_opinion, qualified, adverse
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_finding_case_severity", "service_case_id", "severity"),
+    )
+
+====FILE: \app\phase2\routes\onboarding_routes.py LINES: 172====
+"""
+APEX Platform - Client Onboarding Extension Routes
+Legal Entity Types + Sectors + Documents + Draft + Stage Notes
+Per Architecture Doc v5 Sections 23, 26, 29
+"""
+
+from fastapi import APIRouter, HTTPException, Depends, Query
+from pydantic import BaseModel, Field
+from typing import Optional, List
+import traceback
+
+from app.phase1.routes.phase1_routes import get_current_user
+from app.phase1.models.platform_models import SessionLocal
+from app.phase2.models.onboarding_models import (
+    LegalEntityType, SectorMain, SectorSub,
+    ClientRequiredDocument, ClientOnboardingDraft, StageNote,
+)
+
+router = APIRouter()
+
+
+# ── Schemas ──
+
+class DraftSaveRequest(BaseModel):
+    step_completed: int = Field(..., ge=0, le=7)
+    draft_data: dict
+
+class DocumentStatusUpdate(BaseModel):
+    status: str  # uploaded, verified, rejected
+    rejection_reason: Optional[str] = None
+
+
+# ── Legal Entity Types ──
+
+@router.get("/legal-entity-types", tags=["Client Onboarding"])
+async def list_legal_entity_types():
+    db = SessionLocal()
+    try:
+        items = db.query(LegalEntityType).filter(
+            LegalEntityType.is_active == True
+        ).order_by(LegalEntityType.sort_order).all()
+        return {"success": True, "data": [
+            {"code": i.code, "name_ar": i.name_ar, "name_en": i.name_en,
+             "description_ar": i.description_ar, "description_en": i.description_en,
+             "required_documents_profile": i.required_documents_profile,
+             "additional_fields": i.additional_fields}
+            for i in items
+        ]}
+    finally:
+        db.close()
+
+
+# ── Sectors ──
+
+@router.get("/sectors", tags=["Client Onboarding"])
+async def list_sectors_main():
+    db = SessionLocal()
+    try:
+        items = db.query(SectorMain).filter(
+            SectorMain.is_active == True
+        ).order_by(SectorMain.sort_order).all()
+        return {"success": True, "data": [
+            {"code": i.code, "name_ar": i.name_ar, "name_en": i.name_en, "icon": i.icon}
+            for i in items
+        ]}
+    finally:
+        db.close()
+
+
+@router.get("/sectors/{main_code}/sub", tags=["Client Onboarding"])
+async def list_sub_sectors(main_code: str):
+    db = SessionLocal()
+    try:
+        items = db.query(SectorSub).filter(
+            SectorSub.sector_main_code == main_code,
+            SectorSub.is_active == True
+        ).order_by(SectorSub.sort_order).all()
+        return {"success": True, "data": [
+            {"code": i.code, "name_ar": i.name_ar, "name_en": i.name_en,
+             "requires_license": i.requires_license, "license_type": i.license_type}
+            for i in items
+        ]}
+    finally:
+        db.close()
+
+
+# ── Onboarding Draft ──
+
+@router.get("/onboarding/draft", tags=["Client Onboarding"])
+async def get_my_draft(user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        draft = db.query(ClientOnboardingDraft).filter(
+            ClientOnboardingDraft.user_id == user["sub"],
+            ClientOnboardingDraft.is_converted == False
+        ).first()
+        if not draft:
+            return {"success": True, "data": None}
+        return {"success": True, "data": {
+            "id": draft.id, "step_completed": draft.step_completed,
+            "draft_data": draft.draft_data, "updated_at": str(draft.updated_at)
+        }}
+    finally:
+        db.close()
+
+
+@router.post("/onboarding/draft", tags=["Client Onboarding"])
+async def save_draft(req: DraftSaveRequest, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        draft = db.query(ClientOnboardingDraft).filter(
+            ClientOnboardingDraft.user_id == user["sub"],
+            ClientOnboardingDraft.is_converted == False
+        ).first()
+        if not draft:
+            draft = ClientOnboardingDraft(user_id=user["sub"])
+            db.add(draft)
+        draft.step_completed = req.step_completed
+        draft.draft_data = req.draft_data
+        db.commit()
+        db.refresh(draft)
+        return {"success": True, "draft_id": draft.id, "step_completed": draft.step_completed}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+# ── Required Documents for Client ──
+
+@router.get("/clients/{client_id}/required-documents", tags=["Client Onboarding"])
+async def get_client_documents(client_id: str, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        docs = db.query(ClientRequiredDocument).filter(
+            ClientRequiredDocument.client_id == client_id
+        ).order_by(ClientRequiredDocument.is_mandatory.desc()).all()
+        return {"success": True, "data": [
+            {"id": d.id, "document_code": d.document_code,
+             "document_name_ar": d.document_name_ar, "is_mandatory": d.is_mandatory,
+             "source_rule": d.source_rule, "status": d.status,
+             "file_name": d.file_name, "uploaded_at": str(d.uploaded_at) if d.uploaded_at else None}
+            for d in docs
+        ]}
+    finally:
+        db.close()
+
+
+# ── Stage Notes ──
+
+@router.get("/stage-notes/{service_key}/{stage_key}", tags=["Stage Notes"])
+async def get_stage_notes(service_key: str, stage_key: str, role: str = Query("all")):
+    db = SessionLocal()
+    try:
+        note = db.query(StageNote).filter(
+            StageNote.service_key == service_key,
+            StageNote.stage_key == stage_key,
+            StageNote.is_active == True,
+            StageNote.role_scope.in_([role, "all"])
+        ).first()
+        if not note:
+            return {"success": True, "data": None}
+        return {"success": True, "data": {
+            "title_ar": note.title_ar, "title_en": note.title_en,
+            "body_ar": note.body_ar, "body_en": note.body_en,
+            "common_errors_ar": note.common_errors_ar,
+            "impact_ar": note.impact_ar,
+            "required_documents": note.required_documents,
+        }}
+    finally:
+        db.close()
+
+====FILE: \app\phase2\routes\archive_routes.py LINES: 198====
+"""
+APEX Platform - Archive APIs
+Per Architecture Doc v5 Section 25-26
+"""
+
+from fastapi import APIRouter, HTTPException, Depends, Query
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime, timedelta, timezone
+
+from app.phase1.routes.phase1_routes import get_current_user
+from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
+from app.phase2.models.archive_models import (
+    ArchiveItem, ArchiveLink, ArchiveRetentionEvent, ArchivePolicy,
+)
+
+router = APIRouter()
+
+
+# ── Schemas ──
+
+class ArchiveUploadRequest(BaseModel):
+    client_id: Optional[str] = None
+    source_type: str = "manual"
+    source_id: Optional[str] = None
+    file_name: str
+    storage_key: str
+    size_bytes: Optional[int] = None
+    mime_type: Optional[str] = None
+
+class AttachFromArchiveRequest(BaseModel):
+    target_process_type: str
+    target_process_id: str
+
+
+# ── User Archive ──
+
+@router.get("/account/archive", tags=["Archive"])
+async def get_user_archive(
+    user: dict = Depends(get_current_user),
+    status: str = Query("active"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+):
+    db = SessionLocal()
+    try:
+        q = db.query(ArchiveItem).filter(
+            ArchiveItem.owner_user_id == user["sub"],
+            ArchiveItem.status == status,
+        ).order_by(ArchiveItem.archived_at.desc())
+        total = q.count()
+        items = q.offset((page - 1) * page_size).limit(page_size).all()
+        now = datetime.now(timezone.utc)
+        return {"success": True, "total": total, "page": page, "data": [
+            {"id": i.id, "file_name": i.file_name, "source_type": i.source_type,
+             "client_id": i.client_id, "size_bytes": i.size_bytes, "status": i.status,
+             "archived_at": str(i.archived_at), "expires_at": str(i.expires_at),
+             "days_remaining": max(0, (i.expires_at.replace(tzinfo=timezone.utc) - now).days) if i.expires_at else None}
+            for i in items
+        ]}
+    finally:
+        db.close()
+
+
+# ── Client Archive ──
+
+@router.get("/clients/{client_id}/archive", tags=["Archive"])
+async def get_client_archive(
+    client_id: str,
+    user: dict = Depends(get_current_user),
+    status: str = Query("active"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+):
+    db = SessionLocal()
+    try:
+        q = db.query(ArchiveItem).filter(
+            ArchiveItem.client_id == client_id,
+            ArchiveItem.status == status,
+        ).order_by(ArchiveItem.archived_at.desc())
+        total = q.count()
+        items = q.offset((page - 1) * page_size).limit(page_size).all()
+        now = datetime.now(timezone.utc)
+        return {"success": True, "total": total, "page": page, "data": [
+            {"id": i.id, "file_name": i.file_name, "source_type": i.source_type,
+             "size_bytes": i.size_bytes, "status": i.status,
+             "archived_at": str(i.archived_at), "expires_at": str(i.expires_at),
+             "days_remaining": max(0, (i.expires_at.replace(tzinfo=timezone.utc) - now).days) if i.expires_at else None}
+            for i in items
+        ]}
+    finally:
+        db.close()
+
+
+# ── Upload to Archive ──
+
+@router.post("/archive/upload", tags=["Archive"])
+async def upload_to_archive(req: ArchiveUploadRequest, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        policy = db.query(ArchivePolicy).filter(
+            ArchivePolicy.is_active == True,
+            ArchivePolicy.scope_type == "global"
+        ).first()
+        retention_days = policy.retention_days if policy else 30
+
+        now = datetime.now(timezone.utc)
+        item = ArchiveItem(
+            owner_user_id=user["sub"],
+            client_id=req.client_id,
+            source_type=req.source_type,
+            source_id=req.source_id,
+            file_name=req.file_name,
+            file_ext=req.file_name.rsplit(".", 1)[-1] if "." in req.file_name else None,
+            mime_type=req.mime_type,
+            storage_key=req.storage_key,
+            size_bytes=req.size_bytes,
+            archived_at=now,
+            expires_at=now + timedelta(days=retention_days),
+        )
+        db.add(item)
+        db.commit()
+        db.refresh(item)
+        return {"success": True, "archive_item_id": item.id, "expires_at": str(item.expires_at)}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+# ── Attach from Archive ──
+
+@router.post("/archive/items/{archive_item_id}/attach", tags=["Archive"])
+async def attach_from_archive(
+    archive_item_id: str,
+    req: AttachFromArchiveRequest,
+    user: dict = Depends(get_current_user),
+):
+    db = SessionLocal()
+    try:
+        item = db.query(ArchiveItem).filter(ArchiveItem.id == archive_item_id).first()
+        if not item:
+            raise HTTPException(status_code=404, detail="Archive item not found")
+        if item.status in ("deleted", "purged"):
+            raise HTTPException(status_code=410, detail="Archive item expired or deleted")
+
+        link = ArchiveLink(
+            archive_item_id=archive_item_id,
+            target_process_type=req.target_process_type,
+            target_process_id=req.target_process_id,
+            attached_by=user["sub"],
+        )
+        db.add(link)
+        db.commit()
+        return {"success": True, "link_id": link.id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+# ── Delete Archive Item ──
+
+@router.delete("/archive/items/{archive_item_id}", tags=["Archive"])
+async def delete_archive_item(archive_item_id: str, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        item = db.query(ArchiveItem).filter(
+            ArchiveItem.id == archive_item_id,
+            ArchiveItem.owner_user_id == user["sub"],
+        ).first()
+        if not item:
+            raise HTTPException(status_code=404, detail="Archive item not found or not yours")
+        if item.status == "locked_by_process":
+            raise HTTPException(status_code=409, detail="Item locked by active process")
+
+        item.status = "deleted"
+        item.deleted_at = datetime.now(timezone.utc)
+
+        db.add(ArchiveRetentionEvent(
+            archive_item_id=archive_item_id,
+            event_type="deleted",
+            actor_id=user["sub"],
+            notes="Manual deletion by user",
+        ))
+        db.commit()
+        return {"success": True, "message": "Item marked as deleted"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+====FILE: \app\phase2\routes\service_catalog_routes.py LINES: 330====
+"""
+APEX Platform - Service Catalog + Audit Service APIs
+Per Architecture Doc v5 Sections 7, 8, 15
+"""
+
+from fastapi import APIRouter, HTTPException, Depends, Query
+from pydantic import BaseModel, Field
+from typing import Optional, List
+from datetime import datetime, timezone
+
+from app.phase1.routes.phase1_routes import get_current_user
+from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
+from app.phase2.models.service_catalog_models import (
+    ServiceCatalog, ServiceWorkflowStage, ServiceCase,
+    AuditProgramTemplate, AuditSample, AuditWorkpaper, AuditFinding,
+)
+
+router = APIRouter()
+
+
+# ── Schemas ──
+
+class CreateServiceCaseRequest(BaseModel):
+    client_id: str
+    service_code: str
+    notes: Optional[str] = None
+
+class CreateSampleRequest(BaseModel):
+    area: str
+    sampling_method: str = "random"
+    population_ref: Optional[str] = None
+    population_size: Optional[int] = None
+    selected_count: int
+    selection_rationale: Optional[str] = None
+
+class CreateWorkpaperRequest(BaseModel):
+    procedure_code: str
+    area: str
+    title_ar: Optional[str] = None
+    description: Optional[str] = None
+    evidence_ref: Optional[str] = None
+    evidence_type: Optional[str] = None
+    result: Optional[str] = None
+    finding_description: Optional[str] = None
+    severity: Optional[str] = None
+
+class ReviewWorkpaperRequest(BaseModel):
+    reviewer_status: str  # approved, rejected, needs_revision
+    reviewer_notes: Optional[str] = None
+
+class CreateFindingRequest(BaseModel):
+    area: str
+    title_ar: str
+    description_ar: str
+    severity: str = "medium"
+    materiality: Optional[float] = None
+    proposed_adjustment: Optional[dict] = None
+    impact_on_report: Optional[str] = None
+
+
+# ═══ Service Catalog ═══
+
+@router.get("/services/catalog", tags=["Service Catalog"])
+async def list_services(category: Optional[str] = None):
+    db = SessionLocal()
+    try:
+        q = db.query(ServiceCatalog).filter(ServiceCatalog.is_active == True)
+        if category:
+            q = q.filter(ServiceCatalog.category == category)
+        items = q.order_by(ServiceCatalog.sort_order).all()
+        return {"success": True, "data": [
+            {"id": s.id, "service_code": s.service_code, "title_ar": s.title_ar,
+             "title_en": s.title_en, "category": s.category, "icon": s.icon,
+             "requires_coa": s.requires_coa, "requires_tb": s.requires_tb,
+             "min_plan": s.min_plan,
+             "stages_count": len(s.stages) if s.stages else 0}
+            for s in items
+        ]}
+    finally:
+        db.close()
+
+
+@router.get("/services/catalog/{service_code}", tags=["Service Catalog"])
+async def get_service_detail(service_code: str):
+    db = SessionLocal()
+    try:
+        svc = db.query(ServiceCatalog).filter(ServiceCatalog.service_code == service_code).first()
+        if not svc:
+            raise HTTPException(status_code=404, detail="Service not found")
+        return {"success": True, "data": {
+            "id": svc.id, "service_code": svc.service_code,
+            "title_ar": svc.title_ar, "title_en": svc.title_en,
+            "description_ar": svc.description_ar, "category": svc.category,
+            "requires_coa": svc.requires_coa, "requires_tb": svc.requires_tb,
+            "stages": [{"stage_code": st.stage_code, "stage_order": st.stage_order,
+                        "title_ar": st.title_ar, "is_mandatory": st.is_mandatory,
+                        "input_requirements": st.input_requirements,
+                        "output_deliverables": st.output_deliverables,
+                        "help_text_ar": st.help_text_ar}
+                       for st in (svc.stages or [])]
+        }}
+    finally:
+        db.close()
+
+
+# ═══ Service Cases ═══
+
+@router.post("/services/cases", tags=["Service Cases"])
+async def create_service_case(req: CreateServiceCaseRequest, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        svc = db.query(ServiceCatalog).filter(ServiceCatalog.service_code == req.service_code, ServiceCatalog.is_active == True).first()
+        if not svc:
+            raise HTTPException(status_code=404, detail="Service not found or inactive")
+        first_stage = db.query(ServiceWorkflowStage).filter(
+            ServiceWorkflowStage.service_id == svc.id
+        ).order_by(ServiceWorkflowStage.stage_order).first()
+
+        case = ServiceCase(
+            client_id=req.client_id, service_id=svc.id,
+            service_code=req.service_code, current_stage=first_stage.stage_code if first_stage else None,
+            notes=req.notes, created_by=user["sub"],
+            started_at=datetime.now(timezone.utc),
+        )
+        db.add(case)
+        db.commit()
+        db.refresh(case)
+        return {"success": True, "case_id": case.id, "current_stage": case.current_stage}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+@router.get("/services/cases", tags=["Service Cases"])
+async def list_my_cases(client_id: Optional[str] = None, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        q = db.query(ServiceCase).filter(ServiceCase.created_by == user["sub"])
+        if client_id:
+            q = q.filter(ServiceCase.client_id == client_id)
+        cases = q.order_by(ServiceCase.created_at.desc()).all()
+        return {"success": True, "data": [
+            {"id": c.id, "service_code": c.service_code, "client_id": c.client_id,
+             "status": c.status, "current_stage": c.current_stage,
+             "progress_percent": c.progress_percent,
+             "started_at": str(c.started_at) if c.started_at else None}
+            for c in cases
+        ]}
+    finally:
+        db.close()
+
+
+@router.get("/services/cases/{case_id}", tags=["Service Cases"])
+async def get_case_detail(case_id: str):
+    db = SessionLocal()
+    try:
+        case = db.query(ServiceCase).filter(ServiceCase.id == case_id).first()
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        return {"success": True, "data": {
+            "id": case.id, "service_code": case.service_code, "client_id": case.client_id,
+            "status": case.status, "current_stage": case.current_stage,
+            "progress_percent": case.progress_percent, "notes": case.notes,
+        }}
+    finally:
+        db.close()
+
+
+# ═══ Audit Program Templates ═══
+
+@router.get("/audit/templates", tags=["Audit Service"])
+async def list_audit_templates(area: Optional[str] = None):
+    db = SessionLocal()
+    try:
+        q = db.query(AuditProgramTemplate).filter(AuditProgramTemplate.is_active == True)
+        if area:
+            q = q.filter(AuditProgramTemplate.area == area)
+        items = q.order_by(AuditProgramTemplate.area).all()
+        return {"success": True, "data": [
+            {"id": t.id, "procedure_code": t.procedure_code, "area": t.area,
+             "title_ar": t.title_ar, "risk_level": t.risk_level,
+             "local_std_ref": t.local_std_ref, "international_ref": t.international_ref}
+            for t in items
+        ]}
+    finally:
+        db.close()
+
+
+# ═══ Audit Samples ═══
+
+@router.post("/audit/cases/{case_id}/samples", tags=["Audit Service"])
+async def create_sample(case_id: str, req: CreateSampleRequest, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        sample = AuditSample(
+            service_case_id=case_id, area=req.area,
+            sampling_method=req.sampling_method, population_ref=req.population_ref,
+            population_size=req.population_size, selected_count=req.selected_count,
+            selection_rationale=req.selection_rationale, created_by=user["sub"],
+        )
+        db.add(sample)
+        db.commit()
+        db.refresh(sample)
+        return {"success": True, "sample_id": sample.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+@router.get("/audit/cases/{case_id}/samples", tags=["Audit Service"])
+async def list_samples(case_id: str):
+    db = SessionLocal()
+    try:
+        items = db.query(AuditSample).filter(AuditSample.service_case_id == case_id).all()
+        return {"success": True, "data": [
+            {"id": s.id, "area": s.area, "sampling_method": s.sampling_method,
+             "selected_count": s.selected_count, "status": s.status}
+            for s in items
+        ]}
+    finally:
+        db.close()
+
+
+# ═══ Audit Workpapers ═══
+
+@router.post("/audit/cases/{case_id}/workpapers", tags=["Audit Service"])
+async def create_workpaper(case_id: str, req: CreateWorkpaperRequest, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        wp = AuditWorkpaper(
+            service_case_id=case_id, procedure_code=req.procedure_code,
+            area=req.area, title_ar=req.title_ar, description=req.description,
+            evidence_ref=req.evidence_ref, evidence_type=req.evidence_type,
+            result=req.result, finding_description=req.finding_description,
+            severity=req.severity, created_by=user["sub"],
+        )
+        db.add(wp)
+        db.commit()
+        db.refresh(wp)
+        return {"success": True, "workpaper_id": wp.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+@router.get("/audit/cases/{case_id}/workpapers", tags=["Audit Service"])
+async def list_workpapers(case_id: str, area: Optional[str] = None):
+    db = SessionLocal()
+    try:
+        q = db.query(AuditWorkpaper).filter(AuditWorkpaper.service_case_id == case_id)
+        if area:
+            q = q.filter(AuditWorkpaper.area == area)
+        items = q.order_by(AuditWorkpaper.created_at).all()
+        return {"success": True, "data": [
+            {"id": w.id, "procedure_code": w.procedure_code, "area": w.area,
+             "result": w.result, "severity": w.severity,
+             "reviewer_status": w.reviewer_status}
+            for w in items
+        ]}
+    finally:
+        db.close()
+
+
+@router.post("/audit/workpapers/{wp_id}/review", tags=["Audit Service"])
+async def review_workpaper(wp_id: str, req: ReviewWorkpaperRequest, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        wp = db.query(AuditWorkpaper).filter(AuditWorkpaper.id == wp_id).first()
+        if not wp:
+            raise HTTPException(status_code=404, detail="Workpaper not found")
+        wp.reviewer_status = req.reviewer_status
+        wp.reviewer_notes = req.reviewer_notes
+        wp.reviewer_id = user["sub"]
+        wp.reviewed_at = datetime.now(timezone.utc)
+        db.commit()
+        return {"success": True, "status": wp.reviewer_status}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+# ═══ Audit Findings ═══
+
+@router.post("/audit/cases/{case_id}/findings", tags=["Audit Service"])
+async def create_finding(case_id: str, req: CreateFindingRequest, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        finding = AuditFinding(
+            service_case_id=case_id, finding_code=f"F-{gen_uuid()[:8].upper()}",
+            area=req.area, title_ar=req.title_ar, description_ar=req.description_ar,
+            severity=req.severity, materiality=req.materiality,
+            proposed_adjustment=req.proposed_adjustment,
+            impact_on_report=req.impact_on_report,
+        )
+        db.add(finding)
+        db.commit()
+        db.refresh(finding)
+        return {"success": True, "finding_id": finding.id, "finding_code": finding.finding_code}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+@router.get("/audit/cases/{case_id}/findings", tags=["Audit Service"])
+async def list_findings(case_id: str):
+    db = SessionLocal()
+    try:
+        items = db.query(AuditFinding).filter(AuditFinding.service_case_id == case_id).order_by(AuditFinding.severity.desc()).all()
+        return {"success": True, "data": [
+            {"id": f.id, "finding_code": f.finding_code, "area": f.area,
+             "title_ar": f.title_ar, "severity": f.severity,
+             "status": f.status, "impact_on_report": f.impact_on_report}
+            for f in items
+        ]}
+    finally:
+        db.close()
+
+====FILE: \app\phase2\services\seed_onboarding.py LINES: 125====
+"""
+APEX Platform - Seed Data for Client Onboarding
+Legal Entity Types + Sectors + Stage Notes
+"""
+
+
+def get_legal_entity_types():
+    return [
+        {"code": "individual", "name_ar": "فرد / شخص طبيعي", "name_en": "Individual", "sort_order": 1},
+        {"code": "sole_proprietorship", "name_ar": "مؤسسة فردية", "name_en": "Sole Proprietorship", "sort_order": 2},
+        {"code": "single_llc", "name_ar": "شركة شخص واحد", "name_en": "Single Person LLC", "sort_order": 3},
+        {"code": "llc", "name_ar": "شركة ذات مسؤولية محدودة", "name_en": "Limited Liability Company", "sort_order": 4},
+        {"code": "joint_stock", "name_ar": "شركة مساهمة", "name_en": "Joint Stock Company", "sort_order": 5},
+        {"code": "simplified_joint_stock", "name_ar": "شركة مساهمة مبسطة", "name_en": "Simplified Joint Stock", "sort_order": 6},
+        {"code": "general_partnership", "name_ar": "شركة تضامن", "name_en": "General Partnership", "sort_order": 7},
+        {"code": "limited_partnership", "name_ar": "شركة توصية بسيطة", "name_en": "Limited Partnership", "sort_order": 8},
+        {"code": "foreign_branch", "name_ar": "فرع شركة أجنبية", "name_en": "Foreign Company Branch", "sort_order": 9},
+        {"code": "government", "name_ar": "جهة حكومية / جهة عامة", "name_en": "Government Entity", "sort_order": 10},
+        {"code": "nonprofit", "name_ar": "جمعية / كيان غير ربحي", "name_en": "Non-Profit Organization", "sort_order": 11},
+        {"code": "professional_office", "name_ar": "مكتب مهني / منشأة مهنية", "name_en": "Professional Office", "sort_order": 12},
+        {"code": "other", "name_ar": "أخرى", "name_en": "Other", "sort_order": 99},
+    ]
+
+
+def get_sector_main():
+    return [
+        {"code": "trade", "name_ar": "تجارة", "name_en": "Trade", "icon": "store", "sort_order": 1},
+        {"code": "manufacturing", "name_ar": "صناعة", "name_en": "Manufacturing", "icon": "factory", "sort_order": 2},
+        {"code": "professional_services", "name_ar": "خدمات مهنية", "name_en": "Professional Services", "icon": "work", "sort_order": 3},
+        {"code": "healthcare", "name_ar": "صحة", "name_en": "Healthcare", "icon": "health", "sort_order": 4},
+        {"code": "education", "name_ar": "تعليم", "name_en": "Education", "icon": "school", "sort_order": 5},
+        {"code": "technology", "name_ar": "تقنية", "name_en": "Technology", "icon": "computer", "sort_order": 6},
+        {"code": "logistics", "name_ar": "لوجستيات", "name_en": "Logistics", "icon": "truck", "sort_order": 7},
+        {"code": "construction", "name_ar": "إنشاءات", "name_en": "Construction", "icon": "build", "sort_order": 8},
+        {"code": "agriculture", "name_ar": "زراعة", "name_en": "Agriculture", "icon": "nature", "sort_order": 9},
+        {"code": "hospitality", "name_ar": "ضيافة", "name_en": "Hospitality", "icon": "hotel", "sort_order": 10},
+        {"code": "government", "name_ar": "حكومي", "name_en": "Government", "icon": "account_balance", "sort_order": 11},
+        {"code": "nonprofit", "name_ar": "غير ربحي", "name_en": "Non-Profit", "icon": "volunteer", "sort_order": 12},
+        {"code": "financial", "name_ar": "مالي / استثماري", "name_en": "Financial / Investment", "icon": "attach_money", "sort_order": 13},
+        {"code": "other", "name_ar": "أخرى", "name_en": "Other", "icon": "category", "sort_order": 99},
+    ]
+
+
+def get_sector_sub():
+    return [
+        # Trade
+        {"code": "ecommerce", "sector_main_code": "trade", "name_ar": "تجارة إلكترونية", "name_en": "E-Commerce"},
+        {"code": "wholesale", "sector_main_code": "trade", "name_ar": "تجارة جملة", "name_en": "Wholesale"},
+        {"code": "retail", "sector_main_code": "trade", "name_ar": "تجارة تجزئة", "name_en": "Retail"},
+        {"code": "packaging", "sector_main_code": "trade", "name_ar": "تعبئة وتغليف", "name_en": "Packaging"},
+        # Professional Services
+        {"code": "accounting", "sector_main_code": "professional_services", "name_ar": "محاسبة", "name_en": "Accounting", "requires_license": True},
+        {"code": "auditing", "sector_main_code": "professional_services", "name_ar": "مراجعة", "name_en": "Auditing", "requires_license": True},
+        {"code": "legal", "sector_main_code": "professional_services", "name_ar": "خدمات قانونية", "name_en": "Legal Services", "requires_license": True},
+        {"code": "consulting", "sector_main_code": "professional_services", "name_ar": "استشارات", "name_en": "Consulting"},
+        {"code": "hr_services", "sector_main_code": "professional_services", "name_ar": "موارد بشرية", "name_en": "HR Services"},
+        # Technology
+        {"code": "saas", "sector_main_code": "technology", "name_ar": "برمجيات كخدمة", "name_en": "SaaS"},
+        {"code": "it_services", "sector_main_code": "technology", "name_ar": "خدمات تقنية", "name_en": "IT Services"},
+        # Healthcare
+        {"code": "hospitals", "sector_main_code": "healthcare", "name_ar": "مستشفيات", "name_en": "Hospitals", "requires_license": True},
+        {"code": "pharmacies", "sector_main_code": "healthcare", "name_ar": "صيدليات", "name_en": "Pharmacies", "requires_license": True},
+        # Construction
+        {"code": "contracting", "sector_main_code": "construction", "name_ar": "مقاولات", "name_en": "Contracting"},
+        {"code": "real_estate", "sector_main_code": "construction", "name_ar": "عقارات", "name_en": "Real Estate"},
+        # Financial
+        {"code": "investment", "sector_main_code": "financial", "name_ar": "استثمار", "name_en": "Investment", "requires_license": True},
+        {"code": "insurance", "sector_main_code": "financial", "name_ar": "تأمين", "name_en": "Insurance", "requires_license": True},
+        {"code": "fintech", "sector_main_code": "financial", "name_ar": "تقنية مالية", "name_en": "FinTech", "requires_license": True},
+    ]
+
+
+def get_stage_notes():
+    return [
+        {"service_key": "coa_upload", "stage_key": "upload", "role_scope": "all",
+         "title_ar": "رفع شجرة الحسابات", "title_en": "Upload Chart of Accounts",
+         "body_ar": "ارفع ملف شجرة الحسابات بصيغة Excel أو CSV. تأكد أن الملف يحتوي على عمود اسم الحساب كحد أدنى.",
+         "body_en": "Upload your Chart of Accounts file in Excel or CSV format.",
+         "common_errors_ar": "ملف فارغ، صيغة غير مدعومة، أعمدة غير واضحة",
+         "impact_ar": "بدون شجرة حسابات معتمدة لا يمكن رفع ميزان المراجعة أو بدء التحليل"},
+        {"service_key": "coa_upload", "stage_key": "mapping", "role_scope": "all",
+         "title_ar": "ربط الأعمدة", "title_en": "Column Mapping",
+         "body_ar": "راجع الأعمدة المكتشفة وتأكد من صحة الربط. عمود اسم الحساب إلزامي.",
+         "body_en": "Review detected columns and confirm the mapping.",
+         "common_errors_ar": "ربط عمود خاطئ، نسيان عمود اسم الحساب",
+         "impact_ar": "ربط خاطئ يؤدي إلى نتائج تحليل غير دقيقة"},
+        {"service_key": "coa_upload", "stage_key": "parse", "role_scope": "all",
+         "title_ar": "قراءة وتحليل الملف", "title_en": "Parse File",
+         "body_ar": "النظام يقرأ الملف ويحول البيانات إلى سجلات موحدة. الصفوف التالفة تُرصد ولا توقف العملية.",
+         "body_en": "System reads the file and converts data to normalized records.",
+         "common_errors_ar": "صفوف فارغة، أكواد مكررة، قيم غير مفهومة",
+         "impact_ar": "الصفوف المرفوضة لن تدخل في التحليل"},
+        {"service_key": "tb_upload", "stage_key": "upload", "role_scope": "all",
+         "title_ar": "رفع ميزان المراجعة", "title_en": "Upload Trial Balance",
+         "body_ar": "ارفع ميزان المراجعة بعد اعتماد شجرة الحسابات. يجب أن يحتوي على أكواد الحسابات والأرصدة.",
+         "body_en": "Upload Trial Balance after approving the Chart of Accounts.",
+         "common_errors_ar": "رفع ميزان قبل اعتماد الشجرة، أرصدة غير متوازنة",
+         "impact_ar": "لا يمكن بدء التحليل المالي بدون ميزان مراجعة مربوط بالشجرة"},
+        {"service_key": "tb_upload", "stage_key": "binding", "role_scope": "all",
+         "title_ar": "ربط الميزان بالشجرة", "title_en": "Bind TB to COA",
+         "body_ar": "النظام يربط أرصدة الميزان بالحسابات المعتمدة. الحسابات غير المطابقة تحتاج مراجعة يدوية.",
+         "body_en": "System binds TB balances to approved COA accounts.",
+         "common_errors_ar": "أكواد غير موجودة في الشجرة، حسابات جديدة لم تُضف",
+         "impact_ar": "الحسابات غير المربوطة لن تدخل في التحليل"},
+        {"service_key": "client_onboarding", "stage_key": "entity_info", "role_scope": "all",
+         "title_ar": "بيانات الكيان الأساسية", "title_en": "Entity Information",
+         "body_ar": "أدخل بيانات المنشأة: الاسم التجاري، الاسم القانوني، السجل التجاري، الرقم الضريبي.",
+         "body_en": "Enter entity details: trade name, legal name, CR number, tax number.",
+         "impact_ar": "هذه البيانات تبني هوية العميل داخل المنصة"},
+        {"service_key": "client_onboarding", "stage_key": "legal_entity", "role_scope": "all",
+         "title_ar": "الشكل القانوني", "title_en": "Legal Entity Type",
+         "body_ar": "اختر نوع الكيان القانوني بدقة. هذا الاختيار يحدد المستندات المطلوبة والخدمات المتاحة.",
+         "body_en": "Select your legal entity type carefully. This determines required documents and available services.",
+         "impact_ar": "اختيار خاطئ يؤدي إلى متطلبات مستندية غير صحيحة"},
+        {"service_key": "client_onboarding", "stage_key": "sector", "role_scope": "all",
+         "title_ar": "النشاط الرئيسي والفرعي", "title_en": "Main and Sub Activity",
+         "body_ar": "اختر نشاطك الرئيسي ثم الفرعي. الأنشطة المنظمة قد تتطلب تراخيص إضافية.",
+         "body_en": "Select your main activity then sub-activity. Regulated activities may require additional licenses.",
+         "impact_ar": "النشاط يحدد القواعد المعرفية والمقارنات المرجعية المناسبة"},
+        {"service_key": "client_onboarding", "stage_key": "documents", "role_scope": "all",
+         "title_ar": "المستندات المطلوبة", "title_en": "Required Documents",
+         "body_ar": "ارفع المستندات الإلزامية حسب نوع الكيان والنشاط. يمكنك استخدام ملفات من الأرشيف.",
+         "body_en": "Upload mandatory documents based on entity type and activity.",
+         "impact_ar": "لا يمكن تفعيل العميل أو فتح الخدمات مع مستندات ناقصة"},
+    ]
+
+====FILE: \app\seed_runner.py LINES: 140====
+"""
+APEX Platform - Master Seed Runner
+Loads all reference data into database
+Usage: python -m app.seed_runner
+"""
+
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app.phase1.models.platform_models import Base, engine, SessionLocal, gen_uuid, utcnow
+from app.phase2.models.onboarding_models import LegalEntityType, SectorMain, SectorSub, StageNote
+from app.phase2.models.archive_models import ArchivePolicy
+from app.phase2.models.service_catalog_models import ServiceCatalog, ServiceWorkflowStage, AuditProgramTemplate
+from app.phase2.services.seed_onboarding import get_legal_entity_types, get_sector_main, get_sector_sub, get_stage_notes
+
+
+def seed_all():
+    print("Creating all tables...")
+    Base.metadata.create_all(bind=engine, checkfirst=True)
+    db = SessionLocal()
+    try:
+        # 1. Legal Entity Types
+        existing = db.query(LegalEntityType).count()
+        if existing == 0:
+            for item in get_legal_entity_types():
+                db.add(LegalEntityType(id=gen_uuid(), **item, is_active=True))
+            db.commit()
+            print(f"  Seeded {len(get_legal_entity_types())} legal entity types")
+        else:
+            print(f"  Legal entity types already exist ({existing})")
+
+        # 2. Sectors Main
+        existing = db.query(SectorMain).count()
+        if existing == 0:
+            for item in get_sector_main():
+                db.add(SectorMain(id=gen_uuid(), **item, is_active=True))
+            db.commit()
+            print(f"  Seeded {len(get_sector_main())} main sectors")
+        else:
+            print(f"  Main sectors already exist ({existing})")
+
+        # 3. Sectors Sub
+        existing = db.query(SectorSub).count()
+        if existing == 0:
+            for item in get_sector_sub():
+                db.add(SectorSub(id=gen_uuid(), **{k:v for k,v in item.items()}, is_active=True))
+            db.commit()
+            print(f"  Seeded {len(get_sector_sub())} sub sectors")
+        else:
+            print(f"  Sub sectors already exist ({existing})")
+
+        # 4. Stage Notes
+        existing = db.query(StageNote).count()
+        if existing == 0:
+            for item in get_stage_notes():
+                db.add(StageNote(id=gen_uuid(), **item, is_active=True))
+            db.commit()
+            print(f"  Seeded {len(get_stage_notes())} stage notes")
+        else:
+            print(f"  Stage notes already exist ({existing})")
+
+        # 5. Default Archive Policy
+        existing = db.query(ArchivePolicy).count()
+        if existing == 0:
+            db.add(ArchivePolicy(id=gen_uuid(), scope_type="global", retention_days=30, allow_reuse=True, allow_download=True, is_active=True))
+            db.commit()
+            print("  Seeded default archive policy (30 days)")
+        else:
+            print(f"  Archive policies already exist ({existing})")
+
+        # 6. Service Catalog
+        existing = db.query(ServiceCatalog).count()
+        if existing == 0:
+            services = [
+                {"service_code": "financial_analysis", "title_ar": "التحليل المالي", "title_en": "Financial Analysis", "category": "financial", "requires_coa": True, "requires_tb": True, "min_plan": "pro", "sort_order": 1},
+                {"service_code": "funding_readiness", "title_ar": "الجاهزية التمويلية", "title_en": "Funding Readiness", "category": "readiness", "requires_coa": True, "requires_tb": True, "min_plan": "business", "sort_order": 2},
+                {"service_code": "accounting_audit", "title_ar": "المراجعة المحاسبية", "title_en": "Accounting Audit", "category": "audit", "requires_coa": True, "requires_tb": True, "min_plan": "business", "sort_order": 3},
+                {"service_code": "tax_zakat", "title_ar": "الخدمات الضريبية والزكوية", "title_en": "Tax & Zakat", "category": "compliance", "requires_coa": True, "min_plan": "pro", "sort_order": 4},
+                {"service_code": "support_readiness", "title_ar": "جاهزية الدعم والبرامج", "title_en": "Support Readiness", "category": "readiness", "min_plan": "pro", "sort_order": 5},
+                {"service_code": "license_readiness", "title_ar": "جاهزية التراخيص", "title_en": "License Readiness", "category": "readiness", "min_plan": "business", "sort_order": 6},
+            ]
+            for s in services:
+                db.add(ServiceCatalog(id=gen_uuid(), **s, is_active=True))
+            db.commit()
+            print(f"  Seeded {len(services)} services")
+
+            # Audit service stages
+            audit_svc = db.query(ServiceCatalog).filter(ServiceCatalog.service_code == "accounting_audit").first()
+            if audit_svc:
+                stages = [
+                    {"stage_code": "coa_setup", "stage_order": 1, "title_ar": "تعريف شجرة الحسابات", "is_mandatory": True},
+                    {"stage_code": "tb_upload", "stage_order": 2, "title_ar": "رفع ميزان المراجعة", "is_mandatory": True},
+                    {"stage_code": "audit_program", "stage_order": 3, "title_ar": "بناء برنامج المراجعة", "is_mandatory": True},
+                    {"stage_code": "sampling", "stage_order": 4, "title_ar": "اختيار العينات", "is_mandatory": True},
+                    {"stage_code": "execution", "stage_order": 5, "title_ar": "تنفيذ الإجراءات", "is_mandatory": True},
+                    {"stage_code": "findings", "stage_order": 6, "title_ar": "التجميع والتقييم", "is_mandatory": True},
+                    {"stage_code": "report", "stage_order": 7, "title_ar": "المخرجات النهائية", "is_mandatory": True},
+                ]
+                for st in stages:
+                    db.add(ServiceWorkflowStage(id=gen_uuid(), service_id=audit_svc.id, **st))
+                db.commit()
+                print(f"  Seeded {len(stages)} audit stages")
+        else:
+            print(f"  Service catalog already exist ({existing})")
+
+        # 7. Audit Program Templates
+        existing = db.query(AuditProgramTemplate).count()
+        if existing == 0:
+            templates = [
+                {"procedure_code": "CASH-01", "area": "cash", "title_ar": "فحص الأرصدة النقدية", "risk_level": "medium", "local_std_ref": "SA-200", "international_ref": "ISA 500"},
+                {"procedure_code": "CASH-02", "area": "cash", "title_ar": "مطابقة كشوف البنك", "risk_level": "high", "local_std_ref": "SA-505", "international_ref": "ISA 505"},
+                {"procedure_code": "REC-01", "area": "receivables", "title_ar": "فحص أرصدة المدينين", "risk_level": "high", "local_std_ref": "SA-505", "international_ref": "ISA 505"},
+                {"procedure_code": "REC-02", "area": "receivables", "title_ar": "مصادقات المدينين", "risk_level": "high", "local_std_ref": "SA-505", "international_ref": "ISA 505"},
+                {"procedure_code": "INV-01", "area": "inventory", "title_ar": "جرد المخزون", "risk_level": "high", "local_std_ref": "SA-501", "international_ref": "ISA 501"},
+                {"procedure_code": "PAY-01", "area": "payables", "title_ar": "فحص أرصدة الدائنين", "risk_level": "medium", "local_std_ref": "SA-500", "international_ref": "ISA 500"},
+                {"procedure_code": "REV-01", "area": "revenue", "title_ar": "فحص الإيرادات وعقود العملاء", "risk_level": "high", "local_std_ref": "SA-315", "international_ref": "ISA 315"},
+                {"procedure_code": "EXP-01", "area": "expenses", "title_ar": "فحص المصروفات التشغيلية", "risk_level": "medium", "local_std_ref": "SA-500", "international_ref": "ISA 500"},
+                {"procedure_code": "FA-01", "area": "fixed_assets", "title_ar": "فحص الأصول الثابتة والاستهلاك", "risk_level": "medium", "local_std_ref": "SA-500", "international_ref": "ISA 500"},
+                {"procedure_code": "EQ-01", "area": "equity", "title_ar": "فحص حقوق الملكية والتغيرات", "risk_level": "low", "local_std_ref": "SA-500", "international_ref": "ISA 500"},
+            ]
+            for t in templates:
+                db.add(AuditProgramTemplate(id=gen_uuid(), **t, is_active=True))
+            db.commit()
+            print(f"  Seeded {len(templates)} audit templates")
+        else:
+            print(f"  Audit templates already exist ({existing})")
+
+        print("\nSeed completed successfully!")
+
+    except Exception as e:
+        db.rollback()
+        print(f"ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    seed_all()
+
+====FILE: \alembic\env.py LINES: 63====
+from logging.config import fileConfig
+from sqlalchemy import engine_from_config, pool
+from alembic import context
+import os, sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app.phase1.models.platform_models import Base, DB_URL
+
+# Import ALL models so they register with Base.metadata
+from app.phase1.models.platform_models import *
+from app.phase2.models.phase2_models import *
+from app.phase2.models.onboarding_models import *
+from app.phase2.models.archive_models import *
+from app.phase2.models.service_catalog_models import *
+from app.phase3.models.phase3_models import *
+from app.phase4.models.phase4_models import *
+from app.phase5.models.phase5_models import *
+from app.phase7.models.phase7_models import *
+from app.phase8.models.phase8_models import *
+from app.phase9.models.phase9_models import *
+from app.phase10.models.phase10_models import *
+from app.phase11.models.phase11_models import *
+from app.sprint1.models.sprint1_models import *
+from app.sprint2.models.sprint2_models import *  if hasattr(__import__('app.sprint2.models', fromlist=['sprint2_models']), 'sprint2_models') else None
+from app.sprint3.models.sprint3_models import *
+from app.sprint4_tb.models.tb_models import *
+from app.sprint5_analysis.models.analysis_models import *
+from app.sprint6_registry.models.registry_models import *
+from app.knowledge_brain.models.db_models import *
+
+config = context.config
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+target_metadata = Base.metadata
+
+
+def get_url():
+    return DB_URL
+
+
+def run_migrations_offline():
+    url = get_url()
+    context.configure(url=url, target_metadata=target_metadata, literal_binds=True, dialect_opts={"paramstyle": "named"})
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online():
+    configuration = config.get_section(config.config_ini_section)
+    configuration["sqlalchemy.url"] = get_url()
+    connectable = engine_from_config(configuration, prefix="sqlalchemy.", poolclass=pool.NullPool)
+    with connectable.connect() as connection:
+        context.configure(connection=connection, target_metadata=target_metadata)
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()

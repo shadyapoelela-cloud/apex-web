@@ -1,0 +1,1634 @@
+﻿  [DIR] .git/
+  [DIR] apex-api/
+  [DIR] apex-web-deploy/
+  [DIR] apex_finance/
+  [DIR] app/
+  [DIR] templates/
+   .dockerignore
+   .gitignore
+   all_api_routes.txt
+   all_dart_code.txt
+   all_db_tables.txt
+   all_python_code.txt
+   all_schemas.txt
+   Amiri-Regular.ttf
+   apex_analyzer.py
+   apex_platform.db
+   api.py
+   Dockerfile
+   financial_reports.py
+   knowledge_brain.db
+   MIGRATION.md
+   Procfile
+   README.md
+   render.yaml
+   requirements.txt
+   test_engine.py
+   tree_structure.txt
+    [DIR] .git/
+    [DIR] apex_finance/
+    [DIR] app/
+    [DIR] templates/
+     .dockerignore
+     .gitignore
+     Amiri-Regular.ttf
+     apex_analyzer.py
+     apex_platform.db
+     api.py
+     Dockerfile
+     financial_reports.py
+     knowledge_brain.db
+     MIGRATION.md
+     Procfile
+     README.md
+     render.yaml
+     requirements.txt
+     test_engine.py
+      [DIR] android/
+      [DIR] assets/
+      [DIR] build/
+      [DIR] ios/
+      [DIR] lib/
+      [DIR] linux/
+      [DIR] macos/
+      [DIR] test/
+      [DIR] web/
+      [DIR] windows/
+       .flutter-plugins
+       .flutter-plugins-dependencies
+       .gitignore
+       .metadata
+       analysis_options.yaml
+       apex_result.json
+       pubspec.lock
+       pubspec.yaml
+       README.md
+       requirements.txt
+        [DIR] .gradle/
+        [DIR] app/
+        [DIR] gradle/
+         .gitignore
+         build.gradle
+         gradle.properties
+         gradlew
+         gradlew.bat
+         local.properties
+         settings.gradle
+          [DIR] 8.3/
+          [DIR] 8.7/
+          [DIR] buildOutputCleanup/
+          [DIR] kotlin/
+          [DIR] noVersion/
+          [DIR] vcs-1/
+           file-system.probe
+            [DIR] checksums/
+            [DIR] dependencies-accessors/
+            [DIR] fileChanges/
+            [DIR] fileHashes/
+            [DIR] vcsMetadata/
+             gc.properties
+               checksums.lock
+               md5-checksums.bin
+               sha1-checksums.bin
+               dependencies-accessors.lock
+               gc.properties
+               last-build.bin
+               fileHashes.bin
+               fileHashes.lock
+            [DIR] checksums/
+            [DIR] dependencies-accessors/
+            [DIR] executionHistory/
+            [DIR] expanded/
+            [DIR] fileChanges/
+            [DIR] fileHashes/
+            [DIR] vcsMetadata/
+             gc.properties
+               checksums.lock
+               md5-checksums.bin
+               sha1-checksums.bin
+               gc.properties
+               executionHistory.bin
+               executionHistory.lock
+               last-build.bin
+               fileHashes.bin
+               fileHashes.lock
+               resourceHashesCache.bin
+             buildOutputCleanup.lock
+             cache.properties
+             outputFiles.bin
+            [DIR] errors/
+            [DIR] sessions/
+             buildLogic.lock
+             gc.properties
+          [DIR] src/
+           build.gradle
+            [DIR] debug/
+            [DIR] main/
+            [DIR] profile/
+               AndroidManifest.xml
+              [DIR] java/
+              [DIR] kotlin/
+              [DIR] res/
+               AndroidManifest.xml
+               AndroidManifest.xml
+          [DIR] wrapper/
+             gradle-wrapper.jar
+             gradle-wrapper.properties
+         apex_logo.png
+        [DIR] Flutter/
+        [DIR] Runner/
+        [DIR] Runner.xcodeproj/
+        [DIR] Runner.xcworkspace/
+        [DIR] RunnerTests/
+         .gitignore
+           AppFrameworkInfo.plist
+           Debug.xcconfig
+           flutter_export_environment.sh
+           Generated.xcconfig
+           Release.xcconfig
+          [DIR] Assets.xcassets/
+          [DIR] Base.lproj/
+           AppDelegate.swift
+           GeneratedPluginRegistrant.h
+           GeneratedPluginRegistrant.m
+           Info.plist
+           Runner-Bridging-Header.h
+            [DIR] AppIcon.appiconset/
+            [DIR] LaunchImage.imageset/
+               Contents.json
+               Icon-App-1024x1024@1x.png
+               Icon-App-20x20@1x.png
+               Icon-App-20x20@2x.png
+               Icon-App-20x20@3x.png
+               Icon-App-29x29@1x.png
+               Icon-App-29x29@2x.png
+               Icon-App-29x29@3x.png
+               Icon-App-40x40@1x.png
+               Icon-App-40x40@2x.png
+               Icon-App-40x40@3x.png
+               Icon-App-60x60@2x.png
+               Icon-App-60x60@3x.png
+               Icon-App-76x76@1x.png
+               Icon-App-76x76@2x.png
+               Icon-App-83.5x83.5@2x.png
+               Contents.json
+               LaunchImage.png
+               LaunchImage@2x.png
+               LaunchImage@3x.png
+               README.md
+             LaunchScreen.storyboard
+             Main.storyboard
+          [DIR] project.xcworkspace/
+          [DIR] xcshareddata/
+           project.pbxproj
+            [DIR] xcshareddata/
+             contents.xcworkspacedata
+               IDEWorkspaceChecks.plist
+               WorkspaceSettings.xcsettings
+            [DIR] xcschemes/
+               Runner.xcscheme
+          [DIR] xcshareddata/
+           contents.xcworkspacedata
+             IDEWorkspaceChecks.plist
+             WorkspaceSettings.xcsettings
+           RunnerTests.swift
+         advanced_unit_screen.dart.bak.disabled
+         app.dart
+         client_create.dart
+         client_create_screen.dart.disabled
+         consultation_screen.dart.bak.disabled
+         dashboard_screen.dart.bak.disabled
+         main.dart
+         main2.dart
+         main_backup.dart
+         multistage_screen.dart.bak.disabled
+         test2.dart
+         test_screen.dart
+         unit1_full_screen.dart.bak.disabled
+         unit2_screen.dart.bak.disabled
+         unit3_screen.dart.bak.disabled
+         unit4_screen.dart.bak.disabled
+         units_screen.dart.bak.disabled
+        [DIR] flutter/
+        [DIR] runner/
+         .gitignore
+         CMakeLists.txt
+          [DIR] ephemeral/
+           CMakeLists.txt
+           generated_plugins.cmake
+           generated_plugin_registrant.cc
+           generated_plugin_registrant.h
+            [DIR] .plugin_symlinks/
+              [DIR] file_picker/
+              [DIR] url_launcher_linux/
+           CMakeLists.txt
+           main.cc
+           my_application.cc
+           my_application.h
+        [DIR] Flutter/
+        [DIR] Runner/
+        [DIR] Runner.xcodeproj/
+        [DIR] Runner.xcworkspace/
+        [DIR] RunnerTests/
+         .gitignore
+          [DIR] ephemeral/
+           Flutter-Debug.xcconfig
+           Flutter-Release.xcconfig
+           GeneratedPluginRegistrant.swift
+             Flutter-Generated.xcconfig
+             flutter_export_environment.sh
+          [DIR] Assets.xcassets/
+          [DIR] Base.lproj/
+          [DIR] Configs/
+           AppDelegate.swift
+           DebugProfile.entitlements
+           Info.plist
+           MainFlutterWindow.swift
+           Release.entitlements
+            [DIR] AppIcon.appiconset/
+               app_icon_1024.png
+               app_icon_128.png
+               app_icon_16.png
+               app_icon_256.png
+               app_icon_32.png
+               app_icon_512.png
+               app_icon_64.png
+               Contents.json
+             MainMenu.xib
+             AppInfo.xcconfig
+             Debug.xcconfig
+             Release.xcconfig
+             Warnings.xcconfig
+          [DIR] project.xcworkspace/
+          [DIR] xcshareddata/
+           project.pbxproj
+            [DIR] xcshareddata/
+               IDEWorkspaceChecks.plist
+            [DIR] xcschemes/
+               Runner.xcscheme
+          [DIR] xcshareddata/
+           contents.xcworkspacedata
+             IDEWorkspaceChecks.plist
+           RunnerTests.swift
+         widget_test.dart.disabled
+        [DIR] icons/
+         favicon.png
+         index.html
+         manifest.json
+           Icon-192.png
+           Icon-512.png
+           Icon-maskable-192.png
+           Icon-maskable-512.png
+        [DIR] flutter/
+        [DIR] runner/
+         .gitignore
+         CMakeLists.txt
+          [DIR] ephemeral/
+           CMakeLists.txt
+           generated_plugins.cmake
+           generated_plugin_registrant.cc
+           generated_plugin_registrant.h
+            [DIR] .plugin_symlinks/
+              [DIR] file_picker/
+              [DIR] url_launcher_windows/
+          [DIR] resources/
+           CMakeLists.txt
+           flutter_window.cpp
+           flutter_window.h
+           main.cpp
+           resource.h
+           runner.exe.manifest
+           Runner.rc
+           utils.cpp
+           utils.h
+           win32_window.cpp
+           win32_window.h
+             app_icon.ico
+      [DIR] core/
+      [DIR] knowledge_brain/
+      [DIR] phase1/
+      [DIR] phase10/
+      [DIR] phase11/
+      [DIR] phase2/
+      [DIR] phase3/
+      [DIR] phase4/
+      [DIR] phase5/
+      [DIR] phase6/
+      [DIR] phase7/
+      [DIR] phase8/
+      [DIR] phase9/
+      [DIR] services/
+      [DIR] sprint1/
+      [DIR] sprint2/
+      [DIR] sprint3/
+      [DIR] sprint4/
+      [DIR] sprint4_tb/
+      [DIR] sprint5_analysis/
+      [DIR] sprint6_registry/
+       main.py
+       __init__.py
+         constants.py
+         saudi_knowledge_base.py
+         __init__.py
+        [DIR] api/
+        [DIR] data/
+        [DIR] models/
+        [DIR] rulebooks/
+        [DIR] services/
+         constitution.py
+         __init__.py
+          [DIR] routes/
+           __init__.py
+             knowledge_routes.py
+             __init__.py
+          [DIR] authorities/
+           __init__.py
+             authority_registry.py
+             __init__.py
+           core_models.py
+           db_models.py
+           __init__.py
+           accounting_rulebook.py
+           compliance_rulebook.py
+           governance_rulebook.py
+           tax_rulebook.py
+           __init__.py
+           brain_service.py
+           seed_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           platform_models.py
+           __init__.py
+           phase1_routes.py
+           __init__.py
+           account_service.py
+           auth_service.py
+           legal_service.py
+           seed_data.py
+           subscription_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase10_models.py
+           __init__.py
+           phase10_routes.py
+           __init__.py
+           notification_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase11_models.py
+           __init__.py
+           phase11_routes.py
+           __init__.py
+           legal_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase2_models.py
+           __init__.py
+           phase2_routes.py
+           __init__.py
+           analysis_service.py
+           client_service.py
+           seed_phase2.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase3_models.py
+           __init__.py
+           phase3_routes.py
+           __init__.py
+           knowledge_feedback_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase4_models.py
+           __init__.py
+           phase4_routes.py
+           __init__.py
+           provider_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase5_models.py
+           __init__.py
+           phase5_routes.py
+           __init__.py
+           marketplace_service.py
+           __init__.py
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase6_routes.py
+           __init__.py
+           admin_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase7_models.py
+           __init__.py
+           phase7_routes.py
+           __init__.py
+           seed_phase7.py
+           __init__.py
+        [DIR] middleware/
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+           entitlement_middleware.py
+           __init__.py
+           phase8_models.py
+           __init__.py
+           phase8_routes.py
+           __init__.py
+           seed_phase8.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase9_models.py
+           __init__.py
+           phase9_routes.py
+           __init__.py
+           account_service.py
+           __init__.py
+        [DIR] ai/
+        [DIR] classification/
+        [DIR] financial/
+        [DIR] ingestion/
+         orchestrator.py
+         pdf_report_service.py
+         __init__.py
+           narrative_service.py
+           __init__.py
+           account_classifier.py
+           tab_consistency_checker.py
+           __init__.py
+           balance_sheet_builder.py
+           cashflow_builder.py
+           income_statement_builder.py
+           ratio_engine.py
+           readiness_engine.py
+           validation_engine.py
+           __init__.py
+           trial_balance_reader.py
+           trial_balance_reader_backup.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           sprint1_models.py
+           __init__.py
+           sprint1_routes.py
+           __init__.py
+           coa.py
+           __init__.py
+          [DIR] coa/
+           __init__.py
+             coa_file_reader.py
+             coa_normalizer.py
+             coa_parser.py
+             coa_upload_service.py
+             __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           sprint2_models.py
+           __init__.py
+           sprint2_routes.py
+           __init__.py
+           classification.py
+           __init__.py
+           coa_classifier.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           sprint3_models.py
+           __init__.py
+           sprint3_routes.py
+           __init__.py
+           __init__.py
+           coa_quality_engine.py
+           coa_review_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           __init__.py
+           sprint4_routes.py
+           __init__.py
+           knowledge.py
+           __init__.py
+           brain_engine.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           tb_models.py
+           __init__.py
+           tb_routes.py
+           __init__.py
+           __init__.py
+           tb_binding_engine.py
+           tb_file_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           analysis_models.py
+           __init__.py
+           analysis_routes.py
+           __init__.py
+           analysis_trigger_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           registry_models.py
+           __init__.py
+           registry_routes.py
+           __init__.py
+           eligibility_engine.py
+           __init__.py
+       APEX_Template_AR.xlsx
+       APEX_Template_EN.xlsx
+    [DIR] .git/
+    [DIR] apex_finance/
+    [DIR] app/
+    [DIR] assets/
+    [DIR] canvaskit/
+    [DIR] icons/
+    [DIR] templates/
+     .dockerignore
+     .gitignore
+     .last_build_id
+     Amiri-Regular.ttf
+     apex_analyzer.py
+     api.py
+     Dockerfile
+     favicon.png
+     financial_reports.py
+     flutter.js
+     flutter_bootstrap.js
+     flutter_service_worker.js
+     index.html
+     main.dart.js
+     manifest.json
+     MIGRATION.md
+     Procfile
+     render.yaml
+     requirements.txt
+     test_engine.py
+     version.json
+      [DIR] android/
+      [DIR] assets/
+      [DIR] build/
+      [DIR] ios/
+      [DIR] lib/
+      [DIR] linux/
+      [DIR] macos/
+      [DIR] test/
+      [DIR] web/
+      [DIR] windows/
+       .flutter-plugins
+       .flutter-plugins-dependencies
+       .gitignore
+       .metadata
+       analysis_options.yaml
+       apex_result.json
+       pubspec.lock
+       pubspec.yaml
+       README.md
+       requirements.txt
+        [DIR] app/
+        [DIR] gradle/
+         .gitignore
+         build.gradle
+         gradle.properties
+         local.properties
+         settings.gradle
+          [DIR] src/
+           build.gradle
+            [DIR] debug/
+            [DIR] main/
+            [DIR] profile/
+               AndroidManifest.xml
+              [DIR] java/
+              [DIR] kotlin/
+              [DIR] res/
+               AndroidManifest.xml
+               AndroidManifest.xml
+          [DIR] wrapper/
+             gradle-wrapper.properties
+         apex_logo.png
+        [DIR] Flutter/
+        [DIR] Runner/
+        [DIR] Runner.xcodeproj/
+        [DIR] Runner.xcworkspace/
+        [DIR] RunnerTests/
+         .gitignore
+           AppFrameworkInfo.plist
+           Debug.xcconfig
+           flutter_export_environment.sh
+           Generated.xcconfig
+           Release.xcconfig
+          [DIR] Assets.xcassets/
+          [DIR] Base.lproj/
+           AppDelegate.swift
+           GeneratedPluginRegistrant.h
+           GeneratedPluginRegistrant.m
+           Info.plist
+           Runner-Bridging-Header.h
+            [DIR] AppIcon.appiconset/
+            [DIR] LaunchImage.imageset/
+               Contents.json
+               Icon-App-1024x1024@1x.png
+               Icon-App-20x20@1x.png
+               Icon-App-20x20@2x.png
+               Icon-App-20x20@3x.png
+               Icon-App-29x29@1x.png
+               Icon-App-29x29@2x.png
+               Icon-App-29x29@3x.png
+               Icon-App-40x40@1x.png
+               Icon-App-40x40@2x.png
+               Icon-App-40x40@3x.png
+               Icon-App-60x60@2x.png
+               Icon-App-60x60@3x.png
+               Icon-App-76x76@1x.png
+               Icon-App-76x76@2x.png
+               Icon-App-83.5x83.5@2x.png
+               Contents.json
+               LaunchImage.png
+               LaunchImage@2x.png
+               LaunchImage@3x.png
+               README.md
+             LaunchScreen.storyboard
+             Main.storyboard
+          [DIR] project.xcworkspace/
+          [DIR] xcshareddata/
+           project.pbxproj
+            [DIR] xcshareddata/
+             contents.xcworkspacedata
+               IDEWorkspaceChecks.plist
+               WorkspaceSettings.xcsettings
+            [DIR] xcschemes/
+               Runner.xcscheme
+          [DIR] xcshareddata/
+           contents.xcworkspacedata
+             IDEWorkspaceChecks.plist
+             WorkspaceSettings.xcsettings
+           RunnerTests.swift
+         advanced_unit_screen.dart.bak.disabled
+         analysis_result_screen.dart
+         api_config.dart
+         app.dart
+         client_create.dart
+         client_create_screen.dart.disabled
+         consultation_screen.dart.bak.disabled
+         dashboard_screen.dart.bak.disabled
+         main.dart
+         main2.dart
+         main_backup.dart
+         multistage_screen.dart.bak.disabled
+         test2.dart
+         test_screen.dart
+         unit1_full_screen.dart.bak.disabled
+         unit2_screen.dart.bak.disabled
+         unit3_screen.dart.bak.disabled
+         unit4_screen.dart.bak.disabled
+         units_screen.dart.bak.disabled
+        [DIR] flutter/
+        [DIR] runner/
+         .gitignore
+         CMakeLists.txt
+          [DIR] ephemeral/
+           CMakeLists.txt
+           generated_plugins.cmake
+           generated_plugin_registrant.cc
+           generated_plugin_registrant.h
+            [DIR] .plugin_symlinks/
+              [DIR] file_picker/
+              [DIR] url_launcher_linux/
+           CMakeLists.txt
+           main.cc
+           my_application.cc
+           my_application.h
+        [DIR] Flutter/
+        [DIR] Runner/
+        [DIR] Runner.xcodeproj/
+        [DIR] Runner.xcworkspace/
+        [DIR] RunnerTests/
+         .gitignore
+          [DIR] ephemeral/
+           Flutter-Debug.xcconfig
+           Flutter-Release.xcconfig
+           GeneratedPluginRegistrant.swift
+             Flutter-Generated.xcconfig
+             flutter_export_environment.sh
+          [DIR] Assets.xcassets/
+          [DIR] Base.lproj/
+          [DIR] Configs/
+           AppDelegate.swift
+           DebugProfile.entitlements
+           Info.plist
+           MainFlutterWindow.swift
+           Release.entitlements
+            [DIR] AppIcon.appiconset/
+               app_icon_1024.png
+               app_icon_128.png
+               app_icon_16.png
+               app_icon_256.png
+               app_icon_32.png
+               app_icon_512.png
+               app_icon_64.png
+               Contents.json
+             MainMenu.xib
+             AppInfo.xcconfig
+             Debug.xcconfig
+             Release.xcconfig
+             Warnings.xcconfig
+          [DIR] project.xcworkspace/
+          [DIR] xcshareddata/
+           project.pbxproj
+            [DIR] xcshareddata/
+               IDEWorkspaceChecks.plist
+            [DIR] xcschemes/
+               Runner.xcscheme
+          [DIR] xcshareddata/
+           contents.xcworkspacedata
+             IDEWorkspaceChecks.plist
+           RunnerTests.swift
+         widget_test.dart.disabled
+        [DIR] icons/
+         favicon.png
+         index.html
+         manifest.json
+           Icon-192.png
+           Icon-512.png
+           Icon-maskable-192.png
+           Icon-maskable-512.png
+        [DIR] flutter/
+        [DIR] runner/
+         .gitignore
+         CMakeLists.txt
+          [DIR] ephemeral/
+           CMakeLists.txt
+           generated_plugins.cmake
+           generated_plugin_registrant.cc
+           generated_plugin_registrant.h
+            [DIR] .plugin_symlinks/
+              [DIR] file_picker/
+              [DIR] url_launcher_windows/
+          [DIR] resources/
+           CMakeLists.txt
+           flutter_window.cpp
+           flutter_window.h
+           main.cpp
+           resource.h
+           runner.exe.manifest
+           Runner.rc
+           utils.cpp
+           utils.h
+           win32_window.cpp
+           win32_window.h
+             app_icon.ico
+      [DIR] core/
+      [DIR] knowledge_brain/
+      [DIR] phase1/
+      [DIR] phase10/
+      [DIR] phase11/
+      [DIR] phase2/
+      [DIR] phase3/
+      [DIR] phase4/
+      [DIR] phase5/
+      [DIR] phase6/
+      [DIR] phase7/
+      [DIR] phase8/
+      [DIR] phase9/
+      [DIR] services/
+      [DIR] sprint1/
+      [DIR] sprint2/
+      [DIR] sprint3/
+      [DIR] sprint4/
+      [DIR] sprint4_tb/
+       main.py
+       __init__.py
+         constants.py
+         saudi_knowledge_base.py
+         __init__.py
+        [DIR] api/
+        [DIR] data/
+        [DIR] models/
+        [DIR] rulebooks/
+        [DIR] services/
+         constitution.py
+         __init__.py
+          [DIR] routes/
+           __init__.py
+             knowledge_routes.py
+             __init__.py
+          [DIR] authorities/
+           __init__.py
+             authority_registry.py
+             __init__.py
+           core_models.py
+           db_models.py
+           __init__.py
+           accounting_rulebook.py
+           compliance_rulebook.py
+           governance_rulebook.py
+           tax_rulebook.py
+           __init__.py
+           brain_service.py
+           seed_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           platform_models.py
+           __init__.py
+           phase1_routes.py
+           __init__.py
+           account_service.py
+           auth_service.py
+           legal_service.py
+           seed_data.py
+           subscription_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase10_models.py
+           __init__.py
+           phase10_routes.py
+           __init__.py
+           notification_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase11_models.py
+           __init__.py
+           phase11_routes.py
+           __init__.py
+           legal_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase2_models.py
+           __init__.py
+           phase2_routes.py
+           __init__.py
+           analysis_service.py
+           client_service.py
+           seed_phase2.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase3_models.py
+           __init__.py
+           phase3_routes.py
+           __init__.py
+           knowledge_feedback_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase4_models.py
+           __init__.py
+           phase4_routes.py
+           __init__.py
+           provider_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase5_models.py
+           __init__.py
+           phase5_routes.py
+           __init__.py
+           marketplace_service.py
+           __init__.py
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase6_routes.py
+           __init__.py
+           admin_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase7_models.py
+           __init__.py
+           phase7_routes.py
+           __init__.py
+           seed_phase7.py
+           __init__.py
+        [DIR] middleware/
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+           entitlement_middleware.py
+           __init__.py
+           phase8_models.py
+           __init__.py
+           phase8_routes.py
+           __init__.py
+           seed_phase8.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] services/
+         __init__.py
+           phase9_models.py
+           __init__.py
+           phase9_routes.py
+           __init__.py
+           account_service.py
+           __init__.py
+        [DIR] ai/
+        [DIR] classification/
+        [DIR] financial/
+        [DIR] ingestion/
+         orchestrator.py
+         pdf_report_service.py
+         __init__.py
+           narrative_service.py
+           __init__.py
+           account_classifier.py
+           tab_consistency_checker.py
+           __init__.py
+           balance_sheet_builder.py
+           cashflow_builder.py
+           income_statement_builder.py
+           ratio_engine.py
+           readiness_engine.py
+           validation_engine.py
+           __init__.py
+           trial_balance_reader.py
+           trial_balance_reader_backup.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           sprint1_models.py
+           __init__.py
+           sprint1_routes.py
+           __init__.py
+           coa.py
+           __init__.py
+          [DIR] coa/
+           __init__.py
+             coa_file_reader.py
+             coa_normalizer.py
+             coa_parser.py
+             coa_upload_service.py
+             __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           sprint2_models.py
+           __init__.py
+           sprint2_routes.py
+           __init__.py
+           classification.py
+           __init__.py
+           coa_classifier.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           sprint3_models.py
+           __init__.py
+           sprint3_routes.py
+           __init__.py
+           __init__.py
+           coa_quality_engine.py
+           coa_review_service.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           __init__.py
+           sprint4_routes.py
+           __init__.py
+           knowledge.py
+           __init__.py
+           brain_engine.py
+           __init__.py
+        [DIR] models/
+        [DIR] routes/
+        [DIR] schemas/
+        [DIR] services/
+         __init__.py
+           tb_models.py
+           __init__.py
+           tb_routes.py
+           __init__.py
+           __init__.py
+           tb_binding_engine.py
+           tb_file_service.py
+           __init__.py
+      [DIR] assets/
+      [DIR] fonts/
+      [DIR] packages/
+      [DIR] shaders/
+       AssetManifest.bin
+       AssetManifest.bin.json
+       AssetManifest.json
+       FontManifest.json
+       NOTICES
+         apex_logo.png
+         MaterialIcons-Regular.otf
+        [DIR] cupertino_icons/
+          [DIR] assets/
+             CupertinoIcons.ttf
+         ink_sparkle.frag
+      [DIR] chromium/
+       canvaskit.js
+       canvaskit.js.symbols
+       canvaskit.wasm
+       skwasm.js
+       skwasm.js.symbols
+       skwasm.wasm
+       skwasm.worker.js
+         canvaskit.js
+         canvaskit.js.symbols
+         canvaskit.wasm
+       Icon-192.png
+       Icon-512.png
+       Icon-maskable-192.png
+       Icon-maskable-512.png
+       APEX_Template_AR.xlsx
+       APEX_Template_EN.xlsx
+    [DIR] android/
+    [DIR] assets/
+    [DIR] build/
+    [DIR] ios/
+    [DIR] lib/
+    [DIR] linux/
+    [DIR] macos/
+    [DIR] test/
+    [DIR] web/
+    [DIR] windows/
+     .flutter-plugins
+     .flutter-plugins-dependencies
+     .gitignore
+     .metadata
+     analysis_options.yaml
+     apex_finance.iml
+     apex_result.json
+     pubspec.lock
+     pubspec.yaml
+     README.md
+     requirements.txt
+      [DIR] app/
+      [DIR] gradle/
+       .gitignore
+       apex_finance_android.iml
+       build.gradle
+       gradle.properties
+       gradlew
+       gradlew.bat
+       local.properties
+       settings.gradle
+        [DIR] src/
+         build.gradle
+          [DIR] debug/
+          [DIR] main/
+          [DIR] profile/
+             AndroidManifest.xml
+            [DIR] java/
+            [DIR] kotlin/
+            [DIR] res/
+             AndroidManifest.xml
+              [DIR] io/
+              [DIR] com/
+              [DIR] drawable/
+              [DIR] drawable-v21/
+              [DIR] mipmap-hdpi/
+              [DIR] mipmap-mdpi/
+              [DIR] mipmap-xhdpi/
+              [DIR] mipmap-xxhdpi/
+              [DIR] mipmap-xxxhdpi/
+              [DIR] values/
+              [DIR] values-night/
+             AndroidManifest.xml
+        [DIR] wrapper/
+           gradle-wrapper.jar
+           gradle-wrapper.properties
+       apex_logo.png
+      [DIR] Flutter/
+      [DIR] Runner/
+      [DIR] Runner.xcodeproj/
+      [DIR] Runner.xcworkspace/
+      [DIR] RunnerTests/
+       .gitignore
+         AppFrameworkInfo.plist
+         Debug.xcconfig
+         flutter_export_environment.sh
+         Generated.xcconfig
+         Release.xcconfig
+        [DIR] Assets.xcassets/
+        [DIR] Base.lproj/
+         AppDelegate.swift
+         GeneratedPluginRegistrant.h
+         GeneratedPluginRegistrant.m
+         Info.plist
+         Runner-Bridging-Header.h
+          [DIR] AppIcon.appiconset/
+          [DIR] LaunchImage.imageset/
+             Contents.json
+             Icon-App-1024x1024@1x.png
+             Icon-App-20x20@1x.png
+             Icon-App-20x20@2x.png
+             Icon-App-20x20@3x.png
+             Icon-App-29x29@1x.png
+             Icon-App-29x29@2x.png
+             Icon-App-29x29@3x.png
+             Icon-App-40x40@1x.png
+             Icon-App-40x40@2x.png
+             Icon-App-40x40@3x.png
+             Icon-App-60x60@2x.png
+             Icon-App-60x60@3x.png
+             Icon-App-76x76@1x.png
+             Icon-App-76x76@2x.png
+             Icon-App-83.5x83.5@2x.png
+             Contents.json
+             LaunchImage.png
+             LaunchImage@2x.png
+             LaunchImage@3x.png
+             README.md
+           LaunchScreen.storyboard
+           Main.storyboard
+        [DIR] project.xcworkspace/
+        [DIR] xcshareddata/
+         project.pbxproj
+          [DIR] xcshareddata/
+           contents.xcworkspacedata
+             IDEWorkspaceChecks.plist
+             WorkspaceSettings.xcsettings
+          [DIR] xcschemes/
+             Runner.xcscheme
+        [DIR] xcshareddata/
+         contents.xcworkspacedata
+           IDEWorkspaceChecks.plist
+           WorkspaceSettings.xcsettings
+         RunnerTests.swift
+       advanced_unit_screen.dart.bak.disabled
+       analysis_full_screen.dart
+       analysis_result_screen.dart
+       api_service.dart
+       app.dart
+       client_create.dart
+       client_create_screen.dart.disabled
+       coa_mapping_screen.dart
+       coa_quality_screen.dart
+       coa_review_screen.dart
+       coa_upload_screen.dart
+       consultation_screen.dart.bak.disabled
+       dashboard_screen.dart.bak.disabled
+       financial_statements_screen.dart
+       main.dart
+       main2.dart
+       main_backup.dart
+       multistage_screen.dart.bak.disabled
+       shared_widgets.dart
+       tb_binding_screen.dart
+       test2.dart
+       test_screen.dart
+       unit1_full_screen.dart.bak.disabled
+       unit2_screen.dart.bak.disabled
+       unit3_screen.dart.bak.disabled
+       unit4_screen.dart.bak.disabled
+       units_screen.dart.bak.disabled
+       upload_screen.dart
+      [DIR] flutter/
+      [DIR] runner/
+       .gitignore
+       CMakeLists.txt
+        [DIR] ephemeral/
+         CMakeLists.txt
+         generated_plugins.cmake
+         generated_plugin_registrant.cc
+         generated_plugin_registrant.h
+          [DIR] .plugin_symlinks/
+            [DIR] path_provider_linux/
+            [DIR] shared_preferences_linux/
+            [DIR] url_launcher_linux/
+         CMakeLists.txt
+         main.cc
+         my_application.cc
+         my_application.h
+      [DIR] Flutter/
+      [DIR] Runner/
+      [DIR] Runner.xcodeproj/
+      [DIR] Runner.xcworkspace/
+      [DIR] RunnerTests/
+       .gitignore
+        [DIR] ephemeral/
+         Flutter-Debug.xcconfig
+         Flutter-Release.xcconfig
+         GeneratedPluginRegistrant.swift
+           Flutter-Generated.xcconfig
+           flutter_export_environment.sh
+        [DIR] Assets.xcassets/
+        [DIR] Base.lproj/
+        [DIR] Configs/
+         AppDelegate.swift
+         DebugProfile.entitlements
+         Info.plist
+         MainFlutterWindow.swift
+         Release.entitlements
+          [DIR] AppIcon.appiconset/
+             app_icon_1024.png
+             app_icon_128.png
+             app_icon_16.png
+             app_icon_256.png
+             app_icon_32.png
+             app_icon_512.png
+             app_icon_64.png
+             Contents.json
+           MainMenu.xib
+           AppInfo.xcconfig
+           Debug.xcconfig
+           Release.xcconfig
+           Warnings.xcconfig
+        [DIR] project.xcworkspace/
+        [DIR] xcshareddata/
+         project.pbxproj
+          [DIR] xcshareddata/
+             IDEWorkspaceChecks.plist
+          [DIR] xcschemes/
+             Runner.xcscheme
+        [DIR] xcshareddata/
+         contents.xcworkspacedata
+           IDEWorkspaceChecks.plist
+         RunnerTests.swift
+       widget_test.dart
+       widget_test.dart.disabled
+      [DIR] icons/
+       favicon.png
+       index.html
+       manifest.json
+         Icon-192.png
+         Icon-512.png
+         Icon-maskable-192.png
+         Icon-maskable-512.png
+      [DIR] flutter/
+      [DIR] runner/
+       .gitignore
+       CMakeLists.txt
+        [DIR] ephemeral/
+         CMakeLists.txt
+         generated_plugins.cmake
+         generated_plugin_registrant.cc
+         generated_plugin_registrant.h
+          [DIR] .plugin_symlinks/
+            [DIR] path_provider_windows/
+            [DIR] shared_preferences_windows/
+            [DIR] url_launcher_windows/
+        [DIR] resources/
+         CMakeLists.txt
+         flutter_window.cpp
+         flutter_window.h
+         main.cpp
+         resource.h
+         runner.exe.manifest
+         Runner.rc
+         utils.cpp
+         utils.h
+         win32_window.cpp
+         win32_window.h
+           app_icon.ico
+    [DIR] core/
+    [DIR] knowledge_brain/
+    [DIR] phase1/
+    [DIR] phase10/
+    [DIR] phase11/
+    [DIR] phase2/
+    [DIR] phase3/
+    [DIR] phase4/
+    [DIR] phase5/
+    [DIR] phase6/
+    [DIR] phase7/
+    [DIR] phase8/
+    [DIR] phase9/
+    [DIR] services/
+    [DIR] sprint1/
+    [DIR] sprint2/
+    [DIR] sprint3/
+    [DIR] sprint4/
+    [DIR] sprint4_tb/
+    [DIR] sprint5_analysis/
+    [DIR] sprint6_registry/
+     main.py
+     __init__.py
+       constants.py
+       saudi_knowledge_base.py
+       __init__.py
+      [DIR] api/
+      [DIR] data/
+      [DIR] models/
+      [DIR] rulebooks/
+      [DIR] services/
+       constitution.py
+       __init__.py
+        [DIR] routes/
+         __init__.py
+           knowledge_routes.py
+           __init__.py
+        [DIR] authorities/
+         __init__.py
+           authority_registry.py
+           __init__.py
+         core_models.py
+         db_models.py
+         __init__.py
+         accounting_rulebook.py
+         compliance_rulebook.py
+         governance_rulebook.py
+         tax_rulebook.py
+         __init__.py
+         brain_service.py
+         seed_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         platform_models.py
+         __init__.py
+         phase1_routes.py
+         __init__.py
+         account_service.py
+         auth_service.py
+         legal_service.py
+         seed_data.py
+         subscription_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase10_models.py
+         __init__.py
+         phase10_routes.py
+         __init__.py
+         notification_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase11_models.py
+         __init__.py
+         phase11_routes.py
+         __init__.py
+         legal_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase2_models.py
+         __init__.py
+         phase2_routes.py
+         __init__.py
+         analysis_service.py
+         client_service.py
+         seed_phase2.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase3_models.py
+         __init__.py
+         phase3_routes.py
+         __init__.py
+         knowledge_feedback_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase4_models.py
+         __init__.py
+         phase4_routes.py
+         __init__.py
+         provider_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase5_models.py
+         __init__.py
+         phase5_routes.py
+         __init__.py
+         marketplace_service.py
+         __init__.py
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase6_routes.py
+         __init__.py
+         admin_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase7_models.py
+         __init__.py
+         phase7_routes.py
+         __init__.py
+         seed_phase7.py
+         __init__.py
+      [DIR] middleware/
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+         entitlement_middleware.py
+         __init__.py
+         phase8_models.py
+         __init__.py
+         phase8_routes.py
+         __init__.py
+         seed_phase8.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         phase9_models.py
+         __init__.py
+         phase9_routes.py
+         __init__.py
+         account_service.py
+         __init__.py
+      [DIR] ai/
+      [DIR] classification/
+      [DIR] financial/
+      [DIR] ingestion/
+       orchestrator.py
+       pdf_report_service.py
+       __init__.py
+         narrative_service.py
+         __init__.py
+         account_classifier.py
+         tab_consistency_checker.py
+         __init__.py
+         balance_sheet_builder.py
+         cashflow_builder.py
+         income_statement_builder.py
+         ratio_engine.py
+         readiness_engine.py
+         validation_engine.py
+         __init__.py
+         trial_balance_reader.py
+         trial_balance_reader_backup.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] schemas/
+      [DIR] services/
+       __init__.py
+         sprint1_models.py
+         __init__.py
+         sprint1_routes.py
+         __init__.py
+         coa.py
+         __init__.py
+        [DIR] coa/
+         __init__.py
+           coa_file_reader.py
+           coa_normalizer.py
+           coa_parser.py
+           coa_upload_service.py
+           __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] schemas/
+      [DIR] services/
+       __init__.py
+         sprint2_models.py
+         __init__.py
+         sprint2_routes.py
+         __init__.py
+         classification.py
+         __init__.py
+         coa_classifier.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] schemas/
+      [DIR] services/
+       __init__.py
+         sprint3_models.py
+         __init__.py
+         sprint3_routes.py
+         __init__.py
+         __init__.py
+         coa_quality_engine.py
+         coa_review_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] schemas/
+      [DIR] services/
+       __init__.py
+         __init__.py
+         sprint4_routes.py
+         __init__.py
+         knowledge.py
+         __init__.py
+         brain_engine.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] schemas/
+      [DIR] services/
+       __init__.py
+         tb_models.py
+         __init__.py
+         tb_routes.py
+         __init__.py
+         __init__.py
+         tb_binding_engine.py
+         tb_file_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         analysis_models.py
+         __init__.py
+         analysis_routes.py
+         __init__.py
+         analysis_trigger_service.py
+         __init__.py
+      [DIR] models/
+      [DIR] routes/
+      [DIR] services/
+       __init__.py
+         registry_models.py
+         __init__.py
+         registry_routes.py
+         __init__.py
+         eligibility_engine.py
+         __init__.py
+     APEX_Template_AR.xlsx
+     APEX_Template_EN.xlsx

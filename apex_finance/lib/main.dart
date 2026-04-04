@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -8,8 +8,16 @@ import 'dart:html' as html;
 // DISABLED: import 'client_create_screen.dart';
 import 'client_create.dart';
 
+import 'screens/clients/client_onboarding_wizard.dart' as wizard;
+import 'screens/marketplace/service_catalog_screen.dart' as catalog;
+import 'screens/account/archive_screen.dart' as archive;
+import 'screens/tasks/audit_service_screen.dart' as audit;
+import 'widgets/auth_widgets.dart' as authw;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'providers/app_providers.dart';
 const _api = 'https://apex-api-ootk.onrender.com';
-void main() => runApp(const ApexApp());
+
+void main() => runApp(const ProviderScope(child: ApexApp()));
 
 // ═══════════════════════════════════════════════════
 // Design System
@@ -33,7 +41,7 @@ class S {
   static String? token, uid, uname, dname, plan, email;
   static List<String> roles = [];
   static Map<String,String> h() => {'Authorization':'Bearer ${token??""}'};
-  static Map<String,String> hj() => {'Authorization':'Bearer ${token??""}',' Content-Type':'application/json'};
+  static Map<String,String> hj() => {'Authorization':'Bearer ${token??""}','Content-Type':'application/json'};
   static void clear() { token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[]; }
   static String planAr() {
     const m = {'free':'\u0645\u062c\u0627\u0646\u064a','pro':'\u0627\u062d\u062a\u0631\u0627\u0641\u064a','business':'\u0623\u0639\u0645\u0627\u0644','expert':'\u062e\u0628\u064a\u0631','enterprise':'\u0645\u0624\u0633\u0633\u064a'};
@@ -378,7 +386,7 @@ class _ClientsS extends State<ClientsTab> {
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: const Text('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.gold))),
     floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: const Icon(Icons.add, color: AC.navy),
-      onPressed: () async { await Navigator.push(c, MaterialPageRoute(builder:(_)=>const ClientCreateScreen2())); _load(); }),
+      onPressed: () async { await Navigator.push(c, MaterialPageRoute(builder:(_)=> wizard.ClientOnboardingWizard(token: S.token))); _load(); }),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       _cl.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.business_outlined, color: AC.ts, size: 60), const SizedBox(height: 12),
@@ -668,6 +676,7 @@ class _MarketS extends State<MarketTab> {
       icon: const Icon(Icons.add, color: AC.navy), label: const Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.navy))),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       ListView(padding: const EdgeInsets.all(14), children: [
+        Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [const Icon(Icons.store_mall_directory, color: AC.gold, size: 36), const SizedBox(height: 8), const Text("كتالوج الخدمات المهنية", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), const Text("تصفح 6 خدمات: تحليل مالي، مراجعة، ضرائب، تمويل، دعم، تراخيص", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => catalog.ServiceCatalogScreen(clientId: '', token: S.token))), icon: const Icon(Icons.arrow_forward), label: const Text("فتح الكتالوج")))])),
         _card('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0639\u062a\u0645\u062f\u0648\u0646', [
           if(_provs.isEmpty) const Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0642\u062f\u0645\u0648 \u062e\u062f\u0645\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
           else ..._provs.take(5).map((p) => Padding(padding: const EdgeInsets.only(bottom: 8),
@@ -704,7 +713,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
   final _title=TextEditingController(), _desc=TextEditingController(), _budget=TextEditingController();
   String _urgency='medium'; List _clients=[]; String? _clientId, _e; bool _l=false, _done=false;
   @override void initState() { super.initState();
-    http.get(Uri.parse('$_api/clients'), headers: S.h()).then((r){ if(mounted) setState(()=> _clients=jsonDecode(r.body)); }); }
+    http.get(Uri.parse('$_api/clients'), headers: S.h()).then((r){ if(mounted) setState((){ final d = jsonDecode(r.body); _clients = d is List ? d : (d['clients'] ?? d['data'] ?? []); }); }); }
   Future<void> _go() async {
     if(_title.text.isEmpty||_clientId==null) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0639\u0645\u064a\u0644 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
@@ -875,7 +884,8 @@ class _AccS extends State<AccountTab> {
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ChangePasswordScreen()))),
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const CloseAccountScreen()))),
-          _mi(Icons.history, 'سجل النشاط', const Color(0xFF9C27B0),
+          _mi(Icons.archive, 'الأرشيف', AC.cyan, () => Navigator.push(context, MaterialPageRoute(builder: (_) => archive.ArchiveScreen(token: S.token)))),
+            _mi(Icons.history, 'سجل النشاط', const Color(0xFF9C27B0),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ActivityHistoryScreen()))),
           _mi(Icons.compare_arrows, 'مقارنة الخطط', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const PlanComparisonScreen()))),
@@ -4363,3 +4373,16 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
         trailing: hasIssues ? Icon(Icons.warning_amber, color: Colors.orangeAccent, size: 18) : Icon(Icons.check_circle_outline, color: Colors.greenAccent.shade400, size: 18)));
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

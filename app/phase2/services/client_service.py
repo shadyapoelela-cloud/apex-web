@@ -1,4 +1,4 @@
-import json
+﻿import json
 """
 APEX Platform — Client Service
 ═══════════════════════════════════════════════════════════════
@@ -228,3 +228,5 @@ class ClientService:
             return {"success": False, "error": str(e)}
         finally:
             db.close()
+
+
