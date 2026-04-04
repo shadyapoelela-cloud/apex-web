@@ -223,12 +223,15 @@ class _DashS extends ConsumerState<DashTab> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r1 = await http.get(Uri.parse('$_api/subscriptions/me'), headers: S.h());
-      final r2 = await http.get(Uri.parse('$_api/plans'));
-      final r3 = await http.get(Uri.parse('$_api/notifications'), headers: S.h());
+      ref.invalidate(currentPlanProvider);
+      ref.invalidate(plansProvider);
+      ref.invalidate(notificationsProvider);
+      final sub = await ref.read(currentPlanProvider.future);
+      final plans = await ref.read(plansProvider.future);
+      final notifs = await ref.read(notificationsProvider.future);
       if(mounted) setState(() {
-        _sub = jsonDecode(r1.body); _plans = jsonDecode(r2.body);
-        try { final nots = jsonDecode(r3.body); if(nots is List) _notifCount = nots.where((n)=>n['is_read']!=true).length; } catch(_){}
+        _sub = sub; _plans = plans;
+        _notifCount = notifs.where((n) => n['is_read'] != true).length;
         _ld = false;
       });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
@@ -387,8 +390,10 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   List _cl=[]; bool _ld=true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
-    try { final r = await http.get(Uri.parse('$_api/clients'), headers: S.h());
-      if(mounted) setState((){  _cl=jsonDecode(r.body); _ld=false; });
+    try {
+      ref.invalidate(clientsProvider);
+      final clients = await ref.read(clientsProvider.future);
+      if(mounted) setState(() { _cl = clients; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
