@@ -277,6 +277,13 @@ class _MainNavS extends State<MainNav> {
         BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: '\u062d\u0633\u0627\u0628\u064a'),
         BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings_rounded), label: '\u0625\u062f\u0627\u0631\u0629'),
       ]));
+  Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
+    leading: Icon(icon, color: isGold ? AC.gold : AC.ts, size: 20),
+    title: Text(label, style: TextStyle(color: isGold ? AC.gold : AC.tp, fontSize: 13, fontWeight: isGold ? FontWeight.bold : FontWeight.normal)),
+    onTap: onTap,
+    dense: true,
+    visualDensity: VisualDensity.compact,
+  );
 }
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
