@@ -72,7 +72,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
     setState(() => _loading = true);
     try {
       // Load draft
-      final dr = await http.get(Uri.parse('$_api/api/v1/onboarding/draft'), headers: _h);
+      final dr = await http.get(Uri.parse('$_api/onboarding/draft'), headers: _h);
       if (dr.statusCode == 200) {
         final d = jsonDecode(utf8.decode(dr.bodyBytes));
         if (d['success'] == true && d['data'] != null) {
@@ -92,11 +92,11 @@ class _WizardState extends State<ClientOnboardingWizard> {
       }
 
       // Load entity types
-      final et = await http.get(Uri.parse('$_api/api/v1/legal-entity-types'));
+      final et = await http.get(Uri.parse('$_api/legal-entity-types'));
       if (et.statusCode == 200) _entityTypes = jsonDecode(et.body)['data'] ?? [];
 
       // Load sectors
-      final sc = await http.get(Uri.parse('$_api/api/v1/sectors'));
+      final sc = await http.get(Uri.parse('$_api/sectors'));
       if (sc.statusCode == 200) _sectors = jsonDecode(sc.body)['data'] ?? [];
 
       // Load sub sectors if sector selected
@@ -110,7 +110,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
   Future<void> _loadSubSectors(String mainCode) async {
     try {
-      final r = await http.get(Uri.parse('$_api/api/v1/sectors/$mainCode/sub'));
+      final r = await http.get(Uri.parse('$_api/sectors/$mainCode/sub'));
       if (r.statusCode == 200) _subSectors = jsonDecode(utf8.decode(r.bodyBytes))['data'] ?? [];
     } catch (_) {}
   }
@@ -119,7 +119,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
     const stages = ['entity_info', 'legal_entity', 'sector', 'sector', 'client_type', 'documents', 'review'];
     if (_step < stages.length) {
       try {
-        final r = await http.get(Uri.parse('$_api/api/v1/stage-notes/client_onboarding/${stages[_step]}'));
+        final r = await http.get(Uri.parse('$_api/stage-notes/client_onboarding/${stages[_step]}'));
         if (r.statusCode == 200) {
           final d = jsonDecode(utf8.decode(r.bodyBytes));
           if (d['success'] == true) _stageNote = d['data'];
@@ -130,7 +130,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
   Future<void> _saveDraft() async {
     try {
-      await http.post(Uri.parse('$_api/api/v1/onboarding/draft'), headers: _h,
+      await http.post(Uri.parse('$_api/onboarding/draft'), headers: _h,
         body: jsonEncode({
           'step_completed': _step,
           'draft_data': {

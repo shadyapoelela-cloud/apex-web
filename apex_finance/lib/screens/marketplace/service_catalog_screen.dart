@@ -40,7 +40,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      String url = '$_api/api/v1/services/catalog';
+      String url = '$_api/services/catalog';
       if (_selectedCategory != null) url += '?category=$_selectedCategory';
       final r = await http.get(Uri.parse(url));
       if (r.statusCode == 200) {
@@ -117,7 +117,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
 
   Future<void> _startService(String code) async {
     try {
-      final r = await http.post(Uri.parse('$_api/api/v1/services/cases'), headers: _h,
+      final r = await http.post(Uri.parse('$_api/services/cases'), headers: _h,
         body: jsonEncode({'client_id': widget.clientId, 'service_code': code}));
       if (r.statusCode == 200) {
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم بدء الخدمة بنجاح'), backgroundColor: Colors.green));
