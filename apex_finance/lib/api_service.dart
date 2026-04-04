@@ -1,5 +1,4 @@
 ﻿import 'dart:convert';
-import 'dart:typed_data';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:http/http.dart' as http;
@@ -169,13 +168,13 @@ class ApiService {
 
   // ── Helpers ──
   static Future<ApiResult> _get(String path) async {
-    try { final res=await http.get(Uri.parse('$_base$path'),headers:_h); if(res.statusCode==200)return ApiResult.ok(jsonDecode(utf8.decode(res.bodyBytes))); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+    try { final res=await http.get(Uri.parse('$_base$path'),headers:_h); if(res.statusCode==200)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
   }
   static Future<ApiResult> _post(String path, Map body) async {
-    try { final res=await http.post(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(utf8.decode(res.bodyBytes))); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+    try { final res=await http.post(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
   }
   static Future<ApiResult> _put(String path, Map body) async {
-    try { final res=await http.put(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(utf8.decode(res.bodyBytes))); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+    try { final res=await http.put(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
   }
   static String _parseErr(String body, int code) { try { final d=jsonDecode(body); return d['detail']??d['message']??'خطأ $code'; } catch(_){return 'خطأ $code';} }
 }
@@ -190,8 +189,5 @@ class ApiResult {
   T? get<T>(String key) { if(data is Map) return data[key] as T?; return null; }
   @override String toString() => success?'ok($data)':'error($error)';
 }
-
-
-
 
 
