@@ -11,6 +11,10 @@ import '../screens/coa/coa_tree_screen.dart';
 import '../screens/legal/legal_acceptance_screen.dart';
 import '../screens/compliance/provider_compliance_detail.dart';
 import '../widgets/copilot_widgets.dart';
+import '../screens/clients/client_detail_screen.dart';
+import '../screens/marketplace/service_request_detail.dart';
+import '../screens/providers/provider_profile_screen.dart';
+import '../screens/notifications/notification_detail_screen.dart';
 import '../screens/shared/result_detail_panel.dart';
 import '../main.dart' hide S;
 import '../screens/extracted/subscription_screens.dart';
@@ -75,6 +79,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/providers/compliance', builder: (c, s) => const ProviderComplianceScreen()),
     GoRoute(path: '/admin/policies', builder: (c, s) => const PolicyManagementScreen()),
     GoRoute(path: '/provider-kanban', builder: (c, s) => const ProviderKanbanScreen()),
+    GoRoute(path: '/client-detail', builder: (c, s) { final args = s.extra as Map<String,dynamic>? ?? {}; return ClientDetailScreen(clientId: args['id'] ?? '', clientName: args['name'] ?? ''); }),
     GoRoute(path: '/legal-acceptance', builder: (c, s) => const LegalAcceptanceLogger()),
     GoRoute(path: '/compliance-detail', builder: (c, s) => const ProviderComplianceDetailScreen()),
     GoRoute(path: '/coa-tree', builder: (c, s) => const CoaTreeScreen()),
