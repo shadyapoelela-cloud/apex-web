@@ -107,6 +107,7 @@ class _SlideAuthState extends State<SlideAuthScreen> {
       child: Center(child: Text(l, style: TextStyle(color: _pg == i ? AC.navy : AC.ts, fontSize: 13, fontWeight: FontWeight.bold))))));
 
   Widget _loginSlide() => Column(children: [
+    const SizedBox(height: 12),
     if (_le != null) _err(_le!),
     _inp(_lu, 'البريد أو اسم المستخدم', Icons.email_outlined, ltr: true),
     const SizedBox(height: 12),
@@ -118,6 +119,7 @@ class _SlideAuthState extends State<SlideAuthScreen> {
   ]);
 
   Widget _registerSlide() => Column(children: [
+    const SizedBox(height: 12),
     if (_rerr != null) _err(_rerr!),
     _inp(_rn, 'الاسم الكامل', Icons.person_outline),
     const SizedBox(height: 10),
