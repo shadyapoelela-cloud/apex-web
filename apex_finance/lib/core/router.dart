@@ -4,6 +4,7 @@ import '../screens/copilot/copilot_screen.dart';
 import '../screens/financial/financial_ops_screen.dart';
 import '../screens/knowledge/knowledge_brain_screen.dart';
 import '../screens/audit/audit_workflow_screen.dart';
+import '../screens/dashboard/enhanced_dashboard.dart';
 import '../main.dart' hide S;
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
@@ -65,6 +66,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/providers/documents', builder: (c, s) => const ProviderDocumentUploadScreen()),
     GoRoute(path: '/admin/providers/compliance', builder: (c, s) => const ProviderComplianceScreen()),
     GoRoute(path: '/admin/policies', builder: (c, s) => const PolicyManagementScreen()),
+    GoRoute(path: '/dashboard', builder: (c, s) => const EnhancedDashboard()),
     GoRoute(path: '/audit-workflow', builder: (c, s) => const AuditWorkflowScreen()),
     GoRoute(path: '/knowledge-brain', builder: (c, s) => const KnowledgeBrainScreen()),
     GoRoute(path: '/financial-ops', builder: (c, s) => const FinancialOpsScreen()),
