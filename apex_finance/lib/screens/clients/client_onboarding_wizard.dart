@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -72,7 +72,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
     setState(() => _loading = true);
     try {
       // Load draft
-      final dr = await http.get(Uri.parse('$_api/api/v1/onboarding/draft'), headers: _h);
+      final dr = await http.get(Uri.parse('$_api/onboarding/draft'), headers: _h);
       if (dr.statusCode == 200) {
         final d = jsonDecode(dr.body);
         if (d['success'] == true && d['data'] != null) {
@@ -92,11 +92,11 @@ class _WizardState extends State<ClientOnboardingWizard> {
       }
 
       // Load entity types
-      final et = await http.get(Uri.parse('$_api/api/v1/legal-entity-types'));
+      final et = await http.get(Uri.parse('$_api/legal-entity-types'));
       if (et.statusCode == 200) _entityTypes = jsonDecode(et.body)['data'] ?? [];
 
       // Load sectors
-      final sc = await http.get(Uri.parse('$_api/api/v1/sectors'));
+      final sc = await http.get(Uri.parse('$_api/sectors'));
       if (sc.statusCode == 200) _sectors = jsonDecode(sc.body)['data'] ?? [];
 
       // Load sub sectors if sector selected
@@ -110,7 +110,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
   Future<void> _loadSubSectors(String mainCode) async {
     try {
-      final r = await http.get(Uri.parse('$_api/api/v1/sectors/$mainCode/sub'));
+      final r = await http.get(Uri.parse('$_api/sectors/$mainCode/sub'));
       if (r.statusCode == 200) _subSectors = jsonDecode(r.body)['data'] ?? [];
     } catch (_) {}
   }
@@ -119,7 +119,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
     const stages = ['entity_info', 'legal_entity', 'sector', 'sector', 'client_type', 'documents', 'review'];
     if (_step < stages.length) {
       try {
-        final r = await http.get(Uri.parse('$_api/api/v1/stage-notes/client_onboarding/${stages[_step]}'));
+        final r = await http.get(Uri.parse('$_api/stage-notes/client_onboarding/${stages[_step]}'));
         if (r.statusCode == 200) {
           final d = jsonDecode(r.body);
           if (d['success'] == true) _stageNote = d['data'];
@@ -130,7 +130,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
   Future<void> _saveDraft() async {
     try {
-      await http.post(Uri.parse('$_api/api/v1/onboarding/draft'), headers: _h,
+      await http.post(Uri.parse('$_api/onboarding/draft'), headers: _h,
         body: jsonEncode({
           'step_completed': _step,
           'draft_data': {
@@ -148,15 +148,15 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
   void _next() async {
     if (_step == 0 && _nameArC.text.trim().isEmpty) {
-      setState(() => _error = 'الاسم العربي مطلوب');
+      setState(() => _error = 'ط§ظ„ط§ط³ظ… ط§ظ„ط¹ط±ط¨ظٹ ظ…ط·ظ„ظˆط¨');
       return;
     }
     if (_step == 1 && _selectedEntityType == null) {
-      setState(() => _error = 'اختر الشكل القانوني');
+      setState(() => _error = 'ط§ط®طھط± ط§ظ„ط´ظƒظ„ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ');
       return;
     }
     if (_step == 2 && _selectedSector == null) {
-      setState(() => _error = 'اختر النشاط الرئيسي');
+      setState(() => _error = 'ط§ط®طھط± ط§ظ„ظ†ط´ط§ط· ط§ظ„ط±ط¦ظٹط³ظٹ');
       return;
     }
     setState(() { _error = null; _step++; });
@@ -186,14 +186,14 @@ class _WizardState extends State<ClientOnboardingWizard> {
       if (mounted) {
         if (r.statusCode == 200 && d['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم إنشاء العميل بنجاح'), backgroundColor: Colors.green));
+            const SnackBar(content: Text('طھظ… ط¥ظ†ط´ط§ط، ط§ظ„ط¹ظ…ظٹظ„ ط¨ظ†ط¬ط§ط­'), backgroundColor: Colors.green));
           Navigator.pop(context, true);
         } else {
-          setState(() { _error = d['detail'] ?? d['error'] ?? 'فشل الإنشاء'; _loading = false; });
+          setState(() { _error = d['detail'] ?? d['error'] ?? 'ظپط´ظ„ ط§ظ„ط¥ظ†ط´ط§ط،'; _loading = false; });
         }
       }
     } catch (e) {
-      if (mounted) setState(() { _error = 'خطأ: $e'; _loading = false; });
+      if (mounted) setState(() { _error = 'ط®ط·ط£: $e'; _loading = false; });
     }
   }
 
@@ -207,12 +207,12 @@ class _WizardState extends State<ClientOnboardingWizard> {
     return Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
-        title: const Text('تسجيل عميل جديد', style: TextStyle(color: AC.gold)),
+        title: const Text('طھط³ط¬ظٹظ„ ط¹ظ…ظٹظ„ ط¬ط¯ظٹط¯', style: TextStyle(color: AC.gold)),
         leading: _step > 0 ? IconButton(icon: const Icon(Icons.arrow_back, color: AC.gold), onPressed: _back) : null,
         actions: [
           if (_stageNote != null) IconButton(
             icon: const Icon(Icons.help_outline, color: AC.gold),
-            tooltip: 'لماذا هذه الخطوة؟',
+            tooltip: 'ظ„ظ…ط§ط°ط§ ظ‡ط°ظ‡ ط§ظ„ط®ط·ظˆط©طں',
             onPressed: () => _showStageNote(context)),
         ],
       ),
@@ -231,14 +231,14 @@ class _WizardState extends State<ClientOnboardingWizard> {
           if (_step > 0) Expanded(child: OutlinedButton(
             onPressed: _back,
             style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold), padding: const EdgeInsets.symmetric(vertical: 14)),
-            child: const Text('السابق', style: TextStyle(color: AC.gold)))),
+            child: const Text('ط§ظ„ط³ط§ط¨ظ‚', style: TextStyle(color: AC.gold)))),
           if (_step > 0) const SizedBox(width: 12),
           Expanded(child: ElevatedButton(
             onPressed: _step == 6 ? _submit : _next,
             style: ElevatedButton.styleFrom(
               backgroundColor: _step == 6 ? Colors.green.shade700 : AC.gold,
               padding: const EdgeInsets.symmetric(vertical: 14)),
-            child: Text(_step == 6 ? 'إنشاء العميل' : 'التالي',
+            child: Text(_step == 6 ? 'ط¥ظ†ط´ط§ط، ط§ظ„ط¹ظ…ظٹظ„' : 'ط§ظ„طھط§ظ„ظٹ',
               style: TextStyle(color: _step == 6 ? Colors.white : AC.navy, fontWeight: FontWeight.bold)))),
         ])),
       ]),
@@ -251,7 +251,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('خطوة ' + (_step + 1).toString() + ' من 7', style: const TextStyle(color: AC.ts, fontSize: 12)),
+          Text('ط®ط·ظˆط© ' + (_step + 1).toString() + ' ظ…ظ† 7', style: const TextStyle(color: AC.ts, fontSize: 12)),
           Text(percent.toString() + '%', style: const TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
         ]),
         const SizedBox(height: 6),
@@ -265,7 +265,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
   }
 
   String _stepTitle() {
-    const titles = ['بيانات الكيان', 'الشكل القانوني', 'النشاط الرئيسي', 'النشاط الفرعي', 'نوع العميل', 'المستندات', 'المراجعة والتفعيل'];
+    const titles = ['ط¨ظٹط§ظ†ط§طھ ط§ظ„ظƒظٹط§ظ†', 'ط§ظ„ط´ظƒظ„ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ', 'ط§ظ„ظ†ط´ط§ط· ط§ظ„ط±ط¦ظٹط³ظٹ', 'ط§ظ„ظ†ط´ط§ط· ط§ظ„ظپط±ط¹ظٹ', 'ظ†ظˆط¹ ط§ظ„ط¹ظ…ظٹظ„', 'ط§ظ„ظ…ط³طھظ†ط¯ط§طھ', 'ط§ظ„ظ…ط±ط§ط¬ط¹ط© ظˆط§ظ„طھظپط¹ظٹظ„'];
     return titles[_step.clamp(0, 6)];
   }
 
@@ -283,12 +283,12 @@ class _WizardState extends State<ClientOnboardingWizard> {
   }
 
   Widget _stepEntityInfo() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-    _field('الاسم التجاري (عربي) *', _nameArC, Icons.business),
-    _field('الاسم التجاري (إنجليزي)', _nameEnC, Icons.business),
-    _field('السجل التجاري', _crC, Icons.assignment),
-    _field('الرقم الضريبي', _taxC, Icons.receipt),
-    _field('العنوان الوطني', _addressC, Icons.location_on),
-    _field('المدينة', _cityC, Icons.location_city),
+    _field('ط§ظ„ط§ط³ظ… ط§ظ„طھط¬ط§ط±ظٹ (ط¹ط±ط¨ظٹ) *', _nameArC, Icons.business),
+    _field('ط§ظ„ط§ط³ظ… ط§ظ„طھط¬ط§ط±ظٹ (ط¥ظ†ط¬ظ„ظٹط²ظٹ)', _nameEnC, Icons.business),
+    _field('ط§ظ„ط³ط¬ظ„ ط§ظ„طھط¬ط§ط±ظٹ', _crC, Icons.assignment),
+    _field('ط§ظ„ط±ظ‚ظ… ط§ظ„ط¶ط±ظٹط¨ظٹ', _taxC, Icons.receipt),
+    _field('ط§ظ„ط¹ظ†ظˆط§ظ† ط§ظ„ظˆط·ظ†ظٹ', _addressC, Icons.location_on),
+    _field('ط§ظ„ظ…ط¯ظٹظ†ط©', _cityC, Icons.location_city),
   ]);
 
   Widget _field(String label, TextEditingController c, IconData icon) => Padding(
@@ -305,45 +305,45 @@ class _WizardState extends State<ClientOnboardingWizard> {
         _loadSubSectors(v!).then((_) { if (mounted) setState(() {}); }); })).toList());
 
   Widget _stepSubSector() => _subSectors.isEmpty
-    ? const Center(child: Padding(padding: EdgeInsets.all(32), child: Text('اختر النشاط الرئيسي أولاً أو لا توجد أنشطة فرعية', style: TextStyle(color: AC.ts))))
+    ? const Center(child: Padding(padding: EdgeInsets.all(32), child: Text('ط§ط®طھط± ط§ظ„ظ†ط´ط§ط· ط§ظ„ط±ط¦ظٹط³ظٹ ط£ظˆظ„ط§ظ‹ ط£ظˆ ظ„ط§ طھظˆط¬ط¯ ط£ظ†ط´ط·ط© ظپط±ط¹ظٹط©', style: TextStyle(color: AC.ts))))
     : Column(children: _subSectors.map((s) {
         final hasLicense = s['requires_license'] == true;
-        return _radioTile(s['code'], s['name_ar'], hasLicense ? 'يتطلب ترخيص' : '', _selectedSubSector,
-          (v) => setState(() => _selectedSubSector = v), badge: hasLicense ? 'مرخص' : null);
+        return _radioTile(s['code'], s['name_ar'], hasLicense ? 'ظٹطھط·ظ„ط¨ طھط±ط®ظٹطµ' : '', _selectedSubSector,
+          (v) => setState(() => _selectedSubSector = v), badge: hasLicense ? 'ظ…ط±ط®طµ' : null);
       }).toList());
 
   Widget _stepClientType() {
     const types = [
-      {'code': 'standard_business', 'label': 'شركة تجارية عادية', 'km': false},
-      {'code': 'financial_entity', 'label': 'جهة مالية', 'km': true},
-      {'code': 'accounting_firm', 'label': 'مكتب محاسبة', 'km': true},
-      {'code': 'audit_firm', 'label': 'مكتب مراجعة', 'km': true},
-      {'code': 'investment_entity', 'label': 'جهة استثمارية', 'km': true},
-      {'code': 'government_entity', 'label': 'جهة حكومية', 'km': true},
-      {'code': 'legal_regulatory_entity', 'label': 'جهة قانونية/تنظيمية', 'km': true},
+      {'code': 'standard_business', 'label': 'ط´ط±ظƒط© طھط¬ط§ط±ظٹط© ط¹ط§ط¯ظٹط©', 'km': false},
+      {'code': 'financial_entity', 'label': 'ط¬ظ‡ط© ظ…ط§ظ„ظٹط©', 'km': true},
+      {'code': 'accounting_firm', 'label': 'ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط©', 'km': true},
+      {'code': 'audit_firm', 'label': 'ظ…ظƒطھط¨ ظ…ط±ط§ط¬ط¹ط©', 'km': true},
+      {'code': 'investment_entity', 'label': 'ط¬ظ‡ط© ط§ط³طھط«ظ…ط§ط±ظٹط©', 'km': true},
+      {'code': 'government_entity', 'label': 'ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط©', 'km': true},
+      {'code': 'legal_regulatory_entity', 'label': 'ط¬ظ‡ط© ظ‚ط§ظ†ظˆظ†ظٹط©/طھظ†ط¸ظٹظ…ظٹط©', 'km': true},
     ];
     return Column(children: types.map((t) =>
       _radioTile(t['code'] as String, t['label'] as String, '', _clientType,
         (v) => setState(() => _clientType = v!),
-        badge: (t['km'] as bool) ? 'معرفي' : null)).toList());
+        badge: (t['km'] as bool) ? 'ظ…ط¹ط±ظپظٹ' : null)).toList());
   }
 
   Widget _stepDocuments() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
     const Icon(Icons.cloud_upload, size: 48, color: AC.gold),
     const SizedBox(height: 12),
-    const Text('المستندات المطلوبة ستظهر بناءً على نوع الكيان والنشاط',
+    const Text('ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ظ…ط·ظ„ظˆط¨ط© ط³طھط¸ظ‡ط± ط¨ظ†ط§ط،ظ‹ ط¹ظ„ظ‰ ظ†ظˆط¹ ط§ظ„ظƒظٹط§ظ† ظˆط§ظ„ظ†ط´ط§ط·',
       textAlign: TextAlign.center, style: TextStyle(color: AC.ts, fontSize: 14)),
     const SizedBox(height: 12),
     Container(padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('المستندات الأساسية:', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)),
+        const Text('ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ط£ط³ط§ط³ظٹط©:', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        _docRow('السجل التجاري', _crC.text.isNotEmpty),
-        _docRow('الرقم الضريبي', _taxC.text.isNotEmpty),
-        _docRow('العنوان الوطني', _addressC.text.isNotEmpty),
+        _docRow('ط§ظ„ط³ط¬ظ„ ط§ظ„طھط¬ط§ط±ظٹ', _crC.text.isNotEmpty),
+        _docRow('ط§ظ„ط±ظ‚ظ… ط§ظ„ط¶ط±ظٹط¨ظٹ', _taxC.text.isNotEmpty),
+        _docRow('ط§ظ„ط¹ظ†ظˆط§ظ† ط§ظ„ظˆط·ظ†ظٹ', _addressC.text.isNotEmpty),
         if (_selectedEntityType != null && _selectedEntityType != 'individual')
-          _docRow('عقد التأسيس', false),
+          _docRow('ط¹ظ‚ط¯ ط§ظ„طھط£ط³ظٹط³', false),
       ])),
   ]);
 
@@ -358,25 +358,25 @@ class _WizardState extends State<ClientOnboardingWizard> {
   Widget _stepReview() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
     const Icon(Icons.verified, size: 48, color: AC.ok),
     const SizedBox(height: 12),
-    const Text('مراجعة البيانات قبل الإنشاء', textAlign: TextAlign.center,
+    const Text('ظ…ط±ط§ط¬ط¹ط© ط§ظ„ط¨ظٹط§ظ†ط§طھ ظ‚ط¨ظ„ ط§ظ„ط¥ظ†ط´ط§ط،', textAlign: TextAlign.center,
       style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
     const SizedBox(height: 16),
-    _reviewRow('الاسم العربي', _nameArC.text),
-    _reviewRow('الاسم الإنجليزي', _nameEnC.text),
-    _reviewRow('السجل التجاري', _crC.text),
-    _reviewRow('الرقم الضريبي', _taxC.text),
-    _reviewRow('الشكل القانوني', _selectedEntityType ?? '—'),
-    _reviewRow('النشاط الرئيسي', _selectedSector ?? '—'),
-    _reviewRow('النشاط الفرعي', _selectedSubSector ?? '—'),
-    _reviewRow('نوع العميل', _clientType),
-    _reviewRow('المدينة', _cityC.text),
+    _reviewRow('ط§ظ„ط§ط³ظ… ط§ظ„ط¹ط±ط¨ظٹ', _nameArC.text),
+    _reviewRow('ط§ظ„ط§ط³ظ… ط§ظ„ط¥ظ†ط¬ظ„ظٹط²ظٹ', _nameEnC.text),
+    _reviewRow('ط§ظ„ط³ط¬ظ„ ط§ظ„طھط¬ط§ط±ظٹ', _crC.text),
+    _reviewRow('ط§ظ„ط±ظ‚ظ… ط§ظ„ط¶ط±ظٹط¨ظٹ', _taxC.text),
+    _reviewRow('ط§ظ„ط´ظƒظ„ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ', _selectedEntityType ?? 'â€”'),
+    _reviewRow('ط§ظ„ظ†ط´ط§ط· ط§ظ„ط±ط¦ظٹط³ظٹ', _selectedSector ?? 'â€”'),
+    _reviewRow('ط§ظ„ظ†ط´ط§ط· ط§ظ„ظپط±ط¹ظٹ', _selectedSubSector ?? 'â€”'),
+    _reviewRow('ظ†ظˆط¹ ط§ظ„ط¹ظ…ظٹظ„', _clientType),
+    _reviewRow('ط§ظ„ظ…ط¯ظٹظ†ط©', _cityC.text),
   ]);
 
   Widget _reviewRow(String label, String value) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(label, style: const TextStyle(color: AC.ts, fontSize: 13)),
-      Flexible(child: Text(value.isEmpty ? '—' : value,
+      Flexible(child: Text(value.isEmpty ? 'â€”' : value,
         style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold), textAlign: TextAlign.end)),
     ]));
 
@@ -420,15 +420,16 @@ class _WizardState extends State<ClientOnboardingWizard> {
           Text(_stageNote!['body_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13, height: 1.6)),
           if (_stageNote!['common_errors_ar'] != null) ...[
             const SizedBox(height: 12),
-            const Text('أخطاء شائعة:', style: TextStyle(color: AC.warn, fontWeight: FontWeight.bold, fontSize: 12)),
+            const Text('ط£ط®ط·ط§ط، ط´ط§ط¦ط¹ط©:', style: TextStyle(color: AC.warn, fontWeight: FontWeight.bold, fontSize: 12)),
             Text(_stageNote!['common_errors_ar'], style: const TextStyle(color: AC.warn, fontSize: 12)),
           ],
           if (_stageNote!['impact_ar'] != null) ...[
             const SizedBox(height: 12),
-            const Text('أثر عدم الإكمال:', style: TextStyle(color: AC.err, fontWeight: FontWeight.bold, fontSize: 12)),
+            const Text('ط£ط«ط± ط¹ط¯ظ… ط§ظ„ط¥ظƒظ…ط§ظ„:', style: TextStyle(color: AC.err, fontWeight: FontWeight.bold, fontSize: 12)),
             Text(_stageNote!['impact_ar'], style: const TextStyle(color: AC.err, fontSize: 12)),
           ],
           const SizedBox(height: 20),
         ])));
   }
 }
+

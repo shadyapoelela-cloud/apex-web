@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -52,13 +52,13 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
   Map<String, String> get _h => {'Authorization': 'Bearer ${widget.token ?? ""}'};
 
   static const _stages = [
-    {'key': 'coa_setup', 'label': 'شجرة الحسابات', 'icon': Icons.account_tree},
-    {'key': 'tb_upload', 'label': 'ميزان المراجعة', 'icon': Icons.balance},
-    {'key': 'audit_program', 'label': 'برنامج المراجعة', 'icon': Icons.checklist},
-    {'key': 'sampling', 'label': 'العينات', 'icon': Icons.filter_list},
-    {'key': 'execution', 'label': 'أوراق العمل', 'icon': Icons.edit_document},
-    {'key': 'findings', 'label': 'الملاحظات', 'icon': Icons.warning_amber},
-    {'key': 'report', 'label': 'التقرير', 'icon': Icons.description},
+    {'key': 'coa_setup', 'label': 'ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ', 'icon': Icons.account_tree},
+    {'key': 'tb_upload', 'label': 'ظ…ظٹط²ط§ظ† ط§ظ„ظ…ط±ط§ط¬ط¹ط©', 'icon': Icons.balance},
+    {'key': 'audit_program', 'label': 'ط¨ط±ظ†ط§ظ…ط¬ ط§ظ„ظ…ط±ط§ط¬ط¹ط©', 'icon': Icons.checklist},
+    {'key': 'sampling', 'label': 'ط§ظ„ط¹ظٹظ†ط§طھ', 'icon': Icons.filter_list},
+    {'key': 'execution', 'label': 'ط£ظˆط±ط§ظ‚ ط§ظ„ط¹ظ…ظ„', 'icon': Icons.edit_document},
+    {'key': 'findings', 'label': 'ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ', 'icon': Icons.warning_amber},
+    {'key': 'report', 'label': 'ط§ظ„طھظ‚ط±ظٹط±', 'icon': Icons.description},
   ];
 
   @override
@@ -71,13 +71,13 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
   Future<void> _loadAll() async {
     setState(() => _loading = true);
     try {
-      final tR = await http.get(Uri.parse('$_api/api/v1/audit/templates'), headers: _h);
+      final tR = await http.get(Uri.parse('$_api/audit/templates'), headers: _h);
       if (tR.statusCode == 200) _templates = jsonDecode(tR.body)['data'] ?? [];
-      final sR = await http.get(Uri.parse('$_api/api/v1/audit/cases/${widget.caseId}/samples'), headers: _h);
+      final sR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/samples'), headers: _h);
       if (sR.statusCode == 200) _samples = jsonDecode(sR.body)['data'] ?? [];
-      final wR = await http.get(Uri.parse('$_api/api/v1/audit/cases/${widget.caseId}/workpapers'), headers: _h);
+      final wR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/workpapers'), headers: _h);
       if (wR.statusCode == 200) _workpapers = jsonDecode(wR.body)['data'] ?? [];
-      final fR = await http.get(Uri.parse('$_api/api/v1/audit/cases/${widget.caseId}/findings'), headers: _h);
+      final fR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/findings'), headers: _h);
       if (fR.statusCode == 200) _findings = jsonDecode(fR.body)['data'] ?? [];
     } catch (_) {}
     if (mounted) setState(() => _loading = false);
@@ -89,7 +89,7 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
     appBar: AppBar(
-      title: Text('المراجعة: ' + widget.clientName, style: const TextStyle(color: AC.gold, fontSize: 14)),
+      title: Text('ط§ظ„ظ…ط±ط§ط¬ط¹ط©: ' + widget.clientName, style: const TextStyle(color: AC.gold, fontSize: 14)),
       backgroundColor: AC.navy2,
       bottom: TabBar(controller: _tabC, isScrollable: true,
         labelColor: AC.gold, unselectedLabelColor: AC.ts, indicatorColor: AC.gold,
@@ -97,10 +97,10 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
     ),
     body: _loading ? const Center(child: CircularProgressIndicator(color: AC.gold))
       : TabBarView(controller: _tabC, children: [
-          _stageView('شجرة الحسابات', 'تأكد من اعتماد شجرة الحسابات', [_card('الحالة', [_kv('الشجرة', 'معتمدة', vc: AC.ok)])]),
-          _stageView('ميزان المراجعة', 'ارفع الميزان وتأكد من ربطه', [_card('الحالة', [_kv('الميزان', 'مربوط', vc: AC.ok)])]),
-          _stageView('برنامج المراجعة', 'إجراءات المراجعة', [_card('الإجراءات (' + _templates.length.toString() + ')',
-            _templates.isEmpty ? [const Text('لا توجد إجراءات', style: TextStyle(color: AC.ts))]
+          _stageView('ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ', 'طھط£ظƒط¯ ظ…ظ† ط§ط¹طھظ…ط§ط¯ ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ', [_card('ط§ظ„ط­ط§ظ„ط©', [_kv('ط§ظ„ط´ط¬ط±ط©', 'ظ…ط¹طھظ…ط¯ط©', vc: AC.ok)])]),
+          _stageView('ظ…ظٹط²ط§ظ† ط§ظ„ظ…ط±ط§ط¬ط¹ط©', 'ط§ط±ظپط¹ ط§ظ„ظ…ظٹط²ط§ظ† ظˆطھط£ظƒط¯ ظ…ظ† ط±ط¨ط·ظ‡', [_card('ط§ظ„ط­ط§ظ„ط©', [_kv('ط§ظ„ظ…ظٹط²ط§ظ†', 'ظ…ط±ط¨ظˆط·', vc: AC.ok)])]),
+          _stageView('ط¨ط±ظ†ط§ظ…ط¬ ط§ظ„ظ…ط±ط§ط¬ط¹ط©', 'ط¥ط¬ط±ط§ط،ط§طھ ط§ظ„ظ…ط±ط§ط¬ط¹ط©', [_card('ط§ظ„ط¥ط¬ط±ط§ط،ط§طھ (' + _templates.length.toString() + ')',
+            _templates.isEmpty ? [const Text('ظ„ط§ طھظˆط¬ط¯ ط¥ط¬ط±ط§ط،ط§طھ', style: TextStyle(color: AC.ts))]
             : _templates.take(10).map((t) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Row(children: [
                 Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle,
                   color: t['risk_level'] == 'high' ? AC.err : t['risk_level'] == 'medium' ? AC.warn : AC.ok)),
@@ -108,15 +108,15 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
                 Expanded(child: Text(t['title_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13))),
                 Text(t['risk_level'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 11)),
               ]))).toList())]),
-          _stageView('العينات', 'اختيار عينات المراجعة', [_card('العينات (' + _samples.length.toString() + ')',
-            _samples.isEmpty ? [const Text('لم يتم اختيار عينات', style: TextStyle(color: AC.ts))]
+          _stageView('ط§ظ„ط¹ظٹظ†ط§طھ', 'ط§ط®طھظٹط§ط± ط¹ظٹظ†ط§طھ ط§ظ„ظ…ط±ط§ط¬ط¹ط©', [_card('ط§ظ„ط¹ظٹظ†ط§طھ (' + _samples.length.toString() + ')',
+            _samples.isEmpty ? [const Text('ظ„ظ… ظٹطھظ… ط§ط®طھظٹط§ط± ط¹ظٹظ†ط§طھ', style: TextStyle(color: AC.ts))]
             : _samples.map((s) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Text(s['area'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13)),
-                  Text((s['selected_count'] ?? 0).toString() + ' عينة', style: const TextStyle(color: AC.cyan, fontSize: 12)),
+                  Text((s['selected_count'] ?? 0).toString() + ' ط¹ظٹظ†ط©', style: const TextStyle(color: AC.cyan, fontSize: 12)),
                 ]))).toList())]),
-          _stageView('أوراق العمل', 'توثيق تنفيذ الاختبارات', [_card('أوراق العمل (' + _workpapers.length.toString() + ')',
-            _workpapers.isEmpty ? [const Text('لا توجد أوراق عمل', style: TextStyle(color: AC.ts))]
+          _stageView('ط£ظˆط±ط§ظ‚ ط§ظ„ط¹ظ…ظ„', 'طھظˆط«ظٹظ‚ طھظ†ظپظٹط° ط§ظ„ط§ط®طھط¨ط§ط±ط§طھ', [_card('ط£ظˆط±ط§ظ‚ ط§ظ„ط¹ظ…ظ„ (' + _workpapers.length.toString() + ')',
+            _workpapers.isEmpty ? [const Text('ظ„ط§ طھظˆط¬ط¯ ط£ظˆط±ط§ظ‚ ط¹ظ…ظ„', style: TextStyle(color: AC.ts))]
             : _workpapers.map((w) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: AC.navy, borderRadius: BorderRadius.circular(8)),
                 child: Row(children: [
@@ -125,8 +125,8 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
                   const SizedBox(width: 8),
                   Expanded(child: Text(w['procedure_code'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold))),
                 ]))).toList())]),
-          _stageView('الملاحظات', 'تجميع الملاحظات', [_card('الملاحظات (' + _findings.length.toString() + ')',
-            _findings.isEmpty ? [const Text('لا توجد ملاحظات', style: TextStyle(color: AC.ts))]
+          _stageView('ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ', 'طھط¬ظ…ظٹط¹ ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ', [_card('ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ (' + _findings.length.toString() + ')',
+            _findings.isEmpty ? [const Text('ظ„ط§ طھظˆط¬ط¯ ظ…ظ„ط§ط­ط¸ط§طھ', style: TextStyle(color: AC.ts))]
             : _findings.map((f) => Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: AC.navy, borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: f['severity'] == 'critical' ? AC.err : AC.bdr)),
@@ -134,18 +134,18 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
                   Expanded(child: Text(f['title_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold))),
                   _badge(f['severity'] ?? '', f['severity'] == 'critical' ? AC.err : f['severity'] == 'high' ? AC.warn : AC.ok),
                 ]))).toList())]),
-          _stageView('التقرير', 'مسودة التقرير النهائي', [
-            _card('ملخص المراجعة', [
-              _kv('الإجراءات', _templates.length.toString()),
-              _kv('العينات', _samples.length.toString()),
-              _kv('أوراق العمل', _workpapers.length.toString()),
-              _kv('الملاحظات', _findings.length.toString(), vc: _findings.isNotEmpty ? AC.warn : AC.ok),
+          _stageView('ط§ظ„طھظ‚ط±ظٹط±', 'ظ…ط³ظˆط¯ط© ط§ظ„طھظ‚ط±ظٹط± ط§ظ„ظ†ظ‡ط§ط¦ظٹ', [
+            _card('ظ…ظ„ط®طµ ط§ظ„ظ…ط±ط§ط¬ط¹ط©', [
+              _kv('ط§ظ„ط¥ط¬ط±ط§ط،ط§طھ', _templates.length.toString()),
+              _kv('ط§ظ„ط¹ظٹظ†ط§طھ', _samples.length.toString()),
+              _kv('ط£ظˆط±ط§ظ‚ ط§ظ„ط¹ظ…ظ„', _workpapers.length.toString()),
+              _kv('ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ', _findings.length.toString(), vc: _findings.isNotEmpty ? AC.warn : AC.ok),
             ]),
             Container(padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(color: AC.warn.withOpacity(0.1), borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AC.warn.withOpacity(0.3))),
               child: const Row(children: [Icon(Icons.person_search, color: AC.warn, size: 20), SizedBox(width: 8),
-                Expanded(child: Text('التقرير يتطلب اعتماد المشرف قبل الإصدار', style: TextStyle(color: AC.warn, fontSize: 12)))])),
+                Expanded(child: Text('ط§ظ„طھظ‚ط±ظٹط± ظٹطھط·ظ„ط¨ ط§ط¹طھظ…ط§ط¯ ط§ظ„ظ…ط´ط±ظپ ظ‚ط¨ظ„ ط§ظ„ط¥طµط¯ط§ط±', style: TextStyle(color: AC.warn, fontSize: 12)))])),
           ]),
         ]),
   );
@@ -160,3 +160,4 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
       ...children,
     ]));
 }
+

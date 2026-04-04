@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -29,8 +29,8 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   String? _selectedCategory;
 
   static const _categories = <String?, String>{
-    null: 'الكل', 'financial': 'مالية', 'audit': 'رقابية',
-    'compliance': 'امتثال', 'readiness': 'جاهزية', 'advisory': 'استشارية',
+    null: 'ط§ظ„ظƒظ„', 'financial': 'ظ…ط§ظ„ظٹط©', 'audit': 'ط±ظ‚ط§ط¨ظٹط©',
+    'compliance': 'ط§ظ…طھط«ط§ظ„', 'readiness': 'ط¬ط§ظ‡ط²ظٹط©', 'advisory': 'ط§ط³طھط´ط§ط±ظٹط©',
   };
 
   Map<String, String> get _h => {'Authorization': 'Bearer ${widget.token ?? ""}', 'Content-Type': 'application/json'};
@@ -40,7 +40,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      String url = '$_api/api/v1/services/catalog';
+      String url = '$_api/services/catalog';
       if (_selectedCategory != null) url += '?category=$_selectedCategory';
       final r = await http.get(Uri.parse(url));
       if (r.statusCode == 200) {
@@ -53,7 +53,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('كتالوج الخدمات', style: TextStyle(color: AC.gold)), backgroundColor: const Color(0xFF080F1F)),
+    appBar: AppBar(title: const Text('ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.gold)), backgroundColor: const Color(0xFF080F1F)),
     body: Column(children: [
       SingleChildScrollView(scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.all(12),
@@ -71,7 +71,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
       Expanded(child: _loading
         ? const Center(child: CircularProgressIndicator(color: AC.gold))
         : _services.isEmpty
-          ? const Center(child: Text('لا توجد خدمات', style: TextStyle(color: AC.ts)))
+          ? const Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.ts)))
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               itemCount: _services.length,
@@ -88,21 +88,21 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
                       Expanded(child: Text(s['title_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
                       Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-                        child: Text(stagesCount + ' مراحل', style: const TextStyle(color: AC.cyan, fontSize: 11))),
+                        child: Text(stagesCount + ' ظ…ط±ط§ط­ظ„', style: const TextStyle(color: AC.cyan, fontSize: 11))),
                     ]),
                     const SizedBox(height: 6),
                     Row(children: [
-                      if (s['requires_coa'] == true) _tag('يتطلب COA', AC.warn),
-                      if (s['requires_tb'] == true) _tag('يتطلب TB', AC.warn),
+                      if (s['requires_coa'] == true) _tag('ظٹطھط·ظ„ط¨ COA', AC.warn),
+                      if (s['requires_tb'] == true) _tag('ظٹطھط·ظ„ط¨ TB', AC.warn),
                       _tag(s['category'] ?? '', AC.gold),
                       const Spacer(),
-                      _tag('الحد الأدنى: ' + minPlan, AC.ts),
+                      _tag('ط§ظ„ط­ط¯ ط§ظ„ط£ط¯ظ†ظ‰: ' + minPlan, AC.ts),
                     ]),
                     const SizedBox(height: 10),
                     SizedBox(width: double.infinity, child: ElevatedButton(
                       onPressed: () => _startService(s['service_code']),
                       style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy),
-                      child: const Text('بدء الخدمة'))),
+                      child: const Text('ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط©'))),
                   ]),
                 );
               })),
@@ -117,16 +117,17 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
 
   Future<void> _startService(String code) async {
     try {
-      final r = await http.post(Uri.parse('$_api/api/v1/services/cases'), headers: _h,
+      final r = await http.post(Uri.parse('$_api/services/cases'), headers: _h,
         body: jsonEncode({'client_id': widget.clientId, 'service_code': code}));
       if (r.statusCode == 200) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم بدء الخدمة بنجاح'), backgroundColor: Colors.green));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('طھظ… ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط© ط¨ظ†ط¬ط§ط­'), backgroundColor: Colors.green));
       } else {
         final d = jsonDecode(r.body);
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(d['detail'] ?? 'فشل'), backgroundColor: Colors.red));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(d['detail'] ?? 'ظپط´ظ„'), backgroundColor: Colors.red));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ط®ط·ط£: $e'), backgroundColor: Colors.red));
     }
   }
 }
+

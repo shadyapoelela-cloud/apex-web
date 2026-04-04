@@ -43,33 +43,33 @@ class ApiService {
 
 
   // ── Client Onboarding (New) ──
-  static Future<ApiResult> getLegalEntityTypes() => _get('/api/v1/legal-entity-types');
-  static Future<ApiResult> getSectors() => _get('/api/v1/sectors');
-  static Future<ApiResult> getSubSectors(String mainCode) => _get('/api/v1/sectors/$mainCode/sub');
-  static Future<ApiResult> getOnboardingDraft() => _get('/api/v1/onboarding/draft');
-  static Future<ApiResult> saveOnboardingDraft({required int step, required Map data}) => _post('/api/v1/onboarding/draft', {'step_completed':step,'draft_data':data});
-  static Future<ApiResult> getClientRequiredDocs(String clientId) => _get('/api/v1/clients/$clientId/required-documents');
-  static Future<ApiResult> getStageNotes(String service, String stage, {String role='all'}) => _get('/api/v1/stage-notes/$service/$stage?role=$role');
+  static Future<ApiResult> getLegalEntityTypes() => _get('/legal-entity-types');
+  static Future<ApiResult> getSectors() => _get('/sectors');
+  static Future<ApiResult> getSubSectors(String mainCode) => _get('/sectors/$mainCode/sub');
+  static Future<ApiResult> getOnboardingDraft() => _get('/onboarding/draft');
+  static Future<ApiResult> saveOnboardingDraft({required int step, required Map data}) => _post('/onboarding/draft', {'step_completed':step,'draft_data':data});
+  static Future<ApiResult> getClientRequiredDocs(String clientId) => _get('/clients/$clientId/required-documents');
+  static Future<ApiResult> getStageNotes(String service, String stage, {String role='all'}) => _get('/stage-notes/$service/$stage?role=$role');
 
   // ── Archive (New) ──
-  static Future<ApiResult> getUserArchive({int page=1}) => _get('/api/v1/account/archive?page=$page');
-  static Future<ApiResult> getClientArchive(String clientId, {int page=1}) => _get('/api/v1/clients/$clientId/archive?page=$page');
-  static Future<ApiResult> attachFromArchive(String itemId, {required String processType, required String processId}) => _post('/api/v1/archive/items/$itemId/attach', {'target_process_type':processType,'target_process_id':processId});
+  static Future<ApiResult> getUserArchive({int page=1}) => _get('/account/archive?page=$page');
+  static Future<ApiResult> getClientArchive(String clientId, {int page=1}) => _get('/clients/$clientId/archive?page=$page');
+  static Future<ApiResult> attachFromArchive(String itemId, {required String processType, required String processId}) => _post('/archive/items/$itemId/attach', {'target_process_type':processType,'target_process_id':processId});
 
   // ── Service Catalog (New) ──
-  static Future<ApiResult> getServiceCatalog({String? category}) => _get('/api/v1/services/catalog${category!=null?"?category=$category":""}');
-  static Future<ApiResult> getServiceDetail(String code) => _get('/api/v1/services/catalog/$code');
-  static Future<ApiResult> createServiceCase({required String clientId, required String serviceCode}) => _post('/api/v1/services/cases', {'client_id':clientId,'service_code':serviceCode});
-  static Future<ApiResult> getServiceCases({String? clientId}) => _get('/api/v1/services/cases${clientId!=null?"?client_id=$clientId":""}');
+  static Future<ApiResult> getServiceCatalog({String? category}) => _get('/services/catalog${category!=null?"?category=$category":""}');
+  static Future<ApiResult> getServiceDetail(String code) => _get('/services/catalog/$code');
+  static Future<ApiResult> createServiceCase({required String clientId, required String serviceCode}) => _post('/services/cases', {'client_id':clientId,'service_code':serviceCode});
+  static Future<ApiResult> getServiceCases({String? clientId}) => _get('/services/cases${clientId!=null?"?client_id=$clientId":""}');
 
   // ── Audit Service (New) ──
-  static Future<ApiResult> getAuditTemplates({String? area}) => _get('/api/v1/audit/templates${area!=null?"?area=$area":""}');
-  static Future<ApiResult> createAuditSample(String caseId, Map body) => _post('/api/v1/audit/cases/$caseId/samples', body);
-  static Future<ApiResult> getAuditSamples(String caseId) => _get('/api/v1/audit/cases/$caseId/samples');
-  static Future<ApiResult> createWorkpaper(String caseId, Map body) => _post('/api/v1/audit/cases/$caseId/workpapers', body);
-  static Future<ApiResult> getWorkpapers(String caseId) => _get('/api/v1/audit/cases/$caseId/workpapers');
-  static Future<ApiResult> createFinding(String caseId, Map body) => _post('/api/v1/audit/cases/$caseId/findings', body);
-  static Future<ApiResult> getFindings(String caseId) => _get('/api/v1/audit/cases/$caseId/findings');
+  static Future<ApiResult> getAuditTemplates({String? area}) => _get('/audit/templates${area!=null?"?area=$area":""}');
+  static Future<ApiResult> createAuditSample(String caseId, Map body) => _post('/audit/cases/$caseId/samples', body);
+  static Future<ApiResult> getAuditSamples(String caseId) => _get('/audit/cases/$caseId/samples');
+  static Future<ApiResult> createWorkpaper(String caseId, Map body) => _post('/audit/cases/$caseId/workpapers', body);
+  static Future<ApiResult> getWorkpapers(String caseId) => _get('/audit/cases/$caseId/workpapers');
+  static Future<ApiResult> createFinding(String caseId, Map body) => _post('/audit/cases/$caseId/findings', body);
+  static Future<ApiResult> getFindings(String caseId) => _get('/audit/cases/$caseId/findings');
 
   // ── COA ──
   static Future<ApiResult> uploadCoa({required String clientId, required List<int> bytes, required String fileName}) async {
@@ -189,4 +189,5 @@ class ApiResult {
   T? get<T>(String key) { if(data is Map) return data[key] as T?; return null; }
   @override String toString() => success?'ok($data)':'error($error)';
 }
+
 
