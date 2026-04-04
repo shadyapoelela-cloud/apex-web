@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'core/router.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -83,15 +85,15 @@ InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
 // ═══════════════════════════════════════════════════
 class ApexApp extends StatelessWidget {
   const ApexApp({super.key});
-  @override Widget build(BuildContext context) => MaterialApp(
+  @override Widget build(BuildContext context) => MaterialApp.router(
     title: 'APEX', debugShowCheckedModeBanner: false,
+    routerConfig: appRouter,
     theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: AC.navy,
       appBarTheme: const AppBarTheme(backgroundColor: AC.navy2, elevation: 0, centerTitle: true),
       elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
         backgroundColor: AC.gold, foregroundColor: AC.navy,
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))))),
-    home: const LoginScreen());
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))))));
 }
 
 // ═══════════════════════════════════════════════════
