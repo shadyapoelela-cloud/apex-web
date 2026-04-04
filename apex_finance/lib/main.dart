@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'core/router.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -23,13 +23,14 @@ import 'screens/extracted/legal_screens_v2.dart';
 import 'screens/extracted/client_screens.dart';
 import 'screens/extracted/coa_screens.dart';
 import 'screens/auth/forgot_password_flow.dart';
+import 'screens/copilot/copilot_screen.dart';
 const _api = 'https://apex-api-ootk.onrender.com';
 
 void main() => runApp(const ProviderScope(child: ApexApp()));
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // Design System
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AC {
   static const gold = Color(0xFFC9A84C);
   static const navy = Color(0xFF050D1A);
@@ -80,9 +81,9 @@ InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)));
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // App Root
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ApexApp extends StatelessWidget {
   const ApexApp({super.key});
   @override Widget build(BuildContext context) => MaterialApp.router(
@@ -96,9 +97,9 @@ class ApexApp extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))))));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // LOGIN
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override State<LoginScreen> createState() => _LoginS();
@@ -142,16 +143,16 @@ class _LoginS extends State<LoginScreen> {
         child: _l ? const SizedBox(height:20,width:20, child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(fontWeight: FontWeight.bold)))),
       const SizedBox(height: 8),
       TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ForgotPasswordScreen())),
-        child: const Text('نسيت كلمة المرور؟', style: TextStyle(color: AC.warn, fontSize: 13))),
+        child: const Text('ظ†ط³ظٹطھ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±طں', style: TextStyle(color: AC.warn, fontSize: 13))),
       const SizedBox(height: 4),
       TextButton(onPressed:()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const RegScreen())),
         child: const Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f \u0633\u062c\u0651\u0644 \u0627\u0644\u0622\u0646', style: TextStyle(color: AC.gold))),
     ])))));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // REGISTER
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class RegScreen extends StatefulWidget {
   const RegScreen({super.key});
   @override State<RegScreen> createState() => _RegS();
@@ -189,9 +190,9 @@ class _RegS extends State<RegScreen> {
       ])))));
 }
 
-// ═══════════════════════════════════════════════════
-// MAIN NAVIGATION — 6 tabs
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// MAIN NAVIGATION â€” 6 tabs
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class MainNav extends StatefulWidget {
   const MainNav({super.key});
   @override State<MainNav> createState() => _MainNavS();
@@ -200,6 +201,11 @@ class _MainNavS extends State<MainNav> {
   int _i = 0;
   @override Widget build(BuildContext c) => Scaffold(
     body: [const DashTab(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()][_i],
+        floatingActionButton: FloatingActionButton(
+      backgroundColor: AC.gold,
+      onPressed: () => context.go('/copilot'),
+      child: const Icon(Icons.smart_toy, color: AC.navy),
+    ),
     bottomNavigationBar: BottomNavigationBar(currentIndex:_i, onTap:(i)=>setState(()=>_i=i),
       type: BottomNavigationBarType.fixed, backgroundColor: AC.navy2,
       selectedItemColor: AC.gold, unselectedItemColor: AC.ts, selectedFontSize: 11, unselectedFontSize: 10,
@@ -214,9 +220,9 @@ class _MainNavS extends State<MainNav> {
       ]));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // DASHBOARD
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class DashTab extends ConsumerStatefulWidget { const DashTab({super.key}); @override ConsumerState<DashTab> createState()=>_DashS(); }
 class _DashS extends ConsumerState<DashTab> {
   Map<String,dynamic>? _sub; List _plans=[]; bool _ld=true; int _notifCount=0;
@@ -286,9 +292,9 @@ class _DashS extends ConsumerState<DashTab> {
       ])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // NOTIFICATIONS SCREEN (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
   @override ConsumerState<NotificationsScreen> createState() => _NotifS();
@@ -340,9 +346,9 @@ class _NotifS extends ConsumerState<NotificationsScreen> {
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // UPGRADE PLAN SCREEN (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class UpgradePlanScreen extends StatelessWidget {
   final List plans; final String? currentPlan;
   const UpgradePlanScreen({super.key, required this.plans, this.currentPlan});
@@ -382,9 +388,9 @@ class UpgradePlanScreen extends StatelessWidget {
     ]));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // CLIENTS TAB
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ClientsTab extends ConsumerStatefulWidget { const ClientsTab({super.key}); @override ConsumerState<ClientsTab> createState()=>_ClientsS(); }
 class _ClientsS extends ConsumerState<ClientsTab> {
   List _cl=[]; bool _ld=true;
@@ -460,9 +466,9 @@ class _NewCS extends State<NewClientScreen> {
         child: _l ? const CircularProgressIndicator(strokeWidth:2) : const Text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644')))])));
 }
 
-// ═══════════════════════════════════════════════════
-// ANALYSIS TAB — with Result Details Panel (!)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// ANALYSIS TAB â€” with Result Details Panel (!)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AnalysisTab extends ConsumerStatefulWidget { const AnalysisTab({super.key}); @override ConsumerState<AnalysisTab> createState()=>_AnalysisS(); }
 class _AnalysisS extends ConsumerState<AnalysisTab> {
   PlatformFile? _f; List<int>? _fb; bool _a=false; Map<String,dynamic>? _r; String? _e;
@@ -589,7 +595,7 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
               final bytes = await res.stream.toBytes();
               if (res.statusCode == 200) {
                 // PDF downloaded - show success
-                ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('تم تحميل التقرير بنجاح'), backgroundColor: Color(0xFF2ECC8A)));
+                ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('طھظ… طھط­ظ…ظٹظ„ ط§ظ„طھظ‚ط±ظٹط± ط¨ظ†ط¬ط§ط­'), backgroundColor: Color(0xFF2ECC8A)));
               }
             } catch (e) {
               ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u062e\u0637\u0623: $e'), backgroundColor: AC.navy3));
@@ -605,9 +611,9 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // KNOWLEDGE FEEDBACK (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class KnowledgeFeedbackScreen extends StatefulWidget {
   final String? resultId;
   const KnowledgeFeedbackScreen({super.key, this.resultId});
@@ -664,9 +670,9 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
         label: Text(_l ? '\u062c\u0627\u0631\u064a \u0627\u0644\u0625\u0631\u0633\u0627\u0644...' : '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629')))])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // MARKETPLACE TAB
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class MarketTab extends ConsumerStatefulWidget { const MarketTab({super.key}); @override ConsumerState<MarketTab> createState()=>_MarketS(); }
 class _MarketS extends ConsumerState<MarketTab> {
   List _provs=[], _reqs=[]; bool _ld=true;
@@ -689,7 +695,7 @@ class _MarketS extends ConsumerState<MarketTab> {
       icon: const Icon(Icons.add, color: AC.navy), label: const Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.navy))),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       ListView(padding: const EdgeInsets.all(14), children: [
-        Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [const Icon(Icons.store_mall_directory, color: AC.gold, size: 36), const SizedBox(height: 8), const Text("كتالوج الخدمات المهنية", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), const Text("تصفح 6 خدمات: تحليل مالي، مراجعة، ضرائب، تمويل، دعم، تراخيص", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => catalog.ServiceCatalogScreen(clientId: '', token: S.token))), icon: const Icon(Icons.arrow_forward), label: const Text("فتح الكتالوج")))])),
+        Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [const Icon(Icons.store_mall_directory, color: AC.gold, size: 36), const SizedBox(height: 8), const Text("ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ ط§ظ„ظ…ظ‡ظ†ظٹط©", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), const Text("طھطµظپط­ 6 ط®ط¯ظ…ط§طھ: طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹطŒ ظ…ط±ط§ط¬ط¹ط©طŒ ط¶ط±ط§ط¦ط¨طŒ طھظ…ظˆظٹظ„طŒ ط¯ط¹ظ…طŒ طھط±ط§ط®ظٹطµ", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => catalog.ServiceCatalogScreen(clientId: '', token: S.token))), icon: const Icon(Icons.arrow_forward), label: const Text("ظپطھط­ ط§ظ„ظƒطھط§ظ„ظˆط¬")))])),
         _card('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0639\u062a\u0645\u062f\u0648\u0646', [
           if(_provs.isEmpty) const Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0642\u062f\u0645\u0648 \u062e\u062f\u0645\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
           else ..._provs.take(5).map((p) => Padding(padding: const EdgeInsets.only(bottom: 8),
@@ -715,9 +721,9 @@ class _MarketS extends ConsumerState<MarketTab> {
       ]));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // NEW SERVICE REQUEST (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class NewServiceRequestScreen extends StatefulWidget {
   const NewServiceRequestScreen({super.key});
   @override State<NewServiceRequestScreen> createState() => _NSRS();
@@ -777,9 +783,9 @@ class _NSRS extends State<NewServiceRequestScreen> {
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0637\u0644\u0628')))])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // PROVIDER TAB
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ProviderTab extends StatefulWidget { const ProviderTab({super.key}); @override State<ProviderTab> createState()=>_ProvS(); }
 class _ProvS extends State<ProviderTab> {
   Map<String,dynamic>? _p; bool _ld=true; bool _notProvider=false;
@@ -842,9 +848,9 @@ class _ProvS extends State<ProviderTab> {
       ]));
 }
 
-// ═══════════════════════════════════════════════════
-// ACCOUNT TAB — with Profile Editing
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// ACCOUNT TAB â€” with Profile Editing
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AccountTab extends ConsumerStatefulWidget { const AccountTab({super.key}); @override ConsumerState<AccountTab> createState()=>_AccS(); }
 class _AccS extends ConsumerState<AccountTab> {
   Map<String,dynamic>? _p, _s; bool _ld=true;
@@ -887,7 +893,7 @@ class _AccS extends ConsumerState<AccountTab> {
           _kv('\u0622\u062e\u0631 \u062f\u062e\u0648\u0644', _s?['last_login']?.toString().substring(0,16)??'-'),
         ]),
         // Menu Items
-                _mi(Icons.account_tree, 'شجرة الحسابات COA', AC.cyan,
+                _mi(Icons.account_tree, 'ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ COA', AC.cyan,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ClientListScreen()))),
         _mi(Icons.workspace_premium, '\u062e\u0637\u062a\u064a \u0648\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643', AC.gold,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SubscriptionScreen()))),
@@ -897,16 +903,16 @@ class _AccS extends ConsumerState<AccountTab> {
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ChangePasswordScreen()))),
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
           ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const CloseAccountScreen()))),
-          _mi(Icons.archive, 'الأرشيف', AC.cyan, () => Navigator.push(context, MaterialPageRoute(builder: (_) => archive.ArchiveScreen(token: S.token)))),
-            _mi(Icons.history, 'سجل النشاط', const Color(0xFF9C27B0),
+          _mi(Icons.archive, 'ط§ظ„ط£ط±ط´ظٹظپ', AC.cyan, () => Navigator.push(context, MaterialPageRoute(builder: (_) => archive.ArchiveScreen(token: S.token)))),
+            _mi(Icons.history, 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·', const Color(0xFF9C27B0),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const ActivityHistoryScreen()))),
-          _mi(Icons.compare_arrows, 'مقارنة الخطط', AC.cyan,
+          _mi(Icons.compare_arrows, 'ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const PlanComparisonScreen()))),
-          _mi(Icons.assignment, 'أنواع المهام', AC.cyan,
+          _mi(Icons.assignment, 'ط£ظ†ظˆط§ط¹ ط§ظ„ظ…ظ‡ط§ظ…', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const TaskTypesBrowserScreen()))),
-          _mi(Icons.description, 'الشروط والأحكام', const Color(0xFF607D8B),
+          _mi(Icons.description, 'ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…', const Color(0xFF607D8B),
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>LegalDocumentsScreenV2()))),
-          _mi(Icons.devices, 'الجلسات النشطة', AC.cyan,
+          _mi(Icons.devices, 'ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©', AC.cyan,
             ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>const SessionsScreen()))),
       ])));
   Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) => GestureDetector(onTap: onTap,
@@ -915,9 +921,9 @@ class _AccS extends ConsumerState<AccountTab> {
         trailing: const Icon(Icons.chevron_left, color: AC.ts))));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // EDIT PROFILE (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class EditProfileScreen extends StatefulWidget {
   final Map<String,dynamic>? profile;
   const EditProfileScreen({super.key, this.profile});
@@ -964,9 +970,9 @@ class _EditPS extends State<EditProfileScreen> {
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062d\u0641\u0638 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a')))])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // CHANGE PASSWORD (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
   @override State<ChangePasswordScreen> createState() => _ChPwS();
@@ -1005,9 +1011,9 @@ class _ChPwS extends State<ChangePasswordScreen> {
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062a\u063a\u064a\u064a\u0631')))])));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // CLOSE ACCOUNT (NEW)
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class CloseAccountScreen extends StatefulWidget {
   const CloseAccountScreen({super.key});
   @override State<CloseAccountScreen> createState() => _CloseAS();
@@ -1068,9 +1074,9 @@ class _CloseAS extends State<CloseAccountScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════
-// ADMIN TAB — Platform Dashboard
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// ADMIN TAB â€” Platform Dashboard
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AdminTab extends ConsumerStatefulWidget { const AdminTab({super.key}); @override ConsumerState<AdminTab> createState()=>_AdminS(); }
 class _AdminS extends ConsumerState<AdminTab> {
   Map<String,dynamic> _stats = {}; List _users = []; bool _ld = true;
@@ -1161,9 +1167,9 @@ class _AdminS extends ConsumerState<AdminTab> {
         const Icon(Icons.chevron_left, color: AC.ts, size: 20)])));
 }
 
-// ═══════════════════════════════════════════════════
-// REVIEWER CONSOLE — Knowledge Feedback Review
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// REVIEWER CONSOLE â€” Knowledge Feedback Review
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ReviewerConsoleScreen extends StatefulWidget {
   const ReviewerConsoleScreen({super.key});
   @override State<ReviewerConsoleScreen> createState() => _RevCS();
@@ -1238,9 +1244,9 @@ class _RevCS extends State<ReviewerConsoleScreen> {
       ]));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // PROVIDER VERIFICATION QUEUE
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ProviderVerificationScreen extends StatefulWidget {
   const ProviderVerificationScreen({super.key});
   @override State<ProviderVerificationScreen> createState() => _PVS();
@@ -1307,9 +1313,9 @@ class _PVS extends State<ProviderVerificationScreen> {
         })));
 }
 
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // POLICY MANAGEMENT
-// ═══════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class PolicyManagementScreen extends StatefulWidget {
   const PolicyManagementScreen({super.key});
   @override State<PolicyManagementScreen> createState() => _PMS();
@@ -1366,7 +1372,7 @@ class _PMS extends State<PolicyManagementScreen> {
 
 
 // ============================================================
-// Legal Acceptance Screen (Execution Master §15)
+// Legal Acceptance Screen (Execution Master آ§15)
 // ============================================================
 class LegalAcceptanceScreen extends StatefulWidget {
   final VoidCallback onAccepted;
@@ -1397,7 +1403,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
         body: jsonEncode({'document_type': 'acceptable_use', 'version': '1.0'}));
       widget.onAccepted();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ط®ط·ط£: $e')));
     }
     setState(() => _loading = false);
   }
@@ -1406,7 +1412,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -1416,22 +1422,22 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
             child: Row(children: [
               const Icon(Icons.info_outline, color: Color(0xFF856404)),
               const SizedBox(width: 12),
-              const Expanded(child: Text('يجب الموافقة على جميع الشروط والسياسات قبل إكمال التسجيل',
+              const Expanded(child: Text('ظٹط¬ط¨ ط§ظ„ظ…ظˆط§ظپظ‚ط© ط¹ظ„ظ‰ ط¬ظ…ظٹط¹ ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط³ظٹط§ط³ط§طھ ظ‚ط¨ظ„ ط¥ظƒظ…ط§ظ„ ط§ظ„طھط³ط¬ظٹظ„',
                 style: TextStyle(color: Color(0xFF856404), fontSize: 13))),
             ]),
           ),
           const SizedBox(height: 24),
 
-          _buildPolicyCard('شروط وأحكام المنصة', 'الإصدار 1.0',
-            'تتضمن شروط استخدام المنصة والتزامات المستخدم وحقوق المنصة في تعليق الحسابات عند المخالفة.',
+          _buildPolicyCard('ط´ط±ظˆط· ظˆط£ط­ظƒط§ظ… ط§ظ„ظ…ظ†طµط©', 'ط§ظ„ط¥طµط¯ط§ط± 1.0',
+            'طھطھط¶ظ…ظ† ط´ط±ظˆط· ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ†طµط© ظˆط§ظ„طھط²ط§ظ…ط§طھ ط§ظ„ظ…ط³طھط®ط¯ظ… ظˆط­ظ‚ظˆظ‚ ط§ظ„ظ…ظ†طµط© ظپظٹ طھط¹ظ„ظٹظ‚ ط§ظ„ط­ط³ط§ط¨ط§طھ ط¹ظ†ط¯ ط§ظ„ظ…ط®ط§ظ„ظپط©.',
             Icons.description, _termsAccepted, (v) => setState(() => _termsAccepted = v!)),
 
-          _buildPolicyCard('سياسة الخصوصية', 'الإصدار 1.0',
-            'كيفية جمع واستخدام وحماية بياناتك الشخصية والمالية.',
+          _buildPolicyCard('ط³ظٹط§ط³ط© ط§ظ„ط®طµظˆطµظٹط©', 'ط§ظ„ط¥طµط¯ط§ط± 1.0',
+            'ظƒظٹظپظٹط© ط¬ظ…ط¹ ظˆط§ط³طھط®ط¯ط§ظ… ظˆط­ظ…ط§ظٹط© ط¨ظٹط§ظ†ط§طھظƒ ط§ظ„ط´ط®طµظٹط© ظˆط§ظ„ظ…ط§ظ„ظٹط©.',
             Icons.privacy_tip, _privacyAccepted, (v) => setState(() => _privacyAccepted = v!)),
 
-          _buildPolicyCard('سياسة الاستخدام المقبول', 'الإصدار 1.0',
-            'القواعد المنظمة لاستخدام المنصة بما يشمل رفع الملفات والتحليلات وطلب الخدمات.',
+          _buildPolicyCard('ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„', 'ط§ظ„ط¥طµط¯ط§ط± 1.0',
+            'ط§ظ„ظ‚ظˆط§ط¹ط¯ ط§ظ„ظ…ظ†ط¸ظ…ط© ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ†طµط© ط¨ظ…ط§ ظٹط´ظ…ظ„ ط±ظپط¹ ط§ظ„ظ…ظ„ظپط§طھ ظˆط§ظ„طھط­ظ„ظٹظ„ط§طھ ظˆط·ظ„ط¨ ط§ظ„ط®ط¯ظ…ط§طھ.',
             Icons.verified_user, _usageAccepted, (v) => setState(() => _usageAccepted = v!)),
 
           const SizedBox(height: 24),
@@ -1444,7 +1450,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
             ),
             child: _loading
               ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('أوافق وأتابع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              : const Text('ط£ظˆط§ظپظ‚ ظˆط£طھط§ط¨ط¹', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ]),
       ),
@@ -1474,9 +1480,9 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
         const SizedBox(height: 12),
         Row(children: [
           Checkbox(value: value, onChanged: onChanged, activeColor: AC.gold),
-          const Text('أوافق على هذه السياسة', style: TextStyle(fontSize: 13)),
+          const Text('ط£ظˆط§ظپظ‚ ط¹ظ„ظ‰ ظ‡ط°ظ‡ ط§ظ„ط³ظٹط§ط³ط©', style: TextStyle(fontSize: 13)),
           const Spacer(),
-          TextButton(onPressed: () {}, child: const Text('قراءة كاملة', style: TextStyle(color: Color(0xFF1B2A4A)))),
+          TextButton(onPressed: () {}, child: const Text('ظ‚ط±ط§ط،ط© ظƒط§ظ…ظ„ط©', style: TextStyle(color: Color(0xFF1B2A4A)))),
         ]),
       ]),
     );
@@ -1484,7 +1490,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
 }
 
 // ============================================================
-// Client Type Selection Screen (Execution Master §5)
+// Client Type Selection Screen (Execution Master آ§5)
 // ============================================================
 class ClientTypeSelectionScreen extends StatefulWidget {
   final Function(String) onSelected;
@@ -1496,33 +1502,33 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
   String? _selected;
 
   final _types = [
-    {'id': 'standard_business', 'name': 'منشأة تجارية', 'icon': Icons.business, 'km': false,
-     'desc': 'شركة أو مؤسسة تجارية تستخدم خدمات التحليل'},
-    {'id': 'accounting_firm', 'name': 'مكتب محاسبة', 'icon': Icons.calculate, 'km': true,
-     'desc': 'مكتب محاسبة قانوني معتمد'},
-    {'id': 'audit_firm', 'name': 'مكتب تدقيق', 'icon': Icons.fact_check, 'km': true,
-     'desc': 'مكتب تدقيق ومراجعة'},
-    {'id': 'financial_entity', 'name': 'جهة مالية', 'icon': Icons.account_balance, 'km': true,
-     'desc': 'بنك أو مؤسسة مالية'},
-    {'id': 'investment_entity', 'name': 'جهة استثمارية', 'icon': Icons.trending_up, 'km': true,
-     'desc': 'شركة أو صندوق استثماري'},
-    {'id': 'government_entity', 'name': 'جهة حكومية', 'icon': Icons.account_balance_wallet, 'km': true,
-     'desc': 'جهة حكومية أو شبه حكومية'},
-    {'id': 'legal_regulatory_entity', 'name': 'جهة قانونية/تنظيمية', 'icon': Icons.gavel, 'km': true,
-     'desc': 'هيئة تنظيمية أو مكتب قانوني'},
-    {'id': 'sector_consulting_entity', 'name': 'استشارات قطاعية', 'icon': Icons.lightbulb, 'km': true,
-     'desc': 'شركة استشارات متخصصة'},
+    {'id': 'standard_business', 'name': 'ظ…ظ†ط´ط£ط© طھط¬ط§ط±ظٹط©', 'icon': Icons.business, 'km': false,
+     'desc': 'ط´ط±ظƒط© ط£ظˆ ظ…ط¤ط³ط³ط© طھط¬ط§ط±ظٹط© طھط³طھط®ط¯ظ… ط®ط¯ظ…ط§طھ ط§ظ„طھط­ظ„ظٹظ„'},
+    {'id': 'accounting_firm', 'name': 'ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط©', 'icon': Icons.calculate, 'km': true,
+     'desc': 'ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط© ظ‚ط§ظ†ظˆظ†ظٹ ظ…ط¹طھظ…ط¯'},
+    {'id': 'audit_firm', 'name': 'ظ…ظƒطھط¨ طھط¯ظ‚ظٹظ‚', 'icon': Icons.fact_check, 'km': true,
+     'desc': 'ظ…ظƒطھط¨ طھط¯ظ‚ظٹظ‚ ظˆظ…ط±ط§ط¬ط¹ط©'},
+    {'id': 'financial_entity', 'name': 'ط¬ظ‡ط© ظ…ط§ظ„ظٹط©', 'icon': Icons.account_balance, 'km': true,
+     'desc': 'ط¨ظ†ظƒ ط£ظˆ ظ…ط¤ط³ط³ط© ظ…ط§ظ„ظٹط©'},
+    {'id': 'investment_entity', 'name': 'ط¬ظ‡ط© ط§ط³طھط«ظ…ط§ط±ظٹط©', 'icon': Icons.trending_up, 'km': true,
+     'desc': 'ط´ط±ظƒط© ط£ظˆ طµظ†ط¯ظˆظ‚ ط§ط³طھط«ظ…ط§ط±ظٹ'},
+    {'id': 'government_entity', 'name': 'ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط©', 'icon': Icons.account_balance_wallet, 'km': true,
+     'desc': 'ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط© ط£ظˆ ط´ط¨ظ‡ ط­ظƒظˆظ…ظٹط©'},
+    {'id': 'legal_regulatory_entity', 'name': 'ط¬ظ‡ط© ظ‚ط§ظ†ظˆظ†ظٹط©/طھظ†ط¸ظٹظ…ظٹط©', 'icon': Icons.gavel, 'km': true,
+     'desc': 'ظ‡ظٹط¦ط© طھظ†ط¸ظٹظ…ظٹط© ط£ظˆ ظ…ظƒطھط¨ ظ‚ط§ظ†ظˆظ†ظٹ'},
+    {'id': 'sector_consulting_entity', 'name': 'ط§ط³طھط´ط§ط±ط§طھ ظ‚ط·ط§ط¹ظٹط©', 'icon': Icons.lightbulb, 'km': true,
+     'desc': 'ط´ط±ظƒط© ط§ط³طھط´ط§ط±ط§طھ ظ…طھط®طµطµط©'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ط§ط®طھظٹط§ط± ظ†ظˆط¹ ط§ظ„ط¹ظ…ظٹظ„'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
           width: double.infinity, padding: const EdgeInsets.all(16), color: const Color(0xFFF0F4FF),
-          child: const Text('اختر نوع المنشأة — هذا يحدد الخدمات والصلاحيات المتاحة',
+          child: const Text('ط§ط®طھط± ظ†ظˆط¹ ط§ظ„ظ…ظ†ط´ط£ط© â€” ظ‡ط°ط§ ظٹط­ط¯ط¯ ط§ظ„ط®ط¯ظ…ط§طھ ظˆط§ظ„طµظ„ط§ط­ظٹط§طھ ط§ظ„ظ…طھط§ط­ط©',
             style: TextStyle(color: Color(0xFF1B2A4A), fontSize: 13), textAlign: TextAlign.center),
         ),
         Expanded(
@@ -1554,7 +1560,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(8)),
-                        child: const Text('مؤهل للعقل المعرفي', style: TextStyle(fontSize: 10, color: Color(0xFF2E7D32))),
+                        child: const Text('ظ…ط¤ظ‡ظ„ ظ„ظ„ط¹ظ‚ظ„ ط§ظ„ظ…ط¹ط±ظپظٹ', style: TextStyle(fontSize: 10, color: Color(0xFF2E7D32))),
                       ),
                     ],
                   ]),
@@ -1576,7 +1582,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('تأكيد واستمرار', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            child: const Text('طھط£ظƒظٹط¯ ظˆط§ط³طھظ…ط±ط§ط±', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ),
       ]),
@@ -1585,7 +1591,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
 }
 
 // ============================================================
-// Provider Document Upload Screen (Execution Master §7)
+// Provider Document Upload Screen (Execution Master آ§7)
 // ============================================================
 class ProviderDocumentUploadScreen extends StatefulWidget {
   const ProviderDocumentUploadScreen({Key? key}) : super(key: key);
@@ -1594,11 +1600,11 @@ class ProviderDocumentUploadScreen extends StatefulWidget {
 
 class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScreen> {
   final _docs = [
-    {'type': 'identity', 'name': 'إثبات الهوية', 'icon': Icons.badge, 'required': true, 'uploaded': false},
-    {'type': 'professional_license', 'name': 'الرخصة المهنية', 'icon': Icons.card_membership, 'required': true, 'uploaded': false},
-    {'type': 'academic_certificate', 'name': 'الشهادة الأكاديمية', 'icon': Icons.school, 'required': true, 'uploaded': false},
-    {'type': 'experience_letter', 'name': 'خطاب الخبرة', 'icon': Icons.work_history, 'required': false, 'uploaded': false},
-    {'type': 'portfolio', 'name': 'نماذج أعمال', 'icon': Icons.folder_special, 'required': false, 'uploaded': false},
+    {'type': 'identity', 'name': 'ط¥ط«ط¨ط§طھ ط§ظ„ظ‡ظˆظٹط©', 'icon': Icons.badge, 'required': true, 'uploaded': false},
+    {'type': 'professional_license', 'name': 'ط§ظ„ط±ط®طµط© ط§ظ„ظ…ظ‡ظ†ظٹط©', 'icon': Icons.card_membership, 'required': true, 'uploaded': false},
+    {'type': 'academic_certificate', 'name': 'ط§ظ„ط´ظ‡ط§ط¯ط© ط§ظ„ط£ظƒط§ط¯ظٹظ…ظٹط©', 'icon': Icons.school, 'required': true, 'uploaded': false},
+    {'type': 'experience_letter', 'name': 'ط®ط·ط§ط¨ ط§ظ„ط®ط¨ط±ط©', 'icon': Icons.work_history, 'required': false, 'uploaded': false},
+    {'type': 'portfolio', 'name': 'ظ†ظ…ط§ط°ط¬ ط£ط¹ظ…ط§ظ„', 'icon': Icons.folder_special, 'required': false, 'uploaded': false},
   ];
 
   @override
@@ -1608,7 +1614,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ظ…ط³طھظ†ط¯ط§طھ ط§ظ„طھط­ظ‚ظ‚'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
           width: double.infinity, padding: const EdgeInsets.all(16),
@@ -1619,8 +1625,8 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
             const SizedBox(width: 12),
             Expanded(child: Text(
               uploadedRequired == requiredCount
-                ? 'جميع المستندات الإلزامية مرفوعة — في انتظار المراجعة'
-                : 'يجب رفع المستندات الإلزامية (*) للتحقق وتفعيل حسابك',
+                ? 'ط¬ظ…ظٹط¹ ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ط¥ظ„ط²ط§ظ…ظٹط© ظ…ط±ظپظˆط¹ط© â€” ظپظٹ ط§ظ†طھط¸ط§ط± ط§ظ„ظ…ط±ط§ط¬ط¹ط©'
+                : 'ظٹط¬ط¨ ط±ظپط¹ ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ط¥ظ„ط²ط§ظ…ظٹط© (*) ظ„ظ„طھط­ظ‚ظ‚ ظˆطھظپط¹ظٹظ„ ط­ط³ط§ط¨ظƒ',
               style: TextStyle(fontSize: 13, color: uploadedRequired == requiredCount ? const Color(0xFF2E7D32) : const Color(0xFF856404)))),
           ]),
         ),
@@ -1649,13 +1655,13 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
                       Text(doc['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
                       if (doc['required'] == true) const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                     ]),
-                    Text(doc['uploaded'] == true ? 'تم الرفع — قيد المراجعة' : 'لم يتم الرفع',
+                    Text(doc['uploaded'] == true ? 'طھظ… ط§ظ„ط±ظپط¹ â€” ظ‚ظٹط¯ ط§ظ„ظ…ط±ط§ط¬ط¹ط©' : 'ظ„ظ… ظٹطھظ… ط§ظ„ط±ظپط¹',
                       style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : Colors.grey)),
                   ])),
                   ElevatedButton.icon(
                     onPressed: () => setState(() => _docs[i] = {...doc, 'uploaded': true}),
                     icon: Icon(doc['uploaded'] == true ? Icons.refresh : Icons.upload_file, size: 16),
-                    label: Text(doc['uploaded'] == true ? 'تحديث' : 'رفع', style: const TextStyle(fontSize: 12)),
+                    label: Text(doc['uploaded'] == true ? 'طھط­ط¯ظٹط«' : 'ط±ظپط¹', style: const TextStyle(fontSize: 12)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: doc['uploaded'] == true ? Colors.grey[200] : AC.navy,
                       foregroundColor: doc['uploaded'] == true ? Colors.black87 : Colors.white,
@@ -1676,7 +1682,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: Text(uploadedRequired == requiredCount ? 'إرسال للمراجعة' : 'أكمل رفع المستندات الإلزامية',
+            child: Text(uploadedRequired == requiredCount ? 'ط¥ط±ط³ط§ظ„ ظ„ظ„ظ…ط±ط§ط¬ط¹ط©' : 'ط£ظƒظ…ظ„ ط±ظپط¹ ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ط¥ظ„ط²ط§ظ…ظٹط©',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         ),
@@ -1686,7 +1692,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
 }
 
 // ============================================================
-// Task Document Management Screen (Zero Ambiguity §9)
+// Task Document Management Screen (Zero Ambiguity آ§9)
 // ============================================================
 class TaskDocumentScreen extends StatefulWidget {
   final String requestId;
@@ -1699,13 +1705,13 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
   late TabController _tabs;
 
   final _inputs = [
-    {'name': 'مصادر القيود', 'uploaded': true, 'date': '2026-03-28'},
-    {'name': 'كشف حساب بنكي', 'uploaded': true, 'date': '2026-03-29'},
-    {'name': 'فواتير', 'uploaded': false, 'date': null},
+    {'name': 'ظ…طµط§ط¯ط± ط§ظ„ظ‚ظٹظˆط¯', 'uploaded': true, 'date': '2026-03-28'},
+    {'name': 'ظƒط´ظپ ط­ط³ط§ط¨ ط¨ظ†ظƒظٹ', 'uploaded': true, 'date': '2026-03-29'},
+    {'name': 'ظپظˆط§طھظٹط±', 'uploaded': false, 'date': null},
   ];
   final _outputs = [
-    {'name': 'ملف قيود منظم', 'uploaded': false, 'date': null},
-    {'name': 'ملاحظات التسوية', 'uploaded': false, 'date': null},
+    {'name': 'ظ…ظ„ظپ ظ‚ظٹظˆط¯ ظ…ظ†ط¸ظ…', 'uploaded': false, 'date': null},
+    {'name': 'ظ…ظ„ط§ط­ط¸ط§طھ ط§ظ„طھط³ظˆظٹط©', 'uploaded': false, 'date': null},
   ];
 
   @override
@@ -1721,11 +1727,11 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: const Text('مستندات المهمة'),
+        title: const Text('ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ظ…ظ‡ظ…ط©'),
         backgroundColor: AC.navy, foregroundColor: Colors.white,
         bottom: TabBar(controller: _tabs, indicatorColor: AC.gold, labelColor: Colors.white, tabs: [
-          Tab(text: 'المدخلات ($inputsDone/${_inputs.length})'),
-          Tab(text: 'المخرجات ($outputsDone/${_outputs.length})'),
+          Tab(text: 'ط§ظ„ظ…ط¯ط®ظ„ط§طھ ($inputsDone/${_inputs.length})'),
+          Tab(text: 'ط§ظ„ظ…ط®ط±ط¬ط§طھ ($outputsDone/${_outputs.length})'),
         ]),
       ),
       body: Column(children: [
@@ -1736,14 +1742,14 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
           child: Row(children: [
             const Icon(Icons.timer, size: 16, color: Color(0xFFD32F2F)),
             const SizedBox(width: 8),
-            const Text('الموعد النهائي: 15 أبريل 2026', style: TextStyle(fontSize: 12, color: Color(0xFFD32F2F))),
+            const Text('ط§ظ„ظ…ظˆط¹ط¯ ط§ظ„ظ†ظ‡ط§ط¦ظٹ: 15 ط£ط¨ط±ظٹظ„ 2026', style: TextStyle(fontSize: 12, color: Color(0xFFD32F2F))),
             const Spacer(),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: inputsDone == _inputs.length ? const Color(0xFF2ECC8A) : const Color(0xFFFF9800),
                 borderRadius: BorderRadius.circular(8)),
-              child: Text(inputsDone == _inputs.length ? 'مكتمل' : 'ناقص',
+              child: Text(inputsDone == _inputs.length ? 'ظ…ظƒطھظ…ظ„' : 'ظ†ط§ظ‚طµ',
                 style: const TextStyle(color: Colors.white, fontSize: 11)),
             ),
           ]),
@@ -1777,14 +1783,14 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(doc['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(doc['uploaded'] == true ? 'تم الرفع: ${doc['date']}' : 'مطلوب — لم يتم الرفع',
+              Text(doc['uploaded'] == true ? 'طھظ… ط§ظ„ط±ظپط¹: ${doc['date']}' : 'ظ…ط·ظ„ظˆط¨ â€” ظ„ظ… ظٹطھظ… ط§ظ„ط±ظپط¹',
                 style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? Colors.green : Colors.red)),
             ])),
             if (doc['uploaded'] != true)
               ElevatedButton.icon(
                 onPressed: () => setState(() => docs[i] = {...doc, 'uploaded': true, 'date': '2026-03-30'}),
                 icon: const Icon(Icons.upload_file, size: 16),
-                label: const Text('رفع'),
+                label: const Text('ط±ظپط¹'),
                 style: ElevatedButton.styleFrom(backgroundColor: AC.navy, foregroundColor: Colors.white),
               ),
           ]),
@@ -1795,7 +1801,7 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
 }
 
 // ============================================================
-// Provider Compliance Status Screen (Zero Ambiguity §9)
+// Provider Compliance Status Screen (Zero Ambiguity آ§9)
 // ============================================================
 class ProviderComplianceScreen extends StatelessWidget {
   const ProviderComplianceScreen({Key? key}) : super(key: key);
@@ -1804,7 +1810,7 @@ class ProviderComplianceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ط­ط§ظ„ط© ط§ظ„ط§ظ…طھط«ط§ظ„'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -1818,28 +1824,28 @@ class ProviderComplianceScreen extends StatelessWidget {
             child: Column(children: [
               const Icon(Icons.verified, color: Color(0xFF2ECC8A), size: 48),
               const SizedBox(height: 12),
-              const Text('حالة الحساب: نشط', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text('ط­ط§ظ„ط© ط§ظ„ط­ط³ط§ط¨: ظ†ط´ط·', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(color: const Color(0xFF2ECC8A), borderRadius: BorderRadius.circular(20)),
-                child: const Text('لا توجد مخالفات', style: TextStyle(color: Colors.white, fontSize: 13)),
+                child: const Text('ظ„ط§ طھظˆط¬ط¯ ظ…ط®ط§ظ„ظپط§طھ', style: TextStyle(color: Colors.white, fontSize: 13)),
               ),
             ]),
           ),
           const SizedBox(height: 20),
 
           // Compliance Metrics
-          const Text('مؤشرات الامتثال', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('ظ…ط¤ط´ط±ط§طھ ط§ظ„ط§ظ…طھط«ط§ظ„', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
-          _metricCard('المهام المكتملة', '12', Icons.task_alt, const Color(0xFF2ECC8A)),
-          _metricCard('المستندات المرفوعة', '8/8', Icons.description, const Color(0xFF2ECC8A)),
-          _metricCard('المخالفات', '0', Icons.warning, const Color(0xFF2ECC8A)),
-          _metricCard('التعليقات السابقة', '0', Icons.block, const Color(0xFF2ECC8A)),
-          _metricCard('تقييم الأداء', '4.8/5', Icons.star, const Color(0xFFD4A843)),
+          _metricCard('ط§ظ„ظ…ظ‡ط§ظ… ط§ظ„ظ…ظƒطھظ…ظ„ط©', '12', Icons.task_alt, const Color(0xFF2ECC8A)),
+          _metricCard('ط§ظ„ظ…ط³طھظ†ط¯ط§طھ ط§ظ„ظ…ط±ظپظˆط¹ط©', '8/8', Icons.description, const Color(0xFF2ECC8A)),
+          _metricCard('ط§ظ„ظ…ط®ط§ظ„ظپط§طھ', '0', Icons.warning, const Color(0xFF2ECC8A)),
+          _metricCard('ط§ظ„طھط¹ظ„ظٹظ‚ط§طھ ط§ظ„ط³ط§ط¨ظ‚ط©', '0', Icons.block, const Color(0xFF2ECC8A)),
+          _metricCard('طھظ‚ظٹظٹظ… ط§ظ„ط£ط¯ط§ط،', '4.8/5', Icons.star, const Color(0xFFD4A843)),
 
           const SizedBox(height: 20),
-          const Text('سجل الامتثال', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('ط³ط¬ظ„ ط§ظ„ط§ظ…طھط«ط§ظ„', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(24),
@@ -1847,8 +1853,8 @@ class ProviderComplianceScreen extends StatelessWidget {
             child: Column(children: [
               const Icon(Icons.check_circle, color: Color(0xFF2ECC8A), size: 40),
               const SizedBox(height: 8),
-              const Text('سجل نظيف', style: TextStyle(fontSize: 14, color: Colors.grey)),
-              const Text('لا توجد مخالفات أو تعليقات سابقة', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const Text('ط³ط¬ظ„ ظ†ط¸ظٹظپ', style: TextStyle(fontSize: 14, color: Colors.grey)),
+              const Text('ظ„ط§ طھظˆط¬ط¯ ظ…ط®ط§ظ„ظپط§طھ ط£ظˆ طھط¹ظ„ظٹظ‚ط§طھ ط³ط§ط¨ظ‚ط©', style: TextStyle(fontSize: 12, color: Colors.grey)),
             ]),
           ),
         ]),
@@ -1873,7 +1879,7 @@ class ProviderComplianceScreen extends StatelessWidget {
 }
 
 // ============================================================
-// Activity History Screen (Execution Master §9)
+// Activity History Screen (Execution Master آ§9)
 // ============================================================
 class ActivityHistoryScreen extends StatelessWidget {
   const ActivityHistoryScreen({Key? key}) : super(key: key);
@@ -1881,16 +1887,16 @@ class ActivityHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activities = [
-      {'action': 'تحليل مالي', 'detail': 'رفع ميزان مراجعة - retail', 'time': 'اليوم 11:30', 'icon': Icons.analytics, 'color': const Color(0xFF1B2A4A)},
-      {'action': 'تحميل تقرير PDF', 'detail': 'تقرير التحليل المالي', 'time': 'اليوم 11:45', 'icon': Icons.picture_as_pdf, 'color': const Color(0xFF2ECC8A)},
-      {'action': 'إنشاء عميل', 'detail': 'شركة التقنية المتقدمة', 'time': 'أمس 14:00', 'icon': Icons.person_add, 'color': const Color(0xFFD4A843)},
-      {'action': 'طلب خدمة', 'detail': 'مسك دفاتر - شهري', 'time': 'أمس 15:30', 'icon': Icons.shopping_cart, 'color': const Color(0xFF9C27B0)},
-      {'action': 'ملاحظة معرفية', 'detail': 'تحسين تبويب الإيرادات', 'time': '28 مارس', 'icon': Icons.lightbulb, 'color': const Color(0xFFFF9800)},
+      {'action': 'طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹ', 'detail': 'ط±ظپط¹ ظ…ظٹط²ط§ظ† ظ…ط±ط§ط¬ط¹ط© - retail', 'time': 'ط§ظ„ظٹظˆظ… 11:30', 'icon': Icons.analytics, 'color': const Color(0xFF1B2A4A)},
+      {'action': 'طھط­ظ…ظٹظ„ طھظ‚ط±ظٹط± PDF', 'detail': 'طھظ‚ط±ظٹط± ط§ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ', 'time': 'ط§ظ„ظٹظˆظ… 11:45', 'icon': Icons.picture_as_pdf, 'color': const Color(0xFF2ECC8A)},
+      {'action': 'ط¥ظ†ط´ط§ط، ط¹ظ…ظٹظ„', 'detail': 'ط´ط±ظƒط© ط§ظ„طھظ‚ظ†ظٹط© ط§ظ„ظ…طھظ‚ط¯ظ…ط©', 'time': 'ط£ظ…ط³ 14:00', 'icon': Icons.person_add, 'color': const Color(0xFFD4A843)},
+      {'action': 'ط·ظ„ط¨ ط®ط¯ظ…ط©', 'detail': 'ظ…ط³ظƒ ط¯ظپط§طھط± - ط´ظ‡ط±ظٹ', 'time': 'ط£ظ…ط³ 15:30', 'icon': Icons.shopping_cart, 'color': const Color(0xFF9C27B0)},
+      {'action': 'ظ…ظ„ط§ط­ط¸ط© ظ…ط¹ط±ظپظٹط©', 'detail': 'طھط­ط³ظٹظ† طھط¨ظˆظٹط¨ ط§ظ„ط¥ظٹط±ط§ط¯ط§طھ', 'time': '28 ظ…ط§ط±ط³', 'icon': Icons.lightbulb, 'color': const Color(0xFFFF9800)},
     ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: activities.length,
@@ -1923,9 +1929,9 @@ class ActivityHistoryScreen extends StatelessWidget {
 
 
 
-// ═══════════════════════════════════════════════════════
-// Result Detail Panel — ! icon explanation (Execution §6)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// Result Detail Panel â€” ! icon explanation (Execution آ§6)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ResultDetailPanel extends StatefulWidget {
   final String analysisId;
   final String resultKey;
@@ -2008,7 +2014,7 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
     child: Text(t, style: TextStyle(color: c, fontSize: 11)));
 }
 
-// Result Detail Dialog — triggered by ! icon
+// Result Detail Dialog â€” triggered by ! icon
 void showResultDetail(BuildContext context, String analysisId, String resultKey) {
   showModalBottomSheet(
     context: context, backgroundColor: AC.navy2,
@@ -2021,9 +2027,9 @@ void showResultDetail(BuildContext context, String analysisId, String resultKey)
 }
 
 
-// ═══════════════════════════════════════════════════════
-// Task Document Management (Execution §8)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// Task Document Management (Execution آ§8)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class TaskDocumentManagementScreen extends StatefulWidget {
   final String taskId;
   final String taskTypeCode;
@@ -2055,7 +2061,7 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
   bool _isUploaded(String reqId) => _submissions.any((s) => s['requirement_id'] == reqId && s['status'] == 'uploaded');
   
   Future<void> _upload(String reqId, String docName) async {
-    // Simulate upload — in production, use file picker
+    // Simulate upload â€” in production, use file picker
     try {
       final r = await http.post(Uri.parse('$_api/task-submissions'),
         headers: {...S.h(), 'Content-Type': 'application/json'},
@@ -2167,9 +2173,9 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // Task Types Browser (shows all task types + requirements)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class TaskTypesBrowserScreen extends StatefulWidget {
   const TaskTypesBrowserScreen({super.key});
   @override State<TaskTypesBrowserScreen> createState() => _TaskTypesBrowserS();
@@ -2246,9 +2252,9 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════════
-// Knowledge Developer Console (Zero-Ambiguity §8)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// Knowledge Developer Console (Zero-Ambiguity آ§8)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class KnowledgeDeveloperConsole extends StatefulWidget {
   const KnowledgeDeveloperConsole({super.key});
   @override State<KnowledgeDeveloperConsole> createState() => _KnowledgeDevConsoleS();
@@ -2337,9 +2343,9 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
 }
 
 
-// ═══════════════════════════════════════════════════════
-// Audit Log Screen (Zero-Ambiguity §3)
-// ═══════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// Audit Log Screen (Zero-Ambiguity آ§3)
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class AuditLogScreen extends StatefulWidget {
   const AuditLogScreen({super.key});
   @override State<AuditLogScreen> createState() => _AuditLogS();
@@ -2412,7 +2418,7 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
   void _verify() {
     final entered = _codeC.text.trim();
     if (entered.isEmpty) {
-      setState(() { _err = 'أدخل رمز التحقق'; });
+      setState(() { _err = 'ط£ط¯ط®ظ„ ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚'; });
       return;
     }
     // For now, since we have the token from API, we verify locally
@@ -2421,23 +2427,23 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
       Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (_) => NewPasswordScreen(token: widget.token, email: widget.email)));
     } else {
-      setState(() { _err = 'الرمز غير صحيح'; });
+      setState(() { _err = 'ط§ظ„ط±ظ…ط² ط؛ظٹط± طµط­ظٹط­'; });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('إدخال رمز التحقق')),
+      appBar: AppBar(title: const Text('ط¥ط¯ط®ط§ظ„ ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚')),
       body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const SizedBox(height: 24),
           const Icon(Icons.verified_user, size: 72, color: AC.gold),
           const SizedBox(height: 24),
-          Text('تم إرسال رمز التحقق إلى\n${widget.email}',
+          Text('طھظ… ط¥ط±ط³ط§ظ„ ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚ ط¥ظ„ظ‰\n${widget.email}',
             style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
           const SizedBox(height: 8),
-          const Text('أدخل الرمز الذي وصلك للمتابعة',
+          const Text('ط£ط¯ط®ظ„ ط§ظ„ط±ظ…ط² ط§ظ„ط°ظٹ ظˆطµظ„ظƒ ظ„ظ„ظ…طھط§ط¨ط¹ط©',
             style: TextStyle(color: Colors.white38, fontSize: 13), textAlign: TextAlign.center),
           const SizedBox(height: 24),
           if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
@@ -2446,17 +2452,17 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
           TextField(controller: _codeC, textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 4),
             decoration: InputDecoration(
-              hintText: 'رمز التحقق',
+              hintText: 'ط±ظ…ط² ط§ظ„طھط­ظ‚ظ‚',
               hintStyle: const TextStyle(color: Colors.white30, letterSpacing: 1),
               prefixIcon: const Icon(Icons.pin, color: AC.gold),
               enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
               focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
           const SizedBox(height: 24),
           SizedBox(height: 52, child: ElevatedButton(onPressed: _verify,
-            child: const Text('تحقق واستمر', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
+            child: const Text('طھط­ظ‚ظ‚ ظˆط§ط³طھظ…ط±', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
           const SizedBox(height: 16),
           TextButton(onPressed: () => Navigator.pop(context),
-            child: const Text('إعادة إرسال الرمز', style: TextStyle(color: AC.gold, fontSize: 14))),
+            child: const Text('ط¥ط¹ط§ط¯ط© ط¥ط±ط³ط§ظ„ ط§ظ„ط±ظ…ط²', style: TextStyle(color: AC.gold, fontSize: 14))),
         ]))));
   }
 }
@@ -2475,11 +2481,11 @@ class _NewPwS extends State<NewPasswordScreen> {
 
   Future<void> _resetPw() async {
     if (_pw1.text.length < 6) {
-      setState(() { _err = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'; });
+      setState(() { _err = 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ظٹط¬ط¨ ط£ظ† طھظƒظˆظ† 6 ط£ط­ط±ظپ ط¹ظ„ظ‰ ط§ظ„ط£ظ‚ظ„'; });
       return;
     }
     if (_pw1.text != _pw2.text) {
-      setState(() { _err = 'كلمتا المرور غير متطابقتين'; });
+      setState(() { _err = 'ظƒظ„ظ…طھط§ ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± ظ…طھط·ط§ط¨ظ‚طھظٹظ†'; });
       return;
     }
     setState(() { _ld = true; _err = null; });
@@ -2492,10 +2498,10 @@ class _NewPwS extends State<NewPasswordScreen> {
       if (r.statusCode == 200 && d['status'] == 'ok') {
         setState(() { _done = true; });
       } else {
-        setState(() { _err = d['detail'] ?? 'فشلت إعادة التعيين'; });
+        setState(() { _err = d['detail'] ?? 'ظپط´ظ„طھ ط¥ط¹ط§ط¯ط© ط§ظ„طھط¹ظٹظٹظ†'; });
       }
     } catch (e) {
-      setState(() { _err = 'خطأ في الاتصال'; });
+      setState(() { _err = 'ط®ط·ط£ ظپظٹ ط§ظ„ط§طھطµط§ظ„'; });
     } finally {
       setState(() { _ld = false; });
     }
@@ -2504,38 +2510,38 @@ class _NewPwS extends State<NewPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('كلمة المرور الجديدة')),
+      appBar: AppBar(title: const Text('ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط©')),
       body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const SizedBox(height: 24),
           Icon(_done ? Icons.check_circle : Icons.lock_outline, size: 72, color: _done ? Colors.greenAccent : AC.gold),
           const SizedBox(height: 24),
           if (_done) ...[
-            const Text('تم تغيير كلمة المرور بنجاح!',
+            const Text('طھظ… طھط؛ظٹظٹط± ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط¨ظ†ط¬ط§ط­!',
               style: TextStyle(color: Colors.greenAccent, fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            const Text('يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة',
+            const Text('ظٹظ…ظƒظ†ظƒ ط§ظ„ط¢ظ† طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„ ط¨ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط©',
               style: TextStyle(color: Colors.white70, fontSize: 14), textAlign: TextAlign.center),
             const SizedBox(height: 32),
             SizedBox(height: 52, child: ElevatedButton(
               onPressed: () { Navigator.of(context).popUntil((route) => route.isFirst); },
-              child: const Text('العودة لتسجيل الدخول', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
+              child: const Text('ط§ظ„ط¹ظˆط¯ط© ظ„طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
           ] else ...[
-            Text('أدخل كلمة المرور الجديدة لـ\n${widget.email}',
+            Text('ط£ط¯ط®ظ„ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط© ظ„ظ€\n${widget.email}',
               style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
             const SizedBox(height: 24),
             if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(color: Colors.red.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
               child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
             TextField(controller: _pw1, obscureText: true, style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(labelText: 'كلمة المرور الجديدة',
+              decoration: InputDecoration(labelText: 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط©',
                 labelStyle: const TextStyle(color: Colors.white54),
                 prefixIcon: const Icon(Icons.lock_outline, color: AC.gold),
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
                 focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
             const SizedBox(height: 16),
             TextField(controller: _pw2, obscureText: true, style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(labelText: 'تأكيد كلمة المرور',
+              decoration: InputDecoration(labelText: 'طھط£ظƒظٹط¯ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±',
                 labelStyle: const TextStyle(color: Colors.white54),
                 prefixIcon: const Icon(Icons.lock, color: AC.gold),
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
@@ -2544,17 +2550,17 @@ class _NewPwS extends State<NewPasswordScreen> {
             SizedBox(height: 52, child: ElevatedButton(onPressed: _ld ? null : _resetPw,
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade700),
               child: _ld ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Text('إعادة تعيين كلمة المرور', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)))),
+                : const Text('ط¥ط¹ط§ط¯ط© طھط¹ظٹظٹظ† ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)))),
           ],
         ]))));
   }
 }
 
 
-// ═══════════════════════════════════════════════════════════
-// SessionsScreen — إدارة الجلسات النشطة
-// Phase 9 Account Center §6
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// SessionsScreen â€” ط¥ط¯ط§ط±ط© ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©
+// Phase 9 Account Center آ§6
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class SessionsScreen extends StatefulWidget {
   const SessionsScreen({super.key});
   @override State<SessionsScreen> createState() => _SessionsScreenState();
@@ -2587,7 +2593,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
     );
     if (r.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إنهاء جميع الجلسات'), backgroundColor: Colors.green));
+        const SnackBar(content: Text('طھظ… ط¥ظ†ظ‡ط§ط، ط¬ظ…ظٹط¹ ط§ظ„ط¬ظ„ط³ط§طھ'), backgroundColor: Colors.green));
       _load();
     }
   }
@@ -2599,7 +2605,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
     );
     if (r.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إنهاء الجلسة'), backgroundColor: Colors.green));
+        const SnackBar(content: Text('طھظ… ط¥ظ†ظ‡ط§ط، ط§ظ„ط¬ظ„ط³ط©'), backgroundColor: Colors.green));
       _load();
     }
   }
@@ -2609,19 +2615,19 @@ class _SessionsScreenState extends State<SessionsScreen> {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
-        title: const Text('الجلسات النشطة'), backgroundColor: AC.navy2,
+        title: const Text('ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©'), backgroundColor: AC.navy2,
         actions: [
           TextButton.icon(
             onPressed: _logoutAll,
             icon: const Icon(Icons.logout, color: AC.err, size: 18),
-            label: const Text('إنهاء الكل', style: TextStyle(color: AC.err, fontSize: 12)),
+            label: const Text('ط¥ظ†ظ‡ط§ط، ط§ظ„ظƒظ„', style: TextStyle(color: AC.err, fontSize: 12)),
           ),
         ],
       ),
       body: _loading
         ? const Center(child: CircularProgressIndicator(color: AC.gold))
         : _sessions.isEmpty
-          ? Center(child: Text('لا توجد جلسات نشطة', style: TextStyle(color: AC.ts)))
+          ? Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ط¬ظ„ط³ط§طھ ظ†ط´ط·ط©', style: TextStyle(color: AC.ts)))
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: _sessions.length,
@@ -2640,19 +2646,19 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(s['device_info'] ?? 'جهاز غير معروف',
+                        Text(s['device_info'] ?? 'ط¬ظ‡ط§ط² ط؛ظٹط± ظ…ط¹ط±ظˆظپ',
                           style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
-                        Text('IP: ${s['ip_address'] ?? '—'}',
+                        Text('IP: ${s['ip_address'] ?? 'â€”'}',
                           style: TextStyle(color: AC.ts, fontSize: 12)),
-                        Text('آخر نشاط: ${s['last_activity']?.toString().substring(0, 16) ?? '—'}',
+                        Text('ط¢ط®ط± ظ†ط´ط§ط·: ${s['last_activity']?.toString().substring(0, 16) ?? 'â€”'}',
                           style: TextStyle(color: AC.ts, fontSize: 12)),
                       ],
                     )),
                     IconButton(
                       onPressed: () => _logoutOne(s['id']),
                       icon: const Icon(Icons.close, color: AC.err),
-                      tooltip: 'إنهاء الجلسة',
+                      tooltip: 'ط¥ظ†ظ‡ط§ط، ط§ظ„ط¬ظ„ط³ط©',
                     ),
                   ]),
                 );
@@ -2663,7 +2669,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
 }
 
 
-// ═══════════════════════════════════════════════════════════
-// SPRINT 1 — COA FIRST WORKFLOW SCREENS
-// ═══════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// SPRINT 1 â€” COA FIRST WORKFLOW SCREENS
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // [P3] Extracted to screens/extracted/ - see separate file

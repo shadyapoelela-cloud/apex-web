@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../screens/copilot/copilot_screen.dart';
 import '../main.dart' hide S;
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
@@ -61,6 +62,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/providers/documents', builder: (c, s) => const ProviderDocumentUploadScreen()),
     GoRoute(path: '/admin/providers/compliance', builder: (c, s) => const ProviderComplianceScreen()),
     GoRoute(path: '/admin/policies', builder: (c, s) => const PolicyManagementScreen()),
+    GoRoute(path: '/copilot', builder: (c, s) => const CopilotScreen()),
     GoRoute(path: '/admin/audit', builder: (c, s) => const AuditLogScreen()),
   ],
 );

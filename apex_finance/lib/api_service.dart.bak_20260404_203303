@@ -166,16 +166,7 @@ class ApiService {
   static Future<ApiResult> getNotifications() => _get('/notifications');
   static Future<ApiResult> markAllRead() => _post('/notifications/mark-all-read', {});
 
-
-  // ── Copilot AI ──
-  static Future<ApiResult> copilotChat({required String message, String? sessionId, String? clientId}) => _post('/copilot/chat', {'message':message,if(sessionId!=null)'session_id':sessionId,if(clientId!=null)'client_id':clientId});
-  static Future<ApiResult> copilotCreateSession({String? clientId, String sessionType='general'}) => _post('/copilot/sessions', {'client_id':clientId,'session_type':sessionType});
-  static Future<ApiResult> copilotGetSessions() => _get('/copilot/sessions');
-  static Future<ApiResult> copilotGetMessages(String sessionId) => _get('/copilot/sessions/$sessionId/messages');
-  static Future<ApiResult> copilotDetectIntent(String message) => _post('/copilot/detect-intent', {'message':message});
-  static Future<ApiResult> copilotCloseSession(String sessionId) => _post('/copilot/sessions/$sessionId/close', {});
-
-    // ── Helpers ──
+  // ── Helpers ──
   static Future<ApiResult> _get(String path) async {
     try { final res=await http.get(Uri.parse('$_base$path'),headers:_h); if(res.statusCode==200)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
   }

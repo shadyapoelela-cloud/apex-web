@@ -219,10 +219,12 @@ from app.phase2.routes.onboarding_routes import router as onboarding_r
 from app.phase2.routes.archive_routes import router as archive_r
 from app.phase2.routes.service_catalog_routes import router as catalog_r
 from app.phase1.routes.social_auth_routes import router as social_auth_r
+from app.copilot.routes.copilot_routes import router as copilot_router
 app.include_router(onboarding_r, tags=["Onboarding"])
 app.include_router(archive_r, tags=["Archive"])
 app.include_router(catalog_r, tags=["Service Catalog"])
 app.include_router(social_auth_r, tags=["Social Auth"])
+app.include_router(copilot_router)
 print(f"[STARTUP] S6 registered: {len(s6r.routes)} routes")
 
 @app.get("/")
