@@ -67,7 +67,7 @@ class S {
       backgroundColor: AC.navy3,
       side: BorderSide(color: AC.bdr),
       onPressed: () {
-        final nav = context.findAncestorStateOfType<_MainNavS>();
+        final nav = c.findAncestorStateOfType<_MainNavS>();
         if (nav != null) nav.setState(() => nav._i = tabIdx);
       },
     ),

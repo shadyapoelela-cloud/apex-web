@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
 import '../../coa_upload_screen.dart';
@@ -152,16 +152,16 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       ),
       const SizedBox(height: 12),
       _stepCard(1, '\u0631\u0641\u0639 \u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', '\u0631\u0641\u0639 \u0645\u0644\u0641 CSV \u0623\u0648 Excel', Icons.upload_file, AC.cyan, () {
-        if (widget.clientId != null) Navigator.push(context, MaterialPageRoute(builder: (_) => CoaUploadScreen(clientId: widget.clientId!)));
+        if (widget.clientId != null) Navigator.push(context, MaterialPageRoute(builder: (_) => CoaUploadScreen(clientId: widget.clientId!, clientName: widget.clientName ?? '')));
       }),
       _stepCard(2, '\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u062a\u0628\u0648\u064a\u0628', '\u0645\u0631\u0627\u062c\u0639\u0629 \u062a\u0635\u0646\u064a\u0641 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', Icons.map, AC.gold, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const CoaMappingScreen()));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u064a\u0631\u062c\u0649 \u0631\u0641\u0639 \u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a \u0623\u0648\u0644\u0627\u064b', style: TextStyle(fontFamily: 'Tajawal')), backgroundColor: Color(0xFFF0A500)));
       }),
       _stepCard(3, '\u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u062c\u0648\u062f\u0629', '\u0641\u062d\u0635 \u0627\u0643\u062a\u0645\u0627\u0644 \u0648\u0627\u062a\u0633\u0627\u0642 \u0627\u0644\u0634\u062c\u0631\u0629', Icons.assessment, AC.ok, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const CoaQualityScreen()));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u064a\u0631\u062c\u0649 \u0631\u0641\u0639 \u0648\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0634\u062c\u0631\u0629 \u0623\u0648\u0644\u0627\u064b', style: TextStyle(fontFamily: 'Tajawal')), backgroundColor: Color(0xFFF0A500)));
       }),
       _stepCard(4, '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0648\u0627\u0644\u0627\u0639\u062a\u0645\u0627\u062f', '\u0627\u0639\u062a\u0645\u0627\u062f \u0627\u0644\u0634\u062c\u0631\u0629 \u0644\u0644\u0627\u0633\u062a\u062e\u062f\u0627\u0645', Icons.verified, AC.warn, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const CoaReviewScreen()));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u064a\u0631\u062c\u0649 \u0625\u0643\u0645\u0627\u0644 \u0645\u0631\u062d\u0644\u0629 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0623\u0648\u0644\u0627\u064b', style: TextStyle(fontFamily: 'Tajawal')), backgroundColor: Color(0xFFF0A500)));
       }),
     ]);
   }
@@ -176,7 +176,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       const SizedBox(height: 12),
       _stepCard(1, '\u0631\u0641\u0639 \u0627\u0644\u0645\u064a\u0632\u0627\u0646', '\u0631\u0641\u0639 \u0645\u0644\u0641 \u0645\u064a\u0632\u0627\u0646 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', Icons.upload_file, AC.gold, () {}),
       _stepCard(2, '\u0631\u0628\u0637 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', '\u0645\u0637\u0627\u0628\u0642\u0629 \u0627\u0644\u0645\u064a\u0632\u0627\u0646 \u0628\u0627\u0644\u0634\u062c\u0631\u0629', Icons.link, AC.cyan, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const TbBindingScreen()));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u064a\u0631\u062c\u0649 \u0631\u0641\u0639 \u0645\u064a\u0632\u0627\u0646 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0623\u0648\u0644\u0627\u064b', style: TextStyle(fontFamily: 'Tajawal')), backgroundColor: Color(0xFFF0A500)));
       }),
       _stepCard(3, '\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0631\u0628\u0637', '\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0645\u0637\u0627\u0628\u0642\u0629 \u0648\u062d\u0644 \u0627\u0644\u062a\u0639\u0627\u0631\u0636\u0627\u062a', Icons.checklist, AC.ok, () {}),
     ]);

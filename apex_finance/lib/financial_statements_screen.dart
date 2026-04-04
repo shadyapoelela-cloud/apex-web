@@ -129,7 +129,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
       appBar: AppBar(
         backgroundColor: _navy2,
         title: const Text('القوائم المالية',
-          style: TextStyle(fontFamily: 'Tajawal', color: _textPrimary, actions: [IconButton(icon: const Icon(Icons.smart_toy, color: Color(0xFFC9A84C)), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())))])),
+          style: TextStyle(fontFamily: 'Tajawal', color: _textPrimary)),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: _gold,
