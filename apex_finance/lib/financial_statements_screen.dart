@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'screens/copilot/copilot_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 // ignore: avoid_web_libraries_in_flutter
@@ -128,7 +129,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
       appBar: AppBar(
         backgroundColor: _navy2,
         title: const Text('القوائم المالية',
-          style: TextStyle(fontFamily: 'Tajawal', color: _textPrimary)),
+          style: TextStyle(fontFamily: 'Tajawal', color: _textPrimary, actions: [IconButton(icon: const Icon(Icons.smart_toy, color: Color(0xFFC9A84C)), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())))])),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: _gold,
