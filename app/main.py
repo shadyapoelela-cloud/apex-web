@@ -213,6 +213,16 @@ if HAS_S5:
     print(f"[STARTUP] S5 registered: {len(s5r.routes)} routes")
 if HAS_S6:
     app.include_router(s6r, tags=["Sprint 6 Registry + Eligibility"])
+
+# ── New Routes (P0-P4) ──
+from app.phase2.routes.onboarding_routes import router as onboarding_r
+from app.phase2.routes.archive_routes import router as archive_r
+from app.phase2.routes.service_catalog_routes import router as catalog_r
+from app.phase1.routes.social_auth_routes import router as social_auth_r
+app.include_router(onboarding_r, tags=["Onboarding"])
+app.include_router(archive_r, tags=["Archive"])
+app.include_router(catalog_r, tags=["Service Catalog"])
+app.include_router(social_auth_r, tags=["Social Auth"])
     print(f"[STARTUP] S6 registered: {len(s6r.routes)} routes")
 
 @app.get("/")
@@ -896,6 +906,7 @@ async def get_activity_history(limit: int = Query(20)):
 
 if __name__ == "__main__":
     import uvicorn; uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
 
 
 
