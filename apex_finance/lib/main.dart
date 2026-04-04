@@ -58,6 +58,21 @@ class S {
   }
 }
 
+
+  Widget _quickServiceBtn(BuildContext c, String label, IconData icon, int tabIdx) => Padding(
+    padding: const EdgeInsets.only(left: 8),
+    child: ActionChip(
+      avatar: Icon(icon, color: AC.gold, size: 16),
+      label: Text(label, style: const TextStyle(color: AC.tp, fontSize: 11)),
+      backgroundColor: AC.navy3,
+      side: BorderSide(color: AC.bdr),
+      onPressed: () {
+        final nav = context.findAncestorStateOfType<_MainNavS>();
+        if (nav != null) nav.setState(() => nav._i = tabIdx);
+      },
+    ),
+  );
+
 Widget _card(String t, List<Widget> c, {Color? accent}) => Container(
   margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
@@ -274,6 +289,60 @@ class _DashS extends ConsumerState<DashTab> {
             icon: const Icon(Icons.upgrade, color: AC.gold, size: 18),
             label: const Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold)))),
         ]),
+
+        // ── Copilot Quick Access Card ──
+        Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AC.gold.withOpacity(0.12), AC.navy3],
+              begin: Alignment.topRight, end: Alignment.bottomLeft,
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AC.gold.withOpacity(0.3)),
+          ),
+          child: InkWell(
+            onTap: () => Navigator.push(c, MaterialPageRoute(builder: (_) => const CopilotScreen())),
+            borderRadius: BorderRadius.circular(14),
+            child: Row(children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Icons.smart_toy, color: AC.gold, size: 28),
+              ),
+              const SizedBox(width: 14),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  const Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                    child: const Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
+                  ),
+                ]),
+                const SizedBox(height: 4),
+                const Text('\u0627\u0633\u0623\u0644 \u0639\u0646 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a\u060c \u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644\u060c \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629\u060c \u0648\u0623\u0643\u062b\u0631', style: TextStyle(color: AC.ts, fontSize: 12)),
+              ])),
+              const Icon(Icons.arrow_forward_ios, color: AC.gold, size: 16),
+            ]),
+          ),
+        ),
+        // ── Quick Services Row ──
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(children: [
+              _quickServiceBtn(c, '\u062a\u062d\u0644\u064a\u0644 \u0645\u0627\u0644\u064a', Icons.analytics, 2),
+              _quickServiceBtn(c, '\u0634\u062c\u0631\u0629 \u062d\u0633\u0627\u0628\u0627\u062a', Icons.account_tree, 1),
+              _quickServiceBtn(c, '\u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0645\u0627\u0644\u064a\u0629', Icons.receipt_long, 2),
+              _quickServiceBtn(c, '\u0633\u0648\u0642 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', Icons.store, 3),
+              _quickServiceBtn(c, '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', Icons.checklist, 3),
+            ]),
+          ),
+        ),
         // Plans Grid
         const Text('\u0627\u0644\u062e\u0637\u0637 \u0627\u0644\u0645\u062a\u0627\u062d\u0629', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AC.tp)),
         const SizedBox(height: 8),
