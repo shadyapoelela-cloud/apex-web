@@ -524,44 +524,6 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: const Text('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.gold))),
-        drawer: Drawer(
-      backgroundColor: AC.navy2,
-      child: ListView(padding: EdgeInsets.zero, children: [
-        DrawerHeader(
-          decoration: BoxDecoration(color: AC.navy, border: Border(bottom: BorderSide(color: AC.bdr))),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              const Text('v2.0', style: TextStyle(color: AC.ts, fontSize: 10)),
-              const SizedBox(width: 6),
-              const Text('APEX', style: TextStyle(color: AC.gold, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
-            ]),
-            const SizedBox(height: 8),
-            Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: AC.tp, fontSize: 14)),
-            Text(S.planAr(), style: const TextStyle(color: AC.gold, fontSize: 11)),
-          ]),
-        ),
-        _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { Navigator.pop(context); setState(() => _i = 0); }),
-        _drawerItem(Icons.business_rounded, '\u0627\u0644\u0639\u0645\u0644\u0627\u0621', () { Navigator.pop(context); setState(() => _i = 1); }),
-        _drawerItem(Icons.account_balance_wallet, '\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0645\u0627\u0644\u064a\u0629', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); }),
-        _drawerItem(Icons.account_tree, '\u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', () { Navigator.pop(context); setState(() => _i = 2); }),
-        _drawerItem(Icons.analytics_rounded, '\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', () { Navigator.pop(context); setState(() => _i = 2); }),
-        _drawerItem(Icons.receipt_long, '\u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0645\u0627\u0644\u064a\u0629', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); }),
-        const Divider(color: AC.bdr),
-        _drawerItem(Icons.store_rounded, '\u0633\u0648\u0642 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', () { Navigator.pop(context); setState(() => _i = 3); }),
-        _drawerItem(Icons.checklist, '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u062d\u0627\u0633\u0628\u064a\u0629', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const AuditWorkflowScreen())); }),
-        _drawerItem(Icons.work_rounded, '\u0645\u0632\u0648\u062f\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const ProviderKanbanScreen())); }),
-        const Divider(color: AC.bdr),
-        _drawerItem(Icons.psychology, '\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const KnowledgeBrainScreen())); }),
-        _drawerItem(Icons.folder_outlined, '\u0627\u0644\u0623\u0631\u0634\u064a\u0641', () { Navigator.pop(context); context.go('/archive'); }),
-        const Divider(color: AC.bdr),
-        _drawerItem(Icons.person_rounded, '\u062d\u0633\u0627\u0628\u064a', () { Navigator.pop(context); setState(() => _i = 5); }),
-        _drawerItem(Icons.diamond_outlined, '\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a', () { Navigator.pop(context); context.go('/subscription'); }),
-        _drawerItem(Icons.settings, '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const EnhancedSettingsScreen())); }),
-        _drawerItem(Icons.admin_panel_settings, '\u0627\u0644\u0625\u062f\u0627\u0631\u0629', () { Navigator.pop(context); setState(() => _i = 6); }),
-        const Divider(color: AC.bdr),
-        _drawerItem(Icons.smart_toy, 'Apex Copilot', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())); }, isGold: true),
-      ]),
-    ),
     floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: const Icon(Icons.add, color: AC.navy),
       onPressed: () async { await Navigator.push(c, MaterialPageRoute(builder:(_)=> wizard.ClientOnboardingWizard(token: S.token))); _load(); }),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
