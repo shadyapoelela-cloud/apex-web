@@ -128,54 +128,134 @@ class LoginScreen extends StatefulWidget {
   @override State<LoginScreen> createState() => _LoginS();
 }
 class _LoginS extends State<LoginScreen> {
-  final _u=TextEditingController(), _p=TextEditingController();
-  bool _l=false; String? _e;
-  Future<void> _go() async {
-    setState((){ _l=true; _e=null; });
-    try {
-      final r = await http.post(Uri.parse('$_api/auth/login'),
-        headers:{'Content-Type':'application/json'},
-        body: jsonEncode({'username_or_email':_u.text.trim(),'password':_p.text}));
-      final d = jsonDecode(r.body);
-      if(r.statusCode==200 && d['success']==true) {
-        S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
-        S.uname=d['user']['username']; S.dname=d['user']['display_name'];
-        S.plan=d['user']['plan']; S.email=d['user']['email'];
-        S.roles=List<String>.from(d['user']['roles']??[]);
-        if(mounted) context.go('/home');
-      } else { setState(()=> _e=d['detail']??d['error']??'\u062e\u0637\u0623'); }
-    } catch(e){ setState(()=> _e='\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0627\u0644\u062e\u0627\u062f\u0645'); }
-    finally { if(mounted) setState(()=> _l=false); }
-  }
-  @override Widget build(BuildContext c) => Scaffold(body: Center(child: SingleChildScrollView(
-    padding: const EdgeInsets.all(32), child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 400),
-    child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Image.asset('assets/apex_logo.png', width: 316, height: 316, fit: BoxFit.contain),
-      
+  final _u = TextEditingController(), _p = TextEditingController();
+  bool _l = false, _obscure = true;
+  String? _e;
 
-      const SizedBox(height: 40),
-      TextField(controller:_u, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u0623\u0648 \u0627\u0644\u0628\u0631\u064a\u062f', ic: Icons.person_outline)),
-      const SizedBox(height: 14),
-      TextField(controller:_p, obscureText:true, decoration:_inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', ic: Icons.lock_outline), onSubmitted:(_)=>_go()),
-      if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child: Container(padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-        child: Row(children: [const Icon(Icons.error_outline, color:AC.err, size:18), const SizedBox(width:8),
-          Expanded(child: Text(_e!, style:const TextStyle(color:AC.err, fontSize:12)))]))),
-      const SizedBox(height: 22),
-      SizedBox(width: double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
-        child: _l ? const SizedBox(height:20,width:20, child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(fontWeight: FontWeight.bold)))),
-      const SizedBox(height: 8),
-      TextButton(onPressed:()=>context.go('/forgot-password'),
-        child: const Text('ظ†ط³ظٹطھ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±طں', style: TextStyle(color: AC.warn, fontSize: 13))),
-      const SizedBox(height: 4),
-      TextButton(onPressed:()=>context.go('/register'),
-        child: const Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f \u0633\u062c\u0651\u0644 \u0627\u0644\u0622\u0646', style: TextStyle(color: AC.gold))),
-    ])))));
+  Future<void> _go() async {
+    setState(() { _l = true; _e = null; });
+    try {
+      final r = await http.post(Uri.parse('/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username_or_email': _u.text.trim(), 'password': _p.text}));
+      final d = jsonDecode(r.body);
+      if (r.statusCode == 200 && d['success'] == true) {
+        S.token = d['tokens']['access_token']; S.uid = d['user']['id'];
+        S.uname = d['user']['username']; S.dname = d['user']['display_name'];
+        S.plan = d['user']['plan']; S.email = d['user']['email'];
+        S.roles = List<String>.from(d['user']['roles'] ?? []);
+        if (mounted) context.go('/home');
+      } else { setState(() { _e = d['detail'] ?? '\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u062f\u062e\u0648\u0644'; _l = false; }); }
+    } catch (e) { setState(() { _e = ''; _l = false; }); }
+  }
+
+  @override
+  Widget build(BuildContext c) => Scaffold(
+    backgroundColor: AC.navy,
+    body: Center(child: SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        // Logo
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AC.gold.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AC.gold.withOpacity(0.2)),
+          ),
+          child: Column(children: [
+            const Icon(Icons.account_balance, color: AC.gold, size: 48),
+            const SizedBox(height: 8),
+            const Text('APEX', style: TextStyle(color: AC.gold, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 4)),
+            const SizedBox(height: 4),
+            Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0648\u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0647\u0646\u064a\u0629',
+              style: TextStyle(color: AC.ts, fontSize: 11)),
+          ]),
+        ),
+        const SizedBox(height: 32),
+        // Title
+        const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.tp, fontSize: 22, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 6),
+        Text('\u0623\u062f\u062e\u0644 \u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u0644\u0644\u0645\u062a\u0627\u0628\u0639\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
+        const SizedBox(height: 24),
+        // Error
+        if (_e != null) Container(
+          width: double.infinity, margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.err.withOpacity(0.3))),
+          child: Row(children: [const Icon(Icons.error_outline, color: AC.err, size: 18), const SizedBox(width: 8),
+            Expanded(child: Text(_e!, style: const TextStyle(color: AC.err, fontSize: 12)))]),
+        ),
+        // Email field
+        TextField(controller: _u, style: const TextStyle(color: AC.tp),
+          textDirection: TextDirection.ltr,
+          decoration: InputDecoration(
+            labelText: '\u0627\u0644\u0628\u0631\u064a\u062f \u0623\u0648 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
+            prefixIcon: const Icon(Icons.email_outlined, color: AC.gold, size: 20),
+            filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)),
+          )),
+        const SizedBox(height: 14),
+        // Password field
+        TextField(controller: _p, obscureText: _obscure, style: const TextStyle(color: AC.tp),
+          decoration: InputDecoration(
+            labelText: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
+            prefixIcon: const Icon(Icons.lock_outlined, color: AC.gold, size: 20),
+            suffixIcon: IconButton(icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20),
+              onPressed: () => setState(() => _obscure = !_obscure)),
+            filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)),
+          ),
+          onSubmitted: (_) => _go()),
+        // Forgot password
+        Align(alignment: Alignment.centerLeft, child: TextButton(
+          onPressed: () => context.go('/forgot-password'),
+          child: const Text('\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f', style: TextStyle(color: AC.gold, fontSize: 12)))),
+        const SizedBox(height: 8),
+        // Login button
+        SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
+          onPressed: _l ? null : _go,
+          style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            disabledBackgroundColor: AC.gold.withOpacity(0.5)),
+          child: _l ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
+            : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.navy, fontSize: 16, fontWeight: FontWeight.bold)),
+        )),
+        const SizedBox(height: 20),
+        // Divider
+        Row(children: [Expanded(child: Divider(color: AC.bdr)), Padding(padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text('\u0623\u0648 \u0633\u062c\u0651\u0644 \u0628\u0648\u0627\u0633\u0637\u0629', style: TextStyle(color: AC.ts, fontSize: 11))), Expanded(child: Divider(color: AC.bdr))]),
+        const SizedBox(height: 16),
+        // Social Login Buttons (UI only - not functional yet)
+        Row(children: [
+          Expanded(child: OutlinedButton.icon(
+            onPressed: () => ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Google Sign-In'), backgroundColor: AC.navy3)),
+            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            icon: const Icon(Icons.g_mobiledata, color: Colors.red, size: 24),
+            label: const Text('Google', style: TextStyle(color: AC.tp, fontSize: 12)),
+          )),
+          const SizedBox(width: 10),
+          Expanded(child: OutlinedButton.icon(
+            onPressed: () => ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Apple Sign-In'), backgroundColor: AC.navy3)),
+            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            icon: const Icon(Icons.apple, color: AC.tp, size: 22),
+            label: const Text('Apple', style: TextStyle(color: AC.tp, fontSize: 12)),
+          )),
+        ]),
+        const SizedBox(height: 20),
+        // Register link
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f', style: TextStyle(color: AC.ts, fontSize: 13)),
+          TextButton(onPressed: () => context.go('/register'),
+            child: const Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.bold))),
+        ]),
+      ]),
+    )),
+  );
 }
 
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-// REGISTER
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class RegScreen extends StatefulWidget {
   const RegScreen({super.key});
   @override State<RegScreen> createState() => _RegS();
