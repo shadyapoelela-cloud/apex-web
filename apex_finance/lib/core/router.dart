@@ -23,6 +23,7 @@ import '../screens/extracted/legal_screens_v2.dart';
 import '../screens/extracted/client_screens.dart';
 import '../screens/extracted/coa_screens.dart';
 import '../screens/auth/forgot_password_flow.dart';
+import '../screens/auth/slide_auth_screen.dart';
 import '../screens/clients/client_onboarding_wizard.dart' as wizard;
 import '../screens/marketplace/service_catalog_screen.dart' as catalog;
 import '../screens/account/archive_screen.dart' as archive;
@@ -38,7 +39,8 @@ final appRouter = GoRouter(
   // redirect: disabled for now - auth handled in login screen,
     routes: [
     // Auth
-    GoRoute(path: '/login', builder: (c, s) => const LoginScreen()),
+    GoRoute(path: '/login', builder: (c, s) => const SlideAuthScreen()),
+    // GoRoute(path: '/login-old', builder: (c, s) => const LoginScreen()),
     GoRoute(path: '/register', builder: (c, s) => const RegScreen()),
     GoRoute(path: '/forgot-password', builder: (c, s) => const ForgotPasswordScreen()),
 
