@@ -7,6 +7,8 @@ import '../screens/audit/audit_workflow_screen.dart';
 import '../screens/dashboard/enhanced_dashboard.dart';
 import '../screens/providers/provider_kanban_screen.dart';
 import '../screens/settings/enhanced_settings_screen.dart';
+import '../screens/coa/coa_tree_screen.dart';
+import '../screens/shared/result_detail_panel.dart';
 import '../main.dart' hide S;
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
@@ -22,7 +24,8 @@ import '../core/session.dart' show S;
 
 final appRouter = GoRouter(
   initialLocation: '/login',
-  routes: [
+  redirect: (context, state) { final loggedIn = S.token != null; final loggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/register' || state.matchedLocation == '/forgot-password'; if (!loggedIn && !loggingIn) return '/login'; if (loggedIn && loggingIn) return '/home'; return null; },
+    routes: [
     // Auth
     GoRoute(path: '/login', builder: (c, s) => const LoginScreen()),
     GoRoute(path: '/register', builder: (c, s) => const RegScreen()),
@@ -69,6 +72,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/providers/compliance', builder: (c, s) => const ProviderComplianceScreen()),
     GoRoute(path: '/admin/policies', builder: (c, s) => const PolicyManagementScreen()),
     GoRoute(path: '/provider-kanban', builder: (c, s) => const ProviderKanbanScreen()),
+    GoRoute(path: '/coa-tree', builder: (c, s) => const CoaTreeScreen()),
     GoRoute(path: '/settings', builder: (c, s) => const EnhancedSettingsScreen()),
     GoRoute(path: '/dashboard', builder: (c, s) => const EnhancedDashboard()),
     GoRoute(path: '/audit-workflow', builder: (c, s) => const AuditWorkflowScreen()),
