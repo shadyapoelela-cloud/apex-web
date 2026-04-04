@@ -1,4 +1,7 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+TextTheme apexTextTheme(TextTheme base) => GoogleFonts.tajawalTextTheme(base);
 
 class AC {
   static const gold = Color(0xFFC9A84C);

@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'core/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'core/router.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -111,6 +112,7 @@ class ApexApp extends StatelessWidget {
     title: 'APEX', debugShowCheckedModeBanner: false,
     routerConfig: appRouter,
     theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: AC.navy,
+      textTheme: apexTextTheme(ThemeData.dark().textTheme),
       appBarTheme: const AppBarTheme(backgroundColor: AC.navy2, elevation: 0, centerTitle: true),
       elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
         backgroundColor: AC.gold, foregroundColor: AC.navy,
