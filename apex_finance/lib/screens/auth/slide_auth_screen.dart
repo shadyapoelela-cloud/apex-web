@@ -39,7 +39,7 @@ class _SlideAuthState extends State<SlideAuthScreen> {
   Future<void> _login() async {
     setState(() { _ll = true; _le = null; });
     try {
-      final r = await http.post(Uri.parse('\$_api/auth/login'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'username_or_email': _lu.text.trim(), 'password': _lp.text}));
+      final r = await http.post(Uri.parse('$_api/auth/login'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'username_or_email': _lu.text.trim(), 'password': _lp.text}));
       final d = jsonDecode(r.body);
       if (r.statusCode == 200 && d['success'] == true) {
         S.token = d['tokens']['access_token']; S.uid = d['user']['id'];
@@ -55,8 +55,8 @@ class _SlideAuthState extends State<SlideAuthScreen> {
     if (_rp.text != _rp2.text) { setState(() => _rerr = 'كلمة المرور غير متطابقة'); return; }
     setState(() { _rl = true; _rerr = null; });
     try {
-      final phone = '\$_countryCode\${_rph.text.trim()}';
-      final r = await http.post(Uri.parse('\$_api/auth/register'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'username': _ru.text.trim(), 'email': _re2.text.trim(), 'password': _rp.text, 'display_name': _rn.text.trim(), 'phone': phone}));
+      final phone = '$_countryCode\${_rph.text.trim()}';
+      final r = await http.post(Uri.parse('$_api/auth/register'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'username': _ru.text.trim(), 'email': _re2.text.trim(), 'password': _rp.text, 'display_name': _rn.text.trim(), 'phone': phone}));
       final d = jsonDecode(r.body);
       if (r.statusCode == 200 || r.statusCode == 201) {
         setState(() => _rl = false); _slide(0);
