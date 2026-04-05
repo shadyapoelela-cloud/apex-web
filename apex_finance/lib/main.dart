@@ -352,11 +352,6 @@ class _MainNavS extends State<MainNav> {
           ),
         ])),
       ]),
-    floatingActionButton: FloatingActionButton(
-      backgroundColor: AC.gold,
-      onPressed: () => context.go('/copilot'),
-      child: const Icon(Icons.smart_toy, color: AC.navy),
-    ),
     );
   }
   Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
