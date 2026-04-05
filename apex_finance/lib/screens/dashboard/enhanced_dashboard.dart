@@ -41,22 +41,7 @@ class _EDashState extends State<EnhancedDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AC.navy,
-      appBar: AppBar(backgroundColor: AC.navy2,
-        title: Row(children: [
-          const Text('APEX', style: TextStyle(color: AC.gold, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 2)),
-          const SizedBox(width: 8),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
-            child: const Text('v2.0', style: TextStyle(color: AC.gold, fontSize: 9))),
-          const Spacer(),
-          const Text('\u0644\u0648\u062d\u0629 \u0627\u0644\u0642\u064a\u0627\u062f\u0629', style: TextStyle(color: AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
-        ]),
-        actions: [IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold, size: 22),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())))],
-      ),
-      body: _loading ? const Center(child: CircularProgressIndicator(color: AC.gold))
+    return _loading ? const Center(child: CircularProgressIndicator(color: AC.gold))
         : RefreshIndicator(onRefresh: _loadAll, color: AC.gold,
           child: ListView(padding: const EdgeInsets.all(14), children: [
             _buildKpiRow(),
@@ -70,8 +55,7 @@ class _EDashState extends State<EnhancedDashboard> {
             _buildServiceDonut(),
             const SizedBox(height: 16),
             _buildRecentActivity(),
-          ])),
-    );
+          ]));
   }
 
   Widget _buildKpiRow() => Row(children: [
