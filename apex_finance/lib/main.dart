@@ -310,6 +310,7 @@ class _MainNavS extends State<MainNav> {
   double _fabX = 20;
   double _fabY = 100;
   @override Widget build(BuildContext c) {
+    debugPrint('USER: uname=\${S.uname} dname=\${S.dname} token=\${S.token?.substring(0,10)}');
     final tabs = [const EnhancedDashboard(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
     return Scaffold(
       backgroundColor: AC.navy,
@@ -321,7 +322,7 @@ class _MainNavS extends State<MainNav> {
             IconButton(icon: const Icon(Icons.search, color: Color(0xFF8A8880), size: 20), onPressed: () {}),
             const Spacer(),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(S.dname ?? S.uname ?? 'User', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 12, fontWeight: FontWeight.w600)),
+              Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'), style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 13, fontWeight: FontWeight.w600)),
               Text(_activeClient ?? '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644', style: const TextStyle(color: Color(0xFF8A8880), fontSize: 10)),
             ]),
             const SizedBox(width: 6),
