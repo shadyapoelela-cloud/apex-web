@@ -312,8 +312,7 @@ class _MainNavS extends State<MainNav> {
         DrawerHeader(
           decoration: BoxDecoration(color: AC.navy, border: Border(bottom: BorderSide(color: AC.bdr))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C)), onPressed: () => Navigator.pop(context)),
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               const Text('v2.0', style: TextStyle(color: AC.ts, fontSize: 10)),
               const SizedBox(width: 6),
               const Text('APEX', style: TextStyle(color: AC.gold, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
