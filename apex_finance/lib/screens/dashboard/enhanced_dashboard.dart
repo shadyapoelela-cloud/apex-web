@@ -47,7 +47,9 @@ class _EDashState extends State<EnhancedDashboard> {
             _buildKpiRow(),
             const SizedBox(height: 16),
             // quick nav removed
-            Row(children: [Expanded(child: _buildRevenueChart()), const SizedBox(width: 10), Expanded(child: _buildServiceDonut())]),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: _buildRevenueChart()), const SizedBox(width: 10), Expanded(child: _buildServiceDonut())]),
+            const SizedBox(height: 12),
+            _buildPerformanceCard(),
             _buildRecentActivity(),
           ]));
   }
@@ -101,6 +103,7 @@ class _EDashState extends State<EnhancedDashboard> {
 
   // ===== MONTHLY REVENUE BAR CHART =====
   Widget _buildRevenueChart() {
+    // Revenue chart
     final months = ['\u064a\u0646\u0627', '\u0641\u0628\u0631', '\u0645\u0627\u0631', '\u0623\u0628\u0631', '\u0645\u0627\u064a', '\u064a\u0648\u0646'];
     final values = [45.0, 62.0, 78.0, 55.0, 90.0, 72.0];
     return Container(padding: const EdgeInsets.all(14),
@@ -156,7 +159,7 @@ class _EDashState extends State<EnhancedDashboard> {
         const Text('\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
         const SizedBox(height: 12),
         Row(children: [
-          SizedBox(width: 140, height: 140, child: PieChart(PieChartData(
+          SizedBox(width: 160, height: 160, child: PieChart(PieChartData(
             sectionsSpace: 2, centerSpaceRadius: 35,
             sections: data.map((d) => PieChartSectionData(
               value: d['v'] as double, color: d['c'] as Color,
@@ -177,6 +180,41 @@ class _EDashState extends State<EnhancedDashboard> {
         ]),
       ]));
   }
+
+
+  Widget _buildPerformanceCard() => Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        const Icon(Icons.speed, color: AC.gold, size: 18),
+        const SizedBox(width: 8),
+        const Text('\u0645\u0624\u0634\u0631\u0627\u062a \u0627\u0644\u0623\u062f\u0627\u0621', style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold)),
+      ]),
+      const SizedBox(height: 12),
+      Row(children: [
+        Expanded(child: _perfItem('\u0645\u0639\u062f\u0644 \u0627\u0644\u0625\u0646\u062c\u0627\u0632', '87%', Icons.trending_up, AC.ok)),
+        const SizedBox(width: 8),
+        Expanded(child: _perfItem('\u0631\u0636\u0627 \u0627\u0644\u0639\u0645\u0644\u0627\u0621', '92%', Icons.thumb_up, AC.cyan)),
+        const SizedBox(width: 8),
+        Expanded(child: _perfItem('\u0645\u062a\u0648\u0633\u0637 \u0627\u0644\u0648\u0642\u062a', '3.2\u064a', Icons.timer, AC.warn)),
+        const SizedBox(width: 8),
+        Expanded(child: _perfItem('\u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644', '95%', Icons.verified, AC.gold)),
+      ]),
+    ]),
+  );
+
+  Widget _perfItem(String label, String value, IconData icon, Color color) => Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(color: AC.navy.withOpacity(0.5), borderRadius: BorderRadius.circular(10)),
+    child: Column(children: [
+      Icon(icon, color: color, size: 20),
+      const SizedBox(height: 6),
+      Text(value, style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.w900)),
+      const SizedBox(height: 2),
+      Text(label, style: const TextStyle(color: AC.ts, fontSize: 9), textAlign: TextAlign.center),
+    ]),
+  );
 
   Widget _buildRecentActivity() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     const Text('\u0622\u062e\u0631 \u0627\u0644\u0623\u0646\u0634\u0637\u0629', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
