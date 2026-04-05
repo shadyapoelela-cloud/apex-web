@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -59,7 +59,7 @@ class _SAS extends State<SlideAuthScreen> {
         }
       } else {
         setState(() {
-          _le = d['detail'] ?? 'خطأ في الدخول';
+          _le = d['detail'] ?? 'ط®ط·ط£ ظپظٹ ط§ظ„ط¯ط®ظˆظ„';
           _ll = false;
         });
       }
@@ -69,7 +69,7 @@ class _SAS extends State<SlideAuthScreen> {
   }
 
   Future<void> _register() async {
-    if (_rp.text != _rp2.text) { setState(() => _re = 'كلمة المرور غير متطابقة'); return; }
+    if (_rp.text != _rp2.text) { setState(() => _re = 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± ظ…طھط·ط§ط¨ظ‚ط©'); return; }
     setState(() { _rl = true; _re = null; });
     try {
       final url = 'https://apex-api-ootk.onrender.com/auth/register';
@@ -86,7 +86,7 @@ class _SAS extends State<SlideAuthScreen> {
       if (r.statusCode == 200 || r.statusCode == 201) {
         setState(() => _rl = false);
         _sl(0);
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم إنشاء الحساب!'), backgroundColor: AC.ok));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('طھظ… ط¥ظ†ط´ط§ط، ط§ظ„ط­ط³ط§ط¨!'), backgroundColor: AC.ok));
       } else {
         setState(() { _re = d['detail'] ?? 'error'; _rl = false; });
       }
@@ -106,7 +106,7 @@ class _SAS extends State<SlideAuthScreen> {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               const Text('APEX', style: TextStyle(color: AC.gold, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: 6)),
               const SizedBox(height: 4),
-              Text('منصة التحليل المالي والحوكمة المعرفية — السوق السعودي', style: const TextStyle(color: AC.ts, fontSize: 11)),
+              Text('ظ…ظ†طµط© ط§ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ ظˆط§ظ„ط­ظˆظƒظ…ط© ط§ظ„ظ…ط¹ط±ظپظٹط© â€” ط§ظ„ط³ظˆظ‚ ط§ظ„ط³ط¹ظˆط¯ظٹ', style: const TextStyle(color: AC.ts, fontSize: 11)),
               const SizedBox(height: 24),
               Container(
                 width: 420,
@@ -121,7 +121,7 @@ class _SAS extends State<SlideAuthScreen> {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
-                    child: Row(children: [_tb('تسجيل دخول', 0), _tb('إنشاء حساب', 1)]),
+                    child: Row(children: [_tb('طھط³ط¬ظٹظ„ ط¯ط®ظˆظ„', 0), _tb('ط¥ظ†ط´ط§ط، ط­ط³ط§ط¨', 1)]),
                   ),
                   const SizedBox(height: 16),
                   IndexedStack(index: _pg, children: [_loginForm(), _regForm()]),
@@ -151,27 +151,27 @@ class _SAS extends State<SlideAuthScreen> {
   Widget _loginForm() => Column(children: [
     const SizedBox(height: 12),
     if (_le != null) _errW(_le!),
-    _tf(_lu, 'البريد أو اسم المستخدم', Icons.email_outlined, ltr: true),
+    _tf(_lu, 'ط§ظ„ط¨ط±ظٹط¯ ط£ظˆ ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ…', Icons.email_outlined, ltr: true),
     const SizedBox(height: 12),
-    _pf(_lp, 'كلمة المرور', _lo, () => setState(() => _lo = !_lo), sub: _login),
-    Align(alignment: Alignment.centerLeft, child: TextButton(onPressed: () => context.go('/forgot-password'), child: Text('نسيت كلمة المرور؟', style: const TextStyle(color: AC.gold, fontSize: 12)))),
+    _pf(_lp, 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±', _lo, () => setState(() => _lo = !_lo), sub: _login),
+    Align(alignment: Alignment.centerLeft, child: TextButton(onPressed: () => context.go('/forgot-password'), child: Text('ظ†ط³ظٹطھ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±طں', style: const TextStyle(color: AC.gold, fontSize: 12)))),
     const SizedBox(height: 6),
-    _btn('تسجيل الدخول', _ll, _login),
+    _btn('طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„', _ll, _login),
     const SizedBox(height: 14), _orW(), const SizedBox(height: 10), _socW(),
   ]);
 
   Widget _regForm() => Column(children: [
     const SizedBox(height: 12),
     if (_re != null) _errW(_re!),
-    _tf(_rn, 'الاسم الكامل', Icons.person_outline),
+    _tf(_rn, 'ط§ظ„ط§ط³ظ… ط§ظ„ظƒط§ظ…ظ„', Icons.person_outline),
     const SizedBox(height: 10),
-    _tf(_ru, 'اسم المستخدم', Icons.alternate_email, ltr: true),
+    _tf(_ru, 'ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ…', Icons.alternate_email, ltr: true),
     const SizedBox(height: 10),
-    _tf(_rem, 'البريد الإلكتروني', Icons.email_outlined, ltr: true),
+    _tf(_rem, 'ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ', Icons.email_outlined, ltr: true),
     const SizedBox(height: 10),
-    _pf(_rp, 'كلمة المرور', _ro, () => setState(() => _ro = !_ro)),
+    _pf(_rp, 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±', _ro, () => setState(() => _ro = !_ro)),
     const SizedBox(height: 10),
-    _pf(_rp2, 'تأكيد كلمة المرور', _ro, () => setState(() => _ro = !_ro)),
+    _pf(_rp2, 'طھط£ظƒظٹط¯ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±', _ro, () => setState(() => _ro = !_ro)),
     const SizedBox(height: 10),
     Row(children: [
       Container(width: 100, height: 48,
@@ -185,10 +185,10 @@ class _SAS extends State<SlideAuthScreen> {
         )),
       ),
       const SizedBox(width: 8),
-      Expanded(child: _tf(_rph, 'رقم الهاتف', Icons.phone, ltr: true)),
+      Expanded(child: _tf(_rph, 'ط±ظ‚ظ… ط§ظ„ظ‡ط§طھظپ', Icons.phone, ltr: true)),
     ]),
     const SizedBox(height: 14),
-    _btn('إنشاء حساب', _rl, _register),
+    _btn('ط¥ظ†ط´ط§ط، ط­ط³ط§ط¨', _rl, _register),
     const SizedBox(height: 14), _orW(), const SizedBox(height: 10), _socW(),
   ]);
 
@@ -236,7 +236,7 @@ class _SAS extends State<SlideAuthScreen> {
   );
 
   Widget _orW() => Row(children: [Expanded(child: Divider(color: AC.bdr)),
-    Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: Text('أو', style: const TextStyle(color: AC.ts, fontSize: 11))),
+    Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: Text('ط£ظˆ', style: const TextStyle(color: AC.ts, fontSize: 11))),
     Expanded(child: Divider(color: AC.bdr))]);
 
   Widget _socW() => Row(children: [
