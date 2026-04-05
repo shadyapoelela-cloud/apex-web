@@ -332,7 +332,7 @@ class _MainNavS extends State<MainNav> {
             IconButton(icon: const Icon(Icons.search, color: Color(0xFF8A8880), size: 20), onPressed: () {}),
             const Spacer(),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(_userName, style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 13, fontWeight: FontWeight.w600)),
+              Text('t:\${S.token != null ? "yes" : "no"} u:\${S.uname} d:\${S.dname}', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 10, fontWeight: FontWeight.w600)),
               Text(_activeClient ?? _clientLabel, style: const TextStyle(color: Color(0xFF8A8880), fontSize: 10)),
             ]),
             const SizedBox(width: 6),
