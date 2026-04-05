@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../widgets/copilot_widgets.dart';
+import '../shared/result_detail_panel.dart';
 
 class CopilotScreen extends StatefulWidget {
   final String? clientId;
@@ -315,6 +318,20 @@ class _CopilotScreenState extends State<CopilotScreen> {
       'smart_toy': Icons.smart_toy, 'store': Icons.store, 'dashboard': Icons.dashboard,
     };
     return map[name] ?? Icons.arrow_forward;
+  }
+
+  void _onAction(String action) {
+    final routes = {
+      'تحليل': '/financial-ops',
+      'مالي': '/financial-ops',
+      'مراجعة': '/audit-workflow',
+      'معرف': '/knowledge-brain',
+      'عميل': '/clients',
+      'خدم': '/financial-ops',
+    };
+    for (final e in routes.entries) {
+      if (action.contains(e.key)) { context.go(e.value); return; }
+    }
   }
 
   @override
