@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'api_service.dart';
 import 'screens/dashboard/enhanced_dashboard.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme.dart';
@@ -305,6 +306,7 @@ class MainNav extends StatefulWidget {
 class _MainNavS extends State<MainNav> {
   int _i = 0;
   bool _dr = false;
+  String? _activeClient;
   double _fabX = 20;
   double _fabY = 100;
   @override Widget build(BuildContext c) {
@@ -318,9 +320,15 @@ class _MainNavS extends State<MainNav> {
             const SizedBox(width: 8),
             IconButton(icon: const Icon(Icons.search, color: Color(0xFF8A8880), size: 20), onPressed: () {}),
             const Spacer(),
-            Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 12)),
+            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 12, fontWeight: FontWeight.w600)),
+              Text(_activeClient ?? '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644', style: const TextStyle(color: Color(0xFF8A8880), fontSize: 10)),
+            ]),
             const SizedBox(width: 6),
-            const Icon(Icons.account_circle, color: Color(0xFFC9A84C), size: 22),
+            GestureDetector(
+              onTap: () => _showClientPicker(c),
+              child: const Icon(Icons.account_circle, color: Color(0xFFC9A84C), size: 22),
+            ),
           ]),
         ),
         Expanded(child: Stack(children: [
@@ -371,6 +379,30 @@ class _MainNavS extends State<MainNav> {
       ]),
     );
   }
+
+  void _showClientPicker(BuildContext ctx) async {
+    final res = await ApiService.listClients();
+    if (!res.success || res.data is! List) return;
+    final clients = res.data as List;
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: ctx, backgroundColor: AC.navy2,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (_) => Padding(padding: const EdgeInsets.all(16), child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+        const SizedBox(height: 12),
+        const Text('\u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0639\u0645\u064a\u0644', style: TextStyle(color: AC.gold, fontSize: 15, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        ...clients.take(10).map((cl) => ListTile(
+          trailing: const Icon(Icons.business, color: AC.gold, size: 18),
+          title: Text(cl['name'] ?? cl['company_name'] ?? '', textAlign: TextAlign.right, style: const TextStyle(color: AC.tp, fontSize: 13)),
+          onTap: () { setState(() => _activeClient = cl['name'] ?? cl['company_name'] ?? ''); Navigator.pop(context); },
+          dense: true,
+        )),
+      ])),
+    );
+  }
+
   Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
     trailing: Icon(icon, color: isGold ? AC.gold : AC.ts, size: 20),
     title: Text(label, textAlign: TextAlign.right, style: TextStyle(color: isGold ? AC.gold : AC.tp, fontSize: 13, fontWeight: isGold ? FontWeight.bold : FontWeight.normal)),
