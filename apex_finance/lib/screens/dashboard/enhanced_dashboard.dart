@@ -103,43 +103,39 @@ class _EDashState extends State<EnhancedDashboard> {
 
   // ===== MONTHLY REVENUE BAR CHART =====
   Widget _buildRevenueChart() {
-    // Revenue chart
     final months = ['\u064a\u0646\u0627', '\u0641\u0628\u0631', '\u0645\u0627\u0631', '\u0623\u0628\u0631', '\u0645\u0627\u064a', '\u064a\u0648\u0646'];
-    final values = [45.0, 62.0, 78.0, 55.0, 90.0, 72.0];
+    final thisYear = [45.0, 62.0, 78.0, 55.0, 90.0, 72.0];
+    final lastYear = [38.0, 50.0, 65.0, 48.0, 75.0, 60.0];
     return Container(padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Text('\u0627\u0644\u0625\u064a\u0631\u0627\u062f\u0627\u062a \u0627\u0644\u0634\u0647\u0631\u064a\u0629', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
+          const Text('\u0627\u0644\u0625\u064a\u0631\u0627\u062f\u0627\u062a \u0627\u0644\u0633\u0646\u0648\u064a\u0629', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
           const Spacer(),
-          const Text('\u0623\u0644\u0641 \u0631.\u0633', style: TextStyle(color: AC.ts, fontSize: 10)),
+          Container(width: 8, height: 8, decoration: const BoxDecoration(color: AC.gold, shape: BoxShape.circle)),
+          const Text(' 2026 ', style: TextStyle(color: AC.ts, fontSize: 8)),
+          Container(width: 8, height: 8, decoration: const BoxDecoration(color: AC.cyan, shape: BoxShape.circle)),
+          const Text(' 2025', style: TextStyle(color: AC.ts, fontSize: 8)),
         ]),
         const SizedBox(height: 16),
-        SizedBox(height: 180, child: BarChart(BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: 100,
-          barTouchData: BarTouchData(
-            touchTooltipData: BarTouchTooltipData(
-              getTooltipItem: (g, gi, r, ri) => BarTooltipItem('K', const TextStyle(color: AC.gold, fontSize: 12)),
-            ),
-          ),
+        SizedBox(height: 180, child: LineChart(LineChartData(
+          minY: 0, maxY: 100,
+          lineTouchData: const LineTouchData(enabled: true),
           titlesData: FlTitlesData(
             show: true,
-            bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (v, m) =>
-              Padding(padding: const EdgeInsets.only(top: 6), child: Text(months[v.toInt()], style: const TextStyle(color: AC.ts, fontSize: 10))))),
-            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30,
-              getTitlesWidget: (v, m) => Text('', style: const TextStyle(color: AC.ts, fontSize: 9)))),
+            bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (v, m) {
+              final idx = v.toInt(); if (idx < 0 || idx >= months.length) return const SizedBox(); return Padding(padding: const EdgeInsets.only(top: 6), child: Text(months[idx], style: const TextStyle(color: AC.ts, fontSize: 10)));
+            })),
+            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30, getTitlesWidget: (v, m) => Text('${v.toInt()}', style: const TextStyle(color: AC.ts, fontSize: 8)))),
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
-          gridData: FlGridData(show: true, drawVerticalLine: false,
-            getDrawingHorizontalLine: (v) => FlLine(color: AC.bdr, strokeWidth: 0.5)),
+          gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: 25, getDrawingHorizontalLine: (v) => FlLine(color: AC.bdr, strokeWidth: 0.5)),
           borderData: FlBorderData(show: false),
-          barGroups: List.generate(6, (i) => BarChartGroupData(x: i, barRods: [
-            BarChartRodData(toY: values[i], color: i == 4 ? AC.gold : AC.gold.withOpacity(0.5),
-              width: 20, borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-              backDrawRodData: BackgroundBarChartRodData(show: true, toY: 100, color: AC.navy4)),
-          ])),
+          lineBarsData: [
+            LineChartBarData(spots: thisYear.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(), isCurved: true, color: AC.gold, barWidth: 2.5, dotData: const FlDotData(show: true), belowBarData: BarAreaData(show: true, color: AC.gold.withOpacity(0.1))),
+            LineChartBarData(spots: lastYear.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(), isCurved: true, color: AC.cyan, barWidth: 2, dashArray: [5, 3], dotData: const FlDotData(show: false)),
+          ],
         ))),
       ]));
   }
