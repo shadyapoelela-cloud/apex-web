@@ -326,17 +326,11 @@ class _MainNavS extends State<MainNav> {
         Expanded(child: Stack(children: [
           Row(children: [
             Expanded(child: tabs[_i]),
-            if (_dr) SizedBox(width: 250,
-              child: Material(color: AC.navy2,
+            if (_dr) MouseRegion(onExit: (_) => setState(() => _dr = false),
+              child: SizedBox(width: 250,
+                child: Material(color: AC.navy2,
                 child: Column(children: [
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x26C9A84C)))),
-                    child: Row(children: [
-                      Expanded(child: Text(S.dname ?? S.uname ?? '', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 13, fontWeight: FontWeight.w600))),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.account_circle, color: Color(0xFFC9A84C), size: 20),
-                    ]),
-                  ),
+
                   Expanded(child: ListView(padding: EdgeInsets.zero, children: [
         _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { setState(() => _i = 0); }),
         _drawerItem(Icons.business_rounded, '\u0627\u0644\u0639\u0645\u0644\u0627\u0621', () { setState(() => _i = 1); }),
@@ -361,7 +355,7 @@ class _MainNavS extends State<MainNav> {
                   ])),
                 ]),
               ),
-            ),
+            )),
             if (!_dr) MouseRegion(onEnter: (_) => setState(() => _dr = true),
               child: Container(width: 8, color: Colors.transparent)),
           ]),
