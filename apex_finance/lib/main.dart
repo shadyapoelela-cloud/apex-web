@@ -357,18 +357,7 @@ class _MainNavS extends State<MainNav> {
       onPressed: () => context.go('/copilot'),
       child: const Icon(Icons.smart_toy, color: AC.navy),
     ),
-    bottomNavigationBar: BottomNavigationBar(currentIndex:_i, onTap:(i)=>setState(()=>_i=i),
-      type: BottomNavigationBarType.fixed, backgroundColor: AC.navy2,
-      selectedItemColor: AC.gold, unselectedItemColor: AC.ts, selectedFontSize: 11, unselectedFontSize: 10,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629'),
-        BottomNavigationBarItem(icon: Icon(Icons.business_rounded), label: '\u0627\u0644\u0639\u0645\u0644\u0627\u0621'),
-        BottomNavigationBarItem(icon: Icon(Icons.analytics_rounded), label: '\u0627\u0644\u062a\u062d\u0644\u064a\u0644'),
-        BottomNavigationBarItem(icon: Icon(Icons.store_rounded), label: '\u0627\u0644\u0645\u0639\u0631\u0636'),
-        BottomNavigationBarItem(icon: Icon(Icons.work_rounded), label: '\u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: '\u062d\u0633\u0627\u0628\u064a'),
-        BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings_rounded), label: '\u0625\u062f\u0627\u0631\u0629'),
-      ]));
+    );
   }
   Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
     trailing: Icon(icon, color: isGold ? AC.gold : AC.ts, size: 20),
