@@ -321,7 +321,6 @@ class _MainNavS extends State<MainNav> {
               Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 13)),
               Text(S.planAr(), style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 11)),
             ])),
-            IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => Navigator.pop(context)),
           ]),
         ),
         _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { Navigator.pop(context); setState(() => _i = 0); }),
