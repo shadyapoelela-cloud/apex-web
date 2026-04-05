@@ -46,12 +46,8 @@ class _EDashState extends State<EnhancedDashboard> {
           child: ListView(padding: const EdgeInsets.all(14), children: [
             _buildKpiRow(),
             const SizedBox(height: 16),
-            _buildQuickNav(),
-            const SizedBox(height: 16),
-            _buildRevenueChart(),
-            const SizedBox(height: 16),
-            _buildServiceDonut(),
-            const SizedBox(height: 16),
+            // quick nav removed
+            Row(children: [Expanded(child: _buildRevenueChart()), const SizedBox(width: 10), Expanded(child: _buildServiceDonut())]),
             _buildRecentActivity(),
           ]));
   }
