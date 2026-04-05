@@ -47,7 +47,7 @@ class _EDashState extends State<EnhancedDashboard> {
             _buildKpiRow(),
             const SizedBox(height: 16),
             // quick nav removed
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: _buildRevenueChart()), const SizedBox(width: 10), Expanded(child: _buildServiceDonut())]),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: _buildRevenueChart()), const SizedBox(width: 8), Expanded(child: _buildServiceDonut()), const SizedBox(width: 8), Expanded(child: _buildSectorChart())]),
             const SizedBox(height: 12),
             _buildPerformanceCard(),
             _buildRecentActivity(),
@@ -103,9 +103,9 @@ class _EDashState extends State<EnhancedDashboard> {
 
   // ===== MONTHLY REVENUE BAR CHART =====
   Widget _buildRevenueChart() {
-    final months = ['\u064a\u0646\u0627', '\u0641\u0628\u0631', '\u0645\u0627\u0631', '\u0623\u0628\u0631', '\u0645\u0627\u064a', '\u064a\u0648\u0646'];
-    final thisYear = [45.0, 62.0, 78.0, 55.0, 90.0, 72.0];
-    final lastYear = [38.0, 50.0, 65.0, 48.0, 75.0, 60.0];
+    final months = ['\u064a\u0646\u0627', '\u0641\u0628\u0631', '\u0645\u0627\u0631', '\u0623\u0628\u0631', '\u0645\u0627\u064a', '\u064a\u0648\u0646', '\u064a\u0648\u0644', '\u0623\u063a\u0633', '\u0633\u0628\u062a', '\u0623\u0643\u062a', '\u0646\u0648\u0641', '\u062f\u064a\u0633'];
+    final thisYear = [45.0, 62.0, 78.0, 55.0, 90.0, 72.0, 85.0, 68.0, 95.0, 80.0, 88.0, 92.0];
+    final lastYear = [38.0, 50.0, 65.0, 48.0, 75.0, 60.0, 70.0, 55.0, 78.0, 66.0, 72.0, 80.0];
     return Container(padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -144,36 +144,35 @@ class _EDashState extends State<EnhancedDashboard> {
   Widget _buildServiceDonut() {
     final data = [
       {'\u0646': '\u062a\u062d\u0644\u064a\u0644 \u0645\u0627\u0644\u064a', 'v': 32.0, 'c': AC.cyan},
-      {'\u0646': '\u062c\u0627\u0647\u0632\u064a\u0629 \u062a\u0645\u0648\u064a\u0644', 'v': 22.0, 'c': AC.gold},
+      {'\u0646': '\u062c\u0627\u0647\u0632\u064a\u0629 \u062a\u0645\u0648\u064a\u0644', 'v': 24.0, 'c': AC.gold},
       {'\u0646': '\u0645\u0631\u0627\u062c\u0639\u0629', 'v': 16.0, 'c': AC.ok},
       {'\u0646': '\u0636\u0631\u0627\u0626\u0628', 'v': 12.0, 'c': AC.warn},
-      {'\u0646': '\u062f\u0639\u0645 \u0648\u062a\u0631\u0627\u062e\u064a\u0635', 'v': 18.0, 'c': const Color(0xFFE91E63)},
+      {'\u0646': '\u062f\u0639\u0645', 'v': 16.0, 'c': const Color(0xFF9C27B0)},
     ];
     return Container(padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
-        const SizedBox(height: 12),
-        Row(children: [
-          SizedBox(width: 180, height: 180, child: PieChart(PieChartData(
-            sectionsSpace: 2, centerSpaceRadius: 35,
-            sections: data.map((d) => PieChartSectionData(
-              value: d['v'] as double, color: d['c'] as Color,
-              radius: 30, title: '%',
-              titleStyle: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-            )).toList(),
-          ))),
-          const SizedBox(width: 16),
-          Expanded(child: Column(children: data.map((d) => Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(children: [
-              Container(width: 10, height: 10, decoration: BoxDecoration(color: d['c'] as Color, borderRadius: BorderRadius.circular(2))),
-              const SizedBox(width: 6),
-              Expanded(child: Text(d['\u0646'] as String, style: const TextStyle(color: AC.ts, fontSize: 11))),
-              Text('%', style: TextStyle(color: d['c'] as Color, fontSize: 11, fontWeight: FontWeight.bold)),
+        const Text('\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
+        const SizedBox(height: 8),
+        SizedBox(height: 180, child: Row(textDirection: TextDirection.rtl, children: [
+          Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: data.map((d) => Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(textDirection: TextDirection.rtl, children: [
+              Container(width: 8, height: 8, decoration: BoxDecoration(color: d['c'] as Color, shape: BoxShape.circle)),
+              const SizedBox(width: 4),
+              Text('${(d["v"] as num).toInt()}%', style: TextStyle(color: d['c'] as Color, fontSize: 10, fontWeight: FontWeight.bold)),
+              const SizedBox(width: 4),
+              Expanded(child: Text(d['\u0646'] as String, textDirection: TextDirection.rtl, style: const TextStyle(color: AC.ts, fontSize: 9), overflow: TextOverflow.ellipsis)),
             ]),
           )).toList())),
-        ]),
+          SizedBox(width: 130, height: 130, child: PieChart(PieChartData(
+            sectionsSpace: 2, centerSpaceRadius: 28,
+            sections: data.map((d) => PieChartSectionData(
+              value: (d['v'] as num).toDouble(), color: d['c'] as Color,
+              radius: 28, showTitle: false,
+            )).toList(),
+          ))),
+        ])),
       ]));
   }
 
