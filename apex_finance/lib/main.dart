@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'screens/dashboard/enhanced_dashboard.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme.dart';
 import 'package:go_router/go_router.dart';
@@ -310,17 +311,17 @@ class _MainNavS extends State<MainNav> {
       backgroundColor: AC.navy2,
       child: ListView(padding: EdgeInsets.zero, children: [
         Container(color: const Color(0xFF050D1A), padding: const EdgeInsets.only(top: 40, right: 4), child: Align(alignment: Alignment.centerRight, child: IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C)), onPressed: () => Navigator.pop(context)))),
-        DrawerHeader(
-          decoration: BoxDecoration(color: AC.navy, border: Border(bottom: BorderSide(color: AC.bdr))),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              const Text('v2.0', style: TextStyle(color: AC.ts, fontSize: 10)),
-              const SizedBox(width: 6),
-              const Text('APEX', style: TextStyle(color: AC.gold, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 2)),
-            ]),
-            const SizedBox(height: 8),
-            Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: AC.tp, fontSize: 14)),
-            Text(S.planAr(), style: const TextStyle(color: AC.gold, fontSize: 11)),
+        Container(
+          padding: const EdgeInsets.only(top: 44, left: 16, right: 4, bottom: 8),
+          decoration: const BoxDecoration(color: Color(0xFF050D1A), border: Border(bottom: BorderSide(color: Color(0x26C9A84C)))),
+          child: Row(children: [
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('لوحة التحكم', style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 15, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 13)),
+              Text(S.planAr(), style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 11)),
+            ])),
+            IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => Navigator.pop(context)),
           ]),
         ),
         _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { Navigator.pop(context); setState(() => _i = 0); }),
