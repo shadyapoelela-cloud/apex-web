@@ -322,15 +322,11 @@ class _MainNavS extends State<MainNav> {
           if (_dr) Positioned(top: 0, bottom: 0, right: 0, width: 270,
             child: Material(color: AC.navy2, elevation: 12,
               child: Column(children: [
-                Container(padding: const EdgeInsets.only(top: 8, left: 12, right: 4, bottom: 8),
+                Container(padding: const EdgeInsets.only(top: 0, right: 4, bottom: 0),
                   decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x26C9A84C)))),
-                  child: Row(children: [
-                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 14, fontWeight: FontWeight.w600)),
-                      Text(S.planAr(), style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 11)),
-                    ])),
-                    IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => setState(() => _dr = false)),
-                  ]),
+                  child: Align(alignment: Alignment.centerRight,
+                    child: IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => setState(() => _dr = false)),
+                  ),
                 ),
                 Expanded(child: ListView(padding: EdgeInsets.zero, children: [
         _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { setState(() => _dr = false); setState(() => _i = 0); }),
