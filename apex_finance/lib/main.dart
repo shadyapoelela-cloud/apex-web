@@ -331,6 +331,7 @@ class _MainNavS extends State<MainNav> {
             const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)),
             const SizedBox(width: 8),
             IconButton(icon: const Icon(Icons.search, color: Color(0xFF8A8880), size: 20), onPressed: () {}),
+            IconButton(icon: const Icon(Icons.notifications_outlined, color: Color(0xFF8A8880), size: 20), onPressed: () => context.go('/notifications')),
             const Spacer(),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
               Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'), style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 13, fontWeight: FontWeight.w600)),
