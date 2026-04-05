@@ -58,15 +58,23 @@ class _EDashState extends State<EnhancedDashboard> {
           ]));
   }
 
-  Widget _buildKpiRow() => Row(children: [
-    _kpi('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', '', Icons.business, AC.cyan, '+12%'),
-    const SizedBox(width: 8),
-    _kpi('\u0627\u0644\u062a\u062d\u0644\u064a\u0644\u0627\u062a', '', Icons.analytics, AC.ok, '+8%'),
-    const SizedBox(width: 8),
-    _kpi('\u0627\u0644\u062e\u062f\u0645\u0627\u062a', '', Icons.work, AC.gold, '+23%'),
-    const SizedBox(width: 8),
-    _kpi('\u0627\u0644\u0625\u064a\u0631\u0627\u062f\u0627\u062a', 'K', Icons.payments, AC.warn, '+15%'),
-  ].map((w) => Expanded(child: w)).toList());
+  Widget _buildKpiRow() => Column(children: [
+    Row(children: [
+      Expanded(child: _kpi('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', '${_stats["clients"] ?? 0}', Icons.business, AC.cyan, '+12%')),
+      const SizedBox(width: 8),
+      Expanded(child: _kpi('\u0627\u0644\u062a\u062d\u0644\u064a\u0644\u0627\u062a', '${_stats["analyses"] ?? 0}', Icons.analytics, AC.ok, '+8%')),
+      const SizedBox(width: 8),
+      Expanded(child: _kpi('\u0627\u0644\u062e\u062f\u0645\u0627\u062a', '${_stats["services"] ?? 0}', Icons.work, AC.gold, '+23%')),
+    ]),
+    const SizedBox(height: 8),
+    Row(children: [
+      Expanded(child: _kpi('\u0627\u0644\u0625\u064a\u0631\u0627\u062f\u0627\u062a', '${_stats["revenue"] ?? 0}K', Icons.payments, AC.warn, '+15%')),
+      const SizedBox(width: 8),
+      Expanded(child: _kpi('\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0627\u062a', '${_stats["audits"] ?? 0}', Icons.checklist, const Color(0xFF9C27B0), '+5%')),
+      const SizedBox(width: 8),
+      Expanded(child: _kpi('\u0627\u0644\u0645\u0632\u0648\u062f\u064a\u0646', '${_stats["providers"] ?? 0}', Icons.people, const Color(0xFF00BCD4), '+10%')),
+    ]),
+  ]);
 
   Widget _kpi(String t, String v, IconData i, Color c, String ch) => Container(
     padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
