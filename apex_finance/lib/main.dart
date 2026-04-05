@@ -304,9 +304,9 @@ class MainNav extends StatefulWidget {
 class _MainNavS extends State<MainNav> {
   int _i = 0;
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(backgroundColor: const Color(0xFF080F1F), elevation: 0, leading: IconButton(icon: const Icon(Icons.smart_toy, color: Color(0xFFC9A84C)), onPressed: () {}), title: const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)), actions: [Builder(builder: (ctx) => IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C)), onPressed: () => Scaffold.of(ctx).openDrawer()))]),
+    appBar: AppBar(backgroundColor: const Color(0xFF080F1F), elevation: 0, leading: IconButton(icon: const Icon(Icons.smart_toy, color: Color(0xFFC9A84C)), onPressed: () {}), title: const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)), actions: [Builder(builder: (ctx) => IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C)), onPressed: () => Scaffold.of(ctx).openEndDrawer()))]),
     body: [const EnhancedDashboard(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()][_i],
-            drawer: Drawer(
+            endDrawer: Drawer(
       backgroundColor: AC.navy2,
       child: ListView(padding: EdgeInsets.zero, children: [
         DrawerHeader(
