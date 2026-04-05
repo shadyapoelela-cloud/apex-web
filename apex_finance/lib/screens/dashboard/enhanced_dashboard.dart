@@ -159,7 +159,7 @@ class _EDashState extends State<EnhancedDashboard> {
         const Text('\u062a\u0648\u0632\u064a\u0639 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
         const SizedBox(height: 12),
         Row(children: [
-          SizedBox(width: 160, height: 160, child: PieChart(PieChartData(
+          SizedBox(width: 180, height: 180, child: PieChart(PieChartData(
             sectionsSpace: 2, centerSpaceRadius: 35,
             sections: data.map((d) => PieChartSectionData(
               value: d['v'] as double, color: d['c'] as Color,
