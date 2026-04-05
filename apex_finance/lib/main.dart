@@ -304,7 +304,7 @@ class MainNav extends StatefulWidget {
 class _MainNavS extends State<MainNav> {
   int _i = 0;
   @override Widget build(BuildContext c) => Scaffold(
-    body: [const DashTab(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()][_i],
+    body: [const EnhancedDashboard(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()][_i],
             drawer: Drawer(
       backgroundColor: AC.navy2,
       child: ListView(padding: EdgeInsets.zero, children: [
