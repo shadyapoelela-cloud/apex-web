@@ -310,7 +310,7 @@ class _MainNavS extends State<MainNav> {
     return Scaffold(
       backgroundColor: AC.navy,
       body: Column(children: [
-        Container(color: const Color(0xFF080F1F), padding: const EdgeInsets.only(top: 36, left: 12, right: 4, bottom: 8),
+        Container(padding: const EdgeInsets.only(top: 36, left: 12, right: 4, bottom: 8), decoration: const BoxDecoration(color: Color(0xFF080F1F), border: Border(bottom: BorderSide(color: Color(0x26C9A84C), width: 0.5))),
           child: Row(children: [
             const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)),
             const Spacer(),
