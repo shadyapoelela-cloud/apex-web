@@ -310,15 +310,14 @@ class _MainNavS extends State<MainNav> {
             endDrawer: Drawer(
       backgroundColor: AC.navy2,
       child: ListView(padding: EdgeInsets.zero, children: [
-        Container(color: const Color(0xFF050D1A), padding: const EdgeInsets.only(top: 40, right: 4), child: Align(alignment: Alignment.centerRight, child: IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C)), onPressed: () => Navigator.pop(context)))),
         Container(
-          padding: const EdgeInsets.only(top: 44, left: 16, right: 4, bottom: 8),
+          padding: const EdgeInsets.only(top: 38, left: 4, right: 12, bottom: 10),
           decoration: const BoxDecoration(color: Color(0xFF050D1A), border: Border(bottom: BorderSide(color: Color(0x26C9A84C)))),
-          child: Row(children: [
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('لوحة التحكم', style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 15, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 13)),
+          child: Row(textDirection: TextDirection.rtl, children: [
+            IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => Navigator.pop(context)),
+            const SizedBox(width: 4),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 14, fontWeight: FontWeight.w600)),
               Text(S.planAr(), style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 11)),
             ])),
           ]),
@@ -363,8 +362,8 @@ class _MainNavS extends State<MainNav> {
         BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings_rounded), label: '\u0625\u062f\u0627\u0631\u0629'),
       ]));
   Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
-    leading: Icon(icon, color: isGold ? AC.gold : AC.ts, size: 20),
-    title: Text(label, style: TextStyle(color: isGold ? AC.gold : AC.tp, fontSize: 13, fontWeight: isGold ? FontWeight.bold : FontWeight.normal)),
+    trailing: Icon(icon, color: isGold ? AC.gold : AC.ts, size: 20),
+    title: Text(label, textAlign: TextAlign.right, style: TextStyle(color: isGold ? AC.gold : AC.tp, fontSize: 13, fontWeight: isGold ? FontWeight.bold : FontWeight.normal)),
     onTap: onTap,
     dense: true,
     visualDensity: VisualDensity.compact,
