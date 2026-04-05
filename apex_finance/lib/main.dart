@@ -322,12 +322,7 @@ class _MainNavS extends State<MainNav> {
           if (_dr) Positioned(top: 0, bottom: 0, right: 0, width: 270,
             child: Material(color: AC.navy2, elevation: 12,
               child: Column(children: [
-                Container(padding: const EdgeInsets.only(top: 0, right: 4, bottom: 0),
-                  decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x26C9A84C)))),
-                  child: Align(alignment: Alignment.centerRight,
-                    child: IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => setState(() => _dr = false)),
-                  ),
-                ),
+                const Divider(height: 1, color: Color(0x26C9A84C)),
                 Expanded(child: ListView(padding: EdgeInsets.zero, children: [
         _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { setState(() => _dr = false); setState(() => _i = 0); }),
         _drawerItem(Icons.business_rounded, '\u0627\u0644\u0639\u0645\u0644\u0627\u0621', () { setState(() => _dr = false); setState(() => _i = 1); }),
