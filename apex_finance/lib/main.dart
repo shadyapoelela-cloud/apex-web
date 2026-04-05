@@ -321,8 +321,8 @@ class _MainNavS extends State<MainNav> {
             IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => setState(() => _dr = !_dr)),
           ]),
         ),
-        Expanded(child: Stack(children: [
-          tabs[_i],
+        Expanded(child: Row(children: [
+          Expanded(child: tabs[_i]),
           Positioned(
             right: _fabX, bottom: _fabY,
             child: GestureDetector(
@@ -334,7 +334,7 @@ class _MainNavS extends State<MainNav> {
               ),
             ),
           ),
-          if (_dr) Positioned(top: 0, bottom: 0, right: 0, width: 270,
+          if (_dr) SizedBox(width: 270,
             child: Material(color: AC.navy2, elevation: 12,
               child: Column(children: [
                 const Divider(height: 1, color: Color(0x26C9A84C)),
@@ -359,7 +359,7 @@ class _MainNavS extends State<MainNav> {
         _drawerItem(Icons.admin_panel_settings, '\u0627\u0644\u0625\u062f\u0627\u0631\u0629', () { setState(() => _dr = false); setState(() => _i = 6); }),
         const Divider(color: AC.bdr),
         _drawerItem(Icons.smart_toy, 'Apex Copilot', () { setState(() => _dr = false); Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())); }, isGold: true),
-                ])),
+        ])),
               ]),
             ),
           ),
