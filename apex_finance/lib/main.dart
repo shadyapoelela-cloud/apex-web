@@ -315,7 +315,9 @@ class _MainNavS extends State<MainNav> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), () {
+    print('MAINNAV INIT: uname=${S.uname} dname=${S.dname}');
+      Future.delayed(const Duration(milliseconds: 500), () {
+        print('MAINNAV 500ms: uname=${S.uname} dname=${S.dname}');
       if (mounted) setState(() {});
     });
   }
