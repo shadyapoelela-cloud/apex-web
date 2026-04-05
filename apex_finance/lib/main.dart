@@ -309,6 +309,7 @@ class _MainNavS extends State<MainNav> {
             endDrawer: Drawer(
       backgroundColor: AC.navy2,
       child: ListView(padding: EdgeInsets.zero, children: [
+        Container(color: const Color(0xFF050D1A), padding: const EdgeInsets.only(top: 40, right: 4), child: Align(alignment: Alignment.centerRight, child: IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C)), onPressed: () => Navigator.pop(context)))),
         DrawerHeader(
           decoration: BoxDecoration(color: AC.navy, border: Border(bottom: BorderSide(color: AC.bdr))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
