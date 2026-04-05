@@ -30,11 +30,10 @@ import '../screens/account/archive_screen.dart' as archive;
 import '../screens/tasks/audit_service_screen.dart' as audit;
 import '../core/session.dart' show S;
 
-class AuthNotifier extends ChangeNotifier { void notify() => notifyListeners(); }
-final authNotifier = AuthNotifier();
+final authRefresh = ValueNotifier<int>(0);
 
 final appRouter = GoRouter(
-  refreshListenable: authNotifier,
+  refreshListenable: authRefresh,
   initialLocation: '/login',
   // redirect: disabled for now - auth handled in login screen,
     routes: [
