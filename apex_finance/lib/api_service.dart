@@ -186,7 +186,9 @@ class ApiService {
     try { final res=await http.put(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
   }
   static String _parseErr(String body, int code) { try { final d=jsonDecode(body); return d['detail']??d['message']??'خطأ $code'; } catch(_){return 'خطأ $code';} }
+  static Future<ApiResult> adminStats() => _get('/admin/stats');
 }
+
 
 class ApiResult {
   final bool success;
@@ -197,6 +199,5 @@ class ApiResult {
   factory ApiResult.error(String error) => ApiResult._(success:false, error:error);
   T? get<T>(String key) { if(data is Map) return data[key] as T?; return null; }
   @override String toString() => success?'ok($data)':'error($error)';
+
 }
-
-

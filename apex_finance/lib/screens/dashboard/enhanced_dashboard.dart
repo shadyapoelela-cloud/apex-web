@@ -24,12 +24,13 @@ class _EDashState extends State<EnhancedDashboard> {
     try {
       final clientsRes = await ApiService.listClients();
       final notifsRes = await ApiService.getNotifications();
+      final st = <String,dynamic>{}; try { final sr = await ApiService.adminStats(); if (sr.success && sr.data is Map) { st.addAll(sr.data as Map<String,dynamic>); } } catch(_) {}
       setState(() {
         final clients = clientsRes.success && clientsRes.data is List ? clientsRes.data : [];
         final notifs = notifsRes.success && notifsRes.data is List ? notifsRes.data : [];
         _stats = {
           'clients': (clients as List).length,
-          'services': 56, 'analyses': 1834, 'revenue': 184500,
+          'services': (st['total_services'] ?? st['services'] ?? 56) as num, 'analyses': (st['total_analyses'] ?? st['analyses'] ?? 1834) as num, 'revenue': (st['total_revenue'] ?? st['revenue'] ?? 184500) as num,
           'unread': (notifs as List).where((n) => n['is_read'] != true).length,
         };
         _recentActivity = (notifs as List).take(5).toList();
