@@ -304,46 +304,61 @@ class MainNav extends StatefulWidget {
 }
 class _MainNavS extends State<MainNav> {
   int _i = 0;
-  @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(backgroundColor: const Color(0xFF080F1F), elevation: 0, leading: IconButton(icon: const Icon(Icons.smart_toy, color: Color(0xFFC9A84C)), onPressed: () {}), title: const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)), actions: [Builder(builder: (ctx) => IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C)), onPressed: () { if (Scaffold.of(ctx).isEndDrawerOpen) { Navigator.pop(ctx); } else { Scaffold.of(ctx).openEndDrawer(); } }))]),
-    body: [const EnhancedDashboard(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()][_i],
-            endDrawer: Drawer(
-      backgroundColor: AC.navy2,
-      child: ListView(padding: EdgeInsets.zero, children: [
-        Container(
-          padding: const EdgeInsets.only(top: 38, left: 4, right: 12, bottom: 10),
-          decoration: const BoxDecoration(color: Color(0xFF050D1A), border: Border(bottom: BorderSide(color: Color(0x26C9A84C)))),
-          child: Row(textDirection: TextDirection.rtl, children: [
-            IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => Navigator.pop(context)),
-            const SizedBox(width: 4),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 14, fontWeight: FontWeight.w600)),
-              Text(S.planAr(), style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 11)),
-            ])),
+  bool _dr = false;
+  @override Widget build(BuildContext c) {
+    final tabs = [const EnhancedDashboard(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
+    return Scaffold(
+      backgroundColor: AC.navy,
+      body: Column(children: [
+        Container(color: const Color(0xFF080F1F), padding: const EdgeInsets.only(top: 36, left: 12, right: 4, bottom: 8),
+          child: Row(children: [
+            const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)),
+            const Spacer(),
+            IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => setState(() => _dr = !_dr)),
           ]),
         ),
-        _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { Navigator.pop(context); setState(() => _i = 0); }),
-        _drawerItem(Icons.business_rounded, '\u0627\u0644\u0639\u0645\u0644\u0627\u0621', () { Navigator.pop(context); setState(() => _i = 1); }),
-        _drawerItem(Icons.account_balance_wallet, '\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0645\u0627\u0644\u064a\u0629', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); }),
-        _drawerItem(Icons.account_tree, '\u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', () { Navigator.pop(context); setState(() => _i = 2); }),
-        _drawerItem(Icons.analytics_rounded, '\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', () { Navigator.pop(context); setState(() => _i = 2); }),
-        _drawerItem(Icons.receipt_long, '\u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0645\u0627\u0644\u064a\u0629', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); }),
+        Expanded(child: Stack(children: [
+          tabs[_i],
+          if (_dr) Positioned(top: 0, bottom: 0, right: 0, width: 270,
+            child: Material(color: AC.navy2, elevation: 12,
+              child: Column(children: [
+                Container(padding: const EdgeInsets.only(top: 8, left: 12, right: 4, bottom: 8),
+                  decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x26C9A84C)))),
+                  child: Row(children: [
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      Text(S.dname ?? S.uname ?? '', style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text(S.planAr(), style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 11)),
+                    ])),
+                    IconButton(icon: const Icon(Icons.menu, color: Color(0xFFC9A84C), size: 22), onPressed: () => setState(() => _dr = false)),
+                  ]),
+                ),
+                Expanded(child: ListView(padding: EdgeInsets.zero, children: [
+        _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { setState(() => _dr = false); setState(() => _i = 0); }),
+        _drawerItem(Icons.business_rounded, '\u0627\u0644\u0639\u0645\u0644\u0627\u0621', () { setState(() => _dr = false); setState(() => _i = 1); }),
+        _drawerItem(Icons.account_balance_wallet, '\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0645\u0627\u0644\u064a\u0629', () { setState(() => _dr = false); Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); }),
+        _drawerItem(Icons.account_tree, '\u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', () { setState(() => _dr = false); setState(() => _i = 2); }),
+        _drawerItem(Icons.analytics_rounded, '\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', () { setState(() => _dr = false); setState(() => _i = 2); }),
+        _drawerItem(Icons.receipt_long, '\u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0645\u0627\u0644\u064a\u0629', () { setState(() => _dr = false); Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); }),
         const Divider(color: AC.bdr),
-        _drawerItem(Icons.store_rounded, '\u0633\u0648\u0642 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', () { Navigator.pop(context); setState(() => _i = 3); }),
-        _drawerItem(Icons.checklist, '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u062d\u0627\u0633\u0628\u064a\u0629', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const AuditWorkflowScreen())); }),
-        _drawerItem(Icons.work_rounded, '\u0645\u0632\u0648\u062f\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const ProviderKanbanScreen())); }),
+        _drawerItem(Icons.store_rounded, '\u0633\u0648\u0642 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', () { setState(() => _dr = false); setState(() => _i = 3); }),
+        _drawerItem(Icons.checklist, '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u062d\u0627\u0633\u0628\u064a\u0629', () { setState(() => _dr = false); Navigator.push(context, MaterialPageRoute(builder: (_) => const AuditWorkflowScreen())); }),
+        _drawerItem(Icons.work_rounded, '\u0645\u0632\u0648\u062f\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', () { setState(() => _dr = false); Navigator.push(context, MaterialPageRoute(builder: (_) => const ProviderKanbanScreen())); }),
         const Divider(color: AC.bdr),
-        _drawerItem(Icons.psychology, '\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const KnowledgeBrainScreen())); }),
-        _drawerItem(Icons.folder_outlined, '\u0627\u0644\u0623\u0631\u0634\u064a\u0641', () { Navigator.pop(context); context.go('/archive'); }),
+        _drawerItem(Icons.psychology, '\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', () { setState(() => _dr = false); Navigator.push(context, MaterialPageRoute(builder: (_) => const KnowledgeBrainScreen())); }),
+        _drawerItem(Icons.folder_outlined, '\u0627\u0644\u0623\u0631\u0634\u064a\u0641', () { setState(() => _dr = false); context.go('/archive'); }),
         const Divider(color: AC.bdr),
-        _drawerItem(Icons.person_rounded, '\u062d\u0633\u0627\u0628\u064a', () { Navigator.pop(context); setState(() => _i = 5); }),
-        _drawerItem(Icons.diamond_outlined, '\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a', () { Navigator.pop(context); context.go('/subscription'); }),
-        _drawerItem(Icons.settings, '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const EnhancedSettingsScreen())); }),
-        _drawerItem(Icons.admin_panel_settings, '\u0627\u0644\u0625\u062f\u0627\u0631\u0629', () { Navigator.pop(context); setState(() => _i = 6); }),
+        _drawerItem(Icons.person_rounded, '\u062d\u0633\u0627\u0628\u064a', () { setState(() => _dr = false); setState(() => _i = 5); }),
+        _drawerItem(Icons.diamond_outlined, '\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a', () { setState(() => _dr = false); context.go('/subscription'); }),
+        _drawerItem(Icons.settings, '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a', () { setState(() => _dr = false); Navigator.push(context, MaterialPageRoute(builder: (_) => const EnhancedSettingsScreen())); }),
+        _drawerItem(Icons.admin_panel_settings, '\u0627\u0644\u0625\u062f\u0627\u0631\u0629', () { setState(() => _dr = false); setState(() => _i = 6); }),
         const Divider(color: AC.bdr),
-        _drawerItem(Icons.smart_toy, 'Apex Copilot', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())); }, isGold: true),
+        _drawerItem(Icons.smart_toy, 'Apex Copilot', () { setState(() => _dr = false); Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())); }, isGold: true),
+                ])),
+              ]),
+            ),
+          ),
+        ])),
       ]),
-    ),
     floatingActionButton: FloatingActionButton(
       backgroundColor: AC.gold,
       onPressed: () => context.go('/copilot'),
@@ -361,6 +376,7 @@ class _MainNavS extends State<MainNav> {
         BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: '\u062d\u0633\u0627\u0628\u064a'),
         BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings_rounded), label: '\u0625\u062f\u0627\u0631\u0629'),
       ]));
+  }
   Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
     trailing: Icon(icon, color: isGold ? AC.gold : AC.ts, size: 20),
     title: Text(label, textAlign: TextAlign.right, style: TextStyle(color: isGold ? AC.gold : AC.tp, fontSize: 13, fontWeight: isGold ? FontWeight.bold : FontWeight.normal)),
