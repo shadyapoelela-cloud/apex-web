@@ -305,6 +305,8 @@ class MainNav extends StatefulWidget {
 class _MainNavS extends State<MainNav> {
   int _i = 0;
   bool _dr = false;
+  double _fabX = 20;
+  double _fabY = 100;
   @override Widget build(BuildContext c) {
     final tabs = [const EnhancedDashboard(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
     return Scaffold(
@@ -321,6 +323,17 @@ class _MainNavS extends State<MainNav> {
         ),
         Expanded(child: Stack(children: [
           tabs[_i],
+          Positioned(
+            right: _fabX, bottom: _fabY,
+            child: GestureDetector(
+              onPanUpdate: (d) => setState(() { _fabX = (_fabX - d.delta.dx).clamp(0, 300); _fabY = (_fabY - d.delta.dy).clamp(0, 600); }),
+              child: FloatingActionButton(
+                backgroundColor: AC.gold,
+                onPressed: () => context.go('/copilot'),
+                child: const Icon(Icons.smart_toy, color: AC.navy),
+              ),
+            ),
+          ),
           if (_dr) Positioned(top: 0, bottom: 0, right: 0, width: 270,
             child: Material(color: AC.navy2, elevation: 12,
               child: Column(children: [
@@ -352,11 +365,6 @@ class _MainNavS extends State<MainNav> {
           ),
         ])),
       ]),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AC.gold,
-        onPressed: () => context.go('/copilot'),
-        child: const Icon(Icons.smart_toy, color: AC.navy),
-      ),
     );
   }
   Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
