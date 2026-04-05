@@ -216,6 +216,47 @@ class _EDashState extends State<EnhancedDashboard> {
     ]),
   );
 
+
+  Widget _buildSectorChart() {
+    final sectors = [
+      {'\u0646': '\u062a\u062c\u0632\u0626\u0629', 'v': 28.0, 'c': AC.gold},
+      {'\u0646': '\u0645\u0642\u0627\u0648\u0644\u0627\u062a', 'v': 22.0, 'c': AC.cyan},
+      {'\u0646': '\u0635\u0646\u0627\u0639\u0629', 'v': 18.0, 'c': AC.ok},
+      {'\u0646': '\u062e\u062f\u0645\u0627\u062a', 'v': 15.0, 'c': AC.warn},
+      {'\u0646': '\u0639\u0642\u0627\u0631\u0627\u062a', 'v': 10.0, 'c': const Color(0xFF9C27B0)},
+      {'\u0646': '\u0623\u062e\u0631\u0649', 'v': 7.0, 'c': AC.ts},
+    ];
+    return Container(padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('\u0627\u0644\u0639\u0645\u0644\u0627\u0621 \u0628\u0627\u0644\u0642\u0637\u0627\u0639', style: TextStyle(color: AC.tp, fontSize: 12, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        SizedBox(height: 180, child: BarChart(BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          maxY: 35,
+          barTouchData: BarTouchData(enabled: true),
+          titlesData: FlTitlesData(
+            show: true,
+            bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (v, m) {
+              final idx = v.toInt();
+              if (idx >= 0 && idx < sectors.length) return Text(sectors[idx]['\u0646'] as String, style: const TextStyle(color: AC.ts, fontSize: 7));
+              return const Text('');
+            })),
+            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 25, getTitlesWidget: (v, m) =>
+              Text('${v.toInt()}', style: const TextStyle(color: AC.ts, fontSize: 8)))),
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+          borderData: FlBorderData(show: false),
+          gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: 10,
+            getDrawingHorizontalLine: (v) => FlLine(color: AC.bdr, strokeWidth: 0.5)),
+          barGroups: sectors.asMap().entries.map((e) => BarChartGroupData(x: e.key,
+            barRods: [BarChartRodData(toY: (e.value['v'] as num).toDouble(), color: e.value['c'] as Color, width: 12, borderRadius: BorderRadius.circular(3))])).toList(),
+        ))),
+      ]),
+    );
+  }
+
   Widget _buildRecentActivity() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     const Text('\u0622\u062e\u0631 \u0627\u0644\u0623\u0646\u0634\u0637\u0629', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
     const SizedBox(height: 8),
