@@ -46,8 +46,6 @@ class _EDashState extends State<EnhancedDashboard> {
           child: ListView(padding: const EdgeInsets.all(14), children: [
             _buildKpiRow(),
             const SizedBox(height: 16),
-            _buildCopilotCard(),
-            const SizedBox(height: 16),
             _buildQuickNav(),
             const SizedBox(height: 16),
             _buildRevenueChart(),
@@ -86,22 +84,6 @@ class _EDashState extends State<EnhancedDashboard> {
       Text(v, style: TextStyle(color: c, fontSize: 20, fontWeight: FontWeight.w900)),
       Text(t, style: const TextStyle(color: AC.ts, fontSize: 9)),
     ]));
-
-  Widget _buildCopilotCard() => GestureDetector(
-    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())),
-    child: Container(padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.gold.withOpacity(0.12), AC.navy3], begin: Alignment.topRight, end: Alignment.bottomLeft),
-        borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold.withOpacity(0.3))),
-      child: Row(children: [
-        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.smart_toy, color: AC.gold, size: 24)),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 14, fontWeight: FontWeight.bold)), const SizedBox(width: 6),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(6)),
-              child: const Text('AI', style: TextStyle(color: AC.gold, fontSize: 9, fontWeight: FontWeight.w700)))]),
-          const Text('\u0627\u0633\u0623\u0644 \u0639\u0646 \u0627\u0644\u062a\u062d\u0644\u064a\u0644\u060c \u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644\u060c \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.ts, fontSize: 11))])),
-        const Icon(Icons.arrow_forward_ios, color: AC.gold, size: 14)])));
 
   Widget _buildQuickNav() {
     final items = [
