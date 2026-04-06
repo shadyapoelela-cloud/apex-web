@@ -46646,7 +46646,7 @@ Xl(a,b){return this.rj(a,b,!1)},
 Xk(a,b,c,d,e){var s=null,r=A.a3(b).j("M<1,rd>")
 return A.a4(A.a([A.o(a,s,s,s,s,B.bC,s,s),B.ai,A.z7(B.F2,A.a6(new A.M(b,new A.awR(c,e,d),r),!0,r.j("ak.E")),8,8)],t.p),B.aH,B.f,B.h)},
 aaC(a,b){var s,r=this,q=null
-switch(a){case 0:return r.Xk("\u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644",A.a(["\u0634\u0631\u0643\u0629 \u0645\u0633\u0627\u0647\u0645\u0629","\u0634\u0631\u0643\u0629 \u0630\u0627\u062a \u0645\u0633\u0624\u0648\u0644\u064a\u0629 \u0645\u062d\u062f\u0648\u062f\u0629","\u0645\u0624\u0633\u0633\u0629 \u0641\u0631\u062f\u064a\u0629","\u062c\u0647\u0629 \u062d\u0643\u0648\u0645\u064a\u0629","\u0645\u0646\u0638\u0645\u0629 \u063a\u064a\u0631 \u0631\u0628\u062d\u064a\u0629"],t.s),r.ch,b,new A.awC(r))
+switch(a){case 0:return r.Xk("\u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644",A.a(["standard_business","financial_entity","financing_entity","accounting_firm","audit_firm","government_entity"],t.s),r.ch,b,new A.awC(r))
 case 1:return A.a4(A.a([r.Xl("\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 (\u0639\u0631\u0628\u064a)",r.z),r.rj("\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 (\u0625\u0646\u062c\u0644\u064a\u0632\u064a)",r.y,!0)],t.p),B.j,B.f,B.h)
 case 2:return A.a4(A.a([r.rj("\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a",r.Q,!0),r.rj("\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641",r.as,!0),r.Xl("\u0627\u0644\u0639\u0646\u0648\u0627\u0646",r.ay)],t.p),B.j,B.f,B.h)
 case 3:return A.a4(A.a([r.rj("\u0631\u0642\u0645 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a",r.at,!0),r.rj("\u0631\u0642\u0645 \u0627\u0644\u0636\u0631\u064a\u0628\u064a (VAT)",r.ax,!0)],t.p),B.j,B.f,B.h)
@@ -46739,14 +46739,14 @@ s=n.b
 r=s.z.a.a
 r=r.length!==0?r:s.y.a.a
 q=s.ch
-q=q.length!==0?q:"company"
+q=q.length!==0?q:"standard_business"
 p=s.CW
 p=p.length!==0?p:null
 o=t.z
 o=A.B(o,o)
 o.p(0,"client_code",m)
 o.p(0,"name",r)
-o.p(0,"client_type",q)
+o.p(0,"client_type_code",q)
 if(p!=null)o.p(0,"industry",p)
 A.w_("/clients",o)
 s.aU()
