@@ -696,7 +696,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
 
   Widget _buildWizardStep(int step, void Function(void Function()) ss) {
     switch (step) {
-      case 0: return _wc('\u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644', ['\u0634\u0631\u0643\u0629 \u0645\u0633\u0627\u0647\u0645\u0629','\u0634\u0631\u0643\u0629 \u0630\u0627\u062a \u0645\u0633\u0624\u0648\u0644\u064a\u0629 \u0645\u062d\u062f\u0648\u062f\u0629','\u0645\u0624\u0633\u0633\u0629 \u0641\u0631\u062f\u064a\u0629','\u062c\u0647\u0629 \u062d\u0643\u0648\u0645\u064a\u0629','\u0645\u0646\u0638\u0645\u0629 \u063a\u064a\u0631 \u0631\u0628\u062d\u064a\u0629'], _cType, ss, (v) => _cType = v);
+      case 0: return _wc('\u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644', ['standard_business','financial_entity','financing_entity','accounting_firm','audit_firm','government_entity'], _cType, ss, (v) => _cType = v);
       case 1: return Column(children: [_wf('\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 (\u0639\u0631\u0628\u064a)', _cNameAr), _wf('\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 (\u0625\u0646\u062c\u0644\u064a\u0632\u064a)', _cName, ltr: true)]);
       case 2: return Column(children: [_wf('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a', _cEmail, ltr: true), _wf('\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641', _cPhone, ltr: true), _wf('\u0627\u0644\u0639\u0646\u0648\u0627\u0646', _cAddress)]);
       case 3: return Column(children: [_wf('\u0631\u0642\u0645 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a', _cCR, ltr: true), _wf('\u0631\u0642\u0645 \u0627\u0644\u0636\u0631\u064a\u0628\u064a (VAT)', _cVAT, ltr: true)]);
@@ -771,7 +771,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
               if (_step > 0) const SizedBox(width: 10),
               Expanded(child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AC.gold, padding: const EdgeInsets.symmetric(vertical: 12)),
-                onPressed: () { if (_step < 6) { setSt(() => _step++); } else { ApiService.createClient(clientCode: DateTime.now().millisecondsSinceEpoch.toString().substring(5), name: _cNameAr.text.isNotEmpty ? _cNameAr.text : _cName.text, clientType: _cType.isNotEmpty ? _cType : 'company', industry: _cSector.isNotEmpty ? _cSector : null); _load(); Navigator.pop(dc); } },
+                onPressed: () { if (_step < 6) { setSt(() => _step++); } else { ApiService.createClient(clientCode: DateTime.now().millisecondsSinceEpoch.toString().substring(5), name: _cNameAr.text.isNotEmpty ? _cNameAr.text : _cName.text, clientType: _cType.isNotEmpty ? _cType : 'standard_business', industry: _cSector.isNotEmpty ? _cSector : null); _load(); Navigator.pop(dc); } },
                 child: Text(_step < 6 ? '\u0627\u0644\u062a\u0627\u0644\u064a' : '\u062a\u0623\u0643\u064a\u062f', style: const TextStyle(color: AC.navy, fontWeight: FontWeight.bold)))),
             ]),
           ]),
