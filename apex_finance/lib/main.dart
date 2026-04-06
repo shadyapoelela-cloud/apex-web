@@ -380,7 +380,7 @@ class _MainNavS extends State<MainNav> {
           child: Row(children: [
             GestureDetector(onTap: () => setState(() => _i = 0), child: const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2))),
             const SizedBox(width: 8),
-            IconButton(icon: const Icon(Icons.search, color: Color(0xFF8A8880), size: 20), onPressed: () {}),
+            IconButton(icon: const Icon(Icons.search, color: Color(0xFFC9A84C), size: 20), onPressed: () {}),
             IconButton(
               key: _bizKey,
               icon: const Icon(Icons.business, color: Color(0xFFC9A84C), size: 20),
@@ -415,7 +415,7 @@ class _MainNavS extends State<MainNav> {
             IconButton(
               key: _notifKey,
               icon: Stack(children: [
-                const Icon(Icons.notifications_outlined, color: Color(0xFF8A8880), size: 20),
+                const Icon(Icons.notifications_outlined, color: Color(0xFFC9A84C), size: 20),
                 if (_notifs.any((n) => n['is_read'] != true)) Positioned(right: 0, top: 0, child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFC9A84C), shape: BoxShape.circle))),
               ]),
               onPressed: () {
