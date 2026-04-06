@@ -671,6 +671,21 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   String _cType = '';
   String _cSector = '';
 
+  Future<void> _doCreateClient(BuildContext dc) async {
+    Navigator.pop(dc);
+    final code = 'CL${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
+    final name = _cNameAr.text.isNotEmpty ? _cNameAr.text : (_cName.text.isNotEmpty ? _cName.text : 'New Client');
+    final type = _cType.isNotEmpty ? _cType : 'standard_business';
+    final res = await ApiService.createClient(clientCode: code, name: name, clientType: type, industry: _cSector.isNotEmpty ? _cSector : null);
+    if (res.success) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644'), backgroundColor: Color(0xFF2E7D32)));
+      _load();
+    } else {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? '\u062e\u0637\u0623'), backgroundColor: const Color(0xFFC62828)));
+    }
+    _cName.clear(); _cNameAr.clear(); _cEmail.clear(); _cPhone.clear(); _cCR.clear(); _cVAT.clear(); _cAddress.clear(); _cType = ''; _cSector = '';
+  }
+
   Widget _wf(String label, TextEditingController ctrl, {bool ltr = false}) => Padding(
     padding: const EdgeInsets.only(bottom: 10),
     child: TextField(controller: ctrl, textDirection: ltr ? TextDirection.ltr : null,
@@ -771,7 +786,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
               if (_step > 0) const SizedBox(width: 10),
               Expanded(child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AC.gold, padding: const EdgeInsets.symmetric(vertical: 12)),
-                onPressed: () { if (_step < 6) { setSt(() => _step++); } else { ApiService.createClient(clientCode: DateTime.now().millisecondsSinceEpoch.toString().substring(5), name: _cNameAr.text.isNotEmpty ? _cNameAr.text : _cName.text, clientType: _cType.isNotEmpty ? _cType : 'standard_business', industry: _cSector.isNotEmpty ? _cSector : null); _load(); Navigator.pop(dc); } },
+                onPressed: () { if (_step < 6) { setSt(() => _step++); } else { _doCreateClient(dc); } },
                 child: Text(_step < 6 ? '\u0627\u0644\u062a\u0627\u0644\u064a' : '\u062a\u0623\u0643\u064a\u062f', style: const TextStyle(color: AC.navy, fontWeight: FontWeight.bold)))),
             ]),
           ]),
