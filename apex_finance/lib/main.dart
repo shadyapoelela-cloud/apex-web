@@ -709,20 +709,106 @@ class _ClientsS extends ConsumerState<ClientsTab> {
 
   Widget _buildWizardStep(int step, void Function(void Function()) ss) {
     switch (step) {
-      case 0: return _wc('\u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644', ['standard_business','financial_entity','financing_entity','accounting_firm','audit_firm','government_entity'], _cType, ss, (v) => _cType = v);
-      case 1: return Column(children: [_wf('\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 (\u0639\u0631\u0628\u064a)', _cNameAr), _wf('\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 (\u0625\u0646\u062c\u0644\u064a\u0632\u064a)', _cName, ltr: true)]);
-      case 2: return Column(children: [_wf('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a', _cEmail, ltr: true), _wf('\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641', _cPhone, ltr: true), _wf('\u0627\u0644\u0639\u0646\u0648\u0627\u0646', _cAddress)]);
-      case 3: return Column(children: [_wf('\u0631\u0642\u0645 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a', _cCR, ltr: true), _wf('\u0631\u0642\u0645 \u0627\u0644\u0636\u0631\u064a\u0628\u064a (VAT)', _cVAT, ltr: true)]);
-      case 4: return _wc('\u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0642\u0637\u0627\u0639', ['\u062a\u062c\u0632\u0626\u0629','\u0645\u0642\u0627\u0648\u0644\u0627\u062a','\u0635\u0646\u0627\u0639\u0629','\u062e\u062f\u0645\u0627\u062a','\u0639\u0642\u0627\u0631\u0627\u062a','\u062a\u0642\u0646\u064a\u0629','\u0635\u062d\u0629','\u062a\u0639\u0644\u064a\u0645'], _cSector, ss, (v) => _cSector = v);
-      case 5: return Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
-        child: const Column(children: [Icon(Icons.cloud_upload_outlined, color: AC.gold, size: 36), SizedBox(height: 8), Text('\u0631\u0641\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 13)), SizedBox(height: 4), Text('\u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a\u060c \u0627\u0644\u0647\u0648\u064a\u0629\u060c \u0639\u0642\u062f \u0627\u0644\u062a\u0623\u0633\u064a\u0633', style: TextStyle(color: AC.ts, fontSize: 10))]));
-      case 6: return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          _rv('\u0627\u0644\u0646\u0648\u0639', _cType), _rv('\u0627\u0644\u0627\u0633\u0645', _cNameAr.text), _rv('\u0627\u0644\u0628\u0631\u064a\u062f', _cEmail.text), _rv('\u0627\u0644\u0647\u0627\u062a\u0641', _cPhone.text), _rv('\u0627\u0644\u0633\u062c\u0644', _cCR.text), _rv('\u0627\u0644\u0642\u0637\u0627\u0639', _cSector),
-        ]));
+      case 0:
+        // Step 1: Entity Origin
+        return _wc('\u0646\u0648\u0639 \u0627\u0644\u0643\u064a\u0627\u0646', [
+          '\u0643\u064a\u0627\u0646 \u0633\u0639\u0648\u062f\u064a',
+          '\u0627\u0633\u062a\u062b\u0645\u0627\u0631 \u0623\u062c\u0646\u0628\u064a',
+          '\u0641\u0631\u0639 \u0634\u0631\u0643\u0629 \u0623\u062c\u0646\u0628\u064a\u0629',
+        ], _cType, ss, (v) { _cType = v; _cSector = ''; });
+      case 1:
+        // Step 2: Entity Type (based on MoC + SAGIA)
+        final saudiTypes = [
+          '\u0634\u0631\u0643\u0629 \u0645\u0633\u0627\u0647\u0645\u0629 \u0645\u063a\u0644\u0642\u0629',
+          '\u0634\u0631\u0643\u0629 \u0645\u0633\u0627\u0647\u0645\u0629 \u0645\u0641\u062a\u0648\u062d\u0629',
+          '\u0634\u0631\u0643\u0629 \u0630\u0627\u062a \u0645\u0633\u0624\u0648\u0644\u064a\u0629 \u0645\u062d\u062f\u0648\u062f\u0629',
+          '\u0634\u0631\u0643\u0629 \u062a\u0636\u0627\u0645\u0646\u064a\u0629',
+          '\u0634\u0631\u0643\u0629 \u062a\u0648\u0635\u064a\u0629 \u0628\u0633\u064a\u0637\u0629',
+          '\u0645\u0624\u0633\u0633\u0629 \u0641\u0631\u062f\u064a\u0629',
+          '\u0634\u0631\u0643\u0629 \u0645\u0647\u0646\u064a\u0629',
+        ];
+        final foreignTypes = [
+          '\u0634\u0631\u0643\u0629 \u0630\u0627\u062a \u0645\u0633\u0624\u0648\u0644\u064a\u0629 \u0645\u062d\u062f\u0648\u062f\u0629 (\u0623\u062c\u0646\u0628\u064a)',
+          '\u0641\u0631\u0639 \u0634\u0631\u0643\u0629 \u0623\u062c\u0646\u0628\u064a\u0629',
+          '\u0645\u0643\u062a\u0628 \u062a\u0645\u062b\u064a\u0644\u064a',
+          '\u0645\u0634\u0631\u0648\u0639 \u0645\u0634\u062a\u0631\u0643',
+        ];
+        final types = _cType.contains('\u0623\u062c\u0646\u0628') ? foreignTypes : saudiTypes;
+        return _wc('\u0627\u0644\u0634\u0643\u0644 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a', types, _cSector, ss, (v) => _cSector = v);
+      case 2:
+        // Step 3: Basic Info
+        return Column(children: [
+          _wf('\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u0634\u0623\u0629 (\u0639\u0631\u0628\u064a)', _cNameAr),
+          _wf('\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u0634\u0623\u0629 (\u0625\u0646\u062c\u0644\u064a\u0632\u064a)', _cName, ltr: true),
+          _wf('\u0631\u0642\u0645 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a (CR)', _cCR, ltr: true),
+          _wf('\u0631\u0642\u0645 \u0627\u0644\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u0636\u0631\u064a\u0628\u064a (VAT)', _cVAT, ltr: true),
+        ]);
+      case 3:
+        // Step 4: Contact Info
+        return Column(children: [
+          _wf('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a', _cEmail, ltr: true),
+          _wf('\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641', _cPhone, ltr: true),
+          _wf('\u0627\u0644\u0645\u062f\u064a\u0646\u0629', _cAddress),
+        ]);
+      case 4:
+        // Step 5: Activity Sector (ISIC aligned)
+        return _wc('\u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u0627\u0642\u062a\u0635\u0627\u062f\u064a (ISIC)', [
+          '\u062a\u062c\u0627\u0631\u0629 \u062a\u062c\u0632\u0626\u0629',
+          '\u062a\u062c\u0627\u0631\u0629 \u062c\u0645\u0644\u0629',
+          '\u0645\u0642\u0627\u0648\u0644\u0627\u062a \u0648\u062a\u0634\u064a\u064a\u062f',
+          '\u0635\u0646\u0627\u0639\u0629 \u0648\u062a\u062d\u0648\u064a\u0644',
+          '\u062e\u062f\u0645\u0627\u062a \u0645\u0647\u0646\u064a\u0629',
+          '\u062a\u0642\u0646\u064a\u0629 \u0645\u0639\u0644\u0648\u0645\u0627\u062a',
+          '\u0639\u0642\u0627\u0631\u0627\u062a',
+          '\u0646\u0642\u0644 \u0648\u0644\u0648\u062c\u0633\u062a\u064a\u0643',
+          '\u0635\u062d\u0629 \u0648\u0631\u0639\u0627\u064a\u0629 \u0637\u0628\u064a\u0629',
+          '\u062a\u0639\u0644\u064a\u0645 \u0648\u062a\u062f\u0631\u064a\u0628',
+          '\u0633\u064a\u0627\u062d\u0629 \u0648\u0636\u064a\u0627\u0641\u0629',
+          '\u0632\u0631\u0627\u0639\u0629 \u0648\u0623\u063a\u0630\u064a\u0629',
+        ], _cSector.contains('\u0634\u0631\u0643\u0629') ? '' : _cSector, ss, (v) => _cSector = _cSector.contains('\u0634\u0631\u0643\u0629') ? _cSector : v);
+      case 5:
+        // Step 6: Documents
+        return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            const Text('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629', style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            _docRow('\u0635\u0648\u0631\u0629 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a', Icons.description),
+            _docRow('\u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u0632\u0643\u0627\u0629 \u0648\u0627\u0644\u062f\u062e\u0644', Icons.receipt_long),
+            _docRow('\u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u062a\u0623\u0645\u064a\u0646\u0627\u062a \u0627\u0644\u0627\u062c\u062a\u0645\u0627\u0639\u064a\u0629', Icons.security),
+            _docRow('\u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u0636\u0631\u064a\u0628\u0629 \u0627\u0644\u0645\u0636\u0627\u0641\u0629 (VAT)', Icons.paid),
+            _docRow('\u0639\u0642\u062f \u0627\u0644\u062a\u0623\u0633\u064a\u0633 / \u0627\u0644\u0646\u0638\u0627\u0645 \u0627\u0644\u0623\u0633\u0627\u0633\u064a', Icons.gavel),
+          ]),
+        );
+      case 6:
+        // Step 7: Review
+        return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            const Text('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            _rv('\u0646\u0648\u0639 \u0627\u0644\u0643\u064a\u0627\u0646', _cType),
+            _rv('\u0627\u0644\u0634\u0643\u0644 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a', _cSector),
+            _rv('\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u0634\u0623\u0629', _cNameAr.text),
+            _rv('\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a', _cName.text),
+            _rv('\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u062a\u0648\u0627\u0635\u0644', _cCR.text),
+            _rv('\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u0636\u0631\u064a\u0628\u064a', _cVAT.text),
+            _rv('\u0627\u0644\u0628\u0631\u064a\u062f', _cEmail.text),
+            _rv('\u0627\u0644\u0647\u0627\u062a\u0641', _cPhone.text),
+          ]));
       default: return const SizedBox();
     }
   }
+
+  Widget _docRow(String label, IconData icon) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      OutlinedButton(style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+        onPressed: () {}, child: const Text('\u0631\u0641\u0639', style: TextStyle(color: AC.gold, fontSize: 10))),
+      const SizedBox(width: 8),
+      Expanded(child: Text(label, textAlign: TextAlign.right, style: const TextStyle(color: AC.tp, fontSize: 12))),
+      const SizedBox(width: 8),
+      Icon(icon, color: AC.gold, size: 18),
+    ]),
+  );
 
   Widget _rv(String l, String v) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
     Text(v.isEmpty ? '-' : v, style: const TextStyle(color: AC.tp, fontSize: 12)), const SizedBox(width: 8), Text(l, style: const TextStyle(color: AC.ts, fontSize: 11))]));
@@ -730,11 +816,11 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   void _showNewClientWizard(BuildContext ctx) {
     int _step = 0;
     final steps = [
-      '\u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644',
-      '\u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0623\u0633\u0627\u0633\u064a\u0629',
+      '\u0646\u0648\u0639 \u0627\u0644\u0643\u064a\u0627\u0646',
+      '\u0627\u0644\u0634\u0643\u0644 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a',
+      '\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0645\u0646\u0634\u0623\u0629',
       '\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u062a\u0648\u0627\u0635\u0644',
-      '\u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a',
-      '\u0627\u0644\u0646\u0634\u0627\u0637 \u0648\u0627\u0644\u0642\u0637\u0627\u0639',
+      '\u0627\u0644\u0646\u0634\u0627\u0637 \u0627\u0644\u0627\u0642\u062a\u0635\u0627\u062f\u064a',
       '\u0631\u0641\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a',
       '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0648\u0627\u0644\u062a\u0623\u0643\u064a\u062f',
     ];
