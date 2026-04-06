@@ -380,12 +380,14 @@ class _MainNavS extends State<MainNav> {
             IconButton(
               icon: const Icon(Icons.business, color: Color(0xFFC9A84C), size: 20),
               onPressed: () {
-                final RenderBox box = context.findRenderObject() as RenderBox;
+                final RenderBox btn = context.findRenderObject() as RenderBox;
+                final Offset pos = btn.localToGlobal(Offset.zero);
+                final Size sz = btn.size;
                 showMenu<String>(
                   context: context,
                   color: AC.navy2,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFC9A84C), width: 0.5)),
-                  position: RelativeRect.fromLTRB(0, kToolbarHeight + 60, 0, 0),
+                  position: RelativeRect.fromLTRB(pos.dx, pos.dy + sz.height, pos.dx + 250, 0),
                   items: _cl.isEmpty
                     ? [const PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: Color(0xFF8A8880), fontSize: 12)))]
                     : _cl.take(10).map((cl) {
