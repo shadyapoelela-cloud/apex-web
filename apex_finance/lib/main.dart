@@ -309,17 +309,20 @@ class ApexSearch extends SearchDelegate<String> {
   @override Widget buildResults(BuildContext context) => _buildList(context);
   @override Widget buildSuggestions(BuildContext context) => _buildList(context);
   Widget _buildList(BuildContext context) {
-    final items = [
-      {'ن': 'الرئيسية', 'r': '/home'},
-      {'ن': 'العملاء', 'r': '/home'},
-      {'ن': 'العمليات المالية', 'r': '/financial-ops'},
-      {'ن': 'سوق الخدمات', 'r': '/home'},
-      {'ن': 'المراجعة', 'r': '/audit-workflow'},
-      {'ن': 'العقل المعرفي', 'r': '/knowledge-brain'},
-      {'ن': 'الإعدادات', 'r': '/settings'},
-      {'ن': 'Apex Copilot', 'r': '/copilot'},
-      {'ن': 'الإشعارات', 'r': '/notifications'},
-    ];
+      final items = [
+        {'ن': 'الرئيسية', 'r': '/home'},
+        {'ن': 'Apex Copilot', 'r': '/copilot'},
+        {'ن': 'العملاء', 'r': '/clients'},
+        {'ن': 'شجرة الحسابات', 'r': '/home'},
+        {'ن': 'ميزان المراجعة', 'r': '/financial-ops'},
+        {'ن': 'القوائم المالية', 'r': '/financial-ops'},
+        {'ن': 'التحليل المالي', 'r': '/home'},
+        {'ن': 'المراجعة المحاسبية', 'r': '/audit-workflow'},
+        {'ن': 'سوق الخدمات', 'r': '/home'},
+        {'ن': 'العقل المعرفي', 'r': '/knowledge-brain'},
+        {'ن': 'الأرشيف', 'r': '/archive'},
+        {'ن': 'الإعدادات', 'r': '/settings'},
+      ];
     final filtered = query.isEmpty ? items : items.where((i) => (i['ن'] as String).contains(query)).toList();
     return Container(color: const Color(0xFF050D1A), child: ListView(children: filtered.map((i) => ListTile(
       trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xFF8A8880), size: 14),
@@ -457,26 +460,38 @@ class _MainNavS extends State<MainNav> {
                 child: Column(children: [
 
                   Expanded(child: ListView(padding: EdgeInsets.zero, children: [
-        _drawerItem(Icons.dashboard_rounded, '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', () { setState(() => _i = 0); }),
-        _drawerItem(Icons.business_rounded, '\u0627\u0644\u0639\u0645\u0644\u0627\u0621', () { setState(() => _i = 1); }),
-        _drawerItem(Icons.account_balance_wallet, '\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0645\u0627\u0644\u064a\u0629', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); }),
-        _drawerItem(Icons.account_tree, '\u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', () { setState(() => _i = 2); }),
-        _drawerItem(Icons.analytics_rounded, '\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', () { setState(() => _i = 2); }),
-        _drawerItem(Icons.receipt_long, '\u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0645\u0627\u0644\u064a\u0629', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); }),
+        _sectionHeader('الأساسي'),
+        _drawerItem(Icons.dashboard_rounded, 'الرئيسية', () { setState(() => _i = 0); }),
+        _drawerItem(Icons.smart_toy, 'Apex Copilot', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())); setState(() => _dr = false); }, isGold: true),
+        _drawerItem(Icons.business_rounded, 'العملاء', () { setState(() => _i = 1); }),
         const Divider(color: AC.bdr),
-        _drawerItem(Icons.store_rounded, '\u0633\u0648\u0642 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', () { setState(() => _i = 3); }),
-        _drawerItem(Icons.checklist, '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u062d\u0627\u0633\u0628\u064a\u0629', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const AuditWorkflowScreen())); }),
-        _drawerItem(Icons.work_rounded, '\u0645\u0632\u0648\u062f\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProviderKanbanScreen())); }),
+        _sectionHeader('المسار المالي'),
+        _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () { setState(() => _i = 2); }),
+        _drawerItem(Icons.table_chart, 'ميزان المراجعة TB', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
+        _drawerItem(Icons.receipt_long, 'القوائم المالية', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
+        _drawerItem(Icons.analytics_rounded, 'التحليل المالي', () { setState(() => _i = 2); }),
         const Divider(color: AC.bdr),
-        _drawerItem(Icons.psychology, '\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const KnowledgeBrainScreen())); }),
-        _drawerItem(Icons.folder_outlined, '\u0627\u0644\u0623\u0631\u0634\u064a\u0641', () { context.go('/archive'); }),
+        _sectionHeader('الجاهزية والامتثال'),
+        _drawerItem(Icons.shield_rounded, 'الجاهزية التمويلية', _comingSoon),
+        _drawerItem(Icons.checklist_rounded, 'الامتثال', _comingSoon),
+        _drawerItem(Icons.workspace_premium, 'الأهلية الترخيصية', _comingSoon),
+        _drawerItem(Icons.volunteer_activism, 'الدعم والحوافز', _comingSoon),
+        _drawerItem(Icons.gavel_rounded, 'المراجعة المحاسبية والقانونية', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const AuditWorkflowScreen())); setState(() => _dr = false); }),
         const Divider(color: AC.bdr),
-        _drawerItem(Icons.person_rounded, '\u062d\u0633\u0627\u0628\u064a', () { setState(() => _i = 5); }),
-        _drawerItem(Icons.diamond_outlined, '\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a', () { context.go('/subscription'); }),
-        _drawerItem(Icons.settings, '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const EnhancedSettingsScreen())); }),
-        _drawerItem(Icons.admin_panel_settings, '\u0627\u0644\u0625\u062f\u0627\u0631\u0629', () { setState(() => _i = 6); }),
+        _sectionHeader('السوق'),
+        _drawerItem(Icons.store_rounded, 'سوق الخدمات', () { setState(() => _i = 3); }),
+        _drawerItem(Icons.work_rounded, 'مقدمو الخدمات', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProviderKanbanScreen())); setState(() => _dr = false); }),
+        _drawerItem(Icons.menu_book, 'Bookkeeping', _comingSoon),
         const Divider(color: AC.bdr),
-        _drawerItem(Icons.smart_toy, 'Apex Copilot', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())); }, isGold: true),
+        _sectionHeader('التقارير والمعرفة'),
+        _drawerItem(Icons.bar_chart_rounded, 'التقارير', _comingSoon),
+        _drawerItem(Icons.folder_outlined, 'الأرشيف', () { context.go('/archive'); setState(() => _dr = false); }),
+        _drawerItem(Icons.psychology, 'العقل المعرفي', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const KnowledgeBrainScreen())); setState(() => _dr = false); }),
+        _drawerItem(Icons.admin_panel_settings, 'Reviewer Console', () { context.go('/admin/reviewer'); setState(() => _dr = false); }),
+        const Divider(color: AC.bdr),
+        _sectionHeader('الإدارة'),
+        _drawerItem(Icons.settings, 'الإدارة والإعدادات', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const EnhancedSettingsScreen())); setState(() => _dr = false); }),
+        _drawerItem(Icons.diamond_outlined, 'الحساب والاشتراكات', () { setState(() => _i = 5); }),
                   ])),
                 ]),
               ),
@@ -498,6 +513,20 @@ class _MainNavS extends State<MainNav> {
   }
 
 
+
+
+  Widget _sectionHeader(String label) => Padding(
+    padding: const EdgeInsets.only(top: 12, bottom: 4, right: 16, left: 16),
+    child: Text(label, textAlign: TextAlign.right, style: const TextStyle(
+      color: Color(0xFFC9A84C), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+  );
+
+  void _comingSoon() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('قريبًا — هذه الخدمة قيد التطوير'),
+        backgroundColor: Color(0xFF1A2536), duration: Duration(seconds: 2)));
+    setState(() => _dr = false);
+  }
 
   Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
     trailing: Icon(icon, color: isGold ? AC.gold : AC.ts, size: 20),
