@@ -46,6 +46,7 @@ class _SAS extends State<SlideAuthScreen> {
         S.plan = d['user']['plan'];
         S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
+        if (mounted) context.go('/home');
       } else {
         setState(() { _le = d['detail'] ?? 'خطأ في الدخول'; _ll = false; });
       }
