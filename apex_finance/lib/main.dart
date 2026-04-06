@@ -661,6 +661,59 @@ class _ClientsS extends ConsumerState<ClientsTab> {
       if(mounted) setState(() { _cl = clients; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
+  final _cName = TextEditingController();
+  final _cNameAr = TextEditingController();
+  final _cEmail = TextEditingController();
+  final _cPhone = TextEditingController();
+  final _cCR = TextEditingController();
+  final _cVAT = TextEditingController();
+  final _cAddress = TextEditingController();
+  String _cType = '';
+  String _cSector = '';
+
+  Widget _wf(String label, TextEditingController ctrl, {bool ltr = false}) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: TextField(controller: ctrl, textDirection: ltr ? TextDirection.ltr : null,
+      style: const TextStyle(color: AC.tp, fontSize: 13),
+      decoration: InputDecoration(labelText: label, labelStyle: const TextStyle(color: AC.ts, fontSize: 12),
+        filled: true, fillColor: AC.navy3, isDense: true, contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AC.gold)))),
+  );
+
+  Widget _wc(String label, List<String> opts, String sel, void Function(void Function()) ss, void Function(String) onSel) => Column(
+    crossAxisAlignment: CrossAxisAlignment.end, children: [
+      Text(label, style: const TextStyle(color: AC.ts, fontSize: 12)),
+      const SizedBox(height: 8),
+      Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.end, children: opts.map((o) =>
+        ChoiceChip(label: Text(o, style: TextStyle(color: sel == o ? AC.navy : AC.tp, fontSize: 11)),
+          selected: sel == o, selectedColor: AC.gold, backgroundColor: AC.navy3,
+          side: BorderSide(color: sel == o ? AC.gold : AC.bdr),
+          onSelected: (s) { if (s) { onSel(o); ss(() {}); } },
+        )).toList()),
+    ],
+  );
+
+  Widget _buildWizardStep(int step, void Function(void Function()) ss) {
+    switch (step) {
+      case 0: return _wc('\u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644', ['\u0634\u0631\u0643\u0629 \u0645\u0633\u0627\u0647\u0645\u0629','\u0634\u0631\u0643\u0629 \u0630\u0627\u062a \u0645\u0633\u0624\u0648\u0644\u064a\u0629 \u0645\u062d\u062f\u0648\u062f\u0629','\u0645\u0624\u0633\u0633\u0629 \u0641\u0631\u062f\u064a\u0629','\u062c\u0647\u0629 \u062d\u0643\u0648\u0645\u064a\u0629','\u0645\u0646\u0638\u0645\u0629 \u063a\u064a\u0631 \u0631\u0628\u062d\u064a\u0629'], _cType, ss, (v) => _cType = v);
+      case 1: return Column(children: [_wf('\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 (\u0639\u0631\u0628\u064a)', _cNameAr), _wf('\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644 (\u0625\u0646\u062c\u0644\u064a\u0632\u064a)', _cName, ltr: true)]);
+      case 2: return Column(children: [_wf('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a', _cEmail, ltr: true), _wf('\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641', _cPhone, ltr: true), _wf('\u0627\u0644\u0639\u0646\u0648\u0627\u0646', _cAddress)]);
+      case 3: return Column(children: [_wf('\u0631\u0642\u0645 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a', _cCR, ltr: true), _wf('\u0631\u0642\u0645 \u0627\u0644\u0636\u0631\u064a\u0628\u064a (VAT)', _cVAT, ltr: true)]);
+      case 4: return _wc('\u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0642\u0637\u0627\u0639', ['\u062a\u062c\u0632\u0626\u0629','\u0645\u0642\u0627\u0648\u0644\u0627\u062a','\u0635\u0646\u0627\u0639\u0629','\u062e\u062f\u0645\u0627\u062a','\u0639\u0642\u0627\u0631\u0627\u062a','\u062a\u0642\u0646\u064a\u0629','\u0635\u062d\u0629','\u062a\u0639\u0644\u064a\u0645'], _cSector, ss, (v) => _cSector = v);
+      case 5: return Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+        child: const Column(children: [Icon(Icons.cloud_upload_outlined, color: AC.gold, size: 36), SizedBox(height: 8), Text('\u0631\u0641\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 13)), SizedBox(height: 4), Text('\u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a\u060c \u0627\u0644\u0647\u0648\u064a\u0629\u060c \u0639\u0642\u062f \u0627\u0644\u062a\u0623\u0633\u064a\u0633', style: TextStyle(color: AC.ts, fontSize: 10))]));
+      case 6: return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          _rv('\u0627\u0644\u0646\u0648\u0639', _cType), _rv('\u0627\u0644\u0627\u0633\u0645', _cNameAr.text), _rv('\u0627\u0644\u0628\u0631\u064a\u062f', _cEmail.text), _rv('\u0627\u0644\u0647\u0627\u062a\u0641', _cPhone.text), _rv('\u0627\u0644\u0633\u062c\u0644', _cCR.text), _rv('\u0627\u0644\u0642\u0637\u0627\u0639', _cSector),
+        ]));
+      default: return const SizedBox();
+    }
+  }
+
+  Widget _rv(String l, String v) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+    Text(v.isEmpty ? '-' : v, style: const TextStyle(color: AC.tp, fontSize: 12)), const SizedBox(width: 8), Text(l, style: const TextStyle(color: AC.ts, fontSize: 11))]));
+
   void _showNewClientWizard(BuildContext ctx) {
     int _step = 0;
     final steps = [
@@ -704,7 +757,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
             ))),
             const Divider(color: AC.bdr),
             Expanded(child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Icon(icons[_step], color: AC.gold, size: 40),
+            _buildWizardStep(_step, setSt),
               const SizedBox(height: 12),
               Text(steps[_step], style: const TextStyle(color: AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
@@ -718,7 +771,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
               if (_step > 0) const SizedBox(width: 10),
               Expanded(child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AC.gold, padding: const EdgeInsets.symmetric(vertical: 12)),
-                onPressed: () { if (_step < 6) setSt(() => _step++); else Navigator.pop(dc); },
+                onPressed: () { if (_step < 6) { setSt(() => _step++); } else { ApiService.createClient(clientCode: DateTime.now().millisecondsSinceEpoch.toString().substring(5), name: _cNameAr.text.isNotEmpty ? _cNameAr.text : _cName.text, clientType: _cType.isNotEmpty ? _cType : 'company', industry: _cSector.isNotEmpty ? _cSector : null); _load(); Navigator.pop(dc); } },
                 child: Text(_step < 6 ? '\u0627\u0644\u062a\u0627\u0644\u064a' : '\u062a\u0623\u0643\u064a\u062f', style: const TextStyle(color: AC.navy, fontWeight: FontWeight.bold)))),
             ]),
           ]),
