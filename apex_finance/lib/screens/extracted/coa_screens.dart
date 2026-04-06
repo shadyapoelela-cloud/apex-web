@@ -1,3 +1,4 @@
+import '../../api_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:html' as html;
@@ -683,6 +684,8 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم اعتماد الشجرة')));
         Navigator.pop(context, true);
       }
+    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'))); }
+  }
 
   Future<void> _loadGate() async {
     setState(() => _gateLoading = true);
@@ -691,8 +694,6 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
       _gate = res.success ? (res.data is Map ? res.data as Map<String, dynamic> : {}) : {};
       _gateLoading = false;
     });
-  }
-    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'))); }
   }
 
   List<dynamic> get _filtered {
@@ -741,29 +742,21 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
                   Expanded(
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       if (_gate == null && !_gateLoading)
-                        TextButton(onPressed: _loadGate,
-                          child: Text('??? ???? ????????', style: TextStyle(color: AC.cyan))),
+                        TextButton(onPressed: _loadGate, child: Text('فحص شروط الاعتماد', style: TextStyle(color: AC.cyan))),
                       if (_gateLoading)
-                        const Padding(padding: EdgeInsets.all(8),
-                          child: CircularProgressIndicator(color: AC.gold, strokeWidth: 2)),
+                        const Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator(color: AC.gold, strokeWidth: 2)),
                       if (_gate != null && _gate!['can_approve'] == true)
                         ElevatedButton(
                           onPressed: _approveAll,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.greenAccent.shade700,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                          child: const Text('?????? ??????', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent.shade700, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                          child: const Text('اعتماد الشجرة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
                       if (_gate != null && _gate!['can_approve'] != true)
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withAlpha(20),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.orange.withAlpha(60))),
+                        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(
+                          color: Colors.orange.withAlpha(20), borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.orange.withAlpha(60))),
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Row(children: [Icon(Icons.lock, color: Colors.orange, size: 16), const SizedBox(width: 6),
-                              Text('?? ???? ???????? ???', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12))]),
+                              Text('لا يمكن الاعتماد بعد', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12))]),
                             const SizedBox(height: 6),
                             ...(_gate!['blockers'] as List? ?? []).map((b) =>
                               Padding(padding: const EdgeInsets.only(bottom: 3), child: Row(children: [
@@ -771,9 +764,6 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
                                 Expanded(child: Text(b.toString(), style: const TextStyle(color: AC.tp, fontSize: 11)))]))),
                           ])),
                     ]),
-                  ),
-                      child: const Text('اعتماد الشجرة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    ),
                   ),
                 ],
               ),
