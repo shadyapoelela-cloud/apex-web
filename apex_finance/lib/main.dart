@@ -676,7 +676,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
     final code = 'CL${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
     final name = _cNameAr.text.isNotEmpty ? _cNameAr.text : (_cName.text.isNotEmpty ? _cName.text : 'New Client');
     final type = _cType.isNotEmpty ? _cType : 'standard_business';
-    final res = await ApiService.createClient(clientCode: code, name: name, clientType: type, industry: _cSector.isNotEmpty ? _cSector : null);
+    final res = await ApiService.createClient(clientCode: code, name: _cName.text.isNotEmpty ? _cName.text : name, nameAr: _cNameAr.text.isNotEmpty ? _cNameAr.text : name, clientType: type, industry: _cSector.isNotEmpty ? _cSector : null);
     if (res.success) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644'), backgroundColor: Color(0xFF2E7D32)));
       _load();

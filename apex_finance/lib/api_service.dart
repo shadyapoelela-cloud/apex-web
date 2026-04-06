@@ -39,7 +39,7 @@ class ApiService {
   static Future<ApiResult> getClientTypes() => _get('/client-types');
   static Future<ApiResult> listClients() => _get('/clients');
   static Future<ApiResult> getClient(String id) => _get('/clients/$id');
-  static Future<ApiResult> createClient({required String clientCode, required String name, required String clientType, String? industry, String? country, String? currency}) => _post('/clients', {'client_code':clientCode,'name':name,'client_type_code':clientType,if(industry!=null)'industry':industry,if(country!=null)'country':country,if(currency!=null)'currency':currency});
+  static Future<ApiResult> createClient({required String clientCode, required String name, required String clientType, String? nameAr, String? industry, String? country, String? currency}) => _post('/clients', {'client_code':clientCode,'name':name,'name_ar':nameAr ?? name,'client_type_code':clientType,if(industry!=null)'industry':industry,if(country!=null)'country':country,if(currency!=null)'currency':currency});
 
 
   // ── Client Onboarding (New) ──
