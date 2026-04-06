@@ -638,6 +638,8 @@ class CoaReviewApprovalScreen extends StatefulWidget {
 }
 
 class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
+  Map<String, dynamic>? _gate;
+  bool _gateLoading = false;
   List<dynamic> _accounts = [];
   bool _loading = true;
   String? _error;
@@ -681,6 +683,15 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم اعتماد الشجرة')));
         Navigator.pop(context, true);
       }
+
+  Future<void> _loadGate() async {
+    setState(() => _gateLoading = true);
+    final res = await ApiService.checkApprovalGates(widget.uploadId);
+    setState(() {
+      _gate = res.success ? (res.data is Map ? res.data as Map<String, dynamic> : {}) : {};
+      _gateLoading = false;
+    });
+  }
     } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'))); }
   }
 
@@ -728,13 +739,39 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: _approveAll,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.greenAccent.shade700,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      if (_gate == null && !_gateLoading)
+                        TextButton(onPressed: _loadGate,
+                          child: Text('??? ???? ????????', style: TextStyle(color: AC.cyan))),
+                      if (_gateLoading)
+                        const Padding(padding: EdgeInsets.all(8),
+                          child: CircularProgressIndicator(color: AC.gold, strokeWidth: 2)),
+                      if (_gate != null && _gate!['can_approve'] == true)
+                        ElevatedButton(
+                          onPressed: _approveAll,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.greenAccent.shade700,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                          child: const Text('?????? ??????', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                      if (_gate != null && _gate!['can_approve'] != true)
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withAlpha(20),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.orange.withAlpha(60))),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Row(children: [Icon(Icons.lock, color: Colors.orange, size: 16), const SizedBox(width: 6),
+                              Text('?? ???? ???????? ???', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12))]),
+                            const SizedBox(height: 6),
+                            ...(_gate!['blockers'] as List? ?? []).map((b) =>
+                              Padding(padding: const EdgeInsets.only(bottom: 3), child: Row(children: [
+                                Icon(Icons.close, color: Colors.orange, size: 12), const SizedBox(width: 4),
+                                Expanded(child: Text(b.toString(), style: const TextStyle(color: AC.tp, fontSize: 11)))]))),
+                          ])),
+                    ]),
+                  ),
                       child: const Text('اعتماد الشجرة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ),

@@ -187,6 +187,13 @@ class ApiService {
     try { final res=await http.put(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
   }
   static String _parseErr(String body, int code) { try { final d=jsonDecode(body); return d['detail']??d['message']??'خطأ $code'; } catch(_){return 'خطأ $code';} }
+
+  // ── Phase 1: Client Readiness + Documents + Approval Gate ──
+  static Future<ApiResult> getClientReadiness(String clientId) => _get('/clients/$clientId/readiness');
+  static Future<ApiResult> getClientDocuments(String clientId) => _get('/clients/$clientId/documents');
+  static Future<ApiResult> updateDocumentStatus(String clientId, String docType, String status, {String? reason}) => _patch('/clients/$clientId/documents/$docType/status', {'status': status, if (reason != null) 'reason': reason});
+  static Future<ApiResult> checkApprovalGates(String uploadId) => _get('/coa/uploads/$uploadId/approval-check');
+
   static Future<ApiResult> adminStats() => _get('/admin/stats');
 }
 
