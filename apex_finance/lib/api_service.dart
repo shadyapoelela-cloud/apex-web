@@ -12,7 +12,7 @@ class ApiService {
   static Map<String,String> get _h => {'Content-Type':'application/json', if(_token!=null)'Authorization':'Bearer $_token'};
 
   // ── Auth ──
-  static Future<ApiResult> login(String username, String password) => _post('/auth/login', {'username':username,'password':password});
+  static Future<ApiResult> login(String username, String password) => _post('/auth/login', {'username_or_email':username,'password':password});
   static Future<ApiResult> register({required String username, required String email, required String password, String? displayName, String? mobile, String? countryCode}) => _post('/auth/register', {'username':username,'email':email,'password':password,if(displayName!=null)'display_name':displayName,if(mobile!=null)'mobile':mobile,if(countryCode!=null)'mobile_country_code':countryCode});
   static Future<ApiResult> forgotPassword(String email) => _post('/auth/forgot-password', {'email':email});
   static Future<ApiResult> changePassword({required String current, required String newPw, required String confirm}) => _put('/users/me/security/password', {'current_password':current,'new_password':newPw,'confirm_password':confirm});
