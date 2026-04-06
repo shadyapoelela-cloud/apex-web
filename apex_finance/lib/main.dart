@@ -389,7 +389,7 @@ class _MainNavS extends State<MainNav> {
                   context: context,
                   color: AC.navy2,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFC9A84C), width: 0.5)),
-                  position: RelativeRect.fromLTRB(pos.dx, pos.dy + sz.height, 0, 0),
+                  position: RelativeRect.fromLTRB(pos.dx, pos.dy + sz.height, MediaQuery.of(context).size.width - pos.dx - 250, 0),
                   items: _cl.isEmpty
                     ? [const PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: Color(0xFF8A8880), fontSize: 12)))]
                     : _cl.take(10).map((cl) {
