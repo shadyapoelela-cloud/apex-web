@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../main.dart' show AC, S;
+import '../../api_service.dart';
 import '../../core/router.dart' show authRefresh;
 
 class SlideAuthScreen extends StatefulWidget {
@@ -38,6 +39,7 @@ class _SAS extends State<SlideAuthScreen> {
       final d = jsonDecode(r.body);
       if (r.statusCode == 200 && d['success'] == true) {
         S.token = d['tokens']['access_token'];
+        ApiService.setToken(S.token!);
         S.uid = d['user']['id'];
         S.uname = d['user']['username'];
         S.dname = d['user']['display_name'];
