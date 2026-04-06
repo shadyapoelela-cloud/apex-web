@@ -377,23 +377,34 @@ class _MainNavS extends State<MainNav> {
             GestureDetector(onTap: () => setState(() => _i = 0), child: const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2))),
             const SizedBox(width: 8),
             IconButton(icon: const Icon(Icons.search, color: Color(0xFF8A8880), size: 20), onPressed: () {}),
-            PopupMenuButton<String>(
+            IconButton(
               icon: const Icon(Icons.business, color: Color(0xFFC9A84C), size: 20),
-              tooltip: '\u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644',
-              color: AC.navy2,
-              onSelected: (v) => setState(() { if (_activeClients.contains(v)) _activeClients.remove(v); else _activeClients.add(v); }),
-              itemBuilder: (_) => _cl.isEmpty
-                ? [const PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.ts, fontSize: 12)))]
-                : _cl.take(10).map((cl) {
-                    final name = (cl['name_ar'] ?? cl['name'] ?? '') as String;
-                    final sel = _activeClients.contains(name);
-                    return PopupMenuItem<String>(value: name, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                      Text(name, style: TextStyle(color: sel ? AC.gold : AC.tp, fontSize: 12, fontWeight: sel ? FontWeight.bold : FontWeight.normal)),
-                      const SizedBox(width: 8),
-                      Icon(sel ? Icons.check_box : Icons.check_box_outline_blank, color: sel ? AC.gold : AC.ts, size: 18),
-                    ]));
-                  }).toList(),
+              onPressed: () {
+                final RenderBox box = context.findRenderObject() as RenderBox;
+                showMenu<String>(
+                  context: context,
+                  color: AC.navy2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFC9A84C), width: 0.5)),
+                  position: RelativeRect.fromLTRB(0, kToolbarHeight + 60, 0, 0),
+                  items: _cl.isEmpty
+                    ? [const PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: Color(0xFF8A8880), fontSize: 12)))]
+                    : _cl.take(10).map((cl) {
+                        final name = (cl['name_ar'] ?? cl['name'] ?? '') as String;
+                        final sel = _activeClients.contains(name);
+                        return PopupMenuItem<String>(
+                          value: name,
+                          height: 40,
+                          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                            Text(name, style: TextStyle(color: sel ? const Color(0xFFC9A84C) : const Color(0xFFF0EDE6), fontSize: 12, fontWeight: sel ? FontWeight.bold : FontWeight.normal)),
+                            const SizedBox(width: 8),
+                            Icon(sel ? Icons.check_box : Icons.check_box_outline_blank, color: sel ? const Color(0xFFC9A84C) : const Color(0xFF8A8880), size: 18),
+                          ]),
+                        );
+                      }).toList(),
+                ).then((v) { if (v != null && v.isNotEmpty) setState(() { if (_activeClients.contains(v)) _activeClients.remove(v); else _activeClients.add(v); }); });
+              },
             ),
+
             IconButton(icon: const Icon(Icons.notifications_outlined, color: Color(0xFF8A8880), size: 20), onPressed: () => context.go('/notifications')),
             const Spacer(),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
