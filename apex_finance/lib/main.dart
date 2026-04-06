@@ -309,6 +309,8 @@ class _MainNavS extends State<MainNav> {
   List _cl = [];
   List<String> _activeClients = [];
   final _bizKey = GlobalKey();
+  final _notifKey = GlobalKey();
+  List _notifs = [];
   double _fabX = 20;
   double _fabY = 100;
   String _userName = 'User';
@@ -320,6 +322,7 @@ class _MainNavS extends State<MainNav> {
     print('MAINNAV INIT: uname=${S.uname} dname=${S.dname}');
       Future.delayed(const Duration(milliseconds: 500), () {
       ApiService.listClients().then((res) { if (res.success && res.data is List && mounted) setState(() => _cl = res.data as List); });
+      ApiService.listNotifications().then((res) { if (res.success && res.data is List && mounted) setState(() => _notifs = res.data as List); });
         print('MAINNAV 500ms: uname=${S.uname} dname=${S.dname}');
       if (mounted) setState(() {});
     });
@@ -409,7 +412,42 @@ class _MainNavS extends State<MainNav> {
               },
             ),
 
-            IconButton(icon: const Icon(Icons.notifications_outlined, color: Color(0xFF8A8880), size: 20), onPressed: () => context.go('/notifications')),
+            IconButton(
+              key: _notifKey,
+              icon: Stack(children: [
+                const Icon(Icons.notifications_outlined, color: Color(0xFF8A8880), size: 20),
+                if (_notifs.any((n) => n['is_read'] != true)) Positioned(right: 0, top: 0, child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFC9A84C), shape: BoxShape.circle))),
+              ]),
+              onPressed: () {
+                final RenderBox btn = _notifKey.currentContext!.findRenderObject() as RenderBox;
+                final Offset pos = btn.localToGlobal(Offset.zero);
+                final Size sz = btn.size;
+                showMenu<String>(
+                  context: context,
+                  color: AC.navy2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFC9A84C), width: 0.5)),
+                  position: RelativeRect.fromLTRB(pos.dx, pos.dy + sz.height, MediaQuery.of(context).size.width - pos.dx - 300, 0),
+                  items: _notifs.isEmpty
+                    ? [const PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: Color(0xFF8A8880), fontSize: 12)))]
+                    : [
+                      ..._notifs.take(8).map((n) {
+                        final unread = n['is_read'] != true;
+                        final title = (n['title'] ?? n['message'] ?? '') as String;
+                        return PopupMenuItem<String>(
+                          value: n['id']?.toString() ?? '',
+                          height: 44,
+                          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                            Expanded(child: Text(title, textAlign: TextAlign.right, overflow: TextOverflow.ellipsis, style: TextStyle(color: unread ? const Color(0xFFC9A84C) : const Color(0xFFF0EDE6), fontSize: 11, fontWeight: unread ? FontWeight.bold : FontWeight.normal))),
+                            const SizedBox(width: 8),
+                            Icon(unread ? Icons.circle : Icons.circle_outlined, color: unread ? const Color(0xFFC9A84C) : const Color(0xFF8A8880), size: 8),
+                          ]),
+                        );
+                      }),
+                      const PopupMenuItem<String>(value: 'all', height: 36, child: Center(child: Text('\u0639\u0631\u0636 \u0627\u0644\u0643\u0644', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 11, fontWeight: FontWeight.bold)))),
+                    ],
+                ).then((v) { if (v == 'all') context.go('/notifications'); });
+              },
+            ),
             const Spacer(),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
               Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'), style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 13, fontWeight: FontWeight.w600)),
