@@ -655,11 +655,9 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   List _cl=[]; bool _ld=true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
-    try {
-      ref.invalidate(clientsProvider);
-      final clients = await ref.read(clientsProvider.future);
-      if(mounted) setState(() { _cl = clients; _ld = false; });
-    } catch(_) { if(mounted) setState(()=> _ld=false); }
+    setState(() => _ld = true);
+    final res = await ApiService.listClients();
+    if (mounted) setState(() { _cl = res.success && res.data is List ? res.data as List : []; _ld = false; });
   }
   final _cName = TextEditingController();
   final _cNameAr = TextEditingController();
