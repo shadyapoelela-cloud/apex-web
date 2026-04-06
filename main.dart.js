@@ -46643,32 +46643,39 @@ case 5:return A.T(null,r)
 case 1:return A.S(p,r)}})
 return A.U($async$aU,r)},
 zn(a){return this.acA(a)},
-acA(a){var s=0,r=A.V(t.H),q=this,p,o,n,m,l,k,j
+acA(a){var s=0,r=A.V(t.H),q=this,p,o,n,m,l,k,j,i,h,g,f
 var $async$zn=A.R(function(b,c){if(b===1)return A.S(c,r)
 while(true)switch(s){case 0:A.bu(a,!1).he(null)
 p=B.d.cl(B.t.l(Date.now()),5)
 o=q.z
 n=o.a.a
-if(!(n.length!==0)){m=q.y.a.a
-n=m.length!==0?m:"New Client"}l=q.ch
-l=l.length!==0?l:"standard_business"
-m=q.CW
-m=m.length!==0?m:null
-k=t.z
-k=A.B(k,k)
-k.p(0,"client_code","CL"+p)
-k.p(0,"name",n)
-k.p(0,"client_type_code",l)
-if(m!=null)k.p(0,"industry",m)
+m=n.length!==0
+if(m)l=n
+else{k=q.y.a.a
+l=k.length!==0?k:"New Client"}j=q.ch
+j=j.length!==0?j:"standard_business"
+k=q.y
+i=k.a.a
+i=i.length!==0?i:l
+m=m?n:l
+h=q.CW
+h=h.length!==0?h:null
+g=t.z
+g=A.B(g,g)
+g.p(0,"client_code","CL"+p)
+g.p(0,"name",i)
+g.p(0,"name_ar",m)
+g.p(0,"client_type_code",j)
+if(h!=null)g.p(0,"industry",h)
 s=2
-return A.N(A.w_("/clients",k),$async$zn)
-case 2:j=c
-if(j.a){p=q.c
+return A.N(A.w_("/clients",g),$async$zn)
+case 2:f=c
+if(f.a){p=q.c
 if(p!=null)p.a3(t.O).f.eM(B.a0B)
 q.aU()}else{p=q.c
 if(p!=null){p=p.a3(t.O).f
-m=j.c
-p.eM(A.pY(null,null,null,B.pH,null,B.R,null,A.n(m==null?"\u062e\u0637\u0623":m,null,null,null,null,null,null,null),null,B.b0,null,null,null,null,null,null,null,null,null))}}q.y.hO(0,B.dt)
+m=f.c
+p.eM(A.pY(null,null,null,B.pH,null,B.R,null,A.n(m==null?"\u062e\u0637\u0623":m,null,null,null,null,null,null,null),null,B.b0,null,null,null,null,null,null,null,null,null))}}k.hO(0,B.dt)
 o.hO(0,B.dt)
 q.Q.hO(0,B.dt)
 q.as.hO(0,B.dt)
