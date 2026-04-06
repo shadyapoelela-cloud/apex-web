@@ -306,6 +306,7 @@ class MainNav extends StatefulWidget {
 class _MainNavS extends State<MainNav> {
   int _i = 0;
   bool _dr = false;
+  List _cl = [];
   String? _activeClient;
   double _fabX = 20;
   double _fabY = 100;
@@ -317,6 +318,7 @@ class _MainNavS extends State<MainNav> {
     super.initState();
     print('MAINNAV INIT: uname=${S.uname} dname=${S.dname}');
       Future.delayed(const Duration(milliseconds: 500), () {
+      ApiService.listClients().then((res) { if (res.success && res.data is List && mounted) setState(() => _cl = res.data as List); });
         print('MAINNAV 500ms: uname=${S.uname} dname=${S.dname}');
       if (mounted) setState(() {});
     });
@@ -331,6 +333,7 @@ class _MainNavS extends State<MainNav> {
             GestureDetector(onTap: () => setState(() => _i = 0), child: const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2))),
             const SizedBox(width: 8),
             IconButton(icon: const Icon(Icons.search, color: Color(0xFF8A8880), size: 20), onPressed: () {}),
+            PopupMenuButton<String>(icon: const Icon(Icons.business, color: Color(0xFFC9A84C), size: 20), tooltip: '\u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644', onSelected: (v) => setState(() => _activeClient = v), itemBuilder: (_) => _cl.isEmpty ? [const PopupMenuItem<String>(value: '', child: Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.ts, fontSize: 12)))] : _cl.take(10).map((c) => PopupMenuItem<String>(value: c['name_ar'] ?? c['name'] ?? '', child: Text(c['name_ar'] ?? c['name'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 12)))).toList()),
             IconButton(icon: const Icon(Icons.notifications_outlined, color: Color(0xFF8A8880), size: 20), onPressed: () => context.go('/notifications')),
             const Spacer(),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
