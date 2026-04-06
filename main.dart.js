@@ -46024,39 +46024,39 @@ if(q.c!=null)q.v(new A.auK(q,p))
 return A.T(null,r)}})
 return A.U($async$aQ,r)},
 yV(a){return this.abp(a)},
-abp(a){var s=0,r=A.V(t.H),q=this,p,o,n,m,l,k,j,i,h,g,f
+abp(a){var s=0,r=A.V(t.H),q=this,p,o,n,m,l,k,j,i,h,g
 var $async$yV=A.Q(function(b,c){if(b===1)return A.S(c,r)
 while(true)switch(s){case 0:A.bu(a,!1).h9(null)
 p=B.d.cF(B.t.l(Date.now()),5)
 o=q.z
 n=o.a.a
-m=n.length!==0
-if(m)l=n
-else{k=q.y.a.a
-l=k.length!==0?k:"New Client"}j=q.ch
-j=j.length!==0?j:"standard_business"
-k=q.y
-i=k.a.a
-i=i.length!==0?i:l
-m=m?n:l
-h=q.CW
-h=h.length!==0?h:null
-g=t.z
-g=A.B(g,g)
-g.p(0,"client_code","CL"+p)
-g.p(0,"name",i)
-g.p(0,"name_ar",m)
-g.p(0,"client_type_code",j)
-if(h!=null)g.p(0,"industry",h)
+if(!(n.length!==0)){m=q.y.a.a
+n=m.length!==0?m:"New Client"}m=t.N
+l=A.y(["\u0643\u064a\u0627\u0646 \u0633\u0639\u0648\u062f\u064a","standard_business","\u0627\u0633\u062a\u062b\u0645\u0627\u0631 \u0623\u062c\u0646\u0628\u064a","investment_entity","\u0641\u0631\u0639 \u0634\u0631\u0643\u0629 \u0623\u062c\u0646\u0628\u064a\u0629","financial_entity"],m,m).h(0,q.ch)
+if(l==null)l="standard_business"
+m=q.y
+k=m.a.a
+k=k.length!==0?k:n
+j=o.a.a
+j=j.length!==0?j:n
+i=q.CW
+i=i.length!==0?i:null
+h=t.z
+h=A.B(h,h)
+h.p(0,"client_code","CL"+p)
+h.p(0,"name",k)
+h.p(0,"name_ar",j)
+h.p(0,"client_type_code",l)
+if(i!=null)h.p(0,"industry",i)
 s=2
-return A.M(A.vy("/clients",g),$async$yV)
-case 2:f=c
-if(f.a){p=q.c
+return A.M(A.vy("/clients",h),$async$yV)
+case 2:g=c
+if(g.a){p=q.c
 if(p!=null)p.a2(t.O).f.eK(B.a0B)
 q.aQ()}else{p=q.c
 if(p!=null){p=p.a2(t.O).f
-m=f.c
-p.eK(A.pz(null,null,null,B.pI,null,B.R,null,A.m(m==null?"\u062e\u0637\u0623":m,null,null,null,null,null,null,null),null,B.b_,null,null,null,null,null,null,null,null,null))}}k.hJ(0,B.dt)
+k=g.c
+p.eK(A.pz(null,null,null,B.pI,null,B.R,null,A.m(k==null?"\u062e\u0637\u0623":k,null,null,null,null,null,null,null),null,B.b_,null,null,null,null,null,null,null,null,null))}}m.hJ(0,B.dt)
 o.hJ(0,B.dt)
 q.Q.hJ(0,B.dt)
 q.as.hJ(0,B.dt)
