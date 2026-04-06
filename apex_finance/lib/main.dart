@@ -661,10 +661,75 @@ class _ClientsS extends ConsumerState<ClientsTab> {
       if(mounted) setState(() { _cl = clients; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
+  void _showNewClientWizard(BuildContext ctx) {
+    int _step = 0;
+    final steps = [
+      '\u0627\u062e\u062a\u064a\u0627\u0631 \u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644',
+      '\u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0623\u0633\u0627\u0633\u064a\u0629',
+      '\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u062a\u0648\u0627\u0635\u0644',
+      '\u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a',
+      '\u0627\u0644\u0646\u0634\u0627\u0637 \u0648\u0627\u0644\u0642\u0637\u0627\u0639',
+      '\u0631\u0641\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a',
+      '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0648\u0627\u0644\u062a\u0623\u0643\u064a\u062f',
+    ];
+    final icons = [Icons.category, Icons.person, Icons.phone, Icons.business_center, Icons.work, Icons.upload_file, Icons.check_circle];
+    showDialog(context: ctx, builder: (dc) => StatefulBuilder(builder: (bc, setSt) =>
+      Dialog(backgroundColor: Colors.transparent, insetPadding: const EdgeInsets.all(24),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500, maxHeight: 550),
+          decoration: BoxDecoration(color: AC.navy2.withOpacity(0.95), borderRadius: BorderRadius.circular(20), border: Border.all(color: AC.gold.withOpacity(0.3))),
+          padding: const EdgeInsets.all(20),
+          child: Column(children: [
+            Row(children: [
+              const Text('\u062a\u0633\u062c\u064a\u0644 \u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
+              const Spacer(),
+              IconButton(icon: const Icon(Icons.close, color: AC.ts, size: 20), onPressed: () => Navigator.pop(dc)),
+            ]),
+            const SizedBox(height: 16),
+            SizedBox(height: 50, child: Row(children: List.generate(7, (idx) =>
+              Expanded(child: GestureDetector(
+                onTap: () => setSt(() => _step = idx),
+                child: Column(children: [
+                  Container(width: 28, height: 28,
+                    decoration: BoxDecoration(shape: BoxShape.circle,
+                      color: idx <= _step ? AC.gold : AC.navy3,
+                      border: Border.all(color: idx == _step ? AC.gold : AC.bdr)),
+                    child: Center(child: idx < _step
+                      ? const Icon(Icons.check, color: AC.navy, size: 14)
+                      : Text('${idx + 1}', style: TextStyle(color: idx == _step ? AC.navy : AC.ts, fontSize: 11, fontWeight: FontWeight.bold)))),
+                  const SizedBox(height: 4),
+                  if (idx == _step) Text(steps[idx], style: const TextStyle(color: AC.gold, fontSize: 7), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
+                ]),
+              )),
+            ))),
+            const Divider(color: AC.bdr),
+            Expanded(child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icons[_step], color: AC.gold, size: 40),
+              const SizedBox(height: 12),
+              Text(steps[_step], style: const TextStyle(color: AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text('\u0627\u0644\u062e\u0637\u0648\u0629 ${_step + 1} \u0645\u0646 7', style: const TextStyle(color: AC.ts, fontSize: 12)),
+            ]))),
+            Row(children: [
+              if (_step > 0) Expanded(child: OutlinedButton(
+                style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(vertical: 12)),
+                onPressed: () => setSt(() => _step--),
+                child: const Text('\u0627\u0644\u0633\u0627\u0628\u0642', style: TextStyle(color: AC.ts)))),
+              if (_step > 0) const SizedBox(width: 10),
+              Expanded(child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AC.gold, padding: const EdgeInsets.symmetric(vertical: 12)),
+                onPressed: () { if (_step < 6) setSt(() => _step++); else Navigator.pop(dc); },
+                child: Text(_step < 6 ? '\u0627\u0644\u062a\u0627\u0644\u064a' : '\u062a\u0623\u0643\u064a\u062f', style: const TextStyle(color: AC.navy, fontWeight: FontWeight.bold)))),
+            ]),
+          ]),
+        ),
+      ),
+    ));
+  }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: const Text('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.gold))),
     floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: const Icon(Icons.add, color: AC.navy),
-      onPressed: () async { await Navigator.push(c, MaterialPageRoute(builder:(_)=> wizard.ClientOnboardingWizard(token: S.token))); _load(); }),
+      onPressed: () => _showNewClientWizard(c)),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       _cl.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.business_outlined, color: AC.ts, size: 60), const SizedBox(height: 12),
