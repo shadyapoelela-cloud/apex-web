@@ -673,7 +673,12 @@ class _ClientsS extends ConsumerState<ClientsTab> {
     Navigator.pop(dc);
     final code = 'CL${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
     final name = _cNameAr.text.isNotEmpty ? _cNameAr.text : (_cName.text.isNotEmpty ? _cName.text : 'New Client');
-    final type = _cType.isNotEmpty ? _cType : 'standard_business';
+    final typeMap = {
+      '\u0643\u064a\u0627\u0646 \u0633\u0639\u0648\u062f\u064a': 'standard_business',
+      '\u0627\u0633\u062a\u062b\u0645\u0627\u0631 \u0623\u062c\u0646\u0628\u064a': 'investment_entity',
+      '\u0641\u0631\u0639 \u0634\u0631\u0643\u0629 \u0623\u062c\u0646\u0628\u064a\u0629': 'financial_entity',
+    };
+    final type = typeMap[_cType] ?? 'standard_business';
     final res = await ApiService.createClient(clientCode: code, name: _cName.text.isNotEmpty ? _cName.text : name, nameAr: _cNameAr.text.isNotEmpty ? _cNameAr.text : name, clientType: type, industry: _cSector.isNotEmpty ? _cSector : null);
     if (res.success) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644'), backgroundColor: Color(0xFF2E7D32)));
