@@ -299,6 +299,38 @@ class _RegS extends State<RegScreen> {
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // MAIN NAVIGATION â€” 6 tabs
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+class ApexSearch extends SearchDelegate<String> {
+  @override String get searchFieldLabel => 'بحث في APEX...';
+  @override ThemeData appBarTheme(BuildContext context) => ThemeData.dark().copyWith(
+    appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF080F1F)),
+    inputDecorationTheme: const InputDecorationTheme(hintStyle: TextStyle(color: Color(0xFF8A8880))),
+  );
+  @override List<Widget>? buildActions(BuildContext context) => [IconButton(icon: const Icon(Icons.clear), onPressed: () => query = '')];
+  @override Widget? buildLeading(BuildContext context) => IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => close(context, ''));
+  @override Widget buildResults(BuildContext context) => _buildList(context);
+  @override Widget buildSuggestions(BuildContext context) => _buildList(context);
+  Widget _buildList(BuildContext context) {
+    final items = [
+      {'ن': 'الرئيسية', 'r': '/home'},
+      {'ن': 'العملاء', 'r': '/home'},
+      {'ن': 'العمليات المالية', 'r': '/financial-ops'},
+      {'ن': 'سوق الخدمات', 'r': '/home'},
+      {'ن': 'المراجعة', 'r': '/audit-workflow'},
+      {'ن': 'العقل المعرفي', 'r': '/knowledge-brain'},
+      {'ن': 'الإعدادات', 'r': '/settings'},
+      {'ن': 'Apex Copilot', 'r': '/copilot'},
+      {'ن': 'الإشعارات', 'r': '/notifications'},
+    ];
+    final filtered = query.isEmpty ? items : items.where((i) => (i['ن'] as String).contains(query)).toList();
+    return Container(color: const Color(0xFF050D1A), child: ListView(children: filtered.map((i) => ListTile(
+      trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xFF8A8880), size: 14),
+      title: Text(i['ن'] as String, textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFF0EDE6), fontSize: 14)),
+      onTap: () { close(context, ''); },
+    )).toList()));
+  }
+}
+
 class MainNav extends StatefulWidget {
   const MainNav({super.key});
   @override State<MainNav> createState() => _MainNavS();
@@ -380,7 +412,9 @@ class _MainNavS extends State<MainNav> {
           child: Row(children: [
             GestureDetector(onTap: () => setState(() => _i = 0), child: const Text('APEX', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2))),
             const SizedBox(width: 8),
-            IconButton(icon: const Icon(Icons.search, color: Color(0xFFC9A84C), size: 20), onPressed: () {}),
+            IconButton(icon: const Icon(Icons.search, color: Color(0xFFC9A84C), size: 20), onPressed: () {
+              showSearch(context: context, delegate: ApexSearch());
+            }),
             IconButton(
               key: _bizKey,
               icon: const Icon(Icons.business, color: Color(0xFFC9A84C), size: 20),
@@ -1440,7 +1474,7 @@ class _AccS extends ConsumerState<AccountTab> {
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   void _logout() { http.post(Uri.parse('$_api/auth/logout'), headers: S.h()); S.clear();
-    context.go('/login'); }
+    S.clear(); ApiService.clearToken(); context.go('/login'); }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: const Text('\u062d\u0633\u0627\u0628\u064a', style: TextStyle(color: AC.gold)),
       actions: [IconButton(onPressed: _logout, icon: const Icon(Icons.logout, color: AC.err))]),

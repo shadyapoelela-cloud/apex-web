@@ -47,7 +47,7 @@ class _EDashState extends State<EnhancedDashboard> {
             _buildKpiRow(),
             const SizedBox(height: 16),
             // quick nav removed
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: _buildRevenueChart()), const SizedBox(width: 8), Expanded(child: _buildServiceDonut()), const SizedBox(width: 8), Expanded(child: _buildSectorChart())]),
+            LayoutBuilder(builder: (ctx, box) => box.maxWidth > 700 ? Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: _buildRevenueChart()), const SizedBox(width: 8), Expanded(child: _buildServiceDonut()), const SizedBox(width: 8), Expanded(child: _buildSectorChart())]) : Column(children: [_buildRevenueChart(), const SizedBox(height: 8), _buildServiceDonut(), const SizedBox(height: 8), _buildSectorChart()])),
             const SizedBox(height: 12),
             _buildPerformanceCard(),
             _buildRecentActivity(),
