@@ -6,6 +6,7 @@ import '../../core/session.dart';
 import '../../core/shared_constants.dart';
 import '../../client_create.dart';
 import 'coa_screens.dart';
+import '../clients/client_detail_screen.dart';
 
 final _api = apiBase;
 
@@ -66,7 +67,7 @@ class _ClientListS extends State<ClientListScreen> {
               final km = cl['knowledge_mode'] == true;
               return InkWell(
               onTap: () => Navigator.push(c, MaterialPageRoute(
-                builder: (_) => CoaUploadScreen(clientId: cl['id'], clientName: cl['name_ar'] ?? cl['name'] ?? ''))),
+                builder: (_) => ClientDetailScreen(clientId: cl['id'], clientName: cl['name_ar'] ?? cl['name'] ?? ''))),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 padding: const EdgeInsets.all(16),
