@@ -46,7 +46,6 @@ class _SAS extends State<SlideAuthScreen> {
         S.plan = d['user']['plan'];
         S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
-        if (mounted) { print('LOGIN OK: uname=${S.uname} dname=${S.dname} token=${S.token?.substring(0,10)}'); authRefresh.value++; context.go('/home'); }
       } else {
         setState(() { _le = d['detail'] ?? 'خطأ في الدخول'; _ll = false; });
       }

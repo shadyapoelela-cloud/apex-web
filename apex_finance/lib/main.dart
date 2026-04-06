@@ -14,7 +14,6 @@ import 'dart:html' as html;
 // DISABLED: import 'client_create_screen.dart';
 import 'client_create.dart';
 
-import 'screens/clients/client_onboarding_wizard.dart' as wizard;
 import 'screens/marketplace/service_catalog_screen.dart' as catalog;
 import 'screens/account/archive_screen.dart' as archive;
 import 'screens/tasks/audit_service_screen.dart' as audit;
@@ -147,7 +146,6 @@ class _LoginS extends State<LoginScreen> {
         S.uname = d['user']['username']; S.dname = d['user']['display_name'];
         S.plan = d['user']['plan']; S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
-        if (mounted) { debugPrint('LOGIN OK - navigating...'); context.go('/home'); }
       } else { setState(() { _e = d['detail'] ?? '\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u062f\u062e\u0648\u0644'; _l = false; }); }
     } catch (e) { setState(() { _e = '\u062e\u0637\u0623 \u0627\u0644\u0627\u062a\u0635\u0627\u0644: $e'; _l = false; }); }
   }
@@ -351,55 +349,11 @@ class _MainNavS extends State<MainNav> {
   @override
   void initState() {
     super.initState();
-    print('MAINNAV INIT: uname=${S.uname} dname=${S.dname}');
       Future.delayed(const Duration(milliseconds: 500), () {
       ApiService.listClients().then((res) { if (res.success && res.data is List && mounted) setState(() => _cl = res.data as List); });
       ApiService.listNotifications().then((res) { if (res.success && res.data is List && mounted) setState(() => _notifs = res.data as List); });
-        print('MAINNAV 500ms: uname=${S.uname} dname=${S.dname}');
       if (mounted) setState(() {});
     });
-  }
-  void _showMultiClientPicker(BuildContext ctx) {
-    showDialog(context: ctx, builder: (dc) => StatefulBuilder(builder: (bc, setSt) {
-      return Dialog(backgroundColor: Colors.transparent, insetPadding: const EdgeInsets.all(24),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 450),
-          decoration: BoxDecoration(color: AC.navy2.withOpacity(0.95), borderRadius: BorderRadius.circular(16), border: Border.all(color: AC.gold.withOpacity(0.3))),
-          padding: const EdgeInsets.all(16),
-          child: Column(children: [
-            Row(children: [
-              const Text('\u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.gold, fontSize: 15, fontWeight: FontWeight.bold)),
-              const Spacer(),
-              IconButton(icon: const Icon(Icons.close, color: AC.ts, size: 18), onPressed: () => Navigator.pop(dc)),
-            ]),
-            const Divider(color: AC.bdr),
-            Expanded(child: _cl.isEmpty
-              ? const Center(child: Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.ts)))
-              : ListView.builder(itemCount: _cl.length, itemBuilder: (_, i) {
-                  final name = (_cl[i]['name_ar'] ?? _cl[i]['name'] ?? '') as String;
-                  final selected = _activeClients.contains(name);
-                  return ListTile(
-                    dense: true,
-                    trailing: Icon(selected ? Icons.check_box : Icons.check_box_outline_blank, color: selected ? AC.gold : AC.ts, size: 20),
-                    title: Text(name, textAlign: TextAlign.right, style: TextStyle(color: selected ? AC.gold : AC.tp, fontSize: 13, fontWeight: selected ? FontWeight.bold : FontWeight.normal)),
-                    onTap: () {
-                      setSt(() {
-                        if (selected) { _activeClients.remove(name); } else { _activeClients.add(name); }
-                      });
-                      setState(() {});
-                    },
-                  );
-                })),
-            const SizedBox(height: 8),
-            SizedBox(width: double.infinity, child: ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AC.gold, padding: const EdgeInsets.symmetric(vertical: 12)),
-              onPressed: () => Navigator.pop(dc),
-              child: const Text('\u062a\u0623\u0643\u064a\u062f', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold)),
-            )),
-          ]),
-        ),
-      );
-    }));
   }
 
 
@@ -489,7 +443,7 @@ class _MainNavS extends State<MainNav> {
             ]),
             const SizedBox(width: 6),
             GestureDetector(
-              onTap: () => _showMultiClientPicker(c),
+              onTap: () => {},
               child: const Icon(Icons.account_circle, color: Color(0xFFC9A84C), size: 22),
             ),
           ]),
