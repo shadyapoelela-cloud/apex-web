@@ -228,6 +228,33 @@ def get_assessment(upload_id: str):
 # POST /coa/uploads/{upload_id}/approve-coa
 # ═══════════════════════════════════════════════════════════
 
+@router.get("/coa/uploads/{upload_id}/approval-check", tags=["Phase1-Gates"])
+def check_coa_approval_readiness(upload_id: str):
+    """Check all approval gates before allowing final COA approve."""
+    from app.sprint3.services.coa_approval_gate import check_approval_gates
+
+    db = _get_db()
+    try:
+        scores_row = db.execute(_t(
+            "SELECT overall_score, completeness_score, reporting_readiness_score "
+            "FROM client_coa_assessments WHERE coa_upload_id = :uid"
+        ), {"uid": upload_id}).fetchone()
+
+        if not scores_row:
+            return {"can_approve": False, "blockers": ["Run quality assessment first"], "quality_overall": 0}
+
+        quality_scores = {"overall": scores_row[0] or 0, "completeness": scores_row[1] or 0, "reporting": scores_row[2] or 0}
+
+        rows = db.execute(_t(
+            "SELECT record_status, normalized_class FROM client_chart_of_accounts WHERE coa_upload_id = :uid"
+        ), {"uid": upload_id}).fetchall()
+        accounts = [{"status": r[0], "normalized_class": r[1]} for r in rows]
+
+        return check_approval_gates(accounts, quality_scores)
+    finally:
+        db.close()
+
+
 @router.post("/coa/uploads/{upload_id}/approve-coa")
 def approve_coa(upload_id: str, body: dict = {}):
     """Approve the entire COA upload as the client's approved chart."""

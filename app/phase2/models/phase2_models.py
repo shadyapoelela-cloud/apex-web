@@ -1,4 +1,4 @@
-﻿"""
+"""
 APEX Platform — Phase 2 Models
 ═══════════════════════════════════════════════════════════════
 Clients + COA + Analysis Results + Result Explanations
@@ -119,6 +119,9 @@ class Client(Base):
     registration_status = Column(String(30), default="draft")          # draft, pending_review, active, suspended
     onboarding_step = Column(Integer, default=0)                       # wizard progress 0-7
     onboarding_completed = Column(Boolean, default=False)
+    # ── Phase 1: Readiness + COA Stage (Integration Pack) ──
+    readiness_status = Column(String(30), default="not_ready")   # not_ready, documents_pending, ready_for_coa, coa_in_progress, ready_for_tb
+    coa_stage = Column(String(20), default="none")               # none, upload, parse, classify, quality, review, approve, ready
     is_deleted = Column(Boolean, default=False)
     deleted_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
@@ -153,6 +156,39 @@ class ClientMembership(Base):
 # ═══════════════════════════════════════════════════════════════
 # Migration 06: COA Uploads
 # ═══════════════════════════════════════════════════════════════
+
+
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 1: Client Documents (Integration Pack)
+# ═══════════════════════════════════════════════════════════════
+
+class ClientDocument(Base):
+    """Client document with lifecycle: missing -> uploaded -> under_review -> accepted/rejected -> expired/replaced"""
+    __tablename__ = "client_documents"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
+    document_type = Column(String(50), nullable=False)         # cr, tax, address, aoa, licenses, etc.
+    name_ar = Column(String(200), nullable=False)
+    name_en = Column(String(200), nullable=True)
+    required = Column(Boolean, default=False)
+    status = Column(String(20), default="missing")             # missing, uploaded, under_review, accepted, rejected, expired, replaced
+    file_path = Column(String(500), nullable=True)
+    uploaded_at = Column(DateTime, nullable=True)
+    accepted_at = Column(DateTime, nullable=True)
+    rejected_at = Column(DateTime, nullable=True)
+    reject_reason = Column(Text, nullable=True)
+    expires_at = Column(DateTime, nullable=True)
+    replaced_at = Column(DateTime, nullable=True)
+    replaced_by_id = Column(String(36), nullable=True)         # links to new version
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("ix_client_doc_type", "client_id", "document_type"),
+    )
+
 
 class COAUpload(Base):
     """Upload record — tracks each file upload and its processing."""

@@ -14,6 +14,10 @@ from app.phase1.routes.phase1_routes import get_current_user
 from app.phase2.services.client_service import ClientService
 from app.phase2.services.analysis_service import AnalysisService
 
+# ── Phase 1 Integration ──
+from app.phase2.services.readiness_service import compute_readiness, get_missing_for_coa
+from app.phase2.services.document_service import can_transition, transition_document
+
 router = APIRouter()
 client_service = ClientService()
 analysis_service = AnalysisService()
@@ -208,3 +212,147 @@ async def get_result_details(result_id: str, user: dict = Depends(get_current_us
 async def list_client_results(client_id: str, user: dict = Depends(get_current_user)):
     """List all analysis results for a client."""
     return analysis_service.list_results(client_id)
+
+
+
+# ═══════════════════════════════════════════════════════════════
+# Phase 1: Client Readiness + Document Lifecycle Endpoints
+# ═══════════════════════════════════════════════════════════════
+
+@router.get("/clients/{client_id}/readiness", tags=["Phase1-Readiness"])
+async def get_client_readiness(client_id: str, user: dict = Depends(get_current_user)):
+    """Compute and return client readiness status with blockers."""
+    from app.phase1.models.platform_models import SessionLocal
+    from sqlalchemy import text as _t
+    db = SessionLocal()
+    try:
+        row = db.execute(_t(
+            "SELECT name_ar, client_type_code, sector, city, country, registration_status, "
+            "readiness_status, coa_stage FROM clients WHERE id = :cid"
+        ), {"cid": client_id}).fetchone()
+        if not row:
+            raise HTTPException(404, "Client not found")
+
+        client_data = {
+            "name_ar": row[0], "client_type": row[1], "main_sector": row[2],
+            "city": row[3], "region": row[4], "status": row[5], "coa_stage": row[7],
+        }
+
+        # Get documents
+        docs = db.execute(_t(
+            "SELECT document_type, name_ar, required, status FROM client_documents WHERE client_id = :cid"
+        ), {"cid": client_id}).fetchall()
+        doc_list = [{"id": d[0], "name_ar": d[1], "required": d[2], "status": d[3]} for d in docs]
+
+        readiness = compute_readiness(client_data, doc_list)
+        blockers = get_missing_for_coa(client_data, doc_list)
+
+        # Update stored readiness
+        db.execute(_t(
+            "UPDATE clients SET readiness_status = :rs WHERE id = :cid"
+        ), {"rs": readiness, "cid": client_id})
+        db.commit()
+
+        return {
+            "client_id": client_id,
+            "readiness_status": readiness,
+            "blockers": blockers,
+            "documents_summary": {
+                "total": len(doc_list),
+                "required": len([d for d in doc_list if d["required"]]),
+                "accepted": len([d for d in doc_list if d["status"] == "accepted"]),
+                "missing": len([d for d in doc_list if d["status"] == "missing"]),
+            },
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Readiness error: {e}")
+    finally:
+        db.close()
+
+
+@router.patch("/clients/{client_id}/documents/{doc_type}/status", tags=["Phase1-Documents"])
+async def update_document_status(
+    client_id: str, doc_type: str,
+    body: dict = {},
+    user: dict = Depends(get_current_user)
+):
+    """Update document status following lifecycle rules."""
+    from app.phase1.models.platform_models import SessionLocal
+    from sqlalchemy import text as _t
+    db = SessionLocal()
+    try:
+        row = db.execute(_t(
+            "SELECT id, status, document_type, name_ar, required FROM client_documents "
+            "WHERE client_id = :cid AND document_type = :dt"
+        ), {"cid": client_id, "dt": doc_type}).fetchone()
+        if not row:
+            raise HTTPException(404, "Document not found")
+
+        current_doc = {"id": row[0], "status": row[1], "document_type": row[2], "name_ar": row[3], "required": row[4]}
+        new_status = body.get("status")
+        reason = body.get("reason")
+
+        if not new_status:
+            raise HTTPException(400, "Missing 'status' in body")
+
+        if not can_transition(current_doc["status"], new_status):
+            raise HTTPException(400,
+                f"Invalid transition: {current_doc['status']} -> {new_status}")
+
+        updated = transition_document(current_doc, new_status, reason)
+
+        # Update in DB
+        db.execute(_t(
+            "UPDATE client_documents SET status = :s, uploaded_at = :ua, "
+            "accepted_at = :aa, rejected_at = :ra, reject_reason = :rr, replaced_at = :repa "
+            "WHERE client_id = :cid AND document_type = :dt"
+        ), {
+            "s": updated["status"],
+            "ua": updated.get("uploaded_at"),
+            "aa": updated.get("accepted_at"),
+            "ra": updated.get("rejected_at"),
+            "rr": updated.get("reject_reason"),
+            "repa": updated.get("replaced_at"),
+            "cid": client_id, "dt": doc_type,
+        })
+        db.commit()
+
+        return {"client_id": client_id, "document_type": doc_type, "old_status": current_doc["status"], "new_status": new_status}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Document update error: {e}")
+    finally:
+        db.close()
+
+
+@router.get("/clients/{client_id}/documents", tags=["Phase1-Documents"])
+async def list_client_documents(client_id: str, user: dict = Depends(get_current_user)):
+    """List all documents for a client with their current status."""
+    from app.phase1.models.platform_models import SessionLocal
+    from sqlalchemy import text as _t
+    db = SessionLocal()
+    try:
+        rows = db.execute(_t(
+            "SELECT document_type, name_ar, name_en, required, status, "
+            "uploaded_at, accepted_at, rejected_at, reject_reason, expires_at "
+            "FROM client_documents WHERE client_id = :cid ORDER BY required DESC, document_type"
+        ), {"cid": client_id}).fetchall()
+        return {
+            "client_id": client_id,
+            "documents": [
+                {"type": r[0], "name_ar": r[1], "name_en": r[2], "required": r[3],
+                 "status": r[4], "uploaded_at": str(r[5]) if r[5] else None,
+                 "accepted_at": str(r[6]) if r[6] else None,
+                 "rejected_at": str(r[7]) if r[7] else None,
+                 "reject_reason": r[8], "expires_at": str(r[9]) if r[9] else None}
+                for r in rows
+            ],
+            "total": len(rows),
+            "required_count": len([r for r in rows if r[3]]),
+            "accepted_count": len([r for r in rows if r[4] == "accepted"]),
+        }
+    finally:
+        db.close()

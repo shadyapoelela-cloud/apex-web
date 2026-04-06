@@ -29,3 +29,7 @@ Thumbs.db
 .idea/
 .vscode/
 *.iml
+
+# Phase 1 local backups
+_backups/
+phase1.ps1
