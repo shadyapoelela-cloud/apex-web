@@ -1,7 +1,31 @@
-﻿__pycache__/
+﻿# Python
+__pycache__/
 *.pyc
 *.pyo
-.env
+*.pyd
 
-# Backup files
-*.bak_*
+# Databases
+*.db
+*.sqlite3
+
+# Flutter build
+apex_finance/build/
+apex_finance/.dart_tool/
+
+# Temp files
+_*.py
+*.tmp
+*.bak
+*.old
+
+# Deploy temp
+gh-pages-temp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
