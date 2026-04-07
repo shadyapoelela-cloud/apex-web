@@ -10,7 +10,7 @@ class ApiService {
     static void setToken(String t) => _token = t;
   static void clearToken() => _token = null;
   static bool get isAuthenticated => _token != null;
-  static Map<String,String> get _h => {'Content-Type':'application/json', if(_token!=null)'Authorization':'Bearer ${_token ?? S.token ?? ""}'};
+  static Map<String,String> get _h => {'Content-Type':'application/json', if((_token ?? S.token)!=null)'Authorization':'Bearer ${_token ?? S.token ?? ""}'};
 
   // ── Auth ──
   static Future<ApiResult> login(String username, String password) => _post('/auth/login', {'username_or_email':username,'password':password});
