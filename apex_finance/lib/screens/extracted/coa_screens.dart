@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
+import 'package:excel/excel.dart' as xl;
 import 'package:intl/intl.dart' as intl;
 
 // Color scheme for APEX Platform
@@ -258,6 +259,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
 
   // Windows-1256 to Unicode lookup table (0x80-0xFF)
+
+
+  // ============================================
+  // Windows-1256 to Unicode lookup (0x80-0xFF)
+  // ============================================
   static const List<int> _cp1256 = [
     0x20AC,0x067E,0x201A,0x0192,0x201E,0x2026,0x2020,0x2021,
     0x02C6,0x2030,0x0679,0x2039,0x0152,0x0686,0x0698,0x0688,
@@ -277,38 +283,38 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     0x0651,0x00F9,0x0652,0x00FB,0x00FC,0x200E,0x200F,0x06D2,
   ];
 
-  String _decodeBytes(Uint8List bytes) {
-    // Strip BOM if present
+  String _decodeCp1256(Uint8List bytes) {
     int offset = 0;
-    if (bytes.length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
-      offset = 3; // UTF-8 BOM
-    } else if (bytes.length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE) {
-      offset = 2; // UTF-16 LE BOM â€” try as UTF-8 anyway
+    if (bytes.length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) offset = 3;
+    final buf = StringBuffer();
+    for (int i = offset; i < bytes.length; i++) {
+      final b = bytes[i];
+      buf.writeCharCode(b < 0x80 ? b : _cp1256[b - 0x80]);
     }
+    return buf.toString();
+  }
 
+  String _decodeAsUtf8(Uint8List bytes) {
+    int offset = 0;
+    if (bytes.length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) offset = 3;
     final trimmed = offset > 0 ? bytes.sublist(offset) : bytes;
+    return utf8.decode(trimmed, allowMalformed: true);
+  }
 
-    // Try UTF-8 first
+  List<List<String>> _parseCsv(String content) {
+    final norm = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    // Try comma first
     try {
-      final result = utf8.decode(trimmed);
-      // Check if result has Arabic characters (U+0600-U+06FF range)
-      bool hasArabic = result.runes.any((r) => r >= 0x0600 && r <= 0x06FF);
-      bool hasReplacement = result.contains('\uFFFD');
-      if (hasArabic && !hasReplacement) {
-        return result;
-      }
+      final r = const CsvToListConverter(shouldParseNumbers: false, eol: '\n').convert(norm);
+      if (r.isNotEmpty && r.first.length > 1) return r.map((row) => row.map((c) => c.toString()).toList()).toList();
     } catch (_) {}
-
-    // Fallback: Windows-1256 decoding
-    final buffer = StringBuffer();
-    for (final byte in trimmed) {
-      if (byte < 0x80) {
-        buffer.writeCharCode(byte);
-      } else {
-        buffer.writeCharCode(_cp1256[byte - 0x80]);
-      }
-    }
-    return buffer.toString();
+    // Try semicolon
+    try {
+      final r = const CsvToListConverter(fieldDelimiter: ';', shouldParseNumbers: false, eol: '\n').convert(norm);
+      if (r.isNotEmpty && r.first.length > 1) return r.map((row) => row.map((c) => c.toString()).toList()).toList();
+    } catch (_) {}
+    // Try tab
+    return norm.split('\n').where((l) => l.trim().isNotEmpty).map((l) => l.split('\t')).toList();
   }
 
   Future<void> _parseUploadedFile(dynamic file) async {
@@ -324,118 +330,386 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         return;
       }
 
-      // Decode with encoding detection (UTF-8 â†’ Windows-1256 fallback)
-      final content = _decodeBytes(bytes);
+      final ext = (_uploadedFileName).split('.').last.toLowerCase();
 
-      // Normalize line endings
-      final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
-
-      List<List<dynamic>> rows;
-      try {
-        rows = const CsvToListConverter(shouldParseNumbers: true, eol: '\n').convert(normalized);
-      } catch (_) {
-        // Try with different separator (semicolon for some locales)
+      if (ext == 'xlsx' || ext == 'xls') {
+        // Parse Excel with excel package
         try {
-          rows = const CsvToListConverter(fieldDelimiter: ';', shouldParseNumbers: true, eol: '\n').convert(normalized);
-        } catch (_) {
-          rows = [];
+          final workbook = xl.Excel.decodeBytes(bytes);
+          final sheetName = workbook.tables.keys.first;
+          final sheet = workbook.tables[sheetName]!;
+          List<List<String>> rawRows = [];
+          for (final row in sheet.rows) {
+            rawRows.add(row.map((c) => c?.value?.toString() ?? '').toList());
+          }
+          if (rawRows.length >= 2 && mounted) {
+            await _showMappingDialog(rawRows, null, ext);
+            return;
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('\u062e\u0637\u0623 \u0641\u064a \u0642\u0631\u0627\u0621\u0629 Excel: $e'), backgroundColor: AppColors.redC),
+            );
+          }
         }
+        setState(() { _isUploading = false; });
+        return;
       }
 
-      if (rows.isEmpty) {
+      // CSV: show mapping dialog with encoding options
+      // Try auto-detect first
+      List<List<String>> autoRows = [];
+      String bestEncoding = 'utf-8';
+
+      // Try UTF-8
+      final utf8Content = _decodeAsUtf8(bytes);
+      final utf8Rows = _parseCsv(utf8Content);
+      bool utf8HasArabic = utf8Content.runes.any((r) => r >= 0x0600 && r <= 0x06FF);
+      bool utf8HasGarbled = utf8Content.contains('\uFFFD') || utf8Content.contains('\u00C3');
+
+      // Try Windows-1256
+      final cp1256Content = _decodeCp1256(bytes);
+      final cp1256Rows = _parseCsv(cp1256Content);
+      bool cp1256HasArabic = cp1256Content.runes.any((r) => r >= 0x0600 && r <= 0x06FF);
+
+      if (utf8HasArabic && !utf8HasGarbled && utf8Rows.length >= cp1256Rows.length) {
+        autoRows = utf8Rows;
+        bestEncoding = 'utf-8';
+      } else if (cp1256HasArabic) {
+        autoRows = cp1256Rows;
+        bestEncoding = 'windows-1256';
+      } else {
+        autoRows = utf8Rows.length >= cp1256Rows.length ? utf8Rows : cp1256Rows;
+        bestEncoding = utf8Rows.length >= cp1256Rows.length ? 'utf-8' : 'windows-1256';
+      }
+
+      if (autoRows.length >= 2 && mounted) {
+        await _showMappingDialog(autoRows, bytes, ext, initialEncoding: bestEncoding);
+      } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('\u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063a \u0623\u0648 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d'), backgroundColor: AppColors.redC),
           );
-          setState(() { _isUploading = false; });
         }
-        return;
-      }
-
-      // First row is headers
-      final headers = rows.first.map((h) => h.toString().trim().toLowerCase()).toList();
-      final dataRows = rows.skip(1).where((r) => r.isNotEmpty && r.any((c) => c.toString().trim().isNotEmpty)).toList();
-
-      // Map columns â€” flexible header matching (Arabic + English)
-      int codeCol = _findCol(headers, ['code', 'account_code', 'account code', 'acc_code', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0631\u0642\u0645', '\u0631\u0645\u0632', '\u0631\u0642\u0645', '\u0643\u0648\u062f']);
-      int nameCol = _findCol(headers, ['name', 'account_name', 'account name', 'acc_name', 'description', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0627\u0633\u0645', '\u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0648\u0635\u0641', '\u0628\u064a\u0627\u0646']);
-      int classCol = _findCol(headers, ['classification', 'class', 'type', 'account_type', '\u0627\u0644\u062a\u0635\u0646\u064a\u0641', '\u0627\u0644\u0646\u0648\u0639']);
-      int sectionCol = _findCol(headers, ['section', 'category', 'group', '\u0627\u0644\u0642\u0633\u0645', '\u0627\u0644\u0641\u0626\u0629', '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629']);
-      int balanceCol = _findCol(headers, ['balance', 'amount', 'debit', 'credit', '\u0627\u0644\u0631\u0635\u064a\u062f', '\u0627\u0644\u0645\u0628\u0644\u063a']);
-
-      // Fallback: positional mapping if no headers match
-      if (codeCol < 0 && nameCol < 0) {
-        if (headers.length >= 2) {
-          codeCol = 0;
-          nameCol = 1;
-          classCol = headers.length > 2 ? 2 : -1;
-          sectionCol = headers.length > 3 ? 3 : -1;
-          balanceCol = headers.length > 4 ? 4 : -1;
-        }
-      }
-
-      List<AccountData> parsed = [];
-      for (final row in dataRows) {
-        try {
-          String code = codeCol >= 0 && codeCol < row.length ? row[codeCol].toString().trim() : '';
-          String name = nameCol >= 0 && nameCol < row.length ? row[nameCol].toString().trim() : '';
-          String classification = classCol >= 0 && classCol < row.length ? row[classCol].toString().trim() : '\u063a\u064a\u0631 \u0645\u0635\u0646\u0641';
-          String section = sectionCol >= 0 && sectionCol < row.length ? row[sectionCol].toString().trim() : '\u0639\u0627\u0645';
-          double balance = 0;
-          if (balanceCol >= 0 && balanceCol < row.length) {
-            final bVal = row[balanceCol];
-            if (bVal is num) {
-              balance = bVal.toDouble();
-            } else {
-              balance = double.tryParse(bVal.toString().replaceAll(',', '').replaceAll(' ', '').replaceAll('\u00A0', '')) ?? 0;
-            }
-          }
-
-          if (code.isNotEmpty || name.isNotEmpty) {
-            parsed.add(AccountData(
-              code: code.isNotEmpty ? code : '${parsed.length + 1}',
-              name: name.isNotEmpty ? name : '\u062d\u0633\u0627\u0628 ${parsed.length + 1}',
-              classification: classification,
-              section: section,
-              balance: balance,
-              confidence: 95.0,
-              status: 'Review',
-            ));
-          }
-        } catch (_) {
-          // Skip malformed rows
-        }
-      }
-
-      if (mounted) {
-        setState(() {
-          if (parsed.isNotEmpty) {
-            accounts = parsed;
-            currentStage = 1; // Advance to Analysis stage
-          }
-          _isUploading = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('\u062a\u0645 \u0627\u0633\u062a\u064a\u0631\u0627\u062f ${parsed.length} \u062d\u0633\u0627\u0628 \u0645\u0646 $_uploadedFileName'),
-            backgroundColor: AppColors.greenC,
-            duration: const Duration(seconds: 4),
-          ),
-        );
+        setState(() { _isUploading = false; });
       }
     } catch (e) {
       if (mounted) {
         setState(() { _isUploading = false; });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('\u062e\u0637\u0623 \u0641\u064a \u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0644\u0641: $e'),
-            backgroundColor: AppColors.redC,
-            duration: const Duration(seconds: 4),
-          ),
+          SnackBar(content: Text('\u062e\u0637\u0623: $e'), backgroundColor: AppColors.redC),
         );
       }
     }
+  }
+
+  Future<void> _showMappingDialog(List<List<String>> rawRows, Uint8List? csvBytes, String ext, {String initialEncoding = 'utf-8'}) async {
+    List<String> headers = rawRows.first.map((h) => h.trim()).toList();
+    List<List<String>> dataRows = rawRows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+    String selEncoding = initialEncoding;
+
+    // Auto-detect column mappings
+    final hLower = headers.map((h) => h.toLowerCase()).toList();
+    int selCode = _findCol(hLower, ['code', 'account_code', 'account code', 'acc_code', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0631\u0642\u0645', '\u0631\u0645\u0632', '\u0631\u0642\u0645', '\u0643\u0648\u062f']);
+    int selName = _findCol(hLower, ['name', 'account_name', 'account name', 'description', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0627\u0633\u0645', '\u0627\u0644\u062d\u0633\u0627\u0628', '\u0628\u064a\u0627\u0646', '\u0627\u0644\u0648\u0635\u0641']);
+    int selClass = _findCol(hLower, ['classification', 'class', 'type', 'account_type', '\u0627\u0644\u062a\u0635\u0646\u064a\u0641', '\u0627\u0644\u0646\u0648\u0639']);
+    int selSection = _findCol(hLower, ['section', 'category', 'group', '\u0627\u0644\u0642\u0633\u0645', '\u0627\u0644\u0641\u0626\u0629', '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629']);
+    int selBalance = _findCol(hLower, ['balance', 'amount', 'debit', '\u0627\u0644\u0631\u0635\u064a\u062f', '\u0627\u0644\u0645\u0628\u0644\u063a']);
+
+    // If no columns detected, try positional
+    if (selCode < 0 && selName < 0 && headers.length >= 2) {
+      selCode = 0;
+      selName = 1;
+    }
+
+    final result = await showDialog<Map<String, int>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSt) {
+            final colItems = <DropdownMenuItem<int>>[
+              const DropdownMenuItem(value: -1, child: Text('-- \u063a\u064a\u0631 \u0645\u062d\u062f\u062f --', style: TextStyle(fontSize: 12))),
+              ...List.generate(headers.length, (i) {
+                String label = headers[i];
+                if (label.length > 25) label = '${label.substring(0, 25)}...';
+                return DropdownMenuItem(value: i, child: Text('${i + 1}: $label', style: const TextStyle(fontSize: 12)));
+              }),
+            ];
+
+            return Directionality(
+              textDirection: TextDirection.rtl,
+              child: Dialog(
+                backgroundColor: AppColors.navyLight,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Container(
+                  width: 650,
+                  constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title
+                        Row(
+                          children: [
+                            Icon(Icons.table_chart, color: AppColors.gold, size: 28),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('\u0631\u0628\u0637 \u0623\u0639\u0645\u062f\u0629 \u0627\u0644\u0645\u0644\u0641', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.gold)),
+                                  const SizedBox(height: 4),
+                                  Text('$_uploadedFileName \u2014 ${dataRows.length} \u0635\u0641', style: const TextStyle(color: AppColors.textMid, fontSize: 13)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Encoding selector (CSV only)
+                        if (ext == 'csv' && csvBytes != null) ...[
+                          const Text('\u0627\u0644\u062a\u0631\u0645\u064a\u0632:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              _encChip('\u062a\u0644\u0642\u0627\u0626\u064a', initialEncoding, selEncoding, () {
+                                final rows = _parseCsv(initialEncoding == 'windows-1256' ? _decodeCp1256(csvBytes) : _decodeAsUtf8(csvBytes));
+                                setSt(() {
+                                  selEncoding = initialEncoding;
+                                  headers = rows.first.map((h) => h.trim()).toList();
+                                  dataRows = rows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+                                });
+                              }),
+                              _encChip('UTF-8', 'utf-8', selEncoding, () {
+                                final rows = _parseCsv(_decodeAsUtf8(csvBytes));
+                                setSt(() {
+                                  selEncoding = 'utf-8';
+                                  headers = rows.first.map((h) => h.trim()).toList();
+                                  dataRows = rows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+                                });
+                              }),
+                              _encChip('Windows-1256', 'windows-1256', selEncoding, () {
+                                final rows = _parseCsv(_decodeCp1256(csvBytes));
+                                setSt(() {
+                                  selEncoding = 'windows-1256';
+                                  headers = rows.first.map((h) => h.trim()).toList();
+                                  dataRows = rows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+                                });
+                              }),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // Preview table
+                        const Text('\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: 180,
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBg,
+                            border: Border.all(color: AppColors.borderColor),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SingleChildScrollView(
+                              child: DataTable(
+                                headingRowColor: WidgetStatePropertyAll(AppColors.navyMid),
+                                dataRowColor: WidgetStatePropertyAll(AppColors.cardBg),
+                                columnSpacing: 16,
+                                columns: List.generate(headers.length, (i) => DataColumn(
+                                  label: Text(
+                                    '${i + 1}: ${headers[i].length > 15 ? headers[i].substring(0, 15) : headers[i]}',
+                                    style: const TextStyle(color: AppColors.gold, fontSize: 11, fontWeight: FontWeight.bold),
+                                  ),
+                                )),
+                                rows: dataRows.take(5).map((row) => DataRow(
+                                  cells: List.generate(headers.length, (i) => DataCell(
+                                    Text(
+                                      i < row.length ? (row[i].length > 20 ? row[i].substring(0, 20) : row[i]) : '',
+                                      style: const TextStyle(color: AppColors.textColor, fontSize: 11),
+                                    ),
+                                  )),
+                                )).toList(),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Column mapping
+                        const Text('\u0631\u0628\u0637 \u0627\u0644\u0623\u0639\u0645\u062f\u0629:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 12),
+                        _mapRow('\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628 *', selCode, colItems, (v) => setSt(() => selCode = v ?? -1)),
+                        _mapRow('\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628 *', selName, colItems, (v) => setSt(() => selName = v ?? -1)),
+                        _mapRow('\u0627\u0644\u062a\u0635\u0646\u064a\u0641', selClass, colItems, (v) => setSt(() => selClass = v ?? -1)),
+                        _mapRow('\u0627\u0644\u0642\u0633\u0645', selSection, colItems, (v) => setSt(() => selSection = v ?? -1)),
+                        _mapRow('\u0627\u0644\u0631\u0635\u064a\u062f', selBalance, colItems, (v) => setSt(() => selBalance = v ?? -1)),
+
+                        const SizedBox(height: 24),
+
+                        // Actions
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('\u0625\u0644\u063a\u0627\u0621', style: TextStyle(color: AppColors.textMid)),
+                            ),
+                            const SizedBox(width: 12),
+                            ElevatedButton.icon(
+                              onPressed: (selCode >= 0 || selName >= 0)
+                                  ? () => Navigator.pop(ctx, {
+                                        'code': selCode,
+                                        'name': selName,
+                                        'class': selClass,
+                                        'section': selSection,
+                                        'balance': selBalance,
+                                      })
+                                  : null,
+                              icon: const Icon(Icons.download_done, size: 18),
+                              label: Text('\u0627\u0633\u062a\u064a\u0631\u0627\u062f ${dataRows.length} \u062d\u0633\u0627\u0628'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.gold,
+                                foregroundColor: AppColors.navy,
+                                disabledBackgroundColor: AppColors.navyMid,
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (result != null) {
+      _importData(dataRows, result);
+    } else {
+      setState(() { _isUploading = false; });
+    }
+  }
+
+  void _importData(List<List<String>> dataRows, Map<String, int> mapping) {
+    List<AccountData> parsed = [];
+    final codeIdx = mapping['code'] ?? -1;
+    final nameIdx = mapping['name'] ?? -1;
+    final classIdx = mapping['class'] ?? -1;
+    final sectionIdx = mapping['section'] ?? -1;
+    final balanceIdx = mapping['balance'] ?? -1;
+
+    for (final row in dataRows) {
+      try {
+        String code = codeIdx >= 0 && codeIdx < row.length ? row[codeIdx].trim() : '';
+        String name = nameIdx >= 0 && nameIdx < row.length ? row[nameIdx].trim() : '';
+        String cls = classIdx >= 0 && classIdx < row.length ? row[classIdx].trim() : '\u063a\u064a\u0631 \u0645\u0635\u0646\u0641';
+        String sec = sectionIdx >= 0 && sectionIdx < row.length ? row[sectionIdx].trim() : '\u0639\u0627\u0645';
+        double bal = 0;
+        if (balanceIdx >= 0 && balanceIdx < row.length) {
+          final bStr = row[balanceIdx].replaceAll(',', '').replaceAll(' ', '').replaceAll('\u00A0', '').trim();
+          bal = double.tryParse(bStr) ?? 0;
+        }
+        if (code.isNotEmpty || name.isNotEmpty) {
+          parsed.add(AccountData(
+            code: code.isNotEmpty ? code : '${parsed.length + 1}',
+            name: name.isNotEmpty ? name : '\u062d\u0633\u0627\u0628 ${parsed.length + 1}',
+            classification: cls,
+            section: sec,
+            balance: bal,
+            confidence: 95.0,
+            status: 'Review',
+          ));
+        }
+      } catch (_) {}
+    }
+
+    if (mounted) {
+      setState(() {
+        if (parsed.isNotEmpty) {
+          accounts = parsed;
+          currentStage = 1;
+        }
+        _isUploading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('\u062a\u0645 \u0627\u0633\u062a\u064a\u0631\u0627\u062f ${parsed.length} \u062d\u0633\u0627\u0628 \u0628\u0646\u062c\u0627\u062d'),
+          backgroundColor: AppColors.greenC,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
+  }
+
+  Widget _mapRow(String label, int value, List<DropdownMenuItem<int>> items, ValueChanged<int?> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(label, style: const TextStyle(color: AppColors.textColor, fontSize: 13)),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.navyMid,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.borderColor),
+              ),
+              child: DropdownButton<int>(
+                value: value,
+                items: items,
+                onChanged: onChanged,
+                isExpanded: true,
+                dropdownColor: AppColors.navyMid,
+                style: const TextStyle(color: AppColors.textColor, fontSize: 12, fontFamily: 'Tajawal'),
+                underline: const SizedBox(),
+                icon: const Icon(Icons.arrow_drop_down, color: AppColors.gold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _encChip(String label, String value, String selected, VoidCallback onTap) {
+    final isSelected = value == selected;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.gold : AppColors.navyMid,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSelected ? AppColors.gold : AppColors.borderColor),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppColors.navy : AppColors.textMid,
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
   }
 
   int _findCol(List<String> headers, List<String> candidates) {
