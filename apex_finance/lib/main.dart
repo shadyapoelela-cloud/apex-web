@@ -94,7 +94,10 @@ class S {
     uname = st['apex_uname']; dname = st['apex_dname'];
     plan = st['apex_plan']; email = st['apex_email'];
     final r = st['apex_roles'];
-    if (r != null && r.isNotEmpty) roles = List<String>.from(jsonDecode(r));
+    if (r != null && r.isNotEmpty) {
+        try { roles = List<String>.from(jsonDecode(r)); }
+        catch(_) { roles = r.split(','); }
+      }
     return true;
   }
 }
