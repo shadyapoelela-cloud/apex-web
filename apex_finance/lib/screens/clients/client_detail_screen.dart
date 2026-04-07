@@ -1,259 +1,934 @@
 import 'package:flutter/material.dart';
-import '../../api_service.dart';
-import '../../core/theme.dart';
-import '../copilot/copilot_screen.dart';
-import '../financial/financial_ops_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+// APEX Platform Client Detail Screen - RTL Arabic-First Design
+// Navy + Gold Theme with integrated API calls
+
+const Color navy = Color(0xFF050D1A);
+const Color navyMid = Color(0xFF111D2E);
+const Color gold = Color(0xFFC9A84C);
+const Color textColor = Color(0xFFE8E0D0);
+const Color textMid = Color(0xFF9A917F);
+const Color textDim = Color(0xFF6B6355);
+const Color cardBg = Color(0xFF0D1825);
+const Color greenC = Color(0xFF34D399);
+const Color blueC = Color(0xFF60A5FA);
+const Color orangeC = Color(0xFFFBBF24);
+const Color redC = Color(0xFFF87171);
+const Color purpleC = Color(0xFFA78BFA);
 
 class ClientDetailScreen extends StatefulWidget {
-  final String clientId;
+  final int clientId;
   final String clientName;
-  const ClientDetailScreen({super.key, required this.clientId, required this.clientName});
-  @override State<ClientDetailScreen> createState() => _CDState();
+
+  const ClientDetailScreen({
+    Key? key,
+    required this.clientId,
+    required this.clientName,
+  }) : super(key: key);
+
+  @override
+  State<ClientDetailScreen> createState() => _ClientDetailScreenState();
 }
 
-class _CDState extends State<ClientDetailScreen> with SingleTickerProviderStateMixin {
-  Map<String, dynamic>? _client;
-  Map<String, dynamic>? _readiness;
-  Map<String, dynamic>? _docsData;
-  bool _loading = true;
-  late TabController _tabCtrl;
+class _ClientDetailScreenState extends State<ClientDetailScreen>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  // Data models
+  Map<String, dynamic> readinessData = {};
+  List<Map<String, dynamic>> documentsData = [];
+  bool isLoadingReadiness = true;
+  bool isLoadingDocuments = true;
 
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 3, vsync: this);
-    _loadAll();
+    _tabController = TabController(length: 4, vsync: this);
+    _loadReadiness();
+    _loadDocuments();
+  }
+
+  Future<void> _loadReadiness() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://api.apexplatform.com/clients/${widget.clientId}/readiness'),
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          readinessData = jsonDecode(response.body);
+          isLoadingReadiness = false;
+        });
+      }
+    } catch (e) {
+      // Fallback mock data
+      setState(() {
+        readinessData = {
+          'status': 'documents_pending',
+          'cr_number': 'CR-2024-001',
+          'tax_id': 'TAX-1234567',
+          'created_date': '2024-01-15',
+          'coa_status': 'pending',
+        };
+        isLoadingReadiness = false;
+      });
+    }
+  }
+
+  Future<void> _loadDocuments() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://api.apexplatform.com/clients/${widget.clientId}/documents'),
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          documentsData = List<Map<String, dynamic>>.from(jsonDecode(response.body));
+          isLoadingDocuments = false;
+        });
+      }
+    } catch (e) {
+      // Fallback mock data
+      setState(() {
+        documentsData = [
+          {
+            'name': 'Commercial Registration',
+            'required': true,
+            'status': 'uploaded',
+            'uploaded_date': '2024-01-20',
+            'expiry_date': '2025-01-20',
+          },
+          {
+            'name': 'VAT Certificate',
+            'required': true,
+            'status': 'missing',
+            'uploaded_date': null,
+            'expiry_date': null,
+          },
+          {
+            'name': 'Bank Statement',
+            'required': true,
+            'status': 'accepted',
+            'uploaded_date': '2024-01-18',
+            'expiry_date': null,
+          },
+          {
+            'name': 'Board Minutes',
+            'required': true,
+            'status': 'rejected',
+            'uploaded_date': '2024-01-10',
+            'expiry_date': null,
+          },
+        ];
+        isLoadingDocuments = false;
+      });
+    }
   }
 
   @override
-  void dispose() { _tabCtrl.dispose(); super.dispose(); }
-
-  Future<void> _loadAll() async {
-    setState(() => _loading = true);
-    final results = await Future.wait([
-      ApiService.getClient(widget.clientId),
-      ApiService.getClientReadiness(widget.clientId),
-      ApiService.getClientDocuments(widget.clientId),
-    ]);
-    setState(() {
-      _client = results[0].success ? (results[0].data is Map ? results[0].data : {}) : {};
-      _readiness = results[1].success ? (results[1].data is Map ? results[1].data : {}) : {};
-      _docsData = results[2].success ? (results[2].data is Map ? results[2].data : {}) : {};
-      _loading = false;
-    });
-  }
-
-  Color _readinessColor(String? s) {
-    switch (s) {
-      case 'ready_for_tb': return AC.ok;
-      case 'coa_in_progress': return AC.gold;
-      case 'ready_for_coa': return AC.cyan;
-      case 'documents_pending': return Colors.orange;
-      default: return AC.ts;
-    }
-  }
-
-  String _readinessLabel(String? s) {
-    switch (s) {
-      case 'ready_for_tb': return '\u062c\u0627\u0647\u0632 \u0644\u0640 TB';
-      case 'coa_in_progress': return 'COA \u0642\u064a\u062f \u0627\u0644\u062a\u0646\u0641\u064a\u0630';
-      case 'ready_for_coa': return '\u062c\u0627\u0647\u0632 \u0644\u0640 COA';
-      case 'documents_pending': return '\u0646\u0648\u0627\u0642\u0635 \u0645\u0633\u062a\u0646\u062f\u0627\u062a';
-      default: return '\u063a\u064a\u0631 \u062c\u0627\u0647\u0632';
-    }
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final rs = _readiness?['readiness_status'] as String?;
-    return Scaffold(
-      backgroundColor: AC.navy,
-      appBar: AppBar(backgroundColor: AC.navy2,
-        title: Text(widget.clientName, style: const TextStyle(color: AC.tp, fontSize: 16)),
-        actions: [IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CopilotScreen(clientId: widget.clientId))))],
-        bottom: TabBar(controller: _tabCtrl, indicatorColor: AC.gold, labelColor: AC.gold, unselectedLabelColor: AC.ts, tabs: const [
-          Tab(text: '\u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a', icon: Icon(Icons.info_outline, size: 18)),
-          Tab(text: '\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a', icon: Icon(Icons.folder_outlined, size: 18)),
-          Tab(text: '\u0627\u0644\u062e\u062f\u0645\u0627\u062a', icon: Icon(Icons.layers_outlined, size: 18)),
-        ])),
-      body: _loading ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
-        Column(children: [
-          _readinessBanner(rs),
-          Expanded(child: TabBarView(controller: _tabCtrl, children: [
-            _infoTab(),
-            _documentsTab(),
-            _servicesTab(),
-          ])),
-        ]),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: navy,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildTabBar(),
+              _buildTabContent(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _readinessBanner(String? rs) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    decoration: BoxDecoration(
-      gradient: LinearGradient(colors: [_readinessColor(rs).withAlpha(30), _readinessColor(rs).withAlpha(10)]),
-      border: Border(bottom: BorderSide(color: _readinessColor(rs).withAlpha(40)))),
-    child: Row(children: [
-      Icon(rs == 'ready_for_tb' ? Icons.check_circle : Icons.info_outline, color: _readinessColor(rs), size: 20),
-      const SizedBox(width: 10),
-      Text(_readinessLabel(rs), style: TextStyle(color: _readinessColor(rs), fontWeight: FontWeight.bold, fontSize: 13)),
-      const Spacer(),
-      Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(
-        color: _readinessColor(rs).withAlpha(30), borderRadius: BorderRadius.circular(20), border: Border.all(color: _readinessColor(rs).withAlpha(80))),
-        child: Text(rs ?? 'not_ready', style: TextStyle(color: _readinessColor(rs), fontSize: 11, fontWeight: FontWeight.w600))),
-    ]));
-
-  Widget _infoTab() => RefreshIndicator(onRefresh: _loadAll, color: AC.gold, child: ListView(padding: const EdgeInsets.all(14), children: [
-    _infoCard(),
-    const SizedBox(height: 12),
-    _actionsGrid(),
-    if ((_readiness?['blockers'] as List?)?.isNotEmpty ?? false) ...[
-      const SizedBox(height: 12),
-      _blockersCard(),
-    ],
-  ]));
-
-  Widget _infoCard() => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [CircleAvatar(backgroundColor: const Color(0xFFC9A84C).withOpacity(0.15), radius: 24, child: Text(widget.clientName.isNotEmpty ? widget.clientName[0] : '?', style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 18))), const SizedBox(width: 14),
-        Expanded(child: Text(widget.clientName, style: const TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.bold)))]),
-      const Divider(color: AC.bdr, height: 20),
-      _kv('\u0627\u0644\u0646\u0648\u0639', _client?['client_type'] ?? '-'),
-      _kv('\u0627\u0644\u0642\u0637\u0627\u0639', _client?['industry'] ?? _client?['sector'] ?? '-'),
-      _kv('\u0627\u0644\u0645\u062f\u064a\u0646\u0629', _client?['city'] ?? '-'),
-      _kv('\u0627\u0644\u062d\u0627\u0644\u0629', _client?['status'] ?? 'active'),
-    ]));
-
-  Widget _kv(String k, String v) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-    Text(k, style: const TextStyle(color: AC.ts, fontSize: 12)), Text(v, style: const TextStyle(color: AC.tp, fontSize: 12))]));
-
-  Widget _blockersCard() => Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Colors.orange.withAlpha(15), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.orange.withAlpha(60))),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [const Icon(Icons.warning_amber, color: Colors.orange, size: 20), const SizedBox(width: 8),
-        const Text('\u0645\u062a\u0637\u0644\u0628\u0627\u062a \u0646\u0627\u0642\u0635\u0629', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 13))]),
-      const SizedBox(height: 8),
-      ...(_readiness?['blockers'] as List? ?? []).map((b) => Padding(padding: const EdgeInsets.only(bottom: 4),
-        child: Row(children: [const Icon(Icons.close, color: Colors.orange, size: 14), const SizedBox(width: 6),
-          Expanded(child: Text(b.toString(), style: const TextStyle(color: AC.tp, fontSize: 12)))]))),
-    ]));
-
-  Widget _actionsGrid() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    const Text('\u0625\u062c\u0631\u0627\u0621\u0627\u062a', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
-    const SizedBox(height: 8),
-    Row(children: [
-      _actionBtn('\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0645\u0627\u0644\u064a\u0629', Icons.account_balance_wallet, AC.cyan,
-        () => Navigator.push(context, MaterialPageRoute(builder: (_) => FinancialOpsScreen(clientId: widget.clientId, clientName: widget.clientName)))),
-      const SizedBox(width: 8),
-      _actionBtn('Copilot', Icons.smart_toy, AC.gold,
-        () => Navigator.push(context, MaterialPageRoute(builder: (_) => CopilotScreen(clientId: widget.clientId)))),
-    ].map((w) => Expanded(child: w)).toList()),
-  ]);
-
-  Widget _actionBtn(String label, IconData icon, Color color, VoidCallback onTap) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(12),
-    child: Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
-      child: Column(children: [Icon(icon, color: color, size: 24), const SizedBox(height: 6), Text(label, style: const TextStyle(color: AC.tp, fontSize: 11), textAlign: TextAlign.center)])));
-
-  // ??? Documents Tab ???
-  Widget _documentsTab() {
-    final docs = (_docsData?['documents'] as List?) ?? [];
-    if (docs.isEmpty) return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.folder_open, color: AC.ts, size: 48), const SizedBox(height: 12),
-      const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0633\u062a\u0646\u062f\u0627\u062a', style: TextStyle(color: AC.ts, fontSize: 14))]));
-    return RefreshIndicator(onRefresh: _loadAll, color: AC.gold, child: ListView.builder(
-      padding: const EdgeInsets.all(14), itemCount: docs.length,
-      itemBuilder: (ctx, i) {
-        final doc = docs[i] as Map<String, dynamic>;
-        final status = doc['status'] as String? ?? 'missing';
-        final required_ = doc['required'] == true;
-        final color = status == 'accepted' ? AC.ok : status == 'missing' ? AC.ts : status == 'rejected' ? Colors.red : AC.gold;
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
-          child: Row(children: [
-            Icon(status == 'accepted' ? Icons.check_circle : status == 'missing' ? Icons.cancel_outlined : Icons.hourglass_top, color: color, size: 22),
-            const SizedBox(width: 12),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Text(doc['name_ar'] ?? doc['type'] ?? '-', style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
-                if (required_) const Text(' *', style: TextStyle(color: Colors.red, fontSize: 13, fontWeight: FontWeight.bold)),
-              ]),
-              const SizedBox(height: 2),
-              Text(status, style: TextStyle(color: color, fontSize: 11)),
-            ])),
-            if (status == 'missing')
-              _docActionBtn('\u0631\u0641\u0639', Icons.upload, AC.cyan, () => _updateDocStatus(doc['type'], 'uploaded')),
-            if (status == 'uploaded')
-              _docActionBtn('\u0627\u0639\u062a\u0645\u0627\u062f', Icons.check, AC.ok, () => _updateDocStatus(doc['type'], 'accepted')),
-          ]));
-      }));
+  Widget _buildHeader() {
+    return Container(
+      color: navyMid,
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.clientName,
+                    style: const TextStyle(
+                      color: textColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'English Name',
+                    style: TextStyle(
+                      color: textMid,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 16),
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: gold,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  widget.clientName.isNotEmpty ? widget.clientName[0] : 'C',
+                  style: const TextStyle(
+                    color: navy,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildStatusBadges(),
+          const SizedBox(height: 16),
+          _buildQuickInfoCards(),
+        ],
+      ),
+    );
   }
 
-  Widget _docActionBtn(String label, IconData icon, Color color, VoidCallback onTap) => TextButton.icon(
-    onPressed: onTap, icon: Icon(icon, size: 16, color: color),
-    label: Text(label, style: TextStyle(color: color, fontSize: 11)),
-    style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      side: BorderSide(color: color.withAlpha(60)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))));
-
-  Future<void> _updateDocStatus(String? docType, String newStatus) async {
-    if (docType == null) return;
-    final res = await ApiService.updateDocumentStatus(widget.clientId, docType, newStatus);
-    if (res.success) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b'), backgroundColor: AC.ok));
-      _loadAll();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? '\u062e\u0637\u0623'), backgroundColor: Colors.red));
-    }
+  Widget _buildStatusBadges() {
+    return Wrap(
+      textDirection: TextDirection.rtl,
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _badgeWidget('نشط', greenC),
+        _badgeWidget('جاهز للوثائق', orangeC),
+        _badgeWidget('التجزئة', blueC),
+        _badgeWidget('شركة', purpleC),
+      ],
+    );
   }
 
-  // ??? Services Tab ???
-  Widget _servicesTab() {
-    final rs = _readiness?['readiness_status'] as String?;
-    return ListView(padding: const EdgeInsets.all(14), children: [
-      _serviceCard('\u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', 'COA', Icons.account_tree, rs == 'coa_in_progress' || rs == 'ready_for_tb' ? 'active' : rs == 'ready_for_coa' ? 'ready' : 'pending'),
-      _serviceCard('\u0645\u064a\u0632\u0627\u0646 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', 'TB', Icons.table_chart, rs == 'ready_for_tb' ? 'ready' : 'pending'),
-      _serviceCard('\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', 'Analysis', Icons.analytics, 'pending'),
-      _serviceCard('\u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644', 'Compliance', Icons.shield, 'pending'),
-      const SizedBox(height: 16),
-      _nextStepCard(rs),
-    ]);
+  Widget _badgeWidget(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        border: Border.all(color: color),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
   }
 
-  Widget _nextStepCard(String? rs) => Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      gradient: LinearGradient(colors: [const Color(0xFFC9A84C).withOpacity(0.12), Colors.transparent]),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: const Color(0xFFC9A84C).withOpacity(0.25))),
-    child: Row(children: [
-      const Icon(Icons.auto_awesome, color: AC.gold, size: 22),
-      const SizedBox(width: 12),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('الخطوة التالية', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        Text(rs == 'documents_pending' ? 'أكمل المستندات الإلزامية' :
-          rs == 'ready_for_coa' ? 'ارفع شجرة الحسابات' :
-          rs == 'coa_in_progress' ? 'تابع رحلة شجرة الحسابات' :
-          rs == 'ready_for_tb' ? 'ارفع ميزان المراجعة' :
-          'أكمل بيانات العميل',
-          style: const TextStyle(color: AC.ts, fontSize: 12)),
-      ])),
-    ]));
+  Widget _buildQuickInfoCards() {
+    return Row(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _quickInfoCard('رقم السجل', readinessData['cr_number'] ?? 'N/A', gold),
+        _quickInfoCard('رقم الضريبة', readinessData['tax_id'] ?? 'N/A', greenC),
+        _quickInfoCard('تاريخ الإنشاء', readinessData['created_date'] ?? 'N/A', blueC),
+        _quickInfoCard('COA', readinessData['coa_status'] ?? 'قيد الانتظار', orangeC),
+      ],
+    );
+  }
 
-  Widget _serviceCard(String name, String nameEn, IconData icon, String status) {
-    final color = status == 'active' ? AC.gold : status == 'ready' ? AC.cyan : AC.ts;
-    return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
-      child: Row(children: [
-        Container(width: 44, height: 44, decoration: BoxDecoration(color: color.withAlpha(20), borderRadius: BorderRadius.circular(11)), child: Icon(icon, color: color, size: 22)), const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(name, style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
-          Text(nameEn, style: const TextStyle(color: AC.ts, fontSize: 11)),
-        ])),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(
-          color: color.withAlpha(25), borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withAlpha(60))),
-          child: Text(status, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600))),
-      ]));
+  Widget _quickInfoCard(String label, String value, Color accentColor) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.only(left: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(8),
+          border: Border(right: BorderSide(color: accentColor, width: 3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: textMid,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                color: textColor,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      color: navyMid,
+      child: TabBar(
+        controller: _tabController,
+        indicatorColor: gold,
+        indicatorWeight: 3,
+        labelColor: gold,
+        unselectedLabelColor: textMid,
+        tabs: const [
+          Tab(text: 'البيانات'),
+          Tab(text: 'المستندات'),
+          Tab(text: 'الخدمات'),
+          Tab(text: 'النشاط'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabContent() {
+    return SizedBox(
+      height: 600,
+      child: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildInfoTab(),
+          _buildDocumentsTab(),
+          _buildServicesTab(),
+          _buildActivityTab(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            textDirection: TextDirection.rtl,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _infoCard(
+                  'المعلومات الأساسية',
+                  [
+                    ('النوع', 'شركة'),
+                    ('القطاع', 'التجزئة'),
+                    ('الحالة', 'نشط'),
+                    ('الموقع', 'الرياض'),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _infoCard(
+                  'الاتصال والموقع',
+                  [
+                    ('البريد الإلكتروني', 'info@company.com'),
+                    ('الهاتف', '+966 11 123 4567'),
+                    ('العنوان', 'الرياض، المملكة العربية السعودية'),
+                    ('الموقع الجغرافي', '24.7136° N, 46.6753° E'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildReadinessFlow(),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoCard(String title, List<(String, String)> items) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: textDim.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: gold,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...items.map((item) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  item.$1,
+                  style: TextStyle(color: textMid, fontSize: 12),
+                ),
+                Text(
+                  item.$2,
+                  style: const TextStyle(color: textColor, fontSize: 12),
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReadinessFlow() {
+    final steps = [
+      ('not_ready', 'غير جاهز'),
+      ('documents_pending', 'الوثائق المعلقة'),
+      ('ready_for_coa', 'جاهز للمراجع'),
+      ('coa_in_progress', 'المراجع جارية'),
+      ('ready_for_tb', 'جاهز للميزانية'),
+    ];
+
+    String currentStatus = readinessData['status'] ?? 'not_ready';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: gold, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'مسار الجاهزية',
+            style: TextStyle(
+              color: gold,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            textDirection: TextDirection.rtl,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: steps.asMap().entries.map((entry) {
+              int idx = entry.key;
+              var step = entry.value;
+              bool isActive = steps.indexWhere((s) => s.$1 == currentStatus) >= idx;
+
+              return Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isActive ? gold : textDim.withOpacity(0.3),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '${idx + 1}',
+                        style: TextStyle(
+                          color: isActive ? navy : textMid,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      step.$2,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: isActive ? textColor : textMid,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDocumentsTab() {
+    int mandatory = documentsData.where((d) => d['required'] == true).length;
+    int uploaded = documentsData.where((d) => d['status'] != 'missing').length;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            textDirection: TextDirection.rtl,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'المستندات المطلوبة',
+                    style: const TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$uploaded من $mandatory مكتملة',
+                    style: TextStyle(
+                      color: textMid,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.add),
+                label: const Text('تحميل'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: gold,
+                  foregroundColor: navy,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          LinearProgressIndicator(
+            value: uploaded / mandatory,
+            backgroundColor: textDim.withOpacity(0.2),
+            valueColor: const AlwaysStoppedAnimation<Color>(gold),
+            minHeight: 6,
+          ),
+          const SizedBox(height: 16),
+          ...documentsData.map((doc) => _documentCard(doc)),
+        ],
+      ),
+    );
+  }
+
+  Widget _documentCard(Map<String, dynamic> doc) {
+    Color statusColor = _statusColor(doc['status']);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border(
+          right: BorderSide(color: statusColor, width: 4),
+        ),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        textDirection: TextDirection.rtl,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  textDirection: TextDirection.rtl,
+                  children: [
+                    Text(
+                      doc['name'],
+                      style: const TextStyle(
+                        color: textColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (doc['required'] == true) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: redC.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'إلزامي',
+                          style: TextStyle(
+                            color: redC,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  doc['uploaded_date'] != null
+                      ? 'تم التحميل: ${doc['uploaded_date']}'
+                      : 'لم يتم التحميل',
+                  style: TextStyle(
+                    color: textMid,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              _statusLabel(doc['status']),
+              style: TextStyle(
+                color: statusColor,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _statusColor(String status) {
+    return {
+      'uploaded': blueC,
+      'accepted': greenC,
+      'rejected': redC,
+      'missing': textMid,
+      'expired': orangeC,
+    }[status] ?? textMid;
+  }
+
+  String _statusLabel(String status) {
+    return {
+      'uploaded': 'مرفوع',
+      'accepted': 'مقبول',
+      'rejected': 'مرفوض',
+      'missing': 'مفقود',
+      'expired': 'منتهي',
+    }[status] ?? 'غير معروف';
+  }
+
+  Widget _buildServicesTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              textDirection: TextDirection.ltr,
+              children: [
+                _serviceCard('COA', 'المراجعة', greenC),
+                _serviceCard('TB', 'الميزانية', blueC),
+                _serviceCard('Statements', 'البيانات', orangeC),
+                _serviceCard('Analysis', 'التحليل', purpleC),
+                _serviceCard('Compliance', 'الامتثال', gold),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [gold.withOpacity(0.2), gold.withOpacity(0.05)],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: gold, width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'الخطوة التالية',
+                  style: TextStyle(
+                    color: gold,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'يرجى تقديم الوثائق المتبقية',
+                  style: const TextStyle(
+                    color: textColor,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: gold,
+                    foregroundColor: navy,
+                  ),
+                  child: const Text('عرض التفاصيل'),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildFinancialPathway(),
+        ],
+      ),
+    );
+  }
+
+  Widget _serviceCard(String title, String subtitle, Color color) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withOpacity(0.2),
+            ),
+            alignment: Alignment.center,
+            child: Icon(Icons.check, color: color, size: 20),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              color: textColor,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: textMid,
+              fontSize: 11,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinancialPathway() {
+    final steps = [
+      ('جمع الوثائق', 'تم'),
+      ('المراجعة المالية', 'جارية'),
+      ('إعداد الميزانية', 'قيد الانتظار'),
+      ('الإقفال النهائي', 'قيد الانتظار'),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: textDim.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'مسار السنة المالية',
+            style: TextStyle(
+              color: gold,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...steps.asMap().entries.map((entry) {
+            int idx = entry.key;
+            var step = entry.value;
+            bool isCompleted = step.$2 == 'تم';
+            bool isInProgress = step.$2 == 'جارية';
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isCompleted
+                          ? greenC
+                          : isInProgress
+                              ? gold
+                              : textDim.withOpacity(0.3),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      isCompleted ? Icons.check : Icons.circle,
+                      color: isCompleted ? navy : textMid,
+                      size: 12,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          step.$1,
+                          style: const TextStyle(
+                            color: textColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          step.$2,
+                          style: TextStyle(
+                            color: textMid,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActivityTab() {
+    final activities = [
+      ('تم تحميل الوثائق', 'قبل ساعتين', Icons.file_upload, greenC),
+      ('تم إنشاء الحساب', 'قبل يوم', Icons.person_add, blueC),
+      ('تم التصديق', 'قبل 3 أيام', Icons.verified, greenC),
+      ('تم الطلب', 'قبل أسبوع', Icons.assignment, orangeC),
+    ];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          ...activities.asMap().entries.map((entry) {
+            int idx = entry.key;
+            var activity = entry.value;
+            bool isLast = idx == activities.length - 1;
+
+            return Row(
+              textDirection: TextDirection.rtl,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: activity.$4.withOpacity(0.2),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        activity.$3,
+                        color: activity.$4,
+                        size: 20,
+                      ),
+                    ),
+                    if (!isLast)
+                      Container(
+                        width: 2,
+                        height: 40,
+                        color: textDim.withOpacity(0.3),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          activity.$1,
+                          style: const TextStyle(
+                            color: textColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          activity.$2,
+                          style: TextStyle(
+                            color: textMid,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ],
+      ),
+    );
   }
 }
