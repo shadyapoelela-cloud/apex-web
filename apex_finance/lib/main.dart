@@ -381,7 +381,7 @@ class _MainNavS extends State<MainNav> {
   List _notifs = [];
   double _fabX = 20;
   double _fabY = 100;
-  String _userName = 'User';
+  String _userName = S.dname ?? 'User';
   String _clientLabel = '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644';
   @override
   @override
