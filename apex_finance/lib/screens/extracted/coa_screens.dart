@@ -255,29 +255,97 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   }
 
 
+
+
+  // Windows-1256 to Unicode lookup table (0x80-0xFF)
+  static const List<int> _cp1256 = [
+    0x20AC,0x067E,0x201A,0x0192,0x201E,0x2026,0x2020,0x2021,
+    0x02C6,0x2030,0x0679,0x2039,0x0152,0x0686,0x0698,0x0688,
+    0x06AF,0x2018,0x2019,0x201C,0x201D,0x2022,0x2013,0x2014,
+    0x06A9,0x2122,0x0691,0x203A,0x0153,0x200C,0x200D,0x06BA,
+    0x00A0,0x060C,0x00A2,0x00A3,0x00A4,0x00A5,0x00A6,0x00A7,
+    0x00A8,0x00A9,0x06BE,0x00AB,0x00AC,0x00AD,0x00AE,0x00AF,
+    0x00B0,0x00B1,0x00B2,0x00B3,0x00B4,0x00B5,0x00B6,0x00B7,
+    0x00B8,0x00B9,0x061B,0x00BB,0x00BC,0x00BD,0x00BE,0x061F,
+    0x06C1,0x0621,0x0622,0x0623,0x0624,0x0625,0x0626,0x0627,
+    0x0628,0x0629,0x062A,0x062B,0x062C,0x062D,0x062E,0x062F,
+    0x0630,0x0631,0x0632,0x0633,0x0634,0x0635,0x0636,0x00D7,
+    0x0637,0x0638,0x0639,0x063A,0x0640,0x0641,0x0642,0x0643,
+    0x00E0,0x0644,0x00E2,0x0645,0x0646,0x0647,0x0648,0x00E7,
+    0x00E8,0x00E9,0x00EA,0x00EB,0x0649,0x064A,0x00EE,0x00EF,
+    0x064B,0x064C,0x064D,0x064E,0x00F4,0x064F,0x0650,0x00F7,
+    0x0651,0x00F9,0x0652,0x00FB,0x00FC,0x200E,0x200F,0x06D2,
+  ];
+
+  String _decodeBytes(Uint8List bytes) {
+    // Strip BOM if present
+    int offset = 0;
+    if (bytes.length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
+      offset = 3; // UTF-8 BOM
+    } else if (bytes.length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE) {
+      offset = 2; // UTF-16 LE BOM â€” try as UTF-8 anyway
+    }
+
+    final trimmed = offset > 0 ? bytes.sublist(offset) : bytes;
+
+    // Try UTF-8 first
+    try {
+      final result = utf8.decode(trimmed);
+      // Check if result has Arabic characters (U+0600-U+06FF range)
+      bool hasArabic = result.runes.any((r) => r >= 0x0600 && r <= 0x06FF);
+      bool hasReplacement = result.contains('\uFFFD');
+      if (hasArabic && !hasReplacement) {
+        return result;
+      }
+    } catch (_) {}
+
+    // Fallback: Windows-1256 decoding
+    final buffer = StringBuffer();
+    for (final byte in trimmed) {
+      if (byte < 0x80) {
+        buffer.writeCharCode(byte);
+      } else {
+        buffer.writeCharCode(_cp1256[byte - 0x80]);
+      }
+    }
+    return buffer.toString();
+  }
+
   Future<void> _parseUploadedFile(dynamic file) async {
     try {
       final bytes = file.bytes as Uint8List?;
       if (bytes == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('لا يمكن قراءة الملف'), backgroundColor: AppColors.redC),
+            const SnackBar(content: Text('\u0644\u0627 \u064a\u0645\u0643\u0646 \u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0645\u0644\u0641'), backgroundColor: AppColors.redC),
           );
           setState(() { _isUploading = false; });
         }
         return;
       }
 
-      final content = utf8.decode(bytes, allowMalformed: true);
-      List<List<dynamic>> rows;
+      // Decode with encoding detection (UTF-8 â†’ Windows-1256 fallback)
+      final content = _decodeBytes(bytes);
 
-      // Parse CSV content
-      rows = const CsvToListConverter(eol: '\n', shouldParseNumbers: true).convert(content);
+      // Normalize line endings
+      final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+
+      List<List<dynamic>> rows;
+      try {
+        rows = const CsvToListConverter(shouldParseNumbers: true, eol: '\n').convert(normalized);
+      } catch (_) {
+        // Try with different separator (semicolon for some locales)
+        try {
+          rows = const CsvToListConverter(fieldDelimiter: ';', shouldParseNumbers: true, eol: '\n').convert(normalized);
+        } catch (_) {
+          rows = [];
+        }
+      }
 
       if (rows.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('الملف فارغ'), backgroundColor: AppColors.redC),
+            const SnackBar(content: Text('\u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063a \u0623\u0648 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d'), backgroundColor: AppColors.redC),
           );
           setState(() { _isUploading = false; });
         }
@@ -288,48 +356,54 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       final headers = rows.first.map((h) => h.toString().trim().toLowerCase()).toList();
       final dataRows = rows.skip(1).where((r) => r.isNotEmpty && r.any((c) => c.toString().trim().isNotEmpty)).toList();
 
-      // Map columns â€” flexible header matching
-      int codeCol = _findCol(headers, ['code', 'account_code', 'رقم الحساب', 'الرقم', 'رمز']);
-      int nameCol = _findCol(headers, ['name', 'account_name', 'اسم الحساب', 'الاسم', 'الحساب']);
-      int classCol = _findCol(headers, ['classification', 'class', 'type', 'التصنيف', 'النوع']);
-      int sectionCol = _findCol(headers, ['section', 'category', 'القسم', 'الفئة']);
-      int balanceCol = _findCol(headers, ['balance', 'amount', 'الرصيد', 'المبلغ']);
+      // Map columns â€” flexible header matching (Arabic + English)
+      int codeCol = _findCol(headers, ['code', 'account_code', 'account code', 'acc_code', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0631\u0642\u0645', '\u0631\u0645\u0632', '\u0631\u0642\u0645', '\u0643\u0648\u062f']);
+      int nameCol = _findCol(headers, ['name', 'account_name', 'account name', 'acc_name', 'description', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0627\u0633\u0645', '\u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0648\u0635\u0641', '\u0628\u064a\u0627\u0646']);
+      int classCol = _findCol(headers, ['classification', 'class', 'type', 'account_type', '\u0627\u0644\u062a\u0635\u0646\u064a\u0641', '\u0627\u0644\u0646\u0648\u0639']);
+      int sectionCol = _findCol(headers, ['section', 'category', 'group', '\u0627\u0644\u0642\u0633\u0645', '\u0627\u0644\u0641\u0626\u0629', '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629']);
+      int balanceCol = _findCol(headers, ['balance', 'amount', 'debit', 'credit', '\u0627\u0644\u0631\u0635\u064a\u062f', '\u0627\u0644\u0645\u0628\u0644\u063a']);
 
-      // Fallback: if no headers match, use positional (code, name, class, section, balance)
-      if (codeCol < 0 && headers.length >= 2) {
-        codeCol = 0;
-        nameCol = 1;
-        classCol = headers.length > 2 ? 2 : -1;
-        sectionCol = headers.length > 3 ? 3 : -1;
-        balanceCol = headers.length > 4 ? 4 : -1;
+      // Fallback: positional mapping if no headers match
+      if (codeCol < 0 && nameCol < 0) {
+        if (headers.length >= 2) {
+          codeCol = 0;
+          nameCol = 1;
+          classCol = headers.length > 2 ? 2 : -1;
+          sectionCol = headers.length > 3 ? 3 : -1;
+          balanceCol = headers.length > 4 ? 4 : -1;
+        }
       }
 
       List<AccountData> parsed = [];
       for (final row in dataRows) {
-        String code = codeCol >= 0 && codeCol < row.length ? row[codeCol].toString().trim() : '';
-        String name = nameCol >= 0 && nameCol < row.length ? row[nameCol].toString().trim() : '';
-        String classification = classCol >= 0 && classCol < row.length ? row[classCol].toString().trim() : 'غير مصنف';
-        String section = sectionCol >= 0 && sectionCol < row.length ? row[sectionCol].toString().trim() : 'عام';
-        double balance = 0;
-        if (balanceCol >= 0 && balanceCol < row.length) {
-          final bVal = row[balanceCol];
-          if (bVal is num) {
-            balance = bVal.toDouble();
-          } else {
-            balance = double.tryParse(bVal.toString().replaceAll(',', '').replaceAll(' ', '')) ?? 0;
+        try {
+          String code = codeCol >= 0 && codeCol < row.length ? row[codeCol].toString().trim() : '';
+          String name = nameCol >= 0 && nameCol < row.length ? row[nameCol].toString().trim() : '';
+          String classification = classCol >= 0 && classCol < row.length ? row[classCol].toString().trim() : '\u063a\u064a\u0631 \u0645\u0635\u0646\u0641';
+          String section = sectionCol >= 0 && sectionCol < row.length ? row[sectionCol].toString().trim() : '\u0639\u0627\u0645';
+          double balance = 0;
+          if (balanceCol >= 0 && balanceCol < row.length) {
+            final bVal = row[balanceCol];
+            if (bVal is num) {
+              balance = bVal.toDouble();
+            } else {
+              balance = double.tryParse(bVal.toString().replaceAll(',', '').replaceAll(' ', '').replaceAll('\u00A0', '')) ?? 0;
+            }
           }
-        }
 
-        if (code.isNotEmpty || name.isNotEmpty) {
-          parsed.add(AccountData(
-            code: code.isNotEmpty ? code : '\${parsed.length + 1}',
-            name: name.isNotEmpty ? name : 'حساب \${parsed.length + 1}',
-            classification: classification,
-            section: section,
-            balance: balance,
-            confidence: 95.0,
-            status: 'Imported',
-          ));
+          if (code.isNotEmpty || name.isNotEmpty) {
+            parsed.add(AccountData(
+              code: code.isNotEmpty ? code : '${parsed.length + 1}',
+              name: name.isNotEmpty ? name : '\u062d\u0633\u0627\u0628 ${parsed.length + 1}',
+              classification: classification,
+              section: section,
+              balance: balance,
+              confidence: 95.0,
+              status: 'Review',
+            ));
+          }
+        } catch (_) {
+          // Skip malformed rows
         }
       }
 
@@ -344,7 +418,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('تم استيراد \${parsed.length} حساب من \$_uploadedFileName'),
+            content: Text('\u062a\u0645 \u0627\u0633\u062a\u064a\u0631\u0627\u062f ${parsed.length} \u062d\u0633\u0627\u0628 \u0645\u0646 $_uploadedFileName'),
             backgroundColor: AppColors.greenC,
             duration: const Duration(seconds: 4),
           ),
@@ -355,7 +429,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         setState(() { _isUploading = false; });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في تحليل الملف: \$e'),
+            content: Text('\u062e\u0637\u0623 \u0641\u064a \u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0644\u0641: $e'),
             backgroundColor: AppColors.redC,
             duration: const Duration(seconds: 4),
           ),
@@ -371,6 +445,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     }
     return -1;
   }
+
 
   Widget _buildStagePipeline() {
     final stages = [
