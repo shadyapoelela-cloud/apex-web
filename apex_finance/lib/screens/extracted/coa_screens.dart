@@ -71,7 +71,7 @@ class _CoaUploadS extends State<CoaUploadScreen> {
             decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AC.gold.withOpacity(0.3), width: 2, style: BorderStyle.solid)),
             child: Column(children: [
-              Icon(_uploading ? Icons.hourglass_top : Icons.cloud_upload, size: 64, color: AC.gold),
+              Icon(_uploading ? Icons.hourglass_top : Icons.cloud_upload_outlined, size: 72, color: AC.gold),
               const SizedBox(height: 16),
               Text(_uploading ? 'جاري رفع الملف...' : 'اختر ملف شجرة الحسابات',
                 style: const TextStyle(color: AC.tp, fontSize: 16)),
@@ -92,7 +92,7 @@ class _CoaUploadS extends State<CoaUploadScreen> {
           Container(padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
             child: Row(children: [
-              const Icon(Icons.check_circle, color: Colors.greenAccent),
+              Container(width: 36, height: 36, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.greenAccent.withOpacity(0.15)), child: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 22)),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('تم رفع: ${_uploadResult!['file_name']}', style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
@@ -126,14 +126,16 @@ class _CoaUploadS extends State<CoaUploadScreen> {
   );
 
   Widget _stepDot(String label, int num, bool active) => Column(mainAxisSize: MainAxisSize.min, children: [
-    Container(width: 32, height: 32,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: active ? AC.gold : AC.navy4,
-        border: Border.all(color: active ? AC.gold : AC.ts, width: 2)),
+    Container(width: 36, height: 36,
+      decoration: BoxDecoration(shape: BoxShape.circle,
+        color: active ? AC.gold : AC.navy4,
+        border: Border.all(color: active ? AC.gold : AC.ts.withOpacity(0.4), width: 2),
+        boxShadow: active ? [BoxShadow(color: AC.gold.withOpacity(0.3), blurRadius: 8)] : []),
       child: Center(child: Text('$num', style: TextStyle(color: active ? AC.navy : AC.ts, fontWeight: FontWeight.bold, fontSize: 13)))),
     const SizedBox(height: 4),
     Text(label, style: TextStyle(color: active ? AC.gold : AC.ts, fontSize: 11)),
   ]);
-  Widget _stepLine() => Container(width: 30, height: 2, color: AC.ts.withOpacity(0.3), margin: const EdgeInsets.only(bottom: 16));
+  Widget _stepLine() => Container(width: 40, height: 2, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(borderRadius: BorderRadius.circular(1), color: AC.ts.withOpacity(0.3)));
 }
 
 // ── 4. Column Mapping Screen ──
@@ -256,14 +258,16 @@ class _CoaColMapS extends State<CoaColumnMappingScreen> {
   );
 
   Widget _stepDot(String label, int num, bool active) => Column(mainAxisSize: MainAxisSize.min, children: [
-    Container(width: 32, height: 32,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: active ? AC.gold : AC.navy4,
-        border: Border.all(color: active ? AC.gold : AC.ts, width: 2)),
+    Container(width: 36, height: 36,
+      decoration: BoxDecoration(shape: BoxShape.circle,
+        color: active ? AC.gold : AC.navy4,
+        border: Border.all(color: active ? AC.gold : AC.ts.withOpacity(0.4), width: 2),
+        boxShadow: active ? [BoxShadow(color: AC.gold.withOpacity(0.3), blurRadius: 8)] : []),
       child: Center(child: Text('$num', style: TextStyle(color: active ? AC.navy : AC.ts, fontWeight: FontWeight.bold, fontSize: 13)))),
     const SizedBox(height: 4),
     Text(label, style: TextStyle(color: active ? AC.gold : AC.ts, fontSize: 11)),
   ]);
-  Widget _stepLine() => Container(width: 30, height: 2, color: AC.ts.withOpacity(0.3), margin: const EdgeInsets.only(bottom: 16));
+  Widget _stepLine() => Container(width: 40, height: 2, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(borderRadius: BorderRadius.circular(1), color: AC.ts.withOpacity(0.3)));
 }
 
 // ── 5. COA Parsed Preview Screen ──
@@ -570,7 +574,7 @@ class _CoaQualityReportS extends State<CoaQualityReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('تقرير جودة شجرة الحسابات', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      appBar: AppBar(title: const Text('تقرير الجودة', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)), backgroundColor: AC.navy2),
       body: _loading ? const Center(child: CircularProgressIndicator(color: AC.gold))
           : _error != null ? Center(child: Text(_error!, style: const TextStyle(color: Colors.redAccent)))
           : _buildReport());
@@ -704,9 +708,9 @@ class _CoaReviewApprovalS extends State<CoaReviewApprovalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('مراجعة واعتماد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy,
+      appBar: AppBar(title: const Text('مراجعة واعتماد', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)), backgroundColor: AC.navy2,
         actions: [if (_selected.isNotEmpty) TextButton.icon(onPressed: _bulkApprove,
-          icon: const Icon(Icons.check_circle, color: Colors.greenAccent),
+          icon: Container(width: 36, height: 36, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.greenAccent.withOpacity(0.15)), child: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 22)),
           label: Text('اعتماد ${_selected.length}', style: const TextStyle(color: Colors.greenAccent)))]),
       body: _loading ? const Center(child: CircularProgressIndicator(color: AC.gold))
           : _error != null ? Center(child: Text(_error!, style: const TextStyle(color: Colors.redAccent)))
