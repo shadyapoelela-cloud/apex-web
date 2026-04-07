@@ -33,6 +33,7 @@
 
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
+<script>if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i of r)i.unregister()});caches.keys().then(function(n){for(var k of n)caches.delete(k)})}</script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
