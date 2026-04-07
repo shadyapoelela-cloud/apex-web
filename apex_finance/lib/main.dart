@@ -40,6 +40,7 @@ void main() {
   // Restore session from localStorage
   if (S.token == null) {
     final restored = S.restore();
+    print('[main] S.restore() returned: $restored, token null: ${S.token == null}, token len: ${S.token?.length ?? 0}');
     if (restored && S.token != null) {
       ApiService.setToken(S.token!);
     }
@@ -93,7 +94,7 @@ class S {
     uname = st['apex_uname']; dname = st['apex_dname'];
     plan = st['apex_plan']; email = st['apex_email'];
     final r = st['apex_roles'];
-    if (r != null && r.isNotEmpty) roles = r.split(',');
+    if (r != null && r.isNotEmpty) roles = List<String>.from(jsonDecode(r));
     return true;
   }
 }
@@ -838,14 +839,27 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   Future<void> _load() async {
     setState(() => _ld = true);
     try {
-      final r = await http.get(Uri.parse('$_api/clients'), headers: S.hj());
+      // Ensure token is available - re-restore from localStorage if needed
+      if (S.token == null || S.token!.isEmpty) {
+        S.restore();
+      }
+      final tk = S.token ?? '';
+      print('[ClientsTab] _load called, token length: ${tk.length}, first10: ${tk.length > 10 ? tk.substring(0,10) : tk}');
+      final r = await http.get(
+        Uri.parse('$_api/clients'),
+        headers: {'Authorization': 'Bearer $tk', 'Content-Type': 'application/json'},
+      );
+      print('[ClientsTab] Response status: ${r.statusCode}');
       if (r.statusCode == 200) {
         final data = jsonDecode(r.body);
+        print('[ClientsTab] Got ${data is List ? data.length : 0} clients');
         if (mounted) setState(() { _cl = data is List ? data : []; _ld = false; });
       } else {
+        print('[ClientsTab] Error body: ${r.body}');
         if (mounted) setState(() { _cl = []; _ld = false; });
       }
     } catch(e) {
+      print('[ClientsTab] Exception: $e');
       if (mounted) setState(() { _cl = []; _ld = false; });
     }
   }
