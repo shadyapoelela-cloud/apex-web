@@ -264,6 +264,137 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   // ============================================
   // Windows-1256 to Unicode lookup (0x80-0xFF)
   // ============================================
+
+
+  // ============================================
+  // ERP Template definitions for column mapping
+  // ============================================
+  static const List<Map<String, dynamic>> _erpTemplates = [
+    {
+      'name': 'ظƒط´ظپ طھظ„ظ‚ط§ط¦ظٹ',
+      'icon': 0xe834, // Icons.auto_fix_high
+      'encoding': 'auto',
+      'code': <String>['code', 'account_code', 'account code', 'acc_code', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0631\u0642\u0645', '\u0631\u0645\u0632', '\u0631\u0642\u0645', '\u0643\u0648\u062f', '\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'name_col': <String>['name', 'account_name', 'account name', 'description', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0627\u0633\u0645', '\u0627\u0644\u062d\u0633\u0627\u0628', '\u0628\u064a\u0627\u0646', '\u0627\u0644\u0648\u0635\u0641'],
+      'class': <String>['classification', 'class', 'type', 'account_type', '\u0627\u0644\u062a\u0635\u0646\u064a\u0641', '\u0627\u0644\u0646\u0648\u0639', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'section': <String>['section', 'category', 'group', 'parent', '\u0627\u0644\u0642\u0633\u0645', '\u0627\u0644\u0641\u0626\u0629', '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628'],
+      'balance': <String>['balance', 'amount', '\u0627\u0644\u0631\u0635\u064a\u062f', '\u0627\u0644\u0645\u0628\u0644\u063a'],
+    },
+    {
+      'name': 'SAP',
+      'icon': 0xe30a, // Icons.business
+      'encoding': 'windows-1256',
+      'code': <String>['saknr', 'account number', 'account', 'gl account', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', 'ktonr', 'hkont'],
+      'name_col': <String>['txt50', 'txt20', 'sakt', 'description', 'short text', 'long text', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0648\u0635\u0641'],
+      'class': <String>['ktoks', 'account group', 'account type', 'gvtyp', '\u0645\u062c\u0645\u0648\u0639\u0629 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u062a\u0635\u0646\u064a\u0641'],
+      'section': <String>['bilkt', 'mitkz', 'xbilk', '\u0627\u0644\u0642\u0633\u0645', 'bs category'],
+      'balance': <String>['balance', 'saldo', 'hsl', '\u0627\u0644\u0631\u0635\u064a\u062f'],
+    },
+    {
+      'name': 'Oracle',
+      'icon': 0xe30a,
+      'encoding': 'utf-8',
+      'code': <String>['segment1', 'account', 'gl_code', 'account_number', 'code_combination', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'name_col': <String>['description', 'account_description', 'segment1_desc', 'account_name', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0648\u0635\u0641'],
+      'class': <String>['account_type', 'type', 'acct_type', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u062a\u0635\u0646\u064a\u0641'],
+      'section': <String>['parent_segment', 'summary_account', 'roll_up_group', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628'],
+      'balance': <String>['begin_balance', 'balance', 'period_net', '\u0627\u0644\u0631\u0635\u064a\u062f'],
+    },
+    {
+      'name': 'Odoo',
+      'icon': 0xe30a,
+      'encoding': 'utf-8',
+      'code': <String>['code', 'code/id', '\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0631\u0645\u0632'],
+      'name_col': <String>['name', 'name/id', '\u0627\u0644\u0627\u0633\u0645', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'class': <String>['user_type_id', 'user_type', 'account_type', 'internal_type', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'section': <String>['parent_id', 'group_id', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628'],
+      'balance': <String>['balance', 'debit', 'credit', '\u0627\u0644\u0631\u0635\u064a\u062f'],
+    },
+    {
+      'name': '\u0642\u064a\u0648\u062f (Qoyod)',
+      'icon': 0xe30a,
+      'encoding': 'utf-8',
+      'code': <String>['code', '\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0631\u0645\u0632', '\u0631\u0642\u0645'],
+      'name_col': <String>['name', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0627\u0633\u0645'],
+      'class': <String>['account type', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628', 'type'],
+      'section': <String>['parent account code', '\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628', 'parent'],
+      'balance': <String>['balance', '\u0627\u0644\u0631\u0635\u064a\u062f'],
+    },
+    {
+      'name': '\u062f\u0641\u062a\u0631\u0629 (Daftra)',
+      'icon': 0xe30a,
+      'encoding': 'utf-8',
+      'code': <String>['code', 'account_code', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0631\u0642\u0645'],
+      'name_col': <String>['name', 'account_name', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0627\u0633\u0645'],
+      'class': <String>['type', 'account_type', '\u0627\u0644\u0646\u0648\u0639', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'section': <String>['parent', 'parent_account', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0631\u0626\u064a\u0633\u064a'],
+      'balance': <String>['balance', '\u0627\u0644\u0631\u0635\u064a\u062f', '\u0627\u0644\u0645\u0628\u0644\u063a'],
+    },
+    {
+      'name': '\u0648\u0627\u0641\u0642 (Wafeq)',
+      'icon': 0xe30a,
+      'encoding': 'utf-8',
+      'code': <String>['code', 'account code', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'name_col': <String>['name', 'account name', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'class': <String>['type', 'account type', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'section': <String>['parent', 'parent account', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628'],
+      'balance': <String>['balance', '\u0627\u0644\u0631\u0635\u064a\u062f'],
+    },
+    {
+      'name': '\u0623\u0648\u0646\u0643\u0633 (ONYX)',
+      'icon': 0xe30a,
+      'encoding': 'windows-1256',
+      'code': <String>['account_no', 'account no', 'acc_no', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0631\u0642\u0645', '\u0643\u0648\u062f'],
+      'name_col': <String>['account_name', 'account name', 'acc_name', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0627\u0633\u0645', '\u0628\u064a\u0627\u0646 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'class': <String>['account_type', 'type', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u062a\u0635\u0646\u064a\u0641', '\u0637\u0628\u064a\u0639\u0629 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'section': <String>['parent_account', 'main_account', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0631\u0626\u064a\u0633\u064a', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628'],
+      'balance': <String>['balance', 'opening_balance', '\u0627\u0644\u0631\u0635\u064a\u062f', '\u0631\u0635\u064a\u062f \u0627\u0641\u062a\u062a\u0627\u062d\u064a'],
+    },
+    {
+      'name': 'ERPNext',
+      'icon': 0xe30a,
+      'encoding': 'utf-8',
+      'code': <String>['name', 'account_number', 'account number', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'name_col': <String>['account_name', 'account name', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'class': <String>['root_type', 'account_type', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'section': <String>['parent_account', 'parent', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628'],
+      'balance': <String>['balance', '\u0627\u0644\u0631\u0635\u064a\u062f'],
+    },
+    {
+      'name': 'Tally',
+      'icon': 0xe30a,
+      'encoding': 'windows-1256',
+      'code': <String>['ledger code', 'code', 'account code', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'name_col': <String>['ledger name', 'name', 'particulars', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'class': <String>['group', 'under', 'account group', '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629'],
+      'section': <String>['parent', 'under group', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628'],
+      'balance': <String>['closing balance', 'balance', 'amount', '\u0627\u0644\u0631\u0635\u064a\u062f'],
+    },
+    {
+      'name': 'Amazon',
+      'icon': 0xe30a,
+      'encoding': 'utf-8',
+      'code': <String>['account_id', 'account id', 'transaction type', 'sku', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'name_col': <String>['account_name', 'description', 'product name', 'marketplace', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0648\u0635\u0641'],
+      'class': <String>['type', 'transaction type', 'category', '\u0627\u0644\u0646\u0648\u0639'],
+      'section': <String>['category', 'group', '\u0627\u0644\u0641\u0626\u0629'],
+      'balance': <String>['total', 'amount', 'balance', '\u0627\u0644\u0645\u0628\u0644\u063a', '\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a'],
+    },
+    {
+      'name': 'Microsoft Dynamics',
+      'icon': 0xe30a,
+      'encoding': 'utf-8',
+      'code': <String>['mainaccountid', 'main account', 'account number', 'ledgeraccount', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'name_col': <String>['name', 'description', 'account name', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'class': <String>['mainaccountcategory', 'account type', 'type', '\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628'],
+      'section': <String>['parentaccount', 'parent', '\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628'],
+      'balance': <String>['openingbalance', 'balance', '\u0627\u0644\u0631\u0635\u064a\u062f'],
+    },
+  ];
+
+  // ============================================
+  // Windows-1256 to Unicode lookup (0x80-0xFF)
+  // ============================================
   static const List<int> _cp1256 = [
     0x20AC,0x067E,0x201A,0x0192,0x201E,0x2026,0x2020,0x2021,
     0x02C6,0x2030,0x0679,0x2039,0x0152,0x0686,0x0698,0x0688,
@@ -303,17 +434,14 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   List<List<String>> _parseCsv(String content) {
     final norm = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
-    // Try comma first
     try {
       final r = const CsvToListConverter(shouldParseNumbers: false, eol: '\n').convert(norm);
       if (r.isNotEmpty && r.first.length > 1) return r.map((row) => row.map((c) => c.toString()).toList()).toList();
     } catch (_) {}
-    // Try semicolon
     try {
       final r = const CsvToListConverter(fieldDelimiter: ';', shouldParseNumbers: false, eol: '\n').convert(norm);
       if (r.isNotEmpty && r.first.length > 1) return r.map((row) => row.map((c) => c.toString()).toList()).toList();
     } catch (_) {}
-    // Try tab
     return norm.split('\n').where((l) => l.trim().isNotEmpty).map((l) => l.split('\t')).toList();
   }
 
@@ -333,7 +461,6 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       final ext = (_uploadedFileName).split('.').last.toLowerCase();
 
       if (ext == 'xlsx' || ext == 'xls') {
-        // Parse Excel with excel package
         try {
           final workbook = xl.Excel.decodeBytes(bytes);
           final sheetName = workbook.tables.keys.first;
@@ -357,31 +484,24 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         return;
       }
 
-      // CSV: show mapping dialog with encoding options
-      // Try auto-detect first
-      List<List<String>> autoRows = [];
+      // CSV: auto-detect encoding
       String bestEncoding = 'utf-8';
-
-      // Try UTF-8
       final utf8Content = _decodeAsUtf8(bytes);
-      final utf8Rows = _parseCsv(utf8Content);
+      final cp1256Content = _decodeCp1256(bytes);
       bool utf8HasArabic = utf8Content.runes.any((r) => r >= 0x0600 && r <= 0x06FF);
       bool utf8HasGarbled = utf8Content.contains('\uFFFD') || utf8Content.contains('\u00C3');
-
-      // Try Windows-1256
-      final cp1256Content = _decodeCp1256(bytes);
-      final cp1256Rows = _parseCsv(cp1256Content);
       bool cp1256HasArabic = cp1256Content.runes.any((r) => r >= 0x0600 && r <= 0x06FF);
 
-      if (utf8HasArabic && !utf8HasGarbled && utf8Rows.length >= cp1256Rows.length) {
-        autoRows = utf8Rows;
+      List<List<String>> autoRows;
+      if (utf8HasArabic && !utf8HasGarbled) {
+        autoRows = _parseCsv(utf8Content);
         bestEncoding = 'utf-8';
       } else if (cp1256HasArabic) {
-        autoRows = cp1256Rows;
+        autoRows = _parseCsv(cp1256Content);
         bestEncoding = 'windows-1256';
       } else {
-        autoRows = utf8Rows.length >= cp1256Rows.length ? utf8Rows : cp1256Rows;
-        bestEncoding = utf8Rows.length >= cp1256Rows.length ? 'utf-8' : 'windows-1256';
+        autoRows = _parseCsv(utf8Content);
+        bestEncoding = 'utf-8';
       }
 
       if (autoRows.length >= 2 && mounted) {
@@ -408,19 +528,57 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     List<String> headers = rawRows.first.map((h) => h.trim()).toList();
     List<List<String>> dataRows = rawRows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
     String selEncoding = initialEncoding;
+    int selTemplate = 0; // 0 = auto-detect
 
-    // Auto-detect column mappings
+    // Auto-detect columns
     final hLower = headers.map((h) => h.toLowerCase()).toList();
-    int selCode = _findCol(hLower, ['code', 'account_code', 'account code', 'acc_code', '\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0631\u0642\u0645', '\u0631\u0645\u0632', '\u0631\u0642\u0645', '\u0643\u0648\u062f']);
-    int selName = _findCol(hLower, ['name', 'account_name', 'account name', 'description', '\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628', '\u0627\u0644\u0627\u0633\u0645', '\u0627\u0644\u062d\u0633\u0627\u0628', '\u0628\u064a\u0627\u0646', '\u0627\u0644\u0648\u0635\u0641']);
-    int selClass = _findCol(hLower, ['classification', 'class', 'type', 'account_type', '\u0627\u0644\u062a\u0635\u0646\u064a\u0641', '\u0627\u0644\u0646\u0648\u0639']);
-    int selSection = _findCol(hLower, ['section', 'category', 'group', '\u0627\u0644\u0642\u0633\u0645', '\u0627\u0644\u0641\u0626\u0629', '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629']);
-    int selBalance = _findCol(hLower, ['balance', 'amount', 'debit', '\u0627\u0644\u0631\u0635\u064a\u062f', '\u0627\u0644\u0645\u0628\u0644\u063a']);
+    final autoTpl = _erpTemplates[0];
+    int selCode = _findCol(hLower, List<String>.from(autoTpl['code']));
+    int selName = _findCol(hLower, List<String>.from(autoTpl['name_col']));
+    int selClass = _findCol(hLower, List<String>.from(autoTpl['class']));
+    int selSection = _findCol(hLower, List<String>.from(autoTpl['section']));
+    int selBalance = _findCol(hLower, List<String>.from(autoTpl['balance']));
 
-    // If no columns detected, try positional
     if (selCode < 0 && selName < 0 && headers.length >= 2) {
       selCode = 0;
       selName = 1;
+    }
+
+    // Try to auto-detect which ERP template matches best
+    int bestMatch = 0;
+    int bestScore = 0;
+    for (int t = 1; t < _erpTemplates.length; t++) {
+      final tpl = _erpTemplates[t];
+      int score = 0;
+      if (_findCol(hLower, List<String>.from(tpl['code'])) >= 0) score += 2;
+      if (_findCol(hLower, List<String>.from(tpl['name_col'])) >= 0) score += 2;
+      if (_findCol(hLower, List<String>.from(tpl['class'])) >= 0) score++;
+      if (_findCol(hLower, List<String>.from(tpl['section'])) >= 0) score++;
+      if (_findCol(hLower, List<String>.from(tpl['balance'])) >= 0) score++;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = t;
+      }
+    }
+    if (bestScore >= 3) {
+      selTemplate = bestMatch;
+      final tpl = _erpTemplates[selTemplate];
+      selCode = _findCol(hLower, List<String>.from(tpl['code']));
+      selName = _findCol(hLower, List<String>.from(tpl['name_col']));
+      selClass = _findCol(hLower, List<String>.from(tpl['class']));
+      selSection = _findCol(hLower, List<String>.from(tpl['section']));
+      selBalance = _findCol(hLower, List<String>.from(tpl['balance']));
+      // Apply recommended encoding
+      final recEnc = tpl['encoding'] as String;
+      if (recEnc != 'auto' && csvBytes != null && ext == 'csv') {
+        final newContent = recEnc == 'windows-1256' ? _decodeCp1256(csvBytes) : _decodeAsUtf8(csvBytes);
+        final newRows = _parseCsv(newContent);
+        if (newRows.length > dataRows.length) {
+          headers = newRows.first.map((h) => h.trim()).toList();
+          dataRows = newRows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+          selEncoding = recEnc;
+        }
+      }
     }
 
     final result = await showDialog<Map<String, int>>(
@@ -445,7 +603,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Container(
                   width: 650,
-                  constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+                  constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.9),
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(24),
                     child: Column(
@@ -471,6 +629,73 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         ),
                         const SizedBox(height: 20),
 
+                        // ERP Template Selector
+                        const Text('\u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u0645\u0635\u062f\u0631:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: List.generate(_erpTemplates.length, (i) {
+                            final tpl = _erpTemplates[i];
+                            final isSelected = selTemplate == i;
+                            return GestureDetector(
+                              onTap: () {
+                                setSt(() {
+                                  selTemplate = i;
+                                  final t = _erpTemplates[i];
+                                  final h = headers.map((h) => h.toLowerCase()).toList();
+                                  selCode = _findCol(h, List<String>.from(t['code']));
+                                  selName = _findCol(h, List<String>.from(t['name_col']));
+                                  selClass = _findCol(h, List<String>.from(t['class']));
+                                  selSection = _findCol(h, List<String>.from(t['section']));
+                                  selBalance = _findCol(h, List<String>.from(t['balance']));
+                                  // Switch encoding if CSV
+                                  if (csvBytes != null && ext == 'csv') {
+                                    final enc = t['encoding'] as String;
+                                    if (enc != 'auto' && enc != selEncoding) {
+                                      final newContent = enc == 'windows-1256' ? _decodeCp1256(csvBytes) : _decodeAsUtf8(csvBytes);
+                                      final newRows = _parseCsv(newContent);
+                                      if (newRows.length >= 2) {
+                                        headers = newRows.first.map((h) => h.trim()).toList();
+                                        dataRows = newRows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+                                        selEncoding = enc;
+                                        // Re-detect with new headers
+                                        final hh = headers.map((h) => h.toLowerCase()).toList();
+                                        selCode = _findCol(hh, List<String>.from(t['code']));
+                                        selName = _findCol(hh, List<String>.from(t['name_col']));
+                                        selClass = _findCol(hh, List<String>.from(t['class']));
+                                        selSection = _findCol(hh, List<String>.from(t['section']));
+                                        selBalance = _findCol(hh, List<String>.from(t['balance']));
+                                      }
+                                    }
+                                  }
+                                  if (selCode < 0 && selName < 0 && headers.length >= 2) {
+                                    selCode = 0;
+                                    selName = 1;
+                                  }
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? AppColors.gold : AppColors.navyMid,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: isSelected ? AppColors.gold : AppColors.borderColor),
+                                ),
+                                child: Text(
+                                  tpl['name'] as String,
+                                  style: TextStyle(
+                                    color: isSelected ? AppColors.navy : AppColors.textMid,
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: 16),
+
                         // Encoding selector (CSV only)
                         if (ext == 'csv' && csvBytes != null) ...[
                           const Text('\u0627\u0644\u062a\u0631\u0645\u064a\u0632:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
@@ -478,29 +703,25 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           Wrap(
                             spacing: 8,
                             children: [
-                              _encChip('\u062a\u0644\u0642\u0627\u0626\u064a', initialEncoding, selEncoding, () {
-                                final rows = _parseCsv(initialEncoding == 'windows-1256' ? _decodeCp1256(csvBytes) : _decodeAsUtf8(csvBytes));
-                                setSt(() {
-                                  selEncoding = initialEncoding;
-                                  headers = rows.first.map((h) => h.trim()).toList();
-                                  dataRows = rows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
-                                });
-                              }),
                               _encChip('UTF-8', 'utf-8', selEncoding, () {
                                 final rows = _parseCsv(_decodeAsUtf8(csvBytes));
-                                setSt(() {
-                                  selEncoding = 'utf-8';
-                                  headers = rows.first.map((h) => h.trim()).toList();
-                                  dataRows = rows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
-                                });
+                                if (rows.length >= 2) {
+                                  setSt(() {
+                                    selEncoding = 'utf-8';
+                                    headers = rows.first.map((h) => h.trim()).toList();
+                                    dataRows = rows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+                                  });
+                                }
                               }),
                               _encChip('Windows-1256', 'windows-1256', selEncoding, () {
                                 final rows = _parseCsv(_decodeCp1256(csvBytes));
-                                setSt(() {
-                                  selEncoding = 'windows-1256';
-                                  headers = rows.first.map((h) => h.trim()).toList();
-                                  dataRows = rows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
-                                });
+                                if (rows.length >= 2) {
+                                  setSt(() {
+                                    selEncoding = 'windows-1256';
+                                    headers = rows.first.map((h) => h.trim()).toList();
+                                    dataRows = rows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+                                  });
+                                }
                               }),
                             ],
                           ),
@@ -660,18 +881,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          SizedBox(
-            width: 130,
-            child: Text(label, style: const TextStyle(color: AppColors.textColor, fontSize: 13)),
-          ),
+          SizedBox(width: 130, child: Text(label, style: const TextStyle(color: AppColors.textColor, fontSize: 13))),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: AppColors.navyMid,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.borderColor),
-              ),
+              decoration: BoxDecoration(color: AppColors.navyMid, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.borderColor)),
               child: DropdownButton<int>(
                 value: value,
                 items: items,
@@ -700,14 +914,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: isSelected ? AppColors.gold : AppColors.borderColor),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? AppColors.navy : AppColors.textMid,
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
+        child: Text(label, style: TextStyle(color: isSelected ? AppColors.navy : AppColors.textMid, fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
       ),
     );
   }
