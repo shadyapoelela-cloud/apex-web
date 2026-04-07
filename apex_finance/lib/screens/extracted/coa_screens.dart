@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart' as intl;
 
 // Color scheme for APEX Platform
@@ -167,7 +168,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'رحلة مخطط الحسابات',
+                  'مرحلة اعتماد شجرة الحسابات',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -181,20 +182,63 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           Row(
             children: [
               Text(
-                '${widget.clientName} • ',
+                '\${widget.clientName} • ',
                 style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textMid,
                 ),
               ),
               Text(
-                'معرف العميل: ${widget.clientId}',
+                'معرف العميل: \${widget.clientId}',
                 style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textMid,
                 ),
               ),
             ],
+          ),
+          SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () async {
+              try {
+                final result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['xlsx', 'xls', 'csv'],
+                  allowMultiple: false,
+                );
+                if (result != null && result.files.isNotEmpty) {
+                  final file = result.files.first;
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('تم اختيار: \${file.name} (\${(file.size / 1024).toStringAsFixed(0)} KB) — جاري التحليل...'),
+                        backgroundColor: AppColors.greenC,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                    // TODO: Upload file to API and process COA
+                  }
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('خطأ في اختيار الملف: \$e'),
+                      backgroundColor: AppColors.redC,
+                    ),
+                  );
+                }
+              }
+            },
+            icon: const Icon(Icons.upload_file, size: 20),
+            label: const Text('رفع شجرة حسابات (Excel / CSV)'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.gold,
+              foregroundColor: AppColors.navy,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+            ),
           ),
         ],
       ),

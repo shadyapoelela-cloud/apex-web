@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import '../extracted/coa_screens.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -205,8 +206,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           const SizedBox(height: 16),
           _buildStatusBadges(),
           const SizedBox(height: 16),
-          _buildHeaderActions(),
-          const SizedBox(height: 16),
           _buildQuickInfoCards(),
         ],
       ),
@@ -247,45 +246,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   }
 
 
-  Widget _buildHeaderActions() {
-    return Row(
-      textDirection: TextDirection.rtl,
-      children: [
-        ElevatedButton.icon(
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (_) => CoaJourneyScreen(
-                clientId: widget.clientId.toString(),
-                clientName: widget.clientName,
-              ),
-            ));
-          },
-          icon: const Icon(Icons.upload_file, size: 18),
-          label: const Text('رفع شجرة حسابات'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: gold,
-            foregroundColor: navy,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-          ),
-        ),
-        const SizedBox(width: 12),
-        OutlinedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.description, size: 18),
-          label: const Text('رفع مستندات'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: textColor,
-            side: const BorderSide(color: textMid),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildQuickInfoCards() {
     return Row(
@@ -566,13 +526,34 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 ],
               ),
               ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('سيتم تفعيل رفع المستندات قريباً', style: TextStyle(fontFamily: 'Tajawal')),
-                      backgroundColor: Color(0xFFC9A84C),
-                    ),
-                  );
+                onPressed: () async {
+                  try {
+                    final result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
+                      allowMultiple: false,
+                    );
+                    if (result != null && result.files.isNotEmpty) {
+                      final file = result.files.first;
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('تم اختيار: \${file.name} (\${(file.size / 1024).toStringAsFixed(0)} KB)', style: const TextStyle(fontFamily: 'Tajawal')),
+                            backgroundColor: const Color(0xFF34D399),
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('خطأ في اختيار الملف: \$e'),
+                          backgroundColor: const Color(0xFFF87171),
+                        ),
+                      );
+                    }
+                  }
                 },
                 icon: const Icon(Icons.add),
                 label: const Text('تحميل'),
