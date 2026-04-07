@@ -837,9 +837,17 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     setState(() => _ld = true);
-    if(S.token!=null) { ApiService.setToken(S.token!); }
-    final res = await ApiService.listClients();
-    if (mounted) setState(() { _cl = res.success && res.data is List ? res.data as List : []; _ld = false; });
+    try {
+      final r = await http.get(Uri.parse('$_api/clients'), headers: S.hj());
+      if (r.statusCode == 200) {
+        final data = jsonDecode(r.body);
+        if (mounted) setState(() { _cl = data is List ? data : []; _ld = false; });
+      } else {
+        if (mounted) setState(() { _cl = []; _ld = false; });
+      }
+    } catch(e) {
+      if (mounted) setState(() { _cl = []; _ld = false; });
+    }
   }
   final _cName = TextEditingController();
   final _cNameAr = TextEditingController();
