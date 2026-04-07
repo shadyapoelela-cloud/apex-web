@@ -68,8 +68,10 @@ class AC {
 class S {
   static String? token, uid, uname, dname, plan, email;
   static List<String> roles = [];
-  static Map<String,String> h() => {'Authorization':'Bearer ${token??""}'};
-  static Map<String,String> hj() => {'Authorization':'Bearer ${token??""}','Content-Type':'application/json'};
+  static String get liveToken => html.window.localStorage['apex_token'] ?? '';
+  static Map<String,String> lh() => {'Authorization':'Bearer \${liveToken}','Content-Type':'application/json'};
+  static Map<String,String> h() => {'Authorization':'Bearer \${liveToken}'};
+  static Map<String,String> hj() => {'Authorization':'Bearer ${liveToken}','Content-Type':'application/json'};
   static void clear() { token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[]; }
   static String planAr() {
     const m = {'free':'\u0645\u062c\u0627\u0646\u064a','pro':'\u0627\u062d\u062a\u0631\u0627\u0641\u064a','business':'\u0623\u0639\u0645\u0627\u0644','expert':'\u062e\u0628\u064a\u0631','enterprise':'\u0645\u0624\u0633\u0633\u064a'};
@@ -391,8 +393,8 @@ class _MainNavS extends State<MainNav> {
     super.initState();
       Future.delayed(const Duration(milliseconds: 500), () {
       if(S.token!=null) ApiService.setToken(S.token!);
-      http.get(Uri.parse('$_api/clients'), headers: S.hj()).then((r) { if (r.statusCode == 200 && mounted) { final d = jsonDecode(r.body); setState(() => _cl = d is List ? d : []); } });
-      http.get(Uri.parse('$_api/notifications'), headers: S.hj()).then((r) { if (r.statusCode == 200 && mounted) { final d = jsonDecode(r.body); setState(() => _notifs = d is List ? d : []); } });
+      http.get(Uri.parse('$_api/clients'), headers: S.lh()).then((r) { if (r.statusCode == 200 && mounted) { final d = jsonDecode(r.body); setState(() => _cl = d is List ? d : []); } });
+      http.get(Uri.parse('$_api/notifications'), headers: S.lh()).then((r) { if (r.statusCode == 200 && mounted) { final d = jsonDecode(r.body); setState(() => _notifs = d is List ? d : []); } });
       if (mounted) setState(() {});
     });
   }
@@ -840,11 +842,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   Future<void> _load() async {
     setState(() => _ld = true);
     try {
-      // Ensure token is available - re-restore from localStorage if needed
-      if (S.token == null || S.token!.isEmpty) {
-        S.restore();
-      }
-      final tk = S.token ?? '';
+      final tk = html.window.localStorage['apex_token'] ?? '';
       final r = await http.get(
         Uri.parse('$_api/clients'),
         headers: {'Authorization': 'Bearer $tk', 'Content-Type': 'application/json'},
@@ -1168,7 +1166,7 @@ class _NewCS extends State<NewClientScreen> {
     if(_n.text.trim().isEmpty||_t==null){ setState(()=> _e='\u0627\u0644\u0627\u0633\u0645 \u0648\u0627\u0644\u0646\u0648\u0639 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/clients'), headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+      final r = await http.post(Uri.parse('$_api/clients'), headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
         body: jsonEncode({'name_ar':_n.text.trim(),'client_type_code':_t}));
       if(jsonDecode(r.body)['success']==true) { if(mounted) Navigator.pop(context); }
       else { setState(()=> _e=jsonDecode(r.body)['detail']); }
@@ -1364,7 +1362,7 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
     setState((){ _l=true; _e=null; });
     try {
       final r = await http.post(Uri.parse('$_api/knowledge-feedback'),
-        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
         body: jsonEncode({'feedback_type':_type,'title':_title.text.trim(),'description':_desc.text.trim()}));
       if(jsonDecode(r.body)['success']==true) setState(()=> _done=true);
       else setState(()=> _e=jsonDecode(r.body)['detail']);
@@ -1463,13 +1461,13 @@ class _NSRS extends State<NewServiceRequestScreen> {
   final _title=TextEditingController(), _desc=TextEditingController(), _budget=TextEditingController();
   String _urgency='medium'; List _clients=[]; String? _clientId, _e; bool _l=false, _done=false;
   @override void initState() { super.initState();
-    http.get(Uri.parse('$_api/clients'), headers: S.hj()).then((r){ if(r.statusCode == 200 && mounted) setState((){ final d = jsonDecode(r.body); _clients = d is List ? d : (d['clients'] ?? d['data'] ?? []); }); }); }
+    http.get(Uri.parse('$_api/clients'), headers: S.lh()).then((r){ if(r.statusCode == 200 && mounted) setState((){ final d = jsonDecode(r.body); _clients = d is List ? d : (d['clients'] ?? d['data'] ?? []); }); }); }
   Future<void> _go() async {
     if(_title.text.isEmpty||_clientId==null) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0639\u0645\u064a\u0644 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
       final r = await http.post(Uri.parse('$_api/marketplace/requests'),
-        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
         body: jsonEncode({'client_id':_clientId,'title':_title.text.trim(),'description':_desc.text.trim(),
           'urgency':_urgency,'budget_sar':double.tryParse(_budget.text)??0,'deadline_days':14}));
       if(jsonDecode(r.body)['success']==true) setState(()=> _done=true);
@@ -1539,7 +1537,7 @@ class _ProvS extends State<ProviderTab> {
   Future<void> _register() async {
     if(_sel==null) return;
     final r = await http.post(Uri.parse('$_api/service-providers/register'),
-      headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+      headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
       body: jsonEncode({'category':_sel}));
     if(r.statusCode==200) _load();
   }
@@ -1673,7 +1671,7 @@ class _EditPS extends State<EditProfileScreen> {
     setState((){ _l=true; _e=null; });
     try {
       final r = await http.put(Uri.parse('$_api/users/me'),
-        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
         body: jsonEncode({'display_name':_dn.text.trim(),'organization_name':_org.text.trim(),'job_title':_job.text.trim(),'city':_city.text.trim()}));
       if(r.statusCode==200) { S.dname=_dn.text.trim(); setState(()=> _done=true); }
       else { setState(()=> _e=jsonDecode(r.body)['detail']); }
@@ -1716,7 +1714,7 @@ class _ChPwS extends State<ChangePasswordScreen> {
     setState((){ _l=true; _e=null; });
     try {
       final r = await http.post(Uri.parse('$_api/auth/change-password'),
-        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
         body: jsonEncode({'current_password':_cur.text,'new_password':_new1.text}));
       if(r.statusCode==200) setState(()=> _done=true);
       else setState(()=> _e=jsonDecode(r.body)['detail']);
@@ -1755,7 +1753,7 @@ class _CloseAS extends State<CloseAccountScreen> {
     setState((){ _l=true; _e=null; });
     try {
       final r = await http.post(Uri.parse('$_api/account/closure'),
-        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
         body: jsonEncode({'closure_type':_type}));
       if(r.statusCode==200) setState(()=> _done=true);
       else setState(()=> _e=jsonDecode(r.body)['detail']??'\u062e\u0637\u0623');
@@ -1916,7 +1914,7 @@ class _RevCS extends State<ReviewerConsoleScreen> {
   }
   Future<void> _review(String id, String decision) async {
     await http.post(Uri.parse('$_api/admin/knowledge-feedback/$id/review'),
-      headers: {'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
+      headers: {'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
       body: jsonEncode({'decision': decision}));
     _load();
   }
