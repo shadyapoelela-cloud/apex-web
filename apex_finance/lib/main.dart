@@ -40,7 +40,6 @@ void main() {
   // Restore session from localStorage
   if (S.token == null) {
     final restored = S.restore();
-    print('[main] S.restore() returned: $restored, token null: ${S.token == null}, token len: ${S.token?.length ?? 0}');
     if (restored && S.token != null) {
       ApiService.setToken(S.token!);
     }
@@ -388,13 +387,12 @@ class _MainNavS extends State<MainNav> {
   String _userName = S.dname ?? 'User';
   String _clientLabel = '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644';
   @override
-  @override
   void initState() {
     super.initState();
       Future.delayed(const Duration(milliseconds: 500), () {
       if(S.token!=null) ApiService.setToken(S.token!);
-      ApiService.listClients().then((res) { if (res.success && res.data is List && mounted) setState(() => _cl = res.data as List); });
-      ApiService.listNotifications().then((res) { if (res.success && res.data is List && mounted) setState(() => _notifs = res.data as List); });
+      http.get(Uri.parse('$_api/clients'), headers: S.hj()).then((r) { if (r.statusCode == 200 && mounted) { final d = jsonDecode(r.body); setState(() => _cl = d is List ? d : []); } });
+      http.get(Uri.parse('$_api/notifications'), headers: S.hj()).then((r) { if (r.statusCode == 200 && mounted) { final d = jsonDecode(r.body); setState(() => _notifs = d is List ? d : []); } });
       if (mounted) setState(() {});
     });
   }
@@ -847,22 +845,17 @@ class _ClientsS extends ConsumerState<ClientsTab> {
         S.restore();
       }
       final tk = S.token ?? '';
-      print('[ClientsTab] _load called, token length: ${tk.length}, first10: ${tk.length > 10 ? tk.substring(0,10) : tk}');
       final r = await http.get(
         Uri.parse('$_api/clients'),
         headers: {'Authorization': 'Bearer $tk', 'Content-Type': 'application/json'},
       );
-      print('[ClientsTab] Response status: ${r.statusCode}');
       if (r.statusCode == 200) {
         final data = jsonDecode(r.body);
-        print('[ClientsTab] Got ${data is List ? data.length : 0} clients');
         if (mounted) setState(() { _cl = data is List ? data : []; _ld = false; });
       } else {
-        print('[ClientsTab] Error body: ${r.body}');
         if (mounted) setState(() { _cl = []; _ld = false; });
       }
     } catch(e) {
-      print('[ClientsTab] Exception: $e');
       if (mounted) setState(() { _cl = []; _ld = false; });
     }
   }
@@ -1470,7 +1463,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
   final _title=TextEditingController(), _desc=TextEditingController(), _budget=TextEditingController();
   String _urgency='medium'; List _clients=[]; String? _clientId, _e; bool _l=false, _done=false;
   @override void initState() { super.initState();
-    http.get(Uri.parse('$_api/clients'), headers: S.h()).then((r){ if(mounted) setState((){ final d = jsonDecode(r.body); _clients = d is List ? d : (d['clients'] ?? d['data'] ?? []); }); }); }
+    http.get(Uri.parse('$_api/clients'), headers: S.hj()).then((r){ if(r.statusCode == 200 && mounted) setState((){ final d = jsonDecode(r.body); _clients = d is List ? d : (d['clients'] ?? d['data'] ?? []); }); }); }
   Future<void> _go() async {
     if(_title.text.isEmpty||_clientId==null) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0639\u0645\u064a\u0644 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
