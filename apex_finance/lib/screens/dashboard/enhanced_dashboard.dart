@@ -1,5 +1,5 @@
-﻿import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import '../clients/client_detail_screen.dart';
 
 // ════════════════════════════════════════
 // ENHANCED DASHBOARD — Phase 1 Visual Alignment
@@ -218,9 +218,9 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   // ════════════════════════════════════════
   Widget _buildClientPipeline() {
     final clients = [
-      _ClientRow('شركة النور للتجارة', 'التجزئة', 'نشط', greenC, 'COA معتمد', greenC),
-      _ClientRow('مصنع الرياض للحديد', 'التصنيع', 'نشط', greenC, 'COA مراجعة', orangeC),
-      _ClientRow('مؤسسة البناء الحديث', 'الإنشاءات', 'تهيئة', orangeC, 'بدون COA', textDim),
+      _ClientRow('شركة النور للتجارة', 'التجزئة', 'نشط', greenC, 'COA معتمد', greenC, clientId: 1),
+      _ClientRow('مصنع الرياض للحديد', 'التصنيع', 'نشط', greenC, 'COA مراجعة', orangeC, clientId: 2),
+      _ClientRow('مؤسسة البناء الحديث', 'الإنشاءات', 'تهيئة', orangeC, 'بدون COA', textDim, clientId: 3),
     ];
     return _card(
       child: Column(
@@ -243,7 +243,11 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
             final c = e.value;
             final isLast = e.key == clients.length - 1;
             return GestureDetector(
-              onTap: () => context.go('/client-detail', extra: {'id': e.key.toString(), 'name': c.name}),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => ClientDetailScreen(clientId: c.clientId ?? 0, clientName: c.name),
+                ));
+              },
               child: Container(
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
@@ -279,7 +283,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                   _badge(c.coaLabel, c.coaColor),
                 ],
               ),
-              ),
+            ),
             );
           }),
         ],
@@ -506,8 +510,9 @@ class _QAction {
 
 class _ClientRow {
   final String name, sector, statusLabel, coaLabel;
+  final int? clientId;
   final Color statusColor, coaColor;
-  _ClientRow(this.name, this.sector, this.statusLabel, this.statusColor, this.coaLabel, this.coaColor);
+  _ClientRow(this.name, this.sector, this.statusLabel, this.statusColor, this.coaLabel, this.coaColor, {this.clientId});
 }
 
 class _Activity {

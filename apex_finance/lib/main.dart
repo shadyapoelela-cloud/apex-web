@@ -173,7 +173,7 @@ class _LoginS extends State<LoginScreen> {
         body: jsonEncode({'username_or_email': _u.text.trim(), 'password': _p.text}));
       final d = jsonDecode(r.body);
       if (r.statusCode == 200 && d['success'] == true) {
-        S.token = d['tokens']['access_token']; S.uid = d['user']['id'];
+        S.token = d['tokens']['access_token']; ApiService.setToken(S.token!); S.uid = d['user']['id'];
         S.uname = d['user']['username']; S.dname = d['user']['display_name'];
         S.plan = d['user']['plan']; S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
@@ -304,7 +304,7 @@ class _RegS extends State<RegScreen> {
         body: jsonEncode({'username':_un.text.trim(),'email':_em.text.trim(),'display_name':_dn.text.trim(),'password':_pw.text}));
       final d = jsonDecode(r.body);
       if(r.statusCode==200 && d['success']==true) {
-        S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
+        S.token=d['tokens']['access_token']; ApiService.setToken(S.token!); S.uid=d['user']['id'];
         S.uname=d['user']['username']; S.dname=d['user']['display_name'];
         S.plan=d['user']['plan']; S.email=d['user']['email'];
 ApiService.setToken(S.token!);
