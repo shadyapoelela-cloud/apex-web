@@ -798,7 +798,7 @@ class UpgradePlanScreen extends StatelessWidget {
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class ClientsTab extends ConsumerStatefulWidget { const ClientsTab({super.key}); @override ConsumerState<ClientsTab> createState()=>_ClientsS(); }
 class _ClientsS extends ConsumerState<ClientsTab> {
-  List _cl=[]; bool _ld=true;
+  List _cl=[]; bool _ld=true; String _search='';
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     setState(() => _ld = true);
@@ -1030,31 +1030,80 @@ class _ClientsS extends ConsumerState<ClientsTab> {
       ),
     ));
   }
-  @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.gold))),
-    floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: const Icon(Icons.add, color: AC.navy),
-      onPressed: () => _showNewClientWizard(c)),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
-      _cl.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.business_outlined, color: AC.ts, size: 60), const SizedBox(height: 12),
-        const Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621 \u0628\u0639\u062f', style: TextStyle(color: AC.ts))])) :
-      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
-        padding: const EdgeInsets.all(14), itemCount: _cl.length, itemBuilder: (_, i) {
-          final c2 = _cl[i];
-          return InkWell(
-            onTap: () => Navigator.push(c, MaterialPageRoute(
-              builder: (_) => ClientDetailScreen(clientId: c2['id'], clientName: c2['name_ar'] ?? c2['name'] ?? ''))),
-            child: Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
-            child: Row(children: [
-              CircleAvatar(backgroundColor: AC.navy4, radius: 22, child: Text((c2['name_ar']??'?')[0], style: const TextStyle(color: AC.gold, fontSize: 18))),
-              const SizedBox(width: 12),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(c2['name_ar']??'', style: const TextStyle(fontWeight: FontWeight.bold, color: AC.tp, fontSize: 14)),
-                const SizedBox(height: 3),
-                Text('${c2['client_type']??''} \u2022 ${c2['your_role']??''}', style: const TextStyle(color: AC.ts, fontSize: 11))])),
-              if(c2['knowledge_mode']==true) const Icon(Icons.psychology, color: AC.cyan, size: 22)])));
-        })));
+  @override Widget build(BuildContext c) {
+    final filtered = _search.isEmpty ? _cl : _cl.where((c2) {
+      final name = (c2['name_ar'] ?? c2['name'] ?? '').toString().toLowerCase();
+      final type = (c2['client_type'] ?? '').toString().toLowerCase();
+      return name.contains(_search.toLowerCase()) || type.contains(_search.toLowerCase());
+    }).toList();
+    return Scaffold(
+      backgroundColor: AC.navy,
+      floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: const Icon(Icons.add, color: AC.navy),
+        onPressed: () => _showNewClientWizard(c)),
+      body: Column(children: [
+        // Header with title + search
+        Container(padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Row(children: [
+              const Expanded(child: Text('العملاء', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
+              Text('${_cl.length} عميل', style: const TextStyle(color: AC.ts, fontSize: 12)),
+            ]),
+            const SizedBox(height: 12),
+            TextField(
+              onChanged: (v) => setState(() => _search = v),
+              style: const TextStyle(color: AC.tp, fontSize: 13),
+              textAlign: TextAlign.right,
+              decoration: InputDecoration(
+                hintText: 'بحث عن عميل...',
+                hintStyle: const TextStyle(color: AC.ts, fontSize: 12),
+                prefixIcon: const Icon(Icons.search, color: AC.ts, size: 20),
+                filled: true, fillColor: AC.navy3, isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AC.gold)),
+              ),
+            ),
+          ]),
+        ),
+        // Client list
+        Expanded(child: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+          filtered.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.business_outlined, color: AC.ts, size: 60), const SizedBox(height: 12),
+            Text(_cl.isEmpty ? 'لا يوجد عملاء بعد' : 'لا نتائج', style: const TextStyle(color: AC.ts, fontSize: 14)),
+          ])) :
+          RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4), itemCount: filtered.length, itemBuilder: (_, i) {
+              final c2 = filtered[i];
+              final name = c2['name_ar'] ?? c2['name'] ?? '';
+              final type = c2['client_type'] ?? '';
+              final role = c2['your_role'] ?? '';
+              return InkWell(
+                onTap: () => Navigator.push(c, MaterialPageRoute(
+                  builder: (_) => ClientDetailScreen(clientId: c2['id'], clientName: name))),
+                child: Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AC.bdr)),
+                  child: Row(children: [
+                    CircleAvatar(backgroundColor: const Color(0xFFC9A84C).withOpacity(0.15), radius: 24,
+                      child: Text(name.isNotEmpty ? name[0] : '?', style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16))),
+                    const SizedBox(width: 14),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: AC.tp, fontSize: 15)),
+                      const SizedBox(height: 4),
+                      Row(children: [
+                        if (type.isNotEmpty) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                          child: Text(type, style: const TextStyle(color: AC.gold, fontSize: 10))),
+                        if (type.isNotEmpty && role.isNotEmpty) const SizedBox(width: 8),
+                        if (role.isNotEmpty) Text(role, style: const TextStyle(color: AC.ts, fontSize: 11)),
+                      ]),
+                    ])),
+                    const Icon(Icons.chevron_left, color: AC.ts, size: 20),
+                  ])));
+            }))),
+      ]),
+    );
+  }
 }
 
 class NewClientScreen extends StatefulWidget { const NewClientScreen({super.key}); @override State<NewClientScreen> createState()=>_NewCS(); }
