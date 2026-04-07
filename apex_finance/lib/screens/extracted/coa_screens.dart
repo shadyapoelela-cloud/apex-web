@@ -157,13 +157,25 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'رحلة مخطط الحسابات',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: AppColors.gold,
-            ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(Icons.arrow_forward, color: AppColors.gold),
+                tooltip: 'رجوع',
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'رحلة مخطط الحسابات',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.gold,
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 8),
           Row(

@@ -34,7 +34,7 @@
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
 <script>
-// APEX Pre-redirect v4.3 - Fix initial route
+// APEX Pre-redirect v4.4b
 (function(){
   var token = localStorage.getItem('apex_token');
   var hash = window.location.hash || '';
@@ -46,7 +46,7 @@
 })();
 </script>
 <script>
-// APEX Token Interceptor v4.3 - Fetch + XHR + SW cleanup
+// APEX Token Interceptor v4.4b
 (function(){
   var API = 'apex-api-ootk.onrender.com';
   var origFetch = window.fetch;
@@ -92,7 +92,7 @@
     return origSend.apply(this, arguments);
   };
   if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i of r)i.unregister()});caches.keys().then(function(n){for(var k of n)caches.delete(k)})}
-  console.log('[APEX] Token interceptor v4.3 active');
+  console.log('[APEX] v4.4b active');
 })();
 </script>
 </head>

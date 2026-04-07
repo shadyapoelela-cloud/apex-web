@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../extracted/coa_screens.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -661,7 +662,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
             child: Row(
               textDirection: TextDirection.ltr,
               children: [
-                _serviceCard('COA', 'المراجعة', greenC),
+                _serviceCard('COA', 'المراجعة', greenC, onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => CoaJourneyScreen(
+                      clientId: widget.clientId.toString(),
+                      clientName: widget.clientName,
+                    ),
+                  ));
+                }),
                 _serviceCard('TB', 'الميزانية', blueC),
                 _serviceCard('Statements', 'البيانات', orangeC),
                 _serviceCard('Analysis', 'التحليل', purpleC),
@@ -702,7 +710,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => CoaJourneyScreen(
+                        clientId: widget.clientId.toString(),
+                        clientName: widget.clientName,
+                      ),
+                    ));
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: gold,
                     foregroundColor: navy,
@@ -719,8 +734,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     );
   }
 
-  Widget _serviceCard(String title, String subtitle, Color color) {
-    return Container(
+  Widget _serviceCard(String title, String subtitle, Color color, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -760,6 +777,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
             textAlign: TextAlign.center,
           ),
         ],
+      ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../extracted/coa_screens.dart';
 import '../clients/client_detail_screen.dart';
 
 // ════════════════════════════════════════
@@ -8,7 +9,9 @@ import '../clients/client_detail_screen.dart';
 // 4 KPIs + إجراءات سريعة + حالة العملاء + نشاط حديث + الخطوة التالية
 
 class EnhancedDashboard extends StatefulWidget {
-  const EnhancedDashboard({super.key});
+  final VoidCallback? onSwitchToClients;
+  final VoidCallback? onCreateClient;
+  const EnhancedDashboard({super.key, this.onSwitchToClients, this.onCreateClient});
   @override
   State<EnhancedDashboard> createState() => _EnhancedDashboardState();
 }
@@ -146,9 +149,13 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   // ════════════════════════════════════════
   Widget _buildQuickActions() {
     final actions = [
-      _QAction('إنشاء عميل جديد', 'بدء معالج الإنشاء', Icons.add, gold),
-      _QAction('رفع شجرة حسابات', 'COA Upload', Icons.upload_file, blueC),
-      _QAction('عرض العملاء', 'قائمة العملاء', Icons.visibility, greenC),
+      _QAction('إنشاء عميل جديد', 'بدء معالج الإنشاء', Icons.add, gold, onTap: () => widget.onCreateClient?.call()),
+      _QAction('رفع شجرة حسابات', 'COA Upload', Icons.upload_file, blueC, onTap: () {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (_) => CoaJourneyScreen(clientId: '1', clientName: 'شركة النور للتجارة'),
+        ));
+      }),
+      _QAction('عرض العملاء', 'قائمة العملاء', Icons.visibility, greenC, onTap: () => widget.onSwitchToClients?.call()),
       _QAction('تقارير الجودة', 'Quality Reports', Icons.bar_chart, orangeC),
     ];
     return _card(
@@ -177,38 +184,41 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   }
 
   Widget _quickActionTile(_QAction action) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: navyMid,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: borderColor),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(
-              color: action.color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: action.onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: navyMid,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40, height: 40,
+              decoration: BoxDecoration(
+                color: action.color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(action.icon, color: action.color, size: 18),
             ),
-            child: Icon(action.icon, color: action.color, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(action.label,
-                    style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 2),
-                Text(action.desc,
-                    style: TextStyle(color: textDim, fontSize: 10)),
-              ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(action.label,
+                      style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 2),
+                  Text(action.desc,
+                      style: TextStyle(color: textDim, fontSize: 10)),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -403,7 +413,11 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
           ),
           const SizedBox(width: 12),
           ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(
+                builder: (_) => CoaJourneyScreen(clientId: '2', clientName: 'مصنع الرياض للحديد'),
+              ));
+            },
             icon: const Icon(Icons.arrow_back, size: 14),
             label: const Text('انتقل للمراجعة'),
             style: ElevatedButton.styleFrom(
@@ -505,7 +519,8 @@ class _QAction {
   final String label, desc;
   final IconData icon;
   final Color color;
-  _QAction(this.label, this.desc, this.icon, this.color);
+  final VoidCallback? onTap;
+  _QAction(this.label, this.desc, this.icon, this.color, {this.onTap});
 }
 
 class _ClientRow {

@@ -407,7 +407,13 @@ class _MainNavS extends State<MainNav> {
 
 
   @override Widget build(BuildContext c) {
-    final tabs = [const EnhancedDashboard(), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
+    final tabs = [EnhancedDashboard(
+          onSwitchToClients: () => setState(() => _i = 1),
+          onCreateClient: () {
+            setState(() => _i = 1);
+            // Trigger create wizard after tab switch
+          },
+        ), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
     return Scaffold(
       backgroundColor: AC.navy,
       body: Column(children: [
