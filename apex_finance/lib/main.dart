@@ -478,7 +478,7 @@ class _MainNavS extends State<MainNav> {
           title: Text('المسار المالي', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           initiallyExpanded: true,
           children: [
-          _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () { setState(() { _i = 2; _dr = false; }); }),
+          _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () { setState(() { _i = 1; _dr = false; }); }),
           _drawerItem(Icons.table_chart, 'ميزان المراجعة TB', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
           _drawerItem(Icons.receipt_long, 'القوائم المالية', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
           _drawerItem(Icons.analytics_rounded, 'التحليل المالي', () { setState(() { _i = 2; _dr = false; }); }),
