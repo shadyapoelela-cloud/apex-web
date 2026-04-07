@@ -306,7 +306,7 @@ class _RegS extends State<RegScreen> {
       if(r.statusCode==200 && d['success']==true) {
         S.token=d['tokens']['access_token']; ApiService.setToken(S.token!); S.uid=d['user']['id'];
         S.uname=d['user']['username']; S.dname=d['user']['display_name'];
-        S.plan=d['user']['plan']; S.email=d['user']['email'];
+        S.plan=d['user']['plan']; S.email=d['user']['email']; S.save();
 ApiService.setToken(S.token!);
 S.save();
         if(mounted) context.go('/home');
