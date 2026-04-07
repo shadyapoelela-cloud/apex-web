@@ -205,6 +205,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           const SizedBox(height: 16),
           _buildStatusBadges(),
           const SizedBox(height: 16),
+          _buildHeaderActions(),
+          const SizedBox(height: 16),
           _buildQuickInfoCards(),
         ],
       ),
@@ -241,6 +243,47 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           fontWeight: FontWeight.w600,
         ),
       ),
+    );
+  }
+
+
+  Widget _buildHeaderActions() {
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (_) => CoaJourneyScreen(
+                clientId: widget.clientId.toString(),
+                clientName: widget.clientName,
+              ),
+            ));
+          },
+          icon: const Icon(Icons.upload_file, size: 18),
+          label: const Text('رفع شجرة حسابات'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: gold,
+            foregroundColor: navy,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+          ),
+        ),
+        const SizedBox(width: 12),
+        OutlinedButton.icon(
+          onPressed: () {},
+          icon: const Icon(Icons.description, size: 18),
+          label: const Text('رفع مستندات'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: textColor,
+            side: const BorderSide(color: textMid),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+        ),
+      ],
     );
   }
 
@@ -523,7 +566,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 ],
               ),
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('سيتم تفعيل رفع المستندات قريباً', style: TextStyle(fontFamily: 'Tajawal')),
+                      backgroundColor: Color(0xFFC9A84C),
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.add),
                 label: const Text('تحميل'),
                 style: ElevatedButton.styleFrom(
@@ -662,14 +712,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
             child: Row(
               textDirection: TextDirection.ltr,
               children: [
-                _serviceCard('COA', 'المراجعة', greenC, onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => CoaJourneyScreen(
-                      clientId: widget.clientId.toString(),
-                      clientName: widget.clientName,
-                    ),
-                  ));
-                }),
+                _serviceCardCOA(),
                 _serviceCard('TB', 'الميزانية', blueC),
                 _serviceCard('Statements', 'البيانات', orangeC),
                 _serviceCard('Analysis', 'التحليل', purpleC),
@@ -778,6 +821,56 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           ),
         ],
       ),
+      ),
+    );
+  }
+
+
+  Widget _serviceCardCOA() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (_) => CoaJourneyScreen(
+            clientId: widget.clientId.toString(),
+            clientName: widget.clientName,
+          ),
+        ));
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: greenC, width: 2),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 48, height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: greenC.withOpacity(0.2),
+              ),
+              alignment: Alignment.center,
+              child: const Icon(Icons.upload_file, color: greenC, size: 24),
+            ),
+            const SizedBox(height: 8),
+            const Text('COA', style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            const Text('رفع / مراجعة', style: TextStyle(color: greenC, fontSize: 11, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: greenC.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text('انتقل', style: TextStyle(color: greenC, fontSize: 10, fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
       ),
     );
   }
