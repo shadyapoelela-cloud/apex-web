@@ -66,6 +66,27 @@ class S {
     const m = {'free':'\u0645\u062c\u0627\u0646\u064a','pro':'\u0627\u062d\u062a\u0631\u0627\u0641\u064a','business':'\u0623\u0639\u0645\u0627\u0644','expert':'\u062e\u0628\u064a\u0631','enterprise':'\u0645\u0624\u0633\u0633\u064a'};
     return m[plan] ?? plan ?? '\u0645\u062c\u0627\u0646\u064a';
   }
+
+  static void save() {
+    final st = html.window.localStorage;
+    if (token != null) st['apex_token'] = token!;
+    if (uid != null) st['apex_uid'] = uid!;
+    if (uname != null) st['apex_uname'] = uname!;
+    if (dname != null) st['apex_dname'] = dname!;
+    if (plan != null) st['apex_plan'] = plan!;
+    if (email != null) st['apex_email'] = email!;
+    st['apex_roles'] = roles.join(',');
+  }
+  static bool restore() {
+    final st = html.window.localStorage;
+    if (st['apex_token'] == null || st['apex_token']!.isEmpty) return false;
+    token = st['apex_token']; uid = st['apex_uid'];
+    uname = st['apex_uname']; dname = st['apex_dname'];
+    plan = st['apex_plan']; email = st['apex_email'];
+    final r = st['apex_roles'];
+    if (r != null && r.isNotEmpty) roles = r.split(',');
+    return true;
+  }
 }
 
 
@@ -147,6 +168,8 @@ class _LoginS extends State<LoginScreen> {
         S.uname = d['user']['username']; S.dname = d['user']['display_name'];
         S.plan = d['user']['plan']; S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
+ApiService.setToken(S.token!);
+S.save();
       } else { setState(() { _e = d['detail'] ?? '\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u062f\u062e\u0648\u0644'; _l = false; }); }
     } catch (e) { setState(() { _e = '\u062e\u0637\u0623 \u0627\u0644\u0627\u062a\u0635\u0627\u0644: $e'; _l = false; }); }
   }
@@ -275,6 +298,8 @@ class _RegS extends State<RegScreen> {
         S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
         S.uname=d['user']['username']; S.dname=d['user']['display_name'];
         S.plan=d['user']['plan']; S.email=d['user']['email'];
+ApiService.setToken(S.token!);
+S.save();
         if(mounted) context.go('/home');
       } else { setState(()=> _e=d['detail']??d['error']??'\u062e\u0637\u0623'); }
     } catch(e){ setState(()=> _e='$e'); }
