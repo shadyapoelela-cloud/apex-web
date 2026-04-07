@@ -25,6 +25,7 @@ import 'screens/extracted/notification_screens_v2.dart';
 import 'screens/extracted/legal_screens_v2.dart';
 import 'screens/extracted/client_screens.dart';
 import 'screens/extracted/coa_screens.dart';
+import 'screens/clients/client_detail_screen.dart';
 import 'screens/auth/forgot_password_flow.dart';
 import 'screens/copilot/copilot_screen.dart';
 import 'screens/settings/enhanced_settings_screen.dart';
@@ -1009,7 +1010,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
           final c2 = _cl[i];
           return InkWell(
             onTap: () => Navigator.push(c, MaterialPageRoute(
-              builder: (_) => CoaUploadScreen(clientId: c2['id'], clientName: c2['name_ar'] ?? c2['name'] ?? ''))),
+              builder: (_) => ClientDetailScreen(clientId: c2['id'], clientName: c2['name_ar'] ?? c2['name'] ?? ''))),
             child: Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
             child: Row(children: [
