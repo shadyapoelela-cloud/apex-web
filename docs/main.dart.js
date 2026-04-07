@@ -6274,7 +6274,7 @@ else if(o==="%")A.AD(a,s,"ZoneID should not contain % anymore")
 i.a=m+o
 s+=3
 r=s
-q=!0}else if(p<127&&(B.jX[p>>>4]&1<<(p&15))!==0){if(q&&65<=p&&90>=p){if(i==null)i=new A.c_("")
+q=!0}else if(p<127&&(B.jY[p>>>4]&1<<(p&15))!==0){if(q&&65<=p&&90>=p){if(i==null)i=new A.c_("")
 if(r<s){i.a+=B.c.R(a,r,s)
 r=s}q=!1}++s}else{l=1
 if((p&64512)===55296&&s+1<c){k=a.charCodeAt(s+1)
@@ -6364,7 +6364,7 @@ q=A.aNy(s)
 p=A.aNy(r)
 if(q<0||p<0)return"%"
 o=q*16+p
-if(o<127&&(B.jX[B.m.eK(o,4)]&1<<(o&15))!==0)return A.dR(c&&65<=o&&90>=o?(o|32)>>>0:o)
+if(o<127&&(B.jY[B.m.eK(o,4)]&1<<(o&15))!==0)return A.dR(c&&65<=o&&90>=o?(o|32)>>>0:o)
 if(s>=97||r>=97)return B.c.R(a,b,b+3).toUpperCase()
 return null},
 aQZ(a){var s,r,q,p,o,n="0123456789ABCDEF"
@@ -42492,10 +42492,10 @@ A.aKX.prototype={
 $2(a,b){var s=this.b,r=this.a
 s.a+=r.a
 r.a="&"
-r=A.a3Q(B.jX,a,B.ae,!0)
+r=A.a3Q(B.jY,a,B.ae,!0)
 r=s.a+=r
 if(b!=null&&b.length!==0){s.a=r+"="
-r=A.a3Q(B.jX,b,B.ae,!0)
+r=A.a3Q(B.jY,b,B.ae,!0)
 s.a+=r}},
 $S:279}
 A.aKW.prototype={
@@ -49126,7 +49126,7 @@ e.r=q.e4(p,A.cb(B.tw,!0,d))
 e.w=q.e4(p,A.cb(B.tG,!0,d))
 e.x=q.e4(p,A.cb(B.tu,!0,d))
 if(o<0&&n<0&&b.length>=2){e.e=0
-e.f=1}for(m=0,l=0,k=1;k<12;++k){j=B.jY[k]
+e.f=1}for(m=0,l=0,k=1;k<12;++k){j=B.jU[k]
 i=q.e4(p,A.cb(j.h(0,"code"),!0,d))>=0?2:0
 if(q.e4(p,A.cb(j.h(0,"name_col"),!0,d))>=0)i+=2
 if(q.e4(p,A.cb(j.h(0,"class"),!0,d))>=0)++i
@@ -49134,7 +49134,7 @@ if(q.e4(p,A.cb(j.h(0,"section"),!0,d))>=0)++i
 if(q.e4(p,A.cb(j.h(0,"balance"),!0,d))>=0)++i
 if(i>l){l=i
 m=k}}if(l>=3){e.d=m
-j=B.jY[m]
+j=B.jU[m]
 e.e=q.e4(p,A.cb(j.h(0,"code"),!0,d))
 e.f=q.e4(p,A.cb(j.h(0,"name_col"),!0,d))
 e.r=q.e4(p,A.cb(j.h(0,"class"),!0,d))
@@ -49394,7 +49394,7 @@ if(r.length>25)r=B.c.R(r,0,25)+"..."
 return A.aPh(A.l(""+(a+1)+": "+r,s,s,s,s,B.eS,s,s),a,t.S)},
 $S:639}
 A.axk.prototype={
-$1(a){var s=this,r=null,q=B.jY[a],p=s.a,o=p.d===a,n=o?B.e:B.bA,m=A.X(20),l=A.aV(o?B.e:B.bo,1),k=A.b_(q.h(0,"name")),j=o?B.N:B.aw
+$1(a){var s=this,r=null,q=B.jU[a],p=s.a,o=p.d===a,n=o?B.e:B.bA,m=A.X(20),l=A.aV(o?B.e:B.bo,1),k=A.b_(q.h(0,"name")),j=o?B.N:B.aw
 return A.cB(r,A.N(r,A.l(k,r,r,r,r,A.a8(r,r,j,r,r,r,r,r,r,r,r,12,r,r,o?B.u:B.E,r,r,!0,r,r,r,r,r,r,r,r),r,r),B.i,r,r,new A.a0(n,r,l,m,r,r,B.n),r,r,r,B.jj,r,r,r),B.x,!1,r,r,r,r,r,r,r,r,r,r,r,r,r,r,new A.axi(p,s.b,s.c,a,s.d,s.e),r,r,r,r,r,r)},
 $S:640}
 A.axi.prototype={
@@ -49404,7 +49404,7 @@ $S:0}
 A.axa.prototype={
 $0(){var s,r,q,p,o,n,m,l,k,j=this,i="name_col",h=j.c,g=j.a
 g.d=h
-s=B.jY[h]
+s=B.jU[h]
 r=g.a
 q=A.R(r).i("M<1,d>")
 p=A.a2(new A.M(r,new A.ax2(),q),!0,q.i("aj.E"))
@@ -52955,7 +52955,7 @@ m.U2(!1)
 s=d.f
 if(s.ao(0,j)){r=m.adH()
 q=s.h(0,j)
-if(q!=null)A.dh(new A.dZ(q),"Relationships",l).gN(0).dI$.E(0,A.aQy(A.zj("Relationship"),A.a([A.qj(A.zj("Id"),"rId"+r,B.ec),A.qj(A.zj("Type"),u.g,B.ec),A.qj(A.zj("Target"),k,B.ec)],t.Fd),B.jV,!0))
+if(q!=null)A.dh(new A.dZ(q),"Relationships",l).gN(0).dI$.E(0,A.aQy(A.zj("Relationship"),A.a([A.qj(A.zj("Id"),"rId"+r,B.ec),A.qj(A.zj("Type"),u.g,B.ec),A.qj(A.zj("Target"),k,B.ec)],t.Fd),B.jW,!0))
 q=m.b
 p="rId"+r
 if(!B.b.n(q,p))q.push(p)
@@ -52963,7 +52963,7 @@ e.a=!0
 q=s.h(0,h)
 if(q!=null)A.dh(new A.dZ(q),g,l).a6(0,new A.ajz(e,i))
 if(e.a){e=s.h(0,h)
-if(e!=null)A.dh(new A.dZ(e),"Types",l).gN(0).dI$.E(0,A.aQy(A.zj(g),A.a([A.qj(A.zj("PartName"),"/xl/sharedStrings.xml",B.ec),A.qj(A.zj("ContentType"),i,B.ec)],t.Fd),B.jV,!0))}}o=B.bN.ci('<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"/>')
+if(e!=null)A.dh(new A.dZ(e),"Types",l).gN(0).dI$.E(0,A.aQy(A.zj(g),A.a([A.qj(A.zj("PartName"),"/xl/sharedStrings.xml",B.ec),A.qj(A.zj("ContentType"),i,B.ec)],t.Fd),B.jW,!0))}}o=B.bN.ci('<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"/>')
 c.Xs(0,A.b3G(f,o.length,o,0))
 b=c.mp(f)}b.nz()
 n=A.Hu(B.ae.aU(0,b.gmh(0)))
@@ -91404,7 +91404,7 @@ r=A.a([],s)
 q=c.y
 q.toString
 p=J.A(q,null)
-if(p==null)p=B.jU
+if(p==null)p=B.jV
 o=A.B(t.ob,t.UX)
 q=c.y
 q.toString
@@ -91424,8 +91424,8 @@ if(j){r=A.a([],s)
 i=c.y
 i.toString
 p=J.A(i,h.gfK())
-if(p==null)p=B.jU}else{r=B.jU
-p=B.jU}l=h
+if(p==null)p=B.jV}else{r=B.jV
+p=B.jV}l=h
 continue}if(j){i=h.b
 i=i==null?b:i.ga_M()
 j=i===!0}else j=!1
@@ -100584,7 +100584,7 @@ ar1(a){var s=a.c,r=s.gcJ(s)
 a.gDd()
 return new A.aZ(s,r,null,null,a.f,a.b,a.d,null,B.agK)},
 KP(a,b){var s=t.N,r=A.B(s,s),q=this.ae1(a,r)
-if(J.cG(q))return new A.dI(B.jW,B.k6,a,b,new A.x5("no routes for location: "+a.l(0)),A.yj(B.jW))
+if(J.cG(q))return new A.dI(B.jX,B.k6,a,b,new A.x5("no routes for location: "+a.l(0)),A.yj(B.jX))
 return new A.dI(q,r,a,b,null,A.yj(q))},
 auk(a){return this.KP(a,null)},
 ae1(a,b){var s,r,q,p,o
@@ -100613,7 +100613,7 @@ q.l(0)
 return s}catch(o){q=A.aI(o)
 if(q instanceof A.x5){r=q
 r.toString
-return new A.dI(B.jW,B.k6,b,null,r,A.yj(B.jW))}else throw o}},
+return new A.dI(B.jX,B.k6,b,null,r,A.yj(B.jX))}else throw o}},
 RM(a){return new A.M(a,new A.amu(),A.R(a).i("M<1,d>")).bH(0," => ")},
 l(a){return"RouterConfiguration: "+A.m(this.a.a.a)},
 asN(){var s,r,q=new A.c_("")
@@ -104456,7 +104456,7 @@ if(q==null)q=r.a(q)
 if(p.$1(q))return q}return null},
 grM(a){return this.tm$}}
 A.arm.prototype={
-gd2(a){return B.jV}}
+gd2(a){return B.jW}}
 A.zi.prototype={
 qn(a){var s,r,q,p=A.a5Y(a,null)
 for(s=this.gd2(this).a,r=A.R(s),s=new J.cP(s,s.length,r.i("cP<1>")),r=r.c;s.q();){q=s.d
@@ -104820,7 +104820,7 @@ s=A.aQB(o)
 this.b=s
 if(s==null)this.nx(0,o,a.ko$)},
 Na(a){return this.nx(0,new A.HB(a.e,a.f,null),a)},
-Nb(a){var s,r=this,q=A.aXR(a.e,r.JT(a.f),B.jV,!0)
+Nb(a){var s,r=this,q=A.aXR(a.e,r.JT(a.f),B.jW,!0)
 if(a.r)r.nx(0,q,a)
 else{s=r.b
 if(s!=null)s.dI$.E(0,q)
@@ -109637,6 +109637,76 @@ B.Yx=new A.pk("en","US")
 B.tz=A.a(s([B.Yx]),t.ss)
 B.tA=A.a(s([0,0,65490,12287,65535,34815,65534,18431]),t.t)
 B.WF=A.a(s([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]),t.t)
+B.cA={name:0,icon:1,encoding:2,code:3,name_col:4,class:5,section:6,balance:7}
+B.tE=A.a(s(["code","account_code","account code","acc_code","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0631\u0642\u0645","\u0631\u0645\u0632","\u0631\u0642\u0645","\u0643\u0648\u062f","\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.tC=A.a(s(["name","account_name","account name","description","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0627\u0633\u0645","\u0627\u0644\u062d\u0633\u0627\u0628","\u0628\u064a\u0627\u0646","\u0627\u0644\u0648\u0635\u0641"]),t.s)
+B.tG=A.a(s(["section","category","group","parent","\u0627\u0644\u0642\u0633\u0645","\u0627\u0644\u0641\u0626\u0629","\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
+B.a_q=new A.bG(B.cA,["\u0643\u0634\u0641 \u062a\u0644\u0642\u0627\u0626\u064a",59444,"auto",B.tE,B.tC,B.tw,B.tG,B.tu],t.yf)
+B.Wz=A.a(s(["saknr","account number","account","gl account","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","ktonr","hkont"]),t.s)
+B.Y1=A.a(s(["txt50","txt20","sakt","description","short text","long text","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0648\u0635\u0641"]),t.s)
+B.Wx=A.a(s(["ktoks","account group","account type","gvtyp","\u0645\u062c\u0645\u0648\u0639\u0629 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u062a\u0635\u0646\u064a\u0641"]),t.s)
+B.Xa=A.a(s(["bilkt","mitkz","xbilk","\u0627\u0644\u0642\u0633\u0645","bs category"]),t.s)
+B.XS=A.a(s(["balance","saldo","hsl","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
+B.a_n=new A.bG(B.cA,["SAP",58122,"windows-1256",B.Wz,B.Y1,B.Wx,B.Xa,B.XS],t.yf)
+B.Yc=A.a(s(["segment1","account","gl_code","account_number","code_combination","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.WA=A.a(s(["description","account_description","segment1_desc","account_name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0648\u0635\u0641"]),t.s)
+B.Wq=A.a(s(["account_type","type","acct_type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u062a\u0635\u0646\u064a\u0641"]),t.s)
+B.X8=A.a(s(["parent_segment","summary_account","roll_up_group","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
+B.XU=A.a(s(["begin_balance","balance","period_net","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
+B.a_x=new A.bG(B.cA,["Oracle",58122,"utf-8",B.Yc,B.WA,B.Wq,B.X8,B.XU],t.yf)
+B.WE=A.a(s(["code","code/id","\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0631\u0645\u0632"]),t.s)
+B.Y2=A.a(s(["name","name/id","\u0627\u0644\u0627\u0633\u0645","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Yt=A.a(s(["user_type_id","user_type","account_type","internal_type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Yj=A.a(s(["parent_id","group_id","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
+B.Yk=A.a(s(["balance","debit","credit","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
+B.a_m=new A.bG(B.cA,["Odoo",58122,"utf-8",B.WE,B.Y2,B.Yt,B.Yj,B.Yk],t.yf)
+B.X0=A.a(s(["code","\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0631\u0645\u0632","\u0631\u0642\u0645"]),t.s)
+B.VT=A.a(s(["name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0627\u0633\u0645"]),t.s)
+B.WL=A.a(s(["account type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628","type"]),t.s)
+B.Vo=A.a(s(["parent account code","\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628","parent"]),t.s)
+B.n8=A.a(s(["balance","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
+B.a_p=new A.bG(B.cA,["\u0642\u064a\u0648\u062f (Qoyod)",58122,"utf-8",B.X0,B.VT,B.WL,B.Vo,B.n8],t.yf)
+B.XW=A.a(s(["code","account_code","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0631\u0642\u0645"]),t.s)
+B.Wy=A.a(s(["name","account_name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0627\u0633\u0645"]),t.s)
+B.Wk=A.a(s(["type","account_type","\u0627\u0644\u0646\u0648\u0639","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Xb=A.a(s(["parent","parent_account","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0631\u0626\u064a\u0633\u064a"]),t.s)
+B.Y7=A.a(s(["balance","\u0627\u0644\u0631\u0635\u064a\u062f","\u0627\u0644\u0645\u0628\u0644\u063a"]),t.s)
+B.a_t=new A.bG(B.cA,["\u062f\u0641\u062a\u0631\u0629 (Daftra)",58122,"utf-8",B.XW,B.Wy,B.Wk,B.Xb,B.Y7],t.yf)
+B.XO=A.a(s(["code","account code","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Wo=A.a(s(["name","account name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Wm=A.a(s(["type","account type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Xd=A.a(s(["parent","parent account","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
+B.a_u=new A.bG(B.cA,["\u0648\u0627\u0641\u0642 (Wafeq)",58122,"utf-8",B.XO,B.Wo,B.Wm,B.Xd,B.n8],t.yf)
+B.X6=A.a(s(["account_no","account no","acc_no","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0631\u0642\u0645","\u0643\u0648\u062f"]),t.s)
+B.Y8=A.a(s(["account_name","account name","acc_name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0627\u0633\u0645","\u0628\u064a\u0627\u0646 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Y0=A.a(s(["account_type","type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u062a\u0635\u0646\u064a\u0641","\u0637\u0628\u064a\u0639\u0629 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Ya=A.a(s(["parent_account","main_account","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0631\u0626\u064a\u0633\u064a","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
+B.Y9=A.a(s(["balance","opening_balance","\u0627\u0644\u0631\u0635\u064a\u062f","\u0631\u0635\u064a\u062f \u0627\u0641\u062a\u062a\u0627\u062d\u064a"]),t.s)
+B.a_s=new A.bG(B.cA,["\u0623\u0648\u0646\u0643\u0633 (ONYX)",58122,"windows-1256",B.X6,B.Y8,B.Y0,B.Ya,B.Y9],t.yf)
+B.X9=A.a(s(["name","account_number","account number","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Wl=A.a(s(["account_name","account name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.VJ=A.a(s(["root_type","account_type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.WD=A.a(s(["parent_account","parent","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
+B.a_w=new A.bG(B.cA,["ERPNext",58122,"utf-8",B.X9,B.Wl,B.VJ,B.WD,B.n8],t.yf)
+B.XV=A.a(s(["ledger code","code","account code","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Vl=A.a(s(["ledger name","name","particulars","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Yd=A.a(s(["group","under","account group","\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629"]),t.s)
+B.Yr=A.a(s(["parent","under group","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
+B.X4=A.a(s(["closing balance","balance","amount","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
+B.a_o=new A.bG(B.cA,["Tally",58122,"windows-1256",B.XV,B.Vl,B.Yd,B.Yr,B.X4],t.yf)
+B.Wn=A.a(s(["account_id","account id","transaction type","sku","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Wj=A.a(s(["account_name","description","product name","marketplace","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0648\u0635\u0641"]),t.s)
+B.WG=A.a(s(["type","transaction type","category","\u0627\u0644\u0646\u0648\u0639"]),t.s)
+B.Y3=A.a(s(["category","group","\u0627\u0644\u0641\u0626\u0629"]),t.s)
+B.Ys=A.a(s(["total","amount","balance","\u0627\u0644\u0645\u0628\u0644\u063a","\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a"]),t.s)
+B.a_v=new A.bG(B.cA,["Amazon",58122,"utf-8",B.Wn,B.Wj,B.WG,B.Y3,B.Ys],t.yf)
+B.Yu=A.a(s(["mainaccountid","main account","account number","ledgeraccount","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.X5=A.a(s(["name","description","account name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Xc=A.a(s(["mainaccountcategory","account type","type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
+B.Wa=A.a(s(["parentaccount","parent","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
+B.Yf=A.a(s(["openingbalance","balance","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
+B.a_r=new A.bG(B.cA,["Microsoft Dynamics",58122,"utf-8",B.Yu,B.X5,B.Xc,B.Wa,B.Yf],t.yf)
+B.jU=A.a(s([B.a_q,B.a_n,B.a_x,B.a_m,B.a_p,B.a_t,B.a_u,B.a_s,B.a_w,B.a_o,B.a_v,B.a_r]),t.H7)
 B.a6z=new A.fD("\u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a",null,null)
 B.a6F=new A.fD("\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a",null,null)
 B.a6H=new A.fD("\u0627\u0644\u062e\u062f\u0645\u0627\u062a",null,null)
@@ -109652,17 +109722,14 @@ B.b9=new A.GP(0,"upstream")
 B.WY=A.a(s([B.b9,B.t]),A.aQ("w<GP>"))
 B.aN=new A.uR(1,"ltr")
 B.n9=A.a(s([B.a0,B.aN]),A.aQ("w<uR>"))
-B.tC=A.a(s(["name","account_name","account name","description","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0627\u0633\u0645","\u0627\u0644\u062d\u0633\u0627\u0628","\u0628\u064a\u0627\u0646","\u0627\u0644\u0648\u0635\u0641"]),t.s)
 B.tD=A.a(s([0,0,32776,33792,1,10240,0,0]),t.t)
 B.WZ=A.a(s([47,47,47,47,72,97,122,147]),t.t)
 B.X_=A.a(s(["left","right","top","bottom","diagonal"]),t.s)
 B.X1=A.a(s([1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577]),t.t)
 B.X7=A.a(s([0,1996959894,3993919788,2567524794,124634137,1886057615,3915621685,2657392035,249268274,2044508324,3772115230,2547177864,162941995,2125561021,3887607047,2428444049,498536548,1789927666,4089016648,2227061214,450548861,1843258603,4107580753,2211677639,325883990,1684777152,4251122042,2321926636,335633487,1661365465,4195302755,2366115317,997073096,1281953886,3579855332,2724688242,1006888145,1258607687,3524101629,2768942443,901097722,1119000684,3686517206,2898065728,853044451,1172266101,3705015759,2882616665,651767980,1373503546,3369554304,3218104598,565507253,1454621731,3485111705,3099436303,671266974,1594198024,3322730930,2970347812,795835527,1483230225,3244367275,3060149565,1994146192,31158534,2563907772,4023717930,1907459465,112637215,2680153253,3904427059,2013776290,251722036,2517215374,3775830040,2137656763,141376813,2439277719,3865271297,1802195444,476864866,2238001368,4066508878,1812370925,453092731,2181625025,4111451223,1706088902,314042704,2344532202,4240017532,1658658271,366619977,2362670323,4224994405,1303535960,984961486,2747007092,3569037538,1256170817,1037604311,2765210733,3554079995,1131014506,879679996,2909243462,3663771856,1141124467,855842277,2852801631,3708648649,1342533948,654459306,3188396048,3373015174,1466479909,544179635,3110523913,3462522015,1591671054,702138776,2966460450,3352799412,1504918807,783551873,3082640443,3233442989,3988292384,2596254646,62317068,1957810842,3939845945,2647816111,81470997,1943803523,3814918930,2489596804,225274430,2053790376,3826175755,2466906013,167816743,2097651377,4027552580,2265490386,503444072,1762050814,4150417245,2154129355,426522225,1852507879,4275313526,2312317920,282753626,1742555852,4189708143,2394877945,397917763,1622183637,3604390888,2714866558,953729732,1340076626,3518719985,2797360999,1068828381,1219638859,3624741850,2936675148,906185462,1090812512,3747672003,2825379669,829329135,1181335161,3412177804,3160834842,628085408,1382605366,3423369109,3138078467,570562233,1426400815,3317316542,2998733608,733239954,1555261956,3268935591,3050360625,752459403,1541320221,2607071920,3965973030,1969922972,40735498,2617837225,3943577151,1913087877,83908371,2512341634,3803740692,2075208622,213261112,2463272603,3855990285,2094854071,198958881,2262029012,4057260610,1759359992,534414190,2176718541,4139329115,1873836001,414664567,2282248934,4279200368,1711684554,285281116,2405801727,4167216745,1634467795,376229701,2685067896,3608007406,1308918612,956543938,2808555105,3495958263,1231636301,1047427035,2932959818,3654703836,1088359270,936918e3,2847714899,3736837829,1202900863,817233897,3183342108,3401237130,1404277552,615818150,3134207493,3453421203,1423857449,601450431,3009837614,3294710456,1567103746,711928724,3020668471,3272380065,1510334235,755167117]),t.t)
-B.tE=A.a(s(["code","account_code","account code","acc_code","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0631\u0642\u0645","\u0631\u0645\u0632","\u0631\u0642\u0645","\u0643\u0648\u062f","\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
 B.Xe=A.a(s([8364,1662,8218,402,8222,8230,8224,8225,710,8240,1657,8249,338,1670,1688,1672,1711,8216,8217,8220,8221,8226,8211,8212,1705,8482,1681,8250,339,8204,8205,1722,160,1548,162,163,164,165,166,167,168,169,1726,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,1563,187,188,189,190,1567,1729,1569,1570,1571,1572,1573,1574,1575,1576,1577,1578,1579,1580,1581,1582,1583,1584,1585,1586,1587,1588,1589,1590,215,1591,1592,1593,1594,1600,1601,1602,1603,224,1604,226,1605,1606,1607,1608,231,232,233,234,235,1609,1610,238,239,1611,1612,1613,1614,244,1615,1616,247,1617,249,1618,251,252,8206,8207,1746]),t.t)
 B.Xf=A.a(s([1,2,4,8,16,32,64,128,27,54,108,216,171,77,154,47,94,188,99,198,151,53,106,212,179,125,250,239,197,145]),t.t)
 B.tF=A.a(s(["text","multiline","number","phone","datetime","emailAddress","url","visiblePassword","name","address","none"]),t.s)
-B.tG=A.a(s(["section","category","group","parent","\u0627\u0644\u0642\u0633\u0645","\u0627\u0644\u0641\u0626\u0629","\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
 B.Xg=A.a(s(["click","scroll"]),t.s)
 B.jA=new A.iU(0,100)
 B.tH=A.a(s([B.jA,B.mG,B.mH,B.E,B.aL,B.aT,B.u,B.fo,B.ds]),A.aQ("w<iU>"))
@@ -109675,14 +109742,14 @@ B.Xw=A.a(s([]),t.lX)
 B.XJ=A.a(s([]),t.fJ)
 B.Xs=A.a(s([]),t.ER)
 B.aiw=A.a(s([]),t.tc)
-B.jU=A.a(s([]),t.jl)
+B.jV=A.a(s([]),t.jl)
 B.XC=A.a(s([]),t.wi)
 B.tJ=A.a(s([]),A.aQ("w<aVO>"))
 B.XB=A.a(s([]),A.aQ("w<hg<@>>"))
 B.Xz=A.a(s([]),t.Vz)
 B.nb=A.a(s([]),t.AO)
 B.XI=A.a(s([]),t.yo)
-B.jW=A.a(s([]),t.i3)
+B.jX=A.a(s([]),t.i3)
 B.nc=A.a(s([]),t.K1)
 B.XA=A.a(s([]),t.D1)
 B.nd=A.a(s([]),t.QF)
@@ -109691,7 +109758,7 @@ B.XH=A.a(s([]),t.Lx)
 B.Xr=A.a(s([]),t.fm)
 B.na=A.a(s([]),t.p)
 B.Xx=A.a(s([]),t.Fd)
-B.jV=A.a(s([]),t.ov)
+B.jW=A.a(s([]),t.ov)
 B.XF=A.a(s([]),A.aQ("w<hP>"))
 B.Xv=A.a(s([]),t.lD)
 B.Xq=A.a(s([]),t.t)
@@ -109757,7 +109824,7 @@ B.Gn=new A.fb(13,"Thin")
 B.Y5=A.a(s([B.lD,B.Go,B.Gp,B.Gq,B.Gr,B.Gs,B.Gt,B.Gu,B.Gv,B.Gw,B.Gk,B.Gl,B.Gm,B.Gn]),A.aQ("w<fb>"))
 B.tM=A.a(s([1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608,16777216,33554432,67108864,134217728,268435456,536870912,1073741824,2147483648]),t.t)
 B.a4=A.a(s([2774754246,2222750968,2574743534,2373680118,234025727,3177933782,2976870366,1422247313,1345335392,50397442,2842126286,2099981142,436141799,1658312629,3870010189,2591454956,1170918031,2642575903,1086966153,2273148410,368769775,3948501426,3376891790,200339707,3970805057,1742001331,4255294047,3937382213,3214711843,4154762323,2524082916,1539358875,3266819957,486407649,2928907069,1780885068,1513502316,1094664062,49805301,1338821763,1546925160,4104496465,887481809,150073849,2473685474,1943591083,1395732834,1058346282,201589768,1388824469,1696801606,1589887901,672667696,2711000631,251987210,3046808111,151455502,907153956,2608889883,1038279391,652995533,1764173646,3451040383,2675275242,453576978,2659418909,1949051992,773462580,756751158,2993581788,3998898868,4221608027,4132590244,1295727478,1641469623,3467883389,2066295122,1055122397,1898917726,2542044179,4115878822,1758581177,0,753790401,1612718144,536673507,3367088505,3982187446,3194645204,1187761037,3653156455,1262041458,3729410708,3561770136,3898103984,1255133061,1808847035,720367557,3853167183,385612781,3309519750,3612167578,1429418854,2491778321,3477423498,284817897,100794884,2172616702,4031795360,1144798328,3131023141,3819481163,4082192802,4272137053,3225436288,2324664069,2912064063,3164445985,1211644016,83228145,3753688163,3249976951,1977277103,1663115586,806359072,452984805,250868733,1842533055,1288555905,336333848,890442534,804056259,3781124030,2727843637,3427026056,957814574,1472513171,4071073621,2189328124,1195195770,2892260552,3881655738,723065138,2507371494,2690670784,2558624025,3511635870,2145180835,1713513028,2116692564,2878378043,2206763019,3393603212,703524551,3552098411,1007948840,2044649127,3797835452,487262998,1994120109,1004593371,1446130276,1312438900,503974420,3679013266,168166924,1814307912,3831258296,1573044895,1859376061,4021070915,2791465668,2828112185,2761266481,937747667,2339994098,854058965,1137232011,1496790894,3077402074,2358086913,1691735473,3528347292,3769215305,3027004632,4199962284,133494003,636152527,2942657994,2390391540,3920539207,403179536,3585784431,2289596656,1864705354,1915629148,605822008,4054230615,3350508659,1371981463,602466507,2094914977,2624877800,555687742,3712699286,3703422305,2257292045,2240449039,2423288032,1111375484,3300242801,2858837708,3628615824,84083462,32962295,302911004,2741068226,1597322602,4183250862,3501832553,2441512471,1489093017,656219450,3114180135,954327513,335083755,3013122091,856756514,3144247762,1893325225,2307821063,2811532339,3063651117,572399164,2458355477,552200649,1238290055,4283782570,2015897680,2061492133,2408352771,4171342169,2156497161,386731290,3669999461,837215959,3326231172,3093850320,3275833730,2962856233,1999449434,286199582,3417354363,4233385128,3602627437,974525996]),t.t)
-B.jX=A.a(s([0,0,24576,1023,65534,34815,65534,18431]),t.t)
+B.jY=A.a(s([0,0,24576,1023,65534,34815,65534,18431]),t.t)
 B.bw=new A.fF(0,"icon")
 B.bL=new A.fF(1,"input")
 B.aV=new A.fF(2,"label")
@@ -109800,73 +109867,6 @@ B.bV=new A.mq(1,"avatar")
 B.dj=new A.mq(2,"deleteIcon")
 B.Yq=A.a(s([B.cf,B.bV,B.dj]),A.aQ("w<mq>"))
 B.nf=A.a(s([0,0,65498,45055,65535,34815,65534,18431]),t.t)
-B.cA={name:0,icon:1,encoding:2,code:3,name_col:4,class:5,section:6,balance:7}
-B.a_u=new A.bG(B.cA,["\u0638\u0192\u0637\xb4\u0638\u067e \u0637\u06be\u0638\u201e\u0638\u201a\u0637\xa7\u0637\xa6\u0638\u0679",59444,"auto",B.tE,B.tC,B.tw,B.tG,B.tu],t.yf)
-B.Wz=A.a(s(["saknr","account number","account","gl account","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","ktonr","hkont"]),t.s)
-B.Y1=A.a(s(["txt50","txt20","sakt","description","short text","long text","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0648\u0635\u0641"]),t.s)
-B.Wx=A.a(s(["ktoks","account group","account type","gvtyp","\u0645\u062c\u0645\u0648\u0639\u0629 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u062a\u0635\u0646\u064a\u0641"]),t.s)
-B.Xa=A.a(s(["bilkt","mitkz","xbilk","\u0627\u0644\u0642\u0633\u0645","bs category"]),t.s)
-B.XS=A.a(s(["balance","saldo","hsl","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
-B.a_n=new A.bG(B.cA,["SAP",58122,"windows-1256",B.Wz,B.Y1,B.Wx,B.Xa,B.XS],t.yf)
-B.Yc=A.a(s(["segment1","account","gl_code","account_number","code_combination","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.WA=A.a(s(["description","account_description","segment1_desc","account_name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0648\u0635\u0641"]),t.s)
-B.Wq=A.a(s(["account_type","type","acct_type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u062a\u0635\u0646\u064a\u0641"]),t.s)
-B.X8=A.a(s(["parent_segment","summary_account","roll_up_group","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
-B.XU=A.a(s(["begin_balance","balance","period_net","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
-B.a_x=new A.bG(B.cA,["Oracle",58122,"utf-8",B.Yc,B.WA,B.Wq,B.X8,B.XU],t.yf)
-B.WE=A.a(s(["code","code/id","\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0631\u0645\u0632"]),t.s)
-B.Y2=A.a(s(["name","name/id","\u0627\u0644\u0627\u0633\u0645","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Yt=A.a(s(["user_type_id","user_type","account_type","internal_type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Yj=A.a(s(["parent_id","group_id","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
-B.Yk=A.a(s(["balance","debit","credit","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
-B.a_m=new A.bG(B.cA,["Odoo",58122,"utf-8",B.WE,B.Y2,B.Yt,B.Yj,B.Yk],t.yf)
-B.X0=A.a(s(["code","\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0631\u0645\u0632","\u0631\u0642\u0645"]),t.s)
-B.VT=A.a(s(["name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0627\u0633\u0645"]),t.s)
-B.WL=A.a(s(["account type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628","type"]),t.s)
-B.Vo=A.a(s(["parent account code","\u0631\u0645\u0632 \u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628","parent"]),t.s)
-B.n8=A.a(s(["balance","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
-B.a_p=new A.bG(B.cA,["\u0642\u064a\u0648\u062f (Qoyod)",58122,"utf-8",B.X0,B.VT,B.WL,B.Vo,B.n8],t.yf)
-B.XW=A.a(s(["code","account_code","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0631\u0642\u0645"]),t.s)
-B.Wy=A.a(s(["name","account_name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0627\u0633\u0645"]),t.s)
-B.Wk=A.a(s(["type","account_type","\u0627\u0644\u0646\u0648\u0639","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Xb=A.a(s(["parent","parent_account","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0631\u0626\u064a\u0633\u064a"]),t.s)
-B.Y7=A.a(s(["balance","\u0627\u0644\u0631\u0635\u064a\u062f","\u0627\u0644\u0645\u0628\u0644\u063a"]),t.s)
-B.a_s=new A.bG(B.cA,["\u062f\u0641\u062a\u0631\u0629 (Daftra)",58122,"utf-8",B.XW,B.Wy,B.Wk,B.Xb,B.Y7],t.yf)
-B.XO=A.a(s(["code","account code","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Wo=A.a(s(["name","account name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Wm=A.a(s(["type","account type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Xd=A.a(s(["parent","parent account","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
-B.a_t=new A.bG(B.cA,["\u0648\u0627\u0641\u0642 (Wafeq)",58122,"utf-8",B.XO,B.Wo,B.Wm,B.Xd,B.n8],t.yf)
-B.X6=A.a(s(["account_no","account no","acc_no","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0631\u0642\u0645","\u0643\u0648\u062f"]),t.s)
-B.Y8=A.a(s(["account_name","account name","acc_name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0627\u0633\u0645","\u0628\u064a\u0627\u0646 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Y0=A.a(s(["account_type","type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u062a\u0635\u0646\u064a\u0641","\u0637\u0628\u064a\u0639\u0629 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Ya=A.a(s(["parent_account","main_account","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0631\u0626\u064a\u0633\u064a","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
-B.Y9=A.a(s(["balance","opening_balance","\u0627\u0644\u0631\u0635\u064a\u062f","\u0631\u0635\u064a\u062f \u0627\u0641\u062a\u062a\u0627\u062d\u064a"]),t.s)
-B.a_r=new A.bG(B.cA,["\u0623\u0648\u0646\u0643\u0633 (ONYX)",58122,"windows-1256",B.X6,B.Y8,B.Y0,B.Ya,B.Y9],t.yf)
-B.X9=A.a(s(["name","account_number","account number","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Wl=A.a(s(["account_name","account name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.VJ=A.a(s(["root_type","account_type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.WD=A.a(s(["parent_account","parent","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
-B.a_w=new A.bG(B.cA,["ERPNext",58122,"utf-8",B.X9,B.Wl,B.VJ,B.WD,B.n8],t.yf)
-B.XV=A.a(s(["ledger code","code","account code","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Vl=A.a(s(["ledger name","name","particulars","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Yd=A.a(s(["group","under","account group","\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629"]),t.s)
-B.Yr=A.a(s(["parent","under group","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
-B.X4=A.a(s(["closing balance","balance","amount","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
-B.a_o=new A.bG(B.cA,["Tally",58122,"windows-1256",B.XV,B.Vl,B.Yd,B.Yr,B.X4],t.yf)
-B.Wn=A.a(s(["account_id","account id","transaction type","sku","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Wj=A.a(s(["account_name","description","product name","marketplace","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628","\u0627\u0644\u0648\u0635\u0641"]),t.s)
-B.WG=A.a(s(["type","transaction type","category","\u0627\u0644\u0646\u0648\u0639"]),t.s)
-B.Y3=A.a(s(["category","group","\u0627\u0644\u0641\u0626\u0629"]),t.s)
-B.Ys=A.a(s(["total","amount","balance","\u0627\u0644\u0645\u0628\u0644\u063a","\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a"]),t.s)
-B.a_v=new A.bG(B.cA,["Amazon",58122,"utf-8",B.Wn,B.Wj,B.WG,B.Y3,B.Ys],t.yf)
-B.Yu=A.a(s(["mainaccountid","main account","account number","ledgeraccount","\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.X5=A.a(s(["name","description","account name","\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Xc=A.a(s(["mainaccountcategory","account type","type","\u0646\u0648\u0639 \u0627\u0644\u062d\u0633\u0627\u0628"]),t.s)
-B.Wa=A.a(s(["parentaccount","parent","\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0628"]),t.s)
-B.Yf=A.a(s(["openingbalance","balance","\u0627\u0644\u0631\u0635\u064a\u062f"]),t.s)
-B.a_q=new A.bG(B.cA,["Microsoft Dynamics",58122,"utf-8",B.Yu,B.X5,B.Xc,B.Wa,B.Yf],t.yf)
-B.jY=A.a(s([B.a_u,B.a_n,B.a_x,B.a_m,B.a_p,B.a_s,B.a_t,B.a_r,B.a_w,B.a_o,B.a_v,B.a_q]),t.H7)
 B.Yw=A.a(s(["pointerdown","pointermove","pointerleave","pointerup","pointercancel","touchstart","touchend","touchmove","touchcancel","mousedown","mousemove","mouseleave","mouseup"]),t.s)
 B.G=new A.DP(0,"ignored")
 B.bR=new A.i(4294967304)
