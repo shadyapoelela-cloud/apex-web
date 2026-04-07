@@ -1,4 +1,5 @@
-﻿import 'dart:convert';
+﻿import 'main.dart';
+import 'dart:convert';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:http/http.dart' as http;
@@ -6,10 +7,11 @@ import 'package:http/http.dart' as http;
 class ApiService {
   static const _base = 'https://apex-api-ootk.onrender.com';
   static String? _token;
+  static String? get _effectiveToken => _token ?? S.token;
   static void setToken(String t) => _token = t;
   static void clearToken() => _token = null;
   static bool get isAuthenticated => _token != null;
-  static Map<String,String> get _h => {'Content-Type':'application/json', if(_token!=null)'Authorization':'Bearer $_token'};
+  static Map<String,String> get _h => {'Content-Type':'application/json', if(_token!=null)'Authorization':'Bearer ${_effectiveToken}'};
 
   // ── Auth ──
   static Future<ApiResult> login(String username, String password) => _post('/auth/login', {'username_or_email':username,'password':password});
@@ -76,7 +78,7 @@ class ApiService {
   static Future<ApiResult> uploadCoa({required String clientId, required List<int> bytes, required String fileName}) async {
     try {
       final request = http.MultipartRequest('POST', Uri.parse('$_base/clients/$clientId/coa/upload'));
-      if(_token!=null) request.headers['Authorization']='Bearer $_token';
+      if(_token!=null) request.headers['Authorization']='Bearer ${_effectiveToken}';
       request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fileName));
       final res = await request.send();
       final body = await res.stream.bytesToString();
@@ -103,7 +105,7 @@ class ApiService {
   static Future<ApiResult> uploadTb({required String clientId, required List<int> bytes, required String fileName, String? coaUploadId, String? periodLabel}) async {
     try {
       final request = http.MultipartRequest('POST', Uri.parse('$_base/clients/$clientId/tb/upload'));
-      if(_token!=null) request.headers['Authorization']='Bearer $_token';
+      if(_token!=null) request.headers['Authorization']='Bearer ${_effectiveToken}';
       request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fileName));
       if(coaUploadId!=null) request.fields['coa_upload_id']=coaUploadId;
       if(periodLabel!=null) request.fields['period_label']=periodLabel;
@@ -128,7 +130,7 @@ class ApiService {
   static Future<ApiResult> analyzeTrialBalance({required List<int> bytes, required String fileName, String industry='general'}) async {
     try {
       final request = http.MultipartRequest('POST', Uri.parse('$_base/analyze/trial-balance?industry=$industry'));
-      if(_token!=null) request.headers['Authorization']='Bearer $_token';
+      if(_token!=null) request.headers['Authorization']='Bearer ${_effectiveToken}';
       request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fileName));
       final res = await request.send();
       final body = await res.stream.bytesToString();
