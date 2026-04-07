@@ -33,19 +33,10 @@
 
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
-
-
-
 <script>
-if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i of r)i.unregister()});caches.keys().then(function(n){for(var k of n)caches.delete(k)})}
-</script>
-
-<script>
-// APEX Token Interceptor v4.1b - Fetch + XHR
+// APEX Token Interceptor v4.2 - Fetch + XHR
 (function(){
   var API = 'apex-api-ootk.onrender.com';
-
-  // === INTERCEPT FETCH API ===
   var origFetch = window.fetch;
   window.fetch = function(input, init) {
     var url = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
@@ -54,34 +45,24 @@ if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(func
       init.headers = init.headers || {};
       var token = localStorage.getItem('apex_token');
       if (token) {
-        // Handle Headers object or plain object
-        if (init.headers instanceof Headers) {
-          init.headers.set('Authorization', 'Bearer ' + token);
-        } else {
-          init.headers['Authorization'] = 'Bearer ' + token;
-        }
+        if (init.headers instanceof Headers) { init.headers.set('Authorization', 'Bearer ' + token); }
+        else { init.headers['Authorization'] = 'Bearer ' + token; }
       }
     }
     return origFetch.apply(this, arguments);
   };
-
-  // === INTERCEPT XHR ===
   var origOpen = XMLHttpRequest.prototype.open;
   var origSetHeader = XMLHttpRequest.prototype.setRequestHeader;
   var origSend = XMLHttpRequest.prototype.send;
-
   XMLHttpRequest.prototype.open = function(method, url) {
-    this._apex_url = url;
-    this._apex_headers = {};
+    this._apex_url = url; this._apex_headers = {};
     return origOpen.apply(this, arguments);
   };
-
-  // Override setRequestHeader to fix empty Authorization
   XMLHttpRequest.prototype.setRequestHeader = function(name, value) {
     if (this._apex_url && this._apex_url.indexOf(API) !== -1) {
       if (name === 'Authorization' || name === 'authorization') {
         var token = localStorage.getItem('apex_token');
-        if (token && (!value || value === 'Bearer ' || value === 'Bearer null' || value === 'Bearer undefined' || value.length < 20)) {
+        if (token && (!value || value === 'Bearer ' || value === 'Bearer null' || value.length < 20)) {
           value = 'Bearer ' + token;
         }
         this._apex_headers[name] = value;
@@ -89,21 +70,17 @@ if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(func
     }
     return origSetHeader.call(this, name, value);
   };
-
   XMLHttpRequest.prototype.send = function(body) {
-    // If no Authorization was set at all, add it
     if (this._apex_url && this._apex_url.indexOf(API) !== -1) {
       if (!this._apex_headers['Authorization'] && !this._apex_headers['authorization']) {
         var token = localStorage.getItem('apex_token');
-        if (token) {
-          try { origSetHeader.call(this, 'Authorization', 'Bearer ' + token); } catch(e) {}
-        }
+        if (token) { try { origSetHeader.call(this, 'Authorization', 'Bearer ' + token); } catch(e) {} }
       }
     }
     return origSend.apply(this, arguments);
   };
-
-  console.log('[APEX] Token interceptor v4.1b active (Fetch+XHR)');
+  if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i of r)i.unregister()});caches.keys().then(function(n){for(var k of n)caches.delete(k)})}
+  console.log('[APEX] Token interceptor v4.2 active');
 })();
 </script>
 </head>

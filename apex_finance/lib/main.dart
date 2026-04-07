@@ -69,10 +69,16 @@ class S {
   static String? token, uid, uname, dname, plan, email;
   static List<String> roles = [];
   static String get liveToken => html.window.localStorage['apex_token'] ?? '';
-  static Map<String,String> lh() => {'Authorization':'Bearer \${liveToken}','Content-Type':'application/json'};
-  static Map<String,String> h() => {'Authorization':'Bearer \${liveToken}'};
+  static Map<String,String> lh() => {'Authorization':'Bearer ${liveToken}','Content-Type':'application/json'};
+  static Map<String,String> h() => {'Authorization':'Bearer ${liveToken}'};
   static Map<String,String> hj() => {'Authorization':'Bearer ${liveToken}','Content-Type':'application/json'};
-  static void clear() { token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[]; }
+  static void clear() {
+    token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[];
+    final st = html.window.localStorage;
+    st.remove('apex_token'); st.remove('apex_uid'); st.remove('apex_uname');
+    st.remove('apex_dname'); st.remove('apex_plan'); st.remove('apex_email');
+    st.remove('apex_roles');
+  }
   static String planAr() {
     const m = {'free':'\u0645\u062c\u0627\u0646\u064a','pro':'\u0627\u062d\u062a\u0631\u0627\u0641\u064a','business':'\u0623\u0639\u0645\u0627\u0644','expert':'\u062e\u0628\u064a\u0631','enterprise':'\u0645\u0624\u0633\u0633\u064a'};
     return m[plan] ?? plan ?? '\u0645\u062c\u0627\u0646\u064a';
