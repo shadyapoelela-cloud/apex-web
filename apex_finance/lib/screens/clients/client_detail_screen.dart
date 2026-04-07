@@ -94,28 +94,28 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       setState(() {
         documentsData = [
           {
-            'name': 'Commercial Registration',
+            'name': 'السجل التجاري',
             'required': true,
             'status': 'uploaded',
             'uploaded_date': '2024-01-20',
             'expiry_date': '2025-01-20',
           },
           {
-            'name': 'VAT Certificate',
+            'name': 'شهادة الضريبة',
             'required': true,
             'status': 'missing',
             'uploaded_date': null,
             'expiry_date': null,
           },
           {
-            'name': 'Bank Statement',
+            'name': 'كشف بنكي',
             'required': true,
             'status': 'accepted',
             'uploaded_date': '2024-01-18',
             'expiry_date': null,
           },
           {
-            'name': 'Board Minutes',
+            'name': 'محضر اجتماع',
             'required': true,
             'status': 'rejected',
             'uploaded_date': '2024-01-10',
@@ -500,66 +500,23 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'المستندات المطلوبة',
-                    style: const TextStyle(
-                      color: textColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$uploaded من $mandatory مكتملة',
-                    style: TextStyle(
-                      color: textMid,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+              Text(
+                'المستندات المطلوبة',
+                style: const TextStyle(
+                  color: textColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  try {
-                    final result = await FilePicker.platform.pickFiles(
-                      type: FileType.custom,
-                      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
-                      allowMultiple: false,
-                    );
-                    if (result != null && result.files.isNotEmpty) {
-                      final file = result.files.first;
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('تم اختيار: \${file.name} (\${(file.size / 1024).toStringAsFixed(0)} KB)', style: const TextStyle(fontFamily: 'Tajawal')),
-                            backgroundColor: const Color(0xFF34D399),
-                          ),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('خطأ في اختيار الملف: \$e'),
-                          backgroundColor: const Color(0xFFF87171),
-                        ),
-                      );
-                    }
-                  }
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('تحميل'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: gold,
-                  foregroundColor: navy,
+              const SizedBox(height: 4),
+              Text(
+                '$uploaded من $mandatory مكتملة',
+                style: TextStyle(
+                  color: textMid,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -580,6 +537,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
 
   Widget _documentCard(Map<String, dynamic> doc) {
     Color statusColor = _statusColor(doc['status']);
+    bool isMissing = doc['status'] == 'missing';
+    bool isRejected = doc['status'] == 'rejected';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -593,7 +552,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       padding: const EdgeInsets.all(12),
       child: Row(
         textDirection: TextDirection.rtl,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Column(
@@ -602,12 +560,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 Row(
                   textDirection: TextDirection.rtl,
                   children: [
-                    Text(
-                      doc['name'],
-                      style: const TextStyle(
-                        color: textColor,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        doc['name'],
+                        style: const TextStyle(
+                          color: textColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     if (doc['required'] == true) ...[
@@ -643,6 +603,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               ],
             ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
@@ -658,6 +619,74 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               ),
             ),
           ),
+          const SizedBox(width: 8),
+          if (isMissing || isRejected)
+            SizedBox(
+              height: 32,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  try {
+                    final result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
+                      allowMultiple: false,
+                    );
+                    if (result != null && result.files.isNotEmpty) {
+                      final file = result.files.first;
+                      if (context.mounted) {
+                        setState(() {
+                          doc['status'] = 'uploaded';
+                          doc['uploaded_date'] = DateTime.now().toString().substring(0, 10);
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('تم رفع \${file.name} بنجاح'),
+                            backgroundColor: const Color(0xFF34D399),
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('خطأ: \$e'), backgroundColor: const Color(0xFFF87171)),
+                      );
+                    }
+                  }
+                },
+                icon: const Icon(Icons.upload_file, size: 14),
+                label: const Text('رفع', style: TextStyle(fontSize: 11)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFC9A84C),
+                  foregroundColor: const Color(0xFF050D1A),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: 32,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('عرض المستند...'),
+                      backgroundColor: Color(0xFF60A5FA),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.visibility, size: 14),
+                label: const Text('عرض', style: TextStyle(fontSize: 11)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF60A5FA),
+                  side: const BorderSide(color: Color(0xFF60A5FA)),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                ),
+              ),
+            ),
         ],
       ),
     );

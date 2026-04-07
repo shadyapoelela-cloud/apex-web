@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:csv/csv.dart';
 import 'package:intl/intl.dart' as intl;
 
 // Color scheme for APEX Platform
@@ -38,7 +41,9 @@ class CoaJourneyScreen extends StatefulWidget {
 class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  int currentStage = 1; // 0-6 for the 7 stages
+  int currentStage = 0; // 0=Upload stage (gold), completed stages=cyan
+  bool _isUploading = false;
+  String _uploadedFileName = '';
 
   // Mock data structures
   List<AccountData> accounts = [];
@@ -199,28 +204,32 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           ),
           SizedBox(height: 16),
           ElevatedButton.icon(
-            onPressed: () async {
+            onPressed: _isUploading ? null : () async {
               try {
                 final result = await FilePicker.platform.pickFiles(
                   type: FileType.custom,
                   allowedExtensions: ['xlsx', 'xls', 'csv'],
                   allowMultiple: false,
+                  withData: true,
                 );
                 if (result != null && result.files.isNotEmpty) {
                   final file = result.files.first;
                   if (mounted) {
+                    setState(() { _isUploading = true; _uploadedFileName = file.name; });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('تم اختيار: \${file.name} (\${(file.size / 1024).toStringAsFixed(0)} KB) — جاري التحليل...'),
-                        backgroundColor: AppColors.greenC,
-                        duration: const Duration(seconds: 3),
+                        content: Text('جاري تحليل: \${file.name}...'),
+                        backgroundColor: AppColors.gold,
+                        duration: const Duration(seconds: 2),
                       ),
                     );
-                    // TODO: Upload file to API and process COA
+                    // Parse the CSV/Excel file
+                    await _parseUploadedFile(file);
                   }
                 }
               } catch (e) {
                 if (mounted) {
+                  setState(() { _isUploading = false; });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('خطأ في اختيار الملف: \$e'),
@@ -231,7 +240,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               }
             },
             icon: const Icon(Icons.upload_file, size: 20),
-            label: const Text('رفع شجرة حسابات (Excel / CSV)'),
+            label: Text(_isUploading ? 'جاري التحليل...' : currentStage > 0 ? 'تم الرفع — إعادة الرفع' : 'رفع شجرة حسابات (Excel / CSV)'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.gold,
               foregroundColor: AppColors.navy,
@@ -243,6 +252,124 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         ],
       ),
     );
+  }
+
+
+  Future<void> _parseUploadedFile(dynamic file) async {
+    try {
+      final bytes = file.bytes as Uint8List?;
+      if (bytes == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('لا يمكن قراءة الملف'), backgroundColor: AppColors.redC),
+          );
+          setState(() { _isUploading = false; });
+        }
+        return;
+      }
+
+      final content = utf8.decode(bytes, allowMalformed: true);
+      List<List<dynamic>> rows;
+
+      // Parse CSV content
+      rows = const CsvToListConverter(eol: '\n', shouldParseNumbers: true).convert(content);
+
+      if (rows.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('الملف فارغ'), backgroundColor: AppColors.redC),
+          );
+          setState(() { _isUploading = false; });
+        }
+        return;
+      }
+
+      // First row is headers
+      final headers = rows.first.map((h) => h.toString().trim().toLowerCase()).toList();
+      final dataRows = rows.skip(1).where((r) => r.isNotEmpty && r.any((c) => c.toString().trim().isNotEmpty)).toList();
+
+      // Map columns â€” flexible header matching
+      int codeCol = _findCol(headers, ['code', 'account_code', 'رقم الحساب', 'الرقم', 'رمز']);
+      int nameCol = _findCol(headers, ['name', 'account_name', 'اسم الحساب', 'الاسم', 'الحساب']);
+      int classCol = _findCol(headers, ['classification', 'class', 'type', 'التصنيف', 'النوع']);
+      int sectionCol = _findCol(headers, ['section', 'category', 'القسم', 'الفئة']);
+      int balanceCol = _findCol(headers, ['balance', 'amount', 'الرصيد', 'المبلغ']);
+
+      // Fallback: if no headers match, use positional (code, name, class, section, balance)
+      if (codeCol < 0 && headers.length >= 2) {
+        codeCol = 0;
+        nameCol = 1;
+        classCol = headers.length > 2 ? 2 : -1;
+        sectionCol = headers.length > 3 ? 3 : -1;
+        balanceCol = headers.length > 4 ? 4 : -1;
+      }
+
+      List<AccountData> parsed = [];
+      for (final row in dataRows) {
+        String code = codeCol >= 0 && codeCol < row.length ? row[codeCol].toString().trim() : '';
+        String name = nameCol >= 0 && nameCol < row.length ? row[nameCol].toString().trim() : '';
+        String classification = classCol >= 0 && classCol < row.length ? row[classCol].toString().trim() : 'غير مصنف';
+        String section = sectionCol >= 0 && sectionCol < row.length ? row[sectionCol].toString().trim() : 'عام';
+        double balance = 0;
+        if (balanceCol >= 0 && balanceCol < row.length) {
+          final bVal = row[balanceCol];
+          if (bVal is num) {
+            balance = bVal.toDouble();
+          } else {
+            balance = double.tryParse(bVal.toString().replaceAll(',', '').replaceAll(' ', '')) ?? 0;
+          }
+        }
+
+        if (code.isNotEmpty || name.isNotEmpty) {
+          parsed.add(AccountData(
+            code: code.isNotEmpty ? code : '\${parsed.length + 1}',
+            name: name.isNotEmpty ? name : 'حساب \${parsed.length + 1}',
+            classification: classification,
+            section: section,
+            balance: balance,
+            confidence: 95.0,
+            status: 'Imported',
+          ));
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          if (parsed.isNotEmpty) {
+            accounts = parsed;
+            currentStage = 1; // Advance to Analysis stage
+          }
+          _isUploading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('تم استيراد \${parsed.length} حساب من \$_uploadedFileName'),
+            backgroundColor: AppColors.greenC,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() { _isUploading = false; });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في تحليل الملف: \$e'),
+            backgroundColor: AppColors.redC,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
+  }
+
+  int _findCol(List<String> headers, List<String> candidates) {
+    for (final c in candidates) {
+      final idx = headers.indexWhere((h) => h.contains(c));
+      if (idx >= 0) return idx;
+    }
+    return -1;
   }
 
   Widget _buildStagePipeline() {
@@ -311,9 +438,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     Color shadowCol;
 
     if (isComplete) {
-      bgColor = AppColors.greenC;
+      bgColor = const Color(0xFF22D3EE);
       textCol = Colors.white;
-      shadowCol = AppColors.greenC.withOpacity(0.3);
+      shadowCol = const Color(0xFF22D3EE).withOpacity(0.3);
     } else if (isCurrent) {
       bgColor = AppColors.gold;
       textCol = AppColors.navy;
@@ -365,7 +492,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       width: 40,
       height: 4,
       margin: EdgeInsets.only(bottom: 26),
-      color: isComplete ? AppColors.greenC : AppColors.textDim.withOpacity(0.3),
+      color: isComplete ? const Color(0xFF22D3EE) : AppColors.textDim.withOpacity(0.3),
     );
   }
 
