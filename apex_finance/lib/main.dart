@@ -388,6 +388,7 @@ class _MainNavS extends State<MainNav> {
   void initState() {
     super.initState();
       Future.delayed(const Duration(milliseconds: 500), () {
+      if(S.token!=null) ApiService.setToken(S.token!);
       ApiService.listClients().then((res) { if (res.success && res.data is List && mounted) setState(() => _cl = res.data as List); });
       ApiService.listNotifications().then((res) { if (res.success && res.data is List && mounted) setState(() => _notifs = res.data as List); });
       if (mounted) setState(() {});
@@ -836,6 +837,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     setState(() => _ld = true);
+    if(S.token!=null) { ApiService.setToken(S.token!); }
     final res = await ApiService.listClients();
     if (mounted) setState(() { _cl = res.success && res.data is List ? res.data as List : []; _ld = false; });
   }
