@@ -33,7 +33,37 @@
 
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
-<script>if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i of r)i.unregister()});caches.keys().then(function(n){for(var k of n)caches.delete(k)})}</script>
+
+<script>
+// APEX Token Interceptor v4.1
+(function(){
+  var origOpen = XMLHttpRequest.prototype.open;
+  var origSend = XMLHttpRequest.prototype.send;
+
+  XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+    this._apex_url = url;
+    this._apex_method = method;
+    return origOpen.apply(this, arguments);
+  };
+
+  XMLHttpRequest.prototype.send = function(body) {
+    if (this._apex_url && this._apex_url.indexOf('apex-api') !== -1) {
+      var token = localStorage.getItem('apex_token');
+      if (token) {
+        try { this.setRequestHeader('Authorization', 'Bearer ' + token); } catch(e) {}
+      }
+    }
+    return origSend.apply(this, arguments);
+  };
+
+  console.log('[APEX] Token interceptor v4.1 active');
+})();
+</script>
+
+<script>
+if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i of r)i.unregister()});caches.keys().then(function(n){for(var k of n)caches.delete(k)})}
+</script>
+
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
