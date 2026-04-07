@@ -34,7 +34,19 @@
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
 <script>
-// APEX Token Interceptor v4.2 - Fetch + XHR
+// APEX Pre-redirect v4.3 - Fix initial route
+(function(){
+  var token = localStorage.getItem('apex_token');
+  var hash = window.location.hash || '';
+  if (token && token.length > 10) {
+    if (!hash || hash === '#/' || hash === '#/login' || hash === '') {
+      window.location.hash = '#/home';
+    }
+  }
+})();
+</script>
+<script>
+// APEX Token Interceptor v4.3 - Fetch + XHR + SW cleanup
 (function(){
   var API = 'apex-api-ootk.onrender.com';
   var origFetch = window.fetch;
@@ -80,7 +92,7 @@
     return origSend.apply(this, arguments);
   };
   if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i of r)i.unregister()});caches.keys().then(function(n){for(var k of n)caches.delete(k)})}
-  console.log('[APEX] Token interceptor v4.2 active');
+  console.log('[APEX] Token interceptor v4.3 active');
 })();
 </script>
 </head>
