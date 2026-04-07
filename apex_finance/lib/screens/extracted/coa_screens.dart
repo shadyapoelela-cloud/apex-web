@@ -304,10 +304,10 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'name': 'Odoo',
       'icon': 0xe30a,
       'encoding': 'utf-8',
-      'code': <String>['code', 'code/id', 'رمز الحساب', 'الرمز'],
-      'name_col': <String>['name', 'name/id', 'الاسم', 'اسم الحساب'],
-      'class': <String>['user_type_id', 'user_type', 'account_type', 'internal_type', 'نوع الحساب'],
-      'section': <String>['parent_id', 'group_id', 'الحساب الأب'],
+      'code': <String>['code', 'code/id', 'رمز', 'رمز الحساب', 'الرمز', 'رقم', 'رقم الحساب'],
+      'name_col': <String>['name', 'name/id', 'اسم الحساب', 'الاسم', 'الحساب', 'بيان'],
+      'class': <String>['user_type_id', 'user_type', 'account_type', 'internal_type', 'النوع', 'نوع الحساب', 'التصنيف'],
+      'section': <String>['parent_id', 'group_id', 'الحساب الأب', 'الشركة'],
       'balance': <String>['balance', 'debit', 'credit', 'الرصيد'],
     },
     {
@@ -560,26 +560,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         bestMatch = t;
       }
     }
-    if (bestScore >= 3) {
-      selTemplate = bestMatch;
-      final tpl = _erpTemplates[selTemplate];
-      selCode = _findCol(hLower, List<String>.from(tpl['code']));
-      selName = _findCol(hLower, List<String>.from(tpl['name_col']));
-      selClass = _findCol(hLower, List<String>.from(tpl['class']));
-      selSection = _findCol(hLower, List<String>.from(tpl['section']));
-      selBalance = _findCol(hLower, List<String>.from(tpl['balance']));
-      // Apply recommended encoding
-      final recEnc = tpl['encoding'] as String;
-      if (recEnc != 'auto' && csvBytes != null && ext == 'csv') {
-        final newContent = recEnc == 'windows-1256' ? _decodeCp1256(csvBytes) : _decodeAsUtf8(csvBytes);
-        final newRows = _parseCsv(newContent);
-        if (newRows.length > dataRows.length) {
-          headers = newRows.first.map((h) => h.trim()).toList();
-          dataRows = newRows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
-          selEncoding = recEnc;
-        }
-      }
-    }
+    // Auto-detect keeps default column mapping
 
     final result = await showDialog<Map<String, int>>(
       context: context,
@@ -792,7 +773,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                         'name': selName,
                                         'class': selClass,
                                         'section': selSection,
-                                        'balance': selBalance,
+
                                       })
                                   : null,
                               icon: const Icon(Icons.download_done, size: 18),
@@ -831,7 +812,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     final nameIdx = mapping['name'] ?? -1;
     final classIdx = mapping['class'] ?? -1;
     final sectionIdx = mapping['section'] ?? -1;
-    final balanceIdx = mapping['balance'] ?? -1;
+    final balanceIdx = -1; // Balance not used in COA qualification
 
     for (final row in dataRows) {
       try {
