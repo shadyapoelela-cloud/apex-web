@@ -91,7 +91,9 @@ class _CDState extends State<ClientDetailScreen> with SingleTickerProviderStateM
 
   Widget _readinessBanner(String? rs) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    color: _readinessColor(rs).withAlpha(25),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(colors: [_readinessColor(rs).withAlpha(30), _readinessColor(rs).withAlpha(10)]),
+      border: Border(bottom: BorderSide(color: _readinessColor(rs).withAlpha(40)))),
     child: Row(children: [
       Icon(rs == 'ready_for_tb' ? Icons.check_circle : Icons.info_outline, color: _readinessColor(rs), size: 20),
       const SizedBox(width: 10),
@@ -114,7 +116,7 @@ class _CDState extends State<ClientDetailScreen> with SingleTickerProviderStateM
 
   Widget _infoCard() => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [const Icon(Icons.business, color: AC.gold, size: 28), const SizedBox(width: 12),
+      Row(children: [CircleAvatar(backgroundColor: const Color(0xFFC9A84C).withOpacity(0.15), radius: 24, child: Text(widget.clientName.isNotEmpty ? widget.clientName[0] : '?', style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 18))), const SizedBox(width: 14),
         Expanded(child: Text(widget.clientName, style: const TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.bold)))]),
       const Divider(color: AC.bdr, height: 20),
       _kv('\u0627\u0644\u0646\u0648\u0639', _client?['client_type'] ?? '-'),
@@ -213,15 +215,38 @@ class _CDState extends State<ClientDetailScreen> with SingleTickerProviderStateM
       _serviceCard('\u0645\u064a\u0632\u0627\u0646 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', 'TB', Icons.table_chart, rs == 'ready_for_tb' ? 'ready' : 'pending'),
       _serviceCard('\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', 'Analysis', Icons.analytics, 'pending'),
       _serviceCard('\u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644', 'Compliance', Icons.shield, 'pending'),
+      const SizedBox(height: 16),
+      _nextStepCard(rs),
     ]);
   }
+
+  Widget _nextStepCard(String? rs) => Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(colors: [const Color(0xFFC9A84C).withOpacity(0.12), Colors.transparent]),
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: const Color(0xFFC9A84C).withOpacity(0.25))),
+    child: Row(children: [
+      const Icon(Icons.auto_awesome, color: AC.gold, size: 22),
+      const SizedBox(width: 12),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('الخطوة التالية', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text(rs == 'documents_pending' ? 'أكمل المستندات الإلزامية' :
+          rs == 'ready_for_coa' ? 'ارفع شجرة الحسابات' :
+          rs == 'coa_in_progress' ? 'تابع رحلة شجرة الحسابات' :
+          rs == 'ready_for_tb' ? 'ارفع ميزان المراجعة' :
+          'أكمل بيانات العميل',
+          style: const TextStyle(color: AC.ts, fontSize: 12)),
+      ])),
+    ]));
 
   Widget _serviceCard(String name, String nameEn, IconData icon, String status) {
     final color = status == 'active' ? AC.gold : status == 'ready' ? AC.cyan : AC.ts;
     return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
       child: Row(children: [
-        Icon(icon, color: color, size: 24), const SizedBox(width: 12),
+        Container(width: 44, height: 44, decoration: BoxDecoration(color: color.withAlpha(20), borderRadius: BorderRadius.circular(11)), child: Icon(icon, color: color, size: 22)), const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(name, style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
           Text(nameEn, style: const TextStyle(color: AC.ts, fontSize: 11)),
