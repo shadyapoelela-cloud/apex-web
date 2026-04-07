@@ -242,7 +242,9 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
           ...clients.asMap().entries.map((e) {
             final c = e.value;
             final isLast = e.key == clients.length - 1;
-            return Container(
+            return GestureDetector(
+              onTap: () => context.go('/client-detail', extra: {'id': e.key.toString(), 'name': c.name}),
+              child: Container(
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
                 border: isLast ? null : Border(bottom: BorderSide(color: borderColor)),
@@ -276,6 +278,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                   const SizedBox(width: 6),
                   _badge(c.coaLabel, c.coaColor),
                 ],
+              ),
               ),
             );
           }),

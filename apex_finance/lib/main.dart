@@ -36,7 +36,16 @@ import 'screens/audit/audit_workflow_screen.dart';
 import 'screens/financial/financial_ops_screen.dart';
 const _api = 'https://apex-api-ootk.onrender.com';
 
-void main() => runApp(const ProviderScope(child: ApexApp()));
+void main() {
+  // Restore session from localStorage
+  if (S.token == null) {
+    final restored = S.restore();
+    if (restored && S.token != null) {
+      ApiService.setToken(S.token!);
+    }
+  }
+  runApp(const ProviderScope(child: ApexApp()));
+}
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // Design System
