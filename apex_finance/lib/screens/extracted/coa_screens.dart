@@ -851,7 +851,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         _mapRow('اسم الحساب *', selName, colItems, (v) => setSt(() => selName = v ?? -1)),
                         _mapRow('التصنيف', selClass, colItems, (v) => setSt(() => selClass = v ?? -1)),
                         _mapRow('القسم', selSection, colItems, (v) => setSt(() => selSection = v ?? -1)),
-                        _mapRow('الرصيد', selBalance, colItems, (v) => setSt(() => selBalance = v ?? -1)),
+                        _mapRow('التسوية', selReconciliation, colItems, (v) => setSt(() => selReconciliation = v ?? -1)),
+                        _mapRow('العملة', selCurrency, colItems, (v) => setSt(() => selCurrency = v ?? -1)),
+                        _mapRow('الشركة', selCompany, colItems, (v) => setSt(() => selCompany = v ?? -1)),
 
                         const SizedBox(height: 24),
 
