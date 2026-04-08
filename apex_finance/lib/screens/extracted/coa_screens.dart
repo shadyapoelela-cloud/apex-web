@@ -279,6 +279,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['classification', 'class', 'type', 'account_type', 'التصنيف', 'النوع', 'نوع الحساب'],
       'section': <String>['section', 'category', 'group', 'parent', 'القسم', 'الفئة', 'المجموعة', 'الحساب الأب'],
       'balance': <String>['balance', 'amount', 'الرصيد', 'المبلغ'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'SAP',
@@ -289,6 +292,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['ktoks', 'account group', 'account type', 'gvtyp', 'مجموعة الحساب', 'التصنيف'],
       'section': <String>['bilkt', 'mitkz', 'xbilk', 'القسم', 'bs category'],
       'balance': <String>['balance', 'saldo', 'hsl', 'الرصيد'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'Oracle',
@@ -299,6 +305,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['account_type', 'type', 'acct_type', 'نوع الحساب', 'التصنيف'],
       'section': <String>['parent_segment', 'summary_account', 'roll_up_group', 'الحساب الأب'],
       'balance': <String>['begin_balance', 'balance', 'period_net', 'الرصيد'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'Odoo',
@@ -309,6 +318,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['user_type_id', 'user_type', 'account_type', 'internal_type', 'النوع', 'نوع الحساب', 'التصنيف'],
       'section': <String>['parent_id', 'group_id', 'الحساب الأب', 'الشركة'],
       'balance': <String>['balance', 'debit', 'credit', 'الرصيد'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'قيود (Qoyod)',
@@ -319,6 +331,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['account type', 'نوع الحساب', 'type'],
       'section': <String>['parent account code', 'رمز الحساب الأب', 'parent'],
       'balance': <String>['balance', 'الرصيد'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'دفترة (Daftra)',
@@ -329,6 +344,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['type', 'account_type', 'النوع', 'نوع الحساب'],
       'section': <String>['parent', 'parent_account', 'الحساب الرئيسي'],
       'balance': <String>['balance', 'الرصيد', 'المبلغ'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'وافق (Wafeq)',
@@ -339,6 +357,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['type', 'account type', 'نوع الحساب'],
       'section': <String>['parent', 'parent account', 'الحساب الأب'],
       'balance': <String>['balance', 'الرصيد'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'أونكس (ONYX)',
@@ -349,6 +370,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['account_type', 'type', 'نوع الحساب', 'التصنيف', 'طبيعة الحساب'],
       'section': <String>['parent_account', 'main_account', 'الحساب الرئيسي', 'الحساب الأب'],
       'balance': <String>['balance', 'opening_balance', 'الرصيد', 'رصيد افتتاحي'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'ERPNext',
@@ -359,6 +383,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['root_type', 'account_type', 'نوع الحساب'],
       'section': <String>['parent_account', 'parent', 'الحساب الأب'],
       'balance': <String>['balance', 'الرصيد'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'Tally',
@@ -369,6 +396,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['group', 'under', 'account group', 'المجموعة'],
       'section': <String>['parent', 'under group', 'الحساب الأب'],
       'balance': <String>['closing balance', 'balance', 'amount', 'الرصيد'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'Amazon',
@@ -379,6 +409,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['type', 'transaction type', 'category', 'النوع'],
       'section': <String>['category', 'group', 'الفئة'],
       'balance': <String>['total', 'amount', 'balance', 'المبلغ', 'الإجمالي'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
     {
       'name': 'Microsoft Dynamics',
@@ -389,8 +422,64 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'class': <String>['mainaccountcategory', 'account type', 'type', 'نوع الحساب'],
       'section': <String>['parentaccount', 'parent', 'الحساب الأب'],
       'balance': <String>['openingbalance', 'balance', 'الرصيد'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
     },
   ];
+
+  // ============================================
+  // Odoo Account Type → Hierarchy Classification
+  // Maps Odoo type names to [parentCategory, subCategory]
+  // ============================================
+  static const Map<String, List<String>> _odooHierarchy = {
+    // Assets - Current
+    'البنك والنقد': ['أصول', 'أصول متداولة'],
+    'Bank and Cash': ['أصول', 'أصول متداولة'],
+    'المدينون': ['أصول', 'أصول متداولة'],
+    'Receivable': ['أصول', 'أصول متداولة'],
+    'الأصول المتداولة': ['أصول', 'أصول متداولة'],
+    'Current Assets': ['أصول', 'أصول متداولة'],
+    'المصروفات المدفوعة مقدماً': ['أصول', 'أصول متداولة'],
+    'Prepayments': ['أصول', 'أصول متداولة'],
+    // Assets - Non-current
+    'الأصول غير المتداولة': ['أصول', 'أصول غير متداولة'],
+    'Non-current Assets': ['أصول', 'أصول غير متداولة'],
+    'الأصول الثابتة': ['أصول', 'أصول غير متداولة'],
+    'Fixed Assets': ['أصول', 'أصول غير متداولة'],
+    // Liabilities - Current
+    'الدائنون': ['التزامات', 'التزامات متداولة'],
+    'Payable': ['التزامات', 'التزامات متداولة'],
+    'الالتزامات المتداولة': ['التزامات', 'التزامات متداولة'],
+    'Current Liabilities': ['التزامات', 'التزامات متداولة'],
+    // Liabilities - Non-current
+    'الالتزامات غير المتداولة': ['التزامات', 'التزامات غير متداولة'],
+    'Non-current Liabilities': ['التزامات', 'التزامات غير متداولة'],
+    // Equity
+    'حقوق الملكية': ['حقوق ملكية', 'حقوق ملكية'],
+    'Equity': ['حقوق ملكية', 'حقوق ملكية'],
+    'الأرباح غير الموزعة': ['حقوق ملكية', 'أرباح مبقاة'],
+    'Unaffected Earnings': ['حقوق ملكية', 'أرباح مبقاة'],
+    'أرباح العام الحالي': ['حقوق ملكية', 'أرباح العام'],
+    'Current Year Earnings': ['حقوق ملكية', 'أرباح العام'],
+    // Income / Revenue
+    'الدخل': ['إيرادات', 'إيرادات'],
+    'Income': ['إيرادات', 'إيرادات'],
+    'إيرادات أخرى': ['إيرادات', 'إيرادات أخرى'],
+    'Other Income': ['إيرادات', 'إيرادات أخرى'],
+    // Expenses
+    'المصروفات': ['مصروفات', 'مصروفات'],
+    'Expenses': ['مصروفات', 'مصروفات'],
+    'الإهلاك': ['مصروفات', 'إهلاك'],
+    'Depreciation': ['مصروفات', 'إهلاك'],
+    'تكلفة الإيرادات': ['مصروفات', 'تكلفة الإيرادات'],
+    'Cost of Revenue': ['مصروفات', 'تكلفة الإيرادات'],
+    'تكلفة المبيعات': ['مصروفات', 'تكلفة المبيعات'],
+    'Cost of Sales': ['مصروفات', 'تكلفة المبيعات'],
+    // Off-Balance Sheet
+    'خارج الميزانية': ['أخرى', 'خارج الميزانية'],
+    'Off-Balance Sheet': ['أخرى', 'خارج الميزانية'],
+  };
 
   // ============================================
   // Windows-1256 to Unicode lookup (0x80-0xFF)
@@ -451,7 +540,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       if (bytes == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('\u0644\u0627 \u064a\u0645\u0643\u0646 \u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0645\u0644\u0641'), backgroundColor: AppColors.redC),
+            const SnackBar(content: Text('لا يمكن قراءة الملف'), backgroundColor: AppColors.redC),
           );
           setState(() { _isUploading = false; });
         }
@@ -476,7 +565,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('\u062e\u0637\u0623 \u0641\u064a \u0642\u0631\u0627\u0621\u0629 Excel: $e'), backgroundColor: AppColors.redC),
+              SnackBar(content: Text('خطأ في قراءة Excel: $e'), backgroundColor: AppColors.redC),
             );
           }
         }
@@ -489,7 +578,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       final utf8Content = _decodeAsUtf8(bytes);
       final cp1256Content = _decodeCp1256(bytes);
       bool utf8HasArabic = utf8Content.runes.any((r) => r >= 0x0600 && r <= 0x06FF);
-      bool utf8HasGarbled = utf8Content.contains('\uFFFD') || utf8Content.contains('\u00C3');
+      bool utf8HasGarbled = utf8Content.contains('�') || utf8Content.contains('Ã');
       bool cp1256HasArabic = cp1256Content.runes.any((r) => r >= 0x0600 && r <= 0x06FF);
 
       List<List<String>> autoRows;
@@ -509,7 +598,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('\u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063a \u0623\u0648 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d'), backgroundColor: AppColors.redC),
+            const SnackBar(content: Text('الملف فارغ أو غير صالح'), backgroundColor: AppColors.redC),
           );
         }
         setState(() { _isUploading = false; });
@@ -518,7 +607,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       if (mounted) {
         setState(() { _isUploading = false; });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('\u062e\u0637\u0623: $e'), backgroundColor: AppColors.redC),
+          SnackBar(content: Text('خطأ: $e'), backgroundColor: AppColors.redC),
         );
       }
     }
@@ -538,6 +627,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     int selClass = _findCol(hLower, List<String>.from(autoTpl['class']));
     int selSection = _findCol(hLower, List<String>.from(autoTpl['section']));
     int selBalance = _findCol(hLower, List<String>.from(autoTpl['balance']));
+    int selReconciliation = _findCol(hLower, List<String>.from(autoTpl['reconciliation'] ?? []));
+    int selCurrency = _findCol(hLower, List<String>.from(autoTpl['currency'] ?? []));
+    int selCompany = _findCol(hLower, List<String>.from(autoTpl['company'] ?? []));
 
     if (selCode < 0 && selName < 0 && headers.length >= 2) {
       selCode = 0;
@@ -569,7 +661,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         return StatefulBuilder(
           builder: (ctx, setSt) {
             final colItems = <DropdownMenuItem<int>>[
-              const DropdownMenuItem(value: -1, child: Text('-- \u063a\u064a\u0631 \u0645\u062d\u062f\u062f --', style: TextStyle(fontSize: 12))),
+              const DropdownMenuItem(value: -1, child: Text('-- غير محدد --', style: TextStyle(fontSize: 12))),
               ...List.generate(headers.length, (i) {
                 String label = headers[i];
                 if (label.length > 25) label = '${label.substring(0, 25)}...';
@@ -600,9 +692,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('\u0631\u0628\u0637 \u0623\u0639\u0645\u062f\u0629 \u0627\u0644\u0645\u0644\u0641', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.gold)),
+                                  const Text('ربط أعمدة الملف', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.gold)),
                                   const SizedBox(height: 4),
-                                  Text('$_uploadedFileName \u2014 ${dataRows.length} \u0635\u0641', style: const TextStyle(color: AppColors.textMid, fontSize: 13)),
+                                  Text('$_uploadedFileName — ${dataRows.length} صف', style: const TextStyle(color: AppColors.textMid, fontSize: 13)),
                                 ],
                               ),
                             ),
@@ -611,7 +703,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         const SizedBox(height: 20),
 
                         // ERP Template Selector
-                        const Text('\u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0627\u0644\u0645\u0635\u062f\u0631:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                        const Text('البرنامج المصدر:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 6,
@@ -630,6 +722,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                   selClass = _findCol(h, List<String>.from(t['class']));
                                   selSection = _findCol(h, List<String>.from(t['section']));
                                   selBalance = _findCol(h, List<String>.from(t['balance']));
+                                  selReconciliation = _findCol(h, List<String>.from(t['reconciliation'] ?? []));
+                                  selCurrency = _findCol(h, List<String>.from(t['currency'] ?? []));
+                                  selCompany = _findCol(h, List<String>.from(t['company'] ?? []));
                                   // Switch encoding if CSV
                                   if (csvBytes != null && ext == 'csv') {
                                     final enc = t['encoding'] as String;
@@ -647,6 +742,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                         selClass = _findCol(hh, List<String>.from(t['class']));
                                         selSection = _findCol(hh, List<String>.from(t['section']));
                                         selBalance = _findCol(hh, List<String>.from(t['balance']));
+                                        selReconciliation = _findCol(hh, List<String>.from(t['reconciliation'] ?? []));
+                                        selCurrency = _findCol(hh, List<String>.from(t['currency'] ?? []));
+                                        selCompany = _findCol(hh, List<String>.from(t['company'] ?? []));
                                       }
                                     }
                                   }
@@ -679,7 +777,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
                         // Encoding selector (CSV only)
                         if (ext == 'csv' && csvBytes != null) ...[
-                          const Text('\u0627\u0644\u062a\u0631\u0645\u064a\u0632:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                          const Text('الترميز:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           Wrap(
                             spacing: 8,
@@ -710,7 +808,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         ],
 
                         // Preview table
-                        const Text('\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                        const Text('معاينة البيانات:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
                         Container(
                           height: 180,
@@ -747,13 +845,13 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         const SizedBox(height: 20),
 
                         // Column mapping
-                        const Text('\u0631\u0628\u0637 \u0627\u0644\u0623\u0639\u0645\u062f\u0629:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                        const Text('ربط الأعمدة:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
-                        _mapRow('\u0631\u0642\u0645 \u0627\u0644\u062d\u0633\u0627\u0628 *', selCode, colItems, (v) => setSt(() => selCode = v ?? -1)),
-                        _mapRow('\u0627\u0633\u0645 \u0627\u0644\u062d\u0633\u0627\u0628 *', selName, colItems, (v) => setSt(() => selName = v ?? -1)),
-                        _mapRow('\u0627\u0644\u062a\u0635\u0646\u064a\u0641', selClass, colItems, (v) => setSt(() => selClass = v ?? -1)),
-                        _mapRow('\u0627\u0644\u0642\u0633\u0645', selSection, colItems, (v) => setSt(() => selSection = v ?? -1)),
-                        _mapRow('\u0627\u0644\u0631\u0635\u064a\u062f', selBalance, colItems, (v) => setSt(() => selBalance = v ?? -1)),
+                        _mapRow('رقم الحساب *', selCode, colItems, (v) => setSt(() => selCode = v ?? -1)),
+                        _mapRow('اسم الحساب *', selName, colItems, (v) => setSt(() => selName = v ?? -1)),
+                        _mapRow('التصنيف', selClass, colItems, (v) => setSt(() => selClass = v ?? -1)),
+                        _mapRow('القسم', selSection, colItems, (v) => setSt(() => selSection = v ?? -1)),
+                        _mapRow('الرصيد', selBalance, colItems, (v) => setSt(() => selBalance = v ?? -1)),
 
                         const SizedBox(height: 24),
 
@@ -763,7 +861,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           children: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx),
-                              child: const Text('\u0625\u0644\u063a\u0627\u0621', style: TextStyle(color: AppColors.textMid)),
+                              child: const Text('إلغاء', style: TextStyle(color: AppColors.textMid)),
                             ),
                             const SizedBox(width: 12),
                             ElevatedButton.icon(
@@ -773,11 +871,14 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                         'name': selName,
                                         'class': selClass,
                                         'section': selSection,
-
+                                        'reconciliation': selReconciliation,
+                                        'currency': selCurrency,
+                                        'company': selCompany,
+                                        'template': selTemplate,
                                       })
                                   : null,
                               icon: const Icon(Icons.download_done, size: 18),
-                              label: Text('\u0627\u0633\u062a\u064a\u0631\u0627\u062f ${dataRows.length} \u062d\u0633\u0627\u0628'),
+                              label: Text('استيراد ${dataRows.length} حساب'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.gold,
                                 foregroundColor: AppColors.navy,
@@ -806,34 +907,84 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     }
   }
 
-  void _importData(List<List<String>> dataRows, Map<String, int> mapping) {
+    void _importData(List<List<String>> dataRows, Map<String, int> mapping) {
     List<AccountData> parsed = [];
     final codeIdx = mapping['code'] ?? -1;
     final nameIdx = mapping['name'] ?? -1;
     final classIdx = mapping['class'] ?? -1;
     final sectionIdx = mapping['section'] ?? -1;
-    final balanceIdx = -1; // Balance not used in COA qualification
+    final reconciliationIdx = mapping['reconciliation'] ?? -1;
+    final currencyIdx = mapping['currency'] ?? -1;
+    final companyIdx = mapping['company'] ?? -1;
+    final templateIdx = mapping['template'] ?? 0;
+
+    // Determine which ERP for hierarchy logic
+    final tplName = templateIdx > 0 && templateIdx < _erpTemplates.length
+        ? _erpTemplates[templateIdx]['name'] as String
+        : '';
 
     for (final row in dataRows) {
       try {
         String code = codeIdx >= 0 && codeIdx < row.length ? row[codeIdx].trim() : '';
         String name = nameIdx >= 0 && nameIdx < row.length ? row[nameIdx].trim() : '';
-        String cls = classIdx >= 0 && classIdx < row.length ? row[classIdx].trim() : '\u063a\u064a\u0631 \u0645\u0635\u0646\u0641';
-        String sec = sectionIdx >= 0 && sectionIdx < row.length ? row[sectionIdx].trim() : '\u0639\u0627\u0645';
-        double bal = 0;
-        if (balanceIdx >= 0 && balanceIdx < row.length) {
-          final bStr = row[balanceIdx].replaceAll(',', '').replaceAll(' ', '').replaceAll('\u00A0', '').trim();
-          bal = double.tryParse(bStr) ?? 0;
+        String cls = classIdx >= 0 && classIdx < row.length ? row[classIdx].trim() : 'غير مصنف';
+        String sec = sectionIdx >= 0 && sectionIdx < row.length ? row[sectionIdx].trim() : 'عام';
+
+        // Parse reconciliation flag
+        bool reconcile = false;
+        if (reconciliationIdx >= 0 && reconciliationIdx < row.length) {
+          final rv = row[reconciliationIdx].trim().toLowerCase();
+          reconcile = rv == 'true' || rv == '1' || rv == 'نعم' || rv == 'yes' || rv == 'صحيح';
         }
+        // Parse currency and company
+        String currency = currencyIdx >= 0 && currencyIdx < row.length ? row[currencyIdx].trim() : '';
+        String company = companyIdx >= 0 && companyIdx < row.length ? row[companyIdx].trim() : '';
+
+        // ---- Smart Hierarchy Classification ----
+        String parentCls = '';
+        String subCls = '';
+        int level = 0;
+
+        if (tplName == 'Odoo' && cls.isNotEmpty && cls != 'غير مصنف') {
+          // Odoo: lookup type in hierarchy map
+          if (_odooHierarchy.containsKey(cls)) {
+            final hier = _odooHierarchy[cls]!;
+            parentCls = hier[0];
+            subCls = hier[1];
+            level = 3;
+          } else {
+            // Check if cls is a main category (Level 1)
+            const mainCats = ['أصول', 'التزامات', 'حقوق ملكية', 'إيرادات', 'مصروفات'];
+            // Check if cls is a sub category (Level 2)
+            const subCatsMap = <String, String>{
+              'أصول متداولة': 'أصول',
+              'أصول غير متداولة': 'أصول',
+              'التزامات متداولة': 'التزامات',
+              'التزامات غير متداولة': 'التزامات',
+            };
+            if (mainCats.contains(cls)) {
+              parentCls = cls;
+              level = 1;
+            } else if (subCatsMap.containsKey(cls)) {
+              parentCls = subCatsMap[cls]!;
+              subCls = cls;
+              level = 2;
+            }
+          }
+        }
+
         if (code.isNotEmpty || name.isNotEmpty) {
           parsed.add(AccountData(
             code: code.isNotEmpty ? code : '${parsed.length + 1}',
-            name: name.isNotEmpty ? name : '\u062d\u0633\u0627\u0628 ${parsed.length + 1}',
+            name: name.isNotEmpty ? name : 'حساب ${parsed.length + 1}',
             classification: cls,
             section: sec,
-            balance: bal,
-            confidence: 95.0,
-            status: 'Review',
+            parentClassification: parentCls,
+            subClassification: subCls,
+            level: level,
+            allowReconciliation: reconcile,
+            currency: currency,
+            company: company,
           ));
         }
       } catch (_) {}
@@ -849,13 +1000,14 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('\u062a\u0645 \u0627\u0633\u062a\u064a\u0631\u0627\u062f ${parsed.length} \u062d\u0633\u0627\u0628 \u0628\u0646\u062c\u0627\u062d'),
+          content: Text('تم استيراد ${parsed.length} حساب بنجاح'),
           backgroundColor: AppColors.greenC,
           duration: const Duration(seconds: 4),
         ),
       );
     }
   }
+
 
   Widget _mapRow(String label, int value, List<DropdownMenuItem<int>> items, ValueChanged<int?> onChanged) {
     return Padding(
@@ -901,8 +1053,19 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   }
 
   int _findCol(List<String> headers, List<String> candidates) {
+    final hNorm = headers.map((h) => h.trim().toLowerCase().replaceAll('\u00A0', ' ')).toList();
+    // Pass 1: exact match
     for (final c in candidates) {
-      final idx = headers.indexWhere((h) => h.contains(c));
+      final cn = c.trim().toLowerCase();
+      if (cn.isEmpty) continue;
+      final idx = hNorm.indexWhere((h) => h == cn);
+      if (idx >= 0) return idx;
+    }
+    // Pass 2: contains match
+    for (final c in candidates) {
+      final cn = c.trim().toLowerCase();
+      if (cn.isEmpty) continue;
+      final idx = hNorm.indexWhere((h) => h.contains(cn));
       if (idx >= 0) return idx;
     }
     return -1;
@@ -1955,6 +2118,12 @@ class AccountData {
   final String name;
   final String classification;
   final String section;
+  final String parentClassification;
+  final String subClassification;
+  final int level;
+  final bool allowReconciliation;
+  final String currency;
+  final String company;
   final double balance;
   final double confidence;
   final String status;
@@ -1964,9 +2133,15 @@ class AccountData {
     required this.name,
     required this.classification,
     required this.section,
-    required this.balance,
-    required this.confidence,
-    required this.status,
+    this.parentClassification = '',
+    this.subClassification = '',
+    this.level = 0,
+    this.allowReconciliation = false,
+    this.currency = '',
+    this.company = '',
+    this.balance = 0,
+    this.confidence = 95.0,
+    this.status = 'Review',
   });
 }
 
