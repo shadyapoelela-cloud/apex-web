@@ -741,6 +741,14 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       if (_findCol(hLower, List<String>.from(tpl['class'])) >= 0) score++;
       if (_findCol(hLower, List<String>.from(tpl['section'])) >= 0) score++;
       if (_findCol(hLower, List<String>.from(tpl['balance'])) >= 0) score++;
+      if (tpl.containsKey('reconciliation') && _findCol(hLower, List<String>.from(tpl['reconciliation'])) >= 0) score++;
+      if (tpl.containsKey('currency') && _findCol(hLower, List<String>.from(tpl['currency'])) >= 0) score++;
+      if (tpl.containsKey('company') && _findCol(hLower, List<String>.from(tpl['company'])) >= 0) score++;
+      if (tpl.containsKey('parentAccount') && _findCol(hLower, List<String>.from(tpl['parentAccount'])) >= 0) score += 2;
+      if (tpl.containsKey('level') && _findCol(hLower, List<String>.from(tpl['level'])) >= 0) score++;
+      if (tpl.containsKey('reportType') && _findCol(hLower, List<String>.from(tpl['reportType'])) >= 0) score++;
+      if (tpl.containsKey('debitCredit') && _findCol(hLower, List<String>.from(tpl['debitCredit'])) >= 0) score++;
+      if (tpl.containsKey('englishName') && _findCol(hLower, List<String>.from(tpl['englishName'])) >= 0) score++;
       if (score > bestScore) {
         bestScore = score;
         bestMatch = t;
