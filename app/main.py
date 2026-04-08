@@ -10,8 +10,6 @@ All 6 Phases Complete:
   P6: Admin Dashboard + Reviewer Tooling
 + Financial Engine v2 + Knowledge Brain
 """
-from starlette.staticfiles import StaticFiles
-from starlette.responses import FileResponse
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 import os, traceback
@@ -229,7 +227,7 @@ app.include_router(social_auth_r, tags=["Social Auth"])
 app.include_router(copilot_router)
 print(f"[STARTUP] S6 registered: {len(s6r.routes)} routes")
 
-@app.get("/api")
+@app.get("/")
 def root():
     return {"name": "APEX Financial Platform API", "version": "6.5.0", "status": "running",
             "phases_active": sum([P1, P2, P3, P4, P5, P6]),
@@ -908,15 +906,6 @@ async def get_activity_history(limit: int = Query(20)):
     return {"activities": [], "total": 0}
 
 
-
-# ── Serve Flutter Web from docs/ ──
-import pathlib as _pl
-_docs_dir = _pl.Path(__file__).resolve().parent.parent / "docs"
-if _docs_dir.is_dir():
-    @app.get("/")
-    async def serve_flutter():
-        return FileResponse(str(_docs_dir / "index.html"))
-    app.mount("/", StaticFiles(directory=str(_docs_dir), html=True), name="flutter_web")
 
 if __name__ == "__main__":
     import uvicorn; uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
