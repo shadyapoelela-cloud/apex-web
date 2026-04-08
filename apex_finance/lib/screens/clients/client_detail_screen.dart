@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../extracted/coa_screens.dart';
 
 // ════════════════════════════════════════
 // APEX Client Detail Screen v5.2 — Visual Alignment
@@ -269,7 +270,12 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 return Expanded(
                   child: GestureDetector(
                     onTap: s.clickable ? () {
-                      // Navigate to COA Journey
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (_) => CoaJourneyScreen(
+                          clientId: '${widget.clientId}',
+                          clientName: widget.clientName,
+                        ),
+                      ));
                     } : null,
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -367,7 +373,12 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
             const SizedBox(width: 12),
             ElevatedButton.icon(
               onPressed: () {
-                // Navigate to COA Journey
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => CoaJourneyScreen(
+                    clientId: '${widget.clientId}',
+                    clientName: widget.clientName,
+                  ),
+                ));
               },
               icon: Icon(Icons.arrow_back, size: 14),
               label: Text(hasCoA ? 'متابعة COA' : 'رفع COA'),
