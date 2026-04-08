@@ -34,15 +34,21 @@ class AppColors {
 
 class CoaAccount {
   String code;
+  String uniqueId;       // code + rowIndex for uniqueness
   String name;
   int level;
+  int rowIndex;          // original row number in file
   String rootClass;      // أصول، التزامات، حقوق ملكية، إيرادات، مصروفات
   String accountType;    // حساب رئيسي، حساب فرعي، حساب تفصيلي
   String nature;         // مدين، دائن
   String reportType;     // ميزانية، دخل
   bool isClosable;       // مؤقت (يُقفل نهاية الفترة)
   bool isBankReconcilable; // قابل للتسوية البنكية
+  bool isDuplicateCode;  // true if code appears more than once
   String parentCode;
+  String parentUniqueId; // parent's uniqueId for duplicate-aware tree
+  String suggestedCode;  // suggested fix for duplicate codes
+  String suggestedParent; // suggested correct parent
   double acceptanceScore; // 0-100
   List<String> flags;    // قائمة الملاحظات والأخطاء
   String status;         // approved, review, flagged
@@ -50,20 +56,92 @@ class CoaAccount {
 
   CoaAccount({
     required this.code,
+    this.uniqueId = '',
     required this.name,
     this.level = 0,
+    this.rowIndex = 0,
     this.rootClass = '',
     this.accountType = '',
     this.nature = '',
     this.reportType = '',
     this.isClosable = false,
     this.isBankReconcilable = false,
+    this.isDuplicateCode = false,
     this.parentCode = '',
+    this.parentUniqueId = '',
+    this.suggestedCode = '',
+    this.suggestedParent = '',
     this.acceptanceScore = 0,
     this.flags = const [],
     this.status = 'approved',
     this.children = const [],
   });
+}
+
+/// Suggest a correct code for duplicate accounts based on name analysis
+String _suggestCodeFix(String code, String name, int rowIndex, List<CoaAccount> allAccounts) {
+  // Find all accounts with same code
+  final dupes = allAccounts.where((a) => a.code == code).toList();
+  if (dupes.length <= 1) return '';
+
+  // The first occurrence keeps the code, later ones get a suffix suggestion
+  final firstOccurrence = dupes.first;
+  if (firstOccurrence.rowIndex == rowIndex) return ''; // First one is fine
+
+  // Find the parent's code to suggest a sequential code
+  // Look at siblings under same parent to find next available code
+  final parentCode = _findParentCodeByPrefix(code, allAccounts);
+  if (parentCode.isNotEmpty) {
+    // Find all siblings
+    final siblingCodes = allAccounts
+        .where((a) => a.code.startsWith(parentCode) && a.code.length == code.length && a.code != code)
+        .map((a) => a.code)
+        .toSet();
+    // Find next available code
+    final codeNum = int.tryParse(code) ?? 0;
+    for (int i = 1; i <= 9; i++) {
+      final candidate = '${codeNum + i}';
+      if (!siblingCodes.contains(candidate) && !allAccounts.any((a) => a.code == candidate)) {
+        return candidate;
+      }
+    }
+  }
+  return '${code}_${rowIndex}';
+}
+
+String _findParentCodeByPrefix(String code, List<CoaAccount> allAccounts) {
+  final cleaned = code.replaceAll(RegExp(r'[^0-9]'), '');
+  if (cleaned.length <= 1) return '';
+  // Try progressively shorter prefixes
+  for (int len = cleaned.length - 1; len >= 1; len--) {
+    final prefix = cleaned.substring(0, len);
+    if (allAccounts.any((a) => a.code == prefix)) return prefix;
+  }
+  return '';
+}
+
+/// Classify account category by analyzing the name (Arabic NLP)
+String _classifyByName(String name) {
+  final n = name.trim();
+  // Bank/Cash accounts
+  if (RegExp(r'بنك|بنوك|مصرف|نقد|صندوق|خزينة|كاش|cash|bank').hasMatch(n)) return 'نقدية وبنوك';
+  // Inventory
+  if (RegExp(r'مخزون|بضاعة|سلع|مواد خام|منتج').hasMatch(n)) return 'مخزون';
+  // Receivables
+  if (RegExp(r'مدين|ذمم مدينة|عملاء|receivable').hasMatch(n)) return 'ذمم مدينة';
+  // Payables
+  if (RegExp(r'دائن|ذمم دائنة|موردين|payable').hasMatch(n)) return 'ذمم دائنة';
+  // Fixed assets
+  if (RegExp(r'أصول ثابتة|أراضي|مباني|سيارات|آلات|أثاث|معدات|عقار').hasMatch(n)) return 'أصول ثابتة';
+  // Revenue
+  if (RegExp(r'إيراد|مبيعات|دخل|revenue|sales|income').hasMatch(n)) return 'إيرادات';
+  // Expenses
+  if (RegExp(r'مصروف|رواتب|إيجار|صيانة|expense|salary').hasMatch(n)) return 'مصروفات';
+  // Equity
+  if (RegExp(r'رأس مال|أرباح|احتياطي|ملكية|capital|equity').hasMatch(n)) return 'حقوق ملكية';
+  // Loans
+  if (RegExp(r'قرض|تمويل|loan').hasMatch(n)) return 'قروض';
+  return '';
 }
 
 // ─── Windows-1256 Decoder ─────────────────────────────────────
@@ -370,11 +448,21 @@ double _calculateAcceptanceScore(CoaAccount acc, List<CoaAccount> allAccounts) {
     flags.add('لم يتم تحديد التصنيف الجذري');
   }
 
-  // Check 6: Duplicate codes (10 points)
+  // Check 6: Duplicate codes (20 points — severe issue)
   final duplicates = allAccounts.where((a) => a.code == acc.code).length;
   if (duplicates > 1) {
-    score -= 10;
-    flags.add('كود مكرر (${duplicates} مرات)');
+    score -= 20;
+    flags.add('كود مكرر (${duplicates} حسابات بنفس الكود ${acc.code})');
+    final nameCategory = _classifyByName(acc.name);
+    if (nameCategory.isNotEmpty) {
+      flags.add('التصنيف بالاسم: $nameCategory');
+    }
+    if (acc.suggestedCode.isNotEmpty) {
+      flags.add('الكود المقترح: ${acc.suggestedCode}');
+    }
+    if (acc.suggestedParent.isNotEmpty) {
+      flags.add('التبويب المقترح تحت: ${acc.suggestedParent}');
+    }
   }
 
   acc.flags = flags;
@@ -877,42 +965,107 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   void _analyzeAccounts() {
     setState(() { _statusMsg = 'جاري تحليل وتأهيل الحسابات...'; });
 
-    // Step 1: Extract raw accounts
+    // Step 1: Extract raw accounts with row indices
     _accounts = [];
+    int rowIdx = 0;
     for (final row in _rawRows) {
       final code = _colCode < row.length ? row[_colCode].toString().trim() : '';
       final name = _colName < row.length ? row[_colName].toString().trim() : '';
       final levelStr = _colLevel >= 0 && _colLevel < row.length ? row[_colLevel].toString().trim() : '';
       final level = int.tryParse(levelStr) ?? 0;
 
+      rowIdx++;
       if (code.isEmpty && name.isEmpty) continue;
 
       _accounts.add(CoaAccount(
         code: code,
         name: name,
         level: level,
+        rowIndex: rowIdx,
       ));
     }
 
-    // Step 2: Detect levels if not provided
+    // Step 2: Assign uniqueId and detect duplicates
+    final codeCount = <String, int>{};
+    for (final acc in _accounts) {
+      codeCount[acc.code] = (codeCount[acc.code] ?? 0) + 1;
+    }
+    for (final acc in _accounts) {
+      acc.uniqueId = '${acc.code}_${acc.rowIndex}';
+      acc.isDuplicateCode = (codeCount[acc.code] ?? 1) > 1;
+    }
+
+    // Step 3: Detect levels if not provided
     if (_colLevel < 0 || _accounts.every((a) => a.level == 0)) {
       for (final acc in _accounts) {
         acc.level = _detectLevelFromCode(acc.code, _accounts);
       }
     }
 
-    // Step 3: Find parent codes
+    // Step 4: Find parent codes — use name classification for duplicates
     for (final acc in _accounts) {
       acc.parentCode = _findParentCode(acc.code, _accounts);
+      // For duplicate-aware tree, find parent's uniqueId
+      if (acc.parentCode.isNotEmpty) {
+        final potentialParents = _accounts.where((a) => a.code == acc.parentCode).toList();
+        if (potentialParents.length == 1) {
+          acc.parentUniqueId = potentialParents.first.uniqueId;
+        } else if (potentialParents.length > 1) {
+          // Multiple parents share same code — use name classification to pick correct one
+          final myCategory = _classifyByName(acc.name);
+          CoaAccount? bestParent;
+          for (final p in potentialParents) {
+            final pCategory = _classifyByName(p.name);
+            if (myCategory.isNotEmpty && pCategory == myCategory) {
+              bestParent = p;
+              break;
+            }
+          }
+          if (bestParent != null) {
+            acc.parentUniqueId = bestParent.uniqueId;
+          } else {
+            // Fallback: use the first occurrence
+            acc.parentUniqueId = potentialParents.first.uniqueId;
+          }
+        }
+      }
     }
 
-    // Step 4: Classify
+    // Step 5: Classify — use name for disambiguation when codes are duplicated
     for (final acc in _accounts) {
       acc.rootClass = _classifyRoot(acc.code);
       acc.nature = _determineNature(acc.rootClass);
       acc.reportType = _determineReportType(acc.rootClass);
       acc.isClosable = _isClosable(acc.rootClass);
       acc.isBankReconcilable = _detectBankReconcilable(acc.name);
+
+      // If duplicate code, enhance classification with name analysis
+      if (acc.isDuplicateCode) {
+        final nameCategory = _classifyByName(acc.name);
+        if (nameCategory.isNotEmpty) {
+          acc.flags = [...acc.flags, 'كود مكرر — التصنيف بناءً على الاسم: $nameCategory'];
+        }
+        // Generate suggested code fix
+        acc.suggestedCode = _suggestCodeFix(acc.code, acc.name, acc.rowIndex, _accounts);
+        if (acc.suggestedCode.isNotEmpty) {
+          acc.flags = [...acc.flags, 'الكود المقترح: ${acc.suggestedCode}'];
+        }
+        // Suggest correct parent based on name
+        final nameClass = _classifyByName(acc.name);
+        if (nameClass.isNotEmpty) {
+          // Find a parent whose name matches the same category
+          final matchingParents = _accounts.where((a) =>
+            a.level < acc.level &&
+            _classifyByName(a.name) == nameClass &&
+            a.code != acc.code
+          ).toList();
+          if (matchingParents.isNotEmpty) {
+            // Pick the closest level parent
+            matchingParents.sort((a, b) => b.level.compareTo(a.level));
+            acc.suggestedParent = matchingParents.first.code;
+          }
+        }
+      }
 
       // Account type by level
       if (acc.level <= 2) {
@@ -924,7 +1077,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       }
     }
 
-    // Step 5: Calculate acceptance scores
+    // Step 6: Calculate acceptance scores
     for (final acc in _accounts) {
       acc.acceptanceScore = _calculateAcceptanceScore(acc, _accounts);
     }
@@ -1428,7 +1581,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   Widget _buildReviewTab() {
     // Filter accounts
     List<CoaAccount> filtered = _accounts;
-    if (_filterStatus != 'all') {
+    if (_filterStatus == 'duplicate') {
+      filtered = _accounts.where((a) => a.isDuplicateCode).toList();
+    } else if (_filterStatus != 'all') {
       filtered = _accounts.where((a) => a.status == _filterStatus).toList();
     }
     if (_searchQuery.isNotEmpty) {
@@ -1478,6 +1633,8 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                     _filterChip('مراجعة', 'review', _accounts.where((a) => a.status == 'review').length),
                     const SizedBox(width: 6),
                     _filterChip('معلّم', 'flagged', _accounts.where((a) => a.status == 'flagged').length),
+                    const SizedBox(width: 6),
+                    _filterChip('مكرر', 'duplicate', _accounts.where((a) => a.isDuplicateCode).length),
                   ],
                 ),
               ),
@@ -1571,7 +1728,22 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(acc.code, style: TextStyle(fontSize: 12, color: AppColors.goldLight, fontWeight: FontWeight.bold)),
+                  Row(
+                    children: [
+                      Text(acc.code, style: TextStyle(fontSize: 12, color: acc.isDuplicateCode ? AppColors.redC : AppColors.goldLight, fontWeight: FontWeight.bold)),
+                      if (acc.isDuplicateCode) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: AppColors.redC.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          child: Text('مكرر', style: TextStyle(fontSize: 9, color: AppColors.redC, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ],
+                  ),
                   Text(acc.name, style: TextStyle(fontSize: 13, color: AppColors.textColor), overflow: TextOverflow.ellipsis),
                 ],
               ),
@@ -1642,8 +1814,8 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               ),
             ),
           ],
-          // Edit button for flagged/review accounts
-          if (acc.status != 'approved') ...[
+          // Action buttons
+          if (acc.status != 'approved' || acc.isDuplicateCode) ...[
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -1653,6 +1825,14 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   icon: Icon(Icons.edit, size: 16, color: AppColors.gold),
                   label: Text('تعديل', style: TextStyle(color: AppColors.gold, fontSize: 12)),
                 ),
+                if (acc.isDuplicateCode) ...[
+                  const SizedBox(width: 8),
+                  TextButton.icon(
+                    onPressed: () => _showReassignDialog(acc),
+                    icon: Icon(Icons.swap_horiz, size: 16, color: AppColors.orangeC),
+                    label: Text('نقل / إعادة تبويب', style: TextStyle(color: AppColors.orangeC, fontSize: 12)),
+                  ),
+                ],
                 const SizedBox(width: 8),
                 TextButton.icon(
                   onPressed: () {
@@ -1702,6 +1882,36 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (acc.isDuplicateCode)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.redC.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.redC.withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.error_outline, color: AppColors.redC, size: 16),
+                            const SizedBox(width: 6),
+                            Text('كود مكرر', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.redC)),
+                          ],
+                        ),
+                        if (acc.suggestedCode.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text('الكود المقترح: ${acc.suggestedCode}', style: TextStyle(fontSize: 11, color: AppColors.orangeC)),
+                        ],
+                        if (_classifyByName(acc.name).isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text('التصنيف بالاسم: ${_classifyByName(acc.name)}', style: TextStyle(fontSize: 11, color: AppColors.blueC)),
+                        ],
+                      ],
+                    ),
+                  ),
                 _editField('الكود', codeCtrl),
                 const SizedBox(height: 12),
                 _editField('اسم الحساب', nameCtrl),
@@ -1715,13 +1925,37 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               onPressed: () => Navigator.pop(ctx),
               child: Text('إلغاء', style: TextStyle(color: AppColors.textMid)),
             ),
+            if (acc.isDuplicateCode && acc.suggestedCode.isNotEmpty)
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.orangeC),
+                onPressed: () {
+                  codeCtrl.text = acc.suggestedCode;
+                },
+                child: Text('تطبيق المقترح', style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold),
               onPressed: () {
                 setState(() {
+                  final oldCode = acc.code;
                   acc.code = codeCtrl.text.trim();
                   acc.name = nameCtrl.text.trim();
                   acc.level = int.tryParse(levelCtrl.text.trim()) ?? acc.level;
+                  acc.uniqueId = '${acc.code}_${acc.rowIndex}';
+                  // Re-check duplicate status
+                  final dupeCount = _accounts.where((a) => a.code == acc.code).length;
+                  acc.isDuplicateCode = dupeCount > 1;
+                  // If old code changed, also update old duplicates
+                  if (oldCode != acc.code) {
+                    final oldDupes = _accounts.where((a) => a.code == oldCode).toList();
+                    if (oldDupes.length == 1) {
+                      oldDupes.first.isDuplicateCode = false;
+                      oldDupes.first.suggestedCode = '';
+                      oldDupes.first.flags = oldDupes.first.flags
+                          .where((f) => !f.contains('كود مكرر') && !f.contains('الكود المقترح') && !f.contains('التصنيف بالاسم'))
+                          .toList();
+                    }
+                  }
                   // Re-classify
                   acc.rootClass = _classifyRoot(acc.code);
                   acc.nature = _determineNature(acc.rootClass);
@@ -1732,11 +1966,151 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   if (acc.level <= 2) acc.accountType = 'حساب رئيسي';
                   else if (acc.level == 3) acc.accountType = 'حساب فرعي';
                   else acc.accountType = 'حساب تفصيلي';
-                  acc.acceptanceScore = _calculateAcceptanceScore(acc, _accounts);
+                  // Recalculate scores for all affected accounts
+                  for (final a in _accounts) {
+                    a.acceptanceScore = _calculateAcceptanceScore(a, _accounts);
+                  }
                 });
                 Navigator.pop(ctx);
               },
               child: Text('حفظ وإعادة تقييم', style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReassignDialog(CoaAccount acc) {
+    final newCodeCtrl = TextEditingController(text: acc.suggestedCode.isNotEmpty ? acc.suggestedCode : acc.code);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: AppColors.navyLight,
+          title: Row(
+            children: [
+              Icon(Icons.swap_horiz, color: AppColors.orangeC, size: 20),
+              const SizedBox(width: 8),
+              Text('نقل / إعادة تبويب', style: TextStyle(color: AppColors.orangeC, fontSize: 15)),
+            ],
+          ),
+          content: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Current info
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.navy,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('الحساب الحالي:', style: TextStyle(fontSize: 11, color: AppColors.textDim)),
+                      const SizedBox(height: 4),
+                      Text('${acc.code} — ${acc.name}', style: TextStyle(fontSize: 13, color: AppColors.textColor)),
+                      Text('التصنيف بالاسم: ${_classifyByName(acc.name).isNotEmpty ? _classifyByName(acc.name) : "غير محدد"}',
+                          style: TextStyle(fontSize: 11, color: AppColors.blueC)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Suggested fix
+                if (acc.suggestedCode.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.greenC.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.greenC.withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('الاقتراح:', style: TextStyle(fontSize: 11, color: AppColors.greenC)),
+                        const SizedBox(height: 4),
+                        Text('تغيير الكود إلى: ${acc.suggestedCode}', style: TextStyle(fontSize: 13, color: AppColors.greenC)),
+                        if (acc.suggestedParent.isNotEmpty)
+                          Text('نقل تحت الحساب: ${acc.suggestedParent}', style: TextStyle(fontSize: 11, color: AppColors.greenC)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                // Manual code entry
+                _editField('الكود الجديد', newCodeCtrl),
+                const SizedBox(height: 8),
+                Text('سيتم نقل جميع الحسابات الفرعية والتفصيلية تلقائياً',
+                    style: TextStyle(fontSize: 10, color: AppColors.textDim)),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('إلغاء', style: TextStyle(color: AppColors.textMid)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.orangeC),
+              onPressed: () {
+                final newCode = newCodeCtrl.text.trim();
+                if (newCode.isEmpty || newCode == acc.code) {
+                  Navigator.pop(ctx);
+                  return;
+                }
+                setState(() {
+                  final oldCode = acc.code;
+                  // Update the account's code
+                  acc.code = newCode;
+                  acc.uniqueId = '${newCode}_${acc.rowIndex}';
+                  acc.isDuplicateCode = false;
+                  acc.suggestedCode = '';
+                  acc.flags = acc.flags
+                      .where((f) => !f.contains('كود مكرر') && !f.contains('الكود المقترح') && !f.contains('التصنيف بالاسم') && !f.contains('التبويب المقترح'))
+                      .toList();
+
+                  // Update children that were under the old code
+                  for (final child in _accounts) {
+                    if (child.parentCode == oldCode) {
+                      // Check if this child belongs to this account by name category
+                      final childCat = _classifyByName(child.name);
+                      final accCat = _classifyByName(acc.name);
+                      if (childCat == accCat || child.parentUniqueId == '${oldCode}_${acc.rowIndex}') {
+                        child.parentCode = newCode;
+                        child.parentUniqueId = acc.uniqueId;
+                      }
+                    }
+                  }
+
+                  // Check if old code duplication is resolved
+                  final remaining = _accounts.where((a) => a.code == oldCode).toList();
+                  if (remaining.length == 1) {
+                    remaining.first.isDuplicateCode = false;
+                    remaining.first.suggestedCode = '';
+                    remaining.first.flags = remaining.first.flags
+                        .where((f) => !f.contains('كود مكرر') && !f.contains('الكود المقترح') && !f.contains('التصنيف بالاسم') && !f.contains('التبويب المقترح'))
+                        .toList();
+                  }
+
+                  // Re-classify and rescore
+                  acc.rootClass = _classifyRoot(acc.code);
+                  acc.nature = _determineNature(acc.rootClass);
+                  acc.reportType = _determineReportType(acc.rootClass);
+                  acc.parentCode = _findParentCode(acc.code, _accounts);
+                  for (final a in _accounts) {
+                    a.acceptanceScore = _calculateAcceptanceScore(a, _accounts);
+                  }
+                });
+                Navigator.pop(ctx);
+              },
+              child: Text('تطبيق النقل', style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -1789,7 +2163,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               // Expand all button
               GestureDetector(
                 onTap: () => setState(() {
-                  for (final a in _accounts) _treeExpanded[a.code] = true;
+                  for (final a in _accounts) _treeExpanded[a.uniqueId] = true;
                 }),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -1831,21 +2205,50 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   }
 
   List<CoaAccount> _buildTreeStructure() {
-    // Create a map for quick lookup
-    final codeMap = <String, CoaAccount>{};
+    // Create a map using uniqueId for duplicate-safe lookup
+    final uidMap = <String, CoaAccount>{};
+    final codeMap = <String, List<CoaAccount>>{};
     for (final acc in _accounts) {
-      // Reset children
       acc.children = [];
-      codeMap[acc.code] = acc;
+      uidMap[acc.uniqueId] = acc;
+      codeMap.putIfAbsent(acc.code, () => []);
+      codeMap[acc.code]!.add(acc);
     }
 
-    // Build parent-child relationships
+    // Build parent-child relationships using uniqueId when available
     final roots = <CoaAccount>[];
     for (final acc in _accounts) {
-      if (acc.parentCode.isNotEmpty && codeMap.containsKey(acc.parentCode)) {
-        final parent = codeMap[acc.parentCode]!;
+      bool attached = false;
+
+      // Try uniqueId-based parent first (duplicate-aware)
+      if (acc.parentUniqueId.isNotEmpty && uidMap.containsKey(acc.parentUniqueId)) {
+        final parent = uidMap[acc.parentUniqueId]!;
         parent.children = [...parent.children, acc];
-      } else {
+        attached = true;
+      }
+      // Fallback to code-based parent (non-duplicate case)
+      else if (acc.parentCode.isNotEmpty && codeMap.containsKey(acc.parentCode)) {
+        final candidates = codeMap[acc.parentCode]!;
+        if (candidates.length == 1) {
+          candidates.first.children = [...candidates.first.children, acc];
+          attached = true;
+        } else {
+          // Multiple parents with same code — use name classification
+          final myCategory = _classifyByName(acc.name);
+          CoaAccount? bestParent;
+          for (final p in candidates) {
+            if (myCategory.isNotEmpty && _classifyByName(p.name) == myCategory) {
+              bestParent = p;
+              break;
+            }
+          }
+          bestParent ??= candidates.first;
+          bestParent.children = [...bestParent.children, acc];
+          attached = true;
+        }
+      }
+
+      if (!attached) {
         roots.add(acc);
       }
     }
@@ -1855,7 +2258,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   Widget _buildTreeNode(CoaAccount acc, int depth) {
     final hasChildren = acc.children.isNotEmpty;
-    final isExpanded = _treeExpanded[acc.code] ?? false;
+    final isExpanded = _treeExpanded[acc.uniqueId] ?? false;
     final indent = depth * 20.0;
 
     // Colors per depth
@@ -1871,85 +2274,152 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         GestureDetector(
-          onTap: hasChildren ? () => setState(() => _treeExpanded[acc.code] = !isExpanded) : null,
+          onTap: hasChildren ? () => setState(() => _treeExpanded[acc.uniqueId] = !isExpanded) : null,
           child: Container(
             margin: EdgeInsets.only(right: indent, bottom: 4),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: depth == 0 ? AppColors.navyMid : AppColors.cardBg,
+              color: acc.isDuplicateCode
+                  ? AppColors.redC.withOpacity(0.08)
+                  : (depth == 0 ? AppColors.navyMid : AppColors.cardBg),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: acc.flags.isNotEmpty ? AppColors.redC.withOpacity(0.4) : nodeColor.withOpacity(0.15),
+                color: acc.isDuplicateCode
+                    ? AppColors.redC.withOpacity(0.6)
+                    : (acc.flags.isNotEmpty ? AppColors.redC.withOpacity(0.4) : nodeColor.withOpacity(0.15)),
+                width: acc.isDuplicateCode ? 1.5 : 1.0,
               ),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Expand/collapse icon
-                if (hasChildren)
-                  Icon(
-                    isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_left,
-                    color: nodeColor, size: 20,
-                  )
-                else
-                  SizedBox(width: 20, child: Icon(Icons.circle, color: nodeColor.withOpacity(0.4), size: 6)),
-                const SizedBox(width: 8),
-                // Level indicator
-                Container(
-                  width: 24, height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: nodeColor.withOpacity(0.15),
-                  ),
-                  child: Center(
-                    child: Text('${acc.level}',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: nodeColor)),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                // Code
-                Text(acc.code,
-                    style: TextStyle(fontSize: 12, color: AppColors.goldLight, fontWeight: FontWeight.w600)),
-                const SizedBox(width: 10),
-                // Name
-                Expanded(
-                  child: Text(acc.name,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textColor,
-                        fontWeight: hasChildren ? FontWeight.bold : FontWeight.normal,
+                Row(
+                  children: [
+                    // Expand/collapse icon
+                    if (hasChildren)
+                      Icon(
+                        isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_left,
+                        color: nodeColor, size: 20,
+                      )
+                    else
+                      SizedBox(width: 20, child: Icon(Icons.circle, color: nodeColor.withOpacity(0.4), size: 6)),
+                    const SizedBox(width: 8),
+                    // Level indicator
+                    Container(
+                      width: 24, height: 24,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: nodeColor.withOpacity(0.15),
                       ),
-                      overflow: TextOverflow.ellipsis),
-                ),
-                // Children count
-                if (hasChildren) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: nodeColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+                      child: Center(
+                        child: Text('${acc.level}',
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: nodeColor)),
+                      ),
                     ),
-                    child: Text('${acc.children.length}',
-                        style: TextStyle(fontSize: 10, color: nodeColor)),
-                  ),
-                  const SizedBox(width: 6),
-                ],
-                // Score
-                Container(
-                  width: 28, height: 28,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: scoreColor.withOpacity(0.1),
-                    border: Border.all(color: scoreColor, width: 1.5),
-                  ),
-                  child: Center(
-                    child: Text('${acc.acceptanceScore.toInt()}',
-                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: scoreColor)),
-                  ),
+                    const SizedBox(width: 10),
+                    // Code (with duplicate indicator)
+                    if (acc.isDuplicateCode) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.redC.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: AppColors.redC.withOpacity(0.4)),
+                        ),
+                        child: Text(acc.code,
+                            style: TextStyle(fontSize: 12, color: AppColors.redC, fontWeight: FontWeight.bold)),
+                      ),
+                    ] else ...[
+                      Text(acc.code,
+                          style: TextStyle(fontSize: 12, color: AppColors.goldLight, fontWeight: FontWeight.w600)),
+                    ],
+                    const SizedBox(width: 10),
+                    // Name
+                    Expanded(
+                      child: Text(acc.name,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textColor,
+                            fontWeight: hasChildren ? FontWeight.bold : FontWeight.normal,
+                          ),
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                    // Children count
+                    if (hasChildren) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: nodeColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text('${acc.children.length}',
+                            style: TextStyle(fontSize: 10, color: nodeColor)),
+                      ),
+                      const SizedBox(width: 6),
+                    ],
+                    // Score
+                    Container(
+                      width: 28, height: 28,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: scoreColor.withOpacity(0.1),
+                        border: Border.all(color: scoreColor, width: 1.5),
+                      ),
+                      child: Center(
+                        child: Text('${acc.acceptanceScore.toInt()}',
+                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: scoreColor)),
+                      ),
+                    ),
+                    // Flag indicator
+                    if (acc.flags.isNotEmpty) ...[
+                      const SizedBox(width: 4),
+                      Icon(Icons.warning_amber, color: AppColors.redC, size: 16),
+                    ],
+                    // Edit button
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: () => _showEditDialog(acc),
+                      child: Icon(Icons.edit, color: AppColors.textDim, size: 14),
+                    ),
+                  ],
                 ),
-                // Flag indicator
-                if (acc.flags.isNotEmpty) ...[
-                  const SizedBox(width: 4),
-                  Icon(Icons.warning_amber, color: AppColors.redC, size: 16),
+                // Duplicate warning banner
+                if (acc.isDuplicateCode) ...[
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.redC.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.error_outline, color: AppColors.redC, size: 14),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'كود مكرر — التصنيف: ${_classifyByName(acc.name).isNotEmpty ? _classifyByName(acc.name) : "غير محدد"}'
+                            '${acc.suggestedCode.isNotEmpty ? " • الكود المقترح: ${acc.suggestedCode}" : ""}',
+                            style: TextStyle(fontSize: 10, color: AppColors.redC),
+                          ),
+                        ),
+                        if (acc.suggestedCode.isNotEmpty || acc.suggestedParent.isNotEmpty)
+                          GestureDetector(
+                            onTap: () => _showReassignDialog(acc),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.orangeC.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: AppColors.orangeC.withOpacity(0.5)),
+                              ),
+                              child: Text('نقل / إعادة تبويب',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.orangeC)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               ],
             ),
