@@ -853,6 +853,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                   selReconciliation = _findCol(h, List<String>.from(t['reconciliation'] ?? []));
                                   selCurrency = _findCol(h, List<String>.from(t['currency'] ?? []));
                                   selCompany = _findCol(h, List<String>.from(t['company'] ?? []));
+                                   selParentAccount = _findCol(h, List<String>.from(t['parentAccount'] ?? []));
+                                   selLevel = _findCol(h, List<String>.from(t['level'] ?? []));
+                                   selReportType = _findCol(h, List<String>.from(t['reportType'] ?? []));
+                                   selDebitCredit = _findCol(h, List<String>.from(t['debitCredit'] ?? []));
+                                   selEnglishName = _findCol(h, List<String>.from(t['englishName'] ?? []));
                                   // Switch encoding if CSV
                                   if (csvBytes != null && ext == 'csv') {
                                     final enc = t['encoding'] as String;
@@ -873,6 +878,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                         selReconciliation = _findCol(hh, List<String>.from(t['reconciliation'] ?? []));
                                         selCurrency = _findCol(hh, List<String>.from(t['currency'] ?? []));
                                         selCompany = _findCol(hh, List<String>.from(t['company'] ?? []));
+                                   selParentAccount = _findCol(hh, List<String>.from(t['parentAccount'] ?? []));
+                                   selLevel = _findCol(hh, List<String>.from(t['level'] ?? []));
+                                   selReportType = _findCol(hh, List<String>.from(t['reportType'] ?? []));
+                                   selDebitCredit = _findCol(hh, List<String>.from(t['debitCredit'] ?? []));
+                                   selEnglishName = _findCol(hh, List<String>.from(t['englishName'] ?? []));
                                       }
                                     }
                                   }
@@ -979,8 +989,8 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         // Base keys - always shown
                         _mapRow('رقم الحساب *', selCode, colItems, (v) => setSt(() => selCode = v ?? -1)),
                         _mapRow('اسم الحساب *', selName, colItems, (v) => setSt(() => selName = v ?? -1)),
-                        _mapRow('التصنيف', selClass, colItems, (v) => setSt(() => selClass = v ?? -1)),
-                        _mapRow('القسم', selSection, colItems, (v) => setSt(() => selSection = v ?? -1)),
+                        _mapRow(_erpTemplates[selTemplate]['name'].toString().contains('أونكس') || _erpTemplates[selTemplate]['name'].toString().contains('ONYX') ? 'حساب فرعي' : 'التصنيف', selClass, colItems, (v) => setSt(() => selClass = v ?? -1)),
+                        _mapRow(_erpTemplates[selTemplate]['name'].toString().contains('أونكس') || _erpTemplates[selTemplate]['name'].toString().contains('ONYX') ? 'حساب رئيسي' : 'القسم', selSection, colItems, (v) => setSt(() => selSection = v ?? -1)),
                         // Optional keys - only if template has them
                         if (_erpTemplates[selTemplate].containsKey('reconciliation'))
                           _mapRow('التسوية', selReconciliation, colItems, (v) => setSt(() => selReconciliation = v ?? -1)),
@@ -988,8 +998,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           _mapRow('العملة', selCurrency, colItems, (v) => setSt(() => selCurrency = v ?? -1)),
                         if (_erpTemplates[selTemplate].containsKey('company'))
                           _mapRow('الشركة', selCompany, colItems, (v) => setSt(() => selCompany = v ?? -1)),
-                        if (_erpTemplates[selTemplate].containsKey('parentAccount'))
-                          _mapRow('الحساب الرئيسي', selParentAccount, colItems, (v) => setSt(() => selParentAccount = v ?? -1)),
+                        
                         if (_erpTemplates[selTemplate].containsKey('level'))
                           _mapRow('الرتبة', selLevel, colItems, (v) => setSt(() => selLevel = v ?? -1)),
                         if (_erpTemplates[selTemplate].containsKey('reportType'))
