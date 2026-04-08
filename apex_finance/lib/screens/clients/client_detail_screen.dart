@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import '../extracted/coa_screens.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-// APEX Platform Client Detail Screen - RTL Arabic-First Design
-// Navy + Gold Theme with integrated API calls
+// ════════════════════════════════════════
+// APEX Client Detail Screen v5.2 — Visual Alignment
+// ════════════════════════════════════════
+// يطابق النموذج المرجعي apex-phase1.jsx (ClientDetailPage)
+// Header + 3 info cards + Service Status Grid + Next Step + 4 tabs
 
 const Color navy = Color(0xFF050D1A);
+const Color navyLight = Color(0xFF0A1628);
 const Color navyMid = Color(0xFF111D2E);
 const Color gold = Color(0xFFC9A84C);
+const Color goldLight = Color(0xFFD4B96A);
 const Color textColor = Color(0xFFE8E0D0);
 const Color textMid = Color(0xFF9A917F);
 const Color textDim = Color(0xFF6B6355);
 const Color cardBg = Color(0xFF0D1825);
+const Color borderColor = Color(0x1FC9A84C);
 const Color greenC = Color(0xFF34D399);
 const Color blueC = Color(0xFF60A5FA);
 const Color orangeC = Color(0xFFFBBF24);
@@ -38,7 +42,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
 
-  // Data models
   Map<String, dynamic> readinessData = {};
   List<Map<String, dynamic>> documentsData = [];
   bool isLoadingReadiness = true;
@@ -64,14 +67,15 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
         });
       }
     } catch (e) {
-      // Fallback mock data
       setState(() {
         readinessData = {
           'status': 'documents_pending',
           'cr_number': 'CR-2024-001',
           'tax_id': 'TAX-1234567',
           'created_date': '2024-01-15',
-          'coa_status': 'pending',
+          'coa_status': 'قيد المراجعة',
+          'sector': 'التجزئة',
+          'type': 'شركة ذات مسؤولية محدودة',
         };
         isLoadingReadiness = false;
       });
@@ -90,37 +94,13 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
         });
       }
     } catch (e) {
-      // Fallback mock data
       setState(() {
         documentsData = [
-          {
-            'name': 'السجل التجاري',
-            'required': true,
-            'status': 'uploaded',
-            'uploaded_date': '2024-01-20',
-            'expiry_date': '2025-01-20',
-          },
-          {
-            'name': 'شهادة الضريبة',
-            'required': true,
-            'status': 'missing',
-            'uploaded_date': null,
-            'expiry_date': null,
-          },
-          {
-            'name': 'كشف بنكي',
-            'required': true,
-            'status': 'accepted',
-            'uploaded_date': '2024-01-18',
-            'expiry_date': null,
-          },
-          {
-            'name': 'محضر اجتماع',
-            'required': true,
-            'status': 'rejected',
-            'uploaded_date': '2024-01-10',
-            'expiry_date': null,
-          },
+          {'name': 'السجل التجاري', 'required': true, 'status': 'accepted', 'uploaded_date': '2024-01-20', 'expiry_date': '2025-01-20'},
+          {'name': 'شهادة التسجيل الضريبي', 'required': true, 'status': 'uploaded', 'uploaded_date': '2024-01-22', 'expiry_date': null},
+          {'name': 'كشف حساب بنكي', 'required': true, 'status': 'missing', 'uploaded_date': null, 'expiry_date': null},
+          {'name': 'محاضر مجلس الإدارة', 'required': false, 'status': 'missing', 'uploaded_date': null, 'expiry_date': null},
+          {'name': 'العنوان الوطني', 'required': true, 'status': 'accepted', 'uploaded_date': '2024-01-18', 'expiry_date': null},
         ];
         isLoadingDocuments = false;
       });
@@ -143,6 +123,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           child: Column(
             children: [
               _buildHeader(),
+              _buildInfoCards(),
+              _buildServiceStatusGrid(),
+              _buildNextStepCard(),
               _buildTabBar(),
               _buildTabContent(),
             ],
@@ -152,145 +135,172 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     );
   }
 
+  // ════════════════════════════════════════
+  // HEADER — matching reference model
+  // ════════════════════════════════════════
   Widget _buildHeader() {
     return Container(
-      color: navyMid,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+      child: Row(
         children: [
-          Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.clientName,
-                    style: const TextStyle(
-                      color: textColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'English Name',
-                    style: TextStyle(
-                      color: textMid,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 16),
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: gold,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  widget.clientName.isNotEmpty ? widget.clientName[0] : 'C',
-                  style: const TextStyle(
-                    color: navy,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+          // Avatar
+          Container(
+            width: 56, height: 56,
+            decoration: BoxDecoration(
+              color: gold.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(Icons.business, color: gold, size: 28),
           ),
-          const SizedBox(height: 16),
-          _buildStatusBadges(),
-          const SizedBox(height: 16),
-          _buildQuickInfoCards(),
+          const SizedBox(width: 16),
+          // Name + badges
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.clientName,
+                    style: const TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    _badge('نشط', greenC),
+                    _badge(readinessData['sector'] ?? 'التجزئة', blueC),
+                    _badge(readinessData['type'] ?? 'شركة', textMid),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Edit button
+          OutlinedButton.icon(
+            onPressed: () {},
+            icon: Icon(Icons.edit, size: 14, color: textMid),
+            label: Text('تعديل', style: TextStyle(color: textMid, fontSize: 12)),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: borderColor),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatusBadges() {
-    return Wrap(
-      textDirection: TextDirection.rtl,
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        _badgeWidget('نشط', greenC),
-        _badgeWidget('جاهز للوثائق', orangeC),
-        _badgeWidget('التجزئة', blueC),
-        _badgeWidget('شركة', purpleC),
-      ],
-    );
-  }
-
-  Widget _badgeWidget(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
-        border: Border.all(color: color),
-        borderRadius: BorderRadius.circular(20),
+  // ════════════════════════════════════════
+  // 3 INFO CARDS — matching reference model
+  // ════════════════════════════════════════
+  Widget _buildInfoCards() {
+    final cards = [
+      _InfoItem('السجل التجاري', readinessData['cr_number'] ?? 'N/A', Icons.description, gold),
+      _InfoItem('تاريخ الإنشاء', readinessData['created_date'] ?? 'N/A', Icons.calendar_today, blueC),
+      _InfoItem('حالة COA', readinessData['coa_status'] ?? 'لم يبدأ', Icons.account_tree, orangeC),
+    ];
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: cards.map((c) => Expanded(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor),
+            ),
+            child: Row(
+              children: [
+                Icon(c.icon, color: c.color, size: 18),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(c.label, style: TextStyle(color: textDim, fontSize: 11)),
+                      const SizedBox(height: 4),
+                      Text(c.value,
+                          style: const TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w600),
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )).toList(),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
     );
   }
 
+  // ════════════════════════════════════════
+  // SERVICE STATUS GRID — 5 services matching reference
+  // ════════════════════════════════════════
+  Widget _buildServiceStatusGrid() {
+    final coaStatus = readinessData['coa_status'] ?? 'pending';
+    final services = [
+      _ServiceItem('شجرة الحسابات', coaStatus == 'معتمد' ? 'approved' : (coaStatus == 'قيد المراجعة' ? 'review' : 'pending'), true),
+      _ServiceItem('ميزان المراجعة', coaStatus == 'معتمد' ? 'ready' : 'pending', false),
+      _ServiceItem('القوائم المالية', 'pending', false),
+      _ServiceItem('التحليل المالي', 'pending', false),
+      _ServiceItem('الامتثال والجاهزية', 'pending', false),
+    ];
 
-
-  Widget _buildQuickInfoCards() {
-    return Row(
-      textDirection: TextDirection.rtl,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _quickInfoCard('رقم السجل', readinessData['cr_number'] ?? 'N/A', gold),
-        _quickInfoCard('رقم الضريبة', readinessData['tax_id'] ?? 'N/A', greenC),
-        _quickInfoCard('تاريخ الإنشاء', readinessData['created_date'] ?? 'N/A', blueC),
-        _quickInfoCard('COA', readinessData['coa_status'] ?? 'قيد الانتظار', orangeC),
-      ],
-    );
-  }
-
-  Widget _quickInfoCard(String label, String value, Color accentColor) {
-    return Expanded(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Container(
-        margin: const EdgeInsets.only(left: 8),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardBg,
-          borderRadius: BorderRadius.circular(8),
-          border: Border(right: BorderSide(color: accentColor, width: 3)),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: textMid,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(
-                color: textColor,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            Text('حالة الخدمات',
+                style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 16),
+            Row(
+              children: services.map((s) {
+                final sColor = _serviceStatusColor(s.status);
+                final sLabel = _serviceStatusLabel(s.status);
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: s.clickable ? () {
+                      // Navigate to COA Journey
+                    } : null,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: navyMid,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(s.label,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: sColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(99),
+                              border: Border.all(color: sColor.withOpacity(0.2)),
+                            ),
+                            child: Text(sLabel,
+                                style: TextStyle(color: sColor, fontSize: 10, fontWeight: FontWeight.w600)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
@@ -298,21 +308,115 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     );
   }
 
+  Color _serviceStatusColor(String status) {
+    switch (status) {
+      case 'approved': return greenC;
+      case 'review': return orangeC;
+      case 'ready': return blueC;
+      default: return textDim;
+    }
+  }
+
+  String _serviceStatusLabel(String status) {
+    switch (status) {
+      case 'approved': return 'معتمد';
+      case 'review': return 'مراجعة';
+      case 'ready': return 'جاهز';
+      default: return 'قريبًا';
+    }
+  }
+
+  // ════════════════════════════════════════
+  // NEXT STEP CARD — matching reference model
+  // ════════════════════════════════════════
+  Widget _buildNextStepCard() {
+    final coaStatus = readinessData['coa_status'] ?? '';
+    final hasCoA = coaStatus.isNotEmpty && coaStatus != 'pending' && coaStatus != 'لم يبدأ';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [gold.withOpacity(0.12), Colors.transparent],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: gold.withOpacity(0.25)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.auto_awesome, color: gold, size: 22),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('الخطوة التالية',
+                      style: TextStyle(color: gold, fontSize: 14, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 3),
+                  Text(
+                    hasCoA ? 'متابعة رحلة شجرة الحسابات' : 'رفع شجرة الحسابات لبدء المسار المالي',
+                    style: TextStyle(color: textMid, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            ElevatedButton.icon(
+              onPressed: () {
+                // Navigate to COA Journey
+              },
+              icon: Icon(Icons.arrow_back, size: 14),
+              label: Text(hasCoA ? 'متابعة COA' : 'رفع COA'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: gold,
+                foregroundColor: navy,
+                textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ════════════════════════════════════════
+  // TAB BAR — pill style matching COA screens
+  // ════════════════════════════════════════
   Widget _buildTabBar() {
-    return Container(
-      color: navyMid,
-      child: TabBar(
-        controller: _tabController,
-        indicatorColor: gold,
-        indicatorWeight: 3,
-        labelColor: gold,
-        unselectedLabelColor: textMid,
-        tabs: const [
-          Tab(text: 'البيانات'),
-          Tab(text: 'المستندات'),
-          Tab(text: 'الخدمات'),
-          Tab(text: 'النشاط'),
-        ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: navyMid,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
+        ),
+        child: TabBar(
+          controller: _tabController,
+          indicator: BoxDecoration(
+            color: gold.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: gold.withOpacity(0.3)),
+          ),
+          indicatorSize: TabBarIndicatorSize.tab,
+          labelColor: gold,
+          unselectedLabelColor: textDim,
+          labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+          unselectedLabelStyle: const TextStyle(fontSize: 12),
+          dividerHeight: 0,
+          tabs: const [
+            Tab(icon: Icon(Icons.info_outline, size: 16), text: 'البيانات'),
+            Tab(icon: Icon(Icons.folder_outlined, size: 16), text: 'المستندات'),
+            Tab(icon: Icon(Icons.hub, size: 16), text: 'الخدمات'),
+            Tab(icon: Icon(Icons.history, size: 16), text: 'النشاط'),
+          ],
+        ),
       ),
     );
   }
@@ -332,37 +436,33 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     );
   }
 
+  // ════════════════════════════════════════
+  // TAB 1: INFO
+  // ════════════════════════════════════════
   Widget _buildInfoTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           Row(
-            textDirection: TextDirection.rtl,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _infoCard(
-                  'المعلومات الأساسية',
-                  [
-                    ('النوع', 'شركة'),
-                    ('القطاع', 'التجزئة'),
-                    ('الحالة', 'نشط'),
-                    ('الموقع', 'الرياض'),
-                  ],
-                ),
+                child: _infoCard('المعلومات الأساسية', [
+                  ('النوع', readinessData['type'] ?? 'شركة'),
+                  ('القطاع', readinessData['sector'] ?? 'التجزئة'),
+                  ('الحالة', 'نشط'),
+                  ('الموقع', 'الرياض'),
+                ]),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _infoCard(
-                  'الاتصال والموقع',
-                  [
-                    ('البريد الإلكتروني', 'info@company.com'),
-                    ('الهاتف', '+966 11 123 4567'),
-                    ('العنوان', 'الرياض، المملكة العربية السعودية'),
-                    ('الموقع الجغرافي', '24.7136° N, 46.6753° E'),
-                  ],
-                ),
+                child: _infoCard('الاتصال والموقع', [
+                  ('البريد الإلكتروني', 'info@company.com'),
+                  ('الهاتف', '+966 11 123 4567'),
+                  ('العنوان', 'الرياض، المملكة العربية السعودية'),
+                  ('الموقع الجغرافي', '24.7136° N, 46.6753° E'),
+                ]),
               ),
             ],
           ),
@@ -378,35 +478,22 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: textDim.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: gold,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
+          Text(title,
+              style: TextStyle(color: goldLight, fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 14),
           ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.only(bottom: 10),
             child: Row(
-              textDirection: TextDirection.rtl,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  item.$1,
-                  style: TextStyle(color: textMid, fontSize: 12),
-                ),
-                Text(
-                  item.$2,
-                  style: const TextStyle(color: textColor, fontSize: 12),
-                ),
+                Text(item.$1, style: TextStyle(color: textMid, fontSize: 12)),
+                Text(item.$2, style: const TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w500)),
               ],
             ),
           )),
@@ -417,70 +504,60 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
 
   Widget _buildReadinessFlow() {
     final steps = [
-      ('not_ready', 'غير جاهز'),
-      ('documents_pending', 'الوثائق المعلقة'),
-      ('ready_for_coa', 'جاهز للمراجع'),
-      ('coa_in_progress', 'المراجع جارية'),
-      ('ready_for_tb', 'جاهز للميزانية'),
+      ('تهيئة', 0), ('المستندات', 1), ('جاهز لـ COA', 2), ('COA جارية', 3), ('جاهز لـ TB', 4),
     ];
-
-    String currentStatus = readinessData['status'] ?? 'not_ready';
+    final currentIdx = 1; // documents_pending
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: gold, width: 1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'مسار الجاهزية',
-            style: TextStyle(
-              color: gold,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text('مسار الجاهزية',
+              style: TextStyle(color: goldLight, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
           Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: steps.asMap().entries.map((entry) {
-              int idx = entry.key;
-              var step = entry.value;
-              bool isActive = steps.indexWhere((s) => s.$1 == currentStatus) >= idx;
+              final idx = entry.key;
+              final step = entry.value;
+              final isCompleted = idx < currentIdx;
+              final isCurrent = idx == currentIdx;
+              final color = isCompleted ? greenC : (isCurrent ? gold : textDim);
 
               return Expanded(
-                child: Column(
+                child: Row(
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isActive ? gold : textDim.withOpacity(0.3),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '${idx + 1}',
-                        style: TextStyle(
-                          color: isActive ? navy : textMid,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 36, height: 36,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isCompleted ? greenC : (isCurrent ? gold : navyMid),
+                              border: Border.all(color: color, width: 2),
+                            ),
+                            child: Center(
+                              child: isCompleted
+                                  ? Icon(Icons.check, color: Colors.white, size: 16)
+                                  : Text('${idx + 1}',
+                                      style: TextStyle(color: isCurrent ? navy : textDim, fontSize: 12, fontWeight: FontWeight.w700)),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(step.$1,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: color, fontSize: 10, fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w400)),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      step.$2,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: isActive ? textColor : textMid,
-                        fontSize: 11,
-                      ),
-                    ),
+                    if (idx < steps.length - 1)
+                      Container(width: 20, height: 2, color: isCompleted ? greenC : borderColor),
                   ],
                 ),
               );
@@ -491,44 +568,56 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     );
   }
 
+  // ════════════════════════════════════════
+  // TAB 2: DOCUMENTS
+  // ════════════════════════════════════════
   Widget _buildDocumentsTab() {
     int mandatory = documentsData.where((d) => d['required'] == true).length;
     int uploaded = documentsData.where((d) => d['status'] != 'missing').length;
+    final pct = mandatory > 0 ? uploaded / mandatory : 0.0;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'المستندات المطلوبة',
-                style: const TextStyle(
-                  color: textColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('المستندات المطلوبة',
+                      style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  Text('$uploaded من $mandatory مكتملة',
+                      style: TextStyle(color: textMid, fontSize: 12)),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                '$uploaded من $mandatory مكتملة',
-                style: TextStyle(
-                  color: textMid,
-                  fontSize: 12,
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.upload_file, size: 16),
+                label: const Text('رفع مستند'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: gold,
+                  foregroundColor: navy,
+                  textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          LinearProgressIndicator(
-            value: uploaded / mandatory,
-            backgroundColor: textDim.withOpacity(0.2),
-            valueColor: const AlwaysStoppedAnimation<Color>(gold),
-            minHeight: 6,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: pct,
+              backgroundColor: navyMid,
+              valueColor: AlwaysStoppedAnimation<Color>(pct >= 1.0 ? greenC : gold),
+              minHeight: 6,
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           ...documentsData.map((doc) => _documentCard(doc)),
         ],
       ),
@@ -536,520 +625,335 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   }
 
   Widget _documentCard(Map<String, dynamic> doc) {
-    Color statusColor = _statusColor(doc['status']);
-    bool isMissing = doc['status'] == 'missing';
-    bool isRejected = doc['status'] == 'rejected';
+    final statusColor = _docStatusColor(doc['status']);
+    final statusLabel = _docStatusLabel(doc['status']);
+    final statusIcon = _docStatusIcon(doc['status']);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border(
-          right: BorderSide(color: statusColor, width: 4),
-        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor),
       ),
-      padding: const EdgeInsets.all(12),
       child: Row(
-        textDirection: TextDirection.rtl,
         children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(statusIcon, color: statusColor, size: 18),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  textDirection: TextDirection.rtl,
                   children: [
-                    Flexible(
-                      child: Text(
-                        doc['name'],
-                        style: const TextStyle(
-                          color: textColor,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                    Text(doc['name'], style: const TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
                     if (doc['required'] == true) ...[
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: redC.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'إلزامي',
-                          style: TextStyle(
-                            color: redC,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                      Text('*', style: TextStyle(color: redC, fontSize: 14, fontWeight: FontWeight.bold)),
                     ],
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
-                  doc['uploaded_date'] != null
-                      ? 'تم التحميل: ${doc['uploaded_date']}'
-                      : 'لم يتم التحميل',
-                  style: TextStyle(
-                    color: textMid,
-                    fontSize: 11,
-                  ),
+                  doc['uploaded_date'] != null ? 'تم الرفع: ${doc['uploaded_date']}' : 'لم يتم الرفع بعد',
+                  style: TextStyle(color: textDim, fontSize: 11),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(6),
+              color: statusColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(99),
+              border: Border.all(color: statusColor.withOpacity(0.2)),
             ),
-            child: Text(
-              _statusLabel(doc['status']),
-              style: TextStyle(
-                color: statusColor,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: Text(statusLabel,
+                style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.w600)),
           ),
-          const SizedBox(width: 8),
-          if (isMissing || isRejected)
-            SizedBox(
-              height: 32,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  try {
-                    final result = await FilePicker.platform.pickFiles(
-                      type: FileType.custom,
-                      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
-                      allowMultiple: false,
-                    );
-                    if (result != null && result.files.isNotEmpty) {
-                      final file = result.files.first;
-                      if (context.mounted) {
-                        setState(() {
-                          doc['status'] = 'uploaded';
-                          doc['uploaded_date'] = DateTime.now().toString().substring(0, 10);
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('تم رفع \${file.name} بنجاح'),
-                            backgroundColor: const Color(0xFF34D399),
-                          ),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('خطأ: \$e'), backgroundColor: const Color(0xFFF87171)),
-                      );
-                    }
-                  }
-                },
-                icon: const Icon(Icons.upload_file, size: 14),
-                label: const Text('رفع', style: TextStyle(fontSize: 11)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFC9A84C),
-                  foregroundColor: const Color(0xFF050D1A),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                  textStyle: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ),
-            )
-          else
-            SizedBox(
-              height: 32,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('عرض المستند...'),
-                      backgroundColor: Color(0xFF60A5FA),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.visibility, size: 14),
-                label: const Text('عرض', style: TextStyle(fontSize: 11)),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF60A5FA),
-                  side: const BorderSide(color: Color(0xFF60A5FA)),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                ),
-              ),
-            ),
         ],
       ),
     );
   }
 
-  Color _statusColor(String status) {
-    return {
-      'uploaded': blueC,
-      'accepted': greenC,
-      'rejected': redC,
-      'missing': textMid,
-      'expired': orangeC,
-    }[status] ?? textMid;
+  Color _docStatusColor(String status) {
+    switch (status) {
+      case 'accepted': return greenC;
+      case 'uploaded': return blueC;
+      case 'rejected': return redC;
+      case 'expired': return orangeC;
+      default: return textDim;
+    }
   }
 
-  String _statusLabel(String status) {
-    return {
-      'uploaded': 'مرفوع',
-      'accepted': 'مقبول',
-      'rejected': 'مرفوض',
-      'missing': 'مفقود',
-      'expired': 'منتهي',
-    }[status] ?? 'غير معروف';
+  String _docStatusLabel(String status) {
+    switch (status) {
+      case 'accepted': return 'مقبول';
+      case 'uploaded': return 'مرفوع';
+      case 'rejected': return 'مرفوض';
+      case 'expired': return 'منتهي';
+      default: return 'مفقود';
+    }
   }
 
+  IconData _docStatusIcon(String status) {
+    switch (status) {
+      case 'accepted': return Icons.check_circle_outline;
+      case 'uploaded': return Icons.cloud_done;
+      case 'rejected': return Icons.cancel_outlined;
+      case 'expired': return Icons.timer_off;
+      default: return Icons.insert_drive_file_outlined;
+    }
+  }
+
+  // ════════════════════════════════════════
+  // TAB 3: SERVICES (detailed)
+  // ════════════════════════════════════════
   Widget _buildServicesTab() {
+    final services = [
+      _DetailedService('شجرة الحسابات', 'COA', 'تحليل وتصنيف الدليل المحاسبي', greenC, Icons.account_tree, 'قيد المراجعة'),
+      _DetailedService('ميزان المراجعة', 'TB', 'التحقق من صحة الأرصدة المحاسبية', blueC, Icons.balance, 'بعد COA'),
+      _DetailedService('القوائم المالية', 'Statements', 'إعداد الميزانية وقائمة الدخل', orangeC, Icons.assessment, 'بعد TB'),
+      _DetailedService('التحليل المالي', 'Analysis', 'النسب المالية والمؤشرات', purpleC, Icons.analytics, 'بعد Statements'),
+      _DetailedService('الامتثال والجاهزية', 'Compliance', 'التأكد من الجاهزية النظامية', gold, Icons.shield, 'متوازي'),
+    ];
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              textDirection: TextDirection.ltr,
-              children: [
-                _serviceCardCOA(),
-                _serviceCard('TB', 'الميزانية', blueC),
-                _serviceCard('Statements', 'البيانات', orangeC),
-                _serviceCard('Analysis', 'التحليل', purpleC),
-                _serviceCard('Compliance', 'الامتثال', gold),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Container(
+          ...services.map((s) => Container(
+            margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [gold.withOpacity(0.2), gold.withOpacity(0.05)],
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-              ),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: gold, width: 1),
+              color: cardBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(
-                  'الخطوة التالية',
-                  style: TextStyle(
-                    color: gold,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                Container(
+                  width: 48, height: 48,
+                  decoration: BoxDecoration(
+                    color: s.color.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  child: Icon(s.icon, color: s.color, size: 22),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'يرجى تقديم الوثائق المتبقية',
-                  style: const TextStyle(
-                    color: textColor,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (_) => CoaJourneyScreen(
-                        clientId: widget.clientId.toString(),
-                        clientName: widget.clientName,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(s.label, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
+                          const SizedBox(width: 8),
+                          Text(s.labelEn, style: TextStyle(color: textDim, fontSize: 11)),
+                        ],
                       ),
-                    ));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: gold,
-                    foregroundColor: navy,
+                      const SizedBox(height: 4),
+                      Text(s.desc, style: TextStyle(color: textDim, fontSize: 11)),
+                    ],
                   ),
-                  child: const Text('عرض التفاصيل'),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: s.color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(99),
+                    border: Border.all(color: s.color.withOpacity(0.2)),
+                  ),
+                  child: Text(s.status,
+                      style: TextStyle(color: s.color, fontSize: 10, fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 20),
+          )),
+
+          const SizedBox(height: 16),
+          // Financial pathway
           _buildFinancialPathway(),
         ],
       ),
     );
   }
 
-  Widget _serviceCard(String title, String subtitle, Color color, {VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color.withOpacity(0.2),
-            ),
-            alignment: Alignment.center,
-            child: Icon(Icons.check, color: color, size: 20),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              color: textColor,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: TextStyle(
-              color: textMid,
-              fontSize: 11,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-      ),
-    );
-  }
-
-
-  Widget _serviceCardCOA() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (_) => CoaJourneyScreen(
-            clientId: widget.clientId.toString(),
-            clientName: widget.clientName,
-          ),
-        ));
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: greenC, width: 2),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 48, height: 48,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: greenC.withOpacity(0.2),
-              ),
-              alignment: Alignment.center,
-              child: const Icon(Icons.upload_file, color: greenC, size: 24),
-            ),
-            const SizedBox(height: 8),
-            const Text('COA', style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            const Text('رفع / مراجعة', style: TextStyle(color: greenC, fontSize: 11, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: greenC.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text('انتقل', style: TextStyle(color: greenC, fontSize: 10, fontWeight: FontWeight.w700)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildFinancialPathway() {
     final steps = [
-      ('جمع الوثائق', 'تم'),
-      ('المراجعة المالية', 'جارية'),
-      ('إعداد الميزانية', 'قيد الانتظار'),
-      ('الإقفال النهائي', 'قيد الانتظار'),
+      ('جمع الوثائق', 'تم', greenC),
+      ('المراجعة المالية', 'جارية', gold),
+      ('إعداد الميزانية', 'قيد الانتظار', textDim),
+      ('الإقفال النهائي', 'قيد الانتظار', textDim),
     ];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: textDim.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'مسار السنة المالية',
-            style: TextStyle(
-              color: gold,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text('مسار السنة المالية',
+              style: TextStyle(color: goldLight, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
-          ...steps.asMap().entries.map((entry) {
-            int idx = entry.key;
-            var step = entry.value;
-            bool isCompleted = step.$2 == 'تم';
-            bool isInProgress = step.$2 == 'جارية';
-
+          ...steps.map((step) {
+            final isCompleted = step.$2 == 'تم';
+            final isActive = step.$2 == 'جارية';
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 14),
               child: Row(
-                textDirection: TextDirection.rtl,
                 children: [
                   Container(
-                    width: 24,
-                    height: 24,
+                    width: 28, height: 28,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isCompleted
-                          ? greenC
-                          : isInProgress
-                              ? gold
-                              : textDim.withOpacity(0.3),
+                      color: step.$3.withOpacity(isCompleted ? 1.0 : 0.15),
+                      border: Border.all(color: step.$3, width: 2),
                     ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      isCompleted ? Icons.check : Icons.circle,
-                      color: isCompleted ? navy : textMid,
-                      size: 12,
+                    child: Center(
+                      child: isCompleted
+                          ? Icon(Icons.check, color: Colors.white, size: 14)
+                          : (isActive
+                              ? Icon(Icons.play_arrow, color: gold, size: 14)
+                              : null),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          step.$1,
-                          style: const TextStyle(
-                            color: textColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          step.$2,
-                          style: TextStyle(
-                            color: textMid,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
+                    child: Text(step.$1,
+                        style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w600)),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: step.$3.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(99),
                     ),
+                    child: Text(step.$2,
+                        style: TextStyle(color: step.$3, fontSize: 10, fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
   }
 
+  // ════════════════════════════════════════
+  // TAB 4: ACTIVITY TIMELINE
+  // ════════════════════════════════════════
   Widget _buildActivityTab() {
     final activities = [
-      ('تم تحميل الوثائق', 'قبل ساعتين', Icons.file_upload, greenC),
-      ('تم إنشاء الحساب', 'قبل يوم', Icons.person_add, blueC),
-      ('تم التصديق', 'قبل 3 أيام', Icons.verified, greenC),
-      ('تم الطلب', 'قبل أسبوع', Icons.assignment, orangeC),
+      ('تم اعتماد شجرة حسابات العميل', 'الجودة: 87% — جميع الحسابات معتمدة', 'قبل ساعتين', Icons.check_circle_outline, greenC),
+      ('تم رفع شهادة التسجيل الضريبي', 'المستند بانتظار المراجعة', 'قبل 4 ساعات', Icons.upload_file, blueC),
+      ('تم إنشاء ملف العميل', 'بيانات أساسية + معلومات الاتصال', 'أمس', Icons.person_add, gold),
+      ('فحص الامتثال — ناجح', 'جميع المستندات الإلزامية سارية', 'قبل يومين', Icons.shield, greenC),
+      ('تحديث بيانات الاتصال', 'تم تحديث البريد الإلكتروني ورقم الهاتف', 'قبل 3 أيام', Icons.edit, orangeC),
     ];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: Column(
-        children: [
-          ...activities.asMap().entries.map((entry) {
-            int idx = entry.key;
-            var activity = entry.value;
-            bool isLast = idx == activities.length - 1;
+        children: activities.asMap().entries.map((entry) {
+          final idx = entry.key;
+          final a = entry.value;
+          final isLast = idx == activities.length - 1;
 
-            return Row(
-              textDirection: TextDirection.rtl,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: activity.$4.withOpacity(0.2),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        activity.$3,
-                        color: activity.$4,
-                        size: 20,
-                      ),
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    width: 38, height: 38,
+                    decoration: BoxDecoration(
+                      color: a.$5.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    if (!isLast)
-                      Container(
-                        width: 2,
-                        height: 40,
-                        color: textDim.withOpacity(0.3),
+                    child: Icon(a.$4, color: a.$5, size: 16),
+                  ),
+                  if (!isLast)
+                    Container(width: 2, height: 40, color: borderColor),
+                ],
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4, bottom: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(a.$1,
+                                style: const TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
+                          ),
+                          Text(a.$3, style: TextStyle(color: textDim, fontSize: 11)),
+                        ],
                       ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          activity.$1,
-                          style: const TextStyle(
-                            color: textColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          activity.$2,
-                          style: TextStyle(
-                            color: textMid,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
+                      const SizedBox(height: 4),
+                      Text(a.$2, style: TextStyle(color: textDim, fontSize: 11)),
+                    ],
                   ),
                 ),
-              ],
-            );
-          }).toList(),
-        ],
+              ),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
+
+  // ════════════════════════════════════════
+  // HELPERS
+  // ════════════════════════════════════════
+  Widget _badge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Text(text,
+          style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+// ─── Data Classes ───
+class _InfoItem {
+  final String label, value;
+  final IconData icon;
+  final Color color;
+  _InfoItem(this.label, this.value, this.icon, this.color);
+}
+
+class _ServiceItem {
+  final String label, status;
+  final bool clickable;
+  _ServiceItem(this.label, this.status, this.clickable);
+}
+
+class _DetailedService {
+  final String label, labelEn, desc, status;
+  final Color color;
+  final IconData icon;
+  _DetailedService(this.label, this.labelEn, this.desc, this.color, this.icon, this.status);
 }
