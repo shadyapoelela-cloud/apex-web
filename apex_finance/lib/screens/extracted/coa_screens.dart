@@ -911,6 +911,29 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                             );
                           }),
                         ),
+                        // Custom ERP name input
+                        if (_erpTemplates[selTemplate]['name'] == 'برامج أخرى') ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0A1628),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFFC9A84C)),
+                            ),
+                            child: TextField(
+                              onChanged: (v) { customErpName = v; },
+                              style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Tajawal'),
+                              textDirection: TextDirection.rtl,
+                              decoration: const InputDecoration(
+                                hintText: 'ادخل اسم البرنامج',
+                                hintStyle: TextStyle(color: Color(0xFF5A6A7A)),
+                                border: InputBorder.none,
+                                icon: Icon(Icons.edit, color: Color(0xFFC9A84C), size: 18),
+                              ),
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 16),
 
                         // Encoding selector (CSV only)
