@@ -32,6 +32,16 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", 
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS", "30"))
 MAX_FAILED_LOGINS = 5
 LOCKOUT_MINUTES = 15
+
+
+# ── Safe datetime helper (v6.5.1) ──────────────────────────
+def safe_aware(dt):
+    """Ensure a datetime is timezone-aware (UTC). Fixes naive vs aware comparison."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
 PASSWORD_MIN_LENGTH = 8
 
 # Try bcrypt, fallback to hashlib
@@ -204,8 +214,8 @@ class AuthService:
                 return {"success": False, "error": "ط§ظ„ط­ط³ط§ط¨ ظ…ط¹ط·ظ‘ظ„"}
 
             if user.failed_login_count >= MAX_FAILED_LOGINS:
-                if user.locked_until and user.locked_until > datetime.now(timezone.utc):
-                    remaining = (user.locked_until - datetime.now(timezone.utc)).seconds // 60
+                if user.locked_until and safe_aware(user.locked_until) > datetime.now(timezone.utc):
+                    remaining = (safe_aware(user.locked_until) - datetime.now(timezone.utc)).seconds // 60
                     return {"success": False, "error": f"ط§ظ„ط­ط³ط§ط¨ ظ…ظ‚ظپظ„ â€” ط­ط§ظˆظ„ ط¨ط¹ط¯ {remaining} ط¯ظ‚ظٹظ‚ط©"}
                 else:
                     user.failed_login_count = 0
@@ -358,7 +368,7 @@ class AuthService:
             ).first()
             if not reset:
                 return {"success": False, "error": "ط±ظ…ط² ط¥ط¹ط§ط¯ط© ط§ظ„طھط¹ظٹظٹظ† ط؛ظٹط± طµط§ظ„ط­"}
-            if reset.expires_at < datetime.now(timezone.utc):
+            if safe_aware(reset.expires_at) < datetime.now(timezone.utc):
                 return {"success": False, "error": "ط§ظ†طھظ‡طھ طµظ„ط§ط­ظٹط© ط§ظ„ط±ظ…ط²"}
 
             user = db.query(User).filter(User.id == reset.user_id).first()

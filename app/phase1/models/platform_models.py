@@ -149,10 +149,10 @@ class User(Base):
     status = Column(String(30), default=UserStatus.pending_verification.value, nullable=False)
     email_verified = Column(Boolean, default=False)
     mobile_verified = Column(Boolean, default=False)
-    last_login_at = Column(DateTime, nullable=True)
+    last_login_at = Column(DateTime(timezone=True), nullable=True)
     login_count = Column(Integer, default=0)
     failed_login_count = Column(Integer, default=0)
-    locked_until = Column(DateTime, nullable=True)
+    locked_until = Column(DateTime(timezone=True), nullable=True)
     language = Column(String(5), default="ar")
     timezone = Column(String(50), default="Asia/Riyadh")
 
@@ -165,11 +165,11 @@ class User(Base):
     mobile_number = Column(String(20), nullable=True)
     mobile_verified = Column(Boolean, default=False)
     is_deleted = Column(Boolean, default=False)
-    deleted_at = Column(DateTime, nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
 
     # Timestamps
-    created_at = Column(DateTime, default=utcnow, nullable=False)
-    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
     # Relationships
     profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
@@ -198,8 +198,8 @@ class UserProfile(Base):
     notification_email = Column(Boolean, default=True)
     notification_sms = Column(Boolean, default=False)
     notification_in_app = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
-    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
     user = relationship("User", back_populates="profile")
 
@@ -215,9 +215,9 @@ class UserSession(Base):
     device_info = Column(String(500), nullable=True)
     ip_address = Column(String(45), nullable=True)
     is_active = Column(Boolean, default=True)
-    expires_at = Column(DateTime, nullable=False)
-    last_used_at = Column(DateTime, default=utcnow)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    last_used_at = Column(DateTime(timezone=True), default=utcnow)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="sessions")
 
@@ -229,10 +229,10 @@ class PasswordReset(Base):
     id = Column(String(36), primary_key=True, default=gen_uuid)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     token_hash = Column(String(255), nullable=False, unique=True)
-    expires_at = Column(DateTime, nullable=False)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
     used = Column(Boolean, default=False)
-    used_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    used_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
 
 class UserSecurityEvent(Base):
@@ -245,7 +245,7 @@ class UserSecurityEvent(Base):
     ip_address = Column(String(45), nullable=True)
     user_agent = Column(String(500), nullable=True)
     details = Column(JSON, nullable=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="security_events")
 
@@ -268,7 +268,7 @@ class Role(Base):
     name_en = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
     is_system = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
 
 class Permission(Base):
@@ -281,7 +281,7 @@ class Permission(Base):
     name_en = Column(String(150), nullable=True)
     resource = Column(String(50), nullable=False)
     action = Column(String(30), nullable=False)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     __table_args__ = (
         Index("ix_perm_resource_action", "resource", "action"),
@@ -295,7 +295,7 @@ class RolePermission(Base):
     id = Column(String(36), primary_key=True, default=gen_uuid)
     role_id = Column(String(36), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False)
     permission_id = Column(String(36), ForeignKey("permissions.id", ondelete="CASCADE"), nullable=False)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     __table_args__ = (
         UniqueConstraint("role_id", "permission_id", name="uq_role_perm"),
@@ -309,7 +309,7 @@ class UserRole(Base):
     id = Column(String(36), primary_key=True, default=gen_uuid)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     role_id = Column(String(36), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False)
-    assigned_at = Column(DateTime, default=utcnow, nullable=False)
+    assigned_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     assigned_by = Column(String(36), nullable=True)
 
     user = relationship("User", back_populates="roles")
@@ -340,8 +340,8 @@ class Plan(Base):
     sort_order = Column(Integer, default=0)
     target_user_ar = Column(String(200), nullable=True)
     target_user_en = Column(String(200), nullable=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
-    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
     features = relationship("PlanFeature", back_populates="plan", cascade="all, delete-orphan")
 
@@ -357,7 +357,7 @@ class PlanFeature(Base):
     feature_name_en = Column(String(150), nullable=True)
     value_type = Column(String(20), default="boolean")  # boolean, integer, string
     value = Column(String(50), nullable=False)  # "true", "false", "20", "unlimited"
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     plan = relationship("Plan", back_populates="features")
 
@@ -375,13 +375,13 @@ class UserSubscription(Base):
     plan_id = Column(String(36), ForeignKey("plans.id"), nullable=False)
     status = Column(String(20), default=SubscriptionStatus.active.value, nullable=False)
     billing_cycle = Column(String(10), default="monthly")  # monthly, yearly
-    started_at = Column(DateTime, default=utcnow, nullable=False)
-    expires_at = Column(DateTime, nullable=True)
-    renewed_at = Column(DateTime, nullable=True)
-    cancelled_at = Column(DateTime, nullable=True)
+    started_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+    renewed_at = Column(DateTime(timezone=True), nullable=True)
+    cancelled_at = Column(DateTime(timezone=True), nullable=True)
     previous_plan_id = Column(String(36), nullable=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
-    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
     user = relationship("User", back_populates="subscription")
     plan = relationship("Plan")
@@ -397,8 +397,8 @@ class SubscriptionEntitlement(Base):
     value_type = Column(String(20), default="boolean")
     value = Column(String(50), nullable=False)
     source_plan_id = Column(String(36), ForeignKey("plans.id"), nullable=True)
-    granted_at = Column(DateTime, default=utcnow, nullable=False)
-    expires_at = Column(DateTime, nullable=True)
+    granted_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    expires_at = Column(DateTime(timezone=True), nullable=True)
 
     user = relationship("User", back_populates="entitlements")
 
@@ -424,9 +424,9 @@ class PolicyDocument(Base):
     content_ar = Column(Text, nullable=False)
     content_en = Column(Text, nullable=True)
     is_current = Column(Boolean, default=True)
-    effective_from = Column(DateTime, default=utcnow, nullable=False)
-    superseded_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    effective_from = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    superseded_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     __table_args__ = (
         UniqueConstraint("policy_type", "version", name="uq_policy_version"),
@@ -441,7 +441,7 @@ class PolicyAcceptanceLog(Base):
     id = Column(String(36), primary_key=True, default=gen_uuid)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     policy_document_id = Column(String(36), ForeignKey("policy_documents.id"), nullable=False)
-    accepted_at = Column(DateTime, default=utcnow, nullable=False)
+    accepted_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     accepted_ip = Column(String(45), nullable=True)
     accepted_user_agent = Column(String(500), nullable=True)
 
@@ -471,8 +471,8 @@ class Notification(Base):
     source_type = Column(String(50), nullable=True)  # registration, verification, plan_change, etc.
     source_id = Column(String(36), nullable=True)
     is_read = Column(Boolean, default=False)
-    read_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    read_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="notifications")
 
@@ -494,12 +494,12 @@ class AccountClosureRequest(Base):
     closure_type = Column(String(20), nullable=False)  # temporary, permanent
     reason = Column(Text, nullable=True)
     status = Column(String(20), default=ClosureStatus.requested.value, nullable=False)
-    requested_at = Column(DateTime, default=utcnow, nullable=False)
-    processed_at = Column(DateTime, nullable=True)
+    requested_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    processed_at = Column(DateTime(timezone=True), nullable=True)
     processed_by = Column(String(36), nullable=True)
-    reactivation_date = Column(DateTime, nullable=True)  # For temporary closures
+    reactivation_date = Column(DateTime(timezone=True), nullable=True)  # For temporary closures
     retention_notice_sent = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="closure_requests")
 
@@ -519,7 +519,7 @@ class AuditEvent(Base):
     resource_id = Column(String(36), nullable=True)
     details = Column(JSON, nullable=True)
     ip_address = Column(String(45), nullable=True)
-    created_at = Column(DateTime, default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     __table_args__ = (
         Index("ix_audit_user_action", "user_id", "action"),
