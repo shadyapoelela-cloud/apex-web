@@ -1,3 +1,4 @@
+import 'dart:html' as html;
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -373,6 +374,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
       'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
       'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
+      'parentAccount': <String>['الحساب الرئيسي', 'parent_account', 'parent', 'الحساب الأب'],
+      'level': <String>['الرتبة', 'level', 'المستوى'],
+      'reportType': <String>['نوع التقرير', 'report_type'],
+      'debitCredit': <String>['مدين دائن', 'debit_credit', 'طبيعة الحساب'],
+      'englishName': <String>['الاسم الاجنبي', 'english_name', 'الاسم بالانجليزي'],
     },
     {
       'name': 'ERPNext',
@@ -425,6 +431,19 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile', 'allow_reconciliation'],
       'currency': <String>['عملة الحساب', 'العملة', 'currency', 'currency_id', 'waers'],
       'company': <String>['الشركة', 'اسم الشركة', 'company', 'company_id', 'bukrs', 'company_name'],
+    },
+    {
+      'name': 'برامج أخرى',
+      'icon': 0xe145,
+      'encoding': 'auto',
+      'code': <String>['code', 'رقم', 'رمز', 'رقم الحساب', 'الرقم', 'كود', 'account_code', 'account'],
+      'name_col': <String>['name', 'اسم', 'اسم الحساب', 'الاسم', 'بيان', 'account_name', 'description'],
+      'class': <String>['type', 'النوع', 'التصنيف', 'نوع الحساب', 'account_type', 'classification'],
+      'section': <String>['section', 'القسم', 'الفئة', 'category', 'group', 'parent'],
+      'balance': <String>['balance', 'الرصيد', 'المبلغ', 'amount'],
+      'reconciliation': <String>['السماح بالتسوية', 'التسوية', 'reconciliation', 'reconcile'],
+      'currency': <String>['عملة الحساب', 'العملة', 'currency'],
+      'company': <String>['الشركة', 'اسم الشركة', 'company'],
     },
   ];
 
@@ -480,6 +499,75 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     'خارج الميزانية': ['أخرى', 'خارج الميزانية'],
     'Off-Balance Sheet': ['أخرى', 'خارج الميزانية'],
   };
+
+  // ============================================
+  // ONYX: Classify account using parent chain + report type
+  // ============================================
+  static List<String> _onyxClassify(String code, String parentCode, String levelStr, String reportType, String debitCredit) {
+    // Returns [parentClassification, subClassification, level]
+    final codeNum = int.tryParse(code) ?? 0;
+    final level = int.tryParse(levelStr) ?? 0;
+    final report = int.tryParse(reportType) ?? 1;
+    final isDebit = debitCredit == '1' || debitCredit.toLowerCase() == 'true';
+
+    // Determine main category from first digit of account code
+    String mainCat = '';
+    String subCat = '';
+    if (codeNum > 0) {
+      final firstDigit = code.trim()[0];
+      switch (firstDigit) {
+        case '1':
+          mainCat = 'أصول';
+          // Sub-classify by second digit
+          if (code.length >= 2) {
+            switch (code.trim()[1]) {
+              case '1': subCat = 'أصول ثابتة'; break;
+              case '2': subCat = 'أصول متداولة'; break;
+              case '3': subCat = 'أصول متداولة'; break;
+              case '4': subCat = 'أرصدة مدينة أخرى'; break;
+              default: subCat = 'أصول أخرى'; break;
+            }
+          }
+          break;
+        case '2':
+          mainCat = 'التزامات';
+          if (code.length >= 2) {
+            switch (code.trim()[1]) {
+              case '1': subCat = 'حقوق ملكية وخصوم ثابتة'; break;
+              case '2': subCat = 'خصوم متداولة'; break;
+              case '3': subCat = 'أرصدة دائنة أخرى'; break;
+              default: subCat = 'التزامات أخرى'; break;
+            }
+          }
+          break;
+        case '3':
+          mainCat = 'مصروفات';
+          if (code.length >= 2) {
+            switch (code.trim()[1]) {
+              case '1': subCat = 'مصاريف النشاط'; break;
+              case '2': subCat = 'مصاريف إدارية وعمومية'; break;
+              default: subCat = 'مصروفات أخرى'; break;
+            }
+          }
+          break;
+        case '4':
+          mainCat = 'إيرادات';
+          if (code.length >= 2) {
+            switch (code.trim()[1]) {
+              case '1': subCat = 'إيرادات النشاط'; break;
+              case '2': subCat = 'إيرادات أخرى'; break;
+              default: subCat = 'إيرادات أخرى'; break;
+            }
+          }
+          break;
+        default:
+          mainCat = 'أخرى';
+          subCat = 'غير مصنف';
+      }
+    }
+    return [mainCat, subCat, level.toString()];
+  }
+
 
   // ============================================
   // Windows-1256 to Unicode lookup (0x80-0xFF)
@@ -618,6 +706,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     List<List<String>> dataRows = rawRows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
     String selEncoding = initialEncoding;
     int selTemplate = 0; // 0 = auto-detect
+    String customErpName = '';
 
     // Auto-detect columns
     final hLower = headers.map((h) => h.toLowerCase()).toList();
@@ -652,9 +741,30 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         bestMatch = t;
       }
     }
-    // Auto-detect keeps default column mapping
+    if (bestScore >= 3) {
+      selTemplate = bestMatch;
+      final tpl = _erpTemplates[selTemplate];
+      selCode = _findCol(hLower, List<String>.from(tpl['code']));
+      selName = _findCol(hLower, List<String>.from(tpl['name_col']));
+      selClass = _findCol(hLower, List<String>.from(tpl['class']));
+      selSection = _findCol(hLower, List<String>.from(tpl['section']));
+      selReconciliation = _findCol(hLower, List<String>.from(tpl['reconciliation'] ?? []));
+      selCurrency = _findCol(hLower, List<String>.from(tpl['currency'] ?? []));
+      selCompany = _findCol(hLower, List<String>.from(tpl['company'] ?? []));
+      // Apply recommended encoding
+      final recEnc = tpl['encoding'] as String;
+      if (recEnc != 'auto' && csvBytes != null && ext == 'csv') {
+        final newContent = recEnc == 'windows-1256' ? _decodeCp1256(csvBytes) : _decodeAsUtf8(csvBytes);
+        final newRows = _parseCsv(newContent);
+        if (newRows.length > dataRows.length) {
+          headers = newRows.first.map((h) => h.trim()).toList();
+          dataRows = newRows.skip(1).where((r) => r.any((c) => c.trim().isNotEmpty)).toList();
+          selEncoding = recEnc;
+        }
+      }
+    }
 
-    final result = await showDialog<Map<String, int>>(
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
@@ -868,7 +978,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                             const SizedBox(width: 12),
                             ElevatedButton.icon(
                               onPressed: (selCode >= 0 || selName >= 0)
-                                  ? () => Navigator.pop(ctx, {
+                                  ? () => Navigator.pop<Map<String, dynamic>>(ctx, {
                                         'code': selCode,
                                         'name': selName,
                                         'class': selClass,
@@ -877,6 +987,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                         'currency': selCurrency,
                                         'company': selCompany,
                                         'template': selTemplate,
+                                        'customErpName': customErpName,
                                       })
                                   : null,
                               icon: const Icon(Icons.download_done, size: 18),
@@ -909,18 +1020,19 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     }
   }
 
-    void _importData(List<List<String>> dataRows, Map<String, int> mapping) {
+    void _importData(List<List<String>> dataRows, Map<String, dynamic> mapping) {
     List<AccountData> parsed = [];
-    final codeIdx = mapping['code'] ?? -1;
-    final nameIdx = mapping['name'] ?? -1;
-    final classIdx = mapping['class'] ?? -1;
-    final sectionIdx = mapping['section'] ?? -1;
-    final reconciliationIdx = mapping['reconciliation'] ?? -1;
-    final currencyIdx = mapping['currency'] ?? -1;
-    final companyIdx = mapping['company'] ?? -1;
-    final templateIdx = mapping['template'] ?? 0;
+    final codeIdx = (mapping['code'] as int?) ?? -1;
+    final nameIdx = (mapping['name'] as int?) ?? -1;
+    final classIdx = (mapping['class'] as int?) ?? -1;
+    final sectionIdx = (mapping['section'] as int?) ?? -1;
+    final reconciliationIdx = (mapping['reconciliation'] as int?) ?? -1;
+    final currencyIdx = (mapping['currency'] as int?) ?? -1;
+    final companyIdx = (mapping['company'] as int?) ?? -1;
+    final templateIdx = (mapping['template'] as int?) ?? 0;
 
     // Determine which ERP for hierarchy logic
+    final customErp = (mapping['customErpName'] as String?) ?? '';
     final tplName = templateIdx > 0 && templateIdx < _erpTemplates.length
         ? _erpTemplates[templateIdx]['name'] as String
         : '';
@@ -973,6 +1085,20 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               level = 2;
             }
           }
+        } else if (tplName.contains('أونكس') || tplName.contains('ONYX')) {
+          // ONYX: classify using account code structure
+          final parentAccIdx = mapping['parentAccount'] ?? -1;
+          final levelIdx = mapping['level'] ?? -1;
+          final reportIdx = mapping['reportType'] ?? -1;
+          final dcIdx = mapping['debitCredit'] ?? -1;
+          final pAcc = parentAccIdx >= 0 && parentAccIdx < row.length ? row[parentAccIdx].trim() : '';
+          final lvl = levelIdx >= 0 && levelIdx < row.length ? row[levelIdx].trim() : '';
+          final rpt = reportIdx >= 0 && reportIdx < row.length ? row[reportIdx].trim() : '';
+          final dc = dcIdx >= 0 && dcIdx < row.length ? row[dcIdx].trim() : '';
+          final hier = _onyxClassify(code, pAcc, lvl, rpt, dc);
+          parentCls = hier[0];
+          subCls = hier[1];
+          level = int.tryParse(hier[2]) ?? 0;
         }
 
         if (code.isNotEmpty || name.isNotEmpty) {
@@ -1000,6 +1126,15 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         }
         _isUploading = false;
       });
+            // Store in Knowledge Brain
+      final cols = <String>[];
+      if (codeIdx >= 0) cols.add('code');
+      if (nameIdx >= 0) cols.add('name');
+      if (classIdx >= 0) cols.add('class');
+      if (reconciliationIdx >= 0) cols.add('reconciliation');
+      if (currencyIdx >= 0) cols.add('currency');
+      if (companyIdx >= 0) cols.add('company');
+      _storeErpKnowledge(tplName, parsed.length, cols, customErp);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('تم استيراد ${parsed.length} حساب بنجاح'),
@@ -1052,6 +1187,29 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         child: Text(label, style: TextStyle(color: isSelected ? AppColors.navy : AppColors.textMid, fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
       ),
     );
+  }
+
+
+
+  // ============================================
+  // Knowledge Brain: Store ERP detection results
+  // ============================================
+  void _storeErpKnowledge(String erpName, int accountCount, List<String> columns, String customName) {
+    try {
+      final key = 'apex_erp_knowledge';
+      final existing = html.window.localStorage[key] ?? '[]';
+      final ts = DateTime.now().toIso8601String();
+      final entry = '{"erp":"$erpName","custom":"$customName","accounts":$accountCount,"columns":"${columns.join(',')}","date":"$ts"}';
+      // Parse existing and add new entry (keep last 50)
+      final entries = existing == '[]' ? <String>[] : existing.substring(1, existing.length - 1).split('},{').map((e) {
+        if (!e.startsWith('{')) e = '{$e';
+        if (!e.endsWith('}')) e = '$e}';
+        return e;
+      }).toList();
+      entries.add(entry);
+      if (entries.length > 50) entries.removeRange(0, entries.length - 50);
+      html.window.localStorage[key] = '[${entries.join(',')}]';
+    } catch (_) {}
   }
 
   int _findCol(List<String> headers, List<String> candidates) {
