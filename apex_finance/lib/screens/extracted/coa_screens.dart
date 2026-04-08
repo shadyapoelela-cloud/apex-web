@@ -1147,6 +1147,15 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           parentCls = hier[0];
           subCls = hier[1];
           level = int.tryParse(hier[2]) ?? 0;
+          // Classify by level
+          if (level <= 2) {
+            cls = 'حساب رئيسي';
+          } else if (level == 3) {
+            cls = 'حساب فرعي';
+          } else {
+            cls = 'حساب تفصيلي';
+          }
+          if (pAcc.isNotEmpty && pAcc != '0') sec = pAcc;
         }
 
         if (code.isNotEmpty || name.isNotEmpty) {
