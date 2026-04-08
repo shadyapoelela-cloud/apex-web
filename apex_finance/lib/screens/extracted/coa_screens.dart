@@ -579,7 +579,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -1193,10 +1193,12 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   Widget _buildStagePipeline() {
     final stages = [
       ('رفع الملف', Icons.cloud_upload),
-      ('التحليل والتأهيل', Icons.auto_fix_high),
+      ('القراءة', Icons.document_scanner),
+      ('التصنيف', Icons.category),
+      ('الجودة', Icons.speed),
       ('المراجعة', Icons.rate_review),
-      ('الشجرة', Icons.account_tree),
       ('الاعتماد', Icons.verified),
+      ('جاهز لـ TB', Icons.check_circle),
     ];
 
     return Container(
@@ -1307,23 +1309,41 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   Widget _buildTabBar() {
     return Container(
       color: AppColors.navyLight,
-      child: TabBar(
-        controller: _tabController,
-        labelColor: AppColors.gold,
-        unselectedLabelColor: AppColors.textMid,
-        indicatorColor: AppColors.gold,
-        indicatorWeight: 3,
-        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-        tabs: const [
-          Tab(text: 'النظرة العامة'),
-          Tab(text: 'المراجعة'),
-          Tab(text: 'الشجرة'),
-          Tab(text: 'التقرير'),
-        ],
-        onTap: (i) {
-          if (i == 2) setState(() => _currentStage = 3);
-          if (i == 1) setState(() => _currentStage = 2);
-        },
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.navyMid,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: const EdgeInsets.all(3),
+        child: TabBar(
+          controller: _tabController,
+          labelColor: AppColors.gold,
+          unselectedLabelColor: AppColors.textMid,
+          indicator: BoxDecoration(
+            color: AppColors.gold.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          indicatorSize: TabBarIndicatorSize.tab,
+          labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          unselectedLabelStyle: const TextStyle(fontSize: 12),
+          tabs: const [
+            Tab(icon: Icon(Icons.pie_chart, size: 16), text: 'النظرة العامة'),
+            Tab(icon: Icon(Icons.table_chart, size: 16), text: 'الحسابات'),
+            Tab(icon: Icon(Icons.speed, size: 16), text: 'الجودة'),
+            Tab(icon: Icon(Icons.visibility, size: 16), text: 'المراجعة'),
+            Tab(icon: Icon(Icons.account_tree, size: 16), text: 'الشجرة'),
+          ],
+          onTap: (i) {
+            setState(() {
+              if (i == 0) _currentStage = 1;
+              if (i == 1) _currentStage = 2;
+              if (i == 2) _currentStage = 3;
+              if (i == 3) _currentStage = 4;
+              if (i == 4) _currentStage = 4;
+            });
+          },
+        ),
       ),
     );
   }
@@ -1333,9 +1353,10 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       controller: _tabController,
       children: [
         _buildOverviewTab(),
+        _buildAccountsTab(),
+        _buildQualityTab(),
         _buildReviewTab(),
         _buildTreeTab(),
-        _buildReportTab(),
       ],
     );
   }
@@ -1609,6 +1630,407 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       case 'مصروفات': return AppColors.orangeC;
       default: return AppColors.textDim;
     }
+  }
+
+  // ─── Accounts Tab (جدول الحسابات المصنفة) ──────────────────
+
+  Widget _buildAccountsTab() {
+    // Filter
+    List<CoaAccount> filtered = _accounts;
+    if (_filterStatus == 'duplicate') {
+      filtered = _accounts.where((a) => a.isDuplicateCode).toList();
+    } else if (_filterStatus != 'all') {
+      filtered = _accounts.where((a) => a.status == _filterStatus).toList();
+    }
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered.where((a) =>
+          a.code.contains(_searchQuery) ||
+          a.name.contains(_searchQuery)).toList();
+    }
+
+    return Column(
+      children: [
+        // Toolbar
+        Container(
+          padding: const EdgeInsets.all(12),
+          color: AppColors.navyLight,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.navy,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.borderColor),
+                      ),
+                      child: TextField(
+                        style: TextStyle(color: AppColors.textColor, fontSize: 13),
+                        decoration: InputDecoration(
+                          hintText: 'بحث بالكود أو الاسم...',
+                          hintStyle: TextStyle(color: AppColors.textDim, fontSize: 13),
+                          border: InputBorder.none,
+                          icon: Icon(Icons.search, color: AppColors.textDim, size: 20),
+                        ),
+                        onChanged: (v) => setState(() => _searchQuery = v),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.gold.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('${filtered.length} حساب',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.gold)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                reverse: true,
+                child: Row(
+                  children: [
+                    _filterChip('الكل', 'all', _accounts.length),
+                    const SizedBox(width: 6),
+                    _filterChip('معتمد', 'approved', _accounts.where((a) => a.status == 'approved').length),
+                    const SizedBox(width: 6),
+                    _filterChip('مراجعة', 'review', _accounts.where((a) => a.status == 'review').length),
+                    const SizedBox(width: 6),
+                    _filterChip('معلّم', 'flagged', _accounts.where((a) => a.status == 'flagged').length),
+                    const SizedBox(width: 6),
+                    _filterChip('مكرر', 'duplicate', _accounts.where((a) => a.isDuplicateCode).length),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Table header
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          color: AppColors.navyMid,
+          child: Row(
+            children: [
+              SizedBox(width: 60, child: Text('الكود', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+              const SizedBox(width: 8),
+              Expanded(flex: 3, child: Text('الاسم', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+              SizedBox(width: 60, child: Text('الفئة', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+              SizedBox(width: 50, child: Text('الطبيعة', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+              SizedBox(width: 60, child: Text('القبول', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+              SizedBox(width: 50, child: Text('الحالة', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+            ],
+          ),
+        ),
+        // Table rows
+        Expanded(
+          child: ListView.builder(
+            itemCount: filtered.length,
+            itemBuilder: (ctx, i) {
+              final a = filtered[i];
+              final scoreColor = a.acceptanceScore >= 85 ? AppColors.greenC :
+                                 a.acceptanceScore >= 60 ? AppColors.orangeC : AppColors.redC;
+              final statusText = a.status == 'approved' ? 'معتمد' :
+                                 a.status == 'review' ? 'مراجعة' : 'معلّم';
+              final statusColor = a.status == 'approved' ? AppColors.greenC :
+                                  a.status == 'review' ? AppColors.orangeC : AppColors.redC;
+              return GestureDetector(
+                onTap: () => _showEditDialog(a),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: AppColors.borderColor.withOpacity(0.3))),
+                    color: i.isEven ? AppColors.cardBg : AppColors.navy,
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 60,
+                        child: Text(a.code,
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold,
+                                color: a.isDuplicateCode ? AppColors.redC : AppColors.goldLight,
+                                fontFamily: 'monospace')),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        flex: 3,
+                        child: Text(a.name, style: TextStyle(fontSize: 12, color: AppColors.textColor),
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      SizedBox(
+                        width: 60,
+                        child: Text(a.rootClass.length > 6 ? a.rootClass.substring(0, 6) : a.rootClass,
+                            style: TextStyle(fontSize: 10, color: _rootColor(a.rootClass))),
+                      ),
+                      SizedBox(
+                        width: 50,
+                        child: Text(a.nature, style: TextStyle(fontSize: 10, color: AppColors.textMid)),
+                      ),
+                      // Confidence meter
+                      SizedBox(
+                        width: 60,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(3),
+                                child: LinearProgressIndicator(
+                                  value: a.acceptanceScore / 100, minHeight: 6,
+                                  backgroundColor: AppColors.navyMid,
+                                  valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text('${a.acceptanceScore.toInt()}',
+                                style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: scoreColor)),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 50,
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: statusColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(statusText,
+                                style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: statusColor)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ─── Quality Tab (6 أبعاد الجودة) ──────────────────────────
+
+  Widget _buildQualityTab() {
+    final total = _accounts.length;
+    if (total == 0) {
+      return Center(child: Text('لا توجد حسابات', style: TextStyle(color: AppColors.textMid)));
+    }
+
+    // Calculate quality dimensions
+    final avgScore = _accounts.map((a) => a.acceptanceScore).reduce((a, b) => a + b) / total;
+
+    // Completeness: accounts with non-empty code, name, and rootClass
+    final complete = _accounts.where((a) =>
+        a.code.isNotEmpty && a.name.trim().length >= 3 && a.rootClass != 'غير محدد').length;
+    final completeness = (complete / total * 100).round();
+
+    // Consistency: accounts where level matches code pattern
+    final consistent = _accounts.where((a) => a.parentCode.isNotEmpty || a.level <= 1).length;
+    final consistency = (consistent / total * 100).round();
+
+    // Naming clarity: accounts with name length > 5
+    final clearNames = _accounts.where((a) => a.name.trim().length > 5).length;
+    final naming = (clearNames / total * 100).round();
+
+    // Duplication risk: inverse of duplicate ratio
+    final dupeCount = _accounts.where((a) => a.isDuplicateCode).length;
+    final duplication = ((1 - dupeCount / total) * 100).round();
+
+    // Reporting readiness: accounts with valid reportType
+    final reportReady = _accounts.where((a) =>
+        a.reportType == 'ميزانية' || a.reportType == 'دخل').length;
+    final reporting = (reportReady / total * 100).round();
+
+    // Mapping confidence: accounts with score >= 75
+    final highConf = _accounts.where((a) => a.acceptanceScore >= 75).length;
+    final mapping = (highConf / total * 100).round();
+
+    final overall = (completeness * 0.25 + consistency * 0.20 + naming * 0.15 +
+        duplication * 0.15 + reporting * 0.15 + mapping * 0.10).round();
+
+    final overallColor = overall >= 80 ? AppColors.greenC : (overall >= 60 ? AppColors.orangeC : AppColors.redC);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Overall score card
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.cardBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderColor),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('درجة الجودة الإجمالية — Overall COA Quality Score',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textColor)),
+                    ),
+                    Container(
+                      width: 80, height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: overallColor, width: 5),
+                      ),
+                      child: Center(
+                        child: Text('$overall',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: overallColor)),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // 6 dimensions grid
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _qualityDimension('الاكتمال', 'Completeness', completeness, '25%', AppColors.blueC),
+                    _qualityDimension('الاتساق', 'Consistency', consistency, '20%', AppColors.greenC),
+                    _qualityDimension('وضوح التسمية', 'Naming', naming, '15%', AppColors.purpleC),
+                    _qualityDimension('خطر التكرار', 'Duplication', duplication, '15%', AppColors.orangeC),
+                    _qualityDimension('جاهزية التقارير', 'Reporting', reporting, '15%', AppColors.goldLight),
+                    _qualityDimension('ثقة الربط', 'Mapping', mapping, '10%', AppColors.blueC),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Warnings
+          Text('التحذيرات والملاحظات',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
+          const SizedBox(height: 12),
+          if (completeness < 80) _warningCard('الاكتمال منخفض', 'بعض الحسابات بدون تصنيف واضح أو اسم قصير', AppColors.orangeC),
+          if (duplication < 90) _warningCard('يوجد أكواد مكررة', '$dupeCount حساب بأكواد مكررة — يحتاج مراجعة', AppColors.redC),
+          if (naming < 70) _warningCard('أسماء غامضة', 'بعض الحسابات بأسماء قصيرة أو غير واضحة', AppColors.orangeC),
+          if (reporting < 70) _warningCard('جاهزية التقارير', 'بعض الحسابات بدون نوع تقرير محدد', AppColors.blueC),
+          if (completeness >= 80 && duplication >= 90 && naming >= 70 && reporting >= 70)
+            _warningCard('لا توجد تحذيرات', 'الجودة ممتازة — جاهز للاعتماد', AppColors.greenC),
+
+          const SizedBox(height: 20),
+
+          // Readiness for approval
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: overall >= 70 ? AppColors.greenC.withOpacity(0.08) : AppColors.redC.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: (overall >= 70 ? AppColors.greenC : AppColors.redC).withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                Icon(overall >= 70 ? Icons.check_circle : Icons.cancel,
+                    color: overall >= 70 ? AppColors.greenC : AppColors.redC, size: 32),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(overall >= 70 ? 'جاهز للاعتماد' : 'غير جاهز للاعتماد',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,
+                              color: overall >= 70 ? AppColors.greenC : AppColors.redC)),
+                      Text(overall >= 70
+                          ? 'الدليل يستوفي الحد الأدنى من الجودة للانتقال إلى ميزان المراجعة'
+                          : 'يحتاج تحسين الجودة — راجع التحذيرات أعلاه',
+                          style: TextStyle(fontSize: 11, color: AppColors.textMid)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _qualityDimension(String label, String labelEn, int value, String weight, Color color) {
+    final dimColor = value >= 80 ? AppColors.greenC : (value >= 60 ? AppColors.orangeC : AppColors.redC);
+    return SizedBox(
+      width: 160,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.navyMid,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(child: Text(label, style: TextStyle(fontSize: 11, color: AppColors.textColor))),
+                Text('وزن $weight', style: TextStyle(fontSize: 9, color: AppColors.textDim)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(labelEn, style: TextStyle(fontSize: 9, color: AppColors.textDim)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: LinearProgressIndicator(
+                      value: value / 100, minHeight: 8,
+                      backgroundColor: AppColors.navy,
+                      valueColor: AlwaysStoppedAnimation<Color>(dimColor),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text('$value', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: dimColor)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _warningCard(String title, String desc, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.25)),
+      ),
+      child: Row(
+        children: [
+          Icon(color == AppColors.greenC ? Icons.check_circle : Icons.warning_amber,
+              color: color, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
+                Text(desc, style: TextStyle(fontSize: 11, color: AppColors.textMid)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ─── Review Tab ────────────────────────────────────────────
@@ -2542,143 +2964,4 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   // ─── Report Tab ────────────────────────────────────────────
 
-  Widget _buildReportTab() {
-    final approved = _accounts.where((a) => a.status == 'approved').length;
-    final review = _accounts.where((a) => a.status == 'review').length;
-    final flagged = _accounts.where((a) => a.status == 'flagged').length;
-    final avgScore = _accounts.isEmpty ? 0.0 :
-        _accounts.map((a) => a.acceptanceScore).reduce((a, b) => a + b) / _accounts.length;
-    final allApproved = review == 0 && flagged == 0;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Readiness status
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: allApproved ? AppColors.greenC.withOpacity(0.1) : AppColors.orangeC.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: allApproved ? AppColors.greenC.withOpacity(0.3) : AppColors.orangeC.withOpacity(0.3)),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  allApproved ? Icons.verified : Icons.pending,
-                  color: allApproved ? AppColors.greenC : AppColors.orangeC,
-                  size: 40,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        allApproved ? 'الدليل جاهز للمرحلة التالية' : 'يحتاج مراجعة قبل المتابعة',
-                        style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold,
-                          color: allApproved ? AppColors.greenC : AppColors.orangeC),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        allApproved
-                            ? 'تم اعتماد جميع الحسابات بنجاح — يمكن الانتقال لميزان المراجعة'
-                            : '$review حساب يحتاج مراجعة و $flagged حساب معلّم',
-                        style: TextStyle(fontSize: 12, color: AppColors.textMid),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Summary checklist
-          Text('ملخص التأهيل', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
-          const SizedBox(height: 12),
-          _checkItem('تم قراءة الملف بنجاح', true),
-          _checkItem('تم اكتشاف الأعمدة تلقائياً', true),
-          _checkItem('تم تحليل ${_accounts.length} حساب', true),
-          _checkItem('درجة القبول الإجمالية: ${avgScore.toStringAsFixed(0)}%', avgScore >= 60),
-          _checkItem('جميع الحسابات معتمدة ($approved/${_accounts.length})', allApproved),
-          _checkItem('لا توجد أكواد مكررة',
-              _accounts.map((a) => a.code).toSet().length == _accounts.length),
-          _checkItem('تم تصنيف جميع الحسابات',
-              _accounts.every((a) => a.rootClass != 'غير محدد')),
-
-          const SizedBox(height: 24),
-
-          // Next step button
-          if (allApproved)
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.gold,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              onPressed: () {
-                setState(() => _currentStage = 4);
-                // TODO: Navigate to trial balance
-              },
-              icon: Icon(Icons.arrow_forward, color: AppColors.navy),
-              label: Text('الانتقال إلى ميزان المراجعة',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.navy)),
-            ),
-
-          // Upload new file button
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.gold.withOpacity(0.3)),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () {
-              setState(() {
-                _accounts.clear();
-                _rawRows.clear();
-                _headers.clear();
-                _currentStage = 0;
-                _filterStatus = 'all';
-                _searchQuery = '';
-                _treeExpanded.clear();
-              });
-            },
-            icon: Icon(Icons.refresh, color: AppColors.gold, size: 18),
-            label: Text('رفع ملف جديد', style: TextStyle(fontSize: 13, color: AppColors.gold)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _checkItem(String text, bool checked) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.borderColor),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 22, height: 22,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: checked ? AppColors.greenC : AppColors.navyMid,
-              border: Border.all(color: checked ? AppColors.greenC : AppColors.textDim),
-            ),
-            child: checked ? Center(child: Icon(Icons.check, color: Colors.white, size: 14)) : null,
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: Text(text, style: TextStyle(fontSize: 13, color: AppColors.textColor))),
-        ],
-      ),
-    );
-  }
 }
