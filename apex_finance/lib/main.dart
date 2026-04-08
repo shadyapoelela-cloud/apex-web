@@ -529,7 +529,36 @@ class _MainNavS extends State<MainNav> {
           title: Text('المسار المالي', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           initiallyExpanded: true,
           children: [
-          _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () { setState(() { _i = 1; _dr = false; }); }),
+          _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () {
+              setState(() => _dr = false);
+              // Navigate to COA for active client
+              if (_activeClients.isNotEmpty) {
+                final ac = _cl.firstWhere(
+                  (c) => _activeClients.contains(c['name_ar'] ?? c['name'] ?? ''),
+                  orElse: () => _cl.isNotEmpty ? _cl.first : null,
+                );
+                if (ac != null) {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => CoaJourneyScreen(
+                      clientId: '${ac['id'] ?? ac['client_code'] ?? '1'}',
+                      clientName: ac['name_ar'] ?? ac['name'] ?? '',
+                    ),
+                  ));
+                  return;
+                }
+              }
+              if (_cl.isNotEmpty) {
+                final first = _cl.first;
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => CoaJourneyScreen(
+                    clientId: '${first['id'] ?? first['client_code'] ?? '1'}',
+                    clientName: first['name_ar'] ?? first['name'] ?? '',
+                  ),
+                ));
+              } else {
+                setState(() => _i = 1);
+              }
+            }, isGold: true),
           _drawerItem(Icons.table_chart, 'ميزان المراجعة TB', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
           _drawerItem(Icons.receipt_long, 'القوائم المالية', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
           _drawerItem(Icons.analytics_rounded, 'التحليل المالي', () { setState(() { _i = 2; _dr = false; }); }),

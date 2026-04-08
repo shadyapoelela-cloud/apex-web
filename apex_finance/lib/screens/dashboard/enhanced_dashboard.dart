@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import '../extracted/coa_screens.dart';
 import '../clients/client_detail_screen.dart';
+import '../extracted/coa_screens.dart';
+import '../../api_service.dart';
 
 // ════════════════════════════════════════
-// ENHANCED DASHBOARD — Phase 1 Visual Alignment
+// ENHANCED DASHBOARD v5.3 — Live API Integration
 // ════════════════════════════════════════
-// يطابق النموذج المرجعي apex-phase1.jsx (DashboardPage)
-// 4 KPIs + إجراءات سريعة + حالة العملاء + نشاط حديث + الخطوة التالية
+// يقرأ العملاء الفعليين من API
+// Quick actions + Client Pipeline + Recent Activity + Next Step
 
 class EnhancedDashboard extends StatefulWidget {
   final VoidCallback? onSwitchToClients;
   final VoidCallback? onCreateClient;
+
   const EnhancedDashboard({super.key, this.onSwitchToClients, this.onCreateClient});
   @override
   State<EnhancedDashboard> createState() => _EnhancedDashboardState();
@@ -27,12 +29,35 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   static const textMid = Color(0xFF9A917F);
   static const textDim = Color(0xFF6B6355);
   static const cardBg = Color(0xFF0D1825);
-  static const borderColor = Color(0x1FC9A84C); // ~12% gold
+  static const borderColor = Color(0x1FC9A84C);
   static const greenC = Color(0xFF34D399);
   static const redC = Color(0xFFF87171);
   static const blueC = Color(0xFF60A5FA);
   static const orangeC = Color(0xFFFBBF24);
   static const purpleC = Color(0xFFA78BFA);
+
+  List<dynamic> _clients = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadClients();
+  }
+
+  Future<void> _loadClients() async {
+    try {
+      final res = await ApiService.listClients();
+      if (mounted) {
+        setState(() {
+          _clients = res.success && res.data is List ? res.data as List : [];
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,60 +65,79 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: navy,
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ─── Welcome ───
-              Text('مرحبًا بك في Apex',
-                  style: TextStyle(color: textColor, fontSize: 22, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 4),
-              Text('لوحة القيادة الرئيسية — نظرة سريعة على حالة العمليات',
-                  style: TextStyle(color: textMid, fontSize: 13)),
-              const SizedBox(height: 24),
+        body: _loading
+            ? Center(child: CircularProgressIndicator(color: gold))
+            : RefreshIndicator(
+                color: gold,
+                onRefresh: _loadClients,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ─── Welcome ───
+                      Text('مرحبًا بك في Apex',
+                          style: TextStyle(color: textColor, fontSize: 22, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 4),
+                      Text('لوحة القيادة الرئيسية — نظرة سريعة على حالة العمليات',
+                          style: TextStyle(color: textMid, fontSize: 13)),
+                      const SizedBox(height: 24),
 
-              // ─── 4 KPI Cards ───
-              _buildKPIRow(),
-              const SizedBox(height: 24),
+                      // ─── 4 KPI Cards ───
+                      _buildKPIRow(),
+                      const SizedBox(height: 24),
 
-              // ─── Quick Actions + Client Pipeline ───
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: _buildQuickActions()),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildClientPipeline()),
-                ],
+                      // ─── Quick Actions + Client Pipeline ───
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: _buildQuickActions()),
+                          const SizedBox(width: 16),
+                          Expanded(child: _buildClientPipeline()),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+
+                      // ─── Recent Activity ───
+                      _buildRecentActivity(),
+                      const SizedBox(height: 24),
+
+                      // ─── Next Step Card ───
+                      _buildNextStepCard(),
+                      const SizedBox(height: 24),
+
+                      // ─── Service Status Row ───
+                      _buildServiceStatusRow(),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 24),
-
-              // ─── Recent Activity ───
-              _buildRecentActivity(),
-              const SizedBox(height: 24),
-
-              // ─── Next Step Card ───
-              _buildNextStepCard(),
-              const SizedBox(height: 24),
-
-              // ─── Service Status Row ───
-              _buildServiceStatusRow(),
-            ],
-          ),
-        ),
       ),
     );
   }
 
   // ════════════════════════════════════════
-  // KPI ROW
+  // KPI ROW — Live data
   // ════════════════════════════════════════
   Widget _buildKPIRow() {
+    final totalClients = _clients.length;
+    // Count by COA status
+    int coaApproved = 0;
+    int coaReview = 0;
+    int coaReady = 0;
+    for (final c in _clients) {
+      final coaStatus = (c['coa_status'] ?? '').toString().toLowerCase();
+      if (coaStatus == 'approved' || coaStatus == 'معتمد') coaApproved++;
+      else if (coaStatus == 'review' || coaStatus == 'مراجعة' || coaStatus == 'in_progress') coaReview++;
+      else if (coaStatus == 'ready' || coaStatus == 'جاهز') coaReady++;
+    }
+
     final kpis = [
-      _KPI('العملاء النشطون', '3', '+1 هذا الأسبوع', Icons.people_outline, blueC),
-      _KPI('شجرة معتمدة', '1', 'من أصل 3', Icons.check_circle_outline, greenC),
-      _KPI('قيد المراجعة', '1', 'بانتظار قرار', Icons.schedule, orangeC),
-      _KPI('جاهز لـ TB', '1', 'عميل واحد', Icons.track_changes, gold),
+      _KPI('العملاء النشطون', '$totalClients', totalClients > 0 ? 'مسجلون في النظام' : 'لا يوجد عملاء', Icons.people_outline, blueC),
+      _KPI('شجرة معتمدة', '$coaApproved', 'من أصل $totalClients', Icons.check_circle_outline, greenC),
+      _KPI('قيد المراجعة', '$coaReview', coaReview > 0 ? 'بانتظار قرار' : 'لا يوجد', Icons.schedule, orangeC),
+      _KPI('جاهز لـ TB', '$coaReady', coaReady > 0 ? '${coaReady == 1 ? "عميل واحد" : "$coaReady عملاء"}' : 'بعد COA', Icons.track_changes, gold),
     ];
     return Row(
       children: kpis.map((k) => Expanded(
@@ -127,7 +171,8 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 ),
                 child: Icon(kpi.icon, color: kpi.color, size: 22),
               ),
-              Icon(Icons.trending_up, color: greenC, size: 14),
+              if (kpi.value != '0')
+                Icon(Icons.trending_up, color: greenC, size: 14),
             ],
           ),
           const SizedBox(height: 14),
@@ -149,14 +194,31 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   // ════════════════════════════════════════
   Widget _buildQuickActions() {
     final actions = [
-      _QAction('إنشاء عميل جديد', 'بدء معالج الإنشاء', Icons.add, gold, onTap: () => widget.onCreateClient?.call()),
-      _QAction('رفع شجرة حسابات', 'COA Upload', Icons.upload_file, blueC, onTap: () {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (_) => CoaJourneyScreen(clientId: '1', clientName: 'شركة النور للتجارة'),
-        ));
+      _QAction('إنشاء عميل جديد', 'بدء معالج الإنشاء', Icons.add, gold, () {
+        // Switch to Clients tab and trigger create
+        if (widget.onCreateClient != null) {
+          widget.onCreateClient!();
+        } else if (widget.onSwitchToClients != null) {
+          widget.onSwitchToClients!();
+        }
       }),
-      _QAction('عرض العملاء', 'قائمة العملاء', Icons.visibility, greenC, onTap: () => widget.onSwitchToClients?.call()),
-      _QAction('تقارير الجودة', 'Quality Reports', Icons.bar_chart, orangeC),
+      _QAction('رفع شجرة حسابات', 'COA Upload', Icons.upload_file, blueC, () {
+        if (_clients.isNotEmpty) {
+          final c = _clients.first;
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => CoaJourneyScreen(
+              clientId: '${c['id'] ?? c['client_code'] ?? '1'}',
+              clientName: c['name_ar'] ?? c['name'] ?? 'عميل',
+            ),
+          ));
+        } else if (widget.onSwitchToClients != null) {
+          widget.onSwitchToClients!();
+        }
+      }),
+      _QAction('عرض العملاء', 'قائمة العملاء', Icons.visibility, greenC, () {
+        if (widget.onSwitchToClients != null) widget.onSwitchToClients!();
+      }),
+      _QAction('تقارير الجودة', 'Quality Reports', Icons.bar_chart, orangeC, null),
     ];
     return _card(
       child: Column(
@@ -224,14 +286,9 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   }
 
   // ════════════════════════════════════════
-  // CLIENT PIPELINE
+  // CLIENT PIPELINE — Live data
   // ════════════════════════════════════════
   Widget _buildClientPipeline() {
-    final clients = [
-      _ClientRow('شركة النور للتجارة', 'التجزئة', 'نشط', greenC, 'COA معتمد', greenC, clientId: 1),
-      _ClientRow('مصنع الرياض للحديد', 'التصنيع', 'نشط', greenC, 'COA مراجعة', orangeC, clientId: 2),
-      _ClientRow('مؤسسة البناء الحديث', 'الإنشاءات', 'تهيئة', orangeC, 'بدون COA', textDim, clientId: 3),
-    ];
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,57 +302,102 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 Text('حالة العملاء',
                     style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w700)),
               ]),
-              _badge('${clients.length} عملاء', textDim),
+              _badgeWidget('${_clients.length} عملاء', textDim),
             ],
           ),
           const SizedBox(height: 16),
-          ...clients.asMap().entries.map((e) {
-            final c = e.value;
-            final isLast = e.key == clients.length - 1;
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => ClientDetailScreen(clientId: c.clientId ?? 0, clientName: c.name),
-                ));
-              },
-              child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                border: isLast ? null : Border(bottom: BorderSide(color: borderColor)),
-              ),
-              child: Row(
+          if (_clients.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
                 children: [
-                  Container(
-                    width: 40, height: 40,
-                    decoration: BoxDecoration(
-                      color: gold.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: Text(c.name[0],
-                          style: TextStyle(color: gold, fontSize: 14, fontWeight: FontWeight.w800)),
-                    ),
+                  Icon(Icons.people_outline, color: textDim, size: 40),
+                  const SizedBox(height: 12),
+                  Text('لا يوجد عملاء بعد', style: TextStyle(color: textMid, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  TextButton.icon(
+                    onPressed: widget.onCreateClient ?? widget.onSwitchToClients,
+                    icon: Icon(Icons.add, color: gold, size: 16),
+                    label: Text('إنشاء عميل جديد', style: TextStyle(color: gold, fontSize: 12)),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(c.name,
-                            style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 2),
-                        Text(c.sector, style: TextStyle(color: textDim, fontSize: 11)),
-                      ],
-                    ),
-                  ),
-                  _badge(c.statusLabel, c.statusColor),
-                  const SizedBox(width: 6),
-                  _badge(c.coaLabel, c.coaColor),
                 ],
               ),
+            )
+          else
+            ...(_clients.length > 5 ? _clients.sublist(0, 5) : _clients).asMap().entries.map((e) {
+              final c = e.value;
+              final isLast = e.key == (_clients.length > 5 ? 4 : _clients.length - 1);
+              final clientName = c['name_ar'] ?? c['name'] ?? 'عميل';
+              final sector = c['industry'] ?? c['sector'] ?? '';
+              final status = c['status'] ?? 'active';
+              final coaStatus = c['coa_status'] ?? '';
+              final clientId = c['id'] ?? c['client_code'] ?? 0;
+
+              Color statusColor = status == 'active' ? greenC : orangeC;
+              String statusLabel = status == 'active' ? 'نشط' : 'تهيئة';
+              Color coaColor = textDim;
+              String coaLabel = 'بدون COA';
+              if (coaStatus == 'approved' || coaStatus == 'معتمد') { coaColor = greenC; coaLabel = 'COA معتمد'; }
+              else if (coaStatus == 'review' || coaStatus == 'مراجعة' || coaStatus == 'in_progress') { coaColor = orangeC; coaLabel = 'COA مراجعة'; }
+              else if (coaStatus == 'ready') { coaColor = blueC; coaLabel = 'جاهز لـ TB'; }
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => ClientDetailScreen(
+                      clientId: clientId is int ? clientId : int.tryParse('$clientId') ?? 0,
+                      clientName: clientName,
+                    ),
+                  ));
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    border: isLast ? null : Border(bottom: BorderSide(color: borderColor)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          color: gold.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(clientName.isNotEmpty ? clientName[0] : '?',
+                              style: TextStyle(color: gold, fontSize: 14, fontWeight: FontWeight.w800)),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(clientName,
+                                style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
+                            if (sector.isNotEmpty)
+                              Text(sector, style: TextStyle(color: textDim, fontSize: 11)),
+                          ],
+                        ),
+                      ),
+                      _badgeWidget(statusLabel, statusColor),
+                      const SizedBox(width: 6),
+                      _badgeWidget(coaLabel, coaColor),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          if (_clients.length > 5) ...[
+            const SizedBox(height: 8),
+            Center(
+              child: TextButton(
+                onPressed: widget.onSwitchToClients,
+                child: Text('عرض جميع العملاء (${_clients.length})',
+                    style: TextStyle(color: gold, fontSize: 12)),
+              ),
             ),
-            );
-          }),
+          ],
         ],
       ),
     );
@@ -305,13 +407,28 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   // RECENT ACTIVITY
   // ════════════════════════════════════════
   Widget _buildRecentActivity() {
-    final activities = [
-      _Activity('تم اعتماد شجرة حسابات شركة النور للتجارة', 'الجودة: 87% — جميع الحسابات معتمدة', 'قبل ساعتين', Icons.check_circle_outline, greenC),
-      _Activity('مراجعة مطلوبة: شجرة حسابات مصنع الرياض', '4 حسابات بانتظار قرار المراجعة', 'قبل 4 ساعات', Icons.error_outline, orangeC),
-      _Activity('تم إنشاء عميل جديد: مؤسسة البناء الحديث', 'بانتظار رفع المستندات الأساسية', 'أمس', Icons.add, blueC),
-      _Activity('تحديث مستندات شركة النور للتجارة', 'السجل التجاري + الشهادة الضريبية', 'أمس', Icons.description, gold),
-      _Activity('فحص الامتثال لشركة النور — ناجح', 'جميع المستندات سارية المفعول', 'قبل يومين', Icons.shield, greenC),
-    ];
+    // Build dynamic activities based on actual clients
+    final activities = <_Activity>[];
+
+    for (final c in _clients.take(3)) {
+      final name = c['name_ar'] ?? c['name'] ?? 'عميل';
+      final coaStatus = (c['coa_status'] ?? '').toString();
+      final createdAt = c['created_at'] ?? '';
+
+      if (coaStatus == 'approved' || coaStatus == 'معتمد') {
+        activities.add(_Activity('تم اعتماد شجرة حسابات $name', 'جميع الحسابات معتمدة', 'مؤخرًا', Icons.check_circle_outline, greenC));
+      } else if (coaStatus == 'review' || coaStatus == 'مراجعة' || coaStatus == 'in_progress') {
+        activities.add(_Activity('مراجعة مطلوبة: شجرة حسابات $name', 'بانتظار قرار المراجعة', 'مؤخرًا', Icons.error_outline, orangeC));
+      } else {
+        activities.add(_Activity('تم إنشاء عميل: $name', 'بانتظار رفع المستندات', _formatDate(createdAt), Icons.add, blueC));
+      }
+    }
+
+    // Add default if no activities
+    if (activities.isEmpty) {
+      activities.add(_Activity('مرحبًا بك في APEX', 'ابدأ بإنشاء عميلك الأول', 'الآن', Icons.waving_hand, gold));
+    }
+
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,10 +490,65 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
     );
   }
 
+  String _formatDate(String dateStr) {
+    if (dateStr.isEmpty) return 'مؤخرًا';
+    try {
+      final date = DateTime.parse(dateStr);
+      final diff = DateTime.now().difference(date);
+      if (diff.inMinutes < 60) return 'قبل ${diff.inMinutes} دقيقة';
+      if (diff.inHours < 24) return 'قبل ${diff.inHours} ساعة';
+      if (diff.inDays < 7) return 'قبل ${diff.inDays} يوم';
+      return dateStr.substring(0, 10);
+    } catch (_) {
+      return 'مؤخرًا';
+    }
+  }
+
   // ════════════════════════════════════════
-  // NEXT STEP CARD
+  // NEXT STEP CARD — Dynamic based on clients
   // ════════════════════════════════════════
   Widget _buildNextStepCard() {
+    String nextTitle = 'ابدأ الآن';
+    String nextDesc = 'أنشئ عميلك الأول لبدء المسار المالي';
+    String btnLabel = 'إنشاء عميل';
+    VoidCallback? btnAction = widget.onCreateClient ?? widget.onSwitchToClients;
+
+    // Find client that needs attention
+    for (final c in _clients) {
+      final coaStatus = (c['coa_status'] ?? '').toString().toLowerCase();
+      final name = c['name_ar'] ?? c['name'] ?? 'عميل';
+
+      if (coaStatus == 'review' || coaStatus == 'مراجعة' || coaStatus == 'in_progress') {
+        nextTitle = 'الخطوة التالية المقترحة';
+        nextDesc = '$name لديه شجرة حسابات بانتظار المراجعة — أكمل المراجعة واعتمد الشجرة';
+        btnLabel = 'انتقل للمراجعة';
+        final clientId = c['id'] ?? c['client_code'] ?? '1';
+        btnAction = () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => CoaJourneyScreen(
+              clientId: '$clientId',
+              clientName: name,
+            ),
+          ));
+        };
+        break;
+      } else if (coaStatus.isEmpty || coaStatus == 'pending') {
+        nextTitle = 'الخطوة التالية المقترحة';
+        nextDesc = '$name بحاجة لرفع شجرة الحسابات لبدء المسار المالي';
+        btnLabel = 'رفع COA';
+        final clientId = c['id'] ?? c['client_code'] ?? '1';
+        btnAction = () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => CoaJourneyScreen(
+              clientId: '$clientId',
+              clientName: name,
+            ),
+          ));
+        };
+        break;
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -403,23 +575,18 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('الخطوة التالية المقترحة',
+                Text(nextTitle,
                     style: TextStyle(color: gold, fontSize: 15, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 3),
-                Text('مصنع الرياض للحديد لديه شجرة حسابات بانتظار المراجعة — أكمل المراجعة واعتمد الشجرة',
-                    style: TextStyle(color: textMid, fontSize: 12)),
+                Text(nextDesc, style: TextStyle(color: textMid, fontSize: 12)),
               ],
             ),
           ),
           const SizedBox(width: 12),
           ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (_) => CoaJourneyScreen(clientId: '2', clientName: 'مصنع الرياض للحديد'),
-              ));
-            },
+            onPressed: btnAction,
             icon: const Icon(Icons.arrow_back, size: 14),
-            label: const Text('انتقل للمراجعة'),
+            label: Text(btnLabel),
             style: ElevatedButton.styleFrom(
               backgroundColor: gold,
               foregroundColor: navy,
@@ -437,9 +604,15 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   // SERVICE STATUS ROW
   // ════════════════════════════════════════
   Widget _buildServiceStatusRow() {
+    int coaApproved = 0;
+    for (final c in _clients) {
+      final s = (c['coa_status'] ?? '').toString().toLowerCase();
+      if (s == 'approved' || s == 'معتمد') coaApproved++;
+    }
+
     final services = [
-      _Service('شجرة الحسابات', 'COA', 'نشط', greenC, '1/3 معتمد'),
-      _Service('ميزان المراجعة', 'TB', 'قريبًا', textDim, 'بعد COA'),
+      _Service('شجرة الحسابات', 'COA', _clients.isNotEmpty ? 'نشط' : 'قريبًا', _clients.isNotEmpty ? greenC : textDim, '$coaApproved/${_clients.length} معتمد'),
+      _Service('ميزان المراجعة', 'TB', coaApproved > 0 ? 'جاهز' : 'قريبًا', coaApproved > 0 ? blueC : textDim, 'بعد COA'),
       _Service('القوائم المالية', 'Statements', 'قريبًا', textDim, 'بعد TB'),
       _Service('التحليل المالي', 'Analysis', 'قريبًا', textDim, 'بعد Statements'),
       _Service('الامتثال والجاهزية', 'Compliance', 'قريبًا', textDim, 'متوازي'),
@@ -454,7 +627,6 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
               color: cardBg,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: borderColor),
-              // Top colored border
             ),
             child: Column(
               children: [
@@ -467,7 +639,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 Text(s.labelEn,
                     style: TextStyle(color: textDim, fontSize: 10)),
                 const SizedBox(height: 10),
-                _badge(s.status, s.color),
+                _badgeWidget(s.status, s.color),
                 const SizedBox(height: 6),
                 Text(s.detail, style: TextStyle(color: textDim, fontSize: 10)),
               ],
@@ -493,7 +665,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
     );
   }
 
-  Widget _badge(String text, Color color) {
+  Widget _badgeWidget(String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
@@ -520,14 +692,7 @@ class _QAction {
   final IconData icon;
   final Color color;
   final VoidCallback? onTap;
-  _QAction(this.label, this.desc, this.icon, this.color, {this.onTap});
-}
-
-class _ClientRow {
-  final String name, sector, statusLabel, coaLabel;
-  final int? clientId;
-  final Color statusColor, coaColor;
-  _ClientRow(this.name, this.sector, this.statusLabel, this.statusColor, this.coaLabel, this.coaColor, {this.clientId});
+  _QAction(this.label, this.desc, this.icon, this.color, this.onTap);
 }
 
 class _Activity {
