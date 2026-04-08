@@ -719,6 +719,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     int selReconciliation = _findCol(hLower, List<String>.from(autoTpl['reconciliation'] ?? []));
     int selCurrency = _findCol(hLower, List<String>.from(autoTpl['currency'] ?? []));
     int selCompany = _findCol(hLower, List<String>.from(autoTpl['company'] ?? []));
+    int selParentAccount = _findCol(hLower, List<String>.from(autoTpl['parentAccount'] ?? []));
+    int selLevel = _findCol(hLower, List<String>.from(autoTpl['level'] ?? []));
+    int selReportType = _findCol(hLower, List<String>.from(autoTpl['reportType'] ?? []));
+    int selDebitCredit = _findCol(hLower, List<String>.from(autoTpl['debitCredit'] ?? []));
+    int selEnglishName = _findCol(hLower, List<String>.from(autoTpl['englishName'] ?? []));
 
     if (selCode < 0 && selName < 0 && headers.length >= 2) {
       selCode = 0;
@@ -751,6 +756,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       selReconciliation = _findCol(hLower, List<String>.from(tpl['reconciliation'] ?? []));
       selCurrency = _findCol(hLower, List<String>.from(tpl['currency'] ?? []));
       selCompany = _findCol(hLower, List<String>.from(tpl['company'] ?? []));
+      selParentAccount = _findCol(hLower, List<String>.from(tpl['parentAccount'] ?? []));
+      selLevel = _findCol(hLower, List<String>.from(tpl['level'] ?? []));
+      selReportType = _findCol(hLower, List<String>.from(tpl['reportType'] ?? []));
+      selDebitCredit = _findCol(hLower, List<String>.from(tpl['debitCredit'] ?? []));
+      selEnglishName = _findCol(hLower, List<String>.from(tpl['englishName'] ?? []));
       // Apply recommended encoding
       final recEnc = tpl['encoding'] as String;
       if (recEnc != 'auto' && csvBytes != null && ext == 'csv') {
@@ -957,13 +967,29 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         // Column mapping
                         const Text('ربط الأعمدة:', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
+                        // === Dynamic column mapping based on ERP ===
+                        // Base keys - always shown
                         _mapRow('رقم الحساب *', selCode, colItems, (v) => setSt(() => selCode = v ?? -1)),
                         _mapRow('اسم الحساب *', selName, colItems, (v) => setSt(() => selName = v ?? -1)),
                         _mapRow('التصنيف', selClass, colItems, (v) => setSt(() => selClass = v ?? -1)),
                         _mapRow('القسم', selSection, colItems, (v) => setSt(() => selSection = v ?? -1)),
-                        _mapRow('التسوية', selReconciliation, colItems, (v) => setSt(() => selReconciliation = v ?? -1)),
-                        _mapRow('العملة', selCurrency, colItems, (v) => setSt(() => selCurrency = v ?? -1)),
-                        _mapRow('الشركة', selCompany, colItems, (v) => setSt(() => selCompany = v ?? -1)),
+                        // Optional keys - only if template has them
+                        if (_erpTemplates[selTemplate].containsKey('reconciliation'))
+                          _mapRow('التسوية', selReconciliation, colItems, (v) => setSt(() => selReconciliation = v ?? -1)),
+                        if (_erpTemplates[selTemplate].containsKey('currency'))
+                          _mapRow('العملة', selCurrency, colItems, (v) => setSt(() => selCurrency = v ?? -1)),
+                        if (_erpTemplates[selTemplate].containsKey('company'))
+                          _mapRow('الشركة', selCompany, colItems, (v) => setSt(() => selCompany = v ?? -1)),
+                        if (_erpTemplates[selTemplate].containsKey('parentAccount'))
+                          _mapRow('الحساب الرئيسي', selParentAccount, colItems, (v) => setSt(() => selParentAccount = v ?? -1)),
+                        if (_erpTemplates[selTemplate].containsKey('level'))
+                          _mapRow('الرتبة', selLevel, colItems, (v) => setSt(() => selLevel = v ?? -1)),
+                        if (_erpTemplates[selTemplate].containsKey('reportType'))
+                          _mapRow('نوع التقرير', selReportType, colItems, (v) => setSt(() => selReportType = v ?? -1)),
+                        if (_erpTemplates[selTemplate].containsKey('debitCredit'))
+                          _mapRow('مدين / دائن', selDebitCredit, colItems, (v) => setSt(() => selDebitCredit = v ?? -1)),
+                        if (_erpTemplates[selTemplate].containsKey('englishName'))
+                          _mapRow('الاسم الأجنبي', selEnglishName, colItems, (v) => setSt(() => selEnglishName = v ?? -1)),
 
                         const SizedBox(height: 24),
 
@@ -986,6 +1012,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                         'reconciliation': selReconciliation,
                                         'currency': selCurrency,
                                         'company': selCompany,
+                                        'parentAccount': selParentAccount,
+                                        'level': selLevel,
+                                        'reportType': selReportType,
+                                        'debitCredit': selDebitCredit,
+                                        'englishName': selEnglishName,
                                         'template': selTemplate,
                                         'customErpName': customErpName,
                                       })
@@ -1087,10 +1118,10 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           }
         } else if (tplName.contains('أونكس') || tplName.contains('ONYX')) {
           // ONYX: classify using account code structure
-          final parentAccIdx = mapping['parentAccount'] ?? -1;
-          final levelIdx = mapping['level'] ?? -1;
-          final reportIdx = mapping['reportType'] ?? -1;
-          final dcIdx = mapping['debitCredit'] ?? -1;
+          final parentAccIdx = (mapping['parentAccount'] as int?) ?? -1;
+          final levelIdx = (mapping['level'] as int?) ?? -1;
+          final reportIdx = (mapping['reportType'] as int?) ?? -1;
+          final dcIdx = (mapping['debitCredit'] as int?) ?? -1;
           final pAcc = parentAccIdx >= 0 && parentAccIdx < row.length ? row[parentAccIdx].trim() : '';
           final lvl = levelIdx >= 0 && levelIdx < row.length ? row[levelIdx].trim() : '';
           final rpt = reportIdx >= 0 && reportIdx < row.length ? row[reportIdx].trim() : '';
