@@ -1077,7 +1077,42 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       }
     }
 
-    // Step 6: Calculate acceptance scores
+    // Step 6: Validate parent-child name consistency
+    // Detect accounts placed under wrong parent due to misleading code prefixes
+    for (final acc in _accounts) {
+      if (acc.parentCode.isEmpty) continue;
+      final myCategory = _classifyByName(acc.name);
+      if (myCategory.isEmpty) continue; // Can't validate without name classification
+
+      final parent = _accounts.where((a) => a.code == acc.parentCode).toList();
+      if (parent.isEmpty) continue;
+
+      // Check each potential parent
+      for (final p in parent) {
+        final parentCategory = _classifyByName(p.name);
+        if (parentCategory.isEmpty) continue; // Parent has no clear category
+
+        if (myCategory != parentCategory) {
+          // MISMATCH: child's name category differs from parent's
+          acc.flags = [...acc.flags, 'تحذير: "${ acc.name}" ($myCategory) مصنف تحت "${p.name}" ($parentCategory)'];
+
+          // Try to find a better parent with matching category
+          final betterParents = _accounts.where((a) =>
+            a.level < acc.level &&
+            a.level >= (acc.level - 2) &&
+            _classifyByName(a.name) == myCategory &&
+            a.code != acc.code
+          ).toList();
+          if (betterParents.isNotEmpty) {
+            betterParents.sort((a, b) => b.level.compareTo(a.level));
+            acc.suggestedParent = betterParents.first.code;
+            acc.flags = [...acc.flags, 'التبويب المقترح تحت: ${betterParents.first.code} — ${betterParents.first.name}'];
+          }
+        }
+      }
+    }
+
+    // Step 7: Calculate acceptance scores
     for (final acc in _accounts) {
       acc.acceptanceScore = _calculateAcceptanceScore(acc, _accounts);
     }
@@ -1938,15 +1973,41 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               onPressed: () {
                 setState(() {
                   final oldCode = acc.code;
-                  acc.code = codeCtrl.text.trim();
+                  final newEditCode = codeCtrl.text.trim();
                   acc.name = nameCtrl.text.trim();
                   acc.level = int.tryParse(levelCtrl.text.trim()) ?? acc.level;
-                  acc.uniqueId = '${acc.code}_${acc.rowIndex}';
-                  // Re-check duplicate status
-                  final dupeCount = _accounts.where((a) => a.code == acc.code).length;
-                  acc.isDuplicateCode = dupeCount > 1;
-                  // If old code changed, also update old duplicates
-                  if (oldCode != acc.code) {
+
+                  // If code changed, cascade to descendants
+                  if (oldCode != newEditCode) {
+                    // Find descendants BEFORE changing the code
+                    final editDescendants = _accounts
+                        .where((a) => a.code.startsWith(oldCode) && a.code != oldCode)
+                        .toList()
+                      ..sort((a, b) => a.code.length.compareTo(b.code.length));
+
+                    acc.code = newEditCode;
+                    acc.uniqueId = '${newEditCode}_${acc.rowIndex}';
+
+                    // Cascade code changes to descendants
+                    for (final desc in editDescendants) {
+                      final newDescCode = newEditCode + desc.code.substring(oldCode.length);
+                      desc.code = newDescCode;
+                      desc.uniqueId = '${newDescCode}_${desc.rowIndex}';
+                    }
+
+                    // Update parent references
+                    for (final child in _accounts) {
+                      if (child.parentCode == oldCode) {
+                        child.parentCode = newEditCode;
+                        child.parentUniqueId = acc.uniqueId;
+                      } else if (child.parentCode.startsWith(oldCode) && child.parentCode.length > oldCode.length) {
+                        child.parentCode = newEditCode + child.parentCode.substring(oldCode.length);
+                        final np = _accounts.where((a) => a.code == child.parentCode).toList();
+                        if (np.isNotEmpty) child.parentUniqueId = np.first.uniqueId;
+                      }
+                    }
+
+                    // Check if old code duplication resolved
                     final oldDupes = _accounts.where((a) => a.code == oldCode).toList();
                     if (oldDupes.length == 1) {
                       oldDupes.first.isDuplicateCode = false;
@@ -1955,7 +2016,14 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           .where((f) => !f.contains('كود مكرر') && !f.contains('الكود المقترح') && !f.contains('التصنيف بالاسم'))
                           .toList();
                     }
+                  } else {
+                    acc.code = newEditCode;
+                    acc.uniqueId = '${newEditCode}_${acc.rowIndex}';
                   }
+
+                  // Re-check duplicate status
+                  final dupeCount = _accounts.where((a) => a.code == acc.code).length;
+                  acc.isDuplicateCode = dupeCount > 1;
                   // Re-classify
                   acc.rootClass = _classifyRoot(acc.code);
                   acc.nature = _determineNature(acc.rootClass);
@@ -1966,7 +2034,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   if (acc.level <= 2) acc.accountType = 'حساب رئيسي';
                   else if (acc.level == 3) acc.accountType = 'حساب فرعي';
                   else acc.accountType = 'حساب تفصيلي';
-                  // Recalculate scores for all affected accounts
+                  // Recalculate scores for all accounts
                   for (final a in _accounts) {
                     a.acceptanceScore = _calculateAcceptanceScore(a, _accounts);
                   }
@@ -2067,7 +2135,16 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 }
                 setState(() {
                   final oldCode = acc.code;
-                  // Update the account's code
+
+                  // === CASCADING CODE UPDATE ===
+                  // Find ALL descendants whose code starts with oldCode
+                  // Sort by code length (shortest first = parents before children)
+                  final descendants = _accounts
+                      .where((a) => a.code.startsWith(oldCode) && a.code != oldCode)
+                      .toList()
+                    ..sort((a, b) => a.code.length.compareTo(b.code.length));
+
+                  // Update the account's own code first
                   acc.code = newCode;
                   acc.uniqueId = '${newCode}_${acc.rowIndex}';
                   acc.isDuplicateCode = false;
@@ -2076,15 +2153,37 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       .where((f) => !f.contains('كود مكرر') && !f.contains('الكود المقترح') && !f.contains('التصنيف بالاسم') && !f.contains('التبويب المقترح'))
                       .toList();
 
-                  // Update children that were under the old code
+                  // Now cascade: update all descendants' codes
+                  // e.g., oldCode=122, newCode=129 → child 12201 becomes 12901, 12201001 becomes 12901001
+                  for (final desc in descendants) {
+                    final oldDescCode = desc.code;
+                    final newDescCode = newCode + oldDescCode.substring(oldCode.length);
+                    desc.code = newDescCode;
+                    desc.uniqueId = '${newDescCode}_${desc.rowIndex}';
+                    // Clear duplicate flags on descendants too
+                    final dupeCount = _accounts.where((a) => a.code == newDescCode).length;
+                    desc.isDuplicateCode = dupeCount > 1;
+                    if (!desc.isDuplicateCode) {
+                      desc.suggestedCode = '';
+                      desc.flags = desc.flags
+                          .where((f) => !f.contains('كود مكرر') && !f.contains('الكود المقترح') && !f.contains('التصنيف بالاسم') && !f.contains('التبويب المقترح'))
+                          .toList();
+                    }
+                  }
+
+                  // Update parentCode references for all descendants
+                  // Direct children: parentCode was oldCode → now newCode
+                  // Deeper descendants: parentCode started with oldCode → replace prefix
                   for (final child in _accounts) {
                     if (child.parentCode == oldCode) {
-                      // Check if this child belongs to this account by name category
-                      final childCat = _classifyByName(child.name);
-                      final accCat = _classifyByName(acc.name);
-                      if (childCat == accCat || child.parentUniqueId == '${oldCode}_${acc.rowIndex}') {
-                        child.parentCode = newCode;
-                        child.parentUniqueId = acc.uniqueId;
+                      child.parentCode = newCode;
+                      child.parentUniqueId = acc.uniqueId;
+                    } else if (child.parentCode.startsWith(oldCode)) {
+                      child.parentCode = newCode + child.parentCode.substring(oldCode.length);
+                      // Find the actual parent account with the new code
+                      final newParent = _accounts.where((a) => a.code == child.parentCode).toList();
+                      if (newParent.isNotEmpty) {
+                        child.parentUniqueId = newParent.first.uniqueId;
                       }
                     }
                   }
@@ -2099,12 +2198,21 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         .toList();
                   }
 
-                  // Re-classify and rescore
-                  acc.rootClass = _classifyRoot(acc.code);
-                  acc.nature = _determineNature(acc.rootClass);
-                  acc.reportType = _determineReportType(acc.rootClass);
-                  acc.parentCode = _findParentCode(acc.code, _accounts);
+                  // Collect all affected uniqueIds (the account + its descendants)
+                  final affectedIds = <String>{acc.uniqueId};
+                  for (final d in descendants) affectedIds.add(d.uniqueId);
+
+                  // Re-classify and rescore ALL accounts
                   for (final a in _accounts) {
+                    a.rootClass = _classifyRoot(a.code);
+                    a.nature = _determineNature(a.rootClass);
+                    a.reportType = _determineReportType(a.rootClass);
+                    a.isClosable = _isClosable(a.rootClass);
+                    // Only re-find parent for accounts NOT in the cascade
+                    // (cascade already set correct parentCode)
+                    if (!affectedIds.contains(a.uniqueId)) {
+                      a.parentCode = _findParentCode(a.code, _accounts);
+                    }
                     a.acceptanceScore = _calculateAcceptanceScore(a, _accounts);
                   }
                 });
