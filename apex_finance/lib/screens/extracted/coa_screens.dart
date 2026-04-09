@@ -1230,16 +1230,24 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   }
 
   Future<void> _submitCoa() async {
+    // v7.6: route through real 6-step COA pipeline (upload→parse→classify→assess→bulk-approve→approve-coa)
+    if (_fileBytes == null || _fileName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: const Text('يجب رفع ملف الدليل المحاسبي أولاً قبل الحفظ'),
+          backgroundColor: AppColors.redC));
+      return;
+    }
+
     final approved = _accounts.where((a) => a.status == 'approved').length;
     final total = _accounts.length;
 
-    if (approved < total) {
+    if (total > 0 && approved < total) {
       final proceed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: const Color(0xFF0D1825),
           title: Text('تأكيد الإرسال', style: TextStyle(color: AppColors.gold)),
-          content: Text('تم اعتماد $approved من $total حساب. هل تريد الإرسال؟',
+          content: Text('تم اعتماد $approved من $total حساب. هل تريد إرسال الملف للسيرفر للمعالجة الكاملة؟',
             style: TextStyle(color: AppColors.textColor)),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('إلغاء', style: TextStyle(color: AppColors.textMid))),
@@ -1253,51 +1261,121 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       if (proceed != true) return;
     }
 
-    setState(() { _isLoading = true; _statusMsg = 'جاري حفظ شجرة الحسابات...'; });
+    setState(() { _isLoading = true; _statusMsg = 'بدء الرفع للسيرفر...'; });
+
+    final base = 'https://apex-api-ootk.onrender.com';
+    final token = html.window.localStorage['apex_token'] ?? '';
+    final authOnly = {'Authorization': 'Bearer $token'};
+    final authJson = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
 
     try {
-      final token = html.window.localStorage['apex_token'] ?? '';
-      final accountsList = <Map<String, dynamic>>[];
-      for (final a in _accounts) {
-        accountsList.add({
-          'code': a.code,
-          'name': a.name,
-          'level': a.level,
-          'parent_code': a.parentCode,
-          // 'classification': not available,
-          'status': a.status,
-          'score': a.acceptanceScore,
-        });
-      }
-      final payload = {
-        'client_id': widget.clientId,
-        'accounts': accountsList,
-        'total_accounts': total,
-        'approved_count': approved,
-        'file_name': _fileName,
-      };
-
-      final resp = await ApiRetry.post(
-        Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/coa'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
+      // ── Step 1: Upload file (multipart) ─────────────────────
+      if (mounted) setState(() => _statusMsg = '1/6 رفع الملف...');
+      final uploadReq = http.MultipartRequest(
+        'POST',
+        Uri.parse('$base/clients/${widget.clientId}/coa/upload'),
       );
+      uploadReq.headers.addAll(authOnly);
+      uploadReq.files.add(http.MultipartFile.fromBytes(
+        'file',
+        _fileBytes!,
+        filename: _fileName,
+      ));
+      final uploadStreamed = await uploadReq.send().timeout(const Duration(seconds: 60));
+      final uploadResp = await http.Response.fromStream(uploadStreamed);
+      if (uploadResp.statusCode != 200 && uploadResp.statusCode != 201) {
+        throw Exception('فشل الرفع (${uploadResp.statusCode}): ${uploadResp.body}');
+      }
+      final uploadData = jsonDecode(uploadResp.body) as Map<String, dynamic>;
+      final uploadId = (uploadData['upload_id'] ?? uploadData['id'] ?? uploadData['uploadId'] ?? '').toString();
+      if (uploadId.isEmpty) {
+        throw Exception('لم يتم استلام upload_id من السيرفر');
+      }
+      if (mounted) setState(() => _currentStage = 1);
 
-      if (resp.statusCode == 200 || resp.statusCode == 201) {
-        setState(() { _hasUnsavedChanges = false; _isLoading = false; _statusMsg = ''; });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('تم حفظ شجرة الحسابات بنجاح ($approved/$total معتمد)'),
-              backgroundColor: const Color(0xFF1A2536)));
-        }
-      } else {
-        throw Exception('Server returned ${resp.statusCode}');
+      // ── Step 2: Parse ───────────────────────────────────────
+      if (mounted) setState(() => _statusMsg = '2/6 تحليل الملف على السيرفر...');
+      final parseResp = await ApiRetry.post(
+        Uri.parse('$base/coa/uploads/$uploadId/parse'),
+        headers: authJson,
+        body: '{}',
+      );
+      if (parseResp.statusCode != 200 && parseResp.statusCode != 201) {
+        throw Exception('فشل التحليل (${parseResp.statusCode}): ${parseResp.body}');
+      }
+      if (mounted) setState(() => _currentStage = 2);
+
+      // ── Step 3: Classify ────────────────────────────────────
+      if (mounted) setState(() => _statusMsg = '3/6 تصنيف الحسابات تلقائياً...');
+      final classifyResp = await ApiRetry.post(
+        Uri.parse('$base/coa/classify/$uploadId'),
+        headers: authOnly,
+      );
+      if (classifyResp.statusCode != 200 && classifyResp.statusCode != 201) {
+        throw Exception('فشل التصنيف (${classifyResp.statusCode}): ${classifyResp.body}');
+      }
+      if (mounted) setState(() => _currentStage = 3);
+
+      // ── Step 4: Assess quality ──────────────────────────────
+      if (mounted) setState(() => _statusMsg = '4/6 تقييم الجودة...');
+      final assessResp = await ApiRetry.post(
+        Uri.parse('$base/coa/uploads/$uploadId/assess'),
+        headers: authJson,
+        body: '{}',
+      );
+      if (assessResp.statusCode != 200 && assessResp.statusCode != 201) {
+        throw Exception('فشل تقييم الجودة (${assessResp.statusCode}): ${assessResp.body}');
+      }
+      if (mounted) setState(() => _currentStage = 4);
+
+      // ── Step 5: Bulk approve ────────────────────────────────
+      if (mounted) setState(() => _statusMsg = '5/6 اعتماد الحسابات جماعياً...');
+      final bulkResp = await ApiRetry.post(
+        Uri.parse('$base/coa/bulk-approve/$uploadId'),
+        headers: authJson,
+        body: '{}',
+      );
+      if (bulkResp.statusCode != 200 && bulkResp.statusCode != 201) {
+        throw Exception('فشل الاعتماد الجماعي (${bulkResp.statusCode}): ${bulkResp.body}');
+      }
+      if (mounted) setState(() => _currentStage = 5);
+
+      // ── Step 6: Final approve ──────────────────────────────
+      if (mounted) setState(() => _statusMsg = '6/6 الحفظ النهائي...');
+      final finalResp = await ApiRetry.post(
+        Uri.parse('$base/coa/uploads/$uploadId/approve-coa'),
+        headers: authJson,
+        body: '{}',
+      );
+      if (finalResp.statusCode != 200 && finalResp.statusCode != 201) {
+        throw Exception('فشل الحفظ النهائي (${finalResp.statusCode}): ${finalResp.body}');
+      }
+
+      if (mounted) {
+        setState(() {
+          _hasUnsavedChanges = false;
+          _isLoading = false;
+          _statusMsg = '';
+          _currentStage = 6;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('تم حفظ شجرة الحسابات بنجاح ($total حساب)'),
+            backgroundColor: AppColors.greenC,
+            duration: const Duration(seconds: 4),
+          ),
+        );
       }
     } catch (e) {
-      setState(() { _isLoading = false; _statusMsg = ''; });
       if (mounted) {
+        setState(() { _isLoading = false; _statusMsg = ''; });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ في الحفظ: $e'), backgroundColor: const Color(0xFF1A2536)));
+          SnackBar(
+            content: Text('خطأ في الحفظ: $e'),
+            backgroundColor: AppColors.redC,
+            duration: const Duration(seconds: 6),
+          ),
+        );
       }
     }
   }
