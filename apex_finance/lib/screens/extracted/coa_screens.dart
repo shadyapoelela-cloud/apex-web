@@ -1678,7 +1678,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               ),
               const SizedBox(width: 6),
               GestureDetector(
-                onTap: () => setState(() => _treeExpanded.clear()),
+                onTap: () => setState(() {
+                  for (final a in _accounts) _treeExpanded[a.uniqueId] = false;
+                }),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
