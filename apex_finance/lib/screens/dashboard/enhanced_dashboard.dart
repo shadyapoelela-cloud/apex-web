@@ -16,8 +16,9 @@ const String _api = 'https://apex-api-ootk.onrender.com';
 class EnhancedDashboard extends StatefulWidget {
   final VoidCallback? onSwitchToClients;
   final VoidCallback? onCreateClient;
+  final VoidCallback? onNavigateToCoa;
 
-  const EnhancedDashboard({super.key, this.onSwitchToClients, this.onCreateClient});
+  const EnhancedDashboard({super.key, this.onSwitchToClients, this.onCreateClient, this.onNavigateToCoa});
   @override
   State<EnhancedDashboard> createState() => _EnhancedDashboardState();
 }
@@ -184,9 +185,11 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
         else if (widget.onSwitchToClients != null) widget.onSwitchToClients!();
       }),
       _QAction('رفع شجرة حسابات', 'COA Upload', Icons.upload_file, blueC, () {
-        if (_clients.isNotEmpty) {
-          final c = _clients.first;
-          _navigateToCoa(c);
+        // v6.6: Use parent callback (checks top-bar client selection)
+        if (widget.onNavigateToCoa != null) {
+          widget.onNavigateToCoa!();
+        } else if (_clients.isNotEmpty) {
+          _navigateToCoa(_clients.first);
         } else if (widget.onSwitchToClients != null) {
           widget.onSwitchToClients!();
         }
@@ -449,13 +452,13 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
         title = 'الخطوة التالية المقترحة';
         desc = '$name لديه شجرة حسابات بانتظار المراجعة';
         btn = 'انتقل للمراجعة';
-        action = () => _navigateToCoa(c);
+        action = widget.onNavigateToCoa ?? () => _navigateToCoa(c);
         break;
       } else if (coaStatus.isEmpty || coaStatus == 'pending') {
         title = 'الخطوة التالية المقترحة';
         desc = '$name بحاجة لرفع شجرة الحسابات';
         btn = 'رفع COA';
-        action = () => _navigateToCoa(c);
+        action = widget.onNavigateToCoa ?? () => _navigateToCoa(c);
         break;
       }
     }

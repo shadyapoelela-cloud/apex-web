@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -52,7 +53,7 @@ class CoaAccount {
   double acceptanceScore; // 0-100
   List<String> flags;    // قائمة الملاحظات والأخطاء
   String status;         // approved, review, flagged
-  List<CoaAccount> children;
+  List<CoaAccount> children = [];
 
   CoaAccount({
     required this.code,
@@ -1147,6 +1148,104 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         ),
       ),
     );
+  }
+
+
+  // ─── Save & Submit COA to API (v6.9) ─────────────
+  bool _hasUnsavedChanges = false;
+
+  Future<bool> _onWillPop() async {
+    if (!_hasUnsavedChanges || _accounts.isEmpty) return true;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF0D1825),
+        title: Text('تغييرات غير محفوظة', style: TextStyle(color: AppColors.gold)),
+        content: Text('لديك تعديلات لم تُحفظ. هل تريد الخروج بدون حفظ؟',
+          style: TextStyle(color: AppColors.textColor)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('إلغاء', style: TextStyle(color: AppColors.textMid))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.redC),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('خروج بدون حفظ')),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  Future<void> _submitCoa() async {
+    final approved = _accounts.where((a) => a.status == 'approved').length;
+    final total = _accounts.length;
+
+    if (approved < total) {
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: const Color(0xFF0D1825),
+          title: Text('تأكيد الإرسال', style: TextStyle(color: AppColors.gold)),
+          content: Text('تم اعتماد $approved من $total حساب. هل تريد الإرسال؟',
+            style: TextStyle(color: AppColors.textColor)),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('إلغاء', style: TextStyle(color: AppColors.textMid))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.navy),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('إرسال')),
+          ],
+        ),
+      );
+      if (proceed != true) return;
+    }
+
+    setState(() { _isLoading = true; _statusMsg = 'جاري حفظ شجرة الحسابات...'; });
+
+    try {
+      final token = html.window.localStorage['apex_token'] ?? '';
+      final accountsList = <Map<String, dynamic>>[];
+      for (final a in _accounts) {
+        accountsList.add({
+          'code': a.code,
+          'name': a.name,
+          'level': a.level,
+          'parent_code': a.parentCode,
+          // 'classification': not available,
+          'status': a.status,
+          'score': a.acceptanceScore,
+        });
+      }
+      final payload = {
+        'client_id': widget.clientId,
+        'accounts': accountsList,
+        'total_accounts': total,
+        'approved_count': approved,
+        'file_name': _fileName,
+      };
+
+      final resp = await http.post(
+        Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/coa'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (resp.statusCode == 200 || resp.statusCode == 201) {
+        setState(() { _hasUnsavedChanges = false; _isLoading = false; _statusMsg = ''; });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('تم حفظ شجرة الحسابات بنجاح ($approved/$total معتمد)'),
+              backgroundColor: const Color(0xFF1A2536)));
+        }
+      } else {
+        throw Exception('Server returned ${resp.statusCode}');
+      }
+    } catch (e) {
+      setState(() { _isLoading = false; _statusMsg = ''; });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('خطأ في الحفظ: $e'), backgroundColor: const Color(0xFF1A2536)));
+      }
+    }
   }
 
   Widget _buildHeader() {
@@ -2297,7 +2396,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       acc.status = 'approved';
                       acc.acceptanceScore = 100;
                       acc.flags = [];
-                    });
+                     _hasUnsavedChanges = true; });
                   },
                   icon: Icon(Icons.check_circle, size: 16, color: AppColors.greenC),
                   label: Text('قبول على الوضع الحالي', style: TextStyle(color: AppColors.greenC, fontSize: 12)),

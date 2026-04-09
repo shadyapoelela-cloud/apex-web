@@ -413,6 +413,7 @@ class _MainNavS extends State<MainNav> {
             setState(() => _i = 1);
             // Trigger create wizard after tab switch
           },
+          onNavigateToCoa: _goToCoa,
         ), const ClientsTab(), const AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
     return Scaffold(
       backgroundColor: AC.navy,
@@ -529,36 +530,7 @@ class _MainNavS extends State<MainNav> {
           title: Text('المسار المالي', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           initiallyExpanded: true,
           children: [
-          _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () {
-              setState(() => _dr = false);
-              // Navigate to COA for active client
-              if (_activeClients.isNotEmpty) {
-                final ac = _cl.firstWhere(
-                  (c) => _activeClients.contains(c['name_ar'] ?? c['name'] ?? ''),
-                  orElse: () => _cl.isNotEmpty ? _cl.first : null,
-                );
-                if (ac != null) {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => CoaJourneyScreen(
-                      clientId: '${ac['id'] ?? ac['client_code'] ?? '1'}',
-                      clientName: ac['name_ar'] ?? ac['name'] ?? '',
-                    ),
-                  ));
-                  return;
-                }
-              }
-              if (_cl.isNotEmpty) {
-                final first = _cl.first;
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => CoaJourneyScreen(
-                    clientId: '${first['id'] ?? first['client_code'] ?? '1'}',
-                    clientName: first['name_ar'] ?? first['name'] ?? '',
-                  ),
-                ));
-              } else {
-                setState(() => _i = 1);
-              }
-            }, isGold: true),
+          _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () => _goToCoa(), isGold: true),
           _drawerItem(Icons.table_chart, 'ميزان المراجعة TB', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
           _drawerItem(Icons.receipt_long, 'القوائم المالية', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
           _drawerItem(Icons.analytics_rounded, 'التحليل المالي', () { setState(() { _i = 2; _dr = false; }); }),
@@ -634,6 +606,82 @@ class _MainNavS extends State<MainNav> {
     child: Text(label, textAlign: TextAlign.right, style: const TextStyle(
       color: Color(0xFFC9A84C), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
   );
+
+
+  /// Smart COA navigation — checks top-bar client selection (v6.7)
+  void _goToCoa() {
+    setState(() => _dr = false);
+    if (_activeClients.isEmpty) {
+      _showCoaDialog(
+        '\u062a\u062d\u062f\u064a\u062f \u0639\u0645\u064a\u0644',
+        '\u0628\u0631\u062c\u0627\u0621 \u062a\u062d\u062f\u064a\u062f \u0639\u0645\u064a\u0644 \u0645\u0646 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0639\u0644\u0648\u064a\u0629 \u0623\u0648\u0644\u0627\u064b',
+        Icons.person_search,
+      );
+      return;
+    }
+    if (_activeClients.length > 1) {
+      _showCoaDialog(
+        '\u062a\u062d\u062f\u064a\u062f \u0639\u0645\u064a\u0644 \u0648\u0627\u062d\u062f',
+        '\u0628\u0631\u062c\u0627\u0621 \u062a\u062d\u062f\u064a\u062f \u0639\u0645\u064a\u0644 \u0648\u0627\u062d\u062f \u0641\u0642\u0637 \u0644\u0641\u062a\u062d \u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a',
+        Icons.warning_amber_rounded,
+      );
+      return;
+    }
+    final selectedName = _activeClients.first;
+    final client = _cl.firstWhere(
+      (c) => (c['name_ar'] ?? c['name'] ?? '') == selectedName,
+      orElse: () => null,
+    );
+    if (client != null) {
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => CoaJourneyScreen(
+          clientId: (client['id'] ?? client['client_code'] ?? '1').toString(),
+          clientName: client['name_ar'] ?? client['name'] ?? '',
+        ),
+      ));
+    } else {
+      _showCoaDialog(
+        '\u062e\u0637\u0623',
+        '\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0639\u0645\u064a\u0644',
+        Icons.error_outline,
+      );
+    }
+  }
+
+  void _showCoaDialog(String title, String message, IconData icon) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: const Color(0xFF0D1825),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0x33C9A84C), width: 1),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(icon, color: const Color(0xFFC9A84C), size: 48),
+            const SizedBox(height: 16),
+            Text(title, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFE8E0D0), fontSize: 14, height: 1.5)),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFC9A84C),
+                foregroundColor: const Color(0xFF050D1A),
+                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('\u062d\u0633\u0646\u0627\u064b', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
 
   void _comingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(

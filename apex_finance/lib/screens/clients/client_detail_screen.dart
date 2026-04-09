@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:html' as html;
 import '../extracted/coa_screens.dart';
 
 // ════════════════════════════════════════
@@ -48,6 +49,13 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   bool isLoadingReadiness = true;
   bool isLoadingDocuments = true;
 
+  String get _token => html.window.localStorage['apex_token'] ?? '';
+  Map<String, String> get _authHeaders => {
+    'Authorization': 'Bearer $_token',
+    'Content-Type': 'application/json',
+  };
+
+
   @override
   void initState() {
     super.initState();
@@ -59,7 +67,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   Future<void> _loadReadiness() async {
     try {
       final response = await http.get(
-        Uri.parse('https://api.apexplatform.com/clients/${widget.clientId}/readiness'),
+        Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/readiness'),
+        headers: _authHeaders,
       );
       if (response.statusCode == 200) {
         setState(() {
@@ -86,7 +95,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   Future<void> _loadDocuments() async {
     try {
       final response = await http.get(
-        Uri.parse('https://api.apexplatform.com/clients/${widget.clientId}/documents'),
+        Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/documents'),
+        headers: _authHeaders,
       );
       if (response.statusCode == 200) {
         setState(() {
@@ -176,7 +186,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           ),
           // Edit button
           OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () => _showEditClientDialog(),
             icon: Icon(Icons.edit, size: 14, color: textMid),
             label: Text('تعديل', style: TextStyle(color: textMid, fontSize: 12)),
             style: OutlinedButton.styleFrom(
@@ -605,16 +615,19 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                       style: TextStyle(color: textMid, fontSize: 12)),
                 ],
               ),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.upload_file, size: 16),
-                label: const Text('رفع مستند'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: gold,
-                  foregroundColor: navy,
-                  textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: gold.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: gold.withOpacity(0.3)),
                 ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.folder_open, color: gold, size: 16),
+                  const SizedBox(width: 6),
+                  Text('ارفع من الزر المقابل لكل مستند',
+                    style: TextStyle(color: gold, fontSize: 11, fontWeight: FontWeight.w600)),
+                ]),
               ),
             ],
           ),
@@ -639,6 +652,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     final statusColor = _docStatusColor(doc['status']);
     final statusLabel = _docStatusLabel(doc['status']);
     final statusIcon = _docStatusIcon(doc['status']);
+    final isMissing = doc['status'] == 'missing';
+    final isUploaded = doc['status'] == 'uploaded' || doc['status'] == 'accepted';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -646,7 +661,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: isMissing ? gold.withOpacity(0.3) : borderColor),
       ),
       child: Row(
         children: [
@@ -665,9 +680,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               children: [
                 Row(
                   children: [
-                    Text(doc['name'], style: const TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
+                    Flexible(child: Text(doc['name'], style: const TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600))),
                     if (doc['required'] == true) ...[
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Text('*', style: TextStyle(color: redC, fontSize: 14, fontWeight: FontWeight.bold)),
                     ],
                   ],
@@ -680,6 +695,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          // Status badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
@@ -690,7 +707,154 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
             child: Text(statusLabel,
                 style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.w600)),
           ),
+          const SizedBox(width: 8),
+          // Per-document action button
+          SizedBox(
+            height: 32,
+            child: isMissing
+              ? ElevatedButton.icon(
+                  onPressed: () => _uploadDocForType(doc['name']),
+                  icon: const Icon(Icons.upload_file, size: 14),
+                  label: Text('\u0631\u0641\u0639', style: const TextStyle(fontSize: 11)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: gold,
+                    foregroundColor: navy,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                )
+              : OutlinedButton.icon(
+                  onPressed: () => _viewDoc(doc['name']),
+                  icon: Icon(isUploaded ? Icons.visibility : Icons.refresh, size: 14, color: gold),
+                  label: Text(isUploaded ? '\u0639\u0631\u0636' : '\u0625\u0639\u0627\u062f\u0629',
+                    style: TextStyle(fontSize: 11, color: gold)),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: gold.withOpacity(0.4)),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+          ),
         ],
+      ),
+    );
+  }
+
+  void _uploadDocForType(String docName) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: const Color(0xFF0D1825),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: gold.withOpacity(0.3)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.cloud_upload_outlined, color: gold, size: 48),
+            const SizedBox(height: 16),
+            Text('رفع $docName', style: TextStyle(color: gold, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('اختر الملف المطلوب لرفعه',
+              style: TextStyle(color: textMid, fontSize: 13), textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              _uploadFormatBtn(ctx, docName, 'PDF', Icons.picture_as_pdf),
+              const SizedBox(width: 12),
+              _uploadFormatBtn(ctx, docName, 'Excel', Icons.table_chart),
+              const SizedBox(width: 12),
+              _uploadFormatBtn(ctx, docName, 'صورة', Icons.image),
+            ]),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('إلغاء', style: TextStyle(color: textMid, fontSize: 13)),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _uploadFormatBtn(BuildContext ctx, String docName, String format, IconData icon) {
+    return InkWell(
+      onTap: () {
+        Navigator.pop(ctx);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('جاري رفع $docName ($format)...'),
+          backgroundColor: const Color(0xFF1A2536),
+        ));
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 80, height: 80,
+        decoration: BoxDecoration(
+          color: gold.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: gold.withOpacity(0.25)),
+        ),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Icon(icon, color: gold, size: 28),
+          const SizedBox(height: 6),
+          Text(format, style: TextStyle(color: gold, fontSize: 11, fontWeight: FontWeight.w600)),
+        ]),
+      ),
+    );
+  }
+
+  void _viewDoc(String docName) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('عرض $docName — قريباً'),
+      backgroundColor: const Color(0xFF1A2536),
+    ));
+  }
+
+  void _showEditClientDialog() {
+    final nameCtrl = TextEditingController(text: widget.clientName);
+    final sectorCtrl = TextEditingController(text: readinessData['sector'] ?? '');
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: cardBg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: gold.withOpacity(0.3))),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text('تعديل بيانات العميل', style: TextStyle(color: gold, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            TextField(controller: nameCtrl, style: const TextStyle(color: textColor),
+              decoration: InputDecoration(labelText: 'اسم العميل', labelStyle: TextStyle(color: textMid),
+                filled: true, fillColor: navyMid, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none))),
+            const SizedBox(height: 12),
+            TextField(controller: sectorCtrl, style: const TextStyle(color: textColor),
+              decoration: InputDecoration(labelText: 'القطاع', labelStyle: TextStyle(color: textMid),
+                filled: true, fillColor: navyMid, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none))),
+            const SizedBox(height: 20),
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: Text('إلغاء', style: TextStyle(color: textMid))),
+              const SizedBox(width: 12),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: gold, foregroundColor: navy),
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  try {
+                    await http.put(Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}'),
+                      headers: _authHeaders,
+                      body: jsonEncode({'name_ar': nameCtrl.text, 'sector': sectorCtrl.text}));
+                    _loadReadiness();
+                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('تم التحديث بنجاح'), backgroundColor: Color(0xFF1A2536)));
+                  } catch (_) {
+                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('خطأ في التحديث'), backgroundColor: Color(0xFF1A2536)));
+                  }
+                },
+                child: const Text('حفظ', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ]),
+          ]),
+        ),
       ),
     );
   }
