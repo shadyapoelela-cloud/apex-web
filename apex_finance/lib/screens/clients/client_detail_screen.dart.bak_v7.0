@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:file_picker/file_picker.dart';
 import 'dart:html' as html;
 import '../extracted/coa_screens.dart';
 
@@ -741,50 +740,41 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     );
   }
 
-  void _uploadDocForType(String docName) async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'xlsx', 'xls', 'csv', 'jpg', 'jpeg', 'png'],
-        withData: true,
-      );
-      if (result == null || result.files.isEmpty) return;
-      final file = result.files.first;
-      
-      // Show uploading indicator
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('جاري رفع ${file.name}...'),
-            backgroundColor: const Color(0xFF1A2536)));
-      }
-      
-      // Upload to API
-      final uri = Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/documents');
-      final request = http.MultipartRequest('POST', uri);
-      request.headers['Authorization'] = 'Bearer $_token';
-      request.fields['doc_type'] = docName;
-      request.files.add(http.MultipartFile.fromBytes(
-        'file', file.bytes!, filename: file.name,
-      ));
-      
-      final response = await request.send();
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        _loadDocuments();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('تم رفع ${file.name} بنجاح'),
-              backgroundColor: const Color(0xFF1A2536)));
-        }
-      } else {
-        throw Exception('خطأ ${response.statusCode}');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ في الرفع: $e'),
-            backgroundColor: const Color(0xFF1A2536)));
-      }
-    }
+  void _uploadDocForType(String docName) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: const Color(0xFF0D1825),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: gold.withOpacity(0.3)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.cloud_upload_outlined, color: gold, size: 48),
+            const SizedBox(height: 16),
+            Text('رفع $docName', style: TextStyle(color: gold, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('اختر الملف المطلوب لرفعه',
+              style: TextStyle(color: textMid, fontSize: 13), textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              _uploadFormatBtn(ctx, docName, 'PDF', Icons.picture_as_pdf),
+              const SizedBox(width: 12),
+              _uploadFormatBtn(ctx, docName, 'Excel', Icons.table_chart),
+              const SizedBox(width: 12),
+              _uploadFormatBtn(ctx, docName, 'صورة', Icons.image),
+            ]),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('إلغاء', style: TextStyle(color: textMid, fontSize: 13)),
+            ),
+          ]),
+        ),
+      ),
+    );
   }
 
   Widget _uploadFormatBtn(BuildContext ctx, String docName, String format, IconData icon) {
