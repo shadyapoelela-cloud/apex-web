@@ -50,28 +50,46 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   }
 
   Future<void> _loadClients() async {
-    if (!mounted) return;
-    setState(() { _loading = true; _error = null; });
-    try {
-      // Use SAME approach as ClientsTab — read token from localStorage
-      final tk = html.window.localStorage['apex_token'] ?? '';
-      if (tk.isEmpty) {
-        if (mounted) setState(() { _clients = []; _loading = false; _error = 'لم يتم تسجيل الدخول'; });
-        return;
-      }
-      final r = await http.get(
-        Uri.parse('$_api/clients'),
-        headers: {'Authorization': 'Bearer $tk', 'Content-Type': 'application/json'},
-      );
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        if (mounted) setState(() { _clients = data is List ? data : []; _loading = false; });
-      } else {
-        if (mounted) setState(() { _clients = []; _loading = false; _error = 'خطأ ${r.statusCode}'; });
-      }
-    } catch (e) {
-      if (mounted) setState(() { _clients = []; _loading = false; _error = 'تعذر الاتصال بالخادم'; });
+    final token = html.window.localStorage['apex_token'] ?? '';
+    if (token.isEmpty) {
+      if (mounted) setState(() { _loading = false; });
+      return;
     }
+
+    // Retry logic for Render cold starts (up to 3 attempts)
+    for (int attempt = 1; attempt <= 3; attempt++) {
+      try {
+        final resp = await http.get(
+          Uri.parse('$_api/clients'),
+          headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        ).timeout(Duration(seconds: attempt == 1 ? 10 : 20));
+
+        if (resp.statusCode == 200) {
+          final data = jsonDecode(resp.body);
+          final list = data is List ? data : (data['clients'] ?? data['data'] ?? []);
+          if (mounted) {
+            setState(() {
+              _clients = List<Map<String, dynamic>>.from(list);
+              _loading = false;
+            });
+          }
+          return; // Success — exit retry loop
+        } else if (resp.statusCode == 401) {
+          // Token expired — clear and stop
+          html.window.localStorage.remove('apex_token');
+          if (mounted) setState(() { _loading = false; });
+          return;
+        }
+      } catch (e) {
+        if (attempt < 3) {
+          // Wait before retry (Render cold start)
+          await Future.delayed(Duration(seconds: attempt * 3));
+          continue;
+        }
+      }
+    }
+    // All retries failed
+    if (mounted) setState(() { _loading = false; });
   }
 
   @override

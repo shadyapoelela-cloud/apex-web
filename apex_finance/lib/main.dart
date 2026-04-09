@@ -66,7 +66,19 @@ class AC {
 }
 
 class S {
-  static String? token, uid, uname, dname, plan, email;
+  static String? _token, uid, uname, dname, plan, email;
+  static String? get token {
+    _token ??= html.window.localStorage['apex_token'];
+    return (_token != null && _token!.isNotEmpty) ? _token : null;
+  }
+  static set token(String? v) {
+    _token = v;
+    if (v != null && v.isNotEmpty) {
+      html.window.localStorage['apex_token'] = v;
+    } else {
+      html.window.localStorage.remove('apex_token');
+    }
+  }
   static List<String> roles = [];
   static String get liveToken => html.window.localStorage['apex_token'] ?? '';
   static Map<String,String> lh() => {'Authorization':'Bearer ${liveToken}','Content-Type':'application/json'};
