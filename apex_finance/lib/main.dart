@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
+
+
 // DISABLED: import 'client_create_screen.dart';
 import 'client_create.dart';
 
@@ -34,6 +36,48 @@ import 'screens/dashboard/enhanced_dashboard.dart';
 import 'screens/knowledge/knowledge_brain_screen.dart';
 import 'screens/audit/audit_workflow_screen.dart';
 import 'screens/financial/financial_ops_screen.dart';
+
+// === v7.5 ApiRetry helper (cold-start tolerance for Render free tier) ===
+class ApiRetry {
+  static Future<http.Response> _attempt(
+    Future<http.Response> Function() call,
+    String method,
+    String url,
+  ) async {
+    Object? lastErr;
+    for (int attempt = 1; attempt <= 3; attempt++) {
+      try {
+        final timeout = Duration(seconds: attempt == 1 ? 10 : 20);
+        final r = await call().timeout(timeout);
+        // Treat 502/503/504 as retriable (cold start gateway errors)
+        if (attempt < 3 && (r.statusCode == 502 || r.statusCode == 503 || r.statusCode == 504)) {
+          await Future.delayed(Duration(seconds: attempt * 3));
+          continue;
+        }
+        return r;
+      } catch (e) {
+        lastErr = e;
+        if (attempt < 3) {
+          await Future.delayed(Duration(seconds: attempt * 3));
+        }
+      }
+    }
+    throw Exception('ApiRetry $method $url failed after 3 attempts: $lastErr');
+  }
+
+  static Future<http.Response> get(Uri url, {Map<String, String>? headers}) =>
+    _attempt(() => http.get(url, headers: headers), 'GET', url.toString());
+
+  static Future<http.Response> post(Uri url,
+    {Map<String, String>? headers, Object? body}) =>
+    _attempt(() => http.post(url, headers: headers, body: body), 'POST', url.toString());
+
+  static Future<http.Response> put(Uri url,
+    {Map<String, String>? headers, Object? body}) =>
+    _attempt(() => http.put(url, headers: headers, body: body), 'PUT', url.toString());
+}
+// === end ApiRetry ===
+
 const _api = 'https://apex-api-ootk.onrender.com';
 
 void main() {
@@ -206,7 +250,7 @@ class _LoginS extends State<LoginScreen> {
   Future<void> _go() async {
     setState(() { _l = true; _e = null; });
     try {
-      final r = await http.post(Uri.parse('$_api/auth/login'),
+      final r = await ApiRetry.post(Uri.parse('$_api/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username_or_email': _u.text.trim(), 'password': _p.text}));
       final d = jsonDecode(r.body);
@@ -338,7 +382,7 @@ class _RegS extends State<RegScreen> {
   Future<void> _go() async {
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/auth/register'), headers:{'Content-Type':'application/json'},
+      final r = await ApiRetry.post(Uri.parse('$_api/auth/register'), headers:{'Content-Type':'application/json'},
         body: jsonEncode({'username':_un.text.trim(),'email':_em.text.trim(),'display_name':_dn.text.trim(),'password':_pw.text}));
       final d = jsonDecode(r.body);
       if(r.statusCode==200 && d['success']==true) {
@@ -959,7 +1003,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
     setState(() => _ld = true);
     try {
       final tk = html.window.localStorage['apex_token'] ?? '';
-      final r = await http.get(
+      final r = await ApiRetry.get(
         Uri.parse('$_api/clients'),
         headers: {'Authorization': 'Bearer $tk', 'Content-Type': 'application/json'},
       );
@@ -1282,7 +1326,7 @@ class _NewCS extends State<NewClientScreen> {
     if(_n.text.trim().isEmpty||_t==null){ setState(()=> _e='\u0627\u0644\u0627\u0633\u0645 \u0648\u0627\u0644\u0646\u0648\u0639 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/clients'), headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
+      final r = await ApiRetry.post(Uri.parse('$_api/clients'), headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
         body: jsonEncode({'name_ar':_n.text.trim(),'client_type_code':_t}));
       if(jsonDecode(r.body)['success']==true) { if(mounted) Navigator.pop(context); }
       else { setState(()=> _e=jsonDecode(r.body)['detail']); }
