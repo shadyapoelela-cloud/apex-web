@@ -390,13 +390,14 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
     );
   }
 
-  void _navigateToCoa(dynamic client) {
+  Future<void> _navigateToCoa(dynamic client) async {
     final clientId = client['id'] ?? client['client_code'] ?? '1';
     final clientName = client['name_ar'] ?? client['name'] ?? 'عميل';
-    Navigator.push(context, MaterialPageRoute(
+    await Navigator.push(context, MaterialPageRoute(
       builder: (_) => CoaJourneyScreen(clientId: '$clientId', clientName: clientName),
     ));
-  }
+    if (mounted) _loadClients();
+}
 
   // ════════════════════════════════════════
   // RECENT ACTIVITY
