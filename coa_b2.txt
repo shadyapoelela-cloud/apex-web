@@ -1,0 +1,773 @@
+﻿=== OVERVIEW TAB (1579-1795) ===
+ 1579:               ],
+ 1580:             ),
+ 1581:           ),
+ 1582:           ElevatedButton.icon(
+ 1583:             onPressed: () {
+ 1584:               ScaffoldMessenger.of(context).showSnackBar(
+ 1585:                 SnackBar(content: Text('طھظ… ط¥ط±ط³ط§ظ„ ط·ظ„ط¨ ط§ظ„ظ…ط±ط§ط¬ط¹ط© - ط³ظٹطھظˆط§طµظ„ ظ…ط¹ظƒ ط§ظ„ظپط±ظٹظ‚ ط®ظ„ط§ظ„ 24 ط³ط§ط¹ط©'),
+ 1586:                   backgroundColor: AppColors.greenC));
+ 1587:             },
+ 1588:             icon: Icon(Icons.send, size: 16, color: AppColors.navy),
+ 1589:             label: Text('ط§ط·ظ„ط¨ ط§ظ„ظ…ط±ط§ط¬ط¹ط©',
+ 1590:                 style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold, fontSize: 12)),
+ 1591:             style: ElevatedButton.styleFrom(
+ 1592:               backgroundColor: AppColors.gold,
+ 1593:               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+ 1594:             ),
+ 1595:           ),
+ 1596:         ],
+ 1597:       ),
+ 1598:     );
+ 1599:   }
+ 1600: 
+ 1601:   Widget _buildTabBar() {
+ 1602:     return Container(
+ 1603:       color: AppColors.navyLight,
+ 1604:       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+ 1605:       child: Container(
+ 1606:         decoration: BoxDecoration(
+ 1607:           color: AppColors.navyMid,
+ 1608:           borderRadius: BorderRadius.circular(10),
+ 1609:         ),
+ 1610:         padding: const EdgeInsets.all(3),
+ 1611:         child: TabBar(
+ 1612:           controller: _tabController,
+ 1613:           labelColor: AppColors.gold,
+ 1614:           unselectedLabelColor: AppColors.textMid,
+ 1615:           indicator: BoxDecoration(
+ 1616:             color: AppColors.gold.withOpacity(0.12),
+ 1617:             borderRadius: BorderRadius.circular(8),
+ 1618:           ),
+ 1619:           indicatorSize: TabBarIndicatorSize.tab,
+ 1620:           labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+ 1621:           unselectedLabelStyle: const TextStyle(fontSize: 12),
+ 1622:           tabs: const [
+ 1623:             Tab(icon: Icon(Icons.code, size: 16), text: 'طھط¹ط¯ظٹظ„ ط§ظ„ط£ظƒظˆط§ط¯'),
+ 1624:             Tab(icon: Icon(Icons.category_outlined, size: 16), text: 'طھط¹ط¯ظٹظ„ ط§ظ„طھط¨ظˆظٹط¨'),
+ 1625:             Tab(icon: Icon(Icons.speed, size: 16), text: 'ط§ظ„ط¬ظˆط¯ط©'),
+ 1626:             Tab(icon: Icon(Icons.visibility, size: 16), text: 'ط§ظ„ظ…ط±ط§ط¬ط¹ط©'),
+ 1627:             Tab(icon: Icon(Icons.account_tree, size: 16), text: 'ط§ظ„ط´ط¬ط±ط©'),
+ 1628:           ],
+ 1629:           onTap: (i) { setState(() {}); },
+ 1630:         ),
+ 1631:       ),
+ 1632:     );
+ 1633:   }
+ 1634: 
+ 1635:   Widget _buildTabContent() {
+ 1636:     return TabBarView(
+ 1637:       controller: _tabController,
+ 1638:       children: [
+ 1639:         _buildOverviewTab(),
+ 1640:         _buildAccountsTab(),
+ 1641:         _buildQualityTab(),
+ 1642:         _buildReviewTab(),
+ 1643:         _buildTreeTab(),
+ 1644:       ],
+ 1645:     );
+ 1646:   }
+ 1647: 
+ 1648:   // â”€â”€â”€ Overview Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ 1649: 
+ 1650:   Widget _buildOverviewTab() {
+ 1651:     final approved = _accounts.where((a) => a.status == 'approved').length;
+ 1652:     final review = _accounts.where((a) => a.status == 'review').length;
+ 1653:     final flagged = _accounts.where((a) => a.status == 'flagged').length;
+ 1654:     final avgScore = _accounts.isEmpty ? 0.0 :
+ 1655:         _accounts.map((a) => a.acceptanceScore).reduce((a, b) => a + b) / _accounts.length;
+ 1656: 
+ 1657:     // Classification distribution
+ 1658:     final rootDist = <String, int>{};
+ 1659:     for (final a in _accounts) {
+ 1660:       rootDist[a.rootClass] = (rootDist[a.rootClass] ?? 0) + 1;
+ 1661:     }
+ 1662: 
+ 1663:     // Level distribution
+ 1664:     final levelDist = <int, int>{};
+ 1665:     for (final a in _accounts) {
+ 1666:       levelDist[a.level] = (levelDist[a.level] ?? 0) + 1;
+ 1667:     }
+ 1668: 
+ 1669:     return SingleChildScrollView(
+ 1670:       padding: const EdgeInsets.all(20),
+ 1671:       child: Column(
+ 1672:         crossAxisAlignment: CrossAxisAlignment.stretch,
+ 1673:         children: [
+ 1674:           // Stats row
+ 1675:           Row(
+ 1676:             children: [
+ 1677:               Expanded(child: _statCard('ط¥ط¬ظ…ط§ظ„ظٹ', '${_accounts.length}', AppColors.blueC, Icons.account_balance)),
+ 1678:               const SizedBox(width: 12),
+ 1679:               Expanded(child: _statCard('ظ…ط¹طھظ…ط¯', '$approved', AppColors.greenC, Icons.check_circle)),
+ 1680:               const SizedBox(width: 12),
+ 1681:               Expanded(child: _statCard('ظ…ط±ط§ط¬ط¹ط©', '$review', AppColors.orangeC, Icons.visibility)),
+ 1682:               const SizedBox(width: 12),
+ 1683:               Expanded(child: _statCard('ظ…ط¹ظ„ظ‘ظ…', '$flagged', AppColors.redC, Icons.flag)),
+ 1684:             ],
+ 1685:           ),
+ 1686:           const SizedBox(height: 20),
+ 1687: 
+ 1688:           // Acceptance score
+ 1689:           Container(
+ 1690:             padding: const EdgeInsets.all(20),
+ 1691:             decoration: BoxDecoration(
+ 1692:               color: AppColors.cardBg,
+ 1693:               borderRadius: BorderRadius.circular(12),
+ 1694:               border: Border.all(color: AppColors.borderColor),
+ 1695:             ),
+ 1696:             child: Row(
+ 1697:               children: [
+ 1698:                 SizedBox(
+ 1699:                   width: 100, height: 100,
+ 1700:                   child: Stack(
+ 1701:                     children: [
+ 1702:                       Center(
+ 1703:                         child: SizedBox(
+ 1704:                           width: 100, height: 100,
+ 1705:                           child: CircularProgressIndicator(
+ 1706:                             value: avgScore / 100,
+ 1707:                             strokeWidth: 8,
+ 1708:                             backgroundColor: AppColors.navyMid,
+ 1709:                             valueColor: AlwaysStoppedAnimation<Color>(
+ 1710:                               avgScore >= 85 ? AppColors.greenC : (avgScore >= 60 ? AppColors.orangeC : AppColors.redC)),
+ 1711:                           ),
+ 1712:                         ),
+ 1713:                       ),
+ 1714:                       Center(
+ 1715:                         child: Text('${avgScore.toStringAsFixed(0)}%',
+ 1716:                             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.gold)),
+ 1717:                       ),
+ 1718:                     ],
+ 1719:                   ),
+ 1720:                 ),
+ 1721:                 const SizedBox(width: 20),
+ 1722:                 Expanded(
+ 1723:                   child: Column(
+ 1724:                     crossAxisAlignment: CrossAxisAlignment.start,
+ 1725:                     children: [
+ 1726:                       Text('ط¯ط±ط¬ط© ط§ظ„ظ‚ط¨ظˆظ„ ط§ظ„ط¥ط¬ظ…ط§ظ„ظٹط©',
+ 1727:                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
+ 1728:                       const SizedBox(height: 8),
+ 1729:                       Text(
+ 1730:                         avgScore >= 85 ? 'ط¬ظˆط¯ط© ط§ظ„ط¯ظ„ظٹظ„ ط§ظ„ظ…ط­ط§ط³ط¨ظٹ ظ…ظ…طھط§ط²ط©' :
+ 1731:                         avgScore >= 60 ? 'ظٹط­طھط§ط¬ ط¨ط¹ط¶ ط§ظ„طھط¹ط¯ظٹظ„ط§طھ' : 'ظٹط­طھط§ط¬ ظ…ط±ط§ط¬ط¹ط© ط´ط§ظ…ظ„ط©',
+ 1732:                         style: TextStyle(fontSize: 12, color: AppColors.textMid),
+ 1733:                       ),
+ 1734:                       if (_detectedErp.isNotEmpty && _detectedErp != 'ط؛ظٹط± ظ…ط¹ط±ظˆظپ') ...[
+ 1735:                         const SizedBox(height: 4),
+ 1736:                         Text('ط§ظ„ط¨ط±ظ†ط§ظ…ط¬: $_detectedErp', style: TextStyle(fontSize: 11, color: AppColors.textDim)),
+ 1737:                       ],
+ 1738:                     ],
+ 1739:                   ),
+ 1740:                 ),
+ 1741:               ],
+ 1742:             ),
+ 1743:           ),
+ 1744:           const SizedBox(height: 20),
+ 1745: 
+ 1746:           // Root classification distribution
+ 1747:           Text('طھظˆط²ظٹط¹ ط§ظ„طھطµظ†ظٹظپط§طھ ط§ظ„ط¬ط°ط±ظٹط©',
+ 1748:               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
+ 1749:           const SizedBox(height: 12),
+ 1750:           Container(
+ 1751:             padding: const EdgeInsets.all(16),
+ 1752:             decoration: BoxDecoration(
+ 1753:               color: AppColors.cardBg,
+ 1754:               borderRadius: BorderRadius.circular(12),
+ 1755:               border: Border.all(color: AppColors.borderColor),
+ 1756:             ),
+ 1757:             child: Column(
+ 1758:               children: rootDist.entries.map((e) {
+ 1759:                 final pct = _accounts.isEmpty ? 0.0 : e.value / _accounts.length;
+ 1760:                 final color = _rootColor(e.key);
+ 1761:                 return Padding(
+ 1762:                   padding: const EdgeInsets.only(bottom: 12),
+ 1763:                   child: Column(
+ 1764:                     children: [
+ 1765:                       Row(
+ 1766:                         children: [
+ 1767:                           Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle, color: color)),
+ 1768:                           const SizedBox(width: 8),
+ 1769:                           Expanded(child: Text(e.key, style: TextStyle(fontSize: 12, color: AppColors.textColor))),
+ 1770:                           Text('${e.value}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
+ 1771:                         ],
+ 1772:                       ),
+ 1773:                       const SizedBox(height: 4),
+ 1774:                       ClipRRect(
+ 1775:                         borderRadius: BorderRadius.circular(3),
+ 1776:                         child: LinearProgressIndicator(
+ 1777:                           value: pct, minHeight: 4,
+ 1778:                           backgroundColor: AppColors.navyMid,
+ 1779:                           valueColor: AlwaysStoppedAnimation<Color>(color),
+ 1780:                         ),
+ 1781:                       ),
+ 1782:                     ],
+ 1783:                   ),
+ 1784:                 );
+ 1785:               }).toList(),
+ 1786:             ),
+ 1787:           ),
+ 1788:           const SizedBox(height: 20),
+ 1789: 
+ 1790:           // Level distribution
+ 1791:           Text('طھظˆط²ظٹط¹ ط§ظ„ظ…ط³طھظˆظٹط§طھ',
+ 1792:               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
+ 1793:           const SizedBox(height: 12),
+ 1794:           Container(
+ 1795:             padding: const EdgeInsets.all(16),
+
+=== ACCOUNTS TAB (1850-2034) ===
+ 1850:       decoration: BoxDecoration(
+ 1851:         color: AppColors.cardBg,
+ 1852:         borderRadius: BorderRadius.circular(12),
+ 1853:         border: Border.all(color: color.withOpacity(0.2)),
+ 1854:       ),
+ 1855:       child: Column(
+ 1856:         children: [
+ 1857:           Icon(icon, color: color, size: 22),
+ 1858:           const SizedBox(height: 8),
+ 1859:           Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+ 1860:           const SizedBox(height: 4),
+ 1861:           Text(title, style: TextStyle(fontSize: 11, color: AppColors.textMid)),
+ 1862:         ],
+ 1863:       ),
+ 1864:     );
+ 1865:   }
+ 1866: 
+ 1867:   Widget _buildInsightsCard() {
+ 1868:     final closableCount = _accounts.where((a) => a.isClosable).length;
+ 1869:     final bankCount = _accounts.where((a) => a.isBankReconcilable).length;
+ 1870:     final bsCount = _accounts.where((a) => a.reportType == 'ظ…ظٹط²ط§ظ†ظٹط©').length;
+ 1871:     final isCount = _accounts.where((a) => a.reportType == 'ط¯ط®ظ„').length;
+ 1872:     final debitCount = _accounts.where((a) => a.nature == 'ظ…ط¯ظٹظ†').length;
+ 1873:     final creditCount = _accounts.where((a) => a.nature == 'ط¯ط§ط¦ظ†').length;
+ 1874: 
+ 1875:     return Container(
+ 1876:       padding: const EdgeInsets.all(16),
+ 1877:       decoration: BoxDecoration(
+ 1878:         color: AppColors.cardBg,
+ 1879:         borderRadius: BorderRadius.circular(12),
+ 1880:         border: Border.all(color: AppColors.borderColor),
+ 1881:       ),
+ 1882:       child: Column(
+ 1883:         children: [
+ 1884:           _insightRow(Icons.swap_horiz, 'ط§ظ„ط·ط¨ظٹط¹ط©', 'ظ…ط¯ظٹظ†: $debitCount â€” ط¯ط§ط¦ظ†: $creditCount', AppColors.blueC),
+ 1885:           _insightRow(Icons.description, 'ظ†ظˆط¹ ط§ظ„طھظ‚ط±ظٹط±', 'ظ…ظٹط²ط§ظ†ظٹط©: $bsCount â€” ط¯ط®ظ„: $isCount', AppColors.purpleC),
+ 1886:           _insightRow(Icons.lock_clock, 'ط­ط³ط§ط¨ط§طھ ظ…ط¤ظ‚طھط© (ظ‚ط§ط¨ظ„ط© ظ„ظ„ط¥ظ‚ظپط§ظ„)', '$closableCount ط­ط³ط§ط¨', AppColors.orangeC),
+ 1887:           _insightRow(Icons.account_balance, 'ط­ط³ط§ط¨ط§طھ ط¨ظ†ظƒظٹط© (ظ‚ط§ط¨ظ„ط© ظ„ظ„طھط³ظˆظٹط©)', '$bankCount ط­ط³ط§ط¨', AppColors.greenC),
+ 1888:         ],
+ 1889:       ),
+ 1890:     );
+ 1891:   }
+ 1892: 
+ 1893:   Widget _insightRow(IconData icon, String label, String value, Color color) {
+ 1894:     return Padding(
+ 1895:       padding: const EdgeInsets.only(bottom: 10),
+ 1896:       child: Row(
+ 1897:         children: [
+ 1898:           Icon(icon, color: color, size: 18),
+ 1899:           const SizedBox(width: 10),
+ 1900:           Text(label, style: TextStyle(fontSize: 12, color: AppColors.textMid)),
+ 1901:           const Spacer(),
+ 1902:           Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textColor)),
+ 1903:         ],
+ 1904:       ),
+ 1905:     );
+ 1906:   }
+ 1907: 
+ 1908:   Color _rootColor(String root) {
+ 1909:     switch (root) {
+ 1910:       case 'ط£طµظˆظ„': return AppColors.blueC;
+ 1911:       case 'ط§ظ„طھط²ط§ظ…ط§طھ': return AppColors.redC;
+ 1912:       case 'ط­ظ‚ظˆظ‚ ظ…ظ„ظƒظٹط©': return AppColors.purpleC;
+ 1913:       case 'ط¥ظٹط±ط§ط¯ط§طھ': return AppColors.greenC;
+ 1914:       case 'ظ…طµط±ظˆظپط§طھ': return AppColors.orangeC;
+ 1915:       default: return AppColors.textDim;
+ 1916:     }
+ 1917:   }
+ 1918: 
+ 1919:   // â”€â”€â”€ Accounts Tab (ط¬ط¯ظˆظ„ ط§ظ„ط­ط³ط§ط¨ط§طھ ط§ظ„ظ…طµظ†ظپط©) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ 1920: 
+ 1921:   Widget _buildAccountsTab() {
+ 1922:     // Filter
+ 1923:     List<CoaAccount> filtered = _accounts;
+ 1924:     if (_filterStatus == 'duplicate') {
+ 1925:       filtered = _accounts.where((a) => a.isDuplicateCode).toList();
+ 1926:     } else if (_filterStatus != 'all') {
+ 1927:       filtered = _accounts.where((a) => a.status == _filterStatus).toList();
+ 1928:     }
+ 1929:     if (_searchQuery.isNotEmpty) {
+ 1930:       filtered = filtered.where((a) =>
+ 1931:           a.code.contains(_searchQuery) ||
+ 1932:           a.name.contains(_searchQuery)).toList();
+ 1933:     }
+ 1934: 
+ 1935:     return Column(
+ 1936:       children: [
+ 1937:         // Toolbar
+ 1938:         Container(
+ 1939:           padding: const EdgeInsets.all(12),
+ 1940:           color: AppColors.navyLight,
+ 1941:           child: Column(
+ 1942:             children: [
+ 1943:               Row(
+ 1944:                 children: [
+ 1945:                   Expanded(
+ 1946:                     child: Container(
+ 1947:                       padding: const EdgeInsets.symmetric(horizontal: 12),
+ 1948:                       decoration: BoxDecoration(
+ 1949:                         color: AppColors.navy,
+ 1950:                         borderRadius: BorderRadius.circular(8),
+ 1951:                         border: Border.all(color: AppColors.borderColor),
+ 1952:                       ),
+ 1953:                       child: TextField(
+ 1954:                         style: TextStyle(color: AppColors.textColor, fontSize: 13),
+ 1955:                         decoration: InputDecoration(
+ 1956:                           hintText: 'ط¨ط­ط« ط¨ط§ظ„ظƒظˆط¯ ط£ظˆ ط§ظ„ط§ط³ظ…...',
+ 1957:                           hintStyle: TextStyle(color: AppColors.textDim, fontSize: 13),
+ 1958:                           border: InputBorder.none,
+ 1959:                           icon: Icon(Icons.search, color: AppColors.textDim, size: 20),
+ 1960:                         ),
+ 1961:                         onChanged: (v) => setState(() => _searchQuery = v),
+ 1962:                       ),
+ 1963:                     ),
+ 1964:                   ),
+ 1965:                   const SizedBox(width: 8),
+ 1966:                   Container(
+ 1967:                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+ 1968:                     decoration: BoxDecoration(
+ 1969:                       color: AppColors.gold.withOpacity(0.12),
+ 1970:                       borderRadius: BorderRadius.circular(8),
+ 1971:                     ),
+ 1972:                     child: Text('${filtered.length} ط­ط³ط§ط¨',
+ 1973:                         style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.gold)),
+ 1974:                   ),
+ 1975:                 ],
+ 1976:               ),
+ 1977:               const SizedBox(height: 8),
+ 1978:               SingleChildScrollView(
+ 1979:                 scrollDirection: Axis.horizontal,
+ 1980:                 reverse: true,
+ 1981:                 child: Row(
+ 1982:                   children: [
+ 1983:                     _filterChip('ط§ظ„ظƒظ„', 'all', _accounts.length),
+ 1984:                     const SizedBox(width: 6),
+ 1985:                     _filterChip('ظ…ط¹طھظ…ط¯', 'approved', _accounts.where((a) => a.status == 'approved').length),
+ 1986:                     const SizedBox(width: 6),
+ 1987:                     _filterChip('ظ…ط±ط§ط¬ط¹ط©', 'review', _accounts.where((a) => a.status == 'review').length),
+ 1988:                     const SizedBox(width: 6),
+ 1989:                     _filterChip('ظ…ط¹ظ„ظ‘ظ…', 'flagged', _accounts.where((a) => a.status == 'flagged').length),
+ 1990:                     const SizedBox(width: 6),
+ 1991:                     _filterChip('ظ…ظƒط±ط±', 'duplicate', _accounts.where((a) => a.isDuplicateCode).length),
+ 1992:                   ],
+ 1993:                 ),
+ 1994:               ),
+ 1995:             ],
+ 1996:           ),
+ 1997:         ),
+ 1998:         // Table header
+ 1999:         Container(
+ 2000:           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+ 2001:           color: AppColors.navyMid,
+ 2002:           child: Row(
+ 2003:             children: [
+ 2004:               SizedBox(width: 60, child: Text('ط§ظ„ظƒظˆط¯', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+ 2005:               const SizedBox(width: 8),
+ 2006:               Expanded(flex: 3, child: Text('ط§ظ„ط§ط³ظ…', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+ 2007:               SizedBox(width: 60, child: Text('ط§ظ„ظپط¦ط©', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+ 2008:               SizedBox(width: 50, child: Text('ط§ظ„ط·ط¨ظٹط¹ط©', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+ 2009:               SizedBox(width: 60, child: Text('ط§ظ„ظ‚ط¨ظˆظ„', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+ 2010:               SizedBox(width: 50, child: Text('ط§ظ„ط­ط§ظ„ط©', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textDim))),
+ 2011:             ],
+ 2012:           ),
+ 2013:         ),
+ 2014:         // Table rows
+ 2015:         Expanded(
+ 2016:           child: ListView.builder(
+ 2017:             itemCount: filtered.length,
+ 2018:             itemBuilder: (ctx, i) {
+ 2019:               final a = filtered[i];
+ 2020:               final scoreColor = a.acceptanceScore >= 85 ? AppColors.greenC :
+ 2021:                                  a.acceptanceScore >= 60 ? AppColors.orangeC : AppColors.redC;
+ 2022:               final statusText = a.status == 'approved' ? 'ظ…ط¹طھظ…ط¯' :
+ 2023:                                  a.status == 'review' ? 'ظ…ط±ط§ط¬ط¹ط©' : 'ظ…ط¹ظ„ظ‘ظ…';
+ 2024:               final statusColor = a.status == 'approved' ? AppColors.greenC :
+ 2025:                                   a.status == 'review' ? AppColors.orangeC : AppColors.redC;
+ 2026:               return GestureDetector(
+ 2027:                 onTap: () => _showEditDialog(a),
+ 2028:                 child: Container(
+ 2029:                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+ 2030:                   decoration: BoxDecoration(
+ 2031:                     border: Border(bottom: BorderSide(color: AppColors.borderColor.withOpacity(0.3))),
+ 2032:                     color: i.isEven ? AppColors.cardBg : AppColors.navy,
+ 2033:                   ),
+ 2034:                   child: Row(
+
+=== TREE TAB (2889-end) ===
+ 2889:                       child.parentUniqueId = acc.uniqueId;
+ 2890:                     } else if (child.parentCode.startsWith(oldCode)) {
+ 2891:                       child.parentCode = newCode + child.parentCode.substring(oldCode.length);
+ 2892:                       // Find the actual parent account with the new code
+ 2893:                       final newParent = _accounts.where((a) => a.code == child.parentCode).toList();
+ 2894:                       if (newParent.isNotEmpty) {
+ 2895:                         child.parentUniqueId = newParent.first.uniqueId;
+ 2896:                       }
+ 2897:                     }
+ 2898:                   }
+ 2899: 
+ 2900:                   // Check if old code duplication is resolved
+ 2901:                   final remaining = _accounts.where((a) => a.code == oldCode).toList();
+ 2902:                   if (remaining.length == 1) {
+ 2903:                     remaining.first.isDuplicateCode = false;
+ 2904:                     remaining.first.suggestedCode = '';
+ 2905:                     remaining.first.flags = remaining.first.flags
+ 2906:                         .where((f) => !f.contains('ظƒظˆط¯ ظ…ظƒط±ط±') && !f.contains('ط§ظ„ظƒظˆط¯ ط§ظ„ظ…ظ‚طھط±ط­') && !f.contains('ط§ظ„طھطµظ†ظٹظپ ط¨ط§ظ„ط§ط³ظ…') && !f.contains('ط§ظ„طھط¨ظˆظٹط¨ ط§ظ„ظ…ظ‚طھط±ط­'))
+ 2907:                         .toList();
+ 2908:                   }
+ 2909: 
+ 2910:                   // Collect all affected uniqueIds (the account + its descendants)
+ 2911:                   final affectedIds = <String>{acc.uniqueId};
+ 2912:                   for (final d in descendants) affectedIds.add(d.uniqueId);
+ 2913: 
+ 2914:                   // Re-classify and rescore ALL accounts
+ 2915:                   for (final a in _accounts) {
+ 2916:                     a.rootClass = _classifyRoot(a.code);
+ 2917:                     a.nature = _determineNature(a.rootClass);
+ 2918:                     a.reportType = _determineReportType(a.rootClass);
+ 2919:                     a.isClosable = _isClosable(a.rootClass);
+ 2920:                     // Only re-find parent for accounts NOT in the cascade
+ 2921:                     // (cascade already set correct parentCode)
+ 2922:                     if (!affectedIds.contains(a.uniqueId)) {
+ 2923:                       a.parentCode = _findParentCode(a.code, _accounts);
+ 2924:                     }
+ 2925:                     a.acceptanceScore = _calculateAcceptanceScore(a, _accounts);
+ 2926:                   }
+ 2927:                 });
+ 2928:                 Navigator.pop(ctx);
+ 2929:               },
+ 2930:               child: Text('طھط·ط¨ظٹظ‚ ط§ظ„ظ†ظ‚ظ„', style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold)),
+ 2931:             ),
+ 2932:           ],
+ 2933:         ),
+ 2934:       ),
+ 2935:     );
+ 2936:   }
+ 2937: 
+ 2938:   Widget _editField(String label, TextEditingController ctrl) {
+ 2939:     return Column(
+ 2940:       crossAxisAlignment: CrossAxisAlignment.start,
+ 2941:       children: [
+ 2942:         Text(label, style: TextStyle(fontSize: 12, color: AppColors.textMid)),
+ 2943:         const SizedBox(height: 4),
+ 2944:         Container(
+ 2945:           padding: const EdgeInsets.symmetric(horizontal: 10),
+ 2946:           decoration: BoxDecoration(
+ 2947:             color: AppColors.navy,
+ 2948:             borderRadius: BorderRadius.circular(8),
+ 2949:             border: Border.all(color: AppColors.borderColor),
+ 2950:           ),
+ 2951:           child: TextField(
+ 2952:             controller: ctrl,
+ 2953:             style: TextStyle(color: AppColors.textColor, fontSize: 13),
+ 2954:             decoration: const InputDecoration(border: InputBorder.none),
+ 2955:           ),
+ 2956:         ),
+ 2957:       ],
+ 2958:     );
+ 2959:   }
+ 2960: 
+ 2961:   // â”€â”€â”€ Tree Tab (Unlimited Nesting) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ 2962: 
+ 2963:   Widget _buildTreeTab() {
+ 2964:     // Build tree structure
+ 2965:     final roots = _buildTreeStructure();
+ 2966: 
+ 2967:     return Column(
+ 2968:       children: [
+ 2969:         // Tree toolbar
+ 2970:         Container(
+ 2971:           padding: const EdgeInsets.all(12),
+ 2972:           color: AppColors.navyLight,
+ 2973:           child: Row(
+ 2974:             children: [
+ 2975:               Icon(Icons.account_tree, color: AppColors.gold, size: 20),
+ 2976:               const SizedBox(width: 8),
+ 2977:               Text('ط§ظ„ط´ط¬ط±ط© ط§ظ„ظ…ط­ط§ط³ط¨ظٹط©',
+ 2978:                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
+ 2979:               const Spacer(),
+ 2980:               // Expand all button
+ 2981:               GestureDetector(
+ 2982:                 onTap: () => setState(() {
+ 2983:                   for (final a in _accounts) _treeExpanded[a.uniqueId] = true;
+ 2984:                 }),
+ 2985:                 child: Container(
+ 2986:                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+ 2987:                   decoration: BoxDecoration(
+ 2988:                     color: AppColors.navy,
+ 2989:                     borderRadius: BorderRadius.circular(6),
+ 2990:                     border: Border.all(color: AppColors.borderColor),
+ 2991:                   ),
+ 2992:                   child: Text('ظپطھط­ ط§ظ„ظƒظ„', style: TextStyle(fontSize: 11, color: AppColors.textMid)),
+ 2993:                 ),
+ 2994:               ),
+ 2995:               const SizedBox(width: 8),
+ 2996:               // Collapse all button
+ 2997:               GestureDetector(
+ 2998:                 onTap: () => setState(() => _treeExpanded.clear()),
+ 2999:                 child: Container(
+ 3000:                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+ 3001:                   decoration: BoxDecoration(
+ 3002:                     color: AppColors.navy,
+ 3003:                     borderRadius: BorderRadius.circular(6),
+ 3004:                     border: Border.all(color: AppColors.borderColor),
+ 3005:                   ),
+ 3006:                   child: Text('ط¥ط؛ظ„ط§ظ‚ ط§ظ„ظƒظ„', style: TextStyle(fontSize: 11, color: AppColors.textMid)),
+ 3007:                 ),
+ 3008:               ),
+ 3009:             ],
+ 3010:           ),
+ 3011:         ),
+ 3012:         Expanded(
+ 3013:           child: roots.isEmpty
+ 3014:               ? Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ط­ط³ط§ط¨ط§طھ', style: TextStyle(color: AppColors.textMid)))
+ 3015:               : ListView(
+ 3016:                   padding: const EdgeInsets.all(12),
+ 3017:                   children: roots.map((root) => _buildTreeNode(root, 0)).toList(),
+ 3018:                 ),
+ 3019:         ),
+ 3020:       ],
+ 3021:     );
+ 3022:   }
+ 3023: 
+ 3024:   List<CoaAccount> _buildTreeStructure() {
+ 3025:     // Create a map using uniqueId for duplicate-safe lookup
+ 3026:     final uidMap = <String, CoaAccount>{};
+ 3027:     final codeMap = <String, List<CoaAccount>>{};
+ 3028:     for (final acc in _accounts) {
+ 3029:       acc.children = [];
+ 3030:       uidMap[acc.uniqueId] = acc;
+ 3031:       codeMap.putIfAbsent(acc.code, () => []);
+ 3032:       codeMap[acc.code]!.add(acc);
+ 3033:     }
+ 3034: 
+ 3035:     // Build parent-child relationships using uniqueId when available
+ 3036:     final roots = <CoaAccount>[];
+ 3037:     for (final acc in _accounts) {
+ 3038:       bool attached = false;
+ 3039: 
+ 3040:       // Try uniqueId-based parent first (duplicate-aware)
+ 3041:       if (acc.parentUniqueId.isNotEmpty && uidMap.containsKey(acc.parentUniqueId)) {
+ 3042:         final parent = uidMap[acc.parentUniqueId]!;
+ 3043:         parent.children = [...parent.children, acc];
+ 3044:         attached = true;
+ 3045:       }
+ 3046:       // Fallback to code-based parent (non-duplicate case)
+ 3047:       else if (acc.parentCode.isNotEmpty && codeMap.containsKey(acc.parentCode)) {
+ 3048:         final candidates = codeMap[acc.parentCode]!;
+ 3049:         if (candidates.length == 1) {
+ 3050:           candidates.first.children = [...candidates.first.children, acc];
+ 3051:           attached = true;
+ 3052:         } else {
+ 3053:           // Multiple parents with same code â€” use name classification
+ 3054:           final myCategory = _classifyByName(acc.name);
+ 3055:           CoaAccount? bestParent;
+ 3056:           for (final p in candidates) {
+ 3057:             if (myCategory.isNotEmpty && _classifyByName(p.name) == myCategory) {
+ 3058:               bestParent = p;
+ 3059:               break;
+ 3060:             }
+ 3061:           }
+ 3062:           bestParent ??= candidates.first;
+ 3063:           bestParent.children = [...bestParent.children, acc];
+ 3064:           attached = true;
+ 3065:         }
+ 3066:       }
+ 3067: 
+ 3068:       if (!attached) {
+ 3069:         roots.add(acc);
+ 3070:       }
+ 3071:     }
+ 3072: 
+ 3073:     return roots;
+ 3074:   }
+ 3075: 
+ 3076:   Widget _buildTreeNode(CoaAccount acc, int depth) {
+ 3077:     final hasChildren = acc.children.isNotEmpty;
+ 3078:     final isExpanded = _treeExpanded[acc.uniqueId] ?? false;
+ 3079:     final indent = depth * 20.0;
+ 3080: 
+ 3081:     // Colors per depth
+ 3082:     final depthColors = [
+ 3083:       AppColors.gold, AppColors.blueC, AppColors.greenC,
+ 3084:       AppColors.purpleC, AppColors.orangeC, AppColors.goldLight,
+ 3085:     ];
+ 3086:     final nodeColor = depthColors[depth % depthColors.length];
+ 3087:     final scoreColor = acc.acceptanceScore >= 85 ? AppColors.greenC :
+ 3088:                        acc.acceptanceScore >= 60 ? AppColors.orangeC : AppColors.redC;
+ 3089: 
+ 3090:     return Column(
+ 3091:       crossAxisAlignment: CrossAxisAlignment.stretch,
+ 3092:       children: [
+ 3093:         GestureDetector(
+ 3094:           onTap: hasChildren ? () => setState(() => _treeExpanded[acc.uniqueId] = !isExpanded) : null,
+ 3095:           child: Container(
+ 3096:             margin: EdgeInsets.only(right: indent, bottom: 4),
+ 3097:             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+ 3098:             decoration: BoxDecoration(
+ 3099:               color: acc.isDuplicateCode
+ 3100:                   ? AppColors.redC.withOpacity(0.08)
+ 3101:                   : (depth == 0 ? AppColors.navyMid : AppColors.cardBg),
+ 3102:               borderRadius: BorderRadius.circular(8),
+ 3103:               border: Border.all(
+ 3104:                 color: acc.isDuplicateCode
+ 3105:                     ? AppColors.redC.withOpacity(0.6)
+ 3106:                     : (acc.flags.isNotEmpty ? AppColors.redC.withOpacity(0.4) : nodeColor.withOpacity(0.15)),
+ 3107:                 width: acc.isDuplicateCode ? 1.5 : 1.0,
+ 3108:               ),
+ 3109:             ),
+ 3110:             child: Column(
+ 3111:               crossAxisAlignment: CrossAxisAlignment.stretch,
+ 3112:               children: [
+ 3113:                 Row(
+ 3114:                   children: [
+ 3115:                     // Expand/collapse icon
+ 3116:                     if (hasChildren)
+ 3117:                       Icon(
+ 3118:                         isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_left,
+ 3119:                         color: nodeColor, size: 20,
+ 3120:                       )
+ 3121:                     else
+ 3122:                       SizedBox(width: 20, child: Icon(Icons.circle, color: nodeColor.withOpacity(0.4), size: 6)),
+ 3123:                     const SizedBox(width: 8),
+ 3124:                     // Level indicator
+ 3125:                     Container(
+ 3126:                       width: 24, height: 24,
+ 3127:                       decoration: BoxDecoration(
+ 3128:                         shape: BoxShape.circle,
+ 3129:                         color: nodeColor.withOpacity(0.15),
+ 3130:                       ),
+ 3131:                       child: Center(
+ 3132:                         child: Text('${acc.level}',
+ 3133:                             style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: nodeColor)),
+ 3134:                       ),
+ 3135:                     ),
+ 3136:                     const SizedBox(width: 10),
+ 3137:                     // Code (with duplicate indicator)
+ 3138:                     if (acc.isDuplicateCode) ...[
+ 3139:                       Container(
+ 3140:                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+ 3141:                         decoration: BoxDecoration(
+ 3142:                           color: AppColors.redC.withOpacity(0.15),
+ 3143:                           borderRadius: BorderRadius.circular(4),
+ 3144:                           border: Border.all(color: AppColors.redC.withOpacity(0.4)),
+ 3145:                         ),
+ 3146:                         child: Text(acc.code,
+ 3147:                             style: TextStyle(fontSize: 12, color: AppColors.redC, fontWeight: FontWeight.bold)),
+ 3148:                       ),
+ 3149:                     ] else ...[
+ 3150:                       Text(acc.code,
+ 3151:                           style: TextStyle(fontSize: 12, color: AppColors.goldLight, fontWeight: FontWeight.w600)),
+ 3152:                     ],
+ 3153:                     const SizedBox(width: 10),
+ 3154:                     // Name
+ 3155:                     Expanded(
+ 3156:                       child: Text(acc.name,
+ 3157:                           style: TextStyle(
+ 3158:                             fontSize: 13,
+ 3159:                             color: AppColors.textColor,
+ 3160:                             fontWeight: hasChildren ? FontWeight.bold : FontWeight.normal,
+ 3161:                           ),
+ 3162:                           overflow: TextOverflow.ellipsis),
+ 3163:                     ),
+ 3164:                     // Children count
+ 3165:                     if (hasChildren) ...[
+ 3166:                       Container(
+ 3167:                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+ 3168:                         decoration: BoxDecoration(
+ 3169:                           color: nodeColor.withOpacity(0.1),
+ 3170:                           borderRadius: BorderRadius.circular(10),
+ 3171:                         ),
+ 3172:                         child: Text('${acc.children.length}',
+ 3173:                             style: TextStyle(fontSize: 10, color: nodeColor)),
+ 3174:                       ),
+ 3175:                       const SizedBox(width: 6),
+ 3176:                     ],
+ 3177:                     // Score
+ 3178:                     Container(
+ 3179:                       width: 28, height: 28,
+ 3180:                       decoration: BoxDecoration(
+ 3181:                         shape: BoxShape.circle,
+ 3182:                         color: scoreColor.withOpacity(0.1),
+ 3183:                         border: Border.all(color: scoreColor, width: 1.5),
+ 3184:                       ),
+ 3185:                       child: Center(
+ 3186:                         child: Text('${acc.acceptanceScore.toInt()}',
+ 3187:                             style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: scoreColor)),
+ 3188:                       ),
+ 3189:                     ),
+ 3190:                     // Flag indicator
+ 3191:                     if (acc.flags.isNotEmpty) ...[
+ 3192:                       const SizedBox(width: 4),
+ 3193:                       Icon(Icons.warning_amber, color: AppColors.redC, size: 16),
+ 3194:                     ],
+ 3195:                     // Edit button
+ 3196:                     const SizedBox(width: 4),
+ 3197:                     GestureDetector(
+ 3198:                       onTap: () => _showEditDialog(acc),
+ 3199:                       child: Icon(Icons.edit, color: AppColors.textDim, size: 14),
+ 3200:                     ),
+ 3201:                   ],
+ 3202:                 ),
+ 3203:                 // Duplicate warning banner
+ 3204:                 if (acc.isDuplicateCode) ...[
+ 3205:                   const SizedBox(height: 6),
+ 3206:                   Container(
+ 3207:                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+ 3208:                     decoration: BoxDecoration(
+ 3209:                       color: AppColors.redC.withOpacity(0.08),
+ 3210:                       borderRadius: BorderRadius.circular(6),
+ 3211:                     ),
+ 3212:                     child: Row(
+ 3213:                       children: [
+ 3214:                         Icon(Icons.error_outline, color: AppColors.redC, size: 14),
+ 3215:                         const SizedBox(width: 6),
+ 3216:                         Expanded(
+ 3217:                           child: Text(
+ 3218:                             'ظƒظˆط¯ ظ…ظƒط±ط± â€” ط§ظ„طھطµظ†ظٹظپ: ${_classifyByName(acc.name).isNotEmpty ? _classifyByName(acc.name) : "ط؛ظٹط± ظ…ط­ط¯ط¯"}'
+ 3219:                             '${acc.suggestedCode.isNotEmpty ? " â€¢ ط§ظ„ظƒظˆط¯ ط§ظ„ظ…ظ‚طھط±ط­: ${acc.suggestedCode}" : ""}',
+ 3220:                             style: TextStyle(fontSize: 10, color: AppColors.redC),
+ 3221:                           ),
+ 3222:                         ),
+ 3223:                         if (acc.suggestedCode.isNotEmpty || acc.suggestedParent.isNotEmpty)
+ 3224:                           GestureDetector(
+ 3225:                             onTap: () => _showReassignDialog(acc),
+ 3226:                             child: Container(
+ 3227:                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+ 3228:                               decoration: BoxDecoration(
+ 3229:                                 color: AppColors.orangeC.withOpacity(0.2),
+ 3230:                                 borderRadius: BorderRadius.circular(4),
+ 3231:                                 border: Border.all(color: AppColors.orangeC.withOpacity(0.5)),
+ 3232:                               ),
+ 3233:                               child: Text('ظ†ظ‚ظ„ / ط¥ط¹ط§ط¯ط© طھط¨ظˆظٹط¨',
+ 3234:                                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.orangeC)),
+ 3235:                             ),
+ 3236:                           ),
+ 3237:                       ],
+ 3238:                     ),
+ 3239:                   ),
+ 3240:                 ],
+ 3241:               ],
+ 3242:             ),
+ 3243:           ),
+ 3244:         ),
+ 3245:         // Children
+ 3246:         if (isExpanded && hasChildren)
+ 3247:           ...acc.children.map((child) => _buildTreeNode(child, depth + 1)),
+ 3248:       ],
+ 3249:     );
+ 3250:   }
+ 3251: 
+ 3252:   // â”€â”€â”€ Report Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+ 3253: 
+ 3254: }

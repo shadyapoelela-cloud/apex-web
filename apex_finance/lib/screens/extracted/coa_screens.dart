@@ -1192,6 +1192,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             children: [
               _buildHeader(),
               _buildStagePipeline(),
+              if (_accounts.isNotEmpty) _buildConsultantBanner(),
               if (_accounts.isEmpty)
                 _buildUploadSection()
               else ...[
@@ -1230,155 +1231,158 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   }
 
   Future<void> _submitCoa() async {
-    // v7.6: route through real 6-step COA pipeline
     if (_fileBytes == null || _fileName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('يجب رفع ملف الدليل المحاسبي أولاً قبل الحفظ'),
-          backgroundColor: AppColors.redC));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('لا يوجد ملف للرفع')));
       return;
     }
-
-    final approved = _accounts.where((a) => a.status == 'approved').length;
-    final total = _accounts.length;
-
-    if (total > 0 && approved < total) {
-      final proceed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: const Color(0xFF0D1825),
-          title: Text('تأكيد الإرسال', style: TextStyle(color: AppColors.gold)),
-          content: Text('تم اعتماد $approved من $total حساب. هل تريد إرسال الملف للسيرفر للمعالجة الكاملة؟',
-            style: TextStyle(color: AppColors.textColor)),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('إلغاء', style: TextStyle(color: AppColors.textMid))),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.navy),
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('إرسال')),
-          ],
-        ),
-      );
-      if (proceed != true) return;
-    }
-
-    setState(() { _isLoading = true; _statusMsg = 'بدء الرفع للسيرفر...'; });
-
+    setState(() { _isLoading = true; _statusMsg = '1/6 رفع الملف...'; });
     final base = 'https://apex-api-ootk.onrender.com';
     final token = html.window.localStorage['apex_token'] ?? '';
     final authOnly = {'Authorization': 'Bearer $token'};
     final authJson = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
 
+    String? uploadId;
     try {
-      // Step 1: Upload file (multipart)
-      if (mounted) setState(() => _statusMsg = '1/6 رفع الملف...');
-      final uploadReq = http.MultipartRequest(
-        'POST',
-        Uri.parse('$base/clients/${widget.clientId}/coa/upload'),
-      );
+      // Step 1: Upload (multipart)
+      final uploadReq = http.MultipartRequest('POST', Uri.parse('$base/clients/${widget.clientId}/coa/upload'));
       uploadReq.headers.addAll(authOnly);
-      uploadReq.files.add(http.MultipartFile.fromBytes(
-        'file',
-        _fileBytes!,
-        filename: _fileName,
-      ));
+      uploadReq.files.add(http.MultipartFile.fromBytes('file', _fileBytes!, filename: _fileName));
       final uploadStreamed = await uploadReq.send().timeout(const Duration(seconds: 60));
       final uploadResp = await http.Response.fromStream(uploadStreamed);
       if (uploadResp.statusCode != 200 && uploadResp.statusCode != 201) {
-        throw Exception('فشل الرفع (${uploadResp.statusCode}): ${uploadResp.body}');
+        throw Exception('Upload failed ${uploadResp.statusCode}: ${uploadResp.body}');
       }
       final uploadData = jsonDecode(uploadResp.body) as Map<String, dynamic>;
-      final uploadId = (uploadData['upload_id'] ?? uploadData['id'] ?? uploadData['uploadId'] ?? '').toString();
-      if (uploadId.isEmpty) {
-        throw Exception('لم يتم استلام upload_id من السيرفر');
-      }
-      if (mounted) setState(() => _currentStage = 1);
+      uploadId = uploadData['upload_id']?.toString();
+      if (uploadId == null) throw Exception('No upload_id in response');
 
-      // Step 2: Parse
-      if (mounted) setState(() => _statusMsg = '2/6 تحليل الملف على السيرفر...');
+      // Build column mapping from suggested + detected columns (replace nulls)
+      final suggested = Map<String, dynamic>.from(uploadData['suggested_column_mapping'] ?? {});
+      final detected = List<String>.from(uploadData['detected_columns'] ?? []);
+      String? findCol(List<String> hints) {
+        for (final h in hints) {
+          for (final c in detected) {
+            if (c.toLowerCase().contains(h)) return c;
+          }
+        }
+        return null;
+      }
+      final mapping = <String, String>{};
+      // account_code
+      mapping['account_code'] = (suggested['account_code'] ?? findCol(['code','رمز','كود']) ?? (detected.isNotEmpty ? detected[0] : 'account_code')) as String;
+      // account_name (REQUIRED — fill if null)
+      mapping['account_name'] = (suggested['account_name'] ?? findCol(['name_ar','name','اسم'])) as String? ?? findCol(['name','اسم']) ?? (detected.length > 1 ? detected[1] : 'account_name');
+      // account_type
+      final at = suggested['account_type'] ?? findCol(['type','نوع']);
+      if (at != null) mapping['account_type'] = at as String;
+      // parent_code
+      final pc = suggested['parent_code'] ?? findCol(['parent','أب','الأب']);
+      if (pc != null) mapping['parent_code'] = pc as String;
+
+      // Step 2: Parse with column_mapping
+      setState(() { _statusMsg = '2/6 تحليل الملف...'; });
       final parseResp = await ApiRetry.post(
         Uri.parse('$base/coa/uploads/$uploadId/parse'),
         headers: authJson,
-        body: '{}',
+        body: jsonEncode({'column_mapping': mapping}),
       );
-      if (parseResp.statusCode != 200 && parseResp.statusCode != 201) {
-        throw Exception('فشل التحليل (${parseResp.statusCode}): ${parseResp.body}');
+      if (parseResp.statusCode != 200) {
+        throw Exception('Parse failed ${parseResp.statusCode}: ${parseResp.body}');
       }
-      if (mounted) setState(() => _currentStage = 2);
 
       // Step 3: Classify
-      if (mounted) setState(() => _statusMsg = '3/6 تصنيف الحسابات تلقائياً...');
+      setState(() { _statusMsg = '3/6 تصنيف الحسابات...'; });
       final classifyResp = await ApiRetry.post(
         Uri.parse('$base/coa/classify/$uploadId'),
         headers: authOnly,
       );
-      if (classifyResp.statusCode != 200 && classifyResp.statusCode != 201) {
-        throw Exception('فشل التصنيف (${classifyResp.statusCode}): ${classifyResp.body}');
+      if (classifyResp.statusCode != 200) {
+        throw Exception('Classify failed ${classifyResp.statusCode}: ${classifyResp.body}');
       }
-      if (mounted) setState(() => _currentStage = 3);
 
-      // Step 4: Assess quality
-      if (mounted) setState(() => _statusMsg = '4/6 تقييم الجودة...');
+      // Step 4: Assess
+      setState(() { _statusMsg = '4/6 تقييم الجودة...'; });
       final assessResp = await ApiRetry.post(
         Uri.parse('$base/coa/uploads/$uploadId/assess'),
         headers: authJson,
         body: '{}',
       );
-      if (assessResp.statusCode != 200 && assessResp.statusCode != 201) {
-        throw Exception('فشل تقييم الجودة (${assessResp.statusCode}): ${assessResp.body}');
+      if (assessResp.statusCode != 200) {
+        throw Exception('Assess failed ${assessResp.statusCode}: ${assessResp.body}');
       }
-      if (mounted) setState(() => _currentStage = 4);
 
-      // Step 5: Bulk approve
-      if (mounted) setState(() => _statusMsg = '5/6 اعتماد الحسابات جماعياً...');
+      // Step 5: Bulk approve with min_confidence
+      setState(() { _statusMsg = '5/6 اعتماد جماعي...'; });
       final bulkResp = await ApiRetry.post(
         Uri.parse('$base/coa/bulk-approve/$uploadId'),
         headers: authJson,
-        body: '{}',
+        body: jsonEncode({'min_confidence': 0.01}),
       );
-      if (bulkResp.statusCode != 200 && bulkResp.statusCode != 201) {
-        throw Exception('فشل الاعتماد الجماعي (${bulkResp.statusCode}): ${bulkResp.body}');
+      if (bulkResp.statusCode != 200) {
+        throw Exception('Bulk approve failed ${bulkResp.statusCode}: ${bulkResp.body}');
       }
-      if (mounted) setState(() => _currentStage = 5);
 
       // Step 6: Final approve
-      if (mounted) setState(() => _statusMsg = '6/6 الحفظ النهائي...');
+      setState(() { _statusMsg = '6/6 الحفظ النهائي...'; });
       final finalResp = await ApiRetry.post(
         Uri.parse('$base/coa/uploads/$uploadId/approve-coa'),
         headers: authJson,
         body: '{}',
       );
-      if (finalResp.statusCode != 200 && finalResp.statusCode != 201) {
-        throw Exception('فشل الحفظ النهائي (${finalResp.statusCode}): ${finalResp.body}');
+      if (finalResp.statusCode != 200) {
+        throw Exception('Final approve failed ${finalResp.statusCode}: ${finalResp.body}');
       }
 
+      setState(() {
+        _isLoading = false;
+        _statusMsg = '✅ تم الحفظ بنجاح!';
+        _currentStage = 6;
+        _hasUnsavedChanges = false;
+      });
       if (mounted) {
-        setState(() {
-          _hasUnsavedChanges = false;
-          _isLoading = false;
-          _statusMsg = '';
-          _currentStage = 6;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('تم حفظ شجرة الحسابات بنجاح ($total حساب)'),
-            backgroundColor: AppColors.greenC,
-            duration: const Duration(seconds: 4),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ تم اعتماد دليل الحسابات بنجاح'), backgroundColor: Colors.green));
       }
     } catch (e) {
+      setState(() { _isLoading = false; _statusMsg = '❌ خطأ: $e'; });
       if (mounted) {
-        setState(() { _isLoading = false; _statusMsg = ''; });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطأ في الحفظ: $e'),
-            backgroundColor: AppColors.redC,
-            duration: const Duration(seconds: 6),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل: $e'), backgroundColor: Colors.red));
       }
     }
   }
+
+
+  // ─── v8.5 Stage-Aware Button Helpers ─────────────────────────
+  String _stageButtonLabel() {
+    switch (_currentStage) {
+      case 0: return 'ارفع الملف أولاً';
+      case 1: return 'اعتماد التكويد';
+      case 2: return 'اعتماد التبويب';
+      case 3: return 'اعتماد الجودة';
+      case 4: return 'اعتماد المراجعة';
+      case 5: return 'الانتقال إلى مرحلة TB';
+      default: return 'اكتمل ✓';
+    }
+  }
+
+  IconData _stageButtonIcon() {
+    if (_currentStage >= 5) return Icons.check_circle_outline;
+    return Icons.arrow_forward_ios;
+  }
+
+  Future<void> _advanceStage() async {
+    if (_accounts.isEmpty) return;
+    if (_currentStage == 5) { await _submitCoa(); return; }
+    setState(() {
+      _currentStage = _currentStage + 1;
+      if (_currentStage <= 5) {
+        final tabIndex = _currentStage - 1;
+        if (tabIndex >= 0 && tabIndex < _tabController.length) {
+          _tabController.animateTo(tabIndex);
+        }
+      }
+    });
+  }
+  // ─── End v8.5 Helpers ─────────────────────────────────────────
 
   Widget _buildHeader() {
     return Container(
@@ -1419,9 +1423,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           if (_accounts.isNotEmpty) const SizedBox(width: 12),
           if (_accounts.isNotEmpty)
             ElevatedButton.icon(
-              onPressed: () => _submitCoa(),
-              icon: Icon(Icons.save_outlined, size: 18, color: AppColors.navy),
-              label: Text('حفظ شجرة الحسابات',
+              onPressed: _isLoading ? null : () => _advanceStage(),
+              icon: Icon(_stageButtonIcon(), size: 18, color: AppColors.navy),
+              label: Text(_stageButtonLabel(),
                   style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold, fontSize: 13)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.gold,
@@ -1436,9 +1440,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   Widget _buildStagePipeline() {
     final stages = [
-      ('رفع الملف', Icons.cloud_upload),
-      ('القراءة', Icons.document_scanner),
-      ('التصنيف', Icons.category),
+      ('الرفع', Icons.cloud_upload),
+      ('مراجعة الأكواد', Icons.code),
+      ('التبويب', Icons.category_outlined),
       ('الجودة', Icons.speed),
       ('المراجعة', Icons.rate_review),
       ('الاعتماد', Icons.verified),
@@ -1550,6 +1554,50 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     );
   }
 
+
+  Widget _buildConsultantBanner() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.gold.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gold.withOpacity(0.35)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.support_agent, color: AppColors.gold, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('مراجعة من خلال مستشارينا',
+                    style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold, fontSize: 14)),
+                Text('يمكنك طلب مراجعة الدليل بواسطة فريقنا المحاسبي خلال 24 ساعة',
+                    style: TextStyle(color: AppColors.textMid, fontSize: 11)),
+              ],
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('تم إرسال طلب المراجعة - سيتواصل معك الفريق خلال 24 ساعة'),
+                  backgroundColor: AppColors.greenC));
+            },
+            icon: Icon(Icons.send, size: 16, color: AppColors.navy),
+            label: Text('اطلب المراجعة',
+                style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold, fontSize: 12)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.gold,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTabBar() {
     return Container(
       color: AppColors.navyLight,
@@ -1572,21 +1620,13 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
           tabs: const [
-            Tab(icon: Icon(Icons.pie_chart, size: 16), text: 'النظرة العامة'),
-            Tab(icon: Icon(Icons.table_chart, size: 16), text: 'الحسابات'),
+            Tab(icon: Icon(Icons.code, size: 16), text: 'تعديل الأكواد'),
+            Tab(icon: Icon(Icons.category_outlined, size: 16), text: 'تعديل التبويب'),
             Tab(icon: Icon(Icons.speed, size: 16), text: 'الجودة'),
             Tab(icon: Icon(Icons.visibility, size: 16), text: 'المراجعة'),
             Tab(icon: Icon(Icons.account_tree, size: 16), text: 'الشجرة'),
           ],
-          onTap: (i) {
-            setState(() {
-              if (i == 0) _currentStage = 1;
-              if (i == 1) _currentStage = 2;
-              if (i == 2) _currentStage = 3;
-              if (i == 3) _currentStage = 4;
-              if (i == 4) _currentStage = 4;
-            });
-          },
+          onTap: (i) { setState(() {}); },
         ),
       ),
     );
@@ -1608,203 +1648,287 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   // ─── Overview Tab ──────────────────────────────────────────
 
   Widget _buildOverviewTab() {
-    final approved = _accounts.where((a) => a.status == 'approved').length;
-    final review = _accounts.where((a) => a.status == 'review').length;
-    final flagged = _accounts.where((a) => a.status == 'flagged').length;
-    final avgScore = _accounts.isEmpty ? 0.0 :
-        _accounts.map((a) => a.acceptanceScore).reduce((a, b) => a + b) / _accounts.length;
-
-    // Classification distribution
-    final rootDist = <String, int>{};
-    for (final a in _accounts) {
-      rootDist[a.rootClass] = (rootDist[a.rootClass] ?? 0) + 1;
-    }
-
-    // Level distribution
-    final levelDist = <int, int>{};
-    for (final a in _accounts) {
-      levelDist[a.level] = (levelDist[a.level] ?? 0) + 1;
-    }
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Stats row
-          Row(
+    // v8.5c: Stage 1 - Tree-Structured Editable Codes
+    final roots = _buildTreeStructure();
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          color: AppColors.navyLight,
+          child: Row(
             children: [
-              Expanded(child: _statCard('إجمالي', '${_accounts.length}', AppColors.blueC, Icons.account_balance)),
-              const SizedBox(width: 12),
-              Expanded(child: _statCard('معتمد', '$approved', AppColors.greenC, Icons.check_circle)),
-              const SizedBox(width: 12),
-              Expanded(child: _statCard('مراجعة', '$review', AppColors.orangeC, Icons.visibility)),
-              const SizedBox(width: 12),
-              Expanded(child: _statCard('معلّم', '$flagged', AppColors.redC, Icons.flag)),
+              Icon(Icons.code, color: AppColors.gold, size: 20),
+              const SizedBox(width: 8),
+              Text('مراجعة وتعديل الأكواد (شجرة)',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => setState(() {
+                  for (final a in _accounts) _treeExpanded[a.uniqueId] = true;
+                }),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.navy,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.borderColor),
+                  ),
+                  child: Text('فتح الكل', style: TextStyle(fontSize: 11, color: AppColors.textMid)),
+                ),
+              ),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () => setState(() => _treeExpanded.clear()),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.navy,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.borderColor),
+                  ),
+                  child: Text('إغلاق الكل', style: TextStyle(fontSize: 11, color: AppColors.textMid)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text('${_accounts.length} حساب',
+                  style: TextStyle(fontSize: 11, color: AppColors.textMid)),
             ],
           ),
-          const SizedBox(height: 20),
-
-          // Acceptance score
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.cardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderColor),
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 100, height: 100,
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: SizedBox(
-                          width: 100, height: 100,
-                          child: CircularProgressIndicator(
-                            value: avgScore / 100,
-                            strokeWidth: 8,
-                            backgroundColor: AppColors.navyMid,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              avgScore >= 85 ? AppColors.greenC : (avgScore >= 60 ? AppColors.orangeC : AppColors.redC)),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Text('${avgScore.toStringAsFixed(0)}%',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.gold)),
-                      ),
-                    ],
-                  ),
+        ),
+        Expanded(
+          child: roots.isEmpty
+              ? Center(child: Text('لا توجد حسابات', style: TextStyle(color: AppColors.textMid)))
+              : ListView(
+                  padding: const EdgeInsets.all(8),
+                  children: roots.map((r) => _buildCodeEditNode(r, 0)).toList(),
                 ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('درجة القبول الإجمالية',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
-                      const SizedBox(height: 8),
-                      Text(
-                        avgScore >= 85 ? 'جودة الدليل المحاسبي ممتازة' :
-                        avgScore >= 60 ? 'يحتاج بعض التعديلات' : 'يحتاج مراجعة شاملة',
-                        style: TextStyle(fontSize: 12, color: AppColors.textMid),
-                      ),
-                      if (_detectedErp.isNotEmpty && _detectedErp != 'غير معروف') ...[
-                        const SizedBox(height: 4),
-                        Text('البرنامج: $_detectedErp', style: TextStyle(fontSize: 11, color: AppColors.textDim)),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Root classification distribution
-          Text('توزيع التصنيفات الجذرية',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.cardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderColor),
-            ),
-            child: Column(
-              children: rootDist.entries.map((e) {
-                final pct = _accounts.isEmpty ? 0.0 : e.value / _accounts.length;
-                final color = _rootColor(e.key);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle, color: color)),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(e.key, style: TextStyle(fontSize: 12, color: AppColors.textColor))),
-                          Text('${e.value}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: pct, minHeight: 4,
-                          backgroundColor: AppColors.navyMid,
-                          valueColor: AlwaysStoppedAnimation<Color>(color),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Level distribution
-          Text('توزيع المستويات',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.cardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderColor),
-            ),
-            child: Column(
-              children: (levelDist.keys.toList()..sort()).map((lvl) {
-                final count = levelDist[lvl]!;
-                final pct = _accounts.isEmpty ? 0.0 : count / _accounts.length;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 80,
-                        child: Text('المستوى $lvl', style: TextStyle(fontSize: 12, color: AppColors.textColor)),
-                      ),
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: LinearProgressIndicator(
-                            value: pct, minHeight: 6,
-                            backgroundColor: AppColors.navyMid,
-                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold.withOpacity(0.4 + 0.15 * lvl)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 30,
-                        child: Text('$count', textAlign: TextAlign.end,
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-
-          // Smart analysis insights
-          const SizedBox(height: 20),
-          Text('التحليل الذكي',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
-          const SizedBox(height: 12),
-          _buildInsightsCard(),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _statCard(String title, String value, Color color, IconData icon) {
+  Widget _buildCodeEditNode(CoaAccount acc, int depth) {
+    final hasChildren = acc.children.isNotEmpty;
+    final isExpanded = _treeExpanded[acc.uniqueId] ?? (depth == 0);
+    final indent = depth * 18.0;
+    final depthColors = [
+      AppColors.gold, AppColors.blueC, AppColors.greenC,
+      AppColors.purpleC, AppColors.orangeC, AppColors.goldLight,
+    ];
+    final nodeColor = depthColors[depth % depthColors.length];
+    final dupColor = acc.isDuplicateCode ? AppColors.redC : nodeColor;
+    final ctrl = TextEditingController(text: acc.code);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          margin: EdgeInsets.only(right: indent, bottom: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: acc.isDuplicateCode
+                ? AppColors.redC.withOpacity(0.08)
+                : (depth == 0 ? AppColors.navyMid : AppColors.cardBg),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: dupColor.withOpacity(0.3)),
+          ),
+          child: Row(
+            children: [
+              // Expand/collapse toggle
+              GestureDetector(
+                onTap: hasChildren
+                    ? () => setState(() => _treeExpanded[acc.uniqueId] = !isExpanded)
+                    : null,
+                child: SizedBox(
+                  width: 22,
+                  child: hasChildren
+                      ? Icon(
+                          isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_left,
+                          color: nodeColor, size: 20,
+                        )
+                      : Icon(Icons.circle, color: nodeColor.withOpacity(0.3), size: 6),
+                ),
+              ),
+              // Level badge
+              Container(
+                width: 22, height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: nodeColor.withOpacity(0.15),
+                ),
+                child: Center(
+                  child: Text('${acc.level}',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: nodeColor)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Editable code field
+              SizedBox(
+                width: 110,
+                child: TextField(
+                  controller: ctrl,
+                  style: TextStyle(
+                    color: acc.isDuplicateCode ? AppColors.redC : AppColors.goldLight,
+                    fontSize: 12, fontWeight: FontWeight.bold,
+                  ),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    filled: true,
+                    fillColor: AppColors.navy,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: BorderSide(color: dupColor.withOpacity(0.4)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: BorderSide(color: dupColor.withOpacity(0.4)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: BorderSide(color: AppColors.gold, width: 1.5),
+                    ),
+                  ),
+                  onSubmitted: (v) {
+                    final nv = v.trim();
+                    if (nv.isEmpty || nv == acc.code) return;
+                    setState(() {
+                      _cascadeRename(acc, nv);
+                      _recomputeDuplicates();
+                      _hasUnsavedChanges = true;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+              // Name + classification
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(acc.name,
+                        style: TextStyle(
+                          color: AppColors.textColor,
+                          fontSize: 12,
+                          fontWeight: hasChildren ? FontWeight.bold : FontWeight.normal,
+                        ),
+                        overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 2),
+                    Text(
+                      acc.rootClass.isNotEmpty ? acc.rootClass : 'غير مصنف',
+                      style: TextStyle(color: AppColors.textDim, fontSize: 10),
+                    ),
+                  ],
+                ),
+              ),
+              // Children count
+              if (hasChildren) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: nodeColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text('${acc.children.length}',
+                      style: TextStyle(fontSize: 10, color: nodeColor)),
+                ),
+                const SizedBox(width: 4),
+              ],
+              if (acc.isDuplicateCode)
+                Icon(Icons.warning_amber, color: AppColors.redC, size: 16),
+            ],
+          ),
+        ),
+        if (isExpanded && hasChildren)
+          ...acc.children.map((c) => _buildCodeEditNode(c, depth + 1)),
+      ],
+    );
+  }
+
+  
+  // ─── v8.5d Cascade Code Rename (fixed) ───────────────────────
+  String _incrementCode(String code) {
+    final nAll = int.tryParse(code);
+    if (nAll != null) return (nAll + 1).toString();
+    int i = code.length;
+    while (i > 0) {
+      final c = code.codeUnitAt(i - 1);
+      if (c < 48 || c > 57) break;
+      i--;
+    }
+    if (i < code.length) {
+      final num = int.parse(code.substring(i));
+      return code.substring(0, i) + (num + 1).toString();
+    }
+    return code + '1';
+  }
+
+  void _cascadeRename(CoaAccount target, String newCode) {
+    final oldCode = target.code;
+    if (oldCode == newCode || newCode.isEmpty) return;
+    // 1) Sibling collision: same parent (by uniqueId) + same newCode
+    CoaAccount? collision;
+    for (final a in _accounts) {
+      if (a.uniqueId == target.uniqueId) continue;
+      if (a.parentUniqueId == target.parentUniqueId && a.code == newCode) {
+        collision = a;
+        break;
+      }
+    }
+    if (collision != null) {
+      _cascadeRename(collision, _incrementCode(newCode));
+    }
+    // 2) Collect descendants via parentUniqueId BFS (duplicate-safe)
+    final descendants = <CoaAccount>[];
+    final queue = <String>[target.uniqueId];
+    while (queue.isNotEmpty) {
+      final pid = queue.removeAt(0);
+      for (final a in _accounts) {
+        if (a.parentUniqueId == pid && a.uniqueId != target.uniqueId) {
+          descendants.add(a);
+          queue.add(a.uniqueId);
+        }
+      }
+    }
+    // 3) Update target code + uniqueId
+    final oldTargetUid = target.uniqueId;
+    target.code = newCode;
+    target.uniqueId = newCode + '_' + target.rowIndex.toString();
+    final uidMap = <String, String>{};
+    uidMap[oldTargetUid] = target.uniqueId;
+    // 4) Update descendants (prefix rewrite) + uniqueIds
+    for (final d in descendants) {
+      final oldUid = d.uniqueId;
+      if (d.code.startsWith(oldCode)) {
+        d.code = newCode + d.code.substring(oldCode.length);
+      }
+      d.uniqueId = d.code + '_' + d.rowIndex.toString();
+      uidMap[oldUid] = d.uniqueId;
+    }
+    // 5) Fix parentCode + parentUniqueId inside subtree only
+    for (final d in descendants) {
+      if (d.parentCode == oldCode) {
+        d.parentCode = newCode;
+      } else if (d.parentCode.length > oldCode.length && d.parentCode.startsWith(oldCode)) {
+        d.parentCode = newCode + d.parentCode.substring(oldCode.length);
+      }
+      final mapped = uidMap[d.parentUniqueId];
+      if (mapped != null) d.parentUniqueId = mapped;
+    }
+  }
+
+  void _recomputeDuplicates() {
+    final counts = <String, int>{};
+    for (final a in _accounts) {
+      counts[a.code] = (counts[a.code] ?? 0) + 1;
+    }
+    for (final a in _accounts) {
+      a.isDuplicateCode = (counts[a.code] ?? 0) > 1;
+    }
+  }
+  // ─── End v8.5d ────────────────────────────────────────────────
+
+    Widget _statCard(String title, String value, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -2143,6 +2267,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   spacing: 12,
                   runSpacing: 12,
                   children: [
+                    _qualityDimension('تقييم التكويد', 'Coding Quality', ((completeness + duplication) / 2).round(), '—', AppColors.blueC),
+                    _qualityDimension('تقييم التبويب', 'Classification', ((consistency + naming) / 2).round(), '—', AppColors.purpleC),
+                    _qualityDimension('توافق IFRS/SOCPA', 'IFRS & SOCPA', reporting, '—', AppColors.greenC),
                     _qualityDimension('الاكتمال', 'Completeness', completeness, '25%', AppColors.blueC),
                     _qualityDimension('الاتساق', 'Consistency', consistency, '20%', AppColors.greenC),
                     _qualityDimension('وضوح التسمية', 'Naming', naming, '15%', AppColors.purpleC),
@@ -2918,67 +3045,132 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   // ─── Tree Tab (Unlimited Nesting) ──────────────────────────
 
   Widget _buildTreeTab() {
-    // Build tree structure
     final roots = _buildTreeStructure();
-
-    return Column(
-      children: [
-        // Tree toolbar
-        Container(
-          padding: const EdgeInsets.all(12),
-          color: AppColors.navyLight,
-          child: Row(
-            children: [
-              Icon(Icons.account_tree, color: AppColors.gold, size: 20),
-              const SizedBox(width: 8),
-              Text('الشجرة المحاسبية',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
-              const Spacer(),
-              // Expand all button
-              GestureDetector(
-                onTap: () => setState(() {
-                  for (final a in _accounts) _treeExpanded[a.uniqueId] = true;
-                }),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.navy,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColors.borderColor),
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          Container(
+            color: AppColors.navyLight,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                  child: Row(
+                    children: [
+                      Icon(Icons.account_tree, color: AppColors.gold, size: 20),
+                      const SizedBox(width: 8),
+                      Text('الشجرة المحاسبية',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
+                      const Spacer(),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('تحميل Excel قيد التطوير'), backgroundColor: AppColors.blueC));
+                        },
+                        icon: Icon(Icons.table_chart, size: 14, color: AppColors.greenC),
+                        label: Text('Excel', style: TextStyle(color: AppColors.greenC, fontSize: 11)),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: AppColors.greenC.withOpacity(0.4)),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('تحميل PDF قيد التطوير'), backgroundColor: AppColors.blueC));
+                        },
+                        icon: Icon(Icons.picture_as_pdf, size: 14, color: AppColors.redC),
+                        label: Text('PDF', style: TextStyle(color: AppColors.redC, fontSize: 11)),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: AppColors.redC.withOpacity(0.4)),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Text('فتح الكل', style: TextStyle(fontSize: 11, color: AppColors.textMid)),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Collapse all button
-              GestureDetector(
-                onTap: () => setState(() => _treeExpanded.clear()),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.navy,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColors.borderColor),
-                  ),
-                  child: Text('إغلاق الكل', style: TextStyle(fontSize: 11, color: AppColors.textMid)),
+                TabBar(
+                  labelColor: AppColors.gold,
+                  unselectedLabelColor: AppColors.textMid,
+                  indicatorColor: AppColors.gold,
+                  labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  tabs: const [
+                    Tab(text: 'كما هي'),
+                    Tab(text: 'بالتسطير الكامل'),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: roots.isEmpty
-              ? Center(child: Text('لا توجد حسابات', style: TextStyle(color: AppColors.textMid)))
-              : ListView(
-                  padding: const EdgeInsets.all(12),
-                  children: roots.map((root) => _buildTreeNode(root, 0)).toList(),
-                ),
-        ),
-      ],
+          Expanded(
+            child: TabBarView(
+              children: [
+                roots.isEmpty
+                    ? Center(child: Text('لا توجد حسابات', style: TextStyle(color: AppColors.textMid)))
+                    : ListView(
+                        padding: const EdgeInsets.all(12),
+                        children: roots.map((root) => _buildTreeNode(root, 0)).toList(),
+                      ),
+                roots.isEmpty
+                    ? Center(child: Text('لا توجد حسابات', style: TextStyle(color: AppColors.textMid)))
+                    : ListView(
+                        padding: const EdgeInsets.all(12),
+                        children: _flattenTreeWithIndent(roots, 0),
+                      ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  List<CoaAccount> _buildTreeStructure() {
+  List<Widget> _flattenTreeWithIndent(List<CoaAccount> accs, int depth) {
+    final widgets = <Widget>[];
+    for (final a in accs) {
+      final color = depth == 0 ? AppColors.gold : (depth == 1 ? AppColors.blueC : (depth == 2 ? AppColors.greenC : AppColors.purpleC));
+      widgets.add(Container(
+        margin: EdgeInsets.only(right: depth * 24.0, bottom: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: depth == 0 ? AppColors.navyMid : AppColors.cardBg,
+          borderRadius: BorderRadius.circular(6),
+          border: Border(right: BorderSide(color: color, width: 3)),
+        ),
+        child: Row(
+          children: [
+            if (depth > 0) Text('└─ ', style: TextStyle(color: AppColors.textDim, fontSize: 12)),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(a.code,
+                  style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(a.name,
+                  style: TextStyle(color: AppColors.textColor, fontSize: 12,
+                    fontWeight: a.children.isNotEmpty ? FontWeight.bold : FontWeight.normal),
+                  overflow: TextOverflow.ellipsis),
+            ),
+            Text('L${a.level}',
+                style: TextStyle(color: AppColors.textDim, fontSize: 10)),
+          ],
+        ),
+      ));
+      if (a.children.isNotEmpty) {
+        widgets.addAll(_flattenTreeWithIndent(a.children, depth + 1));
+      }
+    }
+    return widgets;
+  }
+
+    List<CoaAccount> _buildTreeStructure() {
     // Create a map using uniqueId for duplicate-safe lookup
     final uidMap = <String, CoaAccount>{};
     final codeMap = <String, List<CoaAccount>>{};

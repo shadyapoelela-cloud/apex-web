@@ -72,7 +72,7 @@ const Color redC = Color(0xFFF87171);
 const Color purpleC = Color(0xFFA78BFA);
 
 class ClientDetailScreen extends StatefulWidget {
-  final int clientId;
+  final String clientId;
   final String clientName;
 
   const ClientDetailScreen({

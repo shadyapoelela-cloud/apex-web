@@ -347,7 +347,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 onTap: () async {
                   await Navigator.push(context, MaterialPageRoute(
                     builder: (_) => ClientDetailScreen(
-                      clientId: clientId is int ? clientId : int.tryParse('$clientId') ?? 0,
+                      clientId: clientId.toString(),
                       clientName: clientName,
                     ),
                   ));

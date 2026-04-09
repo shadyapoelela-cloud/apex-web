@@ -1291,7 +1291,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
               final role = c2['your_role'] ?? '';
               return InkWell(
                 onTap: () => Navigator.push(c, MaterialPageRoute(
-                  builder: (_) => ClientDetailScreen(clientId: c2['id'], clientName: name))),
+                  builder: (_) => ClientDetailScreen(clientId: (c2['id'] ?? '').toString(), clientName: name))),
                 child: Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AC.bdr)),
