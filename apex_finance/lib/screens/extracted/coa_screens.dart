@@ -1230,7 +1230,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   }
 
   Future<void> _submitCoa() async {
-    // v7.6: route through real 6-step COA pipeline (upload→parse→classify→assess→bulk-approve→approve-coa)
+    // v7.6: route through real 6-step COA pipeline
     if (_fileBytes == null || _fileName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: const Text('يجب رفع ملف الدليل المحاسبي أولاً قبل الحفظ'),
@@ -1269,7 +1269,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     final authJson = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
 
     try {
-      // ── Step 1: Upload file (multipart) ─────────────────────
+      // Step 1: Upload file (multipart)
       if (mounted) setState(() => _statusMsg = '1/6 رفع الملف...');
       final uploadReq = http.MultipartRequest(
         'POST',
@@ -1293,7 +1293,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       }
       if (mounted) setState(() => _currentStage = 1);
 
-      // ── Step 2: Parse ───────────────────────────────────────
+      // Step 2: Parse
       if (mounted) setState(() => _statusMsg = '2/6 تحليل الملف على السيرفر...');
       final parseResp = await ApiRetry.post(
         Uri.parse('$base/coa/uploads/$uploadId/parse'),
@@ -1305,7 +1305,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       }
       if (mounted) setState(() => _currentStage = 2);
 
-      // ── Step 3: Classify ────────────────────────────────────
+      // Step 3: Classify
       if (mounted) setState(() => _statusMsg = '3/6 تصنيف الحسابات تلقائياً...');
       final classifyResp = await ApiRetry.post(
         Uri.parse('$base/coa/classify/$uploadId'),
@@ -1316,7 +1316,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       }
       if (mounted) setState(() => _currentStage = 3);
 
-      // ── Step 4: Assess quality ──────────────────────────────
+      // Step 4: Assess quality
       if (mounted) setState(() => _statusMsg = '4/6 تقييم الجودة...');
       final assessResp = await ApiRetry.post(
         Uri.parse('$base/coa/uploads/$uploadId/assess'),
@@ -1328,7 +1328,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       }
       if (mounted) setState(() => _currentStage = 4);
 
-      // ── Step 5: Bulk approve ────────────────────────────────
+      // Step 5: Bulk approve
       if (mounted) setState(() => _statusMsg = '5/6 اعتماد الحسابات جماعياً...');
       final bulkResp = await ApiRetry.post(
         Uri.parse('$base/coa/bulk-approve/$uploadId'),
@@ -1340,7 +1340,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       }
       if (mounted) setState(() => _currentStage = 5);
 
-      // ── Step 6: Final approve ──────────────────────────────
+      // Step 6: Final approve
       if (mounted) setState(() => _statusMsg = '6/6 الحفظ النهائي...');
       final finalResp = await ApiRetry.post(
         Uri.parse('$base/coa/uploads/$uploadId/approve-coa'),
