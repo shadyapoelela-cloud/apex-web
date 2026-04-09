@@ -568,6 +568,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   // Analyzed accounts
   List<CoaAccount> _accounts = [];
+  bool _hasUnsavedChanges = false;
 
   // Filter state
   String _filterStatus = 'all'; // all, approved, review, flagged
@@ -1130,21 +1131,31 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.navy,
-        body: Column(
-          children: [
-            _buildHeader(),
-            _buildStagePipeline(),
-            if (_accounts.isEmpty)
-              _buildUploadSection()
-            else ...[
-              _buildTabBar(),
-              Expanded(child: _buildTabContent()),
+    return PopScope(
+      canPop: !_hasUnsavedChanges || _accounts.isEmpty,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldPop = await _onWillPop();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          backgroundColor: AppColors.navy,
+          body: Column(
+            children: [
+              _buildHeader(),
+              _buildStagePipeline(),
+              if (_accounts.isEmpty)
+                _buildUploadSection()
+              else ...[
+                _buildTabBar(),
+                Expanded(child: _buildTabContent()),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -1152,7 +1163,6 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
 
   // ─── Save & Submit COA to API (v6.9) ─────────────
-  bool _hasUnsavedChanges = false;
 
   Future<bool> _onWillPop() async {
     if (!_hasUnsavedChanges || _accounts.isEmpty) return true;
