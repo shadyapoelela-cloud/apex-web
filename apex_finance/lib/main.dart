@@ -188,6 +188,21 @@ class _LoginS extends State<LoginScreen> {
   bool _l = false, _obscure = true;
   String? _e;
 
+  @override
+  void initState() {
+    super.initState();
+    // DEMO MODE: auto-login if ?demo=1 in URL
+    final search = html.window.location.search ?? '';
+    final hash = html.window.location.hash;
+    if (search.contains('demo=1') || hash.contains('demo=1')) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _u.text = 'shady';
+        _p.text = 'Aa@123456';
+        _go();
+      });
+    }
+  }
+
   Future<void> _go() async {
     setState(() { _l = true; _e = null; });
     try {
