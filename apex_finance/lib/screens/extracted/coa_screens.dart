@@ -1284,6 +1284,19 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 ],
               ),
             ),
+          if (_accounts.isNotEmpty) const SizedBox(width: 12),
+          if (_accounts.isNotEmpty)
+            ElevatedButton.icon(
+              onPressed: () => _submitCoa(),
+              icon: Icon(Icons.save_outlined, size: 18, color: AppColors.navy),
+              label: Text('حفظ شجرة الحسابات',
+                  style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold, fontSize: 13)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.gold,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
         ],
       ),
     );

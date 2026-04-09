@@ -344,13 +344,14 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
               else if (coaStatus == 'ready') { coaColor = blueC; coaLabel = 'جاهز لـ TB'; }
 
               return GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
+                onTap: () async {
+                  await Navigator.push(context, MaterialPageRoute(
                     builder: (_) => ClientDetailScreen(
                       clientId: clientId is int ? clientId : int.tryParse('$clientId') ?? 0,
                       clientName: clientName,
                     ),
                   ));
+                  if (mounted) _loadClients();
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
