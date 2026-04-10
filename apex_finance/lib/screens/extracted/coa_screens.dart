@@ -1470,7 +1470,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             final isComplete = si < _currentStage;
             final isCurrent = si == _currentStage;
             final isTbReady = si == 6 && _currentStage >= 6;
-            final bgColor = isTbReady ? const Color(0xFFFF00FF) : (isComplete ? AppColors.greenC : (isCurrent ? AppColors.gold : AppColors.navyMid));
+            final bgColor = isTbReady ? AppColors.greenC : (isComplete ? AppColors.greenC : (isCurrent ? AppColors.gold : AppColors.navyMid));
             final textCol = isTbReady ? AppColors.navy : (isComplete || isCurrent ? (isComplete ? Colors.white : AppColors.navy) : AppColors.textDim);
 
             return Column(
@@ -1479,7 +1479,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   width: 44, height: 44,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle, color: bgColor,
-                    boxShadow: isTbReady ? [BoxShadow(color: const Color(0xFFFF00FF).withOpacity(0.45), blurRadius: 12)] : (isCurrent ? [BoxShadow(color: AppColors.gold.withOpacity(0.4), blurRadius: 10)] : []),
+                    boxShadow: isTbReady ? [BoxShadow(color: AppColors.greenC.withOpacity(0.45), blurRadius: 12)] : (isCurrent ? [BoxShadow(color: AppColors.gold.withOpacity(0.4), blurRadius: 10)] : []),
                   ),
                   child: Center(child: isComplete
                       ? Icon(Icons.check, color: textCol, size: 22)
@@ -1487,7 +1487,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(stages[si].$1,
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: isTbReady ? const Color(0xFFFF00FF) : (isCurrent ? AppColors.gold : AppColors.textMid))),
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: isTbReady ? AppColors.greenC : (isCurrent ? AppColors.gold : AppColors.textMid))),
               ],
             );
           }),
