@@ -1697,6 +1697,27 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             ],
           ),
         ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          color: AppColors.navy,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            reverse: true,
+            child: Row(
+              children: [
+                _filterChip('الكل', 'all', _accounts.length),
+                const SizedBox(width: 6),
+                _filterChip('معتمد', 'approved', _accounts.where((a) => a.status == 'approved').length),
+                const SizedBox(width: 6),
+                _filterChip('مراجعة', 'review', _accounts.where((a) => a.status == 'review').length),
+                const SizedBox(width: 6),
+                _filterChip('معلّم', 'flagged', _accounts.where((a) => a.status == 'flagged').length),
+                const SizedBox(width: 6),
+                _filterChip('مكرر', 'duplicate', _accounts.where((a) => a.isDuplicateCode).length),
+              ],
+            ),
+          ),
+        ),
         Expanded(
           child: roots.isEmpty
               ? Center(child: Text('لا توجد حسابات', style: TextStyle(color: AppColors.textMid)))
@@ -1709,7 +1730,23 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     );
   }
 
+  bool _nodeMatchesFilter(CoaAccount acc) {
+    if (_filterStatus == 'all') return true;
+    bool selfMatch;
+    if (_filterStatus == 'duplicate') {
+      selfMatch = acc.isDuplicateCode;
+    } else {
+      selfMatch = acc.status == _filterStatus;
+    }
+    if (selfMatch) return true;
+    for (final c in acc.children) {
+      if (_nodeMatchesFilter(c)) return true;
+    }
+    return false;
+  }
+
   Widget _buildCodeEditNode(CoaAccount acc, int depth) {
+    if (!_nodeMatchesFilter(acc)) return const SizedBox.shrink();
     final hasChildren = acc.children.isNotEmpty;
     final isExpanded = _treeExpanded[acc.uniqueId] ?? (depth == 0);
     final indent = depth * 18.0;
