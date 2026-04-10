@@ -80,7 +80,11 @@ async def upload_coa(
         })
     
     content = await file.read()
-    
+
+    MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
+    if len(content) > MAX_UPLOAD_SIZE:
+        raise HTTPException(413, "حجم الملف يتجاوز الحد المسموح 10MB")
+
     if len(content) > MAX_FILE_SIZE:
         raise HTTPException(400, {
             "error_code": "file_too_large",

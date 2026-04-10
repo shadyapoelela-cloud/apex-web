@@ -76,6 +76,36 @@ def emit_notification(user_id, notification_type, body_ar=None, body_en=None,
         db.add(log)
         db.commit()
 
+        # Attempt email delivery if user preference has email enabled
+        try:
+            pref = db.query(NotificationPreference).filter(
+                NotificationPreference.user_id == user_id,
+                NotificationPreference.notification_type == notification_type,
+            ).first()
+            # Default: email enabled unless explicitly disabled
+            email_enabled = pref.channel_email if pref else True
+
+            if email_enabled:
+                from app.phase1.models.platform_models import User
+                user = db.query(User).filter(User.id == user_id).first()
+                if user and user.email:
+                    from app.core.email_service import send_notification_email
+                    title = TYPE_TITLES.get(notification_type, notification_type)
+                    body = body_ar or body_en or ""
+                    email_result = send_notification_email(user.email, title, body)
+                    if email_result.get("success"):
+                        email_log = NotificationDeliveryLog(
+                            id=gen_uuid(),
+                            notification_id=notif.id,
+                            channel="email",
+                            status="delivered",
+                        )
+                        db.add(email_log)
+                        db.commit()
+        except Exception as email_err:
+            logging.error("Email delivery failed for notification %s: %s",
+                          notif.id, email_err)
+
         return {"success": True, "notification_id": notif.id}
     except Exception as e:
         db.rollback()

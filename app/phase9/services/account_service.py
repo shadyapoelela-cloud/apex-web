@@ -35,6 +35,13 @@ def create_password_reset(email: str):
         db.add(action)
         db.commit()
 
+        # Send password reset email (non-blocking)
+        try:
+            from app.core.email_service import send_password_reset_email
+            send_password_reset_email(email, raw_token)
+        except Exception as email_err:
+            logging.error("Failed to send password reset email to %s: %s", email, email_err)
+
         return {
             "success": True,
             "message": "\u0625\u0630\u0627 \u0643\u0627\u0646 \u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062c\u0644\u0627\u064b\u060c \u0633\u064a\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0627\u0628\u0637 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646",
