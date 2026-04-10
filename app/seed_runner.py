@@ -4,6 +4,7 @@ Loads all reference data into database
 Usage: python -m app.seed_runner
 """
 
+import logging
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -15,7 +16,7 @@ from app.phase2.services.seed_onboarding import get_legal_entity_types, get_sect
 
 
 def seed_all():
-    print("Creating all tables...")
+    logging.info("Creating all tables...")
     Base.metadata.create_all(bind=engine, checkfirst=True)
     db = SessionLocal()
     try:
@@ -25,9 +26,9 @@ def seed_all():
             for item in get_legal_entity_types():
                 db.add(LegalEntityType(id=gen_uuid(), **item, is_active=True))
             db.commit()
-            print(f"  Seeded {len(get_legal_entity_types())} legal entity types")
+            logging.info(f"  Seeded {len(get_legal_entity_types())} legal entity types")
         else:
-            print(f"  Legal entity types already exist ({existing})")
+            logging.info(f"  Legal entity types already exist ({existing})")
 
         # 2. Sectors Main
         existing = db.query(SectorMain).count()
@@ -35,9 +36,9 @@ def seed_all():
             for item in get_sector_main():
                 db.add(SectorMain(id=gen_uuid(), **item, is_active=True))
             db.commit()
-            print(f"  Seeded {len(get_sector_main())} main sectors")
+            logging.info(f"  Seeded {len(get_sector_main())} main sectors")
         else:
-            print(f"  Main sectors already exist ({existing})")
+            logging.info(f"  Main sectors already exist ({existing})")
 
         # 3. Sectors Sub
         existing = db.query(SectorSub).count()
@@ -45,9 +46,9 @@ def seed_all():
             for item in get_sector_sub():
                 db.add(SectorSub(id=gen_uuid(), **{k:v for k,v in item.items()}, is_active=True))
             db.commit()
-            print(f"  Seeded {len(get_sector_sub())} sub sectors")
+            logging.info(f"  Seeded {len(get_sector_sub())} sub sectors")
         else:
-            print(f"  Sub sectors already exist ({existing})")
+            logging.info(f"  Sub sectors already exist ({existing})")
 
         # 4. Stage Notes
         existing = db.query(StageNote).count()
@@ -55,18 +56,18 @@ def seed_all():
             for item in get_stage_notes():
                 db.add(StageNote(id=gen_uuid(), **item, is_active=True))
             db.commit()
-            print(f"  Seeded {len(get_stage_notes())} stage notes")
+            logging.info(f"  Seeded {len(get_stage_notes())} stage notes")
         else:
-            print(f"  Stage notes already exist ({existing})")
+            logging.info(f"  Stage notes already exist ({existing})")
 
         # 5. Default Archive Policy
         existing = db.query(ArchivePolicy).count()
         if existing == 0:
             db.add(ArchivePolicy(id=gen_uuid(), scope_type="global", retention_days=30, allow_reuse=True, allow_download=True, is_active=True))
             db.commit()
-            print("  Seeded default archive policy (30 days)")
+            logging.info("  Seeded default archive policy (30 days)")
         else:
-            print(f"  Archive policies already exist ({existing})")
+            logging.info(f"  Archive policies already exist ({existing})")
 
         # 6. Service Catalog
         existing = db.query(ServiceCatalog).count()
@@ -82,7 +83,7 @@ def seed_all():
             for s in services:
                 db.add(ServiceCatalog(id=gen_uuid(), **s, is_active=True))
             db.commit()
-            print(f"  Seeded {len(services)} services")
+            logging.info(f"  Seeded {len(services)} services")
 
             # Audit service stages
             audit_svc = db.query(ServiceCatalog).filter(ServiceCatalog.service_code == "accounting_audit").first()
@@ -99,9 +100,9 @@ def seed_all():
                 for st in stages:
                     db.add(ServiceWorkflowStage(id=gen_uuid(), service_id=audit_svc.id, **st))
                 db.commit()
-                print(f"  Seeded {len(stages)} audit stages")
+                logging.info(f"  Seeded {len(stages)} audit stages")
         else:
-            print(f"  Service catalog already exist ({existing})")
+            logging.info(f"  Service catalog already exist ({existing})")
 
         # 7. Audit Program Templates
         existing = db.query(AuditProgramTemplate).count()
@@ -121,17 +122,16 @@ def seed_all():
             for t in templates:
                 db.add(AuditProgramTemplate(id=gen_uuid(), **t, is_active=True))
             db.commit()
-            print(f"  Seeded {len(templates)} audit templates")
+            logging.info(f"  Seeded {len(templates)} audit templates")
         else:
-            print(f"  Audit templates already exist ({existing})")
+            logging.info(f"  Audit templates already exist ({existing})")
 
-        print("\nSeed completed successfully!")
+        logging.info("Seed completed successfully!")
 
     except Exception as e:
         db.rollback()
-        import logging
         logging.error("Seed runner failed", exc_info=True)
-        print(f"ERROR: Seed runner failed. Check logs for details.")
+        logging.error("ERROR: Seed runner failed. Check logs for details.")
     finally:
         db.close()
 

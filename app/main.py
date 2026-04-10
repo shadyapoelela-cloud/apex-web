@@ -736,7 +736,7 @@ async def analyze_full(file: UploadFile = File(...), industry: str = Query("gene
         try:
             from app.knowledge_brain.services.brain_service import KnowledgeBrainService
             bc = KnowledgeBrainService().get_context_for_narrative(r, r.get("knowledge_brain", {}))
-        except Exception: pass
+        except Exception: logging.warning("Failed to get knowledge brain context for narrative", exc_info=True)
         r["narrative"] = await n.generate(r, language=language, brain_context=bc)
         return r
     except Exception as e: logging.error("Full analysis error", exc_info=True); raise HTTPException(500, "Analysis failed")
@@ -782,7 +782,7 @@ async def classify(file: UploadFile = File(...)):
         try: rr = orch.reader.read(tp)
         finally:
             try: os.unlink(tp)
-            except Exception: pass
+            except Exception: logging.warning("Failed to delete temporary file: %s", tp, exc_info=True)
         rows = rr["rows"]
         if not rows: return {"success": False, "error": "No data"}
         cl = orch.classifier.classify_rows(rows)

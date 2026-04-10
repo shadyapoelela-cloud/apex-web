@@ -14,6 +14,7 @@ Per Apex_Coa_First_Workflow_Execution_Document §14
 import re
 from typing import List, Dict, Any, Optional, Tuple
 from difflib import SequenceMatcher
+from app.core.text_utils import normalize_arabic
 
 
 # ── Essential categories for a complete COA ──
@@ -47,24 +48,10 @@ AMBIGUOUS_PATTERNS_EN = [
 ]
 
 
-def _remove_diacritics(text: str) -> str:
-    if not text:
-        return ""
-    return re.sub(r'[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED]', '', text)
-
-
-def _norm(text: str) -> str:
-    if not text:
-        return ""
-    t = _remove_diacritics(text.strip().lower())
-    t = t.replace("أ", "ا").replace("إ", "ا").replace("آ", "ا")
-    t = t.replace("ى", "ي").replace("ة", "ه")
-    return re.sub(r"\s+", " ", t)
-
 
 def assess_completeness(accounts: List[Dict], activity: str = "general") -> Dict:
     """Check if essential account categories are present."""
-    all_names = " ".join([_norm(a.get("account_name_raw", "")) for a in accounts])
+    all_names = " ".join([normalize_arabic(a.get("account_name_raw", "")) for a in accounts])
     found = {}
     missing = []
 
@@ -77,7 +64,7 @@ def assess_completeness(accounts: List[Dict], activity: str = "general") -> Dict
         cat_found = False
         for lang_patterns in [patterns.get("ar", []), patterns.get("en", [])]:
             for p in lang_patterns:
-                if _norm(p) in all_names:
+                if normalize_arabic(p) in all_names:
                     cat_found = True
                     break
             if cat_found:
@@ -184,7 +171,7 @@ def assess_naming_clarity(accounts: List[Dict]) -> Dict:
 
     for a in accounts:
         name = a.get("account_name_raw", "")
-        norm_name = _norm(name)
+        norm_name = normalize_arabic(name)
 
         is_ambiguous = False
         reason = None
@@ -229,7 +216,7 @@ def assess_naming_clarity(accounts: List[Dict]) -> Dict:
 def assess_duplication_risk(accounts: List[Dict]) -> Dict:
     """Find near-duplicate accounts that may cause confusion."""
     suspects = []
-    names_with_idx = [(i, _norm(a.get("account_name_raw", ""))) for i, a in enumerate(accounts)]
+    names_with_idx = [(i, normalize_arabic(a.get("account_name_raw", ""))) for i, a in enumerate(accounts)]
 
     # Compare pairs — limit to avoid O(n²) explosion on large COAs
     max_compare = min(len(names_with_idx), 500)

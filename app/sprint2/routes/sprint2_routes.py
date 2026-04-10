@@ -219,10 +219,10 @@ def get_mapping_preview(
             cls_issues = []
             try:
                 issues = json.loads(r[17] or "[]")
-            except Exception: pass
+            except Exception: logging.warning("Failed to parse issues JSON for row %s", r[0], exc_info=True)
             try:
                 cls_issues = json.loads(r[18] or "[]")
-            except Exception: pass
+            except Exception: logging.warning("Failed to parse classification issues JSON for row %s", r[0], exc_info=True)
 
             accounts.append({
                 "id": r[0],

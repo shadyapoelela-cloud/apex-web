@@ -12,18 +12,9 @@ Per Apex_Coa_First_Workflow_Execution_Document §6.4, §6.5
 """
 
 import json
-from datetime import datetime, timezone
 import logging
 from typing import Dict, List, Optional, Any
-
-
-def _get_db():
-    from app.phase1.models.platform_models import SessionLocal
-    return SessionLocal()
-
-
-def _utcnow():
-    return datetime.now(timezone.utc)
+from app.core.db_utils import get_db_session, utc_now
 
 
 def approve_upload(
@@ -40,9 +31,9 @@ def approve_upload(
     from app.phase1.models.platform_models import gen_uuid
     from sqlalchemy import text as _t
 
-    db = _get_db()
+    db = get_db_session()
     try:
-        now = _utcnow().isoformat()
+        now = utc_now().isoformat()
 
         # Count approved accounts
         approved_count = db.execute(_t(
@@ -139,9 +130,9 @@ def reject_upload(upload_id: str, client_id: str, rejected_by: str = None, notes
     from app.phase1.models.platform_models import gen_uuid
     from sqlalchemy import text as _t
 
-    db = _get_db()
+    db = get_db_session()
     try:
-        now = _utcnow().isoformat()
+        now = utc_now().isoformat()
 
         db.execute(_t(
             "UPDATE coa_approval_records SET is_current = false WHERE coa_upload_id = :uid"
@@ -181,10 +172,10 @@ def create_client_rule(
     from app.phase1.models.platform_models import gen_uuid
     from sqlalchemy import text as _t
 
-    db = _get_db()
+    db = get_db_session()
     try:
         rule_id = gen_uuid()
-        now = _utcnow().isoformat()
+        now = utc_now().isoformat()
 
         db.execute(_t(
             """INSERT INTO client_coa_rules
@@ -212,7 +203,7 @@ def list_client_rules(client_id: str, active_only: bool = True) -> Dict:
     """List classification rules for a client."""
     from sqlalchemy import text as _t
 
-    db = _get_db()
+    db = get_db_session()
     try:
         where = "client_id = :cid"
         params = {"cid": client_id}
@@ -249,7 +240,7 @@ def get_approval_history(upload_id: str) -> Dict:
     """Get approval history for a COA upload."""
     from sqlalchemy import text as _t
 
-    db = _get_db()
+    db = get_db_session()
     try:
         rows = db.execute(_t(
             """SELECT id, action, approved_by, notes, total_accounts, approved_accounts,
