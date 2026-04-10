@@ -202,6 +202,10 @@ def startup():
     if HAS_S1:
         try: init_sprint1_db()
         except Exception as e: logging.error(f"Sprint 1 init error: {e}")
+    try:
+        from app.copilot.models.copilot_models import init_copilot_db
+        init_copilot_db()
+    except Exception as e: logging.error(f"Copilot init error: {e}")
 
 for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
                 (P3, p3r if P3 else None), (P4, p4r if P4 else None), (P5, p5r if P5 else None),
