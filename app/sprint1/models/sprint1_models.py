@@ -93,7 +93,7 @@ class ClientCoaUpload(Base):
     total_rows_rejected = Column(Integer, nullable=True)
     warnings_json = Column(JSON, nullable=True)
 
-    uploaded_by = Column(String(36), ForeignKey("users.id"), nullable=True)
+    uploaded_by = Column(String(36), ForeignKey("users.id"), nullable=True, index=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
@@ -176,7 +176,7 @@ class CoaKnowledgeFeedback(Base):
     coa_account_id = Column(String(36), ForeignKey("client_chart_of_accounts.id"), nullable=True)
 
     feedback_source_type = Column(String(50), nullable=False)
-    submitted_by = Column(String(36), ForeignKey("users.id"), nullable=True)
+    submitted_by = Column(String(36), ForeignKey("users.id"), nullable=True, index=True)
     feedback_category = Column(String(50), nullable=False)
     feedback_severity = Column(String(30), nullable=True)
     feedback_text = Column(Text, nullable=False)

@@ -30,12 +30,13 @@ def _now():
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/references/authorities", tags=["Official Sources"])
-def list_authorities(domain: Optional[str] = None, jurisdiction: Optional[str] = None):
+def list_authorities(domain: Optional[str] = None, jurisdiction: Optional[str] = None,
+                     limit: int = 50, offset: int = 0):
     """List official reference authorities."""
     db = _db()
     try:
         where = "WHERE is_active = true"
-        params = {}
+        params = {"lim": min(limit, 100), "off": offset}
         if domain:
             where += " AND domain_pack = :dom"
             params["dom"] = domain
@@ -46,7 +47,8 @@ def list_authorities(domain: Optional[str] = None, jurisdiction: Optional[str] =
             f"""SELECT id, name_ar, name_en, authority_type, jurisdiction,
                        domain_pack, website_url, authority_level, review_cycle_days,
                        last_checked_at, created_at
-                FROM reference_authorities {where} ORDER BY name_ar""",
+                FROM reference_authorities {where} ORDER BY name_ar
+                LIMIT :lim OFFSET :off""",
             params).fetchall()
         return {"success": True, "data": {"authorities": [{
             "id": r[0], "name_ar": r[1], "name_en": r[2],
@@ -219,16 +221,18 @@ def review_update(update_id: str, body: dict):
 # ══════════════════════════════════════════════════════════════
 
 @router.get("/programs/funding", tags=["Eligibility"])
-def list_funding_programs(active_only: bool = True):
+def list_funding_programs(active_only: bool = True, limit: int = 50, offset: int = 0):
     """List available funding programs."""
     db = _db()
     try:
         where = "WHERE is_active = true" if active_only else ""
+        safe_limit = min(limit, 100)
         rows = _exec(db,
             f"""SELECT id, name_ar, name_en, provider_name_ar,
                        program_type, jurisdiction, validity_status,
                        source_url, created_at
-                FROM funding_programs {where} ORDER BY name_ar""").fetchall()
+                FROM funding_programs {where} ORDER BY name_ar
+                LIMIT :lim OFFSET :off""", {"lim": safe_limit, "off": offset}).fetchall()
         return {"success": True, "data": {"programs": [{
             "id": r[0], "name_ar": r[1], "name_en": r[2],
             "provider_name": r[3], "program_type": r[4],
@@ -240,16 +244,18 @@ def list_funding_programs(active_only: bool = True):
 
 
 @router.get("/programs/support", tags=["Eligibility"])
-def list_support_programs(active_only: bool = True):
+def list_support_programs(active_only: bool = True, limit: int = 50, offset: int = 0):
     """List available support programs."""
     db = _db()
     try:
         where = "WHERE is_active = true" if active_only else ""
+        safe_limit = min(limit, 100)
         rows = _exec(db,
             f"""SELECT id, name_ar, name_en, provider_name_ar,
                        support_type, jurisdiction, validity_status,
                        source_url, created_at
-                FROM support_programs {where} ORDER BY name_ar""").fetchall()
+                FROM support_programs {where} ORDER BY name_ar
+                LIMIT :lim OFFSET :off""", {"lim": safe_limit, "off": offset}).fetchall()
         return {"success": True, "data": {"programs": [{
             "id": r[0], "name_ar": r[1], "name_en": r[2],
             "provider_name": r[3], "support_type": r[4],
@@ -261,16 +267,18 @@ def list_support_programs(active_only: bool = True):
 
 
 @router.get("/programs/licenses", tags=["Eligibility"])
-def list_licenses(active_only: bool = True):
+def list_licenses(active_only: bool = True, limit: int = 50, offset: int = 0):
     """List available license types."""
     db = _db()
     try:
         where = "WHERE is_active = true" if active_only else ""
+        safe_limit = min(limit, 100)
         rows = _exec(db,
             f"""SELECT id, name_ar, name_en, license_type,
                        issuing_authority_ar, jurisdiction,
                        validity_status, source_url, created_at
-                FROM license_registry {where} ORDER BY name_ar""").fetchall()
+                FROM license_registry {where} ORDER BY name_ar
+                LIMIT :lim OFFSET :off""", {"lim": safe_limit, "off": offset}).fetchall()
         return {"success": True, "data": {"licenses": [{
             "id": r[0], "name_ar": r[1], "name_en": r[2],
             "license_type": r[3], "issuing_authority": r[4],

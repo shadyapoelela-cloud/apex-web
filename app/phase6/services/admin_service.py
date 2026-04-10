@@ -72,16 +72,26 @@ class AdminService:
             if search: q = q.filter((User.username.contains(search)) | (User.email.contains(search)) | (User.display_name.contains(search)))
             users = q.order_by(User.created_at.desc()).limit(limit).all()
 
+            # Pre-fetch all roles and subscriptions in bulk to avoid N+1
+            user_ids = [u.id for u in users]
+            role_rows = db.query(UserRole.user_id, Role.code)\
+                .join(Role, Role.id == UserRole.role_id)\
+                .filter(UserRole.user_id.in_(user_ids)).all() if user_ids else []
+            roles_map = {}
+            for uid, rcode in role_rows:
+                roles_map.setdefault(uid, []).append(rcode)
+
+            sub_rows = db.query(UserSubscription)\
+                .filter(UserSubscription.user_id.in_(user_ids), UserSubscription.status == "active").all() if user_ids else []
+            subs_map = {s.user_id: s.plan_id for s in sub_rows}
+
             result = []
             for u in users:
-                roles = [ur.role_id for ur in db.query(UserRole).filter(UserRole.user_id == u.id).all()]
-                role_names = [r.code for r in db.query(Role).filter(Role.id.in_(roles)).all()] if roles else []
-                sub = db.query(UserSubscription).filter(UserSubscription.user_id == u.id, UserSubscription.status == "active").first()
                 result.append({
                     "id": u.id, "username": u.username, "email": u.email,
                     "display_name": u.display_name, "status": u.status,
-                    "roles": role_names,
-                    "plan": sub.plan_id if sub else None,
+                    "roles": roles_map.get(u.id, []),
+                    "plan": subs_map.get(u.id),
                     "created_at": u.created_at.isoformat(),
                 })
             return result

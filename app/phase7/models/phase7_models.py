@@ -67,7 +67,7 @@ class TaskDocumentRequirement(Base):
     __tablename__ = "task_document_requirements"
     __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    task_type_id = Column(String(36), ForeignKey("task_types.id"), nullable=False)
+    task_type_id = Column(String(36), ForeignKey("task_types.id"), nullable=False, index=True)
     requirement_type = Column(SAEnum(DocRequirementType), nullable=False)
     document_name_ar = Column(String(200), nullable=False)
     document_name_en = Column(String(200), nullable=False)
@@ -81,7 +81,7 @@ class TaskSubmission(Base):
     __table_args__ = {"extend_existing": True}
     id = Column(String(36), primary_key=True, default=gen_uuid)
     service_task_id = Column(String(36), nullable=False, index=True)
-    requirement_id = Column(String(36), ForeignKey("task_document_requirements.id"), nullable=False)
+    requirement_id = Column(String(36), ForeignKey("task_document_requirements.id"), nullable=False, index=True)
     provider_id = Column(String(36), nullable=False, index=True)
     file_name = Column(String(500))
     file_url = Column(Text)
@@ -115,7 +115,7 @@ class ProviderSuspension(Base):
     provider_id = Column(String(36), nullable=False, index=True)
     suspension_type = Column(SAEnum(SuspensionType), nullable=False)
     reason = Column(Text, nullable=False)
-    compliance_flag_id = Column(String(36), ForeignKey("provider_compliance_flags.id"))
+    compliance_flag_id = Column(String(36), ForeignKey("provider_compliance_flags.id"), index=True)
     status = Column(SAEnum(SuspensionStatus), default=SuspensionStatus.active)
     suspended_at = Column(DateTime, default=utcnow)
     lifted_at = Column(DateTime)

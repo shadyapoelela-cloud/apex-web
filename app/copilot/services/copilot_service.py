@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from app.phase1.models.platform_models import SessionLocal, gen_uuid
 from app.copilot.models.copilot_models import CopilotSession, CopilotMessage, CopilotEscalation
 from app.copilot.services.intent_router import detect_intent, build_context, suggest_next_actions
@@ -129,7 +129,7 @@ class CopilotService:
                 "message_count": len(conversation_history) + 2,  # +2 for new user+assistant
                 "last_confidence": confidence,
             }
-            session.updated_at = datetime.utcnow()
+            session.updated_at = datetime.now(timezone.utc)
             db.commit()
 
             return {
@@ -206,7 +206,7 @@ class CopilotService:
             if not session:
                 return False
             session.status = "closed"
-            session.updated_at = datetime.utcnow()
+            session.updated_at = datetime.now(timezone.utc)
             db.commit()
             return True
         except Exception as e:

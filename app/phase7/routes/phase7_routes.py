@@ -178,13 +178,13 @@ async def flag_provider_compliance(req: ComplianceFlagRequest, user=Depends(get_
         db.close()
 
 @router.get("/providers/{provider_id}/compliance", tags=["Provider Compliance"])
-async def get_provider_compliance(provider_id: str, user=Depends(get_current_user)):
+async def get_provider_compliance(provider_id: str, limit: int = 50, offset: int = 0, user=Depends(get_current_user)):
     db = SessionLocal()
     try:
         from app.phase7.models.phase7_models import ProviderComplianceFlag, ProviderSuspension, SuspensionStatus
         flags = db.query(ProviderComplianceFlag).filter(
             ProviderComplianceFlag.provider_id == provider_id
-        ).order_by(ProviderComplianceFlag.created_at.desc()).all()
+        ).order_by(ProviderComplianceFlag.created_at.desc()).limit(min(limit, 100)).offset(offset).all()
         
         active_suspension = db.query(ProviderSuspension).filter(
             ProviderSuspension.provider_id == provider_id,

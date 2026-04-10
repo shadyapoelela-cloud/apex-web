@@ -33,7 +33,7 @@ class CopilotEscalation(Base):
     __tablename__ = "copilot_escalations"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     session_id = Column(String(36), ForeignKey("copilot_sessions.id"), nullable=False, index=True)
-    message_id = Column(String(36), ForeignKey("copilot_messages.id"), nullable=True)
+    message_id = Column(String(36), ForeignKey("copilot_messages.id"), nullable=True, index=True)
     reason = Column(String(200), nullable=False)
     severity = Column(String(20), default="medium")
     status = Column(String(20), default="pending")

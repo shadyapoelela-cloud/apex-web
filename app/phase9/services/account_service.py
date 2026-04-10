@@ -4,7 +4,7 @@ Uses Phase 1 PasswordReset + UserSession models
 """
 import logging
 import secrets, hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.phase1.models.platform_models import SessionLocal, User, gen_uuid, utcnow, PasswordReset, UserSession
 from app.phase9.models.phase9_models import AccountAction
 
@@ -23,7 +23,7 @@ def create_password_reset(email: str):
             id=gen_uuid(),
             user_id=user.id,
             token_hash=token_hash,
-            expires_at=datetime.utcnow() + timedelta(hours=1),
+            expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
         )
         db.add(reset)
 
@@ -60,7 +60,7 @@ def execute_password_reset(raw_token: str, new_password: str):
         if not reset:
             return {"status": "error", "detail": "\u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d"}
 
-        if datetime.utcnow() > reset.expires_at:
+        if datetime.now(timezone.utc) > reset.expires_at:
             return {"status": "error", "detail": "\u0627\u0646\u062a\u0647\u062a \u0635\u0644\u0627\u062d\u064a\u0629 \u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646"}
 
         user = db.query(User).filter(User.id == reset.user_id).first()
@@ -73,7 +73,7 @@ def execute_password_reset(raw_token: str, new_password: str):
         except Exception:
             user.password_hash = hashlib.sha256(new_password.encode()).hexdigest()
         reset.used = True
-        reset.used_at = datetime.utcnow()
+        reset.used_at = datetime.now(timezone.utc)
 
         action = AccountAction(
             id=gen_uuid(), user_id=user.id,
@@ -101,7 +101,7 @@ def create_session(user_id, device_info=None, ip_address=None):
             token_hash=token_hash,
             device_info=device_info or "unknown",
             ip_address=ip_address or "unknown",
-            expires_at=datetime.utcnow() + timedelta(days=30),
+            expires_at=datetime.now(timezone.utc) + timedelta(days=30),
         )
         db.add(session)
         db.commit()
@@ -112,13 +112,13 @@ def create_session(user_id, device_info=None, ip_address=None):
     finally:
         db.close()
 
-def get_user_sessions(user_id):
+def get_user_sessions(user_id, limit=20):
     db = SessionLocal()
     try:
         sessions = db.query(UserSession).filter(
             UserSession.user_id == user_id,
             UserSession.is_active == True,
-        ).order_by(UserSession.last_used_at.desc()).all()
+        ).order_by(UserSession.last_used_at.desc()).limit(min(limit, 100)).all()
 
         return [{
             "id": s.id,

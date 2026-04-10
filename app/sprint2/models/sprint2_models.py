@@ -38,16 +38,16 @@ CLASSIFICATION_COLUMNS = {
 }
 
 def init_sprint2_db(engine=None):
-        if engine is None:
-            try:
-                from app.phase1.models.platform_models import engine as eng
-                engine = eng
-            except Exception:
-                from app.phase1.models.platform_models import SessionLocal
-                db = SessionLocal()
-                engine = db.bind
-                db.close()
     """Add classification columns to existing client_chart_of_accounts table."""
+    if engine is None:
+        try:
+            from app.phase1.models.platform_models import engine as eng
+            engine = eng
+        except Exception:
+            from app.phase1.models.platform_models import SessionLocal
+            db = SessionLocal()
+            engine = db.bind
+            db.close()
     import sqlite3
     conn = engine.raw_connection()
     cursor = conn.cursor()

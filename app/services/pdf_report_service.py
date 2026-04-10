@@ -41,7 +41,7 @@ def _ensure_fonts():
         return False
 
 def _ar(text):
-    \"\"\"Reshape Arabic text for RTL PDF rendering.\"\"\"
+    """Reshape Arabic text for RTL PDF rendering."""
     if not text:
         return ""
     try:
@@ -62,7 +62,7 @@ RED = colors.HexColor("#E74C3C")
 GRAY = colors.HexColor("#F5F5F5")
 
 def generate_pdf_report(analysis_result: dict, client_name: str = "", user_name: str = "") -> bytes:
-    \"\"\"Generate professional Arabic PDF report from analysis results.\"\"\"
+    """Generate professional Arabic PDF report from analysis results."""
     has_arabic = _ensure_fonts()
     font_name = "Amiri" if has_arabic else "Helvetica"
     font_bold = "Amiri-Bold" if has_arabic else "Helvetica-Bold"

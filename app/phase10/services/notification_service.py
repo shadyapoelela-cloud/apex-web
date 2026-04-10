@@ -3,7 +3,7 @@ APEX Phase 10 — Notification Engine Service
 Handles: emit, list, mark-read, count, preferences
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase10.models.phase10_models import (
     NotificationV2, NotificationPreference, NotificationDeliveryLog,
@@ -140,7 +140,7 @@ def mark_as_read(user_id, notification_id=None):
             ).first()
             if n:
                 n.is_read = True
-                n.read_at = datetime.utcnow()
+                n.read_at = datetime.now(timezone.utc)
                 db.commit()
                 return {"status": "ok", "marked": 1}
             return {"status": "error", "detail": "الإشعار غير موجود"}
@@ -148,7 +148,7 @@ def mark_as_read(user_id, notification_id=None):
             count = db.query(NotificationV2).filter(
                 NotificationV2.user_id == user_id,
                 NotificationV2.is_read == False,
-            ).update({"is_read": True, "read_at": datetime.utcnow()})
+            ).update({"is_read": True, "read_at": datetime.now(timezone.utc)})
             db.commit()
             return {"status": "ok", "marked": count}
     except Exception as e:
@@ -207,7 +207,7 @@ def update_preference(user_id, notification_type, in_app=True, email=True, sms=F
             pref.channel_in_app = in_app
             pref.channel_email = email
             pref.channel_sms = sms
-            pref.updated_at = datetime.utcnow()
+            pref.updated_at = datetime.now(timezone.utc)
         else:
             pref = NotificationPreference(
                 id=gen_uuid(),

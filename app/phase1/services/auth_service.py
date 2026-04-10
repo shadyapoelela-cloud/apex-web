@@ -256,11 +256,11 @@ class AuthService:
                 ip_address=ip_address,
             ))
 
-            user_roles = []
-            for ur in db.query(UserRole).filter(UserRole.user_id == user.id).all():
-                role = db.query(Role).filter(Role.id == ur.role_id).first()
-                if role:
-                    user_roles.append(role.code)
+            user_roles = [
+                r.code for r in db.query(Role.code)
+                .join(UserRole, UserRole.role_id == Role.id)
+                .filter(UserRole.user_id == user.id).all()
+            ]
 
             access_tok = create_access_token(user.id, user.username, user_roles)
             refresh_tok = create_refresh_token(user.id)

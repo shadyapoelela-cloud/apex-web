@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 VALID_TRANSITIONS = {
     "missing":      ["uploaded"],
@@ -20,7 +20,7 @@ def transition_document(doc, new_status, reason=None):
     if not can_transition(current, new_status):
         raise ValueError(f"Invalid: {current} -> {new_status}")
     updated = {**doc, "status": new_status}
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     if new_status == "uploaded":
         updated["uploaded_at"] = now
     elif new_status == "accepted":

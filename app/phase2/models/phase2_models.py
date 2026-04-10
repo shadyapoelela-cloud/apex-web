@@ -107,7 +107,7 @@ class Client(Base):
     knowledge_mode = Column(Boolean, default=False)
     fiscal_year_end = Column(String(10), default="12-31")  # MM-DD
     inventory_system = Column(String(20), default="unknown")  # periodic, perpetual, unknown
-    created_by = Column(String(36), ForeignKey("users.id"), nullable=False)
+    created_by = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
 
     # ── New fields (Architecture Doc v5 Section 29) ──
     legal_entity_type = Column(String(50), nullable=True, index=True)  # links to legal_entity_types.code
@@ -196,7 +196,7 @@ class COAUpload(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
-    uploaded_by = Column(String(36), ForeignKey("users.id"), nullable=False)
+    uploaded_by = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     filename = Column(String(300), nullable=False)
     file_size_bytes = Column(Integer, nullable=True)
     file_format = Column(String(20), nullable=True)  # apex_v1, apex_v2, unknown
@@ -262,7 +262,7 @@ class AnalysisResult(Base):
     id = Column(String(36), primary_key=True, default=gen_uuid)
     upload_id = Column(String(36), ForeignKey("coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
     client_id = Column(String(36), ForeignKey("clients.id"), nullable=False, index=True)
-    analyzed_by = Column(String(36), ForeignKey("users.id"), nullable=True)
+    analyzed_by = Column(String(36), ForeignKey("users.id"), nullable=True, index=True)
     status = Column(String(20), default=AnalysisStatus.running.value, nullable=False)
 
     # Confidence

@@ -7,7 +7,7 @@ Per execution document sections 8, 11, 12.
 
 import logging
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.phase1.models.platform_models import (
     User, AuditEvent, Notification, SessionLocal, gen_uuid, utcnow,
 )
@@ -31,7 +31,7 @@ class MarketplaceService:
         try:
             deadline = None
             if deadline_days:
-                deadline = datetime.utcnow() + timedelta(days=deadline_days)
+                deadline = datetime.now(timezone.utc) + timedelta(days=deadline_days)
 
             req = ServiceRequest(
                 id=gen_uuid(), client_id=client_id, requested_by=user_id,
@@ -205,7 +205,7 @@ class MarketplaceService:
             if not req.deadline or not req.provider_id:
                 return {"success": True, "status": "no_deadline"}
 
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
             if req.status in ("completed", "cancelled"):
                 return {"success": True, "status": "resolved"}
 
@@ -244,7 +244,7 @@ class MarketplaceService:
         try:
             expires = None
             if duration_days:
-                expires = datetime.utcnow() + timedelta(days=duration_days)
+                expires = datetime.now(timezone.utc) + timedelta(days=duration_days)
 
             event = SuspensionEvent(id=gen_uuid(), target_type=target_type, target_id=target_id,
                 suspension_type=f"{target_type}_suspension", reason=reason,

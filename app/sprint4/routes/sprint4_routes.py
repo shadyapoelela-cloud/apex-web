@@ -8,7 +8,7 @@ ALL raw SQL uses _exec(db, sql, params) — SQLAlchemy 2.x compat.
 Does NOT touch any table from Phases 1-11 or Sprints 1-3.
 """
 import uuid, json, logging
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import text as _t
 from typing import Optional
@@ -29,7 +29,7 @@ def _db():
 
 
 def _now():
-    return datetime.utcnow().isoformat()
+    return datetime.now(timezone.utc).isoformat()
 
 
 # ══════════════════════════════════════════════════════════

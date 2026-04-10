@@ -17,7 +17,7 @@ Endpoints per implementation plan:
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 from app.knowledge_brain.models.db_models import (
     get_db, init_db, get_table_stats,
     Source, Entry, Rule, Update, Authority,
@@ -228,7 +228,7 @@ def apply_update(update_id: str, db: Session = Depends(get_db)):
     u = db.query(Update).filter_by(id=update_id).first()
     if not u: raise HTTPException(404, "Update not found")
     u.status = "applied"
-    u.applied_at = datetime.utcnow()
+    u.applied_at = datetime.now(timezone.utc)
     db.commit()
     _audit(db, "update", update_id, "apply")
     return {"success": True, "data": {"status": "applied"}}
@@ -280,8 +280,8 @@ def search_knowledge(
 # ═══════════════════════════════
 
 @router.get("/authorities")
-def list_authorities(db: Session = Depends(get_db)):
-    auths = db.query(Authority).filter_by(active=True).order_by(Authority.source_priority).all()
+def list_authorities(limit: int = 50, offset: int = 0, db: Session = Depends(get_db)):
+    auths = db.query(Authority).filter_by(active=True).order_by(Authority.source_priority).limit(min(limit, 100)).offset(offset).all()
     return {"success": True, "data": {"count": len(auths), "authorities": [
         {"code": a.code, "name_ar": a.name_ar, "name_en": a.name_en, "jurisdiction": a.jurisdiction,
          "domain_scope": a.domain_scope, "priority": a.source_priority}
@@ -294,8 +294,8 @@ def list_authorities(db: Session = Depends(get_db)):
 # ═══════════════════════════════
 
 @router.get("/review-queue")
-def list_review_queue(status: str = "pending", db: Session = Depends(get_db)):
-    items = db.query(ReviewQueueItem).filter_by(status=status).order_by(ReviewQueueItem.created_at.desc()).all()
+def list_review_queue(status: str = "pending", limit: int = 50, offset: int = 0, db: Session = Depends(get_db)):
+    items = db.query(ReviewQueueItem).filter_by(status=status).order_by(ReviewQueueItem.created_at.desc()).limit(min(limit, 100)).offset(offset).all()
     return {"success": True, "data": {"count": len(items), "items": [
         {"id": i.id, "entity_type": i.entity_type, "entity_id": i.entity_id,
          "action": i.action, "status": i.status, "created_at": str(i.created_at)}
@@ -308,7 +308,7 @@ def approve_review(entity_type: str, entity_id: str, db: Session = Depends(get_d
     item = db.query(ReviewQueueItem).filter_by(entity_type=entity_type, entity_id=entity_id, status="pending").first()
     if item:
         item.status = "approved"
-        item.resolved_at = datetime.utcnow()
+        item.resolved_at = datetime.now(timezone.utc)
         db.commit()
     _audit(db, entity_type, entity_id, "approve")
     return {"success": True, "data": {"status": "approved"}}

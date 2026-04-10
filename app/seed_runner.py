@@ -129,9 +129,9 @@ def seed_all():
 
     except Exception as e:
         db.rollback()
-        print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
+        import logging
+        logging.error("Seed runner failed", exc_info=True)
+        print(f"ERROR: Seed runner failed. Check logs for details.")
     finally:
         db.close()
 

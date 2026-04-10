@@ -109,13 +109,13 @@ async def close_session(session_id: str, user: dict = Depends(get_current_user))
 
 
 @router.get('/sessions/{session_id}/escalations')
-async def get_session_escalations(session_id: str, user: dict = Depends(get_current_user)):
+async def get_session_escalations(session_id: str, limit: int = 50, offset: int = 0, user: dict = Depends(get_current_user)):
     """Get escalations for a specific copilot session."""
     db = SessionLocal()
     try:
         escalations = db.query(CopilotEscalation).filter(
             CopilotEscalation.session_id == session_id
-        ).order_by(CopilotEscalation.created_at.desc()).all()
+        ).order_by(CopilotEscalation.created_at.desc()).limit(min(limit, 100)).offset(offset).all()
         return {'success': True, 'data': [{
             'id': e.id, 'session_id': e.session_id, 'message_id': e.message_id,
             'reason': e.reason, 'severity': e.severity, 'status': e.status,

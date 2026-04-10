@@ -11,7 +11,7 @@ knowledge_review_queue, knowledge_audit_log, knowledge_authorities, knowledge_pl
 
 import os
 import uuid
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from sqlalchemy import (
     create_engine, Column, String, Text, Float, Integer, Boolean,
     DateTime, Date, ForeignKey, JSON, Index, event
@@ -52,7 +52,7 @@ class Authority(Base):
     update_frequency = Column(String(20))                                   # monthly, quarterly, annual
     notes = Column(Text)
     active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 # ═══════════════════════════════════════════
@@ -81,7 +81,7 @@ class Sector(Base):
     name_ar = Column(String(100), nullable=False)
     name_en = Column(String(100))
     description = Column(Text)
-    parent_sector_id = Column(String(12), ForeignKey("knowledge_sectors.id"))
+    parent_sector_id = Column(String(12), ForeignKey("knowledge_sectors.id"), index=True)
     active = Column(Boolean, default=True)
 
 
@@ -110,8 +110,8 @@ class Source(Base):
     superseded_by = Column(String(12))
     raw_text = Column(Text)
     checksum = Column(String(64))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     entries = relationship("Entry", back_populates="source")
@@ -149,8 +149,8 @@ class Entry(Base):
     owner_user = Column(String(50))
     reviewer_user = Column(String(50))
     approver_user = Column(String(50))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     source = relationship("Source", back_populates="entries")
@@ -178,7 +178,7 @@ class Rule(Base):
     condition_json = Column(JSON)                         # {"field": "revenue", "op": ">", "value": 375000}
     action_json = Column(JSON)                            # {"type": "flag", "severity": "warning", "message": "..."}
     exception_json = Column(JSON)
-    source_entry_id = Column(String(12), ForeignKey("knowledge_entries.id"))
+    source_entry_id = Column(String(12), ForeignKey("knowledge_entries.id"), index=True)
     authority_code = Column(String(20))
     reference = Column(String(200))
     obligation_level = Column(String(20), default="mandatory")
@@ -186,8 +186,8 @@ class Rule(Base):
     active = Column(Boolean, default=True, index=True)
     version = Column(Integer, default=1)
     review_status = Column(String(20), default="approved")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     versions = relationship("RuleVersion", back_populates="rule")
 
@@ -204,7 +204,7 @@ class RuleVersion(Base):
     snapshot_json = Column(JSON)
     change_reason = Column(Text)
     changed_by = Column(String(50))
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     rule = relationship("Rule", back_populates="versions")
 
@@ -242,7 +242,7 @@ class Case(Base):
     linked_entries = Column(JSON)
     status = Column(String(20), default="approved", index=True)
     date_recorded = Column(Date)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 # ═══════════════════════════════════════════
@@ -260,7 +260,7 @@ class Pattern(Base):
     data_json = Column(JSON)
     confidence = Column(Float, default=0.7)
     status = Column(String(20), default="approved")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 # ═══════════════════════════════════════════
@@ -283,7 +283,7 @@ class Update(Base):
     status = Column(String(20), default="detected", index=True)   # detected, under_review, approved, applied, archived
     review_deadline = Column(Date)
     applied_at = Column(DateTime)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 # ═══════════════════════════════════════════
@@ -305,8 +305,8 @@ class Playbook(Base):
     outputs_expected = Column(JSON)
     risk_flags = Column(JSON)
     status = Column(String(20), default="approved")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
 # ═══════════════════════════════════════════
@@ -323,7 +323,7 @@ class ReviewQueueItem(Base):
     assigned_to = Column(String(50))
     status = Column(String(20), default="pending", index=True)  # pending, approved, rejected
     notes = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     resolved_at = Column(DateTime)
 
 
@@ -342,7 +342,7 @@ class AuditLog(Base):
     new_value = Column(Text)
     user = Column(String(50))
     reason = Column(Text)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
 
 # ═══════════════════════════════════════════
