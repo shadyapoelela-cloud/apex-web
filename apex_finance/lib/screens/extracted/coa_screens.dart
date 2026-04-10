@@ -1462,14 +1462,15 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               return Container(
                 width: 32, height: 3,
                 margin: const EdgeInsets.only(bottom: 20),
-                color: ci < _currentStage ? AppColors.greenC : AppColors.textDim.withOpacity(0.3),
+                color: (ci == 5 && _currentStage >= 6) ? Colors.cyan : (ci < _currentStage ? AppColors.greenC : AppColors.textDim.withOpacity(0.3)),
               );
             }
             final si = index ~/ 2;
             final isComplete = si < _currentStage;
             final isCurrent = si == _currentStage;
-            final bgColor = isComplete ? AppColors.greenC : (isCurrent ? AppColors.gold : AppColors.navyMid);
-            final textCol = isComplete || isCurrent ? (isComplete ? Colors.white : AppColors.navy) : AppColors.textDim;
+            final isTbReady = si == 6 && _currentStage >= 6;
+            final bgColor = isTbReady ? Colors.cyan : (isComplete ? AppColors.greenC : (isCurrent ? AppColors.gold : AppColors.navyMid));
+            final textCol = isTbReady ? AppColors.navy : (isComplete || isCurrent ? (isComplete ? Colors.white : AppColors.navy) : AppColors.textDim);
 
             return Column(
               children: [
@@ -1477,7 +1478,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   width: 44, height: 44,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle, color: bgColor,
-                    boxShadow: isCurrent ? [BoxShadow(color: AppColors.gold.withOpacity(0.4), blurRadius: 10)] : [],
+                    boxShadow: isTbReady ? [BoxShadow(color: Colors.cyan.withOpacity(0.5), blurRadius: 12)] : (isCurrent ? [BoxShadow(color: AppColors.gold.withOpacity(0.4), blurRadius: 10)] : []),
                   ),
                   child: Center(child: isComplete
                       ? Icon(Icons.check, color: textCol, size: 22)
@@ -1485,7 +1486,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(stages[si].$1,
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: isCurrent ? AppColors.gold : AppColors.textMid)),
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: isTbReady ? Colors.cyan : (isCurrent ? AppColors.gold : AppColors.textMid))),
               ],
             );
           }),
