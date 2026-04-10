@@ -1,4 +1,4 @@
-﻿“””
+"""
 APEX Financial Platform -- FastAPI Backend v9.0
 ================================================================
 All 11 Phases + 6 Sprints:
@@ -15,7 +15,7 @@ All 11 Phases + 6 Sprints:
   P11: Legal Acceptance
 + Financial Engine v2 + Knowledge Brain + Copilot AI
 + Sprints 1-6: COA Workflow, Classification, Quality, KB, TB, Registry
-“””
+"""
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 import os, traceback, logging
