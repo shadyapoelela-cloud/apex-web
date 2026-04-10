@@ -7,20 +7,9 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 import json
 import logging
+from app.core.db_utils import get_db_session as _db, exec_sql as _exec
 
 router = APIRouter()
-
-
-def _db():
-    from app.phase1.models.platform_models import SessionLocal
-    return SessionLocal()
-
-
-def _exec(db, sql, params=None):
-    from sqlalchemy import text as _t
-    if params:
-        return db.execute(_t(sql), params)
-    return db.execute(_t(sql))
 
 
 # ══════════════════════════════════════════════════════════════

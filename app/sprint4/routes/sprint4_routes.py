@@ -8,28 +8,11 @@ ALL raw SQL uses _exec(db, sql, params) — SQLAlchemy 2.x compat.
 Does NOT touch any table from Phases 1-11 or Sprints 1-3.
 """
 import uuid, json, logging
-from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Query
-from sqlalchemy import text as _t
 from typing import Optional
+from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now_iso as _now
 
 router = APIRouter()
-
-
-# ── SQL helper (same pattern as Sprint 2) ─────────────────
-def _exec(db, sql, params=None):
-    if params:
-        return db.execute(_t(sql), params)
-    return db.execute(_t(sql))
-
-
-def _db():
-    from app.phase1.models.platform_models import SessionLocal
-    return SessionLocal()
-
-
-def _now():
-    return datetime.now(timezone.utc).isoformat()
 
 
 # ══════════════════════════════════════════════════════════

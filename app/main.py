@@ -1,5 +1,5 @@
 """
-APEX Financial Platform -- FastAPI Backend v10.0
+APEX Financial Platform -- FastAPI Backend v10.2
 ================================================================
 All 11 Phases + 6 Sprints:
   P1: Identity + Auth + Plans + Legal
@@ -18,8 +18,29 @@ All 11 Phases + 6 Sprints:
 """
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
-import os, traceback, logging
+from pydantic import BaseModel, Field
+from typing import Optional
+import os, logging
 from app.services.orchestrator import AnalysisOrchestrator
+
+
+# ═══════════════════════════════════════════════════════════════
+# Pydantic Request Models (input validation)
+# ═══════════════════════════════════════════════════════════════
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=6)
+    confirm_password: str = Field(..., min_length=6)
+
+
+class AcceptLegalRequest(BaseModel):
+    document_id: str = Field(..., min_length=1)
+
+
+class AccountClosureRequest(BaseModel):
+    type: str = Field(default="temporary", pattern="^(temporary|permanent)$")
+    reason: str = Field(default="")
 
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "apex-admin-2026")
 if ADMIN_SECRET == "apex-admin-2026":
@@ -155,7 +176,7 @@ except Exception as e:
     logging.warning(f"Phase 11 disabled: {e}")
 
 
-app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="10.0.0")
+app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="10.2.0")
 _cors_origins = os.environ.get("CORS_ORIGINS", "").split(",") if os.environ.get("CORS_ORIGINS") else ["*"]
 app.add_middleware(CORSMiddleware, allow_origins=_cors_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
@@ -275,7 +296,7 @@ app.include_router(copilot_router)
 @app.get("/")
 def root():
     phases = [P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8, HAS_P9, HAS_P10, HAS_P11]
-    return {"name": "APEX Financial Platform API", "version": "10.0.0", "status": "running",
+    return {"name": "APEX Financial Platform API", "version": "10.2.0", "status": "running",
             "phases_active": sum(phases), "phases_total": 11,
             "modules": {k: "active" if v else "disabled" for k, v in
                 {"engine": True, "kb": KB, "p1_identity": P1, "p2_clients": P2, "p3_knowledge": P3,
@@ -544,7 +565,7 @@ def seed_all_data(secret: str = Query(...)):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "10.0.0",
+    return {"status": "ok", "version": "10.2.0",
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6,
                        "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9, "p10": HAS_P10, "p11": HAS_P11},
             "sprints": {"s1": HAS_S1, "s2": HAS_S2, "s3": HAS_S3, "s4": HAS_S4,
@@ -734,16 +755,13 @@ async def classify(file: UploadFile = File(...)):
 # GET /users/me/security is served by phase1_routes (AccountService.get_security_info)
 
 @app.put("/users/me/security/password", tags=["Account"])
-async def change_password(body: dict, authorization: str = Header(None)):
+async def change_password(body: ChangePasswordRequest, authorization: str = Header(None)):
     from app.phase1.routes.phase1_routes import get_current_user
     user = await get_current_user(authorization)
-    current = body.get("current_password", "")
-    new_pw = body.get("new_password", "")
-    confirm = body.get("confirm_password", "")
-    if not all([current, new_pw, confirm]):
-        raise HTTPException(400, "All password fields required")
-    if new_pw != confirm:
+    if body.new_password != body.confirm_password:
         raise HTTPException(400, "Passwords do not match")
+    current = body.current_password
+    new_pw = body.new_password
     from app.phase1.services.auth_service import AuthService
     result = AuthService().change_password(user["sub"], current, new_pw)
     if not result.get("success"):
@@ -808,12 +826,10 @@ async def get_acceptable_use():
     return {"success": True, "data": {"version": "1.0", "effective_date": "2026-01-01", "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„ ظ„ظ…ظ†طµط© APEX..."}}
 
 @app.post("/legal/accept", tags=["Legal"])
-async def accept_legal(body: dict, authorization: str = Header(None)):
+async def accept_legal(body: AcceptLegalRequest, authorization: str = Header(None)):
     from app.phase1.routes.phase1_routes import get_current_user
     user = await get_current_user(authorization)
-    doc_id = body.get("document_id", "")
-    if not doc_id:
-        raise HTTPException(400, "document_id required")
+    doc_id = body.document_id
     from app.phase11.services.legal_service import accept_document
     result = accept_document(user["sub"], doc_id)
     if result.get("status") == "error":
@@ -822,11 +838,9 @@ async def accept_legal(body: dict, authorization: str = Header(None)):
 
 # --- Account Closure ---
 @app.post("/account/closure", tags=["Account"])
-async def request_closure(body: dict):
-    closure_type = body.get("type", "temporary")
-    reason = body.get("reason", "")
-    if closure_type not in ("temporary", "permanent"):
-        raise HTTPException(400, "type must be 'temporary' or 'permanent'")
+async def request_closure(body: AccountClosureRequest):
+    closure_type = body.type
+    reason = body.reason
     return {"success": True, "data": {
         "message": f"{'Temporary deactivation' if closure_type == 'temporary' else 'Permanent closure'} request submitted",
         "type": closure_type, "status": "pending",

@@ -5,23 +5,7 @@ Key rule: Analysis only runs if TB binding is approved and COA is approved.
 """
 
 import json
-from datetime import datetime, timezone
-from sqlalchemy import text as _t
-
-
-def _db():
-    from app.phase1.models.platform_models import SessionLocal
-    return SessionLocal()
-
-
-def _now():
-    return datetime.now(timezone.utc)
-
-
-def _exec(db, sql, params=None):
-    if params:
-        return db.execute(_t(sql), params)
-    return db.execute(_t(sql))
+from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now as _now
 
 
 def get_approved_coa_for_client(db, client_id: str) -> dict | None:

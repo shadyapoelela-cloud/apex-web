@@ -2,25 +2,9 @@
 from fastapi import APIRouter, HTTPException
 import json, uuid, logging
 from datetime import datetime, timezone
+from app.core.db_utils import exec_sql as _exec
 
 router = APIRouter()
-
-from sqlalchemy import text as _t
-
-def _exec(db, sql, params=None):
-    """Execute raw SQL with text() wrapper for SQLAlchemy 2.x compat."""
-    if params:
-        return db.execute(_t(sql), params)
-    return db.execute(_t(sql))
-
-
-def _get_db():
-    from app.phase1.models.platform_models import SessionLocal
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # ── POST /coa/uploads/{upload_id}/classify ──
 @router.post("/coa/classify/{upload_id}")

@@ -6,23 +6,9 @@ APEX Sprint 6 — Official Source Registry + Eligibility Engines Routes
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 import json, uuid
-from datetime import datetime, timezone
-from sqlalchemy import text as _t
+from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now_iso as _now
 
 router = APIRouter()
-
-
-def _db():
-    from app.phase1.models.platform_models import SessionLocal
-    return SessionLocal()
-
-def _exec(db, sql, params=None):
-    if params:
-        return db.execute(_t(sql), params)
-    return db.execute(_t(sql))
-
-def _now():
-    return datetime.now(timezone.utc).isoformat()
 
 
 # ══════════════════════════════════════════════════════════════
