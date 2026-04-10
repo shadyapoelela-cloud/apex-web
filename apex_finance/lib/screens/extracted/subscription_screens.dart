@@ -34,7 +34,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       }
       
       // Load available plans
-      final r2 = await http.get(Uri.parse('$_api/subscriptions/plans'));
+      final r2 = await http.get(Uri.parse('$_api/plans'));
       if (r2.statusCode == 200) {
         _plans = jsonDecode(r2.body)['plans'] ?? [];
       }
