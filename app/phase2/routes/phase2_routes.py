@@ -8,7 +8,7 @@ Per execution document sections 5, 6, 12.
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Query
 from pydantic import BaseModel, Field
 from typing import Optional
-import os, traceback
+import os, logging
 
 from app.phase1.routes.phase1_routes import get_current_user
 from app.phase2.services.client_service import ClientService
@@ -50,6 +50,10 @@ class UpdateClientRequest(BaseModel):
 class AddMemberRequest(BaseModel):
     user_id: str
     role: str = "member"
+
+class UpdateDocumentStatusRequest(BaseModel):
+    status: Optional[str] = Field(None, description="New document status")
+    reason: Optional[str] = Field(None, description="Reason for status change")
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -185,10 +189,11 @@ async def upload_and_analyze(
         # Return engine result + metadata
         engine_result["upload_id"] = upload_id
         engine_result["result_id"] = result_id
-        return engine_result
+        return {"success": True, "data": engine_result}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"خطأ في التحليل: {str(e)}\n{traceback.format_exc()}")
+        logging.error("Analysis error", exc_info=True)
+        raise HTTPException(status_code=500, detail="Analysis failed")
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -211,7 +216,8 @@ async def get_result_details(result_id: str, user: dict = Depends(get_current_us
 @router.get("/clients/{client_id}/results", tags=["Results"])
 async def list_client_results(client_id: str, user: dict = Depends(get_current_user)):
     """List all analysis results for a client."""
-    return analysis_service.list_results(client_id)
+    results = analysis_service.list_results(client_id)
+    return {"success": True, "data": results}
 
 
 
@@ -253,7 +259,7 @@ async def get_client_readiness(client_id: str, user: dict = Depends(get_current_
         ), {"rs": readiness, "cid": client_id})
         db.commit()
 
-        return {
+        return {"success": True, "data": {
             "client_id": client_id,
             "readiness_status": readiness,
             "blockers": blockers,
@@ -263,11 +269,12 @@ async def get_client_readiness(client_id: str, user: dict = Depends(get_current_
                 "accepted": len([d for d in doc_list if d["status"] == "accepted"]),
                 "missing": len([d for d in doc_list if d["status"] == "missing"]),
             },
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, f"Readiness error: {e}")
+        logging.error("Readiness check failed", exc_info=True)
+        raise HTTPException(500, "Readiness check failed")
     finally:
         db.close()
 
@@ -275,7 +282,7 @@ async def get_client_readiness(client_id: str, user: dict = Depends(get_current_
 @router.patch("/clients/{client_id}/documents/{doc_type}/status", tags=["Phase1-Documents"])
 async def update_document_status(
     client_id: str, doc_type: str,
-    body: dict = {},
+    body: UpdateDocumentStatusRequest = UpdateDocumentStatusRequest(),
     user: dict = Depends(get_current_user)
 ):
     """Update document status following lifecycle rules."""
@@ -291,8 +298,8 @@ async def update_document_status(
             raise HTTPException(404, "Document not found")
 
         current_doc = {"id": row[0], "status": row[1], "document_type": row[2], "name_ar": row[3], "required": row[4]}
-        new_status = body.get("status")
-        reason = body.get("reason")
+        new_status = body.status
+        reason = body.reason
 
         if not new_status:
             raise HTTPException(400, "Missing 'status' in body")
@@ -319,11 +326,12 @@ async def update_document_status(
         })
         db.commit()
 
-        return {"client_id": client_id, "document_type": doc_type, "old_status": current_doc["status"], "new_status": new_status}
+        return {"success": True, "data": {"client_id": client_id, "document_type": doc_type, "old_status": current_doc["status"], "new_status": new_status}}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, f"Document update error: {e}")
+        logging.error("Document update failed", exc_info=True)
+        raise HTTPException(500, "Document update failed")
     finally:
         db.close()
 
@@ -340,7 +348,7 @@ async def list_client_documents(client_id: str, user: dict = Depends(get_current
             "uploaded_at, accepted_at, rejected_at, reject_reason, expires_at "
             "FROM client_documents WHERE client_id = :cid ORDER BY required DESC, document_type"
         ), {"cid": client_id}).fetchall()
-        return {
+        return {"success": True, "data": {
             "client_id": client_id,
             "documents": [
                 {"type": r[0], "name_ar": r[1], "name_en": r[2], "required": r[3],
@@ -353,6 +361,6 @@ async def list_client_documents(client_id: str, user: dict = Depends(get_current
             "total": len(rows),
             "required_count": len([r for r in rows if r[3]]),
             "accepted_count": len([r for r in rows if r[4] == "accepted"]),
-        }
+        }}
     finally:
         db.close()

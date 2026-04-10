@@ -13,6 +13,7 @@ Per Apex_Coa_First_Workflow_Execution_Document §6.4, §6.5
 
 import json
 from datetime import datetime, timezone
+import logging
 from typing import Dict, List, Optional, Any
 
 
@@ -127,7 +128,8 @@ def approve_upload(
         }
     except Exception as e:
         db.rollback()
-        return {"success": False, "error": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -159,7 +161,8 @@ def reject_upload(upload_id: str, client_id: str, rejected_by: str = None, notes
         return {"success": True, "upload_id": upload_id, "action": "returned_for_review"}
     except Exception as e:
         db.rollback()
-        return {"success": False, "error": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -199,7 +202,8 @@ def create_client_rule(
         return {"success": True, "rule_id": rule_id, "rule_name": rule_name}
     except Exception as e:
         db.rollback()
-        return {"success": False, "error": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 

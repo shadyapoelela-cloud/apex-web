@@ -45,7 +45,7 @@ class ReferenceDocument(Base):
     """Approved reference documents from authorities."""
     __tablename__ = "reference_documents"
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=False)
+    authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=False, index=True)
     title_ar = Column(String(500), nullable=False)
     title_en = Column(String(500), nullable=True)
     document_type = Column(String(50), default="guide")
@@ -75,8 +75,8 @@ class RegulatoryUpdateEvent(Base):
     """Detected changes in official sources."""
     __tablename__ = "regulatory_update_events"
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=False)
-    reference_document_id = Column(String(36), ForeignKey("reference_documents.id"), nullable=True)
+    authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=False, index=True)
+    reference_document_id = Column(String(36), ForeignKey("reference_documents.id"), nullable=True, index=True)
     change_type = Column(String(30), nullable=False, default="minor")
     # minor, major, critical, new_document, superseded
     change_summary_ar = Column(Text, nullable=True)
@@ -120,7 +120,7 @@ class FundingProgram(Base):
     # e.g. {"min_current_ratio": 1.0, "max_debt_ratio": 0.7}
     eligibility_rules_json = Column(JSON, default=list)
     jurisdiction = Column(String(50), default="SA")
-    reference_authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=True)
+    reference_authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=True, index=True)
     effective_from = Column(DateTime, nullable=True)
     effective_to = Column(DateTime, nullable=True)
     validity_status = Column(String(30), default="active")
@@ -151,7 +151,7 @@ class SupportProgram(Base):
     required_documents_json = Column(JSON, default=list)
     benefits_json = Column(JSON, default=list)
     jurisdiction = Column(String(50), default="SA")
-    reference_authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=True)
+    reference_authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=True, index=True)
     effective_from = Column(DateTime, nullable=True)
     effective_to = Column(DateTime, nullable=True)
     validity_status = Column(String(30), default="active")
@@ -174,7 +174,7 @@ class LicenseRegistry(Base):
     license_type = Column(String(50), nullable=False)
     # commercial, professional, medical, industrial, regulatory, sector_specific
     issuing_authority_ar = Column(String(300), nullable=False)
-    issuing_authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=True)
+    issuing_authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=True, index=True)
     target_activities_json = Column(JSON, default=list)
     required_documents_json = Column(JSON, default=list)
     requirements_json = Column(JSON, default=dict)

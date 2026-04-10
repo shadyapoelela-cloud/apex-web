@@ -45,7 +45,7 @@ class ArchiveLink(Base):
     archive_item_id = Column(String(36), ForeignKey("archive_items.id", ondelete="CASCADE"), nullable=False, index=True)
     target_process_type = Column(String(50), nullable=False)  # coa_upload, tb_upload, service_case
     target_process_id = Column(String(36), nullable=False)
-    attached_by = Column(String(36), ForeignKey("users.id"), nullable=False)
+    attached_by = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     attached_at = Column(DateTime, default=utcnow, nullable=False)
 
 

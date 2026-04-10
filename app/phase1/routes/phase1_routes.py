@@ -8,6 +8,7 @@ Per execution document section 12 + Zero-Ambiguity Pack section 14.
 from fastapi import APIRouter, HTTPException, Depends, Header, Request
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
+import logging, os
 
 from app.phase1.services.auth_service import AuthService, decode_token
 from app.phase1.services.account_service import AccountService
@@ -281,28 +282,29 @@ async def api_change_password(request: Request):
         payload = jwt.decode(token, secret, algorithms=["HS256"])
         user_id = payload.get("user_id") or payload.get("sub")
     except Exception as e:
-        raise HTTPException(401, f"Token error: {e}")
+        raise HTTPException(401, "Invalid or expired token")
     body = await request.json()
     current_pw = body.get("current_password", "")
     new_pw = body.get("new_password", "")
     if not current_pw or not new_pw:
         raise HTTPException(400, "current_password and new_password required")
+    from app.phase1.services.auth_service import verify_password, hash_password
+    from app.phase1.models.platform_models import SessionLocal, User
+    db = SessionLocal()
     try:
-        from app.phase1.services.auth_service import verify_password, hash_password
-        from app.phase1.models.platform_models import SessionLocal, User
-        db = SessionLocal()
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            db.close()
             raise HTTPException(404, "User not found")
         if not verify_password(current_pw, user.password_hash):
-            db.close()
             raise HTTPException(401, "Current password incorrect")
         user.password_hash = hash_password(new_pw)
         db.commit()
-        db.close()
-        return {"status": "ok", "message": "Password changed successfully"}
+        return {"success": True, "data": {"message": "Password changed successfully"}}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, f"Error: {traceback.format_exc()}")
+        db.rollback()
+        logging.error("Password change error", exc_info=True)
+        raise HTTPException(500, "Failed to change password")
+    finally:
+        db.close()

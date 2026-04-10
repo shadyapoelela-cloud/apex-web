@@ -1,6 +1,7 @@
 """
 APEX Phase 11 — Legal Acceptance Service
 """
+import logging
 from datetime import datetime
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase11.models.phase11_models import LegalDocumentV2, AcceptanceLogV2, LEGAL_DOC_TYPES
@@ -11,7 +12,7 @@ def seed_legal_documents():
     try:
         existing = db.query(LegalDocumentV2).count()
         if existing > 0:
-            return {"status": "already_seeded", "count": existing}
+            return {"success": True, "already_seeded": True, "count": existing}
 
         docs = [
             {
@@ -60,10 +61,11 @@ def seed_legal_documents():
             created += 1
 
         db.commit()
-        return {"status": "seeded", "created": created}
+        return {"success": True, "seeded": True, "created": created}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -138,14 +140,14 @@ def accept_document(user_id, document_id, ip_address=None):
             LegalDocumentV2.id == document_id
         ).first()
         if not doc:
-            return {"status": "error", "detail": "\u0627\u0644\u0648\u062b\u064a\u0642\u0629 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f\u0629"}
+            return {"success": False, "error": "\u0627\u0644\u0648\u062b\u064a\u0642\u0629 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f\u0629"}
 
         existing = db.query(AcceptanceLogV2).filter(
             AcceptanceLogV2.user_id == user_id,
             AcceptanceLogV2.document_id == document_id,
         ).first()
         if existing:
-            return {"status": "already_accepted"}
+            return {"success": True, "already_accepted": True}
 
         log = AcceptanceLogV2(
             id=gen_uuid(),
@@ -157,10 +159,11 @@ def accept_document(user_id, document_id, ip_address=None):
         )
         db.add(log)
         db.commit()
-        return {"status": "ok", "doc_type": doc.doc_type, "version": doc.version}
+        return {"success": True, "doc_type": doc.doc_type, "version": doc.version}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -192,9 +195,10 @@ def accept_all_current(user_id, ip_address=None):
                 count += 1
 
         db.commit()
-        return {"status": "ok", "accepted": count}
+        return {"success": True, "accepted": count}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()

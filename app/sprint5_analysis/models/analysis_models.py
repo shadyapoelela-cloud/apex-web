@@ -16,8 +16,8 @@ class AnalysisRun(Base):
     __tablename__ = "analysis_runs"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
-    tb_upload_id = Column(String(36), ForeignKey("trial_balance_uploads.id", ondelete="CASCADE"), nullable=False)
-    coa_upload_id = Column(String(36), ForeignKey("client_coa_uploads.id"), nullable=False)
+    tb_upload_id = Column(String(36), ForeignKey("trial_balance_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
+    coa_upload_id = Column(String(36), ForeignKey("client_coa_uploads.id"), nullable=False, index=True)
     # Run metadata
     run_status = Column(String(30), nullable=False, default="pending")
     # pending -> running -> completed -> failed
@@ -55,7 +55,7 @@ class AnalysisResultExplanation(Base):
     """Per-line-item explanation linked to an analysis run + COA account."""
     __tablename__ = "analysis_result_explanations"
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    analysis_run_id = Column(String(36), ForeignKey("analysis_runs.id", ondelete="CASCADE"), nullable=False)
+    analysis_run_id = Column(String(36), ForeignKey("analysis_runs.id", ondelete="CASCADE"), nullable=False, index=True)
     coa_account_id = Column(String(36), nullable=True)
     result_type = Column(String(50), nullable=False)
     # income_line, balance_line, ratio, validation, readiness

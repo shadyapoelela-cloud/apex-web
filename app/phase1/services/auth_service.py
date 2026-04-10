@@ -8,6 +8,7 @@ APEX Platform â€” Auth Service (Security Patched)
 """
 
 import secrets
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import jwt
@@ -195,7 +196,8 @@ class AuthService:
             }
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -254,11 +256,11 @@ class AuthService:
                 ip_address=ip_address,
             ))
 
-            user_roles = []
-            for ur in db.query(UserRole).filter(UserRole.user_id == user.id).all():
-                role = db.query(Role).filter(Role.id == ur.role_id).first()
-                if role:
-                    user_roles.append(role.code)
+            user_roles = [
+                r.code for r in db.query(Role.code)
+                .join(UserRole, UserRole.role_id == Role.id)
+                .filter(UserRole.user_id == user.id).all()
+            ]
 
             access_tok = create_access_token(user.id, user.username, user_roles)
             refresh_tok = create_refresh_token(user.id)
@@ -286,7 +288,8 @@ class AuthService:
             }
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -307,7 +310,8 @@ class AuthService:
             return {"success": True, "message": "طھظ… طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -333,7 +337,8 @@ class AuthService:
             return {"success": True, "message": "طھظ… طھط؛ظٹظٹط± ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -353,7 +358,8 @@ class AuthService:
             return {"success": True, "message": "ط¥ط°ط§ ظƒط§ظ† ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ط§ظ‹ ط³طھطµظ„ظƒ ط±ط³ط§ظ„ط©", "reset_token": reset_token}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -379,7 +385,8 @@ class AuthService:
             return {"success": True, "message": "طھظ… ط¥ط¹ط§ط¯ط© طھط¹ظٹظٹظ† ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 

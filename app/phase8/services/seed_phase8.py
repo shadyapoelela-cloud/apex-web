@@ -5,6 +5,7 @@ Per Execution Master §4 + Zero Ambiguity §5, §10
 Plans: Free, Pro, Business, Expert, Enterprise
 Feature Keys per plan with limits
 """
+import logging
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow, UserSubscription, SubscriptionEntitlement
 from app.phase8.models.phase8_models import P8PlanLimit, P8EntitlementAuditLog
 
@@ -164,10 +165,11 @@ def create_user_subscription(user_id, plan_name="Free"):
             db.add(ent)
         
         db.commit()
-        return {"status": "created", "plan": plan_name, "entitlements": len(limits)}
+        return {"success": True, "plan": plan_name, "entitlements": len(limits)}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -184,7 +186,7 @@ def upgrade_user_plan(user_id, new_plan_name):
         ).first()
         
         if not new_plan:
-            return {"status": "error", "detail": f"Plan not found: {new_plan_name}"}
+            return {"success": False, "error": f"Plan not found: {new_plan_name}"}
         
         # Find current subscription
         current = db.query(UserSubscription).filter_by(user_id=user_id, status="active").first()
@@ -217,10 +219,11 @@ def upgrade_user_plan(user_id, new_plan_name):
         db.add(audit)
         
         db.commit()
-        return {"status": "upgraded", "old_plan": old_plan_name, "new_plan": new_plan_name}
+        return {"success": True, "old_plan": old_plan_name, "new_plan": new_plan_name}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 

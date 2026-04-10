@@ -11,6 +11,8 @@ APEX Ratio Engine — محرك النسب المالية
 from typing import Optional
 from app.core.constants import INDUSTRY_BENCHMARKS
 
+DAYS_PER_YEAR = 365
+
 
 class RatioEngine:
 
@@ -87,11 +89,11 @@ class RatioEngine:
         # ─── Efficiency ───
         asset_turnover = self._ratio(net_rev, total_assets, warnings, "asset_turnover")
         inv_turnover = self._ratio(cogs, inventory, warnings, "inventory_turnover") if inventory > 0 else None
-        days_inv = round(365 / inv_turnover, 1) if inv_turnover and inv_turnover > 0 else None
+        days_inv = round(DAYS_PER_YEAR / inv_turnover, 1) if inv_turnover and inv_turnover > 0 else None
         recv_turnover = self._ratio(net_rev, trade_recv, warnings, "recv_turnover") if trade_recv > 0 else None
-        dso = round(365 / recv_turnover, 1) if recv_turnover and recv_turnover > 0 else None
+        dso = round(DAYS_PER_YEAR / recv_turnover, 1) if recv_turnover and recv_turnover > 0 else None
         pay_turnover = self._ratio(cogs, trade_pay, warnings, "pay_turnover") if trade_pay > 0 else None
-        dpo = round(365 / pay_turnover, 1) if pay_turnover and pay_turnover > 0 else None
+        dpo = round(DAYS_PER_YEAR / pay_turnover, 1) if pay_turnover and pay_turnover > 0 else None
 
         # Cash Conversion Cycle
         ccc = None

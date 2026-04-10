@@ -11,10 +11,27 @@ APIs:
   GET  /tb/uploads/{tb_upload_id}/binding-summary  — Binding stats
 """
 
-import os, traceback, json
+import os, logging, json
 from fastapi import APIRouter, File, UploadFile, HTTPException, Query
+from pydantic import BaseModel, Field
 from typing import Optional
 from sqlalchemy import text as _t
+
+
+# ── Request Models ────────────────────────────────────────
+
+class BindTBRequest(BaseModel):
+    coa_upload_id: Optional[str] = Field(None, description="COA upload ID to bind against (overrides the one from upload)")
+    fuzzy_threshold: float = Field(0.80, ge=0.0, le=1.0, description="Minimum fuzzy-match confidence threshold")
+
+
+class ManualMatchRequest(BaseModel):
+    coa_account_id: str = Field(..., description="COA account ID to match this TB row to")
+    matched_by: Optional[str] = Field(None, description="User/system that performed the match")
+
+
+class ApproveBindingRequest(BaseModel):
+    approved_by: Optional[str] = Field(None, description="User/system that approved the binding")
 
 router = APIRouter(tags=["Sprint 4 — TB Upload & Binding"])
 
@@ -94,7 +111,7 @@ async def upload_tb(
         from app.sprint4_tb.services.tb_file_service import read_and_save_tb
         parse_result = read_and_save_tb(content, file.filename, tb_id, stored_path)
 
-        return {
+        return {"success": True, "data": {
             "tb_upload_id": tb_id,
             "client_id": client_id,
             "coa_upload_id": coa_upload_id,
@@ -107,12 +124,13 @@ async def upload_tb(
             "period": parse_result["period"],
             "warnings": parse_result["warnings"],
             "next_step": "POST /tb/uploads/{tb_upload_id}/bind" if coa_upload_id else "Specify coa_upload_id to bind",
-        }
+        }}
 
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, f"TB upload error: {e}\n{traceback.format_exc()}")
+        logging.error("TB upload error", exc_info=True)
+        raise HTTPException(500, "TB upload failed")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -136,7 +154,7 @@ def get_tb_upload(tb_upload_id: str):
         if not row:
             raise HTTPException(404, "TB upload not found")
 
-        return {
+        return {"success": True, "data": {
             "id": row[0], "client_id": row[1], "coa_upload_id": row[2],
             "file_name": row[3], "file_format": row[4], "upload_status": row[5],
             "period_label": row[6], "total_rows_detected": row[7],
@@ -145,7 +163,7 @@ def get_tb_upload(tb_upload_id: str):
             "total_unmatched": row[12], "binding_confidence_avg": row[13],
             "binding_approved": bool(row[14]) if row[14] is not None else False,
             "created_at": str(row[15]) if row[15] else None,
-        }
+        }}
     finally:
         db.close()
 
@@ -155,7 +173,7 @@ def get_tb_upload(tb_upload_id: str):
 # ═══════════════════════════════════════════════════════════
 
 @router.post("/tb/uploads/{tb_upload_id}/bind")
-def bind_tb(tb_upload_id: str, body: dict = {}):
+def bind_tb(tb_upload_id: str, body: BindTBRequest = BindTBRequest()):
     """Run binding engine — match TB rows to approved COA accounts."""
     from app.sprint4_tb.services.tb_binding_engine import bind_tb_to_coa
 
@@ -169,7 +187,7 @@ def bind_tb(tb_upload_id: str, body: dict = {}):
             raise HTTPException(404, "TB upload not found")
 
         client_id = row[0]
-        coa_upload_id = body.get("coa_upload_id") or row[1]
+        coa_upload_id = body.coa_upload_id or row[1]
 
         if not coa_upload_id:
             raise HTTPException(400, "coa_upload_id is required. Specify in body or upload with it.")
@@ -185,7 +203,7 @@ def bind_tb(tb_upload_id: str, body: dict = {}):
             tb_upload_id=tb_upload_id,
             coa_upload_id=coa_upload_id,
             client_id=client_id,
-            fuzzy_threshold=body.get("fuzzy_threshold", 0.80),
+            fuzzy_threshold=body.fuzzy_threshold,
         )
         if not result.get("success"):
             raise HTTPException(400, result.get("error", "Binding failed"))
@@ -193,8 +211,8 @@ def bind_tb(tb_upload_id: str, body: dict = {}):
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
-        raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+        logging.error("TB binding error", exc_info=True)
+        raise HTTPException(500, "TB binding failed")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -262,7 +280,7 @@ def get_binding_results(
                 "review_status": r[16],
             })
 
-        return {"tb_upload_id": tb_upload_id, "total": total, "page": page, "page_size": page_size, "results": items}
+        return {"success": True, "data": {"tb_upload_id": tb_upload_id, "total": total, "page": page, "page_size": page_size, "results": items}}
     finally:
         db.close()
 
@@ -272,15 +290,11 @@ def get_binding_results(
 # ═══════════════════════════════════════════════════════════
 
 @router.post("/tb/binding/{binding_id}/match")
-def manual_match(binding_id: str, body: dict):
+def manual_match(binding_id: str, body: ManualMatchRequest):
     """Manually match a TB row to a COA account."""
     from app.sprint4_tb.services.tb_binding_engine import manually_match_tb_row
 
-    coa_account_id = body.get("coa_account_id")
-    if not coa_account_id:
-        raise HTTPException(400, "coa_account_id is required")
-
-    result = manually_match_tb_row(binding_id, coa_account_id, body.get("matched_by"))
+    result = manually_match_tb_row(binding_id, body.coa_account_id, body.matched_by)
     if not result.get("success"):
         raise HTTPException(400, result.get("error"))
     return result
@@ -291,10 +305,10 @@ def manual_match(binding_id: str, body: dict):
 # ═══════════════════════════════════════════════════════════
 
 @router.post("/tb/uploads/{tb_upload_id}/approve-binding")
-def approve_tb_binding(tb_upload_id: str, body: dict = {}):
+def approve_tb_binding(tb_upload_id: str, body: ApproveBindingRequest = ApproveBindingRequest()):
     """Approve TB binding — marks ready for analysis."""
     from app.sprint4_tb.services.tb_binding_engine import approve_binding
-    result = approve_binding(tb_upload_id, body.get("approved_by"))
+    result = approve_binding(tb_upload_id, body.approved_by)
     if not result.get("success"):
         raise HTTPException(400, result.get("error"))
     return result
@@ -340,7 +354,7 @@ def binding_summary(tb_upload_id: str):
             else:
                 total_credit += abs(nb)
 
-        return {
+        return {"success": True, "data": {
             "tb_upload_id": tb_upload_id,
             "total_rows": total,
             "matched": matched,
@@ -353,6 +367,6 @@ def binding_summary(tb_upload_id: str):
             "total_debit": round(total_debit, 2),
             "total_credit": round(total_credit, 2),
             "balance_diff": round(total_debit - total_credit, 2),
-        }
+        }}
     finally:
         db.close()

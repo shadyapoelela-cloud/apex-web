@@ -1,26 +1,27 @@
-"""Sprint 2 — COA Classification APIs"""
+"""Sprint 2 -- COA Classification APIs"""
 from fastapi import APIRouter, HTTPException
-import json, uuid
+from pydantic import BaseModel, Field
+from typing import Optional, List
+import json, uuid, logging
 from datetime import datetime, timezone
+from app.core.db_utils import exec_sql as _exec
+
+
+class EditAccountClassificationBody(BaseModel):
+    normalized_class: Optional[str] = Field(None, description="Normalized account class")
+    statement_section: Optional[str] = Field(None, description="Financial statement section")
+    subcategory: Optional[str] = Field(None, description="Account subcategory")
+    current_noncurrent: Optional[str] = Field(None, description="Current or non-current classification")
+    cashflow_role: Optional[str] = Field(None, description="Cash flow statement role")
+    sign_rule: Optional[str] = Field(None, description="Sign rule for the account")
+
+
+class BulkApproveBody(BaseModel):
+    account_ids: List[str] = Field(default_factory=list, description="List of account IDs to approve")
+    min_confidence: Optional[float] = Field(None, description="Minimum confidence threshold for approval")
+    approve_all_above: Optional[float] = Field(None, description="Alias for min_confidence threshold")
 
 router = APIRouter()
-
-from sqlalchemy import text as _t
-
-def _exec(db, sql, params=None):
-    """Execute raw SQL with text() wrapper for SQLAlchemy 2.x compat."""
-    if params:
-        return db.execute(_t(sql), params)
-    return db.execute(_t(sql))
-
-
-def _get_db():
-    from app.phase1.models.platform_models import SessionLocal
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # ── POST /coa/uploads/{upload_id}/classify ──
 @router.post("/coa/classify/{upload_id}")
@@ -135,7 +136,7 @@ def classify_upload(upload_id: str):
         total = len(acc_list)
         avg_conf = round(total_conf / total, 3) if total > 0 else 0.0
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "total_accounts": total,
             "classified": high_conf + low_conf,
@@ -145,7 +146,7 @@ def classify_upload(upload_id: str):
             "avg_confidence": avg_conf,
             "class_distribution": class_dist,
             "section_distribution": section_dist,
-        }
+        }}
     finally:
         db.close()
 
@@ -245,25 +246,25 @@ def get_mapping_preview(
                 "classification_issues": cls_issues,
             })
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "total": total,
             "page": page,
             "page_size": page_size,
             "accounts": accounts,
-        }
+        }}
     finally:
         db.close()
 
 # ── PUT /coa/accounts/{account_id} ──
 @router.put("/coa/account/{account_id}")
-def edit_account_classification(account_id: str, body: dict):
+def edit_account_classification(account_id: str, body: EditAccountClassificationBody):
     """Edit classification for a single account."""
     from app.phase1.models.platform_models import SessionLocal
 
     db = SessionLocal()
     try:
-        row = _exec(db, 
+        row = _exec(db,
             "SELECT id FROM client_chart_of_accounts WHERE id = :aid",
             {"aid": account_id}
         ).fetchone()
@@ -274,11 +275,12 @@ def edit_account_classification(account_id: str, body: dict):
                     "current_noncurrent", "cashflow_role", "sign_rule"]
         updates = []
         params = {"aid": account_id}
+        body_data = body.model_dump(exclude_unset=True)
 
         for field in allowed:
-            if field in body:
+            if field in body_data:
                 updates.append(f"{field} = :{field}")
-                params[field] = body[field]
+                params[field] = body_data[field]
 
         if not updates:
             raise HTTPException(400, "No valid fields to update")
@@ -293,7 +295,7 @@ def edit_account_classification(account_id: str, body: dict):
         )
         db.commit()
 
-        return {"id": account_id, "status": "updated", "review_status": "manually_edited"}
+        return {"success": True, "data": {"id": account_id, "status": "updated", "review_status": "manually_edited"}}
     finally:
         db.close()
 
@@ -320,21 +322,21 @@ def approve_account(account_id: str):
             {"aid": account_id, "now": now}
         )
         db.commit()
-        return {"id": account_id, "review_status": "approved"}
+        return {"success": True, "data": {"id": account_id, "review_status": "approved"}}
     finally:
         db.close()
 
 # ── POST /coa/uploads/{upload_id}/bulk-approve ──
 @router.post("/coa/bulk-approve/{upload_id}")
-def bulk_approve(upload_id: str, body: dict = {}):
+def bulk_approve(upload_id: str, body: BulkApproveBody = BulkApproveBody()):
     """Bulk approve accounts by IDs or confidence threshold."""
     from app.phase1.models.platform_models import SessionLocal
 
     db = SessionLocal()
     try:
         now = datetime.now(timezone.utc).isoformat()
-        account_ids = body.get("account_ids", [])
-        min_confidence = body.get("min_confidence") or body.get("approve_all_above")
+        account_ids = body.account_ids
+        min_confidence = body.min_confidence or body.approve_all_above
 
         if account_ids:
             placeholders = ",".join([f":id{i}" for i in range(len(account_ids))])
@@ -374,16 +376,16 @@ def bulk_approve(upload_id: str, body: dict = {}):
             {"uid": upload_id}
         ).fetchone()[0]
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "approved_count": count,
             "total_accounts": total,
             "approval_percentage": round(count / total * 100, 1) if total > 0 else 0,
-        }
+        }}
     except Exception as e:
         db.rollback()
-        import traceback
-        raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+        logging.error("Batch approve error", exc_info=True)
+        raise HTTPException(500, "Batch approval failed")
     finally:
         db.close()
 
@@ -428,7 +430,7 @@ def classification_summary(upload_id: str):
             review_dist[rs] = review_dist.get(rs, 0) + 1
             source_dist[ms] = source_dist.get(ms, 0) + 1
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "total_accounts": total,
             "high_confidence": high,
@@ -439,14 +441,13 @@ def classification_summary(upload_id: str):
             "section_distribution": section_dist,
             "review_status_distribution": review_dist,
             "source_distribution": source_dist,
-        }
+        }}
     finally:
         db.close()
 
 @router.post("/coa/debug-classify/{upload_id}")
 def debug_classify(upload_id: str):
     """Debug classify with full traceback."""
-    import traceback
     try:
         from app.phase1.models.platform_models import SessionLocal
         db = SessionLocal()
@@ -498,4 +499,5 @@ def debug_classify(upload_id: str):
             "classification": cls_result,
         }
     except Exception as e:
-        return {"error": str(e), "traceback": traceback.format_exc()}
+        logging.error("Debug classification error", exc_info=True)
+        return {"success": False, "error": "Classification debug failed"}

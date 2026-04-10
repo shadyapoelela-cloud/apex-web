@@ -32,8 +32,8 @@ async def create_session(req: SessionRequest, user: dict = Depends(get_current_u
         )
         return {'success': True, 'data': session}
     except Exception as e:
-        logging.error(f"Copilot create_session route error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to create session")
+        logging.error("Copilot create_session route error", exc_info=True)
+        raise HTTPException(status_code=500, detail="فشل إنشاء الجلسة")
 
 
 @router.get('/sessions')
@@ -46,7 +46,7 @@ async def list_sessions(user: dict = Depends(get_current_user)):
 async def get_session(session_id: str):
     session = CopilotService.get_session(session_id)
     if not session:
-        raise HTTPException(status_code=404, detail='Session not found')
+        raise HTTPException(status_code=404, detail='الجلسة غير موجودة')
     return {'success': True, 'data': session}
 
 
@@ -75,8 +75,8 @@ async def chat(req: ChatRequest, user: dict = Depends(get_current_user)):
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Copilot chat error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to process message")
+        logging.error("Copilot chat error", exc_info=True)
+        raise HTTPException(status_code=500, detail="فشل معالجة الرسالة")
 
 
 @router.get('/sessions/{session_id}/messages')
@@ -91,22 +91,31 @@ async def detect_intent_endpoint(req: ChatRequest):
     return {'success': True, 'data': result}
 
 
+@router.get('/sessions/{session_id}/summary')
+async def get_session_summary(session_id: str, user: dict = Depends(get_current_user)):
+    """Get session summary with topic distribution and stats."""
+    summary = CopilotService.get_session_summary(session_id)
+    if not summary:
+        raise HTTPException(status_code=404, detail='الجلسة غير موجودة')
+    return {'success': True, 'data': summary}
+
+
 @router.post('/sessions/{session_id}/close')
 async def close_session(session_id: str, user: dict = Depends(get_current_user)):
     success = CopilotService.close_session(session_id)
     if not success:
-        raise HTTPException(status_code=404, detail='Session not found')
+        raise HTTPException(status_code=404, detail='الجلسة غير موجودة')
     return {'success': True, 'data': {'status': 'closed'}}
 
 
 @router.get('/sessions/{session_id}/escalations')
-async def get_session_escalations(session_id: str, user: dict = Depends(get_current_user)):
+async def get_session_escalations(session_id: str, limit: int = 50, offset: int = 0, user: dict = Depends(get_current_user)):
     """Get escalations for a specific copilot session."""
     db = SessionLocal()
     try:
         escalations = db.query(CopilotEscalation).filter(
             CopilotEscalation.session_id == session_id
-        ).order_by(CopilotEscalation.created_at.desc()).all()
+        ).order_by(CopilotEscalation.created_at.desc()).limit(min(limit, 100)).offset(offset).all()
         return {'success': True, 'data': [{
             'id': e.id, 'session_id': e.session_id, 'message_id': e.message_id,
             'reason': e.reason, 'severity': e.severity, 'status': e.status,

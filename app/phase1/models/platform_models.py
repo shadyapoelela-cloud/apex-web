@@ -293,8 +293,8 @@ class RolePermission(Base):
     __tablename__ = "role_permissions"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    role_id = Column(String(36), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False)
-    permission_id = Column(String(36), ForeignKey("permissions.id", ondelete="CASCADE"), nullable=False)
+    role_id = Column(String(36), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False, index=True)
+    permission_id = Column(String(36), ForeignKey("permissions.id", ondelete="CASCADE"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     __table_args__ = (
@@ -308,7 +308,7 @@ class UserRole(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    role_id = Column(String(36), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False)
+    role_id = Column(String(36), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False, index=True)
     assigned_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     assigned_by = Column(String(36), nullable=True)
 
@@ -372,7 +372,7 @@ class UserSubscription(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
-    plan_id = Column(String(36), ForeignKey("plans.id"), nullable=False)
+    plan_id = Column(String(36), ForeignKey("plans.id"), nullable=False, index=True)
     status = Column(String(20), default=SubscriptionStatus.active.value, nullable=False)
     billing_cycle = Column(String(10), default="monthly")  # monthly, yearly
     started_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)

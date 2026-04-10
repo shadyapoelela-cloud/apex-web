@@ -35,7 +35,8 @@ class AssignRoleReq(BaseModel):
 @router.get("/stats")
 async def platform_stats(user: dict = Depends(require_admin)):
     """Full platform statistics."""
-    return admin.get_platform_stats()
+    result = admin.get_platform_stats()
+    return {"success": True, "data": result}
 
 
 # ─── User Management ─────────────────────────────────────────
@@ -43,7 +44,8 @@ async def platform_stats(user: dict = Depends(require_admin)):
 @router.get("/users")
 async def list_users(status: Optional[str] = None, search: Optional[str] = None,
                      limit: int = Query(50, le=200), user: dict = Depends(require_admin)):
-    return admin.list_users(status=status, search=search, limit=limit)
+    result = admin.list_users(status=status, search=search, limit=limit)
+    return {"success": True, "data": result}
 
 
 @router.post("/users/{uid}/status")
@@ -72,7 +74,8 @@ async def remove_role(uid: str, req: AssignRoleReq, user: dict = Depends(require
 @router.get("/audit-log")
 async def get_audit_log(user_id: Optional[str] = None, action: Optional[str] = None,
                         limit: int = Query(100, le=500), user: dict = Depends(require_admin)):
-    return admin.get_audit_log(user_id=user_id, action=action, limit=limit)
+    result = admin.get_audit_log(user_id=user_id, action=action, limit=limit)
+    return {"success": True, "data": result}
 
 
 # ─── Notifications Stats ────────────────────────────────────

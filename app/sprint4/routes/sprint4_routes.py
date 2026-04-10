@@ -7,29 +7,98 @@ Source Systems, Reviewer Queues, Brain Status.
 ALL raw SQL uses _exec(db, sql, params) — SQLAlchemy 2.x compat.
 Does NOT touch any table from Phases 1-11 or Sprints 1-3.
 """
-import uuid, json
-from datetime import datetime
+import uuid, json, logging
 from fastapi import APIRouter, HTTPException, Query
-from sqlalchemy import text as _t
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, List
+from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now_iso as _now
+
+
+# ══════════════════════════════════════════════════════════
+# PYDANTIC REQUEST MODELS
+# ══════════════════════════════════════════════════════════
+
+class CreateConceptRequest(BaseModel):
+    canonical_name_ar: str = ""
+    canonical_name_en: Optional[str] = None
+    domain_pack: str = "accounting"
+    sector_scope: Optional[str] = None
+    jurisdiction_scope: Optional[str] = None
+    authority_level: str = "platform"
+    description_ar: Optional[str] = None
+    description_en: Optional[str] = None
+    effective_from: Optional[str] = None
+    effective_to: Optional[str] = None
+
+
+class UpdateConceptRequest(BaseModel):
+    canonical_name_ar: Optional[str] = None
+    canonical_name_en: Optional[str] = None
+    description_ar: Optional[str] = None
+    description_en: Optional[str] = None
+    authority_level: Optional[str] = None
+    effective_from: Optional[str] = None
+    effective_to: Optional[str] = None
+
+
+class CreateAliasRequest(BaseModel):
+    concept_id: Optional[str] = None
+    alias_text: str = ""
+    language_code: str = "ar"
+    alias_type: str = "synonym"
+    source_system: Optional[str] = None
+    client_scope: Optional[str] = None
+    sector_scope: Optional[str] = None
+    confidence_weight: float = 1.0
+    is_approved: bool = False
+
+
+class ReviewAliasRequest(BaseModel):
+    decision: Optional[str] = None
+    reviewer_notes: Optional[str] = None
+
+
+class ResolveTermRequest(BaseModel):
+    term: str = ""
+    source_system: Optional[str] = None
+    sector: Optional[str] = None
+    language: str = "ar"
+
+
+class ResolveBatchRequest(BaseModel):
+    terms: List[str] = Field(default_factory=list)
+    source_system: Optional[str] = None
+    sector: Optional[str] = None
+
+
+class SubmitCandidateRuleRequest(BaseModel):
+    rule_name: str = ""
+    domain_pack: str = "accounting"
+    rule_logic_json: dict = Field(default_factory=dict)
+    authority_level: str = "ai"
+    source_type: str = "ai_suggestion"
+    description_ar: Optional[str] = None
+
+
+class PromoteCandidateRuleRequest(BaseModel):
+    decision: Optional[str] = None
+    effective_from: Optional[str] = None
+    reviewer_notes: Optional[str] = None
+
+
+class DetectRuleConflictsRequest(BaseModel):
+    domain_pack: Optional[str] = None
+
+
+class RegisterSourceSystemRequest(BaseModel):
+    system_name: str = ""
+    system_version: Optional[str] = None
+    description_ar: Optional[str] = None
+    supported_languages: List[str] = Field(default=["ar", "en"])
+    known_labels_json: dict = Field(default_factory=dict)
+
 
 router = APIRouter()
-
-
-# ── SQL helper (same pattern as Sprint 2) ─────────────────
-def _exec(db, sql, params=None):
-    if params:
-        return db.execute(_t(sql), params)
-    return db.execute(_t(sql))
-
-
-def _db():
-    from app.phase1.models.platform_models import SessionLocal
-    return SessionLocal()
-
-
-def _now():
-    return datetime.utcnow().isoformat()
 
 
 # ══════════════════════════════════════════════════════════
@@ -37,7 +106,7 @@ def _now():
 # ══════════════════════════════════════════════════════════
 
 @router.post("/knowledge/concepts")
-def create_concept(body: dict):
+def create_concept(body: CreateConceptRequest):
     """Create a new canonical concept."""
     db = _db()
     try:
@@ -58,25 +127,26 @@ def create_concept(body: dict):
                 'active',:now)""",
             {
                 "id": cid,
-                "name_ar":      body.get("canonical_name_ar", ""),
-                "name_en":      body.get("canonical_name_en"),
-                "domain":       body.get("domain_pack", "accounting"),
-                "sector":       body.get("sector_scope"),
-                "jurisdiction": body.get("jurisdiction_scope"),
-                "authority":    body.get("authority_level", "platform"),
-                "desc_ar":      body.get("description_ar"),
-                "desc_en":      body.get("description_en"),
-                "eff_from":     body.get("effective_from"),
-                "eff_to":       body.get("effective_to"),
+                "name_ar":      body.canonical_name_ar,
+                "name_en":      body.canonical_name_en,
+                "domain":       body.domain_pack,
+                "sector":       body.sector_scope,
+                "jurisdiction": body.jurisdiction_scope,
+                "authority":    body.authority_level,
+                "desc_ar":      body.description_ar,
+                "desc_en":      body.description_en,
+                "eff_from":     body.effective_from,
+                "eff_to":       body.effective_to,
                 "verified":     now,
                 "now":          now,
             }
         )
         db.commit()
-        return {"id": cid, "status": "created", "canonical_name_ar": body.get("canonical_name_ar")}
+        return {"success": True, "data": {"id": cid, "status": "created", "canonical_name_ar": body.canonical_name_ar}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -124,12 +194,13 @@ def list_concepts(
         keys = ["id","canonical_name_ar","canonical_name_en","domain_pack",
                 "authority_level","sector_scope","jurisdiction_scope",
                 "validity_status","effective_from","effective_to","last_verified_at"]
-        return {
+        return {"success": True, "data": {
             "total": total, "page": page, "page_size": page_size,
             "concepts": [dict(zip(keys, r)) for r in rows],
-        }
+        }}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -169,17 +240,18 @@ def get_concept(concept_id: str):
         concept["aliases"] = [dict(zip(alias_keys, a)) for a in aliases]
         concept["alias_count"] = len(concept["aliases"])
 
-        return concept
+        return {"success": True, "data": concept}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
 
 @router.put("/knowledge/concepts/{concept_id}")
-def update_concept(concept_id: str, body: dict):
+def update_concept(concept_id: str, body: UpdateConceptRequest):
     """Update concept metadata."""
     db = _db()
     try:
@@ -195,22 +267,23 @@ def update_concept(concept_id: str, body: dict):
                last_verified_at   = :now
                WHERE id = :id""",
             {
-                "name_ar":  body.get("canonical_name_ar"),
-                "name_en":  body.get("canonical_name_en"),
-                "desc_ar":  body.get("description_ar"),
-                "desc_en":  body.get("description_en"),
-                "auth":     body.get("authority_level"),
-                "eff_from": body.get("effective_from"),
-                "eff_to":   body.get("effective_to"),
+                "name_ar":  body.canonical_name_ar,
+                "name_en":  body.canonical_name_en,
+                "desc_ar":  body.description_ar,
+                "desc_en":  body.description_en,
+                "auth":     body.authority_level,
+                "eff_from": body.effective_from,
+                "eff_to":   body.effective_to,
                 "now":      _now(),
                 "id":       concept_id,
             }
         )
         db.commit()
-        return {"id": concept_id, "status": "updated"}
+        return {"success": True, "data": {"id": concept_id, "status": "updated"}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -220,11 +293,11 @@ def update_concept(concept_id: str, body: dict):
 # ══════════════════════════════════════════════════════════
 
 @router.post("/knowledge/aliases")
-def create_alias(body: dict):
+def create_alias(body: CreateAliasRequest):
     """Add an alias to a concept — goes to review queue if not pre-approved."""
     db = _db()
     try:
-        concept_id = body.get("concept_id")
+        concept_id = body.concept_id
         if not concept_id:
             raise HTTPException(422, "concept_id required")
 
@@ -238,7 +311,7 @@ def create_alias(body: dict):
                WHERE alias_text = :text AND concept_id != :cid
                AND (source_system = :sys OR source_system IS NULL)
                LIMIT 1""",
-            {"text": body.get("alias_text",""), "cid": concept_id, "sys": body.get("source_system")}
+            {"text": body.alias_text, "cid": concept_id, "sys": body.source_system}
         ).fetchone()
 
         if dup:
@@ -249,12 +322,12 @@ def create_alias(body: dict):
                    (id, alias_text, concept_id_1, concept_id_2, conflict_type,
                     conflict_status, detected_at)
                    VALUES (:id,:text,:c1,:c2,'duplicate_alias','pending',:now)""",
-                {"id": conflict_id, "text": body.get("alias_text",""),
+                {"id": conflict_id, "text": body.alias_text,
                  "c1": concept_id, "c2": None, "now": _now()}
             )
 
         aid = str(uuid.uuid4())
-        is_approved = body.get("is_approved", False)
+        is_approved = body.is_approved
         _exec(db,
             """INSERT INTO knowledge_concept_aliases
                (id, concept_id, alias_text, language_code, alias_type,
@@ -267,30 +340,31 @@ def create_alias(body: dict):
             {
                 "id":       aid,
                 "cid":      concept_id,
-                "text":     body.get("alias_text",""),
-                "lang":     body.get("language_code","ar"),
-                "type":     body.get("alias_type","synonym"),
-                "sys":      body.get("source_system"),
-                "client":   body.get("client_scope"),
-                "sector":   body.get("sector_scope"),
-                "conf":     body.get("confidence_weight", 1.0),
+                "text":     body.alias_text,
+                "lang":     body.language_code,
+                "type":     body.alias_type,
+                "sys":      body.source_system,
+                "client":   body.client_scope,
+                "sector":   body.sector_scope,
+                "conf":     body.confidence_weight,
                 "approved": 1 if is_approved else 0,
                 "rstatus":  "approved" if is_approved else "pending_review",
                 "now":      _now(),
             }
         )
         db.commit()
-        return {
+        return {"success": True, "data": {
             "id": aid,
             "status": "created",
             "review_status": "approved" if is_approved else "pending_review",
             "conflict_detected": bool(dup),
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -320,22 +394,23 @@ def list_pending_aliases(page: int = 1, page_size: int = 20):
         keys = ["id","alias_text","language_code","alias_type",
                 "source_system","sector_scope","confidence_weight","created_at",
                 "concept_canonical_ar","concept_domain"]
-        return {
+        return {"success": True, "data": {
             "total": total, "page": page, "page_size": page_size,
             "pending_aliases": [dict(zip(keys, r)) for r in rows],
-        }
+        }}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
 
 @router.post("/knowledge/aliases/{alias_id}/review")
-def review_alias(alias_id: str, body: dict):
+def review_alias(alias_id: str, body: ReviewAliasRequest):
     """Reviewer approves or rejects an alias."""
     db = _db()
     try:
-        decision = body.get("decision")
+        decision = body.decision
         if decision not in ("approve", "reject", "escalate"):
             raise HTTPException(422, "decision must be: approve / reject / escalate")
 
@@ -353,17 +428,18 @@ def review_alias(alias_id: str, body: dict):
                 "status":   new_status,
                 "approved": 1 if decision == "approve" else 0,
                 "now":      _now(),
-                "notes":    body.get("reviewer_notes"),
+                "notes":    body.reviewer_notes,
                 "id":       alias_id,
             }
         )
         db.commit()
-        return {"alias_id": alias_id, "decision": decision, "new_status": new_status}
+        return {"success": True, "data": {"alias_id": alias_id, "decision": decision, "new_status": new_status}}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -373,7 +449,7 @@ def review_alias(alias_id: str, body: dict):
 # ══════════════════════════════════════════════════════════
 
 @router.post("/knowledge/resolve")
-def resolve_term(body: dict):
+def resolve_term(body: ResolveTermRequest):
     """
     Resolve a raw term to a canonical concept.
     Core brain function — used by all sprint engines.
@@ -381,10 +457,10 @@ def resolve_term(body: dict):
     from app.sprint4.services.brain_engine import resolve_concept
     db = _db()
     try:
-        raw_term      = body.get("term", "")
-        source_system = body.get("source_system")
-        sector        = body.get("sector")
-        language      = body.get("language", "ar")
+        raw_term      = body.term
+        source_system = body.source_system
+        sector        = body.sector
+        language      = body.language
 
         if not raw_term:
             raise HTTPException(422, "term is required")
@@ -423,30 +499,31 @@ def resolve_term(body: dict):
             )
             db.commit()
 
-        return {
+        return {"success": True, "data": {
             "raw_term":        raw_term,
             "source_system":   source_system,
             "sector":          sector,
             "resolution":      result,
             "queued_for_review": result["match_type"] == "no_match",
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
 
 @router.post("/knowledge/resolve/batch")
-def resolve_batch(body: dict):
+def resolve_batch(body: ResolveBatchRequest):
     """Resolve multiple terms at once — used by COA pipeline."""
     from app.sprint4.services.brain_engine import resolve_concept
     db = _db()
     try:
-        terms = body.get("terms", [])
-        source_system = body.get("source_system")
-        sector        = body.get("sector")
+        terms = body.terms
+        source_system = body.source_system
+        sector        = body.sector
 
         if not terms:
             raise HTTPException(422, "terms list is required")
@@ -474,17 +551,18 @@ def resolve_batch(body: dict):
             if res["match_type"] == "no_match":
                 unresolved.append(term)
 
-        return {
+        return {"success": True, "data": {
             "total": len(terms),
             "resolved": sum(1 for r in results if r["resolution"]["match_type"] != "no_match"),
             "unresolved": len(unresolved),
             "unresolved_terms": unresolved,
             "results": results,
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -494,7 +572,7 @@ def resolve_batch(body: dict):
 # ══════════════════════════════════════════════════════════
 
 @router.post("/knowledge/rules/candidate")
-def submit_candidate_rule(body: dict):
+def submit_candidate_rule(body: SubmitCandidateRuleRequest):
     """Submit a candidate rule for review (from AI or expert feedback)."""
     db = _db()
     try:
@@ -510,20 +588,21 @@ def submit_candidate_rule(body: dict):
                 'pending_review',:now)""",
             {
                 "id":     rid,
-                "name":   body.get("rule_name",""),
-                "domain": body.get("domain_pack","accounting"),
-                "logic":  json.dumps(body.get("rule_logic_json",{}), ensure_ascii=False),
-                "auth":   body.get("authority_level","ai"),
-                "source": body.get("source_type","ai_suggestion"),
-                "desc_ar":body.get("description_ar"),
+                "name":   body.rule_name,
+                "domain": body.domain_pack,
+                "logic":  json.dumps(body.rule_logic_json, ensure_ascii=False),
+                "auth":   body.authority_level,
+                "source": body.source_type,
+                "desc_ar":body.description_ar,
                 "now":    _now(),
             }
         )
         db.commit()
-        return {"id": rid, "status": "pending_review", "rule_name": body.get("rule_name")}
+        return {"success": True, "data": {"id": rid, "status": "pending_review", "rule_name": body.rule_name}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -554,19 +633,20 @@ def list_candidate_rules(domain_pack: Optional[str] = None, page: int = 1, page_
         ).fetchall()
         keys = ["id","rule_name","domain_pack","authority_level",
                 "source_type","description_ar","submission_status","submitted_at"]
-        return {"total": total, "page": page, "candidates": [dict(zip(keys,r)) for r in rows]}
+        return {"success": True, "data": {"total": total, "page": page, "candidates": [dict(zip(keys,r)) for r in rows]}}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
 
 @router.post("/knowledge/rules/candidates/{rule_id}/promote")
-def promote_candidate_rule(rule_id: str, body: dict):
+def promote_candidate_rule(rule_id: str, body: PromoteCandidateRuleRequest):
     """Reviewer promotes a candidate rule to active_knowledge_rules."""
     db = _db()
     try:
-        decision = body.get("decision")
+        decision = body.decision
         if decision not in ("approve", "reject"):
             raise HTTPException(422, "decision must be: approve / reject")
 
@@ -579,7 +659,7 @@ def promote_candidate_rule(rule_id: str, body: dict):
 
         if decision == "approve":
             active_id = str(uuid.uuid4())
-            eff_from = body.get("effective_from", _now()[:10])
+            eff_from = body.effective_from if body.effective_from is not None else _now()[:10]
             _exec(db,
                 """INSERT INTO active_knowledge_rules
                    (id, rule_name, domain_pack, rule_logic_json,
@@ -611,19 +691,20 @@ def promote_candidate_rule(rule_id: str, body: dict):
                    reviewed_at = :now
                WHERE id = :id""",
             {"status": "approved" if decision=="approve" else "rejected",
-             "notes": body.get("reviewer_notes"), "now": _now(), "id": rule_id}
+             "notes": body.reviewer_notes, "now": _now(), "id": rule_id}
         )
         db.commit()
-        return {
+        return {"success": True, "data": {
             "rule_id": rule_id,
             "decision": decision,
             "active_rule_id": active_id if decision=="approve" else None,
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -652,9 +733,10 @@ def list_active_rules(domain_pack: Optional[str] = None, page: int = 1, page_siz
         ).fetchall()
         keys = ["id","rule_name","domain_pack","authority_level",
                 "description_ar","validity_status","effective_from","effective_to"]
-        return {"total": total, "page": page, "rules": [dict(zip(keys,r)) for r in rows]}
+        return {"success": True, "data": {"total": total, "page": page, "rules": [dict(zip(keys,r)) for r in rows]}}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -664,12 +746,12 @@ def list_active_rules(domain_pack: Optional[str] = None, page: int = 1, page_siz
 # ══════════════════════════════════════════════════════════
 
 @router.post("/knowledge/conflicts/detect")
-def detect_rule_conflicts(body: dict):
+def detect_rule_conflicts(body: DetectRuleConflictsRequest):
     """Run conflict detection across active rules in a domain."""
     from app.sprint4.services.brain_engine import detect_conflicts
     db = _db()
     try:
-        domain_pack = body.get("domain_pack")
+        domain_pack = body.domain_pack
         where = "validity_status = 'active'"
         params = {}
         if domain_pack:
@@ -710,16 +792,17 @@ def detect_rule_conflicts(body: dict):
                 pass
 
         db.commit()
-        return {
+        return {"success": True, "data": {
             "domain_pack":       domain_pack,
             "rules_checked":     len(rules),
             "conflicts_found":   len(conflicts),
             "conflicts":         conflicts,
             "requires_review":   [c for c in conflicts if c.get("requires_review")],
-        }
+        }}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -745,9 +828,10 @@ def list_conflicts(status: str = "pending", page: int = 1, page_size: int = 20):
         ).fetchall()
         keys = ["id","alias_text","concept_id_1","concept_id_2",
                 "conflict_type","conflict_status","resolution_notes","detected_at"]
-        return {"total": total, "conflicts": [dict(zip(keys,r)) for r in rows]}
+        return {"success": True, "data": {"total": total, "conflicts": [dict(zip(keys,r)) for r in rows]}}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -757,7 +841,7 @@ def list_conflicts(status: str = "pending", page: int = 1, page_size: int = 20):
 # ══════════════════════════════════════════════════════════
 
 @router.post("/knowledge/source-systems")
-def register_source_system(body: dict):
+def register_source_system(body: RegisterSourceSystemRequest):
     """Register a source system profile (Odoo, SAP, QuickBooks, etc.)."""
     db = _db()
     try:
@@ -769,19 +853,20 @@ def register_source_system(body: dict):
                VALUES (:id,:name,:ver,:desc,:langs,:labels,:now)""",
             {
                 "id":     sid,
-                "name":   body.get("system_name",""),
-                "ver":    body.get("system_version"),
-                "desc":   body.get("description_ar"),
-                "langs":  json.dumps(body.get("supported_languages",["ar","en"]), ensure_ascii=False),
-                "labels": json.dumps(body.get("known_labels_json",{}), ensure_ascii=False),
+                "name":   body.system_name,
+                "ver":    body.system_version,
+                "desc":   body.description_ar,
+                "langs":  json.dumps(body.supported_languages, ensure_ascii=False),
+                "labels": json.dumps(body.known_labels_json, ensure_ascii=False),
                 "now":    _now(),
             }
         )
         db.commit()
-        return {"id": sid, "system_name": body.get("system_name"), "status": "registered"}
+        return {"success": True, "data": {"id": sid, "system_name": body.system_name, "status": "registered"}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -795,9 +880,10 @@ def list_source_systems():
             "SELECT id, system_name, system_version, description_ar, supported_languages, created_at FROM source_system_profiles ORDER BY system_name"
         ).fetchall()
         keys = ["id","system_name","system_version","description_ar","supported_languages","created_at"]
-        return {"total": len(rows), "source_systems": [dict(zip(keys,r)) for r in rows]}
+        return {"success": True, "data": {"total": len(rows), "source_systems": [dict(zip(keys,r)) for r in rows]}}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -821,7 +907,7 @@ def brain_status():
 
         readiness = "operational" if concepts_total >= 10 and aliases_approved >= 20 else                     "partial"     if concepts_total >= 1  else "empty"
 
-        return {
+        return {"success": True, "data": {
             "brain_status":      readiness,
             "concepts_active":   concepts_total,
             "aliases_approved":  aliases_approved,
@@ -836,8 +922,9 @@ def brain_status():
                 "conflict_review":    conflicts_open,
             },
             "version": "6.4.0",
-        }
+        }}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()

@@ -6,6 +6,7 @@ Per execution document Section 9.
 """
 
 from typing import Optional
+import logging
 from app.phase1.models.platform_models import (
     User, UserProfile, UserSecurityEvent, Notification,
     AccountClosureRequest, AuditEvent, UserSession,
@@ -94,7 +95,8 @@ class AccountService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -244,7 +246,8 @@ class AccountService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -271,6 +274,7 @@ class AccountService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()

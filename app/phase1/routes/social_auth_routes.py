@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timezone
 import json
+import logging
 
 from app.phase1.models.platform_models import (
     User, UserSession, UserSecurityEvent, SessionLocal, gen_uuid, utcnow,
@@ -102,7 +103,8 @@ async def google_sign_in(req: GoogleSignInRequest):
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error("Google sign-in failed", exc_info=True)
+        raise HTTPException(status_code=500, detail="Social authentication failed")
     finally:
         db.close()
 
@@ -162,7 +164,8 @@ async def apple_sign_in(req: AppleSignInRequest):
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error("Apple sign-in failed", exc_info=True)
+        raise HTTPException(status_code=500, detail="Social authentication failed")
     finally:
         db.close()
 

@@ -17,6 +17,7 @@ If unmatched accounts exceed 15%, analysis is blocked.
 """
 
 import re, json
+import logging
 from typing import Dict, List, Optional
 from difflib import SequenceMatcher
 
@@ -316,7 +317,8 @@ def manually_match_tb_row(binding_id: str, coa_account_id: str, matched_by: str 
         return {"success": True, "binding_id": binding_id, "status": "manually_matched"}
     except Exception as e:
         db.rollback()
-        return {"success": False, "error": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -354,6 +356,7 @@ def approve_binding(tb_upload_id: str, approved_by: str = None) -> Dict:
         }
     except Exception as e:
         db.rollback()
-        return {"success": False, "error": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()

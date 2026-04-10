@@ -5,6 +5,7 @@ Policy versioning, acceptance logging, mandatory acceptance check.
 Per execution document section 15.
 """
 
+import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
     PolicyDocument, PolicyAcceptanceLog, PolicyType,
@@ -92,7 +93,8 @@ class LegalService:
             return {"success": True, "message": "تم تسجيل القبول", "policy_type": policy.policy_type, "version": policy.version}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 

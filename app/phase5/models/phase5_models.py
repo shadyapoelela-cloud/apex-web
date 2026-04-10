@@ -75,7 +75,7 @@ class ServiceRequest(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id"), nullable=False, index=True)
-    requested_by = Column(String(36), ForeignKey("users.id"), nullable=False)
+    requested_by = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     provider_id = Column(String(36), ForeignKey("service_providers.id"), nullable=True, index=True)
 
     # Request details
@@ -126,7 +126,7 @@ class ServiceRequestMessage(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     request_id = Column(String(36), ForeignKey("service_requests.id", ondelete="CASCADE"), nullable=False, index=True)
-    sender_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    sender_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     message = Column(Text, nullable=False)
     is_system = Column(Boolean, default=False)
     attachment_filename = Column(String(300), nullable=True)
@@ -162,7 +162,7 @@ class ComplianceAction(Base):
     __tablename__ = "compliance_actions"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    compliance_event_id = Column(String(36), ForeignKey("task_compliance_events.id"), nullable=False)
+    compliance_event_id = Column(String(36), ForeignKey("task_compliance_events.id"), nullable=False, index=True)
     action_type = Column(String(50), nullable=False)  # warning_sent, deadline_extended, escalated, suspended
     action_by = Column(String(36), nullable=True)  # null = system
     notes = Column(Text, nullable=True)
@@ -183,7 +183,7 @@ class SuspensionEvent(Base):
     suspension_type = Column(String(50), nullable=False)
     reason = Column(String(50), nullable=False)
     reason_details = Column(Text, nullable=True)
-    suspended_by = Column(String(36), ForeignKey("users.id"), nullable=True)  # null = system
+    suspended_by = Column(String(36), ForeignKey("users.id"), nullable=True, index=True)  # null = system
     is_active = Column(Boolean, default=True)
     started_at = Column(DateTime, default=utcnow, nullable=False)
     expires_at = Column(DateTime, nullable=True)
@@ -203,7 +203,7 @@ class SuspensionAppeal(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     suspension_id = Column(String(36), ForeignKey("suspension_events.id", ondelete="CASCADE"), nullable=False, index=True)
-    appealed_by = Column(String(36), ForeignKey("users.id"), nullable=False)
+    appealed_by = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     appeal_text = Column(Text, nullable=False)
     status = Column(String(20), default=AppealStatus.submitted.value, nullable=False)
     reviewed_by = Column(String(36), nullable=True)

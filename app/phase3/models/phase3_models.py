@@ -148,7 +148,7 @@ class KnowledgeFeedbackReview(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     feedback_id = Column(String(36), ForeignKey("knowledge_feedback_events.id", ondelete="CASCADE"), nullable=False, index=True)
-    reviewer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    reviewer_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     decision = Column(String(30), nullable=False)  # accepted, rejected, needs_refinement, queued_for_rule_design
     reviewer_notes = Column(Text, nullable=True)
     quality_score = Column(Integer, nullable=True)  # 1-5
@@ -166,8 +166,8 @@ class KnowledgeCandidateRule(Base):
     __tablename__ = "knowledge_candidate_rules"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    source_feedback_id = Column(String(36), ForeignKey("knowledge_feedback_events.id"), nullable=True)
-    created_by = Column(String(36), ForeignKey("users.id"), nullable=False)
+    source_feedback_id = Column(String(36), ForeignKey("knowledge_feedback_events.id"), nullable=True, index=True)
+    created_by = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
 
     rule_type = Column(String(50), nullable=False)  # alias_rule, classification_rule, etc.
     rule_code = Column(String(80), unique=True, nullable=False)

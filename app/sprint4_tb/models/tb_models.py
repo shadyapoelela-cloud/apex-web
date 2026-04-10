@@ -84,7 +84,7 @@ class TrialBalanceUpload(Base):
     binding_confidence_avg = Column(Float, nullable=True)
     binding_approved = Column(Boolean, default=False)
 
-    uploaded_by = Column(String(36), ForeignKey("users.id"), nullable=True)
+    uploaded_by = Column(String(36), ForeignKey("users.id"), nullable=True, index=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 

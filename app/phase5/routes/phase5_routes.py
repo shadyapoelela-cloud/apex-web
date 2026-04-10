@@ -79,7 +79,8 @@ async def rate_request(rid: str, req: RateReq, user: dict = Depends(get_current_
 @router.get("/marketplace/requests", tags=["Marketplace"])
 async def list_requests(client_id: Optional[str] = None, provider_id: Optional[str] = None,
                         status: Optional[str] = None, user: dict = Depends(get_current_user)):
-    return mkt.list_requests(client_id=client_id, provider_id=provider_id, status=status)
+    result = mkt.list_requests(client_id=client_id, provider_id=provider_id, status=status)
+    return {"success": True, "data": result}
 
 @router.get("/marketplace/requests/{rid}", tags=["Marketplace"])
 async def get_request_detail(rid: str, user: dict = Depends(get_current_user)):
@@ -91,7 +92,8 @@ async def get_request_detail(rid: str, user: dict = Depends(get_current_user)):
 
 @router.post("/compliance/check/{rid}", tags=["Compliance"])
 async def check_compliance(rid: str, user: dict = Depends(get_current_user)):
-    return mkt.check_compliance(rid)
+    result = mkt.check_compliance(rid)
+    return {"success": True, "data": result}
 
 # ─── Suspension Engine ───────────────────────────────────────
 
@@ -121,4 +123,5 @@ async def submit_appeal(sid: str, req: AppealReq, user: dict = Depends(get_curre
 
 @router.get("/admin/suspensions", tags=["Suspension"])
 async def list_suspensions(active_only: bool = True, user: dict = Depends(get_current_user)):
-    return mkt.list_suspensions(active_only=active_only)
+    result = mkt.list_suspensions(active_only=active_only)
+    return {"success": True, "data": result}

@@ -1,5 +1,5 @@
 """
-APEX Financial Platform -- FastAPI Backend v9.0
+APEX Financial Platform -- FastAPI Backend v10.2
 ================================================================
 All 11 Phases + 6 Sprints:
   P1: Identity + Auth + Plans + Legal
@@ -18,12 +18,40 @@ All 11 Phases + 6 Sprints:
 """
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
-import os, traceback, logging
+from pydantic import BaseModel, Field
+from typing import Optional
+import os, logging
 from app.services.orchestrator import AnalysisOrchestrator
+
+
+# ═══════════════════════════════════════════════════════════════
+# Pydantic Request Models (input validation)
+# ═══════════════════════════════════════════════════════════════
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=6)
+    confirm_password: str = Field(..., min_length=6)
+
+
+class AcceptLegalRequest(BaseModel):
+    document_id: str = Field(..., min_length=1)
+
+
+class AccountClosureRequest(BaseModel):
+    type: str = Field(default="temporary", pattern="^(temporary|permanent)$")
+    reason: str = Field(default="")
 
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "apex-admin-2026")
 if ADMIN_SECRET == "apex-admin-2026":
     logging.warning("ADMIN_SECRET is using default value! Set ADMIN_SECRET env var in production.")
+
+def _verify_admin(secret: str = None, x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    """Verify admin secret from header (preferred) or query param (legacy, deprecated)."""
+    token = x_admin_secret or secret
+    if not token or token != ADMIN_SECRET:
+        raise HTTPException(403, "Invalid admin secret")
+    return token
 from fastapi.responses import Response as PDFResponse
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
@@ -59,7 +87,7 @@ try:
     from app.phase6.routes.phase6_routes import router as p6r
     P6 = True
 except Exception as e: P6 = False; logging.warning(f"Phase 6 disabled: {e}")
-# Phase 7 â€” Task Documents + Suspension + Result Details + Audit
+# Phase 7 â€" Task Documents + Suspension + Result Details + Audit
 try:
     from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
     from app.phase7.routes.phase7_routes import router as p7r
@@ -68,7 +96,7 @@ try:
 except Exception as e:
     logging.warning(f"Phase 7 disabled: {e}")
     HAS_P7 = False
-# Phase 8 â€” Entitlements Engine + Subscription Management
+# Phase 8 â€" Entitlements Engine + Subscription Management
 try:
     from app.phase8.models.phase8_models import init_phase8_db
     from app.phase8.routes.phase8_routes import router as p8r
@@ -77,7 +105,7 @@ try:
 except Exception as e:
     logging.warning(f"Phase 8 disabled: {e}")
     HAS_P8 = False
-# Phase 9 â€” Account Center
+# Phase 9 â€" Account Center
 try:
     from app.phase9.models.phase9_models import init_phase9_db
     from app.phase9.routes.phase9_routes import router as p9r
@@ -85,7 +113,7 @@ try:
 except Exception as e:
     HAS_P9 = False
     logging.warning(f"Phase 9 disabled: {e}")
-# Phase 10 â€” Notification System
+# Phase 10 â€" Notification System
 try:
     from app.phase10.models.phase10_models import init_phase10_db
     from app.phase10.routes.phase10_routes import router as p10r
@@ -94,7 +122,7 @@ try:
 except Exception as e:
     HAS_P10 = False
     logging.warning(f"Phase 10 disabled: {e}")
-# Sprint 1 â€” COA First Workflow
+# Sprint 1 â€" COA First Workflow
 try:
     from app.sprint1.models.sprint1_models import init_sprint1_db
     from app.sprint1.routes.sprint1_routes import router as s1r
@@ -102,14 +130,14 @@ try:
 except Exception as e:
     HAS_S1 = False
     logging.warning(f"Sprint 1 disabled: {e}")
-# Sprint 2 â€” COA Classification Engine
+# Sprint 2 â€" COA Classification Engine
 try:
     from app.sprint2.routes.sprint2_routes import router as s2r
     HAS_S2 = True
 except Exception as e:
     HAS_S2 = False
     logging.warning(f"Sprint 2 disabled: {e}")
-# Sprint 4 â€” Knowledge Brain
+# Sprint 4 â€" Knowledge Brain
 try:
     from app.sprint4.routes.sprint4_routes import router as s4r
     HAS_S4 = True
@@ -144,7 +172,7 @@ try:
     HAS_S6 = True
 except Exception as e:
     logging.warning(f"Sprint 6 disabled: {e}")
-# Phase 11 â€” Legal Acceptance
+# Phase 11 â€" Legal Acceptance
 try:
     from app.phase11.models.phase11_models import init_phase11_db
     from app.phase11.routes.phase11_routes import router as p11r
@@ -155,59 +183,110 @@ except Exception as e:
     logging.warning(f"Phase 11 disabled: {e}")
 
 
-app = FastAPI(title=”APEX Financial Platform API”, description=”APEX Financial Analysis Platform - All 11 Phases + 6 Sprints”, version=”9.0.0”)
-_cors_origins = os.environ.get("CORS_ORIGINS", "").split(",") if os.environ.get("CORS_ORIGINS") else ["*"]
-app.add_middleware(CORSMiddleware, allow_origins=_cors_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
+app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="10.4.0")
+_cors_env = os.environ.get("CORS_ORIGINS", "")
+_cors_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else ["*"]
+_allow_creds = "*" not in _cors_origins  # credentials forbidden with wildcard
+if not _allow_creds:
+    logging.warning("CORS allows all origins — set CORS_ORIGINS env var in production")
+app.add_middleware(CORSMiddleware, allow_origins=_cors_origins, allow_credentials=_allow_creds, allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
-import traceback as _tb
+from collections import defaultdict
+import time
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    import logging
-    logging.error(f"Unhandled: {exc}")
-    import traceback; logging.error(traceback.format_exc()); return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+    logging.error(f"Unhandled: {exc}", exc_info=True)
+    return JSONResponse(status_code=500, content={"success": False, "error": "Internal server error"})
+
+
+# ======================================================================
+# In-memory rate limiter (per-IP, proxy-aware, resets on restart)
+# ======================================================================
+_rate_limits = defaultdict(list)  # ip -> [timestamp, ...]
+RATE_LIMIT_WINDOW = 60  # seconds
+RATE_LIMIT_MAX = 60  # max requests per window (per IP)
+_RATE_LIMIT_MAX_IPS = 10000  # prevent memory leak from IP flooding
+
+
+def _get_client_ip(request) -> str:
+    """Extract real client IP, handling proxied deployments (Render, Cloudflare, nginx)."""
+    for header in ("cf-connecting-ip", "x-real-ip", "x-forwarded-for"):
+        val = request.headers.get(header)
+        if val:
+            return val.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request, call_next):
+    client_ip = _get_client_ip(request)
+    now = time.time()
+    # Prevent memory leak: evict oldest IPs if too many tracked
+    if len(_rate_limits) > _RATE_LIMIT_MAX_IPS:
+        oldest = sorted(_rate_limits.keys(), key=lambda k: _rate_limits[k][-1] if _rate_limits[k] else 0)
+        for ip in oldest[:_RATE_LIMIT_MAX_IPS // 2]:
+            del _rate_limits[ip]
+    # Clean old entries for this IP
+    _rate_limits[client_ip] = [t for t in _rate_limits[client_ip] if now - t < RATE_LIMIT_WINDOW]
+    if len(_rate_limits[client_ip]) >= RATE_LIMIT_MAX:
+        return JSONResponse(status_code=429, content={"success": False, "error": "طلبات كثيرة جداً. الرجاء الانتظار."})
+    _rate_limits[client_ip].append(now)
+    response = await call_next(request)
+    return response
+
+
+@app.middleware("http")
+async def security_headers_middleware(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.on_event("startup")
 def startup():
     if KB:
         try: init_kb()
-        except Exception as e: logging.error(f"Knowledge Brain init error: {e}")
+        except Exception as e: logging.error("Knowledge Brain init error", exc_info=True)
     if P1:
         try: t = init_platform_db(); logging.info(f"APEX: {len(t)} tables"); seed1()
-        except Exception as e: logging.error(f"Phase 1 startup error: {e}")
+        except Exception as e: logging.error("Phase 1 startup error", exc_info=True)
     if P2:
         try: seed_client_types()
-        except Exception as e: logging.error(f"Phase 2 startup error: {e}")
+        except Exception as e: logging.error("Phase 2 startup error", exc_info=True)
     if P4:
         try: init_phase4_db()
-        except Exception as e: logging.error(f"Phase 4 init error: {e}")
+        except Exception as e: logging.error("Phase 4 init error", exc_info=True)
     if P5:
         try: init_phase5_db()
-        except Exception as e: logging.error(f"Phase 5 init error: {e}")
+        except Exception as e: logging.error("Phase 5 init error", exc_info=True)
     if HAS_P7:
         try: init_phase7_db(); seed_task_types()
-        except Exception as e: logging.error(f"Phase 7 init error: {e}")
+        except Exception as e: logging.error("Phase 7 init error", exc_info=True)
     if HAS_P8:
         try: init_phase8_db(); seed_plan_limits()
-        except Exception as e: logging.error(f"Phase 8 init error: {e}")
+        except Exception as e: logging.error("Phase 8 init error", exc_info=True)
     if HAS_P9:
         try: init_phase9_db()
-        except Exception as e: logging.error(f"Phase 9 init error: {e}")
+        except Exception as e: logging.error("Phase 9 init error", exc_info=True)
     if HAS_P10:
         try: init_phase10_db(); seed_welcome_notification()
-        except Exception as e: logging.error(f"Phase 10 init error: {e}")
+        except Exception as e: logging.error("Phase 10 init error", exc_info=True)
     if HAS_P11:
         try: init_phase11_db(); seed_legal_documents()
-        except Exception as e: logging.error(f"Phase 11 init error: {e}")
+        except Exception as e: logging.error("Phase 11 init error", exc_info=True)
     if HAS_S1:
         try: init_sprint1_db()
-        except Exception as e: logging.error(f"Sprint 1 init error: {e}")
+        except Exception as e: logging.error("Sprint 1 init error", exc_info=True)
     try:
         from app.copilot.models.copilot_models import init_copilot_db
         init_copilot_db()
-    except Exception as e: logging.error(f"Copilot init error: {e}")
+    except Exception as e: logging.error("Copilot init error", exc_info=True)
 
 for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
                 (P3, p3r if P3 else None), (P4, p4r if P4 else None), (P5, p5r if P5 else None),
@@ -255,7 +334,7 @@ app.include_router(copilot_router)
 @app.get("/")
 def root():
     phases = [P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8, HAS_P9, HAS_P10, HAS_P11]
-    return {"name": "APEX Financial Platform API", "version": "9.0.0", "status": "running",
+    return {"name": "APEX Financial Platform API", "version": "10.2.0", "status": "running",
             "phases_active": sum(phases), "phases_total": 11,
             "modules": {k: "active" if v else "disabled" for k, v in
                 {"engine": True, "kb": KB, "p1_identity": P1, "p2_clients": P2, "p3_knowledge": P3,
@@ -268,26 +347,25 @@ def root():
 # ADMIN ENDPOINTS
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
-@app.get("/admin/reinit-db")
-def reinit_db(secret: str = Query(...)):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(403, "Invalid secret")
+@app.post("/admin/reinit-db", tags=["Admin"])
+def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     results = {}
 
-    # Phase 1 â€” Core tables
+    # Phase 1 â€" Core tables
     try:
         from app.phase1.models.platform_models import Base, engine
         Base.metadata.create_all(bind=engine, checkfirst=True)
         results["phase1"] = "OK"
     except Exception as e:
-        results["phase1"] = str(e)[:200]
+        results["phase1"] = "error"
 
     # Seed data
     try:
         from app.phase1.services.seed_data import seed_all
         results["seed1"] = seed_all()
     except Exception as e:
-        results["seed1"] = str(e)[:200]
+        results["seed1"] = "error"
 
     # Phase 7 seed
     if HAS_P7:
@@ -295,7 +373,7 @@ def reinit_db(secret: str = Query(...)):
             from app.phase7.services.seed_phase7 import seed_task_types
             results["phase7_seed"] = seed_task_types()
         except Exception as e:
-            results["phase7"] = str(e)[:200]
+            results["phase7"] = "error"
 
     # Phase 9-11 init
     try:
@@ -303,13 +381,13 @@ def reinit_db(secret: str = Query(...)):
             init_phase9_db()
             results["phase9"] = "OK"
     except Exception as e:
-        results["phase9"] = str(e)[:80]
+        results["phase9"] = "error"
     try:
         if HAS_P10:
             init_phase10_db()
             results["phase10"] = "OK"
     except Exception as e:
-        results["phase10"] = str(e)[:80]
+        results["phase10"] = "error"
     try:
         if HAS_P11:
             init_phase11_db()
@@ -317,7 +395,7 @@ def reinit_db(secret: str = Query(...)):
             seed_result = seed_legal_documents()
             results["phase11"] = f"OK - {seed_result}"
     except Exception as e:
-        results["phase11"] = str(e)[:80]
+        results["phase11"] = "error"
 
     # Sprint 2 classification columns
     try:
@@ -343,37 +421,37 @@ def reinit_db(secret: str = Query(...)):
         db.close()
         results["s2_cols"] = f"OK - {added} cols added"
     except Exception as _e2:
-        results["s2_cols"] = str(_e2)[:200]
+        results["s2_cols"] = "error"
 
     # Sprint 3 tables
     try:
         from app.sprint3.models.sprint3_models import init_sprint3_db
         results["sprint3"] = init_sprint3_db()
     except Exception as e:
-        results["sprint3"] = str(e)[:200]
+        results["sprint3"] = "error"
 
     # Sprint 4 TB tables
     try:
         from app.sprint4_tb.models.tb_models import init_sprint4_tb_db
         results["sprint4_tb"] = init_sprint4_tb_db()
     except Exception as e:
-        results["sprint4_tb"] = str(e)[:200]
+        results["sprint4_tb"] = "error"
 
     # Sprint 5 Analysis tables
     try:
         from app.sprint5_analysis.models.analysis_models import init_sprint5_analysis_db
         results["sprint5_analysis"] = init_sprint5_analysis_db()
     except Exception as e:
-        results["sprint5_analysis"] = str(e)[:200]
+        results["sprint5_analysis"] = "error"
 
     # Sprint 6 Registry + Eligibility tables
     try:
         from app.sprint6_registry.models.registry_models import init_sprint6_db
         results["sprint6_registry"] = init_sprint6_db()
     except Exception as e:
-        results["sprint6_registry"] = str(e)[:200]
+        results["sprint6_registry"] = "error"
 
-    # Sprint 4 â€” Knowledge Brain tables (PostgreSQL compatible)
+    # Sprint 4 â€" Knowledge Brain tables (PostgreSQL compatible)
     try:
         from app.phase1.models.platform_models import SessionLocal as _SL4
         from sqlalchemy import text as _t4
@@ -514,52 +592,49 @@ def reinit_db(secret: str = Query(...)):
 
 
 
-@app.get("/admin/seed-all", tags=["Admin"])
-def seed_all_data(secret: str = Query(...)):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(status_code=403, detail="Invalid secret")
+@app.post("/admin/seed-all", tags=["Admin"])
+def seed_all_data(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     from app.seed_runner import seed_all
     seed_all()
-    return {"status": "OK", "message": "All seed data loaded"}
+    return {"success": True, "data": {"message": "All seed data loaded"}}
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "9.0.0",
+    db_ok = False
+    try:
+        from app.phase1.models.platform_models import SessionLocal
+        from sqlalchemy import text as _txt
+        db = SessionLocal()
+        try:
+            db.execute(_txt("SELECT 1"))
+            db_ok = True
+        finally:
+            db.close()
+    except Exception:
+        pass
+    status = "ok" if db_ok else "degraded"
+    return {"status": status, "version": "10.2.0", "database": db_ok,
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6,
                        "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9, "p10": HAS_P10, "p11": HAS_P11},
             "sprints": {"s1": HAS_S1, "s2": HAS_S2, "s3": HAS_S3, "s4": HAS_S4,
-                        "s4_tb": HAS_S4_TB, "s4_tb_error": str(getattr(__import__("sys"), "exc_info", lambda: (None,None,None))()), "s5": HAS_S5, "s6": HAS_S6},
+                        "s4_tb": HAS_S4_TB, "s5": HAS_S5, "s6": HAS_S6},
             "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8])}
 
 
-@app.get("/debug/flags")
-def debug_flags():
-    flags = {}
-    for name in ["HAS_S1", "HAS_S2", "HAS_S3", "HAS_S4", "HAS_S4_TB", "HAS_S5", "HAS_S6",
-                  "HAS_P7", "HAS_P8", "HAS_P9", "HAS_P10", "HAS_P11"]:
-        flags[name] = globals().get(name, "NOT_DEFINED")
-    try:
-        from app.sprint2.routes.sprint2_routes import router as _test
-        flags["s2_import_now"] = f"OK: {len(_test.routes)} routes"
-    except Exception as e:
-        flags["s2_import_now"] = f"FAIL: {e}"
-    return flags
-
-
-# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-# RESET POSTGRES â€” Clean drop and recreate all tables
+# ======================================================================
+# RESET POSTGRES â€" Clean drop and recreate all tables
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
-@app.get("/admin/reset-postgres")
-def reset_postgres(secret: str = Query(...)):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(403, "Invalid secret")
+@app.post("/admin/reset-postgres", tags=["Admin"])
+def reset_postgres(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     from app.phase1.models.platform_models import Base, engine
     from sqlalchemy import text as _txt
     import os
     db_url = os.environ.get("DATABASE_URL", "")
     if "postgres" not in db_url:
-        return {"status": "error", "message": "Not a PostgreSQL database â€” use reinit-db instead"}
+        return {"success": False, "error": "Not a PostgreSQL database -- use reinit-db instead"}
     try:
         with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
             # Drop all tables in public schema
@@ -573,19 +648,19 @@ def reset_postgres(secret: str = Query(...)):
             """))
         # Recreate all tables
         Base.metadata.create_all(bind=engine)
-        return {"status": "OK", "message": "All tables dropped and recreated on PostgreSQL"}
+        return {"success": True, "data": {"message": "All tables dropped and recreated on PostgreSQL"}}
     except Exception as e:
-        return {"status": "error", "message": str(e)[:500]}
+        logging.error("Database reset failed", exc_info=True)
+        return {"success": False, "error": "Database reset failed"}
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-# PROMOTE USER â€” Add admin role
+# PROMOTE USER â€" Add admin role
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
-@app.get("/admin/promote-user")
-def promote_user(secret: str = Query(...), username: str = Query(...), role: str = Query("platform_admin")):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(403, "Invalid secret")
+@app.post("/admin/promote-user", tags=["Admin"])
+def promote_user(username: str = Query(...), role: str = Query("platform_admin"), secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     from app.phase1.models.platform_models import SessionLocal
     from sqlalchemy import text as _t
     import uuid
@@ -612,9 +687,8 @@ def promote_user(secret: str = Query(...), username: str = Query(...), role: str
 
 
 @app.post("/admin/promote/{username}", tags=["Admin"])
-async def promote_to_admin(username: str, secret: str = Query(...)):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(403, "Invalid secret")
+async def promote_to_admin(username: str, secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     try:
         from app.phase1.models.platform_models import SessionLocal, User, UserRole, Role
         db = SessionLocal()
@@ -634,22 +708,11 @@ async def promote_to_admin(username: str, secret: str = Query(...)):
     except HTTPException:
         raise
     except Exception as e:
-        return {"message": f"Error: {e}"}
+        logging.error("Promote user failed", exc_info=True)
+        return {"success": False, "error": "Promotion failed"}
 
 
-@app.get("/debug/s2")
-def debug_s2():
-    try:
-        from app.sprint2.routes.sprint2_routes import router as _s2r
-        routes = [{"method": list(r.methods), "path": r.path} for r in _s2r.routes]
-        return {"s2_loaded": True, "routes": routes, "count": len(routes)}
-    except Exception as e:
-        import traceback
-        import logging; logging.error(traceback.format_exc())
-        return {"s2_loaded": False, "error": str(e)}
-
-
-# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# ======================================================================
 # ANALYSIS ENDPOINTS
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
@@ -659,7 +722,7 @@ async def analyze(file: UploadFile = File(...), industry: str = Query("general")
     try:
         c = await file.read()
         return orch.analyze_bytes(file_bytes=c, filename=file.filename, industry=industry, closing_inventory=closing_inventory)
-    except Exception as e: import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
+    except Exception as e: logging.error("Analysis error", exc_info=True); raise HTTPException(500, "Analysis failed")
 
 @app.post("/analyze/full")
 async def analyze_full(file: UploadFile = File(...), industry: str = Query("general"), language: str = Query("ar"), closing_inventory: float = Query(None)):
@@ -676,7 +739,7 @@ async def analyze_full(file: UploadFile = File(...), industry: str = Query("gene
         except Exception: pass
         r["narrative"] = await n.generate(r, language=language, brain_context=bc)
         return r
-    except Exception as e: import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
+    except Exception as e: logging.error("Full analysis error", exc_info=True); raise HTTPException(500, "Analysis failed")
 
 
 @app.post("/analyze/report", tags=["Analysis"])
@@ -706,8 +769,7 @@ async def analyze_report(
             }
         )
     except Exception as e:
-        import traceback
-        import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
+        logging.error("Report generation error", exc_info=True); raise HTTPException(500, "Report generation failed")
 
 @app.post("/classify")
 async def classify(file: UploadFile = File(...)):
@@ -728,10 +790,10 @@ async def classify(file: UploadFile = File(...)):
                 "summary": orch.classifier.get_summary(cl),
                 "accounts": [{"name": r.get("account_name", ""), "class": r.get("normalized_class"),
                     "confidence": r.get("confidence", 0)} for r in cl]}
-    except Exception as e: import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
+    except Exception as e: logging.error("Classification error", exc_info=True); raise HTTPException(500, "Classification failed")
 
 
-# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+# =â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 # STATIC API ENDPOINTS (Phase 7 compliance)
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
@@ -739,26 +801,23 @@ async def classify(file: UploadFile = File(...)):
 # GET /users/me/security is served by phase1_routes (AccountService.get_security_info)
 
 @app.put("/users/me/security/password", tags=["Account"])
-async def change_password(body: dict, authorization: str = Header(None)):
+async def change_password(body: ChangePasswordRequest, authorization: str = Header(None)):
     from app.phase1.routes.phase1_routes import get_current_user
     user = await get_current_user(authorization)
-    current = body.get("current_password", "")
-    new_pw = body.get("new_password", "")
-    confirm = body.get("confirm_password", "")
-    if not all([current, new_pw, confirm]):
-        raise HTTPException(400, "All password fields required")
-    if new_pw != confirm:
+    if body.new_password != body.confirm_password:
         raise HTTPException(400, "Passwords do not match")
+    current = body.current_password
+    new_pw = body.new_password
     from app.phase1.services.auth_service import AuthService
     result = AuthService().change_password(user["sub"], current, new_pw)
     if not result.get("success"):
         raise HTTPException(400, result.get("error", "Failed"))
-    return {"message": result.get("message", "Password changed successfully")}
+    return {"success": True, "data": {"message": result.get("message", "Password changed successfully")}}
 
 # --- Plans ---
 @app.get("/plans", tags=["Subscriptions"])
 async def list_plans():
-    return {"plans": [
+    return {"success": True, "data": [
         {"id": "free", "name": "Free", "name_ar": "ظ…ط¬ط§ظ†ظٹ", "price": 0, "currency": "SAR",
          "features": {"coa_uploads": 2, "analysis_runs": 5, "result_details": "basic",
                       "marketplace": "browse", "knowledge_mode": False, "exports": "limited"}},
@@ -781,175 +840,69 @@ async def list_plans():
 # --- Legal ---
 @app.get("/legal/terms", tags=["Legal"])
 async def get_current_terms():
-    return {
+    return {"success": True, "data": {
         "version": "1.0",
         "effective_date": "2026-01-01",
         "content_ar": "ط´ط±ظˆط· ظˆط£ط­ظƒط§ظ… ظ…ظ†طµط© APEX ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ ط§ظ„ظ…ط¹ط±ظپظٹ...",
         "content_en": "APEX Platform Terms and Conditions...",
         "requires_acceptance": True
-    }
+    }}
 
 @app.get("/legal/privacy", tags=["Legal"])
 async def get_privacy_policy():
-    return {
+    return {"success": True, "data": {
         "version": "1.0",
         "effective_date": "2026-01-01",
         "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط®طµظˆطµظٹط© ظ„ظ…ظ†طµط© APEX...",
         "content_en": "APEX Platform Privacy Policy..."
-    }
+    }}
 
 @app.get("/legal/provider-policy", tags=["Legal"])
 async def get_provider_policy():
-    return {
+    return {"success": True, "data": {
         "version": "1.0",
         "effective_date": "2026-01-01",
         "content_ar": "ط³ظٹط§ط³ط© ظ…ظ‚ط¯ظ…ظٹ ط§ظ„ط®ط¯ظ…ط§طھ...",
         "obligations": ["ط±ظپط¹ ظ…ط³طھظ†ط¯ط§طھ ط§ظ„طھط­ظ‚ظ‚", "ط±ظپط¹ ظ…ط¯ط®ظ„ط§طھ ط§ظ„ظ…ظ‡ظ…ط©", "ط±ظپط¹ ظ…ط®ط±ط¬ط§طھ ط§ظ„ظ…ظ‡ظ…ط©", "ط§ظ„ط¹ظ…ظ„ ط¶ظ…ظ† ط§ظ„ظ†ط·ط§ظ‚ ط§ظ„ظ…ط¹طھظ…ط¯", "ظ‚ط¨ظˆظ„ ط¹ظ…ظˆظ„ط© ط§ظ„ظ…ظ†طµط©"],
         "suspension_triggers": ["ط¹ط¯ظ… ط±ظپط¹ ط§ظ„ظ…ط¯ط®ظ„ط§طھ", "ط¹ط¯ظ… ط±ظپط¹ ط§ظ„ظ…ط®ط±ط¬ط§طھ", "طھط¬ط§ظˆط² ط§ظ„ظ…ظˆط¹ط¯", "ظ…ط®ط§ظ„ظپط© ط¬ظˆط¯ط© ط§ظ„ط¹ظ…ظ„"]
-    }
+    }}
 
 @app.get("/legal/acceptable-use", tags=["Legal"])
 async def get_acceptable_use():
-    return {"version": "1.0", "effective_date": "2026-01-01", "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„ ظ„ظ…ظ†طµط© APEX..."}
+    return {"success": True, "data": {"version": "1.0", "effective_date": "2026-01-01", "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„ ظ„ظ…ظ†طµط© APEX..."}}
 
 @app.post("/legal/accept", tags=["Legal"])
-async def accept_legal(body: dict, authorization: str = Header(None)):
+async def accept_legal(body: AcceptLegalRequest, authorization: str = Header(None)):
     from app.phase1.routes.phase1_routes import get_current_user
     user = await get_current_user(authorization)
-    doc_id = body.get("document_id", "")
-    if not doc_id:
-        raise HTTPException(400, "document_id required")
+    doc_id = body.document_id
     from app.phase11.services.legal_service import accept_document
     result = accept_document(user["sub"], doc_id)
-    if result.get("status") == "error":
-        raise HTTPException(400, result.get("detail", "Failed"))
+    if not result.get("success", True):
+        raise HTTPException(400, result.get("error", "فشل العملية"))
     return result
 
 # --- Account Closure ---
 @app.post("/account/closure", tags=["Account"])
-async def request_closure(body: dict):
-    closure_type = body.get("type", "temporary")
-    reason = body.get("reason", "")
-    if closure_type not in ("temporary", "permanent"):
-        raise HTTPException(400, "type must be 'temporary' or 'permanent'")
-    return {
+async def request_closure(body: AccountClosureRequest):
+    closure_type = body.type
+    reason = body.reason
+    return {"success": True, "data": {
         "message": f"{'Temporary deactivation' if closure_type == 'temporary' else 'Permanent closure'} request submitted",
         "type": closure_type, "status": "pending",
         "retention_notice": "Data will be retained per legal requirements" if closure_type == "permanent" else None
-    }
+    }}
 
-# --- Knowledge Feedback Review Queue ---
-@app.get("/knowledge-feedback/review-queue", tags=["Knowledge"])
-async def get_review_queue(status: str = Query("submitted")):
-    valid_statuses = ["submitted", "under_review", "accepted", "rejected", "needs_refinement", "queued_for_rule_design"]
-    if status not in valid_statuses:
-        raise HTTPException(400, f"Invalid status. Valid: {valid_statuses}")
-    return {"items": [], "total": 0, "status_filter": status}
-
-@app.put("/knowledge-feedback/{feedback_id}/review", tags=["Knowledge"])
-async def review_feedback(feedback_id: str, body: dict):
-    decision = body.get("decision", "")
-    if decision not in ("accepted", "rejected", "needs_refinement", "queued_for_rule_design"):
-        raise HTTPException(400, "Invalid decision")
-    return {"message": f"Feedback {feedback_id} marked as {decision}", "id": feedback_id, "decision": decision}
-
-# --- Service Provider Documents ---
-@app.get("/service-providers/{provider_id}/documents", tags=["Providers"])
-async def get_provider_documents(provider_id: str):
-    return {"provider_id": provider_id, "documents": [], "verification_status": "pending"}
-
-@app.post("/service-providers/{provider_id}/documents", tags=["Providers"])
-async def upload_provider_document(provider_id: str, file: UploadFile = File(...), doc_type: str = Query("identity")):
-    valid_types = ["identity", "professional_license", "academic_certificate", "experience_letter", "portfolio"]
-    if doc_type not in valid_types:
-        raise HTTPException(400, f"Invalid doc_type. Valid: {valid_types}")
-    return {"message": "Document uploaded", "provider_id": provider_id, "doc_type": doc_type, "filename": file.filename, "status": "pending_review"}
-
-@app.put("/service-providers/{provider_id}/verify", tags=["Providers"])
-async def verify_provider(provider_id: str, body: dict):
-    decision = body.get("decision", "")
-    if decision not in ("approved", "rejected", "pending"):
-        raise HTTPException(400, "Decision must be approved, rejected, or pending")
-    return {"message": f"Provider {provider_id} {decision}", "verification_status": decision, "approved_scopes": body.get("scopes", [])}
-
-# --- Task Document Requirements ---
-@app.get("/task-types", tags=["Tasks"])
-async def list_task_types():
-    return {"task_types": [
-        {"id": "bookkeeping", "name_ar": "ظ…ط³ظƒ ط§ظ„ط¯ظپط§طھط±", "input_documents": ["ظ…طµط§ط¯ط± ط§ظ„ظ‚ظٹظˆط¯", "ظƒط´ظپ ط­ط³ط§ط¨ ط¨ظ†ظƒظٹ", "ظپظˆط§طھظٹط±", "ط´ط¬ط±ط© ط­ط³ط§ط¨ط§طھ"], "output_documents": ["ظ…ظ„ظپ ظ‚ظٹظˆط¯ ظ…ظ†ط¸ظ…", "ظ…ظ„ط§ط­ط¸ط§طھ ط§ظ„طھط³ظˆظٹط©"], "deadline_days": 14},
-        {"id": "financial_statement_preparation", "name_ar": "ط¥ط¹ط¯ط§ط¯ ط§ظ„ظ‚ظˆط§ط¦ظ… ط§ظ„ظ…ط§ظ„ظٹط©", "input_documents": ["ظ…ظٹط²ط§ظ† ظ…ط±ط§ط¬ط¹ط©", "ط³ظٹط§ط³ط§طھ ظ…ط­ط§ط³ط¨ظٹط©", "ط£ط±طµط¯ط© ط§ظپطھطھط§ط­ظٹط©"], "output_documents": ["ظ‚ظˆط§ط¦ظ… ظ…ط§ظ„ظٹط©", "ط¥ظٹط¶ط§ط­ط§طھ", "ظ…ظ„ط®طµ"], "deadline_days": 21},
-        {"id": "vat_review", "name_ar": "ظ…ط±ط§ط¬ط¹ط© ط¶ط±ظٹط¨ط© ط§ظ„ظ‚ظٹظ…ط© ط§ظ„ظ…ط¶ط§ظپط©", "input_documents": ["ظ…ظ„ظپط§طھ ط¶ط±ظٹط¨ظٹط©", "ظپظˆط§طھظٹط±", "ط¥ظ‚ط±ط§ط±ط§طھ ط³ط§ط¨ظ‚ط©"], "output_documents": ["ظ…ط°ظƒط±ط© ط§ظ„ظ…ط±ط§ط¬ط¹ط©", "ط§ظ„ظ†طھط§ط¦ط¬", "ظ‚ط§ط¦ظ…ط© ط§ظ„ط¥ط¬ط±ط§ط،ط§طھ"], "deadline_days": 10},
-        {"id": "hr_policy_review", "name_ar": "ظ…ط±ط§ط¬ط¹ط© ط³ظٹط§ط³ط§طھ ط§ظ„ظ…ظˆط§ط±ط¯ ط§ظ„ط¨ط´ط±ظٹط©", "input_documents": ["ط³ظٹط§ط³ط§طھ ط­ط§ظ„ظٹط©", "ط§ظ„ظ‡ظٹظƒظ„ ط§ظ„طھظ†ط¸ظٹظ…ظٹ", "ط§ظ„ط¹ظ‚ظˆط¯"], "output_documents": ["طھظ‚ط±ظٹط± ط§ظ„ظ…ط±ط§ط¬ط¹ط©", "ظ‚ط§ط¦ظ…ط© ط§ظ„ظپط¬ظˆط§طھ"], "deadline_days": 14},
-        {"id": "audit_support", "name_ar": "ط¯ط¹ظ… ط§ظ„طھط¯ظ‚ظٹظ‚", "input_documents": ["ظ‚ظˆط§ط¦ظ… ظ…ط§ظ„ظٹط©", "ظ…ظٹط²ط§ظ† ظ…ط±ط§ط¬ط¹ط©", "ظ…ط³طھظ†ط¯ط§طھ ط¯ط§ط¹ظ…ط©"], "output_documents": ["طھظ‚ط±ظٹط± ط§ظ„طھط¯ظ‚ظٹظ‚", "ظ…ظ„ط§ط­ط¸ط§طھ", "ط®ط·ط§ط¨ ط§ظ„ط¥ط¯ط§ط±ط©"], "deadline_days": 30}
-    ]}
-
-@app.get("/service-requests/{request_id}/documents", tags=["Tasks"])
-async def get_task_documents(request_id: str):
-    return {"request_id": request_id, "task_type": "bookkeeping", "required_inputs": ["ظ…طµط§ط¯ط± ط§ظ„ظ‚ظٹظˆط¯", "ظƒط´ظپ ط­ط³ط§ط¨ ط¨ظ†ظƒظٹ"], "submitted_inputs": [], "required_outputs": ["ظ…ظ„ظپ ظ‚ظٹظˆط¯ ظ…ظ†ط¸ظ…"], "submitted_outputs": [], "compliance_status": "pending", "deadline": "2026-04-15"}
-
-@app.post("/service-requests/{request_id}/documents/upload", tags=["Tasks"])
-async def upload_task_document(request_id: str, file: UploadFile = File(...), doc_category: str = Query("input"), doc_name: str = Query("")):
-    if doc_category not in ("input", "output"):
-        raise HTTPException(400, "doc_category must be 'input' or 'output'")
-    return {"message": "Document uploaded", "request_id": request_id, "category": doc_category, "filename": file.filename, "doc_name": doc_name}
-
-# --- Provider Compliance & Suspension ---
-@app.get("/providers/compliance/{provider_id}", tags=["Compliance"])
-async def get_compliance_status(provider_id: str):
-    return {"provider_id": provider_id, "status": "active", "flags": [], "missing_documents": [], "overdue_tasks": [], "suspension_history": []}
-
-@app.post("/providers/compliance/{provider_id}/suspend", tags=["Compliance"])
-async def suspend_provider(provider_id: str, body: dict):
-    severity = body.get("severity", "soft")
-    reason = body.get("reason", "")
-    if severity not in ("soft", "hard"):
-        raise HTTPException(400, "severity must be 'soft' or 'hard'")
-    return {"message": f"Provider {provider_id} suspended ({severity})", "severity": severity, "reason": reason, "status": "suspended", "can_receive_new_tasks": False}
-
-@app.post("/providers/compliance/{provider_id}/unsuspend", tags=["Compliance"])
-async def unsuspend_provider(provider_id: str, body: dict):
-    return {"message": f"Provider {provider_id} unsuspended", "status": "active", "can_receive_new_tasks": True}
-
-# --- Client Types ---
-@app.get("/client-types", tags=["Clients"])
-async def list_client_types():
-    return {"client_types": [
-        {"id": "standard_business", "name_ar": "ظ…ظ†ط´ط£ط© طھط¬ط§ط±ظٹط©", "knowledge_mode": False},
-        {"id": "financial_entity", "name_ar": "ط¬ظ‡ط© ظ…ط§ظ„ظٹط©", "knowledge_mode": True},
-        {"id": "financing_entity", "name_ar": "ط¬ظ‡ط© طھظ…ظˆظٹظ„ظٹط©", "knowledge_mode": True},
-        {"id": "accounting_firm", "name_ar": "ظ…ظƒطھط¨ ظ…ط­ط§ط³ط¨ط©", "knowledge_mode": True},
-        {"id": "audit_firm", "name_ar": "ظ…ظƒطھط¨ طھط¯ظ‚ظٹظ‚", "knowledge_mode": True},
-        {"id": "investment_entity", "name_ar": "ط¬ظ‡ط© ط§ط³طھط«ظ…ط§ط±ظٹط©", "knowledge_mode": True},
-        {"id": "sector_consulting_entity", "name_ar": "ط§ط³طھط´ط§ط±ط§طھ ظ‚ط·ط§ط¹ظٹط©", "knowledge_mode": True},
-        {"id": "government_entity", "name_ar": "ط¬ظ‡ط© ط­ظƒظˆظ…ظٹط©", "knowledge_mode": True},
-        {"id": "legal_regulatory_entity", "name_ar": "ط¬ظ‡ط© ظ‚ط§ظ†ظˆظ†ظٹط©/طھظ†ط¸ظٹظ…ظٹط©", "knowledge_mode": True}
-    ]}
-
-# --- Profile Update (alias for /users/me PUT) ---
-@app.put("/users/me/profile", tags=["Account"])
-async def update_profile(body: dict, authorization: str = Header(None)):
-    from app.phase1.routes.phase1_routes import get_current_user
-    user = await get_current_user(authorization)
-    from app.phase1.services.account_service import AccountService
-    return AccountService().update_profile(user["sub"], body)
-
-# --- User Activity History ---
-@app.get("/users/me/activity", tags=["Account"])
-async def get_activity_history(limit: int = Query(20), authorization: str = Header(None)):
-    from app.phase1.routes.phase1_routes import get_current_user
-    user = await get_current_user(authorization)
-    from app.phase1.models.platform_models import SessionLocal, UserSecurityEvent
-    db = SessionLocal()
-    try:
-        events = db.query(UserSecurityEvent).filter(
-            UserSecurityEvent.user_id == user["sub"]
-        ).order_by(UserSecurityEvent.created_at.desc()).limit(limit).all()
-        return {"activities": [
-            {"type": e.event_type, "ip": e.ip_address, "created_at": str(e.created_at)}
-            for e in events
-        ], "total": len(events)}
-    finally:
-        db.close()
+# NOTE: Stub endpoints for knowledge-feedback, service-provider docs, task-types,
+# provider compliance, client-types were removed in Phase 7 cleanup (v10.0).
+# These are now served by their proper phase routers:
+#   - /knowledge-feedback/* -> Phase 3 (phase3_routes.py)
+#   - /service-providers/* -> Phase 4 (phase4_routes.py)
+#   - /task-types -> Phase 7 (phase7_routes.py)
+#   - /providers/compliance/* -> Phase 7 (phase7_routes.py)
+#   - /client-types -> Phase 2 (phase2_routes.py)
+#   - /users/me/profile -> Phase 1 (phase1_routes.py PUT /users/me)
+#   - /users/me/activity -> Phase 9 (phase9_routes.py)
 
 
 
