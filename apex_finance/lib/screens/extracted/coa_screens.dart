@@ -69,7 +69,7 @@ class AppColors {
   static const cardBg = Color(0xFF0D1825);
   static const borderColor = Color(0x1FC9A84C);
   static const greenC = Color(0xFF34D399);
-  static const cyanC = Color(0xFF22D3EE);
+  static const cyanC = Color(0xFF36C6D3);
   static const redC = Color(0xFFF87171);
   static const blueC = Color(0xFF60A5FA);
   static const orangeC = Color(0xFFFBBF24);
