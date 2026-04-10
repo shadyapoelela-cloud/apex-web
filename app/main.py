@@ -18,7 +18,7 @@ All 11 Phases + 6 Sprints:
 “””
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
-import os, traceback
+import os, traceback, logging
 from app.services.orchestrator import AnalysisOrchestrator
 
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "apex-admin-2026")
@@ -27,38 +27,34 @@ try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
     from app.knowledge_brain.models.db_models import init_db as init_kb
     KB = True
-except: KB = False
+except Exception as e: KB = False; logging.warning(f"Knowledge Brain disabled: {e}")
 try:
     from app.phase1.models.platform_models import init_platform_db
     from app.phase1.routes.phase1_routes import router as p1r
     from app.phase1.services.seed_data import seed_all as seed1
     P1 = True
-except Exception as e: P1 = False; print(f"P1: {e}")
+except Exception as e: P1 = False; logging.warning(f"Phase 1 disabled: {e}")
 try:
-    from app.phase2.models.phase2_models import *
     from app.phase2.routes.phase2_routes import router as p2r
     from app.phase2.services.seed_phase2 import seed_client_types
     P2 = True
-except Exception as e: P2 = False; print(f"P2: {e}")
+except Exception as e: P2 = False; logging.warning(f"Phase 2 disabled: {e}")
 try:
-    from app.phase3.models.phase3_models import *
     from app.phase3.routes.phase3_routes import router as p3r
     P3 = True
-except Exception as e: P3 = False; print(f"P3: {e}")
+except Exception as e: P3 = False; logging.warning(f"Phase 3 disabled: {e}")
 try:
-    from app.phase4.models.phase4_models import *
     from app.phase4.routes.phase4_routes import router as p4r
     P4 = True
-except Exception as e: P4 = False; print(f"P4: {e}")
+except Exception as e: P4 = False; logging.warning(f"Phase 4 disabled: {e}")
 try:
-    from app.phase5.models.phase5_models import *
     from app.phase5.routes.phase5_routes import router as p5r
     P5 = True
-except Exception as e: P5 = False; print(f"P5: {e}")
+except Exception as e: P5 = False; logging.warning(f"Phase 5 disabled: {e}")
 try:
     from app.phase6.routes.phase6_routes import router as p6r
     P6 = True
-except Exception as e: P6 = False; print(f"P6: {e}")
+except Exception as e: P6 = False; logging.warning(f"Phase 6 disabled: {e}")
 # Phase 7 â€” Task Documents + Suspension + Result Details + Audit
 try:
     from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
@@ -66,7 +62,7 @@ try:
     from app.phase7.services.seed_phase7 import seed_task_types
     HAS_P7 = True
 except Exception as e:
-    print(f"Phase 7 import warning: {e}")
+    logging.warning(f"Phase 7 disabled: {e}")
     HAS_P7 = False
 # Phase 8 â€” Entitlements Engine + Subscription Management
 try:
@@ -75,7 +71,7 @@ try:
     from app.phase8.services.seed_phase8 import seed_plan_limits, create_user_subscription
     HAS_P8 = True
 except Exception as e:
-    print(f"Phase 8 import warning: {e}")
+    logging.warning(f"Phase 8 disabled: {e}")
     HAS_P8 = False
 # Phase 9 â€” Account Center
 try:
@@ -84,7 +80,7 @@ try:
     HAS_P9 = True
 except Exception as e:
     HAS_P9 = False
-    print(f"Phase 9 disabled: {e}")
+    logging.warning(f"Phase 9 disabled: {e}")
 # Phase 10 â€” Notification System
 try:
     from app.phase10.models.phase10_models import init_phase10_db
@@ -93,7 +89,7 @@ try:
     HAS_P10 = True
 except Exception as e:
     HAS_P10 = False
-    print(f"Phase 10 disabled: {e}")
+    logging.warning(f"Phase 10 disabled: {e}")
 # Sprint 1 â€” COA First Workflow
 try:
     from app.sprint1.models.sprint1_models import init_sprint1_db
@@ -101,55 +97,49 @@ try:
     HAS_S1 = True
 except Exception as e:
     HAS_S1 = False
-    print(f"Sprint 1 disabled: {e}")
+    logging.warning(f"Sprint 1 disabled: {e}")
 # Sprint 2 â€” COA Classification Engine
 try:
     from app.sprint2.routes.sprint2_routes import router as s2r
     HAS_S2 = True
-    print(f"Sprint 2 loaded: {len(s2r.routes)} routes")
 except Exception as e:
     HAS_S2 = False
-    print(f"Sprint 2 disabled: {e}")
+    logging.warning(f"Sprint 2 disabled: {e}")
 # Sprint 4 â€” Knowledge Brain
 try:
     from app.sprint4.routes.sprint4_routes import router as s4r
     HAS_S4 = True
-    print(f"Sprint 4 loaded: {len(s4r.routes)} routes")
 except Exception as e:
     HAS_S4 = False
-    print(f"Sprint 4 disabled: {e}")
+    logging.warning(f"Sprint 4 disabled: {e}")
 # --- Sprint 3: COA Quality + Review ---
 HAS_S3 = False
 try:
     from app.sprint3.routes.sprint3_routes import router as s3r
     HAS_S3 = True
-    print(f"Sprint 3 loaded: {len(s3r.routes)} routes")
 except Exception as e:
-    print(f"Sprint 3 disabled: {e}")
+    logging.warning(f"Sprint 3 disabled: {e}")
 # --- Sprint 4 TB: Trial Balance + Binding ---
 HAS_S4_TB = False
 try:
     from app.sprint4_tb.routes.tb_routes import router as s4_tb_r
     HAS_S4_TB = True
-    print(f"Sprint 4 TB loaded: {len(s4_tb_r.routes)} routes")
 except Exception as e:
-    print(f"Sprint 4 TB disabled: {e}")
+    logging.warning(f"Sprint 4 TB disabled: {e}")
 # --- Sprint 5: Analysis Trigger ---
 HAS_S5 = False
 try:
     from app.sprint5_analysis.routes.analysis_routes import router as s5r
     HAS_S5 = True
-    print(f"Sprint 5 loaded: {len(s5r.routes)} routes")
 except Exception as e:
-    print(f"Sprint 5 disabled: {e}")
+    logging.warning(f"Sprint 5 disabled: {e}")
 # --- Sprint 6: Official Source Registry + Eligibility ---
 HAS_S6 = False
 try:
     from app.sprint6_registry.routes.registry_routes import router as s6r
     HAS_S6 = True
-    print(f"Sprint 6 loaded: {len(s6r.routes)} routes")
 except Exception as e:
-    print(f"Sprint 6 disabled: {e}")
+    logging.warning(f"Sprint 6 disabled: {e}")
 # Phase 11 â€” Legal Acceptance
 try:
     from app.phase11.models.phase11_models import init_phase11_db
@@ -158,11 +148,12 @@ try:
     HAS_P11 = True
 except Exception as e:
     HAS_P11 = False
-    print(f"Phase 11 disabled: {e}")
+    logging.warning(f"Phase 11 disabled: {e}")
 
 
 app = FastAPI(title="APEX Financial Platform API", description="ظ…ظ†طµط© ط£ط¨ظƒط³ ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ â€” ط§ظ„ظ†ط³ط®ط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط©", version="9.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
+_cors_origins = os.environ.get("CORS_ORIGINS", "").split(",") if os.environ.get("CORS_ORIGINS") else ["*"]
+app.add_middleware(CORSMiddleware, allow_origins=_cors_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
 import traceback as _tb
@@ -178,13 +169,13 @@ async def global_exception_handler(request, exc):
 def startup():
     if KB:
         try: init_kb()
-        except: pass
+        except Exception as e: logging.error(f"Knowledge Brain init error: {e}")
     if P1:
-        try: t = init_platform_db(); print(f"APEX: {len(t)} tables"); print(f"Seed: {seed1()}")
-        except Exception as e: print(f"P1 err: {e}")
+        try: t = init_platform_db(); logging.info(f"APEX: {len(t)} tables"); seed1()
+        except Exception as e: logging.error(f"Phase 1 startup error: {e}")
     if P2:
-        try: print(f"P2: {seed_client_types()}")
-        except Exception as e: print(f"P2 err: {e}")
+        try: seed_client_types()
+        except Exception as e: logging.error(f"Phase 2 startup error: {e}")
 
 for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
                 (P3, p3r if P3 else None), (P4, p4r if P4 else None), (P5, p5r if P5 else None),
@@ -206,19 +197,14 @@ if HAS_S1:
     app.include_router(s1r, tags=["Sprint 1 COA"])
 if HAS_S2:
     app.include_router(s2r, tags=["Sprint 2 Classification"])
-    print(f"[STARTUP] S2 registered: {len(s2r.routes)} routes")
 if HAS_S4:
     app.include_router(s4r, tags=["Sprint 4 Knowledge Brain"])
-    print(f"[STARTUP] S4 registered: {len(s4r.routes)} routes")
 if HAS_S3:
     app.include_router(s3r, tags=["Sprint 3 COA Quality"])
-    print(f"[STARTUP] S3 registered: {len(s3r.routes)} routes")
 if HAS_S4_TB:
     app.include_router(s4_tb_r, tags=["Sprint 4 TB Binding"])
-    print(f"[STARTUP] S4-TB registered: {len(s4_tb_r.routes)} routes")
 if HAS_S5:
     app.include_router(s5r, tags=["Sprint 5 Analysis Trigger"])
-    print(f"[STARTUP] S5 registered: {len(s5r.routes)} routes")
 if HAS_S6:
     app.include_router(s6r, tags=["Sprint 6 Registry + Eligibility"])
 
@@ -233,7 +219,6 @@ app.include_router(archive_r, tags=["Archive"])
 app.include_router(catalog_r, tags=["Service Catalog"])
 app.include_router(social_auth_r, tags=["Social Auth"])
 app.include_router(copilot_router)
-print(f"[STARTUP] S6 registered: {len(s6r.routes)} routes")
 
 @app.get("/")
 def root():
