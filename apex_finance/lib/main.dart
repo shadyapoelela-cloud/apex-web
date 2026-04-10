@@ -3383,10 +3383,10 @@ class _NewPwS extends State<NewPasswordScreen> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'token': widget.token, 'new_password': _pw1.text}));
       final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['status'] == 'ok') {
+      if (r.statusCode == 200 && d['success'] == true) {
         setState(() { _done = true; });
       } else {
-        setState(() { _err = d['detail'] ?? 'ظپط´ظ„طھ ط¥ط¹ط§ط¯ط© ط§ظ„طھط¹ظٹظٹظ†'; });
+        setState(() { _err = d['error'] ?? d['detail'] ?? 'فشلت إعادة التعيين'; });
       }
     } catch (e) {
       setState(() { _err = 'ط®ط·ط£ ظپظٹ ط§ظ„ط§طھطµط§ظ„'; });
