@@ -1326,6 +1326,43 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       }
     }
   }
+  Future<void> _advanceStage() async {
+    if (_accounts.isEmpty) return;
+    if (_currentStage == 5) { await _submitCoa(); return; }
+    setState(() {
+      _currentStage = _currentStage + 1;
+      if (_currentStage <= 5) {
+        final tabIndex = _currentStage - 1;
+        if (tabIndex >= 0 && tabIndex < _tabController.length) {
+          _tabController.animateTo(tabIndex);
+        }
+      }
+    });
+  }
+
+  IconData _stageButtonIcon() {
+    switch (_currentStage) {
+      case 0: return Icons.cloud_upload;
+      case 1: return Icons.code;
+      case 2: return Icons.category;
+      case 3: return Icons.speed;
+      case 4: return Icons.rate_review;
+      case 5: return Icons.send;
+      default: return Icons.check_circle;
+    }
+  }
+
+  String _stageButtonLabel() {
+    switch (_currentStage) {
+      case 0: return '\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u062a\u0642\u064a\u064a\u0645 \u0627\u0644\u062a\u0643\u0648\u064a\u062f';
+      case 1: return '\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u062a\u0642\u064a\u064a\u0645 \u0627\u0644\u062a\u0628\u0648\u064a\u0628';
+      case 2: return '\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0627\u0644\u062c\u0648\u062f\u0629';
+      case 3: return '\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629';
+      case 4: return '\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0627\u0644\u0627\u0639\u062a\u0645\u0627\u062f';
+      case 5: return '\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0645\u0631\u062d\u0644\u0629 TB';
+      default: return '\u0645\u0643\u062a\u0645\u0644';
+    }
+  }
   // ─── End v8.5 Helpers ─────────────────────────────────────────
 
   Widget _buildHeader() {
