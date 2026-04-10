@@ -44,10 +44,12 @@ try:
     P3 = True
 except Exception as e: P3 = False; logging.warning(f"Phase 3 disabled: {e}")
 try:
+    from app.phase4.models.phase4_models import init_phase4_db
     from app.phase4.routes.phase4_routes import router as p4r
     P4 = True
 except Exception as e: P4 = False; logging.warning(f"Phase 4 disabled: {e}")
 try:
+    from app.phase5.models.phase5_models import init_phase5_db
     from app.phase5.routes.phase5_routes import router as p5r
     P5 = True
 except Exception as e: P5 = False; logging.warning(f"Phase 5 disabled: {e}")
@@ -176,6 +178,30 @@ def startup():
     if P2:
         try: seed_client_types()
         except Exception as e: logging.error(f"Phase 2 startup error: {e}")
+    if P4:
+        try: init_phase4_db()
+        except Exception as e: logging.error(f"Phase 4 init error: {e}")
+    if P5:
+        try: init_phase5_db()
+        except Exception as e: logging.error(f"Phase 5 init error: {e}")
+    if HAS_P7:
+        try: init_phase7_db(); seed_task_types()
+        except Exception as e: logging.error(f"Phase 7 init error: {e}")
+    if HAS_P8:
+        try: init_phase8_db(); seed_plan_limits()
+        except Exception as e: logging.error(f"Phase 8 init error: {e}")
+    if HAS_P9:
+        try: init_phase9_db()
+        except Exception as e: logging.error(f"Phase 9 init error: {e}")
+    if HAS_P10:
+        try: init_phase10_db(); seed_welcome_notification()
+        except Exception as e: logging.error(f"Phase 10 init error: {e}")
+    if HAS_P11:
+        try: init_phase11_db(); seed_legal_documents()
+        except Exception as e: logging.error(f"Phase 11 init error: {e}")
+    if HAS_S1:
+        try: init_sprint1_db()
+        except Exception as e: logging.error(f"Sprint 1 init error: {e}")
 
 for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
                 (P3, p3r if P3 else None), (P4, p4r if P4 else None), (P5, p5r if P5 else None),
@@ -292,7 +318,7 @@ def reinit_db(secret: str = Query(...)):
         existing_cols = []
         try:
             existing_cols = [c["name"] for c in inspector.get_columns("client_chart_of_accounts")]
-        except:
+        except Exception:
             pass
         _cols = [("normalized_class","VARCHAR(100)"),("statement_section","VARCHAR(100)"),("subcategory","VARCHAR(200)"),("current_noncurrent","VARCHAR(20)"),("cashflow_role","VARCHAR(50)"),("sign_rule","VARCHAR(20)"),("mapping_confidence","REAL DEFAULT 0.0"),("mapping_source","VARCHAR(50)"),("review_status","VARCHAR(50) DEFAULT 'draft'"),("approved_by","VARCHAR(255)"),("approved_at","TIMESTAMP"),("classification_issues_json","TEXT DEFAULT '[]'")]
         db = SessionLocal()
@@ -638,7 +664,7 @@ async def analyze_full(file: UploadFile = File(...), industry: str = Query("gene
         try:
             from app.knowledge_brain.services.brain_service import KnowledgeBrainService
             bc = KnowledgeBrainService().get_context_for_narrative(r, r.get("knowledge_brain", {}))
-        except: pass
+        except Exception: pass
         r["narrative"] = await n.generate(r, language=language, brain_context=bc)
         return r
     except Exception as e: import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
@@ -685,7 +711,7 @@ async def classify(file: UploadFile = File(...)):
         try: rr = orch.reader.read(tp)
         finally:
             try: os.unlink(tp)
-            except: pass
+            except Exception: pass
         rows = rr["rows"]
         if not rows: return {"success": False, "error": "No data"}
         cl = orch.classifier.classify_rows(rows)

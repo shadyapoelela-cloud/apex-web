@@ -534,7 +534,7 @@ class AuditEvent(Base):
 def init_platform_db():
     """Create all tables."""
     Base.metadata.create_all(bind=engine)
-    print(f"APEX Platform DB initialized: {len(Base.metadata.tables)} tables")
+    import logging; logging.info(f"APEX Platform DB initialized: {len(Base.metadata.tables)} tables")
     return list(Base.metadata.tables.keys())
 
 

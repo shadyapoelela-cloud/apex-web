@@ -212,3 +212,10 @@ class SuspensionAppeal(Base):
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
     suspension = relationship("SuspensionEvent", back_populates="appeals")
+
+
+def init_phase5_db():
+    from app.phase1.models.platform_models import engine
+    Base.metadata.create_all(bind=engine)
+    return ["service_requests", "service_request_messages", "task_compliance_events",
+            "compliance_actions", "suspension_events", "suspension_appeals"]

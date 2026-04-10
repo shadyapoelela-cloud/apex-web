@@ -177,7 +177,7 @@ class AuthService:
             try:
                 from app.phase10.services.notification_service import seed_welcome_notification
                 seed_welcome_notification(user.id)
-            except:
+            except Exception:
                 pass
             return {
                 "success": True,
