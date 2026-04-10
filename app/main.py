@@ -22,6 +22,8 @@ import os, traceback, logging
 from app.services.orchestrator import AnalysisOrchestrator
 
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "apex-admin-2026")
+if ADMIN_SECRET == "apex-admin-2026":
+    logging.warning("ADMIN_SECRET is using default value! Set ADMIN_SECRET env var in production.")
 from fastapi.responses import Response as PDFResponse
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
@@ -153,7 +155,7 @@ except Exception as e:
     logging.warning(f"Phase 11 disabled: {e}")
 
 
-app = FastAPI(title="APEX Financial Platform API", description="ظ…ظ†طµط© ط£ط¨ظƒط³ ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ â€” ط§ظ„ظ†ط³ط®ط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط©", version="9.0.0")
+app = FastAPI(title=”APEX Financial Platform API”, description=”APEX Financial Analysis Platform - All 11 Phases + 6 Sprints”, version=”9.0.0”)
 _cors_origins = os.environ.get("CORS_ORIGINS", "").split(",") if os.environ.get("CORS_ORIGINS") else ["*"]
 app.add_middleware(CORSMiddleware, allow_origins=_cors_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
