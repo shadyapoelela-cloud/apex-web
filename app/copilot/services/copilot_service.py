@@ -1,3 +1,7 @@
+"""
+APEX — Copilot service layer for session management and AI-powered chat
+خدمة المساعد الذكي لإدارة الجلسات والمحادثة المدعومة بالذكاء الاصطناعي
+"""
 import logging
 from datetime import datetime, timezone
 from app.phase1.models.platform_models import SessionLocal, gen_uuid

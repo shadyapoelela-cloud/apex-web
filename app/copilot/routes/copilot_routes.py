@@ -1,3 +1,7 @@
+"""
+APEX — Copilot API routes for chat, sessions, and escalation management
+مسارات API للمساعد الذكي: المحادثة، الجلسات، وإدارة التصعيدات
+"""
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel

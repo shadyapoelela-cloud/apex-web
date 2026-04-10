@@ -230,7 +230,8 @@ Write a comprehensive analytical report. Respond with JSON only, no markdown:
 
     async def _call_gemini(self, prompt: str) -> dict:
         import requests as req
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.google_key}"
+        base_url = os.environ.get("GEMINI_API_URL", "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
+        url = f"{base_url}?key={self.google_key}"
         resp = req.post(url, json={
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": 0.3},

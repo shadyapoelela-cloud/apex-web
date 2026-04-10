@@ -1,3 +1,7 @@
+"""
+APEX — Intent detection router using keyword-weight matching (Arabic + English)
+موجّه تحديد النوايا باستخدام مطابقة الكلمات المفتاحية الموزونة (عربي + إنجليزي)
+"""
 import re
 from typing import Optional
 

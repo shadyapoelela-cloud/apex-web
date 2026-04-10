@@ -1,3 +1,9 @@
+"""
+APEX — Client readiness assessment for trial balance binding
+خدمة تقييم جاهزية العميل لربط ميزان المراجعة
+"""
+
+
 def compute_readiness(client_data, documents):
     if not client_data.get("client_type"):
         return "not_ready"

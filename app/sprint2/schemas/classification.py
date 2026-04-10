@@ -1,3 +1,7 @@
+"""
+APEX — Pydantic schemas for COA classification results and summaries
+مخططات التحقق لنتائج وملخصات تصنيف شجرة الحسابات
+"""
 from pydantic import BaseModel
 from typing import Optional, List
 

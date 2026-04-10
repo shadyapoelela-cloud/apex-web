@@ -1,3 +1,7 @@
+"""
+APEX — Document lifecycle service with status transition validation
+خدمة دورة حياة المستندات مع التحقق من صحة انتقالات الحالة
+"""
 from datetime import datetime, timezone
 
 VALID_TRANSITIONS = {

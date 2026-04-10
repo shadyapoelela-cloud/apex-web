@@ -1,3 +1,7 @@
+"""
+APEX — COA approval gate checks for quality, completeness, and reporting thresholds
+بوابة اعتماد شجرة الحسابات للتحقق من الجودة والاكتمال ومعايير التقارير
+"""
 from app.config.phase1_constants import (
     MIN_QUALITY_FOR_APPROVAL,
     MIN_COMPLETENESS_FOR_TB,
