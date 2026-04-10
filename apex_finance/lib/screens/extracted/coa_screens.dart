@@ -2151,7 +2151,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               final statusColor = a.status == 'approved' ? AppColors.greenC :
                                   a.status == 'review' ? AppColors.orangeC : AppColors.redC;
               return GestureDetector(
-                onTap: () => _showEditDialog(a),
+                onTap: () => _openLevelEditor(a),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
@@ -2916,16 +2916,6 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-          IconButton(
-            tooltip: 'تعديل التبويب بالمستويات',
-            icon: Icon(Icons.edit_note, color: AppColors.gold, size: 20),
-            onPressed: () => _openLevelEditor(acc),
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            padding: EdgeInsets.zero,
-          ),
-          Icon(Icons.expand_more, color: AppColors.textDim, size: 20),
-        ]),
         childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
         iconColor: AppColors.textMid,
         collapsedIconColor: AppColors.textMid,
