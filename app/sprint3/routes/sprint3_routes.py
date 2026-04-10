@@ -15,9 +15,39 @@ APIs:
 
 import json, logging
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timezone
 from sqlalchemy import text as _t
+
+
+# ── Request Models ──────────────────────────────────────────
+
+class ApproveCoaBody(BaseModel):
+    approved_by: Optional[str] = None
+    notes: Optional[str] = None
+    min_confidence: float = Field(default=0.5)
+
+
+class RejectCoaBody(BaseModel):
+    rejected_by: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class CreateRuleFromAccountBody(BaseModel):
+    rule_name: Optional[str] = None
+    rule_type: Optional[str] = None
+    condition: Optional[dict] = None
+    action: Optional[dict] = None
+    created_by: Optional[str] = None
+
+
+class CreateClientRuleBody(BaseModel):
+    rule_name: str
+    condition: dict
+    action: dict
+    rule_type: str = Field(default="alias")
+    created_by: Optional[str] = None
 
 router = APIRouter(tags=["Sprint 3 — COA Quality & Review"])
 
@@ -258,7 +288,7 @@ def check_coa_approval_readiness(upload_id: str):
 
 
 @router.post("/coa/uploads/{upload_id}/approve-coa")
-def approve_coa(upload_id: str, body: dict = {}):
+def approve_coa(upload_id: str, body: ApproveCoaBody = ApproveCoaBody()):
     """Approve the entire COA upload as the client's approved chart."""
     from app.sprint3.services.coa_review_service import approve_upload
 
@@ -275,9 +305,9 @@ def approve_coa(upload_id: str, body: dict = {}):
     result = approve_upload(
         upload_id=upload_id,
         client_id=upload_row[0],
-        approved_by=body.get("approved_by"),
-        notes=body.get("notes"),
-        min_confidence=body.get("min_confidence", 0.5),
+        approved_by=body.approved_by,
+        notes=body.notes,
+        min_confidence=body.min_confidence,
     )
 
     if not result.get("success"):
@@ -290,7 +320,7 @@ def approve_coa(upload_id: str, body: dict = {}):
 # ═══════════════════════════════════════════════════════════
 
 @router.post("/coa/uploads/{upload_id}/reject-coa")
-def reject_coa(upload_id: str, body: dict = {}):
+def reject_coa(upload_id: str, body: RejectCoaBody = RejectCoaBody()):
     """Return COA upload for review/revision."""
     from app.sprint3.services.coa_review_service import reject_upload
 
@@ -307,8 +337,8 @@ def reject_coa(upload_id: str, body: dict = {}):
     result = reject_upload(
         upload_id=upload_id,
         client_id=upload_row[0],
-        rejected_by=body.get("rejected_by"),
-        notes=body.get("notes"),
+        rejected_by=body.rejected_by,
+        notes=body.notes,
     )
     if not result.get("success"):
         raise HTTPException(400, result.get("error"))
@@ -331,7 +361,7 @@ def approval_history(upload_id: str):
 # ═══════════════════════════════════════════════════════════
 
 @router.post("/coa/accounts/{account_id}/create-rule")
-def create_rule_from_account(account_id: str, body: dict = {}):
+def create_rule_from_account(account_id: str, body: CreateRuleFromAccountBody = CreateRuleFromAccountBody()):
     """Create a client-specific rule from a manually edited account."""
     from app.sprint3.services.coa_review_service import create_client_rule
 
@@ -346,18 +376,18 @@ def create_rule_from_account(account_id: str, body: dict = {}):
             raise HTTPException(404, "Account not found")
 
         client_id = row[0]
-        rule_name = body.get("rule_name", f"قاعدة مخصصة: {(row[2] or '')[:40]}")
-        rule_type = body.get("rule_type", "classification_override")
+        rule_name = body.rule_name if body.rule_name is not None else f"قاعدة مخصصة: {(row[2] or '')[:40]}"
+        rule_type = body.rule_type if body.rule_type is not None else "classification_override"
 
-        condition = body.get("condition", {
+        condition = body.condition if body.condition is not None else {
             "field": "account_name_raw",
             "contains": row[2],
-        })
-        action = body.get("action", {
+        }
+        action = body.action if body.action is not None else {
             "set_class": row[3],
             "set_section": row[4],
             "set_subcategory": row[5],
-        })
+        }
     finally:
         db.close()
 
@@ -367,7 +397,7 @@ def create_rule_from_account(account_id: str, body: dict = {}):
         rule_type=rule_type,
         condition_json=condition,
         action_json=action,
-        created_by=body.get("created_by"),
+        created_by=body.created_by,
         source_upload_id=row[1],
         source_account_id=account_id,
     )
@@ -385,22 +415,17 @@ def get_client_rules(client_id: str, active_only: bool = Query(True)):
 
 
 @router.post("/clients/{client_id}/coa-rules")
-def create_client_rule_direct(client_id: str, body: dict):
+def create_client_rule_direct(client_id: str, body: CreateClientRuleBody):
     """Create a client-specific classification rule directly."""
     from app.sprint3.services.coa_review_service import create_client_rule
 
-    required = ["rule_name", "condition", "action"]
-    for f in required:
-        if not body.get(f):
-            raise HTTPException(400, f"Missing required field: {f}")
-
     result = create_client_rule(
         client_id=client_id,
-        rule_name=body["rule_name"],
-        rule_type=body.get("rule_type", "alias"),
-        condition_json=body["condition"],
-        action_json=body["action"],
-        created_by=body.get("created_by"),
+        rule_name=body.rule_name,
+        rule_type=body.rule_type,
+        condition_json=body.condition,
+        action_json=body.action,
+        created_by=body.created_by,
     )
 
     if not result.get("success"):

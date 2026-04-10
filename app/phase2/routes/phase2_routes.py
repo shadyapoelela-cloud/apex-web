@@ -51,6 +51,10 @@ class AddMemberRequest(BaseModel):
     user_id: str
     role: str = "member"
 
+class UpdateDocumentStatusRequest(BaseModel):
+    status: Optional[str] = Field(None, description="New document status")
+    reason: Optional[str] = Field(None, description="Reason for status change")
+
 
 # ═══════════════════════════════════════════════════════════════
 # Client APIs
@@ -278,7 +282,7 @@ async def get_client_readiness(client_id: str, user: dict = Depends(get_current_
 @router.patch("/clients/{client_id}/documents/{doc_type}/status", tags=["Phase1-Documents"])
 async def update_document_status(
     client_id: str, doc_type: str,
-    body: dict = {},
+    body: UpdateDocumentStatusRequest = UpdateDocumentStatusRequest(),
     user: dict = Depends(get_current_user)
 ):
     """Update document status following lifecycle rules."""
@@ -294,8 +298,8 @@ async def update_document_status(
             raise HTTPException(404, "Document not found")
 
         current_doc = {"id": row[0], "status": row[1], "document_type": row[2], "name_ar": row[3], "required": row[4]}
-        new_status = body.get("status")
-        reason = body.get("reason")
+        new_status = body.status
+        reason = body.reason
 
         if not new_status:
             raise HTTPException(400, "Missing 'status' in body")

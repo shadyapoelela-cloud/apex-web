@@ -4,10 +4,19 @@ APIs to run financial analysis using approved COA + TB binding.
 """
 
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field
 from typing import Optional
 import json
 import logging
 from app.core.db_utils import get_db_session as _db, exec_sql as _exec
+
+
+class RunAnalysisRequest(BaseModel):
+    client_id: str = Field(..., description="Client ID")
+    tb_upload_id: str = Field(..., description="Trial balance upload ID")
+    industry: str = Field("general", description="Industry sector")
+    closing_inventory: Optional[float] = Field(None, description="Closing inventory value")
+    triggered_by: Optional[str] = Field(None, description="Who triggered the analysis")
 
 router = APIRouter()
 
@@ -39,19 +48,17 @@ def validate_analysis(client_id: str, tb_upload_id: str):
 # 2. Run COA-aware analysis
 # ══════════════════════════════════════════════════════════════
 @router.post("/analysis/run", tags=["Analysis Trigger"])
-def run_analysis(body: dict):
+def run_analysis(body: RunAnalysisRequest):
     """
     Run financial analysis using approved COA mapping + TB binding.
     Required: client_id, tb_upload_id
     Optional: industry, closing_inventory
     """
-    client_id = body.get("client_id")
-    tb_upload_id = body.get("tb_upload_id")
-    if not client_id or not tb_upload_id:
-        raise HTTPException(422, "client_id and tb_upload_id are required")
+    client_id = body.client_id
+    tb_upload_id = body.tb_upload_id
 
-    industry = body.get("industry", "general")
-    closing_inventory = body.get("closing_inventory")
+    industry = body.industry
+    closing_inventory = body.closing_inventory
 
     db = _db()
     try:
@@ -62,7 +69,7 @@ def run_analysis(body: dict):
             db, client_id, tb_upload_id,
             industry=industry,
             closing_inventory=closing_inventory,
-            triggered_by=body.get("triggered_by"),
+            triggered_by=body.triggered_by,
         )
         if not result.get("success"):
             raise HTTPException(400, result)

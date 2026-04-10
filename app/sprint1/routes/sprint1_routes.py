@@ -12,7 +12,29 @@ APIs per Sprint 1 Build Spec §15:
 import os
 import logging
 from fastapi import APIRouter, File, UploadFile, HTTPException, Query, Depends
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Any, Dict, Optional
+
+
+# ── Request Models ──
+
+class ParseCoaRequest(BaseModel):
+    column_mapping: Optional[Dict[str, str]] = Field(None, description="Column mapping overrides")
+    header_row_index: Optional[int] = Field(None, description="Header row index override")
+    sheet_name: Optional[str] = Field(None, description="Sheet name override")
+
+
+class KnowledgeFeedbackRequest(BaseModel):
+    client_id: str = Field(..., description="Client ID")
+    feedback_category: str = Field(..., description="Feedback category")
+    feedback_text: str = Field(..., description="Feedback text content")
+    coa_upload_id: Optional[str] = Field(None, description="Related COA upload ID")
+    coa_account_id: Optional[str] = Field(None, description="Related COA account ID")
+    feedback_source_type: str = Field("privileged_client", description="Source type of feedback")
+    submitted_by: Optional[str] = Field(None, description="User who submitted the feedback")
+    feedback_severity: Optional[str] = Field(None, description="Severity level of feedback")
+    suggested_correction_json: Optional[Any] = Field(None, description="Suggested correction data")
+    reference_context_json: Optional[Any] = Field(None, description="Reference context data")
 
 router = APIRouter(tags=["Sprint 1 — COA Workflow"])
 
@@ -136,23 +158,23 @@ async def get_upload_status(upload_id: str):
 # ══════════════════════════════════════════════════════════════
 
 @router.post("/coa/uploads/{upload_id}/parse")
-async def parse_coa(upload_id: str, body: dict = None):
+async def parse_coa(upload_id: str, body: ParseCoaRequest = None):
     """Execute full parse after confirming column mapping."""
     from app.sprint1.services.coa.coa_upload_service import get_upload, save_parse_results
     from app.sprint1.services.coa.coa_file_reader import stream_rows
     from app.sprint1.services.coa.coa_parser import parse_upload
-    
+
     upload = get_upload(upload_id)
     if not upload:
         raise HTTPException(404, "Upload not found")
-    
+
     # Get mapping from request body or stored mapping
-    body = body or {}
-    column_mapping = body.get("column_mapping") or upload.get("column_mapping") or {}
-    header_row_index = body.get("header_row_index")
+    body = body or ParseCoaRequest()
+    column_mapping = body.column_mapping or upload.get("column_mapping") or {}
+    header_row_index = body.header_row_index
     if header_row_index is None:
         header_row_index = upload.get("header_row_index", 0)
-    sheet_name = body.get("sheet_name") or upload.get("sheet_name")
+    sheet_name = body.sheet_name or upload.get("sheet_name")
     
     # Validate: account_name mapping required
     if "account_name" not in column_mapping or not column_mapping["account_name"]:
@@ -250,30 +272,25 @@ async def list_parsed_accounts(
 # ══════════════════════════════════════════════════════════════
 
 @router.post("/coa/knowledge-feedback")
-async def create_knowledge_feedback(body: dict):
+async def create_knowledge_feedback(body: KnowledgeFeedbackRequest):
     """Save structured knowledge feedback from eligible client."""
     from app.phase1.models.platform_models import SessionLocal, gen_uuid
     from app.sprint1.models.sprint1_models import CoaKnowledgeFeedback
-    
-    required = ["client_id", "feedback_category", "feedback_text"]
-    for field in required:
-        if not body.get(field):
-            raise HTTPException(400, f"Missing required field: {field}")
-    
+
     db = SessionLocal()
     try:
         fb = CoaKnowledgeFeedback(
             id=gen_uuid(),
-            client_id=body["client_id"],
-            coa_upload_id=body.get("coa_upload_id"),
-            coa_account_id=body.get("coa_account_id"),
-            feedback_source_type=body.get("feedback_source_type", "privileged_client"),
-            submitted_by=body.get("submitted_by"),
-            feedback_category=body["feedback_category"],
-            feedback_severity=body.get("feedback_severity"),
-            feedback_text=body["feedback_text"],
-            suggested_correction_json=body.get("suggested_correction_json"),
-            reference_context_json=body.get("reference_context_json"),
+            client_id=body.client_id,
+            coa_upload_id=body.coa_upload_id,
+            coa_account_id=body.coa_account_id,
+            feedback_source_type=body.feedback_source_type,
+            submitted_by=body.submitted_by,
+            feedback_category=body.feedback_category,
+            feedback_severity=body.feedback_severity,
+            feedback_text=body.feedback_text,
+            suggested_correction_json=body.suggested_correction_json,
+            reference_context_json=body.reference_context_json,
         )
         db.add(fb)
         db.commit()

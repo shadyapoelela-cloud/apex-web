@@ -1,8 +1,25 @@
 """Sprint 2 -- COA Classification APIs"""
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+from typing import Optional, List
 import json, uuid, logging
 from datetime import datetime, timezone
 from app.core.db_utils import exec_sql as _exec
+
+
+class EditAccountClassificationBody(BaseModel):
+    normalized_class: Optional[str] = Field(None, description="Normalized account class")
+    statement_section: Optional[str] = Field(None, description="Financial statement section")
+    subcategory: Optional[str] = Field(None, description="Account subcategory")
+    current_noncurrent: Optional[str] = Field(None, description="Current or non-current classification")
+    cashflow_role: Optional[str] = Field(None, description="Cash flow statement role")
+    sign_rule: Optional[str] = Field(None, description="Sign rule for the account")
+
+
+class BulkApproveBody(BaseModel):
+    account_ids: List[str] = Field(default_factory=list, description="List of account IDs to approve")
+    min_confidence: Optional[float] = Field(None, description="Minimum confidence threshold for approval")
+    approve_all_above: Optional[float] = Field(None, description="Alias for min_confidence threshold")
 
 router = APIRouter()
 
@@ -241,13 +258,13 @@ def get_mapping_preview(
 
 # ── PUT /coa/accounts/{account_id} ──
 @router.put("/coa/account/{account_id}")
-def edit_account_classification(account_id: str, body: dict):
+def edit_account_classification(account_id: str, body: EditAccountClassificationBody):
     """Edit classification for a single account."""
     from app.phase1.models.platform_models import SessionLocal
 
     db = SessionLocal()
     try:
-        row = _exec(db, 
+        row = _exec(db,
             "SELECT id FROM client_chart_of_accounts WHERE id = :aid",
             {"aid": account_id}
         ).fetchone()
@@ -258,11 +275,12 @@ def edit_account_classification(account_id: str, body: dict):
                     "current_noncurrent", "cashflow_role", "sign_rule"]
         updates = []
         params = {"aid": account_id}
+        body_data = body.model_dump(exclude_unset=True)
 
         for field in allowed:
-            if field in body:
+            if field in body_data:
                 updates.append(f"{field} = :{field}")
-                params[field] = body[field]
+                params[field] = body_data[field]
 
         if not updates:
             raise HTTPException(400, "No valid fields to update")
@@ -310,15 +328,15 @@ def approve_account(account_id: str):
 
 # ── POST /coa/uploads/{upload_id}/bulk-approve ──
 @router.post("/coa/bulk-approve/{upload_id}")
-def bulk_approve(upload_id: str, body: dict = {}):
+def bulk_approve(upload_id: str, body: BulkApproveBody = BulkApproveBody()):
     """Bulk approve accounts by IDs or confidence threshold."""
     from app.phase1.models.platform_models import SessionLocal
 
     db = SessionLocal()
     try:
         now = datetime.now(timezone.utc).isoformat()
-        account_ids = body.get("account_ids", [])
-        min_confidence = body.get("min_confidence") or body.get("approve_all_above")
+        account_ids = body.account_ids
+        min_confidence = body.min_confidence or body.approve_all_above
 
         if account_ids:
             placeholders = ",".join([f":id{i}" for i in range(len(account_ids))])
