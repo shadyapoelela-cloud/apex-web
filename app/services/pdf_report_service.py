@@ -1,3 +1,7 @@
+"""
+APEX — PDF report generation service using ReportLab with Arabic font support
+خدمة إنشاء تقارير PDF باستخدام ReportLab مع دعم الخطوط العربية
+"""
 import os
 import io
 import tempfile
@@ -17,8 +21,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 FONT_DIR = os.path.join(tempfile.gettempdir(), "apex_fonts")
 os.makedirs(FONT_DIR, exist_ok=True)
 
-AMIRI_URL = "https://github.com/google/fonts/raw/main/ofl/amiri/Amiri-Regular.ttf"
-AMIRI_BOLD_URL = "https://github.com/google/fonts/raw/main/ofl/amiri/Amiri-Bold.ttf"
+AMIRI_URL = os.environ.get("AMIRI_FONT_URL", "https://github.com/google/fonts/raw/main/ofl/amiri/Amiri-Regular.ttf")
+AMIRI_BOLD_URL = os.environ.get("AMIRI_BOLD_FONT_URL", "https://github.com/google/fonts/raw/main/ofl/amiri/Amiri-Bold.ttf")
 AMIRI_PATH = os.path.join(FONT_DIR, "Amiri-Regular.ttf")
 AMIRI_BOLD_PATH = os.path.join(FONT_DIR, "Amiri-Bold.ttf")
 

@@ -16,6 +16,7 @@ from fastapi import APIRouter, File, UploadFile, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional
 from sqlalchemy import text as _t
+from app.core.db_utils import get_db_session
 
 
 # ── Request Models ────────────────────────────────────────
@@ -38,10 +39,6 @@ router = APIRouter(tags=["Sprint 4 — TB Upload & Binding"])
 SUPPORTED_EXTENSIONS = {".xlsx", ".xls"}
 MAX_FILE_SIZE = 15 * 1024 * 1024
 
-
-def _get_db():
-    from app.phase1.models.platform_models import SessionLocal
-    return SessionLocal()
 
 
 # ═══════════════════════════════════════════════════════════
@@ -78,7 +75,7 @@ async def upload_tb(
             f.write(content)
 
         # If no COA specified, find latest approved for this client
-        db = _get_db()
+        db = get_db_session()
         try:
             if not coa_upload_id:
                 coa_row = db.execute(_t(
@@ -140,7 +137,7 @@ async def upload_tb(
 @router.get("/tb/uploads/{tb_upload_id}")
 def get_tb_upload(tb_upload_id: str):
     """Get TB upload metadata and status."""
-    db = _get_db()
+    db = get_db_session()
     try:
         row = db.execute(_t(
             """SELECT id, client_id, coa_upload_id, file_name, file_format,
@@ -177,7 +174,7 @@ def bind_tb(tb_upload_id: str, body: BindTBRequest = BindTBRequest()):
     """Run binding engine — match TB rows to approved COA accounts."""
     from app.sprint4_tb.services.tb_binding_engine import bind_tb_to_coa
 
-    db = _get_db()
+    db = get_db_session()
     try:
         row = db.execute(_t(
             "SELECT client_id, coa_upload_id, upload_status FROM trial_balance_uploads WHERE id = :uid"
@@ -229,7 +226,7 @@ def get_binding_results(
     search: Optional[str] = Query(None),
 ):
     """View binding results with filters and pagination."""
-    db = _get_db()
+    db = get_db_session()
     try:
         where = ["tb_upload_id = :uid"]
         params = {"uid": tb_upload_id}
@@ -321,7 +318,7 @@ def approve_tb_binding(tb_upload_id: str, body: ApproveBindingRequest = ApproveB
 @router.get("/tb/uploads/{tb_upload_id}/binding-summary")
 def binding_summary(tb_upload_id: str):
     """Get binding summary statistics."""
-    db = _get_db()
+    db = get_db_session()
     try:
         rows = db.execute(_t(
             """SELECT matched, match_type, binding_confidence, requires_review,

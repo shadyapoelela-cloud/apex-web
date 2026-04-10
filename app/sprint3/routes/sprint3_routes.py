@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timezone
 from sqlalchemy import text as _t
+from app.core.db_utils import get_db_session
 
 
 # ── Request Models ──────────────────────────────────────────
@@ -52,11 +53,6 @@ class CreateClientRuleBody(BaseModel):
 router = APIRouter(tags=["Sprint 3 — COA Quality & Review"])
 
 
-def _get_db():
-    from app.phase1.models.platform_models import SessionLocal
-    return SessionLocal()
-
-
 # ═══════════════════════════════════════════════════════════
 # POST /coa/uploads/{upload_id}/assess
 # ═══════════════════════════════════════════════════════════
@@ -67,7 +63,7 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
     from app.sprint3.services.coa_quality_engine import run_full_assessment
     from app.phase1.models.platform_models import gen_uuid
 
-    db = _get_db()
+    db = get_db_session()
     try:
         # Verify upload exists and is classified
         upload_row = db.execute(_t(
@@ -211,7 +207,7 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
 @router.get("/coa/uploads/{upload_id}/assessment")
 def get_assessment(upload_id: str):
     """Get stored quality assessment for a COA upload."""
-    db = _get_db()
+    db = get_db_session()
     try:
         row = db.execute(_t(
             """SELECT overall_score, completeness_score, consistency_score,
@@ -264,7 +260,7 @@ def check_coa_approval_readiness(upload_id: str):
     """Check all approval gates before allowing final COA approve."""
     from app.sprint3.services.coa_approval_gate import check_approval_gates
 
-    db = _get_db()
+    db = get_db_session()
     try:
         scores_row = db.execute(_t(
             "SELECT overall_score, completeness_score, reporting_readiness_score "
@@ -292,7 +288,7 @@ def approve_coa(upload_id: str, body: ApproveCoaBody = ApproveCoaBody()):
     """Approve the entire COA upload as the client's approved chart."""
     from app.sprint3.services.coa_review_service import approve_upload
 
-    db = _get_db()
+    db = get_db_session()
     try:
         upload_row = db.execute(_t(
             "SELECT client_id FROM client_coa_uploads WHERE id = :uid"
@@ -324,7 +320,7 @@ def reject_coa(upload_id: str, body: RejectCoaBody = RejectCoaBody()):
     """Return COA upload for review/revision."""
     from app.sprint3.services.coa_review_service import reject_upload
 
-    db = _get_db()
+    db = get_db_session()
     try:
         upload_row = db.execute(_t(
             "SELECT client_id FROM client_coa_uploads WHERE id = :uid"
@@ -365,7 +361,7 @@ def create_rule_from_account(account_id: str, body: CreateRuleFromAccountBody = 
     """Create a client-specific rule from a manually edited account."""
     from app.sprint3.services.coa_review_service import create_client_rule
 
-    db = _get_db()
+    db = get_db_session()
     try:
         row = db.execute(_t(
             """SELECT client_id, coa_upload_id, account_name_raw, normalized_class,
@@ -436,7 +432,7 @@ def create_client_rule_direct(client_id: str, body: CreateClientRuleBody):
 @router.delete("/coa/rules/{rule_id}")
 def deactivate_rule(rule_id: str):
     """Deactivate a client-specific rule (soft delete)."""
-    db = _get_db()
+    db = get_db_session()
     try:
         row = db.execute(_t("SELECT id FROM client_coa_rules WHERE id = :rid"), {"rid": rule_id}).fetchone()
         if not row:

@@ -1,3 +1,7 @@
+"""
+APEX — Copilot API routes for chat, sessions, and escalation management
+مسارات API للمساعد الذكي: المحادثة، الجلسات، وإدارة التصعيدات
+"""
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -43,10 +47,12 @@ async def list_sessions(user: dict = Depends(get_current_user)):
 
 
 @router.get('/sessions/{session_id}')
-async def get_session(session_id: str):
+async def get_session(session_id: str, user: dict = Depends(get_current_user)):
     session = CopilotService.get_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail='الجلسة غير موجودة')
+    if session.get('user_id') != user['sub']:
+        raise HTTPException(status_code=403, detail='غير مصرح بالوصول لهذه الجلسة')
     return {'success': True, 'data': session}
 
 
@@ -86,7 +92,7 @@ async def get_messages(session_id: str, user: dict = Depends(get_current_user)):
 
 
 @router.post('/detect-intent')
-async def detect_intent_endpoint(req: ChatRequest):
+async def detect_intent_endpoint(req: ChatRequest, user: dict = Depends(get_current_user)):
     result = detect_intent(req.message)
     return {'success': True, 'data': result}
 

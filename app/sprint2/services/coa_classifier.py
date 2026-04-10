@@ -20,6 +20,7 @@ Classification priority:
 
 import re, json
 from typing import Optional
+from app.core.text_utils import remove_diacritics
 
 # ── Normalized Classes ──
 CLASSES = ["asset", "liability", "equity", "revenue", "expense", "contra", "other"]
@@ -176,17 +177,11 @@ CODE_PREFIX_RULES = [
     ("52", "expense", 0.65),
 ]
 
-def _remove_diacritics(text: str) -> str:
-    """Remove Arabic diacritics for matching."""
-    if not text:
-        return ""
-    return re.sub(r'[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED]', '', text)
-
 def _normalize_for_match(text: str) -> str:
     """Normalize text for classification matching."""
     if not text:
         return ""
-    t = _remove_diacritics(text.strip().lower())
+    t = remove_diacritics(text.strip().lower())
     # Normalize common Arabic chars
     t = t.replace("أ", "ا").replace("إ", "ا").replace("آ", "ا")
     t = t.replace("ى", "ي").replace("ة", "ه")

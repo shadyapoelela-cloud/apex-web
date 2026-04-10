@@ -1,3 +1,7 @@
+"""
+APEX — Sprint 2 models for COA account classification and review workflow
+نماذج السبرنت الثاني لتصنيف الحسابات ومراجعة شجرة الحسابات
+"""
 import enum
 from sqlalchemy import Column, String, Float, Text, DateTime, Boolean, Integer, Enum as SAEnum, func
 from sqlalchemy.ext.declarative import declarative_base

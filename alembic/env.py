@@ -7,8 +7,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.phase1.models.platform_models import Base, DB_URL
 
-# Import ALL models so they register with Base.metadata
-from app.phase1.models.platform_models import *
+# Import ALL model modules so their classes register with Base.metadata.
+# Wildcard imports are used here intentionally (exception to project rule)
+# because we only need the side-effect of model class registration.
+from app.phase1.models.platform_models import *  # noqa: F403
 from app.phase2.models.phase2_models import *
 from app.phase2.models.onboarding_models import *
 from app.phase2.models.archive_models import *

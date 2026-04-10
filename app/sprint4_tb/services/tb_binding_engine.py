@@ -20,16 +20,7 @@ import re, json
 import logging
 from typing import Dict, List, Optional
 from difflib import SequenceMatcher
-
-
-def _norm(text: str) -> str:
-    if not text:
-        return ""
-    t = text.strip().lower()
-    t = re.sub(r'[\u0610-\u061A\u064B-\u065F\u0670]', '', t)
-    t = t.replace("\u0623", "\u0627").replace("\u0625", "\u0627").replace("\u0622", "\u0627")
-    t = t.replace("\u0649", "\u064a").replace("\u0629", "\u0647")
-    return re.sub(r"\s+", " ", t)
+from app.core.text_utils import normalize_arabic
 
 
 def bind_tb_to_coa(
@@ -69,7 +60,7 @@ def bind_tb_to_coa(
         for r in coa_rows:
             entry = {
                 "id": r[0], "code": (r[1] or "").strip(),
-                "name_raw": r[2], "name_norm": _norm(r[2] or ""),
+                "name_raw": r[2], "name_norm": normalize_arabic(r[2] or ""),
                 "nc": r[4], "section": r[5], "cashflow": r[6],
             }
             coa_list.append(entry)
@@ -119,7 +110,7 @@ def bind_tb_to_coa(
             tb_id = tb[0]
             tb_code = (tb[1] or "").strip()
             tb_name = (tb[2] or "").strip()
-            tb_norm = _norm(tb_name)
+            tb_norm = normalize_arabic(tb_name)
             tb_debit = tb[4] or 0.0
             tb_credit = tb[5] or 0.0
             tb_net = tb[6] or 0.0
@@ -149,7 +140,7 @@ def bind_tb_to_coa(
                         target_class = act.get("set_class")
                         if target_class:
                             for c in coa_list:
-                                if c["nc"] == target_class and _norm(c["name_raw"]) == tb_norm:
+                                if c["nc"] == target_class and normalize_arabic(c["name_raw"]) == tb_norm:
                                     match = (c, "client_rule", 0.85)
                                     break
                         if match:
