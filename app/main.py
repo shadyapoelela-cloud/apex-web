@@ -45,6 +45,13 @@ class AccountClosureRequest(BaseModel):
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "apex-admin-2026")
 if ADMIN_SECRET == "apex-admin-2026":
     logging.warning("ADMIN_SECRET is using default value! Set ADMIN_SECRET env var in production.")
+
+def _verify_admin(secret: str = None, x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    """Verify admin secret from header (preferred) or query param (legacy, deprecated)."""
+    token = x_admin_secret or secret
+    if not token or token != ADMIN_SECRET:
+        raise HTTPException(403, "Invalid admin secret")
+    return token
 from fastapi.responses import Response as PDFResponse
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
@@ -176,9 +183,13 @@ except Exception as e:
     logging.warning(f"Phase 11 disabled: {e}")
 
 
-app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="10.2.0")
-_cors_origins = os.environ.get("CORS_ORIGINS", "").split(",") if os.environ.get("CORS_ORIGINS") else ["*"]
-app.add_middleware(CORSMiddleware, allow_origins=_cors_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
+app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="10.4.0")
+_cors_env = os.environ.get("CORS_ORIGINS", "")
+_cors_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else ["*"]
+_allow_creds = "*" not in _cors_origins  # credentials forbidden with wildcard
+if not _allow_creds:
+    logging.warning("CORS allows all origins — set CORS_ORIGINS env var in production")
+app.add_middleware(CORSMiddleware, allow_origins=_cors_origins, allow_credentials=_allow_creds, allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
 from collections import defaultdict
@@ -337,9 +348,8 @@ def root():
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 @app.post("/admin/reinit-db", tags=["Admin"])
-def reinit_db(secret: str = Query(...)):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(403, "Invalid secret")
+def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     results = {}
 
     # Phase 1 â€" Core tables
@@ -583,9 +593,8 @@ def reinit_db(secret: str = Query(...)):
 
 
 @app.post("/admin/seed-all", tags=["Admin"])
-def seed_all_data(secret: str = Query(...)):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(status_code=403, detail="Invalid secret")
+def seed_all_data(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     from app.seed_runner import seed_all
     seed_all()
     return {"success": True, "data": {"message": "All seed data loaded"}}
@@ -618,9 +627,8 @@ def health():
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 @app.post("/admin/reset-postgres", tags=["Admin"])
-def reset_postgres(secret: str = Query(...)):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(403, "Invalid secret")
+def reset_postgres(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     from app.phase1.models.platform_models import Base, engine
     from sqlalchemy import text as _txt
     import os
@@ -651,9 +659,8 @@ def reset_postgres(secret: str = Query(...)):
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 @app.post("/admin/promote-user", tags=["Admin"])
-def promote_user(secret: str = Query(...), username: str = Query(...), role: str = Query("platform_admin")):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(403, "Invalid secret")
+def promote_user(username: str = Query(...), role: str = Query("platform_admin"), secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     from app.phase1.models.platform_models import SessionLocal
     from sqlalchemy import text as _t
     import uuid
@@ -680,9 +687,8 @@ def promote_user(secret: str = Query(...), username: str = Query(...), role: str
 
 
 @app.post("/admin/promote/{username}", tags=["Admin"])
-async def promote_to_admin(username: str, secret: str = Query(...)):
-    if secret != ADMIN_SECRET:
-        raise HTTPException(403, "Invalid secret")
+async def promote_to_admin(username: str, secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    _verify_admin(secret, x_admin_secret)
     try:
         from app.phase1.models.platform_models import SessionLocal, User, UserRole, Role
         db = SessionLocal()
