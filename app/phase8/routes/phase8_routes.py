@@ -26,6 +26,15 @@ router = APIRouter()
 # ─── Plan ordering for upgrade/downgrade validation ──────
 PLAN_ORDER = {"Free": 0, "Pro": 1, "Business": 2, "Expert": 3, "Enterprise": 4}
 
+# ─── Plan pricing (SAR) ──────────────────────────────────
+PLAN_PRICES = {
+    "Free": {"monthly": 0, "yearly": 0},
+    "Pro": {"monthly": 99, "yearly": 990},
+    "Business": {"monthly": 299, "yearly": 2990},
+    "Expert": {"monthly": 0, "yearly": 0},       # commission-based
+    "Enterprise": {"monthly": 0, "yearly": 0},    # custom pricing
+}
+
 # ─── Helper: Extract user_id from token ───────────────────
 def get_current_user_id(authorization: str = None):
     """Extract user_id from JWT — simplified"""
@@ -274,3 +283,162 @@ def _format_value(value):
         return f"📊 {int(value)} شهرياً"
     except Exception:
         return value
+
+
+# ═══════════════════════════════════════════════════════════════
+# Payment Gateway Endpoints
+# ═══════════════════════════════════════════════════════════════
+
+# ─── POST /subscriptions/checkout ─────────────────────────────
+@router.post("/subscriptions/checkout")
+def create_checkout(
+    plan_name: str = Query(...),
+    period: str = Query("monthly"),
+    authorization: str = None,
+    x_token: str = Header(None, alias="Authorization"),
+):
+    """Create a payment checkout session for a plan."""
+    from app.core.payment_service import create_checkout_session, PAYMENT_BACKEND
+    from app.phase8.models.phase8_models import PaymentRecord
+
+    user_id = get_current_user_id(authorization or x_token)
+    if not user_id:
+        raise HTTPException(401, "يجب تسجيل الدخول")
+
+    if plan_name not in PLAN_PRICES:
+        raise HTTPException(400, f"خطة غير معروفة: {plan_name}")
+
+    if period not in ("monthly", "yearly"):
+        raise HTTPException(400, "الفترة يجب أن تكون monthly أو yearly")
+
+    amount = PLAN_PRICES[plan_name].get(period, 0)
+
+    # Create checkout session via payment service
+    result = create_checkout_session(
+        user_id=user_id,
+        plan_code=plan_name,
+        plan_name=plan_name,
+        amount_sar=amount,
+        period=period,
+    )
+
+    if not result.get("success"):
+        raise HTTPException(500, result.get("error", "فشل إنشاء جلسة الدفع"))
+
+    # Save PaymentRecord with status=pending
+    db = SessionLocal()
+    try:
+        record = PaymentRecord(
+            id=gen_uuid(),
+            user_id=user_id,
+            plan_code=plan_name,
+            amount=amount,
+            currency="SAR",
+            payment_method=PAYMENT_BACKEND,
+            session_id=result["session_id"],
+            status="pending",
+            created_at=utcnow(),
+        )
+        db.add(record)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        logging.error("Failed to save payment record: %s", e)
+    finally:
+        db.close()
+
+    return {
+        "success": True,
+        "data": {
+            "checkout_url": result["checkout_url"],
+            "session_id": result["session_id"],
+            "plan": plan_name,
+            "amount": amount,
+            "currency": "SAR",
+            "period": period,
+        },
+    }
+
+
+# ─── POST /subscriptions/verify-payment ──────────────────────
+@router.post("/subscriptions/verify-payment")
+def verify_payment_endpoint(
+    session_id: str = Query(...),
+    authorization: str = None,
+    x_token: str = Header(None, alias="Authorization"),
+):
+    """Verify payment and activate the user's plan."""
+    from app.core.payment_service import verify_payment
+    from app.phase8.models.phase8_models import PaymentRecord
+
+    user_id = get_current_user_id(authorization or x_token)
+    if not user_id:
+        raise HTTPException(401, "يجب تسجيل الدخول")
+
+    # Look up payment record
+    db = SessionLocal()
+    try:
+        record = (
+            db.query(PaymentRecord)
+            .filter(PaymentRecord.session_id == session_id, PaymentRecord.user_id == user_id)
+            .first()
+        )
+        if not record:
+            raise HTTPException(404, "سجل الدفع غير موجود")
+
+        if record.status == "completed":
+            return {"success": True, "data": {"message": "تم تفعيل الدفع مسبقاً", "plan": record.plan_code}}
+
+        # Verify with payment backend
+        result = verify_payment(session_id)
+        if not result.get("success"):
+            raise HTTPException(500, result.get("error", "فشل التحقق من الدفع"))
+
+        if result.get("paid"):
+            # Update payment record
+            record.status = "completed"
+            record.completed_at = utcnow()
+            db.commit()
+
+            # Activate the plan
+            plan_code = record.plan_code
+            upgrade_result = upgrade_user_plan(user_id, plan_code)
+
+            return {
+                "success": True,
+                "data": {
+                    "message": f"تم تفعيل خطة {plan_code} بنجاح",
+                    "plan": plan_code,
+                    "paid": True,
+                    "upgrade_result": upgrade_result,
+                },
+            }
+        else:
+            record.status = "failed"
+            db.commit()
+            return {"success": True, "data": {"paid": False, "message": "لم يتم إتمام الدفع"}}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logging.error("Payment verification error: %s", e)
+        raise HTTPException(500, "حدث خطأ أثناء التحقق من الدفع")
+    finally:
+        db.close()
+
+
+# ─── GET /subscriptions/payment-history ───────────────────────
+@router.get("/subscriptions/payment-history")
+def get_payment_history_endpoint(
+    authorization: str = None,
+    x_token: str = Header(None, alias="Authorization"),
+):
+    """Get the current user's payment history."""
+    from app.core.payment_service import get_payment_history
+
+    user_id = get_current_user_id(authorization or x_token)
+    if not user_id:
+        raise HTTPException(401, "يجب تسجيل الدخول")
+
+    history = get_payment_history(user_id)
+    return {"success": True, "data": {"payments": history, "total": len(history)}}

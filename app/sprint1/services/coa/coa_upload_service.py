@@ -4,31 +4,24 @@ APEX Sprint 1 — COA Upload Service
 Manages upload records, file storage, status transitions.
 """
 import os
-import uuid
+import logging
 from typing import Optional, Dict, Any
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.sprint1.models.sprint1_models import (
     ClientCoaUpload, ClientChartOfAccount, RejectedCoaRow,
     CoaUploadStatus, CoaRecordStatus,
 )
+from app.core.storage_service import upload_file, download_file
 
-
-UPLOAD_DIR = os.environ.get("COA_UPLOAD_DIR", "/tmp/apex_coa_uploads")
-
-
-def ensure_upload_dir():
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
+logger = logging.getLogger(__name__)
 
 
 def save_uploaded_file(content: bytes, filename: str) -> str:
-    """Save file and return stored path."""
-    ensure_upload_dir()
-    ext = os.path.splitext(filename)[1].lower()
-    stored_name = f"{uuid.uuid4().hex}{ext}"
-    path = os.path.join(UPLOAD_DIR, stored_name)
-    with open(path, "wb") as f:
-        f.write(content)
-    return path
+    """Save file via storage service and return stored path."""
+    result = upload_file(content, filename, folder="coa_uploads")
+    if not result.get("success"):
+        raise RuntimeError(f"File upload failed: {result.get('error', 'unknown')}")
+    return result["stored_path"]
 
 
 def create_upload_record(
