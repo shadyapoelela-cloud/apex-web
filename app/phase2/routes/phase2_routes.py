@@ -13,6 +13,7 @@ import os, logging
 from app.phase1.routes.phase1_routes import get_current_user
 from app.phase2.services.client_service import ClientService
 from app.phase2.services.analysis_service import AnalysisService
+from app.core.storage_service import upload_file as storage_upload
 
 # ── Phase 1 Integration ──
 from app.phase2.services.readiness_service import compute_readiness, get_missing_for_coa
@@ -139,6 +140,12 @@ async def upload_and_analyze(
     MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
     if len(content) > MAX_UPLOAD_SIZE:
         raise HTTPException(status_code=413, detail="حجم الملف يتجاوز الحد المسموح 10MB")
+
+    # Persist file via storage service
+    store_result = storage_upload(content, file.filename, folder="trial_balance")
+    if not store_result.get("success"):
+        logging.error("File storage failed: %s", store_result.get("error"))
+        raise HTTPException(status_code=500, detail="File storage failed")
 
     # Store upload record
     upload_id = analysis_service.store_upload(
