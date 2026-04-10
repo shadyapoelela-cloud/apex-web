@@ -13,7 +13,7 @@ APIs:
   DELETE /coa/rules/{rule_id}              — Deactivate rule
 """
 
-import json, traceback
+import json, logging
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from datetime import datetime, timezone
@@ -148,7 +148,7 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
 
         db.commit()
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "overall_score": result["overall_score"],
             "completeness_score": result["completeness_score"],
@@ -164,11 +164,12 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
             "recommendations": result["recommendations"],
             "reporting_readiness": result["reporting_readiness"]["readiness"],
             "issues_count": len(result["issues"]),
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, f"Assessment error: {e}\n{traceback.format_exc()}")
+        logging.error("COA assessment error", exc_info=True)
+        raise HTTPException(500, "COA quality assessment failed")
     finally:
         db.close()
 
@@ -200,7 +201,7 @@ def get_assessment(upload_id: str):
                 return json.loads(val)
             return val or []
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "overall_score": row[0],
             "completeness_score": row[1],
@@ -219,7 +220,7 @@ def get_assessment(upload_id: str):
             "ambiguous_accounts": _parse(row[14]),
             "duplicate_suspects": _parse(row[15]),
             "assessed_at": str(row[16]) if row[16] else None,
-        }
+        }}
     finally:
         db.close()
 
@@ -241,7 +242,7 @@ def check_coa_approval_readiness(upload_id: str):
         ), {"uid": upload_id}).fetchone()
 
         if not scores_row:
-            return {"can_approve": False, "blockers": ["Run quality assessment first"], "quality_overall": 0}
+            return {"success": True, "data": {"can_approve": False, "blockers": ["Run quality assessment first"], "quality_overall": 0}}
 
         quality_scores = {"overall": scores_row[0] or 0, "completeness": scores_row[1] or 0, "reporting": scores_row[2] or 0}
 
@@ -250,7 +251,8 @@ def check_coa_approval_readiness(upload_id: str):
         ), {"uid": upload_id}).fetchall()
         accounts = [{"status": r[0], "normalized_class": r[1]} for r in rows]
 
-        return check_approval_gates(accounts, quality_scores)
+        result = check_approval_gates(accounts, quality_scores)
+        return {"success": True, "data": result}
     finally:
         db.close()
 
@@ -417,6 +419,6 @@ def deactivate_rule(rule_id: str):
 
         db.execute(_t("UPDATE client_coa_rules SET is_active = false WHERE id = :rid"), {"rid": rule_id})
         db.commit()
-        return {"id": rule_id, "status": "deactivated"}
+        return {"success": True, "data": {"id": rule_id, "status": "deactivated"}}
     finally:
         db.close()

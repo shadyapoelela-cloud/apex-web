@@ -5,6 +5,7 @@ Submit, review, promote feedback to rules.
 Per execution document section 10.
 """
 
+import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
     User, AuditEvent, Notification, SessionLocal, gen_uuid, utcnow,
@@ -70,7 +71,8 @@ class KnowledgeFeedbackService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -181,7 +183,8 @@ class KnowledgeFeedbackService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -222,7 +225,8 @@ class KnowledgeFeedbackService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 

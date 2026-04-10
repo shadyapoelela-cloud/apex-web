@@ -5,6 +5,7 @@ Per Execution Master §4 + Zero Ambiguity §5, §10
 Plans: Free, Pro, Business, Expert, Enterprise
 Feature Keys per plan with limits
 """
+import logging
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow, UserSubscription, SubscriptionEntitlement
 from app.phase8.models.phase8_models import P8PlanLimit, P8EntitlementAuditLog
 
@@ -167,7 +168,8 @@ def create_user_subscription(user_id, plan_name="Free"):
         return {"status": "created", "plan": plan_name, "entitlements": len(limits)}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -220,7 +222,8 @@ def upgrade_user_plan(user_id, new_plan_name):
         return {"status": "upgraded", "old_plan": old_plan_name, "new_plan": new_plan_name}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 

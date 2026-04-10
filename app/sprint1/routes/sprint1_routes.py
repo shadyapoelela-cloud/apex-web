@@ -10,7 +10,7 @@ APIs per Sprint 1 Build Spec §15:
   GET  /knowledge-feedback
 """
 import os
-import traceback
+import logging
 from fastapi import APIRouter, File, UploadFile, HTTPException, Query, Depends
 from typing import Optional
 
@@ -98,7 +98,7 @@ async def upload_coa(
             warnings=detection["warnings"],
         )
         
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "client_id": client_id,
             "file_name": file.filename,
@@ -108,12 +108,13 @@ async def upload_coa(
             "sample_rows": detection["sample_rows"],
             "sheets": sheets,
             "warnings": detection["warnings"],
-        }
+        }}
     
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, {"error_code": "upload_error", "message": str(e)})
+        logging.error("COA upload failed", exc_info=True)
+        raise HTTPException(500, "Upload processing failed")
 
 
 # ══════════════════════════════════════════════════════════════
@@ -127,7 +128,7 @@ async def get_upload_status(upload_id: str):
     upload = get_upload(upload_id)
     if not upload:
         raise HTTPException(404, "Upload not found")
-    return upload
+    return {"success": True, "data": upload}
 
 
 # ══════════════════════════════════════════════════════════════
@@ -208,7 +209,7 @@ async def parse_coa(upload_id: str, body: dict = None):
             })
         
         has_warnings = parse_result.total_rejected > 0 or parse_result.warnings
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "upload_status": "parsed_with_warnings" if has_warnings else "parsed",
             "total_rows_detected": parse_result.total_detected,
@@ -216,12 +217,13 @@ async def parse_coa(upload_id: str, body: dict = None):
             "total_rows_rejected": parse_result.total_rejected,
             "warnings": parse_result.warnings,
             "preview_rows": preview,
-        }
+        }}
     
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, {"error_code": "parse_error", "message": f"{e}\n{traceback.format_exc()}"})
+        logging.error("COA parse error", exc_info=True)
+        raise HTTPException(500, "COA file parsing failed")
 
 
 # ══════════════════════════════════════════════════════════════
@@ -239,7 +241,8 @@ async def list_parsed_accounts(
 ):
     """List parsed accounts with pagination and filters."""
     from app.sprint1.services.coa.coa_upload_service import get_parsed_accounts
-    return get_parsed_accounts(upload_id, page, page_size, record_status, has_issues, search)
+    result = get_parsed_accounts(upload_id, page, page_size, record_status, has_issues, search)
+    return {"success": True, "data": result}
 
 
 # ══════════════════════════════════════════════════════════════
@@ -274,10 +277,11 @@ async def create_knowledge_feedback(body: dict):
         )
         db.add(fb)
         db.commit()
-        return {"id": fb.id, "status": "submitted", "message": "تم حفظ الملاحظة بنجاح"}
+        return {"success": True, "data": {"id": fb.id, "status": "submitted", "message": "تم حفظ الملاحظة بنجاح"}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge feedback submission failed", exc_info=True)
+        raise HTTPException(500, "Failed to submit feedback")
     finally:
         db.close()
 
@@ -308,7 +312,7 @@ async def list_knowledge_feedback(
         items = q.order_by(CoaKnowledgeFeedback.created_at.desc())\
             .offset((page - 1) * page_size).limit(page_size).all()
         
-        return {
+        return {"success": True, "data": {
             "feedback": [{
                 "id": f.id,
                 "client_id": f.client_id,
@@ -322,6 +326,6 @@ async def list_knowledge_feedback(
             "total": total,
             "page": page,
             "page_size": page_size,
-        }
+        }}
     finally:
         db.close()

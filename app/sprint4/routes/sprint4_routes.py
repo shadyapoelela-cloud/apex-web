@@ -7,7 +7,7 @@ Source Systems, Reviewer Queues, Brain Status.
 ALL raw SQL uses _exec(db, sql, params) — SQLAlchemy 2.x compat.
 Does NOT touch any table from Phases 1-11 or Sprints 1-3.
 """
-import uuid, json
+import uuid, json, logging
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import text as _t
@@ -73,10 +73,11 @@ def create_concept(body: dict):
             }
         )
         db.commit()
-        return {"id": cid, "status": "created", "canonical_name_ar": body.get("canonical_name_ar")}
+        return {"success": True, "data": {"id": cid, "status": "created", "canonical_name_ar": body.get("canonical_name_ar")}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -124,12 +125,13 @@ def list_concepts(
         keys = ["id","canonical_name_ar","canonical_name_en","domain_pack",
                 "authority_level","sector_scope","jurisdiction_scope",
                 "validity_status","effective_from","effective_to","last_verified_at"]
-        return {
+        return {"success": True, "data": {
             "total": total, "page": page, "page_size": page_size,
             "concepts": [dict(zip(keys, r)) for r in rows],
-        }
+        }}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -169,11 +171,12 @@ def get_concept(concept_id: str):
         concept["aliases"] = [dict(zip(alias_keys, a)) for a in aliases]
         concept["alias_count"] = len(concept["aliases"])
 
-        return concept
+        return {"success": True, "data": concept}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -207,10 +210,11 @@ def update_concept(concept_id: str, body: dict):
             }
         )
         db.commit()
-        return {"id": concept_id, "status": "updated"}
+        return {"success": True, "data": {"id": concept_id, "status": "updated"}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -280,17 +284,18 @@ def create_alias(body: dict):
             }
         )
         db.commit()
-        return {
+        return {"success": True, "data": {
             "id": aid,
             "status": "created",
             "review_status": "approved" if is_approved else "pending_review",
             "conflict_detected": bool(dup),
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -320,12 +325,13 @@ def list_pending_aliases(page: int = 1, page_size: int = 20):
         keys = ["id","alias_text","language_code","alias_type",
                 "source_system","sector_scope","confidence_weight","created_at",
                 "concept_canonical_ar","concept_domain"]
-        return {
+        return {"success": True, "data": {
             "total": total, "page": page, "page_size": page_size,
             "pending_aliases": [dict(zip(keys, r)) for r in rows],
-        }
+        }}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -358,12 +364,13 @@ def review_alias(alias_id: str, body: dict):
             }
         )
         db.commit()
-        return {"alias_id": alias_id, "decision": decision, "new_status": new_status}
+        return {"success": True, "data": {"alias_id": alias_id, "decision": decision, "new_status": new_status}}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -423,17 +430,18 @@ def resolve_term(body: dict):
             )
             db.commit()
 
-        return {
+        return {"success": True, "data": {
             "raw_term":        raw_term,
             "source_system":   source_system,
             "sector":          sector,
             "resolution":      result,
             "queued_for_review": result["match_type"] == "no_match",
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -474,17 +482,18 @@ def resolve_batch(body: dict):
             if res["match_type"] == "no_match":
                 unresolved.append(term)
 
-        return {
+        return {"success": True, "data": {
             "total": len(terms),
             "resolved": sum(1 for r in results if r["resolution"]["match_type"] != "no_match"),
             "unresolved": len(unresolved),
             "unresolved_terms": unresolved,
             "results": results,
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -520,10 +529,11 @@ def submit_candidate_rule(body: dict):
             }
         )
         db.commit()
-        return {"id": rid, "status": "pending_review", "rule_name": body.get("rule_name")}
+        return {"success": True, "data": {"id": rid, "status": "pending_review", "rule_name": body.get("rule_name")}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -554,9 +564,10 @@ def list_candidate_rules(domain_pack: Optional[str] = None, page: int = 1, page_
         ).fetchall()
         keys = ["id","rule_name","domain_pack","authority_level",
                 "source_type","description_ar","submission_status","submitted_at"]
-        return {"total": total, "page": page, "candidates": [dict(zip(keys,r)) for r in rows]}
+        return {"success": True, "data": {"total": total, "page": page, "candidates": [dict(zip(keys,r)) for r in rows]}}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -614,16 +625,17 @@ def promote_candidate_rule(rule_id: str, body: dict):
              "notes": body.get("reviewer_notes"), "now": _now(), "id": rule_id}
         )
         db.commit()
-        return {
+        return {"success": True, "data": {
             "rule_id": rule_id,
             "decision": decision,
             "active_rule_id": active_id if decision=="approve" else None,
-        }
+        }}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -652,9 +664,10 @@ def list_active_rules(domain_pack: Optional[str] = None, page: int = 1, page_siz
         ).fetchall()
         keys = ["id","rule_name","domain_pack","authority_level",
                 "description_ar","validity_status","effective_from","effective_to"]
-        return {"total": total, "page": page, "rules": [dict(zip(keys,r)) for r in rows]}
+        return {"success": True, "data": {"total": total, "page": page, "rules": [dict(zip(keys,r)) for r in rows]}}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -710,16 +723,17 @@ def detect_rule_conflicts(body: dict):
                 pass
 
         db.commit()
-        return {
+        return {"success": True, "data": {
             "domain_pack":       domain_pack,
             "rules_checked":     len(rules),
             "conflicts_found":   len(conflicts),
             "conflicts":         conflicts,
             "requires_review":   [c for c in conflicts if c.get("requires_review")],
-        }
+        }}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -745,9 +759,10 @@ def list_conflicts(status: str = "pending", page: int = 1, page_size: int = 20):
         ).fetchall()
         keys = ["id","alias_text","concept_id_1","concept_id_2",
                 "conflict_type","conflict_status","resolution_notes","detected_at"]
-        return {"total": total, "conflicts": [dict(zip(keys,r)) for r in rows]}
+        return {"success": True, "data": {"total": total, "conflicts": [dict(zip(keys,r)) for r in rows]}}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -778,10 +793,11 @@ def register_source_system(body: dict):
             }
         )
         db.commit()
-        return {"id": sid, "system_name": body.get("system_name"), "status": "registered"}
+        return {"success": True, "data": {"id": sid, "system_name": body.get("system_name"), "status": "registered"}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -795,9 +811,10 @@ def list_source_systems():
             "SELECT id, system_name, system_version, description_ar, supported_languages, created_at FROM source_system_profiles ORDER BY system_name"
         ).fetchall()
         keys = ["id","system_name","system_version","description_ar","supported_languages","created_at"]
-        return {"total": len(rows), "source_systems": [dict(zip(keys,r)) for r in rows]}
+        return {"success": True, "data": {"total": len(rows), "source_systems": [dict(zip(keys,r)) for r in rows]}}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()
 
@@ -821,7 +838,7 @@ def brain_status():
 
         readiness = "operational" if concepts_total >= 10 and aliases_approved >= 20 else                     "partial"     if concepts_total >= 1  else "empty"
 
-        return {
+        return {"success": True, "data": {
             "brain_status":      readiness,
             "concepts_active":   concepts_total,
             "aliases_approved":  aliases_approved,
@@ -836,8 +853,9 @@ def brain_status():
                 "conflict_review":    conflicts_open,
             },
             "version": "6.4.0",
-        }
+        }}
     except Exception as e:
-        raise HTTPException(500, str(e))
+        logging.error("Knowledge Brain operation failed", exc_info=True)
+        raise HTTPException(500, "Internal server error")
     finally:
         db.close()

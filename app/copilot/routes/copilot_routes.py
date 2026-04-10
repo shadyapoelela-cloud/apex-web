@@ -32,7 +32,7 @@ async def create_session(req: SessionRequest, user: dict = Depends(get_current_u
         )
         return {'success': True, 'data': session}
     except Exception as e:
-        logging.error(f"Copilot create_session route error: {e}")
+        logging.error("Copilot create_session route error", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to create session")
 
 
@@ -75,7 +75,7 @@ async def chat(req: ChatRequest, user: dict = Depends(get_current_user)):
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Copilot chat error: {e}")
+        logging.error("Copilot chat error", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to process message")
 
 
@@ -89,6 +89,15 @@ async def get_messages(session_id: str, user: dict = Depends(get_current_user)):
 async def detect_intent_endpoint(req: ChatRequest):
     result = detect_intent(req.message)
     return {'success': True, 'data': result}
+
+
+@router.get('/sessions/{session_id}/summary')
+async def get_session_summary(session_id: str, user: dict = Depends(get_current_user)):
+    """Get session summary with topic distribution and stats."""
+    summary = CopilotService.get_session_summary(session_id)
+    if not summary:
+        raise HTTPException(status_code=404, detail='Session not found')
+    return {'success': True, 'data': summary}
 
 
 @router.post('/sessions/{session_id}/close')

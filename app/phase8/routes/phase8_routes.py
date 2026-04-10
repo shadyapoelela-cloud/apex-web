@@ -12,6 +12,7 @@ APIs:
 - GET /plans/compare — compare all plans side by side
 """
 from fastapi import APIRouter, Depends, HTTPException, Query, Header
+import logging
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase8.middleware.entitlement_middleware import (
     get_user_subscription, get_all_user_entitlements, check_entitlement, check_usage_count
@@ -43,7 +44,6 @@ def get_current_user_id(authorization: str = None):
 @router.get("/subscriptions/debug")
 def debug_subscription(authorization: str = None):
     """Debug endpoint to trace errors"""
-    import traceback
     result = {}
     try:
         result["step1_auth"] = authorization[:50] if authorization else "None"
@@ -54,8 +54,8 @@ def debug_subscription(authorization: str = None):
         ents = get_all_user_entitlements(uid) if uid else None
         result["step4_entitlements"] = ents
     except Exception as e:
-        result["error"] = str(e)
-        result["traceback"] = traceback.format_exc()
+        logging.error("Entitlement debug error", exc_info=True)
+        result["error"] = "Debug check failed"
     return result
 
 @router.get("/subscriptions/me")
@@ -75,11 +75,11 @@ def get_my_subscription(authorization: str = None, x_token: str = Header(None, a
     
     entitlements = get_all_user_entitlements(user_id)
     
-    return {
+    return {"success": True, "data": {
         "subscription": sub,
         "entitlements": entitlements,
         "plan_features": _get_plan_display(sub["plan_name"] if sub else "Free")
-    }
+    }}
 
 # ─── GET /subscriptions/plans ─────────────────────────────
 @router.get("/subscriptions/plans")
@@ -116,7 +116,7 @@ def list_available_plans():
             "feature_count": sum(1 for f in display_features if f["is_available"]),
         })
     
-    return {"plans": plans}
+    return {"success": True, "data": {"plans": plans}}
 
 # ─── POST /subscriptions/upgrade ──────────────────────────
 @router.post("/subscriptions/upgrade")
@@ -133,8 +133,8 @@ def upgrade_subscription(plan_name: str = Query(...), authorization: str = None,
     result = upgrade_user_plan(user_id, plan_name)
     if result["status"] == "error":
         raise HTTPException(500, result["detail"])
-    
-    return result
+
+    return {"success": True, "data": result}
 
 # ─── POST /subscriptions/downgrade ────────────────────────
 @router.post("/subscriptions/downgrade")
@@ -151,8 +151,8 @@ def downgrade_subscription(plan_name: str = Query(...), authorization: str = Non
     result = upgrade_user_plan(user_id, plan_name)
     if result["status"] == "error":
         raise HTTPException(500, result["detail"])
-    
-    return result
+
+    return {"success": True, "data": result}
 
 # ─── GET /entitlements/me ─────────────────────────────────
 @router.get("/entitlements/me")
@@ -168,11 +168,11 @@ def get_my_entitlements(authorization: str = None, x_token: str = Header(None, a
         create_user_subscription(user_id, "Free")
         entitlements = get_all_user_entitlements(user_id)
     
-    return {
+    return {"success": True, "data": {
         "user_id": user_id,
         "entitlements": entitlements,
         "total": len(entitlements)
-    }
+    }}
 
 # ─── GET /entitlements/check/{feature} ────────────────────
 @router.get("/entitlements/check/{feature}")
@@ -183,12 +183,12 @@ def check_my_entitlement(feature: str, authorization: str = None, x_token: str =
         raise HTTPException(401, "يجب تسجيل الدخول")
     
     allowed, value, message = check_entitlement(user_id, feature)
-    return {
+    return {"success": True, "data": {
         "feature": feature,
         "allowed": allowed,
         "current_value": value,
         "message": message
-    }
+    }}
 
 # ─── GET /plans/compare ──────────────────────────────────
 @router.get("/plans/compare")
@@ -209,7 +209,7 @@ def compare_plans():
             row[plan] = PLAN_LIMITS.get(plan, {}).get(feature_key, "N/A")
         comparison.append(row)
     
-    return {"plans": plan_order, "comparison": comparison}
+    return {"success": True, "data": {"plans": plan_order, "comparison": comparison}}
 
 
 # ─── Helper ───────────────────────────────────────────────

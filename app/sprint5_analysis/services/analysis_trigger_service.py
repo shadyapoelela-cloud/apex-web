@@ -341,7 +341,9 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
         }
 
     except Exception as e:
-        # Mark run as failed
+        import logging
+        logging.error("Analysis run failed", exc_info=True)
+        # Mark run as failed (store error internally for admin debugging)
         _exec(db,
             """UPDATE analysis_runs SET run_status = 'failed',
                error_message = :err, completed_at = :now WHERE id = :id""",
@@ -351,7 +353,7 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
             "success": False,
             "analysis_run_id": run_id,
             "status": "failed",
-            "errors": [str(e)],
+            "errors": ["Analysis processing failed"],
             "warnings": validation.get("warnings", []),
         }
 

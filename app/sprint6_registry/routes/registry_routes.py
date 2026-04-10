@@ -48,13 +48,13 @@ def list_authorities(domain: Optional[str] = None, jurisdiction: Optional[str] =
                        last_checked_at, created_at
                 FROM reference_authorities {where} ORDER BY name_ar""",
             params).fetchall()
-        return {"authorities": [{
+        return {"success": True, "data": {"authorities": [{
             "id": r[0], "name_ar": r[1], "name_en": r[2],
             "authority_type": r[3], "jurisdiction": r[4],
             "domain_pack": r[5], "website_url": r[6],
             "authority_level": r[7], "review_cycle_days": r[8],
             "last_checked_at": r[9], "created_at": r[10],
-        } for r in rows], "total": len(rows)}
+        } for r in rows], "total": len(rows)}}
     finally:
         db.close()
 
@@ -78,7 +78,7 @@ def create_authority(body: dict):
              "url": body.get("website_url"), "alevel": body.get("authority_level", "regulatory"),
              "cycle": body.get("review_cycle_days", 90), "now": _now()})
         db.commit()
-        return {"id": aid, "status": "created"}
+        return {"success": True, "data": {"id": aid}}
     finally:
         db.close()
 
@@ -119,13 +119,13 @@ def list_documents(authority_id: Optional[str] = None,
                 {where} ORDER BY rd.created_at DESC LIMIT :lim OFFSET :off""",
             params).fetchall()
 
-        return {"documents": [{
+        return {"success": True, "data": {"documents": [{
             "id": r[0], "title_ar": r[1], "title_en": r[2],
             "document_type": r[3], "version": r[4],
             "validity_status": r[5], "effective_from": r[6],
             "source_url": r[7], "review_status": r[8],
             "last_verified_at": r[9], "authority_name": r[10],
-        } for r in rows], "total": total, "page": page, "page_size": page_size}
+        } for r in rows], "total": total, "page": page, "page_size": page_size}}
     finally:
         db.close()
 
@@ -149,7 +149,7 @@ def create_document(body: dict):
              "ver": body.get("version"), "vs": "active",
              "url": body.get("source_url"), "rs": "approved", "now": _now()})
         db.commit()
-        return {"id": did, "status": "created"}
+        return {"success": True, "data": {"id": did}}
     finally:
         db.close()
 
@@ -185,11 +185,11 @@ def list_regulatory_updates(status: Optional[str] = None,
                 {where} ORDER BY ru.detected_at DESC LIMIT :lim OFFSET :off""",
             params).fetchall()
 
-        return {"updates": [{
+        return {"success": True, "data": {"updates": [{
             "id": r[0], "change_type": r[1], "summary_ar": r[2],
             "review_status": r[3], "detected_at": r[4],
             "reviewed_at": r[5], "authority_name": r[6],
-        } for r in rows], "total": total, "page": page}
+        } for r in rows], "total": total, "page": page}}
     finally:
         db.close()
 
@@ -209,7 +209,7 @@ def review_update(update_id: str, body: dict):
              "now": _now(), "impact": body.get("impact_assessment"),
              "id": update_id})
         db.commit()
-        return {"id": update_id, "status": decision}
+        return {"success": True, "data": {"id": update_id, "status": decision}}
     finally:
         db.close()
 
@@ -229,12 +229,12 @@ def list_funding_programs(active_only: bool = True):
                        program_type, jurisdiction, validity_status,
                        source_url, created_at
                 FROM funding_programs {where} ORDER BY name_ar""").fetchall()
-        return {"programs": [{
+        return {"success": True, "data": {"programs": [{
             "id": r[0], "name_ar": r[1], "name_en": r[2],
             "provider_name": r[3], "program_type": r[4],
             "jurisdiction": r[5], "validity_status": r[6],
             "source_url": r[7], "created_at": r[8],
-        } for r in rows], "total": len(rows)}
+        } for r in rows], "total": len(rows)}}
     finally:
         db.close()
 
@@ -250,12 +250,12 @@ def list_support_programs(active_only: bool = True):
                        support_type, jurisdiction, validity_status,
                        source_url, created_at
                 FROM support_programs {where} ORDER BY name_ar""").fetchall()
-        return {"programs": [{
+        return {"success": True, "data": {"programs": [{
             "id": r[0], "name_ar": r[1], "name_en": r[2],
             "provider_name": r[3], "support_type": r[4],
             "jurisdiction": r[5], "validity_status": r[6],
             "source_url": r[7], "created_at": r[8],
-        } for r in rows], "total": len(rows)}
+        } for r in rows], "total": len(rows)}}
     finally:
         db.close()
 
@@ -271,12 +271,12 @@ def list_licenses(active_only: bool = True):
                        issuing_authority_ar, jurisdiction,
                        validity_status, source_url, created_at
                 FROM license_registry {where} ORDER BY name_ar""").fetchall()
-        return {"licenses": [{
+        return {"success": True, "data": {"licenses": [{
             "id": r[0], "name_ar": r[1], "name_en": r[2],
             "license_type": r[3], "issuing_authority": r[4],
             "jurisdiction": r[5], "validity_status": r[6],
             "source_url": r[7], "created_at": r[8],
-        } for r in rows], "total": len(rows)}
+        } for r in rows], "total": len(rows)}}
     finally:
         db.close()
 
@@ -292,7 +292,7 @@ def assess_funding(client_id: str, body: dict = {}):
     try:
         from app.sprint6_registry.services.eligibility_engine import assess_funding_eligibility
         result = assess_funding_eligibility(db, client_id, body.get("program_id"))
-        return {"assessments": result, "total": len(result)}
+        return {"success": True, "data": {"assessments": result, "total": len(result)}}
     finally:
         db.close()
 
@@ -304,7 +304,7 @@ def assess_support(client_id: str, body: dict = {}):
     try:
         from app.sprint6_registry.services.eligibility_engine import assess_support_eligibility
         result = assess_support_eligibility(db, client_id, body.get("program_id"))
-        return {"assessments": result, "total": len(result)}
+        return {"success": True, "data": {"assessments": result, "total": len(result)}}
     finally:
         db.close()
 
@@ -316,7 +316,7 @@ def assess_licensing(client_id: str, body: dict = {}):
     try:
         from app.sprint6_registry.services.eligibility_engine import assess_license_eligibility
         result = assess_license_eligibility(db, client_id, body.get("license_id"))
-        return {"assessments": result, "total": len(result)}
+        return {"success": True, "data": {"assessments": result, "total": len(result)}}
     finally:
         db.close()
 
@@ -348,11 +348,11 @@ def get_assessment_history(client_id: str,
                 ORDER BY created_at DESC LIMIT :lim OFFSET :off""",
             params).fetchall()
 
-        return {"assessments": [{
+        return {"success": True, "data": {"assessments": [{
             "id": r[0], "type": r[1], "program_name": r[2],
             "status": r[3], "readiness_score": r[4],
             "confidence": r[5], "boundary": r[6],
             "requires_review": bool(r[7]), "created_at": r[8],
-        } for r in rows], "total": total, "page": page}
+        } for r in rows], "total": total, "page": page}}
     finally:
         db.close()

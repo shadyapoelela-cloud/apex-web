@@ -7,6 +7,7 @@ Resolution chain (per execution document):
   permission check → subscription entitlement check → business rule check → ownership check
 """
 
+import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
     User, Plan, PlanFeature, UserSubscription, SubscriptionEntitlement,
@@ -146,7 +147,8 @@ class SubscriptionService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 

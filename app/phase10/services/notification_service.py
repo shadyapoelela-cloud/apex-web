@@ -2,6 +2,7 @@
 APEX Phase 10 — Notification Engine Service
 Handles: emit, list, mark-read, count, preferences
 """
+import logging
 from datetime import datetime
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase10.models.phase10_models import (
@@ -78,7 +79,8 @@ def emit_notification(user_id, notification_type, body_ar=None, body_en=None,
         return {"status": "ok", "notification_id": notif.id}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -151,7 +153,8 @@ def mark_as_read(user_id, notification_id=None):
             return {"status": "ok", "marked": count}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -220,7 +223,8 @@ def update_preference(user_id, notification_type, in_app=True, email=True, sms=F
         return {"status": "ok"}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 

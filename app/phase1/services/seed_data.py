@@ -5,6 +5,7 @@ Initial data: roles, permissions, plans, features, legal documents.
 Per execution document sections 3, 4, 5, 10, 13, 15.
 """
 
+import logging
 from app.phase1.models.platform_models import (
     Role, Permission, RolePermission, Plan, PlanFeature,
     PolicyDocument, PolicyType,
@@ -27,7 +28,8 @@ def seed_all():
         return {"status": "seeded", "created": created}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "error": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "error": "Internal server error"}
     finally:
         db.close()
 

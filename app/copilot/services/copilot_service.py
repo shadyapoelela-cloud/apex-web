@@ -4,6 +4,9 @@ from app.phase1.models.platform_models import SessionLocal, gen_uuid
 from app.copilot.models.copilot_models import CopilotSession, CopilotMessage, CopilotEscalation
 from app.copilot.services.intent_router import detect_intent, build_context, suggest_next_actions
 
+# Maximum recent messages to include as conversation memory
+MAX_MEMORY_MESSAGES = 10
+
 
 class CopilotService:
 
@@ -20,7 +23,7 @@ class CopilotService:
             return cls._session_to_dict(session)
         except Exception as e:
             db.rollback()
-            logging.error(f"Copilot create_session error: {e}")
+            logging.error("Copilot create_session error", exc_info=True)
             raise
         finally:
             db.close()
@@ -54,9 +57,26 @@ class CopilotService:
             if not session:
                 return {"error": "Session not found"}
 
+            # Load conversation memory (recent messages for context)
+            recent_messages = db.query(CopilotMessage).filter(
+                CopilotMessage.session_id == session_id
+            ).order_by(CopilotMessage.created_at.desc()).limit(MAX_MEMORY_MESSAGES).all()
+            recent_messages.reverse()  # chronological order
+            conversation_history = [{"role": m.role, "content": m.content, "intent": m.intent} for m in recent_messages]
+
+            # Use session context for intent boosting
+            last_intent = (session.context or {}).get("last_intent")
             intent_result = detect_intent(user_message)
             intent = intent_result["intent"]
             confidence = intent_result["confidence"]
+
+            # Continuity boost: if user seems to continue same topic
+            if last_intent and intent == "general" and confidence < 0.5 and conversation_history:
+                # User likely continuing previous topic — inherit last intent with lower confidence
+                intent = last_intent
+                confidence = 0.5
+                intent_result = {"intent": intent, "confidence": confidence, "all_scores": intent_result.get("all_scores", {}), "continued_from": last_intent}
+
             ctx = build_context(session.user_id, client_id or session.client_id, intent)
 
             risk_level = "low"
@@ -66,7 +86,7 @@ class CopilotService:
                 risk_level = "medium"
 
             needs_escalation = confidence < 0.45 or (risk_level == "high" and confidence < 0.7)
-            response_text = cls._generate_response(intent, confidence, ctx, user_message)
+            response_text = cls._generate_response(intent, confidence, ctx, user_message, conversation_history)
             next_actions = suggest_next_actions(intent, ctx)
             references = cls._get_references(intent)
 
@@ -97,8 +117,18 @@ class CopilotService:
                 )
                 db.add(esc)
 
-            # Update session context
-            session.context = {**ctx, "last_intent": intent}
+            # Update session context with history
+            intent_history = (session.context or {}).get("intent_history", [])
+            intent_history.append(intent)
+            if len(intent_history) > 20:
+                intent_history = intent_history[-20:]
+            session.context = {
+                **ctx,
+                "last_intent": intent,
+                "intent_history": intent_history,
+                "message_count": len(conversation_history) + 2,  # +2 for new user+assistant
+                "last_confidence": confidence,
+            }
             session.updated_at = datetime.utcnow()
             db.commit()
 
@@ -111,7 +141,7 @@ class CopilotService:
             }
         except Exception as e:
             db.rollback()
-            logging.error(f"Copilot process_message error: {e}")
+            logging.error("Copilot process_message error", exc_info=True)
             raise
         finally:
             db.close()
@@ -128,6 +158,47 @@ class CopilotService:
             db.close()
 
     @classmethod
+    def get_session_summary(cls, session_id):
+        """Get a summary of the session including topic distribution and escalations."""
+        db = SessionLocal()
+        try:
+            session = db.query(CopilotSession).filter(CopilotSession.id == session_id).first()
+            if not session:
+                return None
+            messages = db.query(CopilotMessage).filter(
+                CopilotMessage.session_id == session_id
+            ).order_by(CopilotMessage.created_at).all()
+            escalations = db.query(CopilotEscalation).filter(
+                CopilotEscalation.session_id == session_id
+            ).all()
+
+            # Topic distribution
+            intents = [m.intent for m in messages if m.intent and m.role == "assistant"]
+            topic_counts = {}
+            for i in intents:
+                topic_counts[i] = topic_counts.get(i, 0) + 1
+
+            # Average confidence
+            confidences = [m.confidence for m in messages if m.confidence is not None]
+            avg_confidence = round(sum(confidences) / len(confidences), 2) if confidences else 0
+
+            return {
+                "session_id": session_id,
+                "status": session.status,
+                "total_messages": len(messages),
+                "user_messages": sum(1 for m in messages if m.role == "user"),
+                "assistant_messages": sum(1 for m in messages if m.role == "assistant"),
+                "topics": topic_counts,
+                "primary_topic": max(topic_counts, key=topic_counts.get) if topic_counts else "general",
+                "avg_confidence": avg_confidence,
+                "escalation_count": len(escalations),
+                "created_at": session.created_at.isoformat() if session.created_at else None,
+                "updated_at": session.updated_at.isoformat() if session.updated_at else None,
+            }
+        finally:
+            db.close()
+
+    @classmethod
     def close_session(cls, session_id):
         db = SessionLocal()
         try:
@@ -140,31 +211,78 @@ class CopilotService:
             return True
         except Exception as e:
             db.rollback()
-            logging.error(f"Copilot close_session error: {e}")
+            logging.error("Copilot close_session error", exc_info=True)
             return False
         finally:
             db.close()
 
     @classmethod
-    def _generate_response(cls, intent, confidence, ctx, user_message):
+    def _generate_response(cls, intent, confidence, ctx, user_message, conversation_history=None):
+        # Primary responses per intent
         responses = {
-            "financial_analysis": "يمكنني مساعدتك في التحليل المالي. هل تريد رفع ميزان المراجعة؟",
-            "coa_workflow": "لنبدأ بشجرة الحسابات. يمكنك رفع الملف وسأقوم بتحليله. CSV و Excel.",
-            "tb_binding": "سأساعدك في ربط الميزان بشجرة الحسابات. هل لديك شجرة معتمدة؟",
-            "funding_readiness": "سأقيّم جاهزية المنشأة للتمويل. سأحتاج بيانات العميل.",
-            "compliance": "سأفحص الامتثال. النتائج استرشادية وتحتاج مراجعة مختص.",
-            "audit_review": "سأساعدك في المراجعة عبر 7 مراحل. من أين نبدأ؟",
-            "knowledge_lookup": "سأبحث في قاعدة المعرفة: SOCPA, ZATCA, نظام الشركات, ISA.",
-            "service_request": "يمكنني مساعدتك في طلب خدمة مهنية. ما نوع الخدمة؟",
-            "explain_result": "سأشرح النتيجة مع الأدلة والمراجع.",
-            "account_management": "يمكنني مساعدتك في إدارة حسابك.",
-            "general": "مرحبا! أنا مساعد Apex الذكي. كيف أساعدك؟"
+            "financial_analysis": {
+                "first": "يمكنني مساعدتك في التحليل المالي. الخطوات:\n1. رفع ميزان المراجعة (Excel)\n2. تحديد القطاع والفترة\n3. استعراض النسب والقوائم المالية\n\nهل تريد رفع ميزان المراجعة الآن؟",
+                "follow_up": "نكمل التحليل المالي. هل تريد عرض النسب المالية أم القوائم؟"
+            },
+            "coa_workflow": {
+                "first": "لنبدأ بشجرة الحسابات:\n1. ارفع الملف (CSV أو Excel)\n2. سأقوم بتحليل وتصنيف الحسابات تلقائيا\n3. راجع التصنيف واعتمده\n\nالملفات المدعومة: CSV, XLSX, XLS",
+                "follow_up": "نكمل العمل على شجرة الحسابات. هل تريد رفع ملف جديد أم مراجعة التصنيف؟"
+            },
+            "tb_binding": {
+                "first": "سأساعدك في ربط ميزان المراجعة بشجرة الحسابات.\n\nالمتطلبات:\n- شجرة حسابات معتمدة\n- ملف ميزان مراجعة (Excel)\n\nهل لديك شجرة حسابات معتمدة؟",
+                "follow_up": "نكمل ربط الميزان. هل تريد عرض نتائج الربط أم تعديل المطابقة؟"
+            },
+            "funding_readiness": {
+                "first": "سأقيّم جاهزية المنشأة للتمويل:\n- تحليل القوائم المالية\n- فحص النسب المطلوبة من جهات التمويل\n- تحديد الفجوات والتوصيات\n\n⚠️ النتائج استرشادية وليست ضمانا للحصول على تمويل.",
+                "follow_up": "نكمل تقييم الجاهزية التمويلية. هل تريد عرض الفجوات أم تجهيز المستندات؟"
+            },
+            "compliance": {
+                "first": "سأفحص الامتثال للأنظمة واللوائح:\n- ضريبة القيمة المضافة (VAT)\n- الزكاة (ZATCA)\n- نظام الشركات\n\n⚠️ النتائج استرشادية وتحتاج مراجعة مختص معتمد.",
+                "follow_up": "نكمل فحص الامتثال. أي جانب تريد التركيز عليه؟"
+            },
+            "audit_review": {
+                "first": "سأساعدك في المراجعة عبر 7 مراحل:\n1. تعريف شجرة الحسابات\n2. رفع ميزان المراجعة\n3. بناء برنامج المراجعة\n4. اختيار العينات\n5. تنفيذ الإجراءات\n6. التجميع والتقييم\n7. المخرجات النهائية\n\nمن أي مرحلة تريد البدء؟",
+                "follow_up": "نكمل المراجعة. أي مرحلة تريد العمل عليها؟"
+            },
+            "knowledge_lookup": {
+                "first": "سأبحث في قاعدة المعرفة المهنية:\n- معايير SOCPA السعودية\n- معايير IFRS الدولية\n- أنظمة ZATCA\n- نظام الشركات ولوائحه\n- معايير المراجعة ISA\n\nما الموضوع الذي تبحث عنه؟",
+                "follow_up": "سأبحث لك. ما المعلومة التي تحتاجها؟"
+            },
+            "service_request": {
+                "first": "يمكنني مساعدتك في طلب خدمة مهنية من سوق الخدمات:\n- مسك دفاتر\n- إعداد قوائم مالية\n- مراجعة ضريبية\n- دعم تدقيق\n\nما نوع الخدمة المطلوبة؟",
+                "follow_up": "هل تريد طلب خدمة جديدة أم متابعة طلب قائم؟"
+            },
+            "explain_result": {
+                "first": "سأشرح النتيجة بالتفصيل مع:\n- الأدلة والمستندات المستخدمة\n- القواعد والمعايير المطبقة\n- مستوى الثقة\n\nأي نتيجة تريد شرحها؟",
+                "follow_up": "هل تريد تفسير نتيجة أخرى أم طلب مراجعة بشرية؟"
+            },
+            "account_management": {
+                "first": "يمكنني مساعدتك في إدارة حسابك:\n- عرض/تعديل الملف الشخصي\n- إدارة الاشتراك والخطة\n- عرض سجل النشاط\n- تغيير كلمة المرور\n\nماذا تحتاج؟",
+                "follow_up": "هل تحتاج مساعدة أخرى في حسابك؟"
+            },
+            "general": {
+                "first": "مرحبا! أنا مساعد Apex الذكي. يمكنني مساعدتك في:\n\n📊 التحليل المالي والنسب\n📋 شجرة الحسابات والتصنيف\n⚖️ الامتثال والزكاة والضريبة\n🔍 المراجعة والتدقيق\n💰 الجاهزية التمويلية\n📚 البحث في المعايير والأنظمة\n🛒 طلب خدمات مهنية\n\nكيف أساعدك؟",
+                "follow_up": "هل تحتاج مساعدة في شيء آخر؟"
+            }
         }
-        base = responses.get(intent, responses["general"])
+
+        # Determine if this is a follow-up or first message for this intent
+        is_follow_up = False
+        if conversation_history:
+            for msg in conversation_history:
+                if msg.get("intent") == intent and msg.get("role") == "assistant":
+                    is_follow_up = True
+                    break
+
+        intent_data = responses.get(intent, responses["general"])
+        base = intent_data["follow_up"] if is_follow_up else intent_data["first"]
+
         if confidence < 0.5:
-            base += "\n\n⚠️ لم أتمكن من فهم طلبك بدقة. وضح أكثر."
+            base += "\n\n⚠️ لم أتمكن من فهم طلبك بدقة. يرجى توضيح ما تحتاجه."
         if ctx.get("requires_client") and not ctx.get("client_id"):
-            base += "\n\n📋 يرجى اختيار العميل أولا."
+            base += "\n\n📋 لإكمال هذه العملية، يرجى اختيار العميل أولا من قائمة العملاء."
+        if ctx.get("requires_file"):
+            base += "\n\n📎 ستحتاج لرفع ملف لإكمال هذه العملية."
         return base
 
     @classmethod

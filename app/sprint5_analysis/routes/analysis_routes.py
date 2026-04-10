@@ -6,6 +6,7 @@ APIs to run financial analysis using approved COA + TB binding.
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 import json
+import logging
 
 router = APIRouter()
 
@@ -35,12 +36,12 @@ def validate_analysis(client_id: str, tb_upload_id: str):
             validate_analysis_preconditions,
         )
         result = validate_analysis_preconditions(db, client_id, tb_upload_id)
-        return result
+        return {"success": True, "data": result}
     except HTTPException:
         raise
     except Exception as e:
-        import traceback as tb
-        raise HTTPException(500, f"{e}\n{tb.format_exc()}")
+        logging.error("Analysis validation failed", exc_info=True)
+        raise HTTPException(500, "Analysis validation failed")
     finally:
         db.close()
 
@@ -114,7 +115,7 @@ def get_analysis_run(run_id: str):
                     return val
             return val
 
-        return {
+        return {"success": True, "data": {
             "id": row[0], "client_id": row[1],
             "tb_upload_id": row[2], "coa_upload_id": row[3],
             "run_status": row[4], "industry": row[5],
@@ -133,7 +134,7 @@ def get_analysis_run(run_id: str):
             "warnings": _parse(row[19]),
             "error_message": row[20],
             "created_at": row[21], "completed_at": row[22],
-        }
+        }}
     finally:
         db.close()
 
@@ -171,7 +172,7 @@ def list_client_runs(client_id: str,
                 ORDER BY created_at DESC LIMIT :lim OFFSET :off""",
             params).fetchall()
 
-        return {
+        return {"success": True, "data": {
             "runs": [{
                 "id": r[0], "tb_upload_id": r[1], "coa_upload_id": r[2],
                 "run_status": r[3], "industry": r[4],
@@ -181,7 +182,7 @@ def list_client_runs(client_id: str,
                 "created_at": r[9], "completed_at": r[10],
             } for r in rows],
             "total": total, "page": page, "page_size": page_size,
-        }
+        }}
     finally:
         db.close()
 
@@ -203,12 +204,12 @@ def get_latest_income_statement(client_id: str):
             {"cid": client_id}).fetchone()
         if not row:
             raise HTTPException(404, "No completed analysis found for this client")
-        return {
+        return {"success": True, "data": {
             "analysis_run_id": row[0],
             "income_statement": json.loads(row[1]) if isinstance(row[1], str) else row[1],
             "confidence": row[2],
             "created_at": row[3],
-        }
+        }}
     finally:
         db.close()
 
@@ -230,12 +231,12 @@ def get_latest_balance_sheet(client_id: str):
             {"cid": client_id}).fetchone()
         if not row:
             raise HTTPException(404, "No completed analysis found for this client")
-        return {
+        return {"success": True, "data": {
             "analysis_run_id": row[0],
             "balance_sheet": json.loads(row[1]) if isinstance(row[1], str) else row[1],
             "confidence": row[2],
             "created_at": row[3],
-        }
+        }}
     finally:
         db.close()
 
@@ -272,7 +273,7 @@ def get_full_report(client_id: str):
                 except Exception: return v
             return v
 
-        return {
+        return {"success": True, "data": {
             "analysis_run_id": row[0],
             "income_statement": _p(row[1]),
             "balance_sheet": _p(row[2]),
@@ -291,7 +292,7 @@ def get_full_report(client_id: str):
             "binding_quality_score": row[15],
             "created_at": row[16],
             "completed_at": row[17],
-        }
+        }}
     finally:
         db.close()
 
@@ -337,11 +338,11 @@ def compare_runs(run_id_1: str, run_id_2: str):
             v2 = (r2.get("income_statement") or r2.get("balance_sheet") or {}).get(key, 0) or 0
             deltas[key] = {"run_1": v1, "run_2": v2, "delta": v2 - v1}
 
-        return {
+        return {"success": True, "data": {
             "run_1": r1,
             "run_2": r2,
             "deltas": deltas,
             "confidence_delta": (r2.get("confidence") or 0) - (r1.get("confidence") or 0),
-        }
+        }}
     finally:
         db.close()

@@ -1,6 +1,7 @@
 """
 APEX Phase 11 — Legal Acceptance Service
 """
+import logging
 from datetime import datetime
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase11.models.phase11_models import LegalDocumentV2, AcceptanceLogV2, LEGAL_DOC_TYPES
@@ -63,7 +64,8 @@ def seed_legal_documents():
         return {"status": "seeded", "created": created}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -160,7 +162,8 @@ def accept_document(user_id, document_id, ip_address=None):
         return {"status": "ok", "doc_type": doc.doc_type, "version": doc.version}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -195,6 +198,7 @@ def accept_all_current(user_id, ip_address=None):
         return {"status": "ok", "accepted": count}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()

@@ -1,11 +1,11 @@
-from sqlalchemy import Column, String, Text, JSON, DateTime, ForeignKey, Float
+from sqlalchemy import Column, String, Text, JSON, DateTime, ForeignKey, Float, Index
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 
 class CopilotSession(Base):
     __tablename__ = "copilot_sessions"
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     client_id = Column(String(36), nullable=True)
     session_type = Column(String(50), default="general")
     context = Column(JSON, default=dict)
@@ -17,7 +17,7 @@ class CopilotSession(Base):
 class CopilotMessage(Base):
     __tablename__ = "copilot_messages"
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    session_id = Column(String(36), ForeignKey("copilot_sessions.id"), nullable=False)
+    session_id = Column(String(36), ForeignKey("copilot_sessions.id"), nullable=False, index=True)
     role = Column(String(20), nullable=False)
     content = Column(Text, nullable=False)
     intent = Column(String(100), nullable=True)
@@ -32,7 +32,7 @@ class CopilotMessage(Base):
 class CopilotEscalation(Base):
     __tablename__ = "copilot_escalations"
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    session_id = Column(String(36), ForeignKey("copilot_sessions.id"), nullable=False)
+    session_id = Column(String(36), ForeignKey("copilot_sessions.id"), nullable=False, index=True)
     message_id = Column(String(36), ForeignKey("copilot_messages.id"), nullable=True)
     reason = Column(String(200), nullable=False)
     severity = Column(String(20), default="medium")

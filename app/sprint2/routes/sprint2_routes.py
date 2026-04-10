@@ -1,6 +1,6 @@
-"""Sprint 2 — COA Classification APIs"""
+"""Sprint 2 -- COA Classification APIs"""
 from fastapi import APIRouter, HTTPException
-import json, uuid
+import json, uuid, logging
 from datetime import datetime, timezone
 
 router = APIRouter()
@@ -135,7 +135,7 @@ def classify_upload(upload_id: str):
         total = len(acc_list)
         avg_conf = round(total_conf / total, 3) if total > 0 else 0.0
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "total_accounts": total,
             "classified": high_conf + low_conf,
@@ -145,7 +145,7 @@ def classify_upload(upload_id: str):
             "avg_confidence": avg_conf,
             "class_distribution": class_dist,
             "section_distribution": section_dist,
-        }
+        }}
     finally:
         db.close()
 
@@ -245,13 +245,13 @@ def get_mapping_preview(
                 "classification_issues": cls_issues,
             })
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "total": total,
             "page": page,
             "page_size": page_size,
             "accounts": accounts,
-        }
+        }}
     finally:
         db.close()
 
@@ -293,7 +293,7 @@ def edit_account_classification(account_id: str, body: dict):
         )
         db.commit()
 
-        return {"id": account_id, "status": "updated", "review_status": "manually_edited"}
+        return {"success": True, "data": {"id": account_id, "status": "updated", "review_status": "manually_edited"}}
     finally:
         db.close()
 
@@ -320,7 +320,7 @@ def approve_account(account_id: str):
             {"aid": account_id, "now": now}
         )
         db.commit()
-        return {"id": account_id, "review_status": "approved"}
+        return {"success": True, "data": {"id": account_id, "review_status": "approved"}}
     finally:
         db.close()
 
@@ -374,16 +374,16 @@ def bulk_approve(upload_id: str, body: dict = {}):
             {"uid": upload_id}
         ).fetchone()[0]
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "approved_count": count,
             "total_accounts": total,
             "approval_percentage": round(count / total * 100, 1) if total > 0 else 0,
-        }
+        }}
     except Exception as e:
         db.rollback()
-        import traceback
-        raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+        logging.error("Batch approve error", exc_info=True)
+        raise HTTPException(500, "Batch approval failed")
     finally:
         db.close()
 
@@ -428,7 +428,7 @@ def classification_summary(upload_id: str):
             review_dist[rs] = review_dist.get(rs, 0) + 1
             source_dist[ms] = source_dist.get(ms, 0) + 1
 
-        return {
+        return {"success": True, "data": {
             "upload_id": upload_id,
             "total_accounts": total,
             "high_confidence": high,
@@ -439,14 +439,13 @@ def classification_summary(upload_id: str):
             "section_distribution": section_dist,
             "review_status_distribution": review_dist,
             "source_distribution": source_dist,
-        }
+        }}
     finally:
         db.close()
 
 @router.post("/coa/debug-classify/{upload_id}")
 def debug_classify(upload_id: str):
     """Debug classify with full traceback."""
-    import traceback
     try:
         from app.phase1.models.platform_models import SessionLocal
         db = SessionLocal()
@@ -498,4 +497,5 @@ def debug_classify(upload_id: str):
             "classification": cls_result,
         }
     except Exception as e:
-        return {"error": str(e), "traceback": traceback.format_exc()}
+        logging.error("Debug classification error", exc_info=True)
+        return {"success": False, "error": "Classification debug failed"}

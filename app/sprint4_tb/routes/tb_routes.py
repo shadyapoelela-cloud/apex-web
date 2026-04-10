@@ -11,7 +11,7 @@ APIs:
   GET  /tb/uploads/{tb_upload_id}/binding-summary  — Binding stats
 """
 
-import os, traceback, json
+import os, logging, json
 from fastapi import APIRouter, File, UploadFile, HTTPException, Query
 from typing import Optional
 from sqlalchemy import text as _t
@@ -94,7 +94,7 @@ async def upload_tb(
         from app.sprint4_tb.services.tb_file_service import read_and_save_tb
         parse_result = read_and_save_tb(content, file.filename, tb_id, stored_path)
 
-        return {
+        return {"success": True, "data": {
             "tb_upload_id": tb_id,
             "client_id": client_id,
             "coa_upload_id": coa_upload_id,
@@ -107,12 +107,13 @@ async def upload_tb(
             "period": parse_result["period"],
             "warnings": parse_result["warnings"],
             "next_step": "POST /tb/uploads/{tb_upload_id}/bind" if coa_upload_id else "Specify coa_upload_id to bind",
-        }
+        }}
 
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, f"TB upload error: {e}\n{traceback.format_exc()}")
+        logging.error("TB upload error", exc_info=True)
+        raise HTTPException(500, "TB upload failed")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -136,7 +137,7 @@ def get_tb_upload(tb_upload_id: str):
         if not row:
             raise HTTPException(404, "TB upload not found")
 
-        return {
+        return {"success": True, "data": {
             "id": row[0], "client_id": row[1], "coa_upload_id": row[2],
             "file_name": row[3], "file_format": row[4], "upload_status": row[5],
             "period_label": row[6], "total_rows_detected": row[7],
@@ -145,7 +146,7 @@ def get_tb_upload(tb_upload_id: str):
             "total_unmatched": row[12], "binding_confidence_avg": row[13],
             "binding_approved": bool(row[14]) if row[14] is not None else False,
             "created_at": str(row[15]) if row[15] else None,
-        }
+        }}
     finally:
         db.close()
 
@@ -193,8 +194,8 @@ def bind_tb(tb_upload_id: str, body: dict = {}):
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
-        raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+        logging.error("TB binding error", exc_info=True)
+        raise HTTPException(500, "TB binding failed")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -262,7 +263,7 @@ def get_binding_results(
                 "review_status": r[16],
             })
 
-        return {"tb_upload_id": tb_upload_id, "total": total, "page": page, "page_size": page_size, "results": items}
+        return {"success": True, "data": {"tb_upload_id": tb_upload_id, "total": total, "page": page, "page_size": page_size, "results": items}}
     finally:
         db.close()
 
@@ -340,7 +341,7 @@ def binding_summary(tb_upload_id: str):
             else:
                 total_credit += abs(nb)
 
-        return {
+        return {"success": True, "data": {
             "tb_upload_id": tb_upload_id,
             "total_rows": total,
             "matched": matched,
@@ -353,6 +354,6 @@ def binding_summary(tb_upload_id: str):
             "total_debit": round(total_debit, 2),
             "total_credit": round(total_credit, 2),
             "balance_diff": round(total_debit - total_credit, 2),
-        }
+        }}
     finally:
         db.close()

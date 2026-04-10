@@ -7,7 +7,7 @@ Per Architecture Doc v5 Sections 23, 26, 29
 from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel, Field
 from typing import Optional, List
-import traceback
+import logging
 
 from app.phase1.routes.phase1_routes import get_current_user
 from app.phase1.models.platform_models import SessionLocal
@@ -122,7 +122,8 @@ async def save_draft(req: DraftSaveRequest, user: dict = Depends(get_current_use
         return {"success": True, "draft_id": draft.id, "step_completed": draft.step_completed}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error("Failed to save onboarding draft", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to save draft")
     finally:
         db.close()
 

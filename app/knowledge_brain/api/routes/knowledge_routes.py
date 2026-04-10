@@ -32,10 +32,9 @@ router = APIRouter(prefix="/knowledge", tags=["Knowledge Brain"])
 def get_stats(db: Session = Depends(get_db)):
     """Dashboard stats — عدد المصادر والمعرفة والقواعد."""
     init_db()
-    return {
-        "status": "ok",
+    return {"success": True, "data": {
         "tables": get_table_stats(db),
-    }
+    }}
 
 
 # ═══ Seed ═══
@@ -45,7 +44,7 @@ def seed_knowledge(db: Session = Depends(get_db)):
     init_db()
     from app.knowledge_brain.services.seed_service import seed_all
     stats = seed_all(db)
-    return {"status": "seeded", "created": stats}
+    return {"success": True, "data": {"status": "seeded", "created": stats}}
 
 
 # ═══════════════════════════════
@@ -65,7 +64,7 @@ def list_sources(
     if authority: q = q.filter(Source.authority_code == authority)
     if status: q = q.filter(Source.status == status)
     sources = q.order_by(Source.created_at.desc()).limit(limit).all()
-    return {"count": len(sources), "sources": [_source_dict(s) for s in sources]}
+    return {"success": True, "data": {"count": len(sources), "sources": [_source_dict(s) for s in sources]}}
 
 
 @router.post("/sources")
@@ -75,7 +74,7 @@ def create_source(data: dict, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(src)
     _audit(db, "source", src.id, "create")
-    return {"status": "created", "source": _source_dict(src)}
+    return {"success": True, "data": _source_dict(src)}
 
 
 @router.get("/sources/{source_id}")
@@ -83,7 +82,7 @@ def get_source(source_id: str, db: Session = Depends(get_db)):
     src = db.query(Source).filter_by(id=source_id).first()
     if not src: raise HTTPException(404, "Source not found")
     entries = db.query(Entry).filter_by(source_id=source_id).all()
-    return {"source": _source_dict(src), "entries": [_entry_dict(e) for e in entries]}
+    return {"success": True, "data": {"source": _source_dict(src), "entries": [_entry_dict(e) for e in entries]}}
 
 
 @router.put("/sources/{source_id}")
@@ -94,7 +93,7 @@ def update_source(source_id: str, data: dict, db: Session = Depends(get_db)):
         if hasattr(src, k) and k != "id": setattr(src, k, v)
     db.commit()
     _audit(db, "source", source_id, "update")
-    return {"status": "updated"}
+    return {"success": True, "data": {"status": "updated"}}
 
 
 @router.post("/sources/{source_id}/archive")
@@ -104,7 +103,7 @@ def archive_source(source_id: str, db: Session = Depends(get_db)):
     src.status = "archived"
     db.commit()
     _audit(db, "source", source_id, "archive")
-    return {"status": "archived"}
+    return {"success": True, "data": {"status": "archived"}}
 
 
 # ═══════════════════════════════
@@ -124,7 +123,7 @@ def list_entries(
     if status: q = q.filter(Entry.status == status)
     if source_id: q = q.filter(Entry.source_id == source_id)
     entries = q.order_by(Entry.created_at.desc()).limit(limit).all()
-    return {"count": len(entries), "entries": [_entry_dict(e) for e in entries]}
+    return {"success": True, "data": {"count": len(entries), "entries": [_entry_dict(e) for e in entries]}}
 
 
 @router.post("/entries")
@@ -134,14 +133,14 @@ def create_entry(data: dict, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(entry)
     _audit(db, "entry", entry.id, "create")
-    return {"status": "created", "entry": _entry_dict(entry)}
+    return {"success": True, "data": _entry_dict(entry)}
 
 
 @router.get("/entries/{entry_id}")
 def get_entry(entry_id: str, db: Session = Depends(get_db)):
     e = db.query(Entry).filter_by(id=entry_id).first()
     if not e: raise HTTPException(404, "Entry not found")
-    return {"entry": _entry_dict(e)}
+    return {"success": True, "data": _entry_dict(e)}
 
 
 @router.post("/entries/{entry_id}/approve")
@@ -152,7 +151,7 @@ def approve_entry(entry_id: str, db: Session = Depends(get_db)):
     e.review_status = "approved"
     db.commit()
     _audit(db, "entry", entry_id, "approve")
-    return {"status": "approved"}
+    return {"success": True, "data": {"status": "approved"}}
 
 
 # ═══════════════════════════════
@@ -170,7 +169,7 @@ def list_rules(
     if domain: q = q.filter(Rule.domain == domain)
     if active is not None: q = q.filter(Rule.active == active)
     rules = q.order_by(Rule.rule_code).limit(limit).all()
-    return {"count": len(rules), "rules": [_rule_dict(r) for r in rules]}
+    return {"success": True, "data": {"count": len(rules), "rules": [_rule_dict(r) for r in rules]}}
 
 
 @router.post("/rules")
@@ -180,7 +179,7 @@ def create_rule(data: dict, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(rule)
     _audit(db, "rule", rule.id, "create")
-    return {"status": "created", "rule": _rule_dict(rule)}
+    return {"success": True, "data": _rule_dict(rule)}
 
 
 @router.post("/rules/{rule_code}/activate")
@@ -190,7 +189,7 @@ def activate_rule(rule_code: str, db: Session = Depends(get_db)):
     r.active = True
     db.commit()
     _audit(db, "rule", r.id, "activate")
-    return {"status": "activated"}
+    return {"success": True, "data": {"status": "activated"}}
 
 
 @router.post("/rules/{rule_code}/deactivate")
@@ -200,7 +199,7 @@ def deactivate_rule(rule_code: str, db: Session = Depends(get_db)):
     r.active = False
     db.commit()
     _audit(db, "rule", r.id, "deactivate")
-    return {"status": "deactivated"}
+    return {"success": True, "data": {"status": "deactivated"}}
 
 
 # ═══════════════════════════════
@@ -212,7 +211,7 @@ def list_updates(status: Optional[str] = None, limit: int = 50, db: Session = De
     q = db.query(Update)
     if status: q = q.filter(Update.status == status)
     updates = q.order_by(Update.created_at.desc()).limit(limit).all()
-    return {"count": len(updates), "updates": [_update_dict(u) for u in updates]}
+    return {"success": True, "data": {"count": len(updates), "updates": [_update_dict(u) for u in updates]}}
 
 
 @router.post("/updates")
@@ -221,7 +220,7 @@ def create_update(data: dict, db: Session = Depends(get_db)):
     db.add(upd)
     db.commit()
     _audit(db, "update", upd.id, "create")
-    return {"status": "created", "id": upd.id}
+    return {"success": True, "data": {"id": upd.id}}
 
 
 @router.post("/updates/{update_id}/apply")
@@ -232,7 +231,7 @@ def apply_update(update_id: str, db: Session = Depends(get_db)):
     u.applied_at = datetime.utcnow()
     db.commit()
     _audit(db, "update", update_id, "apply")
-    return {"status": "applied"}
+    return {"success": True, "data": {"status": "applied"}}
 
 
 # ═══════════════════════════════
@@ -273,7 +272,7 @@ def search_knowledge(
         results.append({"type": "rule", "id": r.id, "code": r.rule_code, "title": r.rule_name_ar,
             "domain": r.domain, "active": r.active, "authority": r.authority_code})
 
-    return {"query": q, "total": len(results), "results": results}
+    return {"success": True, "data": {"query": q, "total": len(results), "results": results}}
 
 
 # ═══════════════════════════════
@@ -283,11 +282,11 @@ def search_knowledge(
 @router.get("/authorities")
 def list_authorities(db: Session = Depends(get_db)):
     auths = db.query(Authority).filter_by(active=True).order_by(Authority.source_priority).all()
-    return {"count": len(auths), "authorities": [
+    return {"success": True, "data": {"count": len(auths), "authorities": [
         {"code": a.code, "name_ar": a.name_ar, "name_en": a.name_en, "jurisdiction": a.jurisdiction,
          "domain_scope": a.domain_scope, "priority": a.source_priority}
         for a in auths
-    ]}
+    ]}}
 
 
 # ═══════════════════════════════
@@ -297,11 +296,11 @@ def list_authorities(db: Session = Depends(get_db)):
 @router.get("/review-queue")
 def list_review_queue(status: str = "pending", db: Session = Depends(get_db)):
     items = db.query(ReviewQueueItem).filter_by(status=status).order_by(ReviewQueueItem.created_at.desc()).all()
-    return {"count": len(items), "items": [
+    return {"success": True, "data": {"count": len(items), "items": [
         {"id": i.id, "entity_type": i.entity_type, "entity_id": i.entity_id,
          "action": i.action, "status": i.status, "created_at": str(i.created_at)}
         for i in items
-    ]}
+    ]}}
 
 
 @router.post("/review/{entity_type}/{entity_id}/approve")
@@ -312,7 +311,7 @@ def approve_review(entity_type: str, entity_id: str, db: Session = Depends(get_d
         item.resolved_at = datetime.utcnow()
         db.commit()
     _audit(db, entity_type, entity_id, "approve")
-    return {"status": "approved"}
+    return {"success": True, "data": {"status": "approved"}}
 
 
 # ═══════════════════════════════
@@ -324,11 +323,11 @@ def list_audit_log(entity_type: Optional[str] = None, limit: int = 50, db: Sessi
     q = db.query(AuditLog)
     if entity_type: q = q.filter(AuditLog.entity_type == entity_type)
     logs = q.order_by(AuditLog.timestamp.desc()).limit(limit).all()
-    return {"count": len(logs), "logs": [
+    return {"success": True, "data": {"count": len(logs), "logs": [
         {"id": l.id, "entity_type": l.entity_type, "entity_id": l.entity_id,
          "action": l.action, "user": l.user, "timestamp": str(l.timestamp)}
         for l in logs
-    ]}
+    ]}}
 
 
 # ═══ Helpers ═══

@@ -5,6 +5,7 @@ Admin dashboard, user management, system stats, reviewer tools.
 Per execution document sections 13, 14.
 """
 
+import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
     User, UserRole, Role, UserSubscription, Plan, UserSession,
@@ -103,7 +104,8 @@ class AdminService:
             return {"success": True, "user_id": user_id, "old_status": old, "new_status": new_status}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -122,7 +124,8 @@ class AdminService:
             return {"success": True, "message": f"تم تعيين الدور: {role_code}"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -140,7 +143,8 @@ class AdminService:
             return {"success": True, "message": f"تم إزالة الدور: {role_code}"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 

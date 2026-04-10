@@ -51,21 +51,21 @@ class NarrativeService:
                 narrative = await self._call_openai(prompt)
                 platform = "gpt4"
             except Exception as e:
-                narrative = {"error": f"GPT-4: {str(e)}"}
+                narrative = {"error": "AI narrative generation failed (GPT-4)"}
 
         if not narrative.get("executive_summary") and self.google_key:
             try:
                 narrative = await self._call_gemini(prompt)
                 platform = "gemini"
             except Exception as e:
-                narrative = {"error": f"Gemini: {str(e)}"}
+                narrative = {"error": "AI narrative generation failed (Gemini)"}
 
         if not narrative.get("executive_summary") and self.anthropic_key:
             try:
                 narrative = await self._call_claude(prompt)
                 platform = "claude"
             except Exception as e:
-                narrative = {"error": f"Claude: {str(e)}"}
+                narrative = {"error": "AI narrative generation failed (Claude)"}
 
         narrative["platform"] = platform
         narrative["language"] = language

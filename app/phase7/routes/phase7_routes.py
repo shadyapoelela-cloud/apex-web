@@ -5,6 +5,7 @@ Per Execution Master §8, §6 + Zero-Ambiguity §9, §7, §14
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional, List
 from pydantic import BaseModel
+import logging
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase1.routes.phase1_routes import get_current_user
 
@@ -78,7 +79,7 @@ async def list_task_types():
                 "input_requirements": inputs,
                 "output_requirements": outputs
             })
-        return result
+        return {"success": True, "data": result}
     finally:
         db.close()
 
@@ -94,16 +95,16 @@ async def get_task_type(code: str):
             TaskDocumentRequirement.task_type_id == tt.id
         ).order_by(TaskDocumentRequirement.sort_order).all()
         
-        return {
+        return {"success": True, "data": {
             "id": tt.id, "code": tt.code,
             "name_ar": tt.name_ar, "name_en": tt.name_en,
-            "input_requirements": [{"id": r.id, "name_ar": r.document_name_ar, 
+            "input_requirements": [{"id": r.id, "name_ar": r.document_name_ar,
                                     "is_mandatory": r.is_mandatory}
                                    for r in reqs if r.requirement_type == DocRequirementType.input_required],
             "output_requirements": [{"id": r.id, "name_ar": r.document_name_ar,
                                      "is_mandatory": r.is_mandatory}
                                     for r in reqs if r.requirement_type == DocRequirementType.output_required]
-        }
+        }}
     finally:
         db.close()
 
@@ -127,10 +128,11 @@ async def submit_task_document(req: SubmitDocRequest, user=Depends(get_current_u
                           entity_type="task_submission", entity_id=sub.id,
                           details=f"Uploaded {req.file_name} for task {req.service_task_id}"))
         db.commit()
-        return {"success": True, "submission_id": sub.id, "status": "uploaded"}
+        return {"success": True, "data": {"submission_id": sub.id, "status": "uploaded"}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, f"Error: {e}")
+        logging.error("Task submission error", exc_info=True)
+        raise HTTPException(500, "Task submission failed")
     finally:
         db.close()
 
@@ -140,10 +142,10 @@ async def get_task_submissions(task_id: str, user=Depends(get_current_user)):
     try:
         from app.phase7.models.phase7_models import TaskSubmission
         subs = db.query(TaskSubmission).filter(TaskSubmission.service_task_id == task_id).all()
-        return [{"id": s.id, "requirement_id": s.requirement_id, "file_name": s.file_name,
+        return {"success": True, "data": [{"id": s.id, "requirement_id": s.requirement_id, "file_name": s.file_name,
                  "status": s.status.value if s.status else "pending",
                  "uploaded_at": str(s.uploaded_at) if s.uploaded_at else None}
-                for s in subs]
+                for s in subs]}
     finally:
         db.close()
 
@@ -167,10 +169,11 @@ async def flag_provider_compliance(req: ComplianceFlagRequest, user=Depends(get_
                           entity_type="provider", entity_id=req.provider_id,
                           details=f"Flagged: {req.action}"))
         db.commit()
-        return {"success": True, "flag_id": flag.id}
+        return {"success": True, "data": {"flag_id": flag.id}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, f"Error: {e}")
+        logging.error("Compliance flag error", exc_info=True)
+        raise HTTPException(500, "Failed to flag provider")
     finally:
         db.close()
 
@@ -188,7 +191,7 @@ async def get_provider_compliance(provider_id: str, user=Depends(get_current_use
             ProviderSuspension.status == SuspensionStatus.active
         ).first()
         
-        return {
+        return {"success": True, "data": {
             "provider_id": provider_id,
             "is_suspended": active_suspension is not None,
             "suspension": {
@@ -202,7 +205,7 @@ async def get_provider_compliance(provider_id: str, user=Depends(get_current_use
                 "created_at": str(f.created_at)
             } for f in flags],
             "unresolved_count": sum(1 for f in flags if not f.is_resolved)
-        }
+        }}
     finally:
         db.close()
 
@@ -222,10 +225,11 @@ async def suspend_provider(req: SuspendRequest, user=Depends(get_current_user)):
                           entity_type="provider", entity_id=req.provider_id,
                           details=req.reason))
         db.commit()
-        return {"success": True, "suspension_id": suspension.id}
+        return {"success": True, "data": {"suspension_id": suspension.id}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, f"Error: {e}")
+        logging.error("Suspension error", exc_info=True)
+        raise HTTPException(500, "Failed to suspend provider")
     finally:
         db.close()
 
@@ -247,12 +251,13 @@ async def unsuspend_provider(provider_id: str, user=Depends(get_current_user)):
         db.add(AuditEvent(id=gen_uuid(), user_id=user["sub"], action="provider_unsuspended",
                           entity_type="provider", entity_id=provider_id))
         db.commit()
-        return {"success": True, "message": "Suspension lifted"}
+        return {"success": True, "data": {"message": "Suspension lifted"}}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, f"Error: {e}")
+        logging.error("Unsuspend error", exc_info=True)
+        raise HTTPException(500, "Failed to lift suspension")
     finally:
         db.close()
 
@@ -270,10 +275,10 @@ async def get_result_details(analysis_id: str, user=Depends(get_current_user)):
         ).all()
         
         if not explanations:
-            return {"analysis_id": analysis_id, "details": [], 
-                    "message": "No detailed explanations available yet"}
-        
-        return {
+            return {"success": True, "data": {"analysis_id": analysis_id, "details": [],
+                    "message": "No detailed explanations available yet"}}
+
+        return {"success": True, "data": {
             "analysis_id": analysis_id,
             "details": [{
                 "id": e.id, "result_key": e.result_key,
@@ -282,7 +287,7 @@ async def get_result_details(analysis_id: str, user=Depends(get_current_user)):
                 "confidence": e.confidence, "warnings": e.warnings,
                 "feedback_count": e.feedback_count
             } for e in explanations]
-        }
+        }}
     finally:
         db.close()
 
@@ -318,10 +323,11 @@ async def generate_result_explanation(analysis_id: str, user=Depends(get_current
                 count += 1
         
         db.commit()
-        return {"success": True, "generated": count, "analysis_id": analysis_id}
+        return {"success": True, "data": {"generated": count, "analysis_id": analysis_id}}
     except Exception as e:
         db.rollback()
-        raise HTTPException(500, f"Error: {e}")
+        logging.error("Explanation generation error", exc_info=True)
+        raise HTTPException(500, "Failed to generate explanations")
     finally:
         db.close()
 
@@ -365,10 +371,10 @@ async def resolve_entitlements(feature: str, user=Depends(get_current_user)):
         matrix = FEATURE_MATRIX.get(feature, {})
         access = matrix.get(plan_code, False)
         
-        return {
+        return {"success": True, "data": {
             "user_id": u.id, "plan": plan_code, "feature": feature,
             "access": access, "allowed": access not in [False, 0, "view"]
-        }
+        }}
     finally:
         db.close()
 
@@ -388,10 +394,10 @@ async def list_audit_events(user_id: Optional[str] = None, action: Optional[str]
         if action:
             q = q.filter(AuditEvent.action == action)
         events = q.order_by(AuditEvent.created_at.desc()).limit(limit).all()
-        return [{
+        return {"success": True, "data": [{
             "id": e.id, "user_id": e.user_id, "action": e.action,
             "entity_type": e.entity_type, "entity_id": e.entity_id,
             "details": e.details, "created_at": str(e.created_at)
-        } for e in events]
+        } for e in events]}
     finally:
         db.close()

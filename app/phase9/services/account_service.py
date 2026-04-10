@@ -2,6 +2,7 @@
 APEX Phase 9 — Account Center Services
 Uses Phase 1 PasswordReset + UserSession models
 """
+import logging
 import secrets, hashlib
 from datetime import datetime, timedelta
 from app.phase1.models.platform_models import SessionLocal, User, gen_uuid, utcnow, PasswordReset, UserSession
@@ -42,7 +43,8 @@ def create_password_reset(email: str):
         }
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -83,7 +85,8 @@ def execute_password_reset(raw_token: str, new_password: str):
         return {"status": "ok", "message": "\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0628\u0646\u062c\u0627\u062d"}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -152,7 +155,8 @@ def logout_all_sessions(user_id, except_current=None):
         return {"status": "ok", "terminated": count}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -171,7 +175,8 @@ def logout_session(user_id, session_id):
         return {"status": "ok", "message": "\u062a\u0645 \u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u062c\u0644\u0633\u0629"}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -206,7 +211,8 @@ def update_profile(user_id, display_name=None, email=None, mobile=None):
         return {"status": "ok", "changes": changes}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 
@@ -241,7 +247,8 @@ def request_account_closure(user_id, closure_type="temporary", reason=""):
         return {"status": "ok", "closure_type": closure_type, "message": msg}
     except Exception as e:
         db.rollback()
-        return {"status": "error", "detail": str(e)}
+        logging.error("Operation failed", exc_info=True)
+        return {"status": "error", "detail": "Internal server error"}
     finally:
         db.close()
 

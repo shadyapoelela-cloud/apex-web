@@ -6,6 +6,7 @@ Client creation, type selection, knowledge mode, memberships.
 Per execution document sections 5, 7.
 """
 
+import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
     User, AuditEvent, Notification, SessionLocal, gen_uuid, utcnow,
@@ -104,7 +105,8 @@ class ClientService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -199,7 +201,8 @@ class ClientService:
             return {"success": True, "message": "تمت إضافة العضو"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -225,7 +228,8 @@ class ClientService:
             return {"success": True, "message": "تم تحديث بيانات العميل"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 

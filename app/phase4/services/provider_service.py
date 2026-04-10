@@ -5,6 +5,7 @@ Registration, document upload, verification, scope management.
 Per execution document section 7.
 """
 
+import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
     User, UserRole, Role, AuditEvent, Notification, PolicyDocument, PolicyAcceptanceLog,
@@ -99,7 +100,8 @@ class ProviderService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -135,7 +137,8 @@ class ProviderService:
             }
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -177,7 +180,8 @@ class ProviderService:
 
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 

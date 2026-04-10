@@ -62,7 +62,8 @@ async def get_my_provider_profile(user: dict = Depends(get_current_user)):
 
 @router.get("/marketplace/providers", tags=["Marketplace"])
 async def list_marketplace_providers(category: Optional[str] = None):
-    return provider_service.list_providers(category=category)
+    result = provider_service.list_providers(category=category)
+    return {"success": True, "data": result}
 
 
 # ─── Admin: Verification ─────────────────────────────────────
@@ -72,7 +73,8 @@ async def verification_queue(user: dict = Depends(get_current_user)):
     allowed = {"reviewer", "platform_admin", "super_admin"}
     if not set(user.get("roles", [])) & allowed:
         raise HTTPException(status_code=403, detail="ليس لديك صلاحية")
-    return provider_service.list_pending_verification()
+    result = provider_service.list_pending_verification()
+    return {"success": True, "data": result}
 
 
 @router.post("/service-providers/{provider_id}/review", tags=["Provider Admin"])

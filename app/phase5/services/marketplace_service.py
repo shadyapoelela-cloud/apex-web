@@ -5,6 +5,7 @@ Service requests, task lifecycle, compliance, suspension engine.
 Per execution document sections 8, 11, 12.
 """
 
+import logging
 from typing import Optional
 from datetime import datetime, timedelta
 from app.phase1.models.platform_models import (
@@ -46,7 +47,8 @@ class MarketplaceService:
                     "deadline": deadline.isoformat() if deadline else None}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -85,7 +87,8 @@ class MarketplaceService:
                     "agreed_price": agreed_price, "commission": commission, "payout": agreed_price - commission}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -127,7 +130,8 @@ class MarketplaceService:
             return {"success": True, "request_id": request_id, "old_status": old_status, "new_status": new_status}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -151,7 +155,8 @@ class MarketplaceService:
             return {"success": True, "rating": rating}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -225,7 +230,8 @@ class MarketplaceService:
             return {"success": True, "status": status, "days_overdue": days_overdue}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -258,7 +264,8 @@ class MarketplaceService:
             return {"success": True, "suspension_id": event.id, "expires": expires.isoformat() if expires else "permanent"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -279,7 +286,8 @@ class MarketplaceService:
             return {"success": True, "message": "تم رفع الإيقاف"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 
@@ -296,7 +304,8 @@ class MarketplaceService:
             return {"success": True, "appeal_id": appeal.id, "status": "submitted"}
         except Exception as e:
             db.rollback()
-            return {"success": False, "error": str(e)}
+            logging.error("Operation failed", exc_info=True)
+            return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
 

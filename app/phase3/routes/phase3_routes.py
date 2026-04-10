@@ -83,7 +83,8 @@ async def list_my_feedback(
     user: dict = Depends(get_current_user),
 ):
     """List my submitted feedback."""
-    return feedback_service.list_feedback(user_id=user["sub"], status=status, client_id=client_id, limit=limit)
+    result = feedback_service.list_feedback(user_id=user["sub"], status=status, client_id=client_id, limit=limit)
+    return {"success": True, "data": result}
 
 
 @router.get("/knowledge-feedback/review-queue", tags=["Knowledge Governance"])
@@ -97,7 +98,8 @@ async def get_review_queue(
     user_roles = set(user.get("roles", []))
     if not user_roles & allowed_roles:
         raise HTTPException(status_code=403, detail="ليس لديك صلاحية المراجعة")
-    return feedback_service.get_review_queue(limit=limit)
+    result = feedback_service.get_review_queue(limit=limit)
+    return {"success": True, "data": result}
 
 
 @router.post("/knowledge-feedback/{feedback_id}/review", tags=["Knowledge Governance"])
@@ -157,4 +159,5 @@ async def list_candidate_rules(
     user: dict = Depends(get_current_user),
 ):
     """List candidate rules — for reviewers."""
-    return feedback_service.list_candidate_rules(status=status)
+    result = feedback_service.list_candidate_rules(status=status)
+    return {"success": True, "data": result}

@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime, timezone
+import logging
 
 from app.phase1.routes.phase1_routes import get_current_user
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
@@ -130,7 +131,8 @@ async def create_service_case(req: CreateServiceCaseRequest, user: dict = Depend
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error("Failed to create service case", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to create service case")
     finally:
         db.close()
 
@@ -208,7 +210,8 @@ async def create_sample(case_id: str, req: CreateSampleRequest, user: dict = Dep
         return {"success": True, "sample_id": sample.id}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error("Failed to create audit sample", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to create audit sample")
     finally:
         db.close()
 
@@ -246,7 +249,8 @@ async def create_workpaper(case_id: str, req: CreateWorkpaperRequest, user: dict
         return {"success": True, "workpaper_id": wp.id}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error("Failed to create workpaper", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to create workpaper")
     finally:
         db.close()
 
@@ -286,7 +290,8 @@ async def review_workpaper(wp_id: str, req: ReviewWorkpaperRequest, user: dict =
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error("Failed to review workpaper", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to review workpaper")
     finally:
         db.close()
 
@@ -310,7 +315,8 @@ async def create_finding(case_id: str, req: CreateFindingRequest, user: dict = D
         return {"success": True, "finding_id": finding.id, "finding_code": finding.finding_code}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error("Failed to create audit finding", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to create audit finding")
     finally:
         db.close()
 
