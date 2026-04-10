@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from pydantic import BaseModel
 from typing import Optional
 from app.copilot.services.copilot_service import CopilotService
 from app.copilot.services.intent_router import detect_intent
+from app.phase1.routes.phase1_routes import get_current_user
 
 router = APIRouter(prefix='/copilot', tags=['Copilot AI'])
 
@@ -19,10 +20,9 @@ class SessionRequest(BaseModel):
 
 
 @router.post('/sessions')
-async def create_session(req: SessionRequest):
-    # TODO: get user_id from auth token
+async def create_session(req: SessionRequest, user: dict = Depends(get_current_user)):
     session = CopilotService.create_session(
-        user_id='current_user',
+        user_id=user['sub'],
         client_id=req.client_id,
         session_type=req.session_type
     )
@@ -30,8 +30,8 @@ async def create_session(req: SessionRequest):
 
 
 @router.get('/sessions')
-async def list_sessions():
-    sessions = CopilotService.list_sessions('current_user')
+async def list_sessions(user: dict = Depends(get_current_user)):
+    sessions = CopilotService.list_sessions(user['sub'])
     return {'success': True, 'data': sessions}
 
 
@@ -44,10 +44,10 @@ async def get_session(session_id: str):
 
 
 @router.post('/chat')
-async def chat(req: ChatRequest):
+async def chat(req: ChatRequest, user: dict = Depends(get_current_user)):
     if not req.session_id:
         session = CopilotService.create_session(
-            user_id='current_user',
+            user_id=user['sub'],
             client_id=req.client_id
         )
         session_id = session['id']

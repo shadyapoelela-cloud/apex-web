@@ -1,19 +1,27 @@
-﻿"""
-APEX Financial Platform â€” FastAPI Backend v3.5 (FINAL)
-â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-All 6 Phases Complete:
+﻿“””
+APEX Financial Platform -- FastAPI Backend v9.0
+================================================================
+All 11 Phases + 6 Sprints:
   P1: Identity + Auth + Plans + Legal
   P2: Clients + COA + Results + Explanations
   P3: Knowledge Governance + Review Queue
   P4: Provider Onboarding + Verification
   P5: Marketplace + Compliance + Suspension
   P6: Admin Dashboard + Reviewer Tooling
-+ Financial Engine v2 + Knowledge Brain
-"""
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query
+  P7: Task Documents + Suspension + Audit
+  P8: Entitlements Engine + Subscriptions
+  P9: Account Center
+  P10: Notification System
+  P11: Legal Acceptance
++ Financial Engine v2 + Knowledge Brain + Copilot AI
++ Sprints 1-6: COA Workflow, Classification, Quality, KB, TB, Registry
+“””
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 import os, traceback
 from app.services.orchestrator import AnalysisOrchestrator
+
+ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "apex-admin-2026")
 from fastapi.responses import Response as PDFResponse
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
@@ -153,7 +161,7 @@ except Exception as e:
     print(f"Phase 11 disabled: {e}")
 
 
-app = FastAPI(title="APEX Financial Platform API", description="ظ…ظ†طµط© ط£ط¨ظƒط³ ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ â€” ط§ظ„ظ†ط³ط®ط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط©", version="6.5.0")
+app = FastAPI(title="APEX Financial Platform API", description="ظ…ظ†طµط© ط£ط¨ظƒط³ ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ â€” ط§ظ„ظ†ط³ط®ط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط©", version="9.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["Content-Disposition"])
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
@@ -163,7 +171,7 @@ import traceback as _tb
 async def global_exception_handler(request, exc):
     import logging
     logging.error(f"Unhandled: {exc}")
-    import traceback; tb_str = traceback.format_exc(); return JSONResponse(status_code=500, content={"detail": f"{exc}\n{tb_str}"})
+    import traceback; logging.error(traceback.format_exc()); return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
 @app.on_event("startup")
@@ -242,7 +250,7 @@ def root():
 
 @app.get("/admin/reinit-db")
 def reinit_db(secret: str = Query(...)):
-    if secret != "apex-admin-2026":
+    if secret != ADMIN_SECRET:
         raise HTTPException(403, "Invalid secret")
     results = {}
 
@@ -488,7 +496,7 @@ def reinit_db(secret: str = Query(...)):
 
 @app.get("/admin/seed-all", tags=["Admin"])
 def seed_all_data(secret: str = Query(...)):
-    if secret != os.environ.get("ADMIN_SECRET", "apex2025"):
+    if secret != ADMIN_SECRET:
         raise HTTPException(status_code=403, detail="Invalid secret")
     from app.seed_runner import seed_all
     seed_all()
@@ -524,7 +532,7 @@ def debug_flags():
 
 @app.get("/admin/reset-postgres")
 def reset_postgres(secret: str = Query(...)):
-    if secret != "apex-admin-2026":
+    if secret != ADMIN_SECRET:
         raise HTTPException(403, "Invalid secret")
     from app.phase1.models.platform_models import Base, engine
     from sqlalchemy import text as _txt
@@ -556,7 +564,7 @@ def reset_postgres(secret: str = Query(...)):
 
 @app.get("/admin/promote-user")
 def promote_user(secret: str = Query(...), username: str = Query(...), role: str = Query("platform_admin")):
-    if secret != "apex-admin-2026":
+    if secret != ADMIN_SECRET:
         raise HTTPException(403, "Invalid secret")
     from app.phase1.models.platform_models import SessionLocal
     from sqlalchemy import text as _t
@@ -585,7 +593,7 @@ def promote_user(secret: str = Query(...), username: str = Query(...), role: str
 
 @app.post("/admin/promote/{username}", tags=["Admin"])
 async def promote_to_admin(username: str, secret: str = Query(...)):
-    if secret != "apex-admin-2026":
+    if secret != ADMIN_SECRET:
         raise HTTPException(403, "Invalid secret")
     try:
         from app.phase1.models.platform_models import SessionLocal, User, UserRole, Role
@@ -617,7 +625,8 @@ def debug_s2():
         return {"s2_loaded": True, "routes": routes, "count": len(routes)}
     except Exception as e:
         import traceback
-        return {"s2_loaded": False, "error": str(e), "traceback": traceback.format_exc()}
+        import logging; logging.error(traceback.format_exc())
+        return {"s2_loaded": False, "error": str(e)}
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
@@ -630,7 +639,7 @@ async def analyze(file: UploadFile = File(...), industry: str = Query("general")
     try:
         c = await file.read()
         return orch.analyze_bytes(file_bytes=c, filename=file.filename, industry=industry, closing_inventory=closing_inventory)
-    except Exception as e: raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+    except Exception as e: import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
 
 @app.post("/analyze/full")
 async def analyze_full(file: UploadFile = File(...), industry: str = Query("general"), language: str = Query("ar"), closing_inventory: float = Query(None)):
@@ -647,7 +656,7 @@ async def analyze_full(file: UploadFile = File(...), industry: str = Query("gene
         except: pass
         r["narrative"] = await n.generate(r, language=language, brain_context=bc)
         return r
-    except Exception as e: raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+    except Exception as e: import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
 
 
 @app.post("/analyze/report", tags=["Analysis"])
@@ -678,7 +687,7 @@ async def analyze_report(
         )
     except Exception as e:
         import traceback
-        raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+        import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
 
 @app.post("/classify")
 async def classify(file: UploadFile = File(...)):
@@ -699,7 +708,7 @@ async def classify(file: UploadFile = File(...)):
                 "summary": orch.classifier.get_summary(cl),
                 "accounts": [{"name": r.get("account_name", ""), "class": r.get("normalized_class"),
                     "confidence": r.get("confidence", 0)} for r in cl]}
-    except Exception as e: raise HTTPException(500, f"{e}\n{traceback.format_exc()}")
+    except Exception as e: import logging; logging.error(traceback.format_exc()); raise HTTPException(500, str(e))
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
@@ -718,7 +727,9 @@ async def get_security(authorization: str = Query(None)):
     }
 
 @app.put("/users/me/security/password", tags=["Account"])
-async def change_password(body: dict):
+async def change_password(body: dict, authorization: str = Header(None)):
+    from app.phase1.routes.phase1_routes import get_current_user
+    user = await get_current_user(authorization)
     current = body.get("current_password", "")
     new_pw = body.get("new_password", "")
     confirm = body.get("confirm_password", "")
@@ -726,9 +737,11 @@ async def change_password(body: dict):
         raise HTTPException(400, "All password fields required")
     if new_pw != confirm:
         raise HTTPException(400, "Passwords do not match")
-    if len(new_pw) < 8:
-        raise HTTPException(400, "Password must be at least 8 characters")
-    return {"message": "Password changed successfully"}
+    from app.phase1.services.auth_service import AuthService
+    result = AuthService().change_password(user["sub"], current, new_pw)
+    if not result.get("success"):
+        raise HTTPException(400, result.get("error", "Failed"))
+    return {"message": result.get("message", "Password changed successfully")}
 
 # --- Plans ---
 @app.get("/plans", tags=["Subscriptions"])
