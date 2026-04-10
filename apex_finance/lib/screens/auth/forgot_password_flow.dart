@@ -42,12 +42,12 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': _eC.text.trim()}));
       final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['status'] == 'ok') {
+      if (r.statusCode == 200 && d['success'] == true) {
         if (!mounted) return;
         Navigator.push(context, MaterialPageRoute(
           builder: (_) => VerifyResetCodeScreen(email: _eC.text.trim(), token: d['reset_token'] ?? '')));
       } else {
-        setState(() { _err = d['detail'] ?? d['message'] ?? 'حدث خطأ'; });
+        setState(() { _err = d['error'] ?? d['detail'] ?? d['message'] ?? 'حدث خطأ'; });
       }
     } catch (e) {
       setState(() { _err = 'خطأ في الاتصال'; });
@@ -176,10 +176,10 @@ class _NewPwS extends State<NewPasswordScreen> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'token': widget.token, 'new_password': _pw1.text}));
       final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['status'] == 'ok') {
+      if (r.statusCode == 200 && d['success'] == true) {
         setState(() { _done = true; });
       } else {
-        setState(() { _err = d['detail'] ?? 'فشلت إعادة التعيين'; });
+        setState(() { _err = d['error'] ?? d['detail'] ?? 'فشلت إعادة التعيين'; });
       }
     } catch (e) {
       setState(() { _err = 'خطأ في الاتصال'; });

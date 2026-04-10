@@ -16,7 +16,7 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
-  <base href="/apex-web/">
+  <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -33,6 +33,26 @@
 
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- APEX Pre-redirect: skip login if token exists (v6.5.2) -->
+  <script id="apex_pre_redirect">
+    (function() {
+      var token = localStorage.getItem('apex_token');
+      var hash = window.location.hash || '';
+      // If user has token and is on login or root, redirect to #/home
+      if (token && token.length > 10) {
+        if (!hash || hash === '#/' || hash === '#/login' || hash === '') {
+          window.location.hash = '#/home';
+        }
+      }
+      // If no token and trying to access protected routes, redirect to login
+      if (!token || token.length < 10) {
+        if (hash && hash !== '#/' && hash !== '#/login') {
+          window.location.hash = '#/login';
+        }
+      }
+    })();
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
