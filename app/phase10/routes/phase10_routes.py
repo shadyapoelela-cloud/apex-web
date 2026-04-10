@@ -53,8 +53,8 @@ def mark_read(req: MarkReadRequest, authorization: str = Header(None)):
     user_id = extract_user_id(authorization)
     from app.phase10.services.notification_service import mark_as_read
     result = mark_as_read(user_id, req.notification_id)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=400, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.get("/preferences")
@@ -68,8 +68,8 @@ def update_pref(req: PreferenceUpdateRequest, authorization: str = Header(None))
     user_id = extract_user_id(authorization)
     from app.phase10.services.notification_service import update_preference
     result = update_preference(user_id, req.notification_type, req.in_app, req.email, req.sms)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=400, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.post("/emit")
@@ -77,6 +77,6 @@ def emit(req: EmitRequest, authorization: str = Header(None)):
     """Admin endpoint to emit a notification (for testing)."""
     from app.phase10.services.notification_service import emit_notification
     result = emit_notification(req.user_id, req.notification_type, body_ar=req.body_ar)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=400, detail=result.get("error", "حدث خطأ"))
     return result

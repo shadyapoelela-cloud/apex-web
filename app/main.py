@@ -872,8 +872,8 @@ async def accept_legal(body: AcceptLegalRequest, authorization: str = Header(Non
     doc_id = body.document_id
     from app.phase11.services.legal_service import accept_document
     result = accept_document(user["sub"], doc_id)
-    if result.get("status") == "error":
-        raise HTTPException(400, result.get("detail", "Failed"))
+    if not result.get("success", True):
+        raise HTTPException(400, result.get("error", "فشل العملية"))
     return result
 
 # --- Account Closure ---

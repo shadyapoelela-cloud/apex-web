@@ -30,8 +30,8 @@ def accept_doc(doc_id: str, authorization: str = Header(None)):
     user_id = extract_user_id(authorization)
     from app.phase11.services.legal_service import accept_document
     result = accept_document(user_id, doc_id)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=400, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.post("/accept-all")
@@ -39,8 +39,8 @@ def accept_all(authorization: str = Header(None)):
     user_id = extract_user_id(authorization)
     from app.phase11.services.legal_service import accept_all_current
     result = accept_all_current(user_id)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=400, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.get("/my-acceptances")

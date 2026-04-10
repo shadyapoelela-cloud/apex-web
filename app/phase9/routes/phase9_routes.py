@@ -40,8 +40,8 @@ class ClosureRequest(BaseModel):
 def forgot_password(req: ForgotPasswordRequest):
     from app.phase9.services.account_service import create_password_reset
     result = create_password_reset(req.email)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=500, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=500, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.post("/reset-password")
@@ -50,8 +50,8 @@ def reset_password(req: ResetPasswordRequest):
     if len(req.new_password) < 6:
         raise HTTPException(status_code=400, detail="كلمة المرور يجب أن تكون 6 أحرف على الأقل")
     result = execute_password_reset(req.token, req.new_password)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=400, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.get("/sessions")
@@ -66,8 +66,8 @@ def logout_all(authorization: str = Header(None)):
     user_id = extract_user_id(authorization)
     from app.phase9.services.account_service import logout_all_sessions
     result = logout_all_sessions(user_id)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=500, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=500, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.post("/sessions/{session_id}/logout")
@@ -75,8 +75,8 @@ def logout_one(session_id: str, authorization: str = Header(None)):
     user_id = extract_user_id(authorization)
     from app.phase9.services.account_service import logout_session
     result = logout_session(user_id, session_id)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=404, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=404, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.put("/profile")
@@ -84,8 +84,8 @@ def update_profile(req: ProfileUpdateRequest, authorization: str = Header(None))
     user_id = extract_user_id(authorization)
     from app.phase9.services.account_service import update_profile
     result = update_profile(user_id, req.display_name, req.email, req.mobile)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=400, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.post("/closure")
@@ -93,8 +93,8 @@ def close_account(req: ClosureRequest, authorization: str = Header(None)):
     user_id = extract_user_id(authorization)
     from app.phase9.services.account_service import request_account_closure
     result = request_account_closure(user_id, req.closure_type, req.reason)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(status_code=400, detail=result.get("error", "حدث خطأ"))
     return result
 
 @router.get("/activity")

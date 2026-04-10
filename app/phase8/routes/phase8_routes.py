@@ -131,8 +131,8 @@ def upgrade_subscription(plan_name: str = Query(...), authorization: str = None,
         raise HTTPException(400, f"خطة غير معروفة: {plan_name}")
     
     result = upgrade_user_plan(user_id, plan_name)
-    if result["status"] == "error":
-        raise HTTPException(500, result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(500, result.get("error", "حدث خطأ"))
 
     return {"success": True, "data": result}
 
@@ -143,14 +143,14 @@ def downgrade_subscription(plan_name: str = Query(...), authorization: str = Non
     user_id = get_current_user_id(authorization or x_token)
     if not user_id:
         raise HTTPException(401, "يجب تسجيل الدخول")
-    
+
     valid_plans = ["Free", "Pro", "Business", "Expert", "Enterprise"]
     if plan_name not in valid_plans:
         raise HTTPException(400, f"خطة غير معروفة: {plan_name}")
-    
+
     result = upgrade_user_plan(user_id, plan_name)
-    if result["status"] == "error":
-        raise HTTPException(500, result["detail"])
+    if not result.get("success", True):
+        raise HTTPException(500, result.get("error", "حدث خطأ"))
 
     return {"success": True, "data": result}
 

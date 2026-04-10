@@ -47,7 +47,7 @@ def emit_notification(user_id, notification_type, body_ar=None, body_en=None,
                       reference_id=None, reference_type=None, action_url=None):
     """Create and deliver a notification."""
     if notification_type not in NOTIFICATION_TYPES:
-        return {"status": "error", "detail": f"Unknown type: {notification_type}"}
+        return {"success": False, "error": f"Unknown type: {notification_type}"}
 
     db = SessionLocal()
     try:
@@ -76,11 +76,11 @@ def emit_notification(user_id, notification_type, body_ar=None, body_en=None,
         db.add(log)
         db.commit()
 
-        return {"status": "ok", "notification_id": notif.id}
+        return {"success": True, "notification_id": notif.id}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -142,19 +142,19 @@ def mark_as_read(user_id, notification_id=None):
                 n.is_read = True
                 n.read_at = datetime.now(timezone.utc)
                 db.commit()
-                return {"status": "ok", "marked": 1}
-            return {"status": "error", "detail": "الإشعار غير موجود"}
+                return {"success": True, "marked": 1}
+            return {"success": False, "error": "الإشعار غير موجود"}
         else:
             count = db.query(NotificationV2).filter(
                 NotificationV2.user_id == user_id,
                 NotificationV2.is_read == False,
             ).update({"is_read": True, "read_at": datetime.now(timezone.utc)})
             db.commit()
-            return {"status": "ok", "marked": count}
+            return {"success": True, "marked": count}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -194,7 +194,7 @@ def get_preferences(user_id):
 def update_preference(user_id, notification_type, in_app=True, email=True, sms=False):
     """Update notification preference for a specific type."""
     if notification_type not in NOTIFICATION_TYPES:
-        return {"status": "error", "detail": f"Unknown type: {notification_type}"}
+        return {"success": False, "error": f"Unknown type: {notification_type}"}
 
     db = SessionLocal()
     try:
@@ -220,11 +220,11 @@ def update_preference(user_id, notification_type, in_app=True, email=True, sms=F
             db.add(pref)
 
         db.commit()
-        return {"status": "ok"}
+        return {"success": True}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 

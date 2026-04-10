@@ -25,11 +25,11 @@ def seed_all():
         created["plan_features"] = _seed_plan_features(db)
         created["policies"] = _seed_policies(db)
         db.commit()
-        return {"status": "seeded", "created": created}
+        return {"success": True, "created": created}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "error": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 

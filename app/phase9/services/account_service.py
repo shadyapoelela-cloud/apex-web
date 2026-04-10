@@ -14,7 +14,7 @@ def create_password_reset(email: str):
     try:
         user = db.query(User).filter(User.email == email).first()
         if not user:
-            return {"status": "ok", "message": "\u0625\u0630\u0627 \u0643\u0627\u0646 \u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062c\u0644\u0627\u064b\u060c \u0633\u064a\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0627\u0628\u0637 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646"}
+            return {"success": True, "message": "\u0625\u0630\u0627 \u0643\u0627\u0646 \u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062c\u0644\u0627\u064b\u060c \u0633\u064a\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0627\u0628\u0637 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646"}
 
         raw_token = secrets.token_urlsafe(48)
         token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
@@ -36,7 +36,7 @@ def create_password_reset(email: str):
         db.commit()
 
         return {
-            "status": "ok",
+            "success": True,
             "message": "\u0625\u0630\u0627 \u0643\u0627\u0646 \u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062c\u0644\u0627\u064b\u060c \u0633\u064a\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0627\u0628\u0637 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646",
             "reset_token": raw_token,
             "expires_in_minutes": 60,
@@ -44,7 +44,7 @@ def create_password_reset(email: str):
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -58,14 +58,14 @@ def execute_password_reset(raw_token: str, new_password: str):
         ).first()
 
         if not reset:
-            return {"status": "error", "detail": "\u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d"}
+            return {"success": False, "error": "\u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d"}
 
         if datetime.now(timezone.utc) > reset.expires_at:
-            return {"status": "error", "detail": "\u0627\u0646\u062a\u0647\u062a \u0635\u0644\u0627\u062d\u064a\u0629 \u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646"}
+            return {"success": False, "error": "\u0627\u0646\u062a\u0647\u062a \u0635\u0644\u0627\u062d\u064a\u0629 \u0631\u0645\u0632 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646"}
 
         user = db.query(User).filter(User.id == reset.user_id).first()
         if not user:
-            return {"status": "error", "detail": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
+            return {"success": False, "error": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
 
         try:
             from app.phase1.services.auth_service import hash_password
@@ -82,11 +82,11 @@ def execute_password_reset(raw_token: str, new_password: str):
         db.add(action)
         db.commit()
 
-        return {"status": "ok", "message": "\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0628\u0646\u062c\u0627\u062d"}
+        return {"success": True, "message": "\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0628\u0646\u062c\u0627\u062d"}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -152,11 +152,11 @@ def logout_all_sessions(user_id, except_current=None):
         )
         db.add(action)
         db.commit()
-        return {"status": "ok", "terminated": count}
+        return {"success": True, "terminated": count}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -169,14 +169,14 @@ def logout_session(user_id, session_id):
             UserSession.is_active == True,
         ).first()
         if not s:
-            return {"status": "error", "detail": "\u0627\u0644\u062c\u0644\u0633\u0629 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f\u0629"}
+            return {"success": False, "error": "\u0627\u0644\u062c\u0644\u0633\u0629 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f\u0629"}
         s.is_active = False
         db.commit()
-        return {"status": "ok", "message": "\u062a\u0645 \u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u062c\u0644\u0633\u0629"}
+        return {"success": True, "message": "\u062a\u0645 \u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u062c\u0644\u0633\u0629"}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -186,7 +186,7 @@ def update_profile(user_id, display_name=None, email=None, mobile=None):
     try:
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            return {"status": "error", "detail": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
+            return {"success": False, "error": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
 
         changes = []
         if display_name and display_name != getattr(user, "display_name", None):
@@ -195,7 +195,7 @@ def update_profile(user_id, display_name=None, email=None, mobile=None):
         if email and email != user.email:
             existing = db.query(User).filter(User.email == email, User.id != user_id).first()
             if existing:
-                return {"status": "error", "detail": "\u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062a\u062e\u062f\u0645 \u0628\u0627\u0644\u0641\u0639\u0644"}
+                return {"success": False, "error": "\u0627\u0644\u0628\u0631\u064a\u062f \u0645\u0633\u062a\u062e\u062f\u0645 \u0628\u0627\u0644\u0641\u0639\u0644"}
             user.email = email
             changes.append(f"email={email}")
 
@@ -208,11 +208,11 @@ def update_profile(user_id, display_name=None, email=None, mobile=None):
             db.add(action)
 
         db.commit()
-        return {"status": "ok", "changes": changes}
+        return {"success": True, "changes": changes}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
@@ -222,7 +222,7 @@ def request_account_closure(user_id, closure_type="temporary", reason=""):
     try:
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            return {"status": "error", "detail": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
+            return {"success": False, "error": "\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f"}
 
         if closure_type == "temporary":
             user.is_active = False
@@ -231,7 +231,7 @@ def request_account_closure(user_id, closure_type="temporary", reason=""):
             user.is_active = False
             msg = "\u062a\u0645 \u0637\u0644\u0628 \u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628 \u0646\u0647\u0627\u0626\u064a\u0627\u064b"
         else:
-            return {"status": "error", "detail": "\u0646\u0648\u0639 \u0625\u063a\u0644\u0627\u0642 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d"}
+            return {"success": False, "error": "\u0646\u0648\u0639 \u0625\u063a\u0644\u0627\u0642 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d"}
 
         # End all sessions
         for s in db.query(UserSession).filter(UserSession.user_id == user_id, UserSession.is_active == True).all():
@@ -244,11 +244,11 @@ def request_account_closure(user_id, closure_type="temporary", reason=""):
         )
         db.add(action)
         db.commit()
-        return {"status": "ok", "closure_type": closure_type, "message": msg}
+        return {"success": True, "closure_type": closure_type, "message": msg}
     except Exception as e:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"status": "error", "detail": "Internal server error"}
+        return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
 
