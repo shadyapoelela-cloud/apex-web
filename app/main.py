@@ -592,6 +592,145 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
 
 
 
+@app.get("/admin/stats", tags=["Admin"])
+def admin_stats(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    """Platform statistics for admin dashboard."""
+    _verify_admin(secret, x_admin_secret)
+    from app.phase1.models.platform_models import SessionLocal, User, UserSubscription, UserRole, Role
+    from datetime import datetime, timezone, timedelta
+
+    stats = {}
+    db = SessionLocal()
+    try:
+        # Total users
+        try:
+            stats["total_users"] = db.query(User).filter(User.is_deleted == False).count()
+        except Exception:
+            stats["total_users"] = None
+
+        # Total clients
+        try:
+            from app.phase2.models.phase2_models import Client
+            stats["total_clients"] = db.query(Client).count()
+        except Exception:
+            stats["total_clients"] = None
+
+        # Active subscriptions
+        try:
+            stats["active_subscriptions"] = db.query(UserSubscription).filter(
+                UserSubscription.status == "active"
+            ).count()
+        except Exception:
+            stats["active_subscriptions"] = None
+
+        # Total COA uploads
+        try:
+            from app.sprint1.models.sprint1_models import ClientCoaUpload
+            stats["total_coa_uploads"] = db.query(ClientCoaUpload).count()
+        except Exception:
+            stats["total_coa_uploads"] = None
+
+        # Total analyses
+        try:
+            from app.phase2.models.phase2_models import AnalysisResult
+            stats["total_analyses"] = db.query(AnalysisResult).count()
+        except Exception:
+            stats["total_analyses"] = None
+
+        # Plans breakdown
+        try:
+            from app.phase1.models.platform_models import Plan
+            from sqlalchemy import func
+            rows = db.query(
+                Plan.name_en, func.count(UserSubscription.id)
+            ).join(
+                UserSubscription, UserSubscription.plan_id == Plan.id
+            ).filter(
+                UserSubscription.status == "active"
+            ).group_by(Plan.name_en).all()
+            stats["plans_breakdown"] = {name: count for name, count in rows}
+        except Exception:
+            stats["plans_breakdown"] = None
+
+        # Recent registrations (last 7 days)
+        try:
+            seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+            stats["recent_registrations"] = db.query(User).filter(
+                User.created_at >= seven_days_ago,
+                User.is_deleted == False,
+            ).count()
+        except Exception:
+            stats["recent_registrations"] = None
+
+    finally:
+        db.close()
+
+    return {"success": True, "data": stats}
+
+
+@app.get("/admin/users", tags=["Admin"])
+def admin_users(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    secret: str = Query(None),
+    x_admin_secret: str = Header(None, alias="X-Admin-Secret"),
+):
+    """Paginated list of platform users for admin dashboard."""
+    _verify_admin(secret, x_admin_secret)
+    from app.phase1.models.platform_models import SessionLocal, User, UserRole, Role
+
+    db = SessionLocal()
+    try:
+        total = db.query(User).filter(User.is_deleted == False).count()
+        offset = (page - 1) * page_size
+        users_q = (
+            db.query(User)
+            .filter(User.is_deleted == False)
+            .order_by(User.created_at.desc())
+            .offset(offset)
+            .limit(page_size)
+            .all()
+        )
+
+        users_list = []
+        for u in users_q:
+            # Fetch roles
+            role_names = []
+            try:
+                for ur in db.query(UserRole).filter(UserRole.user_id == u.id).all():
+                    role = db.query(Role).filter(Role.id == ur.role_id).first()
+                    if role:
+                        role_names.append(role.code)
+            except Exception:
+                pass
+
+            users_list.append({
+                "id": u.id,
+                "username": u.username,
+                "email": u.email,
+                "display_name": u.display_name,
+                "status": u.status,
+                "created_at": u.created_at.isoformat() if u.created_at else None,
+                "roles": role_names,
+            })
+
+        return {
+            "success": True,
+            "data": {
+                "users": users_list,
+                "total": total,
+                "page": page,
+                "page_size": page_size,
+                "total_pages": (total + page_size - 1) // page_size,
+            },
+        }
+    except Exception as e:
+        logging.error("admin_users failed", exc_info=True)
+        raise HTTPException(500, "Failed to fetch users")
+    finally:
+        db.close()
+
+
 @app.post("/admin/seed-all", tags=["Admin"])
 def seed_all_data(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
     _verify_admin(secret, x_admin_secret)

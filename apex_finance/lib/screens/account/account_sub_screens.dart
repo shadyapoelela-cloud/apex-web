@@ -95,9 +95,9 @@ class _ChPwS extends State<ChangePasswordScreen> {
     if(_new1.text!=_new2.text) { setState(()=> _e='\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/auth/change-password'),
+      final r = await http.post(Uri.parse('$_api/users/me/security/password'),
         headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
-        body: jsonEncode({'current_password':_cur.text,'new_password':_new1.text}));
+        body: jsonEncode({'current_password':_cur.text,'new_password':_new1.text,'confirm_password':_new2.text}));
       if(r.statusCode==200) setState(()=> _done=true);
       else setState(()=> _e=jsonDecode(r.body)['detail']);
     } catch(e){ setState(()=> _e='$e'); }

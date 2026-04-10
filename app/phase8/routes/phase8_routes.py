@@ -23,6 +23,9 @@ from app.phase8.services.seed_phase8 import (
 
 router = APIRouter()
 
+# ─── Plan ordering for upgrade/downgrade validation ──────
+PLAN_ORDER = {"Free": 0, "Pro": 1, "Business": 2, "Expert": 3, "Enterprise": 4}
+
 # ─── Helper: Extract user_id from token ───────────────────
 def get_current_user_id(authorization: str = None):
     """Extract user_id from JWT — simplified"""
@@ -118,6 +121,14 @@ def list_available_plans():
     
     return {"success": True, "data": {"plans": plans}}
 
+# ─── Helper: get current plan name for a user ────────────
+def _get_current_plan_name(user_id: str) -> str:
+    """Return the current plan name for a user, or 'Free' if none."""
+    sub = get_user_subscription(user_id)
+    if sub and sub.get("plan_name"):
+        return sub["plan_name"]
+    return "Free"
+
 # ─── POST /subscriptions/upgrade ──────────────────────────
 @router.post("/subscriptions/upgrade")
 def upgrade_subscription(plan_name: str = Query(...), authorization: str = None, x_token: str = Header(None, alias="Authorization")):
@@ -125,11 +136,17 @@ def upgrade_subscription(plan_name: str = Query(...), authorization: str = None,
     user_id = get_current_user_id(authorization or x_token)
     if not user_id:
         raise HTTPException(401, "يجب تسجيل الدخول")
-    
+
     valid_plans = ["Free", "Pro", "Business", "Expert", "Enterprise"]
     if plan_name not in valid_plans:
         raise HTTPException(400, f"خطة غير معروفة: {plan_name}")
-    
+
+    current_plan = _get_current_plan_name(user_id)
+    current_order = PLAN_ORDER.get(current_plan, 0)
+    new_order = PLAN_ORDER.get(plan_name, 0)
+    if new_order <= current_order:
+        raise HTTPException(400, f"الترقية تتطلب خطة أعلى من {current_plan}. استخدم نقطة التخفيض بدلاً من ذلك")
+
     result = upgrade_user_plan(user_id, plan_name)
     if not result.get("success", True):
         raise HTTPException(500, result.get("error", "حدث خطأ"))
@@ -147,6 +164,12 @@ def downgrade_subscription(plan_name: str = Query(...), authorization: str = Non
     valid_plans = ["Free", "Pro", "Business", "Expert", "Enterprise"]
     if plan_name not in valid_plans:
         raise HTTPException(400, f"خطة غير معروفة: {plan_name}")
+
+    current_plan = _get_current_plan_name(user_id)
+    current_order = PLAN_ORDER.get(current_plan, 0)
+    new_order = PLAN_ORDER.get(plan_name, 0)
+    if new_order >= current_order:
+        raise HTTPException(400, f"التخفيض يتطلب خطة أقل من {current_plan}. استخدم نقطة الترقية بدلاً من ذلك")
 
     result = upgrade_user_plan(user_id, plan_name)
     if not result.get("success", True):

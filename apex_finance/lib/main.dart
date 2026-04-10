@@ -247,6 +247,13 @@ class _LoginS extends State<LoginScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    _u.dispose();
+    _p.dispose();
+    super.dispose();
+  }
+
   Future<void> _go() async {
     setState(() { _l = true; _e = null; });
     try {
@@ -379,6 +386,14 @@ class RegScreen extends StatefulWidget {
 class _RegS extends State<RegScreen> {
   final _un=TextEditingController(),_em=TextEditingController(),_dn=TextEditingController(),_pw=TextEditingController();
   bool _l=false; String? _e;
+  @override
+  void dispose() {
+    _un.dispose();
+    _em.dispose();
+    _dn.dispose();
+    _pw.dispose();
+    super.dispose();
+  }
   Future<void> _go() async {
     setState((){ _l=true; _e=null; });
     try {
@@ -1322,6 +1337,11 @@ class NewClientScreen extends StatefulWidget { const NewClientScreen({super.key}
 class _NewCS extends State<NewClientScreen> {
   final _n=TextEditingController(); List _types=[]; String? _t; bool _l=false; String? _e;
   @override void initState() { super.initState(); http.get(Uri.parse('$_api/client-types')).then((r){ if(mounted) setState(()=> _types=jsonDecode(r.body)); }); }
+  @override
+  void dispose() {
+    _n.dispose();
+    super.dispose();
+  }
   Future<void> _go() async {
     if(_n.text.trim().isEmpty||_t==null){ setState(()=> _e='\u0627\u0644\u0627\u0633\u0645 \u0648\u0627\u0644\u0646\u0648\u0639 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
@@ -1517,6 +1537,12 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
     {'code':'data_quality_issue','ar':'\u0645\u0634\u0643\u0644\u0629 \u062c\u0648\u062f\u0629 \u0628\u064a\u0627\u0646\u0627\u062a'},
     {'code':'explanation_improvement','ar':'\u062a\u062d\u0633\u064a\u0646 \u0627\u0644\u0634\u0631\u062d'},
   ];
+  @override
+  void dispose() {
+    _title.dispose();
+    _desc.dispose();
+    super.dispose();
+  }
   Future<void> _submit() async {
     if(_title.text.trim().isEmpty) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0645\u0637\u0644\u0648\u0628'); return; }
     setState((){ _l=true; _e=null; });
@@ -1622,6 +1648,13 @@ class _NSRS extends State<NewServiceRequestScreen> {
   String _urgency='medium'; List _clients=[]; String? _clientId, _e; bool _l=false, _done=false;
   @override void initState() { super.initState();
     http.get(Uri.parse('$_api/clients'), headers: S.lh()).then((r){ if(r.statusCode == 200 && mounted) setState((){ final d = jsonDecode(r.body); _clients = d is List ? d : (d['clients'] ?? d['data'] ?? []); }); }); }
+  @override
+  void dispose() {
+    _title.dispose();
+    _desc.dispose();
+    _budget.dispose();
+    super.dispose();
+  }
   Future<void> _go() async {
     if(_title.text.isEmpty||_clientId==null) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0639\u0645\u064a\u0644 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
@@ -1827,6 +1860,14 @@ class _EditPS extends State<EditProfileScreen> {
     _job=TextEditingController(text: widget.profile?['profile']?['job_title']??'');
     _city=TextEditingController(text: widget.profile?['profile']?['city']??'');
   }
+  @override
+  void dispose() {
+    _dn.dispose();
+    _org.dispose();
+    _job.dispose();
+    _city.dispose();
+    super.dispose();
+  }
   Future<void> _save() async {
     setState((){ _l=true; _e=null; });
     try {
@@ -1869,13 +1910,20 @@ class ChangePasswordScreen extends StatefulWidget {
 class _ChPwS extends State<ChangePasswordScreen> {
   final _cur=TextEditingController(), _new1=TextEditingController(), _new2=TextEditingController();
   bool _l=false; String? _e; bool _done=false;
+  @override
+  void dispose() {
+    _cur.dispose();
+    _new1.dispose();
+    _new2.dispose();
+    super.dispose();
+  }
   Future<void> _go() async {
     if(_new1.text!=_new2.text) { setState(()=> _e='\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/auth/change-password'),
+      final r = await http.post(Uri.parse('$_api/users/me/security/password'),
         headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-        body: jsonEncode({'current_password':_cur.text,'new_password':_new1.text}));
+        body: jsonEncode({'current_password':_cur.text,'new_password':_new1.text,'confirm_password':_new2.text}));
       if(r.statusCode==200) setState(()=> _done=true);
       else setState(()=> _e=jsonDecode(r.body)['detail']);
     } catch(e){ setState(()=> _e='$e'); }
@@ -3304,6 +3352,12 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
   final _codeC = TextEditingController();
   String? _err;
 
+  @override
+  void dispose() {
+    _codeC.dispose();
+    super.dispose();
+  }
+
   void _verify() {
     final entered = _codeC.text.trim();
     if (entered.isEmpty) {
@@ -3366,6 +3420,13 @@ class _NewPwS extends State<NewPasswordScreen> {
   final _pw2 = TextEditingController();
   bool _ld = false, _done = false;
   String? _err;
+
+  @override
+  void dispose() {
+    _pw1.dispose();
+    _pw2.dispose();
+    super.dispose();
+  }
 
   Future<void> _resetPw() async {
     if (_pw1.text.length < 6) {

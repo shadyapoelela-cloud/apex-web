@@ -30,7 +30,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
+          pip install pytest httpx
 
       - name: Syntax check all Python files
         run: |
@@ -38,10 +38,10 @@ jobs:
           find app/ -name "*.py" -print0 | xargs -0 -n1 python -m py_compile
           echo "All files compiled successfully."
 
-      - name: Run core tests
+      - name: Run tests
         run: |
           cd $GITHUB_WORKSPACE
-          python tests/test_core.py
+          pytest tests/ -v
 
       - name: Verify major module imports
         run: |
@@ -75,3 +75,13 @@ jobs:
           else:
               print('\nAll imports passed.')
           "
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Trigger Render Deploy
+        run: |
+          curl -sf "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" || echo "Deploy hook not configured"
