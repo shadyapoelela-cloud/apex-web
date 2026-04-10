@@ -23,6 +23,12 @@ from typing import Optional
 import os, logging
 from app.services.orchestrator import AnalysisOrchestrator
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 
 # ═══════════════════════════════════════════════════════════════
 # Pydantic Request Models (input validation)
@@ -234,6 +240,23 @@ async def rate_limit_middleware(request, call_next):
         return JSONResponse(status_code=429, content={"success": False, "error": "طلبات كثيرة جداً. الرجاء الانتظار."})
     _rate_limits[client_ip].append(now)
     response = await call_next(request)
+    return response
+
+
+_request_logger = logging.getLogger("apex.requests")
+
+
+@app.middleware("http")
+async def request_logging_middleware(request, call_next):
+    path = request.url.path
+    if path == "/health":
+        return await call_next(request)
+    start = time.time()
+    response = await call_next(request)
+    duration_ms = round((time.time() - start) * 1000, 1)
+    _request_logger.info(
+        "%s %s %s %.1fms", request.method, path, response.status_code, duration_ms
+    )
     return response
 
 

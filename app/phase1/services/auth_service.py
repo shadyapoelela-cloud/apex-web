@@ -355,6 +355,14 @@ class AuthService:
                 expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
             ))
             db.commit()
+
+            # Send password reset email (non-blocking)
+            try:
+                from app.core.email_service import send_password_reset_email
+                send_password_reset_email(email, reset_token)
+            except Exception as email_err:
+                logging.error("Failed to send password reset email to %s: %s", email, email_err)
+
             return {"success": True, "message": "ط¥ط°ط§ ظƒط§ظ† ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ط§ظ‹ ط³طھطµظ„ظƒ ط±ط³ط§ظ„ط©", "reset_token": reset_token}
         except Exception as e:
             db.rollback()

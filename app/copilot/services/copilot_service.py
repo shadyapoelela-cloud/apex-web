@@ -2,6 +2,7 @@
 APEX — Copilot service layer for session management and AI-powered chat
 خدمة المساعد الذكي لإدارة الجلسات والمحادثة المدعومة بالذكاء الاصطناعي
 """
+import os
 import logging
 from datetime import datetime, timezone
 from app.phase1.models.platform_models import SessionLocal, gen_uuid
@@ -10,6 +11,28 @@ from app.copilot.services.intent_router import detect_intent, build_context, sug
 
 # Maximum recent messages to include as conversation memory
 MAX_MEMORY_MESSAGES = 10
+
+# AI API key for real responses
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+
+# System prompt for the Copilot AI assistant
+COPILOT_SYSTEM_PROMPT = """أنت مساعد APEX الذكي — منصة مالية سعودية متقدمة للمحاسبين والمراجعين والشركات.
+
+دورك:
+- مساعدة المستخدمين في التحليل المالي، شجرة الحسابات (COA)، النسب المالية، والقوائم المالية
+- الإجابة عن أسئلة الامتثال (ضريبة القيمة المضافة VAT، الزكاة ZATCA، نظام الشركات)
+- شرح معايير المحاسبة (SOCPA، IFRS) ومعايير المراجعة (ISA)
+- المساعدة في تقييم الجاهزية التمويلية وتحليل المخاطر
+- توجيه المستخدمين لخدمات سوق الخدمات المهنية (Marketplace)
+- إدارة الاشتراكات والحسابات
+
+قواعد صارمة:
+- أجب بالعربية دائماً إلا إذا طلب المستخدم الإنجليزية
+- لا تختلق أرقاماً مالية أو بيانات غير موجودة
+- إذا لم تكن متأكداً، اذكر ذلك بوضوح واقترح التصعيد لمختص
+- كن موجزاً ومهنياً — الردود لا تزيد عن 300 كلمة
+- استخدم التنسيق المناسب (نقاط، أرقام) لتسهيل القراءة
+- عند ذكر أنظمة أو معايير، اذكر المرجع الرسمي"""
 
 
 class CopilotService:
@@ -222,6 +245,75 @@ class CopilotService:
 
     @classmethod
     def _generate_response(cls, intent, confidence, ctx, user_message, conversation_history=None):
+        """Generate AI response using Claude API, with fallback to hardcoded responses."""
+        if not ANTHROPIC_API_KEY:
+            return cls._generate_fallback_response(intent, confidence, ctx, user_message, conversation_history)
+
+        try:
+            import anthropic
+            client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+
+            # Build conversation messages for Claude
+            messages = []
+
+            # Include conversation history for context
+            if conversation_history:
+                for msg in conversation_history:
+                    role = msg.get("role", "user")
+                    content = msg.get("content", "")
+                    if role in ("user", "assistant") and content:
+                        messages.append({"role": role, "content": content})
+
+            # Add the current user message
+            messages.append({"role": "user", "content": user_message})
+
+            # Build an enhanced system prompt with intent context
+            intent_labels = {
+                "financial_analysis": "التحليل المالي",
+                "coa_workflow": "شجرة الحسابات",
+                "tb_binding": "ربط ميزان المراجعة",
+                "funding_readiness": "الجاهزية التمويلية",
+                "compliance": "الامتثال والضرائب",
+                "audit_review": "المراجعة والتدقيق",
+                "knowledge_lookup": "البحث في المعايير",
+                "service_request": "طلب خدمة مهنية",
+                "explain_result": "شرح النتائج",
+                "account_management": "إدارة الحساب",
+                "general": "استفسار عام",
+            }
+            intent_label = intent_labels.get(intent, intent)
+
+            system_prompt = COPILOT_SYSTEM_PROMPT + f"\n\nالسياق الحالي:\n- نية المستخدم المكتشفة: {intent_label} (ثقة: {confidence})"
+            if ctx.get("requires_client") and not ctx.get("client_id"):
+                system_prompt += "\n- لم يتم اختيار عميل بعد — ذكّر المستخدم باختيار العميل إذا لزم الأمر"
+            if ctx.get("requires_file"):
+                system_prompt += "\n- هذه العملية تتطلب رفع ملف — وجّه المستخدم لذلك إذا لم يرفع بعد"
+            if ctx.get("may_escalate"):
+                system_prompt += "\n- هذا الموضوع حساس وقد يحتاج تصعيد لمختص — نبّه المستخدم عند الحاجة"
+
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1024,
+                temperature=0.7,
+                system=system_prompt,
+                messages=messages,
+            )
+
+            ai_text = response.content[0].text.strip()
+
+            # Append low-confidence warning if needed
+            if confidence < 0.5:
+                ai_text += "\n\n⚠️ لم أتمكن من فهم طلبك بدقة. يرجى توضيح ما تحتاجه."
+
+            return ai_text
+
+        except Exception as e:
+            logging.error("Copilot Claude API call failed, falling back to hardcoded responses: %s", e)
+            return cls._generate_fallback_response(intent, confidence, ctx, user_message, conversation_history)
+
+    @classmethod
+    def _generate_fallback_response(cls, intent, confidence, ctx, user_message, conversation_history=None):
+        """Fallback hardcoded responses when AI API is unavailable."""
         # Primary responses per intent
         responses = {
             "financial_analysis": {

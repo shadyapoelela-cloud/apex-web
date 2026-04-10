@@ -57,21 +57,30 @@ class ResultDetailResponse(BaseModel):
 async def list_task_types():
     db = SessionLocal()
     try:
+        from collections import defaultdict
         from app.phase7.models.phase7_models import TaskType, TaskDocumentRequirement, DocRequirementType
         types = db.query(TaskType).filter(TaskType.is_active == True).all()
+        type_ids = [tt.id for tt in types]
+
+        # Pre-fetch all requirements in a single query to avoid N+1
+        all_reqs = db.query(TaskDocumentRequirement).filter(
+            TaskDocumentRequirement.task_type_id.in_(type_ids)
+        ).order_by(TaskDocumentRequirement.sort_order).all()
+
+        reqs_by_type = defaultdict(list)
+        for r in all_reqs:
+            reqs_by_type[r.task_type_id].append(r)
+
         result = []
         for tt in types:
-            reqs = db.query(TaskDocumentRequirement).filter(
-                TaskDocumentRequirement.task_type_id == tt.id
-            ).order_by(TaskDocumentRequirement.sort_order).all()
-            
+            reqs = reqs_by_type.get(tt.id, [])
             inputs = [{"id": r.id, "name_ar": r.document_name_ar, "name_en": r.document_name_en,
-                       "is_mandatory": r.is_mandatory} 
+                       "is_mandatory": r.is_mandatory}
                       for r in reqs if r.requirement_type == DocRequirementType.input_required]
             outputs = [{"id": r.id, "name_ar": r.document_name_ar, "name_en": r.document_name_en,
                         "is_mandatory": r.is_mandatory}
                        for r in reqs if r.requirement_type == DocRequirementType.output_required]
-            
+
             result.append({
                 "id": tt.id, "code": tt.code,
                 "name_ar": tt.name_ar, "name_en": tt.name_en,

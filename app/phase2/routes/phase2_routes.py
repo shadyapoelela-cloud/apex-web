@@ -136,6 +136,10 @@ async def upload_and_analyze(
 
     content = await file.read()
 
+    MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
+    if len(content) > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=413, detail="حجم الملف يتجاوز الحد المسموح 10MB")
+
     # Store upload record
     upload_id = analysis_service.store_upload(
         client_id=client_id,
