@@ -2152,6 +2152,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                   a.status == 'review' ? AppColors.orangeC : AppColors.redC;
               return GestureDetector(
                 onTap: () => _openLevelEditor(a),
+                behavior: HitTestBehavior.opaque,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
@@ -2559,18 +2560,27 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     );
   }
 
-  // ═══ v8.5r: Level-by-Level Classification Editor ═══
+  // ═══ v8.5r: Level-by-Level Classification Editor (Cascading) ═══
+
+  List<CoaAccount> _getLevelChildren(String parentCode) {
+    if (parentCode.isEmpty) {
+      final roots = _accounts.where((a) => a.parentCode.isEmpty || a.level <= 1).toList();
+      final seen = <String>{};
+      return roots.where((a) => a.code.isNotEmpty && seen.add(a.code)).toList()
+        ..sort((a, b) => a.code.compareTo(b.code));
+    }
+    return _accounts.where((a) => a.parentCode == parentCode).toList()
+      ..sort((a, b) => a.code.compareTo(b.code));
+  }
+
   List<CoaAccount> _buildLevelChain(CoaAccount acc) {
     final chain = <CoaAccount>[acc];
     var current = acc;
     int safety = 0;
     while (current.parentCode.isNotEmpty && safety < 10) {
       CoaAccount? parent;
-      try {
-        parent = _accounts.firstWhere((a) => a.uniqueId == current.parentUniqueId);
-      } catch (_) {
-        try { parent = _accounts.firstWhere((a) => a.code == current.parentCode); } catch (_) { parent = null; }
-      }
+      try { parent = _accounts.firstWhere((a) => a.uniqueId == current.parentUniqueId); }
+      catch (_) { try { parent = _accounts.firstWhere((a) => a.code == current.parentCode); } catch (_) { parent = null; } }
       if (parent == null || parent.code.isEmpty) break;
       chain.insert(0, parent);
       current = parent;
@@ -2581,10 +2591,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   void _openLevelEditor(CoaAccount acc) {
     final chain = _buildLevelChain(acc);
-    final arCtrls = chain.map((a) => TextEditingController(text: a.name)).toList();
-    final enCtrls = chain.map((a) => TextEditingController(text: a.nameEn)).toList();
-    final rootClasses = chain.map((a) => a.rootClass).toList();
-    const rootOptions = ['الأصول', 'الخصوم', 'حقوق الملكية', 'الإيرادات', 'المصروفات'];
+    final selectedCodes = chain.map((a) => a.code).toList();
 
     showGeneralDialog(
       context: context,
@@ -2601,217 +2608,166 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 .animate(CurvedAnimation(parent: a1, curve: Curves.easeOutCubic)),
             child: Material(
               color: Colors.transparent,
-              child: SizedBox(
-                width: 540,
-                height: double.infinity,
-                child: StatefulBuilder(
-                  builder: (c, setSt) => Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.navyMid,
-                      border: Border(left: BorderSide(color: AppColors.gold.withOpacity(0.4), width: 2)),
-                    ),
-                    child: Column(
-                      children: [
-                        // Header
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppColors.navyLight,
-                            border: Border(bottom: BorderSide(color: AppColors.gold.withOpacity(0.3))),
+              child: SizedBox(width: 540, height: double.infinity,
+                child: StatefulBuilder(builder: (bCtx, setSt) {
+                  final levelWidgets = <Widget>[];
+                  for (int lvl = 0; lvl < selectedCodes.length; lvl++) {
+                    final pCode = lvl == 0 ? '' : selectedCodes[lvl - 1];
+                    final options = _getLevelChildren(pCode);
+                    if (options.isEmpty && lvl > 0) break;
+                    final isLast = lvl == selectedCodes.length - 1;
+                    CoaAccount? curAcc;
+                    try { curAcc = _accounts.firstWhere((a) => a.code == selectedCodes[lvl]); } catch (_) {}
+                    final childCount = curAcc != null ? _getLevelChildren(curAcc.code).length : 0;
+
+                    levelWidgets.add(Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.navyLight,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: isLast ? AppColors.gold.withOpacity(0.5) : AppColors.textDim.withOpacity(0.15)),
+                      ),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                        Row(children: [
+                          Container(width: 30, height: 30, alignment: Alignment.center,
+                            decoration: BoxDecoration(color: isLast ? AppColors.gold : AppColors.greenC, shape: BoxShape.circle),
+                            child: Text('L${lvl + 1}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.navy)),
                           ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.category_outlined, color: AppColors.gold, size: 22),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('تعديل التبويب بالمستويات',
-                                      style: TextStyle(color: AppColors.gold, fontSize: 15, fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 2),
-                                    Text('${chain.length} مستوى · ${acc.code} · ${acc.name}',
-                                      style: TextStyle(color: AppColors.textDim, fontSize: 11),
-                                      maxLines: 1, overflow: TextOverflow.ellipsis),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.close, color: AppColors.textMid),
-                                onPressed: () => Navigator.pop(ctx),
-                              ),
-                            ],
+                          const SizedBox(width: 10),
+                          Text('المستوى ${lvl + 1}', style: TextStyle(color: AppColors.textColor, fontSize: 13, fontWeight: FontWeight.w600)),
+                          const Spacer(),
+                          if (isLast) Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(color: AppColors.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                            child: Text('الحساب المحدد', style: TextStyle(color: AppColors.gold, fontSize: 9, fontWeight: FontWeight.bold)),
                           ),
+                          if (childCount > 0 && !isLast) Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(color: AppColors.greenC.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+                            child: Text('$childCount فرعي', style: TextStyle(color: AppColors.greenC, fontSize: 9, fontWeight: FontWeight.bold)),
+                          ),
+                        ]),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<String>(
+                          value: options.any((a) => a.code == selectedCodes[lvl]) ? selectedCodes[lvl] : null,
+                          dropdownColor: AppColors.navyLight,
+                          isExpanded: true,
+                          style: TextStyle(color: AppColors.textColor, fontSize: 13),
+                          decoration: InputDecoration(
+                            labelText: 'اختر الحساب',
+                            labelStyle: TextStyle(color: AppColors.textDim, fontSize: 11),
+                            prefixIcon: Icon(Icons.search, color: AppColors.textDim, size: 18),
+                            filled: true, fillColor: AppColors.navy,
+                            isDense: true,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                          items: options.map((a) => DropdownMenuItem(
+                            value: a.code,
+                            child: Text('${a.code}  —  ${a.name}', overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+                          )).toList(),
+                          onChanged: (code) {
+                            if (code == null) return;
+                            setSt(() {
+                              selectedCodes[lvl] = code;
+                              while (selectedCodes.length > lvl + 1) selectedCodes.removeLast();
+                              var np = code;
+                              var kids = _getLevelChildren(np);
+                              while (kids.isNotEmpty) {
+                                selectedCodes.add(kids.first.code);
+                                np = kids.first.code;
+                                kids = _getLevelChildren(np);
+                              }
+                            });
+                          },
                         ),
-                        // Breadcrumb
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          color: AppColors.navy.withOpacity(0.5),
-                          child: Wrap(
-                            spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              for (int i = 0; i < chain.length; i++) ...[
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: i == chain.length - 1 ? AppColors.gold.withOpacity(0.18) : AppColors.navyLight,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: i == chain.length - 1 ? AppColors.gold : AppColors.textDim.withOpacity(0.3),
-                                      width: 1),
-                                  ),
-                                  child: Text('L${i+1} · ${chain[i].code}',
-                                    style: TextStyle(
-                                      color: i == chain.length - 1 ? AppColors.gold : AppColors.textMid,
-                                      fontSize: 10, fontWeight: FontWeight.bold)),
-                                ),
-                                if (i < chain.length - 1)
-                                  Icon(Icons.chevron_left, size: 14, color: AppColors.textDim),
-                              ],
-                            ],
-                          ),
-                        ),
-                        // Level cards
-                        Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(12),
-                            itemCount: chain.length,
-                            itemBuilder: (lc, i) {
-                              final isTarget = i == chain.length - 1;
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: AppColors.navyLight,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: isTarget ? AppColors.gold.withOpacity(0.5) : AppColors.textDim.withOpacity(0.15),
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: 28, height: 28,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            color: isTarget ? AppColors.gold : AppColors.greenC,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Text('L${i+1}',
-                                            style: TextStyle(
-                                              fontSize: 10, fontWeight: FontWeight.bold,
-                                              color: AppColors.navy)),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text('كود: ${chain[i].code}',
-                                          style: TextStyle(color: AppColors.textMid, fontSize: 11, fontFamily: 'monospace')),
-                                        const Spacer(),
-                                        if (isTarget)
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.gold.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            child: Text('الحساب المحدد',
-                                              style: TextStyle(color: AppColors.gold, fontSize: 9, fontWeight: FontWeight.bold)),
-                                          ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    TextField(
-                                      controller: arCtrls[i],
-                                      style: TextStyle(color: AppColors.textColor, fontSize: 13),
-                                      decoration: InputDecoration(
-                                        labelText: 'الاسم بالعربية',
-                                        labelStyle: TextStyle(color: AppColors.textDim, fontSize: 11),
-                                        filled: true, fillColor: AppColors.navy,
-                                        isDense: true,
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: BorderSide.none),
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextField(
-                                      controller: enCtrls[i],
-                                      style: TextStyle(color: AppColors.textColor, fontSize: 13),
-                                      textDirection: TextDirection.ltr,
-                                      decoration: InputDecoration(
-                                        labelText: 'English Name',
-                                        labelStyle: TextStyle(color: AppColors.textDim, fontSize: 11),
-                                        filled: true, fillColor: AppColors.navy,
-                                        isDense: true,
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: BorderSide.none),
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    DropdownButtonFormField<String>(
-                                      value: rootOptions.contains(rootClasses[i]) ? rootClasses[i] : null,
-                                      dropdownColor: AppColors.navyLight,
-                                      style: TextStyle(color: AppColors.textColor, fontSize: 13),
-                                      decoration: InputDecoration(
-                                        labelText: 'نوع/تصنيف الحساب',
-                                        labelStyle: TextStyle(color: AppColors.textDim, fontSize: 11),
-                                        filled: true, fillColor: AppColors.navy,
-                                        isDense: true,
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: BorderSide.none),
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                      ),
-                                      items: rootOptions.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
-                                      onChanged: (v) => setSt(() => rootClasses[i] = v ?? ''),
-                                    ),
-                                  ],
-                                ),
-                              );
+                        if (curAcc != null) ...[
+                          const SizedBox(height: 8),
+                          Wrap(spacing: 6, runSpacing: 4, children: [
+                            if (curAcc.rootClass.isNotEmpty) _infoChip('النوع', curAcc.rootClass, AppColors.purpleC),
+                            if (curAcc.nature.isNotEmpty) _infoChip('الطبيعة', curAcc.nature, AppColors.blueC),
+                            if (curAcc.accountType.isNotEmpty) _infoChip('الفئة', curAcc.accountType, AppColors.orangeC),
+                            _infoChip('الأبناء', '$childCount', AppColors.greenC),
+                          ]),
+                        ],
+                      ]),
+                    ));
+                  }
+
+                  return Container(
+                    decoration: BoxDecoration(color: AppColors.navyMid,
+                      border: Border(left: BorderSide(color: AppColors.gold.withOpacity(0.4), width: 2))),
+                    child: Column(children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(color: AppColors.navyLight,
+                          border: Border(bottom: BorderSide(color: AppColors.gold.withOpacity(0.3)))),
+                        child: Row(children: [
+                          Icon(Icons.account_tree_outlined, color: AppColors.gold, size: 22),
+                          const SizedBox(width: 10),
+                          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Text('تعديل التبويب بالمستويات', style: TextStyle(color: AppColors.gold, fontSize: 15, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 2),
+                            Text('${acc.code}  —  ${acc.name}', style: TextStyle(color: AppColors.textDim, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ])),
+                          IconButton(icon: Icon(Icons.close, color: AppColors.textMid), onPressed: () => Navigator.pop(ctx)),
+                        ]),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        color: AppColors.navy.withOpacity(0.5),
+                        child: Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                          for (int i = 0; i < selectedCodes.length; i++) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: i == selectedCodes.length - 1 ? AppColors.gold.withOpacity(0.18) : AppColors.navyLight,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: i == selectedCodes.length - 1 ? AppColors.gold : AppColors.textDim.withOpacity(0.3))),
+                              child: Text('L${i + 1} · ${selectedCodes[i]}',
+                                style: TextStyle(color: i == selectedCodes.length - 1 ? AppColors.gold : AppColors.textMid, fontSize: 10, fontWeight: FontWeight.bold)),
+                            ),
+                            if (i < selectedCodes.length - 1) Icon(Icons.chevron_left, size: 14, color: AppColors.textDim),
+                          ],
+                        ]),
+                      ),
+                      Expanded(child: ListView(padding: const EdgeInsets.all(12), children: levelWidgets)),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(color: AppColors.navyLight,
+                          border: Border(top: BorderSide(color: AppColors.gold.withOpacity(0.3)))),
+                        child: Row(children: [
+                          Expanded(child: OutlinedButton.icon(
+                            icon: Icon(Icons.close, color: AppColors.textMid, size: 16),
+                            label: Text('إلغاء', style: TextStyle(color: AppColors.textMid)),
+                            style: OutlinedButton.styleFrom(side: BorderSide(color: AppColors.textDim.withOpacity(0.4)), padding: const EdgeInsets.symmetric(vertical: 12)),
+                            onPressed: () => Navigator.pop(ctx),
+                          )),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 2, child: ElevatedButton.icon(
+                            icon: Icon(Icons.save, color: AppColors.navy, size: 16),
+                            label: Text('حفظ التعديلات', style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, padding: const EdgeInsets.symmetric(vertical: 12)),
+                            onPressed: () {
+                              setState(() {
+                                if (selectedCodes.length >= 2) {
+                                  final newParent = selectedCodes[selectedCodes.length - 2];
+                                  acc.parentCode = newParent;
+                                  try { final np = _accounts.firstWhere((a) => a.code == newParent); acc.parentUniqueId = np.uniqueId; acc.rootClass = np.rootClass; } catch (_) {}
+                                }
+                              });
+                              Navigator.pop(ctx);
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text('✅ تم تعديل تبويب ${acc.code} — ${acc.name}'), backgroundColor: AppColors.greenC));
                             },
-                          ),
-                        ),
-                        // Footer buttons
-                        Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: AppColors.navyLight,
-                            border: Border(top: BorderSide(color: AppColors.gold.withOpacity(0.3))),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  icon: Icon(Icons.close, color: AppColors.textMid, size: 16),
-                                  label: Text('إلغاء', style: TextStyle(color: AppColors.textMid)),
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(color: AppColors.textDim.withOpacity(0.4)),
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                  ),
-                                  onPressed: () => Navigator.pop(ctx),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                flex: 2,
-                                child: ElevatedButton.icon(
-                                  icon: Icon(Icons.save, color: AppColors.navy, size: 16),
-                                  label: Text('حفظ التعديلات',
-                                    style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.gold,
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                  ),
-                                  onPressed: () => _saveLevelEdits(ctx, chain, arCtrls, enCtrls, rootClasses),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                          )),
+                        ]),
+                      ),
+                    ]),
+                  );
+                }),
               ),
             ),
           ),
@@ -2820,83 +2776,16 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     );
   }
 
-  Future<void> _saveLevelEdits(BuildContext drawerCtx, List<CoaAccount> chain,
-      List<TextEditingController> arCtrls, List<TextEditingController> enCtrls,
-      List<String> rootClasses) async {
-    final changed = <int>[];
-    for (int i = 0; i < chain.length; i++) {
-      if (chain[i].name != arCtrls[i].text ||
-          chain[i].nameEn != enCtrls[i].text ||
-          chain[i].rootClass != rootClasses[i]) {
-        changed.add(i);
-      }
-    }
-    if (changed.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لا توجد تعديلات للحفظ'), backgroundColor: Colors.orange),
-      );
-      return;
-    }
-
-    bool applyToChildren = false;
-    final hasKids = changed.any((i) => chain[i].children.isNotEmpty);
-    if (hasKids) {
-      final res = await showDialog<String>(
-        context: drawerCtx,
-        builder: (dc) => AlertDialog(
-          backgroundColor: AppColors.navyMid,
-          title: Row(children: [
-            Icon(Icons.help_outline, color: AppColors.gold),
-            const SizedBox(width: 8),
-            Text('تطبيق على الحسابات الفرعية؟', style: TextStyle(color: AppColors.gold, fontSize: 15)),
-          ]),
-          content: Text(
-            'بعض المستويات المعدّلة تحتوي حسابات فرعية.\n\nهل تريد نشر تغيير "نوع/تصنيف الحساب" تلقائياً على كل الأبناء؟',
-            style: TextStyle(color: AppColors.textColor, fontSize: 13),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(dc, 'cancel'),
-              child: Text('إلغاء', style: TextStyle(color: AppColors.textMid))),
-            TextButton(onPressed: () => Navigator.pop(dc, 'no'),
-              child: Text('لا، المستوى فقط', style: TextStyle(color: AppColors.blueC))),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.greenC),
-              onPressed: () => Navigator.pop(dc, 'yes'),
-              child: Text('نعم، طبّق على الأبناء', style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold))),
-          ],
-        ),
-      );
-      if (res == null || res == 'cancel') return;
-      applyToChildren = res == 'yes';
-    }
-
-    setState(() {
-      for (final i in changed) {
-        final acc = chain[i];
-        final oldClass = acc.rootClass;
-        acc.name = arCtrls[i].text;
-        acc.nameEn = enCtrls[i].text;
-        acc.rootClass = rootClasses[i];
-        if (applyToChildren && oldClass != acc.rootClass) {
-          _cascadeRootClass(acc, acc.rootClass);
-        }
-      }
-    });
-
-    Navigator.pop(drawerCtx);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('✅ تم حفظ ${changed.length} مستوى${applyToChildren ? " مع نشر التصنيف للأبناء" : ""}'),
-        backgroundColor: AppColors.greenC,
-      ),
+  Widget _infoChip(String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+      child: Text('$label: $value', style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.bold)),
     );
   }
 
   void _cascadeRootClass(CoaAccount parent, String newClass) {
-    for (final child in parent.children) {
-      child.rootClass = newClass;
-      _cascadeRootClass(child, newClass);
-    }
+    for (final child in parent.children) { child.rootClass = newClass; _cascadeRootClass(child, newClass); }
   }
   // ═══ End v8.5r Level Editor ═══
   Widget _buildAccountCard(CoaAccount acc) {
