@@ -252,11 +252,14 @@ app.include_router(copilot_router)
 
 @app.get("/")
 def root():
-    return {"name": "APEX Financial Platform API", "version": "6.5.0", "status": "running",
-            "phases_active": sum([P1, P2, P3, P4, P5, P6]),
+    phases = [P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8, HAS_P9, HAS_P10, HAS_P11]
+    return {"name": "APEX Financial Platform API", "version": "9.0.0", "status": "running",
+            "phases_active": sum(phases), "phases_total": 11,
             "modules": {k: "active" if v else "disabled" for k, v in
                 {"engine": True, "kb": KB, "p1_identity": P1, "p2_clients": P2, "p3_knowledge": P3,
-                 "p4_providers": P4, "p5_marketplace": P5, "p6_admin": P6}.items()}}
+                 "p4_providers": P4, "p5_marketplace": P5, "p6_admin": P6,
+                 "p7_tasks": HAS_P7, "p8_entitlements": HAS_P8, "p9_account": HAS_P9,
+                 "p10_notifications": HAS_P10, "p11_legal": HAS_P11}.items()}}
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
@@ -519,7 +522,7 @@ def seed_all_data(secret: str = Query(...)):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "6.5.0",
+    return {"status": "ok", "version": "9.0.0",
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6,
                        "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9, "p10": HAS_P10, "p11": HAS_P11},
             "sprints": {"s1": HAS_S1, "s2": HAS_S2, "s3": HAS_S3, "s4": HAS_S4,
