@@ -127,7 +127,7 @@ def require_entitlement(feature_key: str, required_value=None):
                     # Use same secret as auth module
                     payload = jwt.decode(token, options={"verify_signature": False})
                     user_id = payload.get("sub") or payload.get("user_id")
-                except:
+                except Exception:
                     pass
         
         if not user_id:

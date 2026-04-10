@@ -68,7 +68,7 @@ def execute_password_reset(raw_token: str, new_password: str):
         try:
             from app.phase1.services.auth_service import hash_password
             user.password_hash = hash_password(new_password)
-        except:
+        except Exception:
             user.password_hash = hashlib.sha256(new_password.encode()).hexdigest()
         reset.used = True
         reset.used_at = datetime.utcnow()

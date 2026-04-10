@@ -157,3 +157,9 @@ class ServiceProviderScope(Base):
     __table_args__ = (
         UniqueConstraint("provider_id", "scope_code", name="uq_provider_scope"),
     )
+
+
+def init_phase4_db():
+    from app.phase1.models.platform_models import engine
+    Base.metadata.create_all(bind=engine)
+    return ["service_providers", "service_provider_documents", "service_provider_scopes"]

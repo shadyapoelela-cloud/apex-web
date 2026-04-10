@@ -13,6 +13,7 @@ from typing import Optional
 import jwt
 import hashlib
 import os
+import bcrypt as _bcrypt
 
 from app.phase1.models.platform_models import (
     User, UserProfile, UserSession, PasswordReset,
@@ -45,7 +46,7 @@ def safe_aware(dt):
 PASSWORD_MIN_LENGTH = 8
 
 # Try bcrypt, fallback to hashlib
-USE_BCRYPT = False  # Using SHA-256 until bcrypt confirmed on Render
+USE_BCRYPT = True
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
@@ -176,7 +177,7 @@ class AuthService:
             try:
                 from app.phase10.services.notification_service import seed_welcome_notification
                 seed_welcome_notification(user.id)
-            except:
+            except Exception:
                 pass
             return {
                 "success": True,

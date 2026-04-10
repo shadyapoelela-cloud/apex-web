@@ -17,7 +17,12 @@ Endpoints per implementation plan:
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional, List
-from app.knowledge_brain.models.db_models import *
+from datetime import datetime
+from app.knowledge_brain.models.db_models import (
+    get_db, init_db, get_table_stats,
+    Source, Entry, Rule, Update, Authority,
+    ReviewQueueItem, AuditLog,
+)
 
 router = APIRouter(prefix="/knowledge", tags=["Knowledge Brain"])
 

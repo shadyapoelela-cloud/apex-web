@@ -38,7 +38,7 @@ def get_client_financial_snapshot(db, client_id: str) -> dict | None:
         if v is None: return {}
         if isinstance(v, str):
             try: return json.loads(v)
-            except: return {}
+            except Exception: return {}
         return v if isinstance(v, dict) else {}
 
     return {

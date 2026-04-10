@@ -35,7 +35,7 @@ def get_current_user_id(authorization: str = None):
         token = authorization.replace("Bearer ", "")
         payload = jwt.decode(token, options={"verify_signature": False})
         return payload.get("sub") or payload.get("user_id")
-    except:
+    except Exception:
         return None
 
 # ─── GET /subscriptions/me ────────────────────────────────
@@ -249,5 +249,5 @@ def _format_value(value):
     if value == "custom": return "⚙️ مخصص"
     try:
         return f"📊 {int(value)} شهرياً"
-    except:
+    except Exception:
         return value

@@ -37,7 +37,7 @@ def _ensure_fonts():
         _font_registered = True
         return True
     except Exception as e:
-        print(f"Font download failed: {e}")
+        import logging; logging.warning(f"Font download failed: {e}")
         return False
 
 def _ar(text):

@@ -42,7 +42,7 @@ def init_sprint2_db(engine=None):
             try:
                 from app.phase1.models.platform_models import engine as eng
                 engine = eng
-            except:
+            except Exception:
                 from app.phase1.models.platform_models import SessionLocal
                 db = SessionLocal()
                 engine = db.bind

@@ -127,7 +127,7 @@ def read_and_save_tb(
                 "UPDATE trial_balance_uploads SET upload_status = 'failed' WHERE id = :uid"
             ), {"uid": tb_upload_id})
             db.commit()
-        except:
+        except Exception:
             pass
         raise e
     finally:

@@ -90,7 +90,7 @@ def bind_tb_to_coa(
                 cond = rr[0] if isinstance(rr[0], dict) else json.loads(rr[0] or "{}")
                 act = rr[1] if isinstance(rr[1], dict) else json.loads(rr[1] or "{}")
                 client_rules.append({"condition": cond, "action": act})
-        except:
+        except Exception:
             pass
 
         # ── Load TB parsed rows ──

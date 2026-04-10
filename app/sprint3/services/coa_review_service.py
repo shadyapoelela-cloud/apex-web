@@ -73,7 +73,7 @@ def approve_upload(
                 "SELECT overall_score FROM client_coa_assessments WHERE coa_upload_id = :uid"
             ), {"uid": upload_id}).fetchone()
             quality_score = quality_row[0] if quality_row else None
-        except:
+        except Exception:
             quality_score = None
             db.rollback()
 
@@ -84,7 +84,7 @@ def approve_upload(
                WHERE coa_upload_id = :uid AND record_status != 'rejected'"""
             ), {"uid": upload_id}).fetchone()
             avg_conf = round(float(conf_row[0] or 0), 3)
-        except:
+        except Exception:
             avg_conf = 0
             db.rollback()
 

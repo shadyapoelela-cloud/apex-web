@@ -269,7 +269,7 @@ def get_full_report(client_id: str):
             if v is None: return None
             if isinstance(v, str):
                 try: return json.loads(v)
-                except: return v
+                except Exception: return v
             return v
 
         return {
@@ -317,7 +317,7 @@ def compare_runs(run_id_1: str, run_id_2: str):
             def _p(v):
                 if v and isinstance(v, str):
                     try: return json.loads(v)
-                    except: return v
+                    except Exception: return v
                 return v
             return {
                 "id": r[0], "status": r[1], "confidence": r[2],

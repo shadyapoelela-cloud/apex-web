@@ -218,10 +218,10 @@ def get_mapping_preview(
             cls_issues = []
             try:
                 issues = json.loads(r[17] or "[]")
-            except: pass
+            except Exception: pass
             try:
                 cls_issues = json.loads(r[18] or "[]")
-            except: pass
+            except Exception: pass
 
             accounts.append({
                 "id": r[0],

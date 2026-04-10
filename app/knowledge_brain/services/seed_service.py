@@ -1,7 +1,9 @@
 """
 Knowledge Brain Seed Service v2 — تعبئة شاملة لكل المعرفة
 """
-from app.knowledge_brain.models.db_models import *
+from app.knowledge_brain.models.db_models import (
+    Source, Entry, Rule, Authority, Domain, Sector,
+)
 from app.knowledge_brain.data.authorities.authority_registry import AUTHORITIES
 from app.knowledge_brain.models.core_models import DOMAINS, SECTORS
 from app.knowledge_brain.rulebooks.tax_rulebook import TAX_RULES
