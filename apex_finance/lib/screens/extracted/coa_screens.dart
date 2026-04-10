@@ -1630,7 +1630,15 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             Tab(icon: Icon(Icons.visibility, size: 16), text: 'المراجعة'),
             Tab(icon: Icon(Icons.account_tree, size: 16), text: 'الشجرة'),
           ],
-          onTap: (i) { setState(() {}); },
+          onTap: (i) {
+            if (i + 1 > _currentStage) {
+              _tabController.animateTo((_currentStage - 1).clamp(0, 4));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('أكمل المرحلة الحالية أولاً للانتقال'), backgroundColor: AppColors.orangeC));
+              return;
+            }
+            setState(() {});
+          },
         ),
       ),
     );
@@ -1639,6 +1647,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   Widget _buildTabContent() {
     return TabBarView(
       controller: _tabController,
+      physics: const NeverScrollableScrollPhysics(),
       children: [
         _buildOverviewTab(),
         _buildAccountsTab(),
@@ -3316,6 +3325,71 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   // ─── Tree Tab (Unlimited Nesting) ──────────────────────────
 
+  // ═══ v8.5u: Excel & PDF Downloads ═══
+  void _downloadExcel() {
+    try {
+      final xl = Excel.createExcel();
+      final sheet = xl['COA'];
+      sheet.appendRow([
+        TextCellValue('الكود'), TextCellValue('الاسم'), TextCellValue('المستوى'),
+        TextCellValue('التصنيف'), TextCellValue('الطبيعة'), TextCellValue('نوع التقرير'),
+        TextCellValue('الحساب الرئيسي'), TextCellValue('نوع الحساب'), TextCellValue('درجة القبول'),
+      ]);
+      for (final acc in _accounts) {
+        sheet.appendRow([
+          TextCellValue(acc.code), TextCellValue(acc.name), IntCellValue(acc.level),
+          TextCellValue(acc.rootClass), TextCellValue(acc.nature), TextCellValue(acc.reportType),
+          TextCellValue(acc.parentCode), TextCellValue(acc.accountType),
+          DoubleCellValue(acc.acceptanceScore),
+        ]);
+      }
+      xl.delete('Sheet1');
+      final bytes = xl.encode();
+      if (bytes == null) return;
+      final blob = html.Blob([bytes], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.AnchorElement(href: url)..setAttribute('download', 'APEX_COA_Tree.xlsx')..click();
+      html.Url.revokeObjectUrl(url);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('✅ تم تحميل الشجرة Excel — ${_accounts.length} حساب'), backgroundColor: AppColors.greenC));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('خطأ في تحميل Excel: $e'), backgroundColor: AppColors.redC));
+    }
+  }
+
+  void _downloadPdf() {
+    final sb = StringBuffer();
+    sb.writeln('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8">');
+    sb.writeln('<title>APEX - الشجرة المحاسبية</title>');
+    sb.writeln('<style>');
+    sb.writeln('body{font-family:Arial,sans-serif;margin:20px;direction:rtl;color:#0A1628}');
+    sb.writeln('h2{color:#0A1628;border-bottom:3px solid #C9A84C;padding-bottom:8px}');
+    sb.writeln('.meta{color:#666;font-size:12px;margin-bottom:16px}');
+    sb.writeln('table{width:100%;border-collapse:collapse}');
+    sb.writeln('th{background:#0A1628;color:#C9A84C;padding:8px 10px;text-align:right;font-size:11px}');
+    sb.writeln('td{border:1px solid #ddd;padding:5px 10px;text-align:right;font-size:11px}');
+    sb.writeln('tr:nth-child(even){background:#f8f8f8}');
+    sb.writeln('.l1{font-weight:bold;background:#e8f4f8}');
+    sb.writeln('.l2{padding-right:20px}.l3{padding-right:40px}');
+    sb.writeln('.l4{padding-right:60px}.l5{padding-right:80px}');
+    sb.writeln('@media print{body{margin:10px}h2{font-size:16px}}');
+    sb.writeln('</style></head><body>');
+    sb.writeln('<h2>🌳 الشجرة المحاسبية النهائية — APEX</h2>');
+    sb.writeln('<p class="meta">عدد الحسابات: ${_accounts.length} | التاريخ: ${DateTime.now().toString().substring(0, 10)}</p>');
+    sb.writeln('<table><thead><tr><th>الكود</th><th>الاسم</th><th>المستوى</th><th>التصنيف</th><th>الطبيعة</th><th>التقرير</th><th>الرئيسي</th></tr></thead><tbody>');
+    for (final acc in _accounts) {
+      final cls = acc.level <= 1 ? 'l1' : 'l${acc.level.clamp(1, 5)}';
+      sb.writeln('<tr class="$cls"><td>${acc.code}</td><td>${acc.name}</td><td>${acc.level}</td><td>${acc.rootClass}</td><td>${acc.nature}</td><td>${acc.reportType}</td><td>${acc.parentCode}</td></tr>');
+    }
+    sb.writeln('</tbody></table>');
+    sb.writeln('<script>setTimeout(function(){window.print();},600);</script>');
+    sb.writeln('</body></html>');
+    final blob = html.Blob([sb.toString()], 'text/html;charset=utf-8');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    html.window.open(url, '_blank');
+  }
+  // ═══ End Downloads ═══
   Widget _buildTreeTab() {
     final roots = _buildTreeStructure();
     return DefaultTabController(
@@ -3336,10 +3410,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
                       const Spacer(),
                       OutlinedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('تحميل Excel قيد التطوير'), backgroundColor: AppColors.blueC));
-                        },
+                        onPressed: _currentStage >= 5 ? () => _downloadExcel() : null,
                         icon: Icon(Icons.table_chart, size: 14, color: AppColors.greenC),
                         label: Text('Excel', style: TextStyle(color: AppColors.greenC, fontSize: 11)),
                         style: OutlinedButton.styleFrom(
@@ -3349,10 +3420,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       ),
                       const SizedBox(width: 6),
                       OutlinedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('تحميل PDF قيد التطوير'), backgroundColor: AppColors.blueC));
-                        },
+                        onPressed: _currentStage >= 5 ? () => _downloadPdf() : null,
                         icon: Icon(Icons.picture_as_pdf, size: 14, color: AppColors.redC),
                         label: Text('PDF', style: TextStyle(color: AppColors.redC, fontSize: 11)),
                         style: OutlinedButton.styleFrom(
