@@ -1234,96 +1234,49 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   }
 
   Future<void> _submitCoa() async {
-    // v8.6: Send locally-processed accounts directly to server
+    // v8.6e: Advance to TB stage locally (no server call needed)
     final approved = _accounts.where((a) => a.status == 'approved').length;
     final total = _accounts.length;
 
     if (total == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062d\u0633\u0627\u0628\u0627\u062a \u0644\u0644\u0625\u0631\u0633\u0627\u0644'),
+        SnackBar(content: const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062d\u0633\u0627\u0628\u0627\u062a'),
           backgroundColor: AppColors.redC));
       return;
     }
 
-    if (approved < total) {
-      final proceed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: const Color(0xFF0D1825),
-          title: Text('\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 TB', style: TextStyle(color: AppColors.gold)),
-          content: Text('\u062a\u0645 \u0627\u0639\u062a\u0645\u0627\u062f $approved \u0645\u0646 $total \u062d\u0633\u0627\u0628.\n\u0647\u0644 \u062a\u0631\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0645\u0631\u062d\u0644\u0629 TB\u061f',
-            style: TextStyle(color: AppColors.textColor)),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: Text('\u0625\u0644\u063a\u0627\u0621', style: TextStyle(color: AppColors.textMid))),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.navy),
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('\u062a\u0623\u0643\u064a\u062f')),
-          ],
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF0D1825),
+        title: Text('\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 TB', style: TextStyle(color: AppColors.gold)),
+        content: Text('\u062a\u0645 \u0627\u0639\u062a\u0645\u0627\u062f $approved \u0645\u0646 $total \u062d\u0633\u0627\u0628.\n\u0647\u0644 \u062a\u0631\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0645\u0631\u062d\u0644\u0629 TB\u061f',
+          style: TextStyle(color: AppColors.textColor)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false),
+            child: Text('\u0625\u0644\u063a\u0627\u0621', style: TextStyle(color: AppColors.textMid))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.navy),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('\u062a\u0623\u0643\u064a\u062f')),
+        ],
+      ),
+    );
+    if (proceed != true) return;
+
+    setState(() {
+      _currentStage = 6;
+      _hasUnsavedChanges = false;
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('\u062a\u0645 \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0645\u0631\u062d\u0644\u0629 TB \u0628\u0646\u062c\u0627\u062d ($approved/$total \u0645\u0639\u062a\u0645\u062f)'),
+          backgroundColor: AppColors.greenC,
+          duration: const Duration(seconds: 4),
         ),
       );
-      if (proceed != true) return;
-    }
-
-    setState(() { _isLoading = true; _statusMsg = '\u062c\u0627\u0631\u064a \u062d\u0641\u0638 \u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a...'; });
-
-    try {
-      final token = html.window.localStorage['apex_token'] ?? '';
-      final accountsList = <Map<String, dynamic>>[];
-      for (final a in _accounts) {
-        accountsList.add({
-          'code': a.code,
-          'name': a.name,
-          'name_en': a.nameEn,
-          'level': a.level,
-          'parent_code': a.parentCode,
-          'root_class': a.rootClass,
-          'status': a.status,
-          'score': a.acceptanceScore,
-        });
-      }
-      final payload = {
-        'client_id': widget.clientId,
-        'accounts': accountsList,
-        'total_accounts': total,
-        'approved_count': approved,
-        'file_name': _fileName,
-      };
-
-      final resp = await ApiRetry.post(
-        Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/coa'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
-        body: jsonEncode(payload),
-      );
-
-      if (resp.statusCode == 200 || resp.statusCode == 201) {
-        setState(() {
-          _hasUnsavedChanges = false;
-          _isLoading = false;
-          _statusMsg = '';
-          _currentStage = 6;
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('\u062a\u0645 \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0645\u0631\u062d\u0644\u0629 TB \u0628\u0646\u062c\u0627\u062d ($approved/$total \u0645\u0639\u062a\u0645\u062f)'),
-              backgroundColor: AppColors.greenC,
-              duration: const Duration(seconds: 4),
-            ),
-          );
-        }
-      } else {
-        throw Exception('Server ${resp.statusCode}: ${resp.body}');
-      }
-    } catch (e) {
-      setState(() { _isLoading = false; _statusMsg = ''; });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$e'), backgroundColor: AppColors.redC,
-            duration: const Duration(seconds: 6)),
-        );
-      }
     }
   }
   Future<void> _advanceStage() async {
