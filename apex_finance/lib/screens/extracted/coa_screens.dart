@@ -1441,8 +1441,8 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   Widget _buildStagePipeline() {
     final stages = [
       ('الرفع', Icons.cloud_upload),
-      ('مراجعة الأكواد', Icons.code),
-      ('التبويب', Icons.category_outlined),
+      ('تقييم التكويد', Icons.code),
+      ('تقييم التبويب', Icons.category_outlined),
       ('الجودة', Icons.speed),
       ('المراجعة', Icons.rate_review),
       ('الاعتماد', Icons.verified),
@@ -1621,7 +1621,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
           tabs: const [
-            Tab(icon: Icon(Icons.code, size: 16), text: 'تعديل الأكواد'),
+            Tab(icon: Icon(Icons.code, size: 16), text: 'تعديل التكويد'),
             Tab(icon: Icon(Icons.category_outlined, size: 16), text: 'تعديل التبويب'),
             Tab(icon: Icon(Icons.speed, size: 16), text: 'الجودة'),
             Tab(icon: Icon(Icons.visibility, size: 16), text: 'المراجعة'),
@@ -1660,7 +1660,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             children: [
               Icon(Icons.code, color: AppColors.gold, size: 20),
               const SizedBox(width: 8),
-              Text('مراجعة وتعديل الأكواد (شجرة)',
+              Text('تعديل التكويد (شجرة)',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
               const Spacer(),
               GestureDetector(
