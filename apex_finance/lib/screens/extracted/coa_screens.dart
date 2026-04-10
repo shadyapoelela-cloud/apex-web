@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -1234,156 +1234,97 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   }
 
   Future<void> _submitCoa() async {
-    if (_fileBytes == null || _fileName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('لا يوجد ملف للرفع')));
+    // v8.6: Send locally-processed accounts directly to server
+    final approved = _accounts.where((a) => a.status == 'approved').length;
+    final total = _accounts.length;
+
+    if (total == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062d\u0633\u0627\u0628\u0627\u062a \u0644\u0644\u0625\u0631\u0633\u0627\u0644'),
+          backgroundColor: AppColors.redC));
       return;
     }
-    setState(() { _isLoading = true; _statusMsg = '1/6 رفع الملف...'; });
-    final base = 'https://apex-api-ootk.onrender.com';
-    final token = html.window.localStorage['apex_token'] ?? '';
-    final authOnly = {'Authorization': 'Bearer $token'};
-    final authJson = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
 
-    String? uploadId;
+    if (approved < total) {
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: const Color(0xFF0D1825),
+          title: Text('\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 TB', style: TextStyle(color: AppColors.gold)),
+          content: Text('\u062a\u0645 \u0627\u0639\u062a\u0645\u0627\u062f $approved \u0645\u0646 $total \u062d\u0633\u0627\u0628.\n\u0647\u0644 \u062a\u0631\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0645\u0631\u062d\u0644\u0629 TB\u061f',
+            style: TextStyle(color: AppColors.textColor)),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false),
+              child: Text('\u0625\u0644\u063a\u0627\u0621', style: TextStyle(color: AppColors.textMid))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.navy),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('\u062a\u0623\u0643\u064a\u062f')),
+          ],
+        ),
+      );
+      if (proceed != true) return;
+    }
+
+    setState(() { _isLoading = true; _statusMsg = '\u062c\u0627\u0631\u064a \u062d\u0641\u0638 \u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a...'; });
+
     try {
-      // Step 1: Upload (multipart)
-      final uploadReq = http.MultipartRequest('POST', Uri.parse('$base/clients/${widget.clientId}/coa/upload'));
-      uploadReq.headers.addAll(authOnly);
-      uploadReq.files.add(http.MultipartFile.fromBytes('file', _fileBytes!, filename: _fileName));
-      final uploadStreamed = await uploadReq.send().timeout(const Duration(seconds: 60));
-      final uploadResp = await http.Response.fromStream(uploadStreamed);
-      if (uploadResp.statusCode != 200 && uploadResp.statusCode != 201) {
-        throw Exception('Upload failed ${uploadResp.statusCode}: ${uploadResp.body}');
+      final token = html.window.localStorage['apex_token'] ?? '';
+      final accountsList = <Map<String, dynamic>>[];
+      for (final a in _accounts) {
+        accountsList.add({
+          'code': a.code,
+          'name': a.name,
+          'name_en': a.nameEn,
+          'level': a.level,
+          'parent_code': a.parentCode,
+          'root_class': a.rootClass,
+          'status': a.status,
+          'score': a.acceptanceScore,
+        });
       }
-      final uploadData = jsonDecode(uploadResp.body) as Map<String, dynamic>;
-      uploadId = uploadData['upload_id']?.toString();
-      if (uploadId == null) throw Exception('No upload_id in response');
+      final payload = {
+        'client_id': widget.clientId,
+        'accounts': accountsList,
+        'total_accounts': total,
+        'approved_count': approved,
+        'file_name': _fileName,
+      };
 
-      // Build column mapping from suggested + detected columns (replace nulls)
-      final suggested = Map<String, dynamic>.from(uploadData['suggested_column_mapping'] ?? {});
-      final detected = List<String>.from(uploadData['detected_columns'] ?? []);
-      String? findCol(List<String> hints) {
-        for (final h in hints) {
-          for (final c in detected) {
-            if (c.toLowerCase().contains(h)) return c;
-          }
+      final resp = await ApiRetry.post(
+        Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/coa'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (resp.statusCode == 200 || resp.statusCode == 201) {
+        setState(() {
+          _hasUnsavedChanges = false;
+          _isLoading = false;
+          _statusMsg = '';
+          _currentStage = 6;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('\u062a\u0645 \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0645\u0631\u062d\u0644\u0629 TB \u0628\u0646\u062c\u0627\u062d ($approved/$total \u0645\u0639\u062a\u0645\u062f)'),
+              backgroundColor: AppColors.greenC,
+              duration: const Duration(seconds: 4),
+            ),
+          );
         }
-        return null;
-      }
-      final mapping = <String, String>{};
-      // account_code
-      mapping['account_code'] = (suggested['account_code'] ?? findCol(['code','رمز','كود']) ?? (detected.isNotEmpty ? detected[0] : 'account_code')) as String;
-      // account_name (REQUIRED — fill if null)
-      mapping['account_name'] = (suggested['account_name'] ?? findCol(['name_ar','name','اسم'])) as String? ?? findCol(['name','اسم']) ?? (detected.length > 1 ? detected[1] : 'account_name');
-      // account_type
-      final at = suggested['account_type'] ?? findCol(['type','نوع']);
-      if (at != null) mapping['account_type'] = at as String;
-      // parent_code
-      final pc = suggested['parent_code'] ?? findCol(['parent','أب','الأب']);
-      if (pc != null) mapping['parent_code'] = pc as String;
-
-      // Step 2: Parse with column_mapping
-      setState(() { _statusMsg = '2/6 تحليل الملف...'; });
-      final parseResp = await ApiRetry.post(
-        Uri.parse('$base/coa/uploads/$uploadId/parse'),
-        headers: authJson,
-        body: jsonEncode({'column_mapping': mapping}),
-      );
-      if (parseResp.statusCode != 200) {
-        throw Exception('Parse failed ${parseResp.statusCode}: ${parseResp.body}');
-      }
-
-      // Step 3: Classify
-      setState(() { _statusMsg = '3/6 تصنيف الحسابات...'; });
-      final classifyResp = await ApiRetry.post(
-        Uri.parse('$base/coa/classify/$uploadId'),
-        headers: authOnly,
-      );
-      if (classifyResp.statusCode != 200) {
-        throw Exception('Classify failed ${classifyResp.statusCode}: ${classifyResp.body}');
-      }
-
-      // Step 4: Assess
-      setState(() { _statusMsg = '4/6 تقييم الجودة...'; });
-      final assessResp = await ApiRetry.post(
-        Uri.parse('$base/coa/uploads/$uploadId/assess'),
-        headers: authJson,
-        body: '{}',
-      );
-      if (assessResp.statusCode != 200) {
-        throw Exception('Assess failed ${assessResp.statusCode}: ${assessResp.body}');
-      }
-
-      // Step 5: Bulk approve with min_confidence
-      setState(() { _statusMsg = '5/6 اعتماد جماعي...'; });
-      final bulkResp = await ApiRetry.post(
-        Uri.parse('$base/coa/bulk-approve/$uploadId'),
-        headers: authJson,
-        body: jsonEncode({'min_confidence': 0.01}),
-      );
-      if (bulkResp.statusCode != 200) {
-        throw Exception('Bulk approve failed ${bulkResp.statusCode}: ${bulkResp.body}');
-      }
-
-      // Step 6: Final approve
-      setState(() { _statusMsg = '6/6 الحفظ النهائي...'; });
-      final finalResp = await ApiRetry.post(
-        Uri.parse('$base/coa/uploads/$uploadId/approve-coa'),
-        headers: authJson,
-        body: '{}',
-      );
-      if (finalResp.statusCode != 200) {
-        throw Exception('Final approve failed ${finalResp.statusCode}: ${finalResp.body}');
-      }
-
-      setState(() {
-        _isLoading = false;
-        _statusMsg = '✅ تم الحفظ بنجاح!';
-        _currentStage = 6;
-        _hasUnsavedChanges = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ تم اعتماد دليل الحسابات بنجاح', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: AppColors.greenC));
+      } else {
+        throw Exception('Server ${resp.statusCode}: ${resp.body}');
       }
     } catch (e) {
-      setState(() { _isLoading = false; _statusMsg = '❌ خطأ: $e'; });
+      setState(() { _isLoading = false; _statusMsg = ''; });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$e'), backgroundColor: AppColors.redC,
+            duration: const Duration(seconds: 6)),
+        );
       }
     }
-  }
-
-
-  // ─── v8.5 Stage-Aware Button Helpers ─────────────────────────
-  String _stageButtonLabel() {
-    switch (_currentStage) {
-      case 0: return 'ارفع الملف أولاً';
-      case 1: return 'اعتماد التكويد';
-      case 2: return 'اعتماد التبويب';
-      case 3: return 'اعتماد الجودة';
-      case 4: return 'اعتماد المراجعة';
-      case 5: return 'الانتقال إلى مرحلة TB';
-      default: return 'اكتمل ✓';
-    }
-  }
-
-  IconData _stageButtonIcon() {
-    if (_currentStage >= 5) return Icons.check_circle_outline;
-    return Icons.arrow_forward_ios;
-  }
-
-  Future<void> _advanceStage() async {
-    if (_accounts.isEmpty) return;
-    if (_currentStage == 5) { await _submitCoa(); return; }
-    setState(() {
-      _currentStage = _currentStage + 1;
-      if (_currentStage <= 5) {
-        final tabIndex = _currentStage - 1;
-        if (tabIndex >= 0 && tabIndex < _tabController.length) {
-          _tabController.animateTo(tabIndex);
-        }
-      }
-    });
   }
   // ─── End v8.5 Helpers ─────────────────────────────────────────
 
