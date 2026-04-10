@@ -2158,6 +2158,8 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           ),
                         ),
                       ),
+                                          const SizedBox(width: 4),
+                      Icon(Icons.edit, color: AppColors.gold, size: 16),
                     ],
                   ),
                 ),
@@ -2690,17 +2692,46 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                             icon: Icon(Icons.save, color: AppColors.navy, size: 16),
                             label: Text('حفظ التعديلات', style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold)),
                             style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, padding: const EdgeInsets.symmetric(vertical: 12)),
-                            onPressed: () {
+                            onPressed: () async {
+                              String? newRootClass;
                               setState(() {
                                 if (selectedCodes.length >= 2) {
                                   final newParent = selectedCodes[selectedCodes.length - 2];
                                   acc.parentCode = newParent;
-                                  try { final np = _accounts.firstWhere((a) => a.code == newParent); acc.parentUniqueId = np.uniqueId; acc.rootClass = np.rootClass; } catch (_) {}
+                                  try { final np = _accounts.firstWhere((a) => a.code == newParent); acc.parentUniqueId = np.uniqueId; acc.rootClass = np.rootClass; newRootClass = np.rootClass; } catch (_) {}
                                 }
                               });
                               Navigator.pop(ctx);
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('✅ تم تعديل تبويب ${acc.code} — ${acc.name}'), backgroundColor: AppColors.greenC));
+                              final children = _accounts.where((a) => a.parentCode == acc.code).toList();
+                              if (children.isNotEmpty && newRootClass != null && newRootClass!.isNotEmpty) {
+                                final cascade = await showDialog<bool>(
+                                  context: context,
+                                  builder: (dCtx) => Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: AlertDialog(
+                                      backgroundColor: const Color(0xFF0D1825),
+                                      title: Text('تعميم التصنيف', style: TextStyle(color: AppColors.gold)),
+                                      content: Text('هل تريد تطبيق التصنيف "$newRootClass" على ${children.length} حساب فرعي؟',
+                                        style: TextStyle(color: AppColors.textColor)),
+                                      actions: [
+                                        TextButton(onPressed: () => Navigator.pop(dCtx, false),
+                                          child: Text('لا', style: TextStyle(color: AppColors.textMid))),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.navy),
+                                          onPressed: () => Navigator.pop(dCtx, true),
+                                          child: const Text('نعم، عمّم')),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                                if (cascade == true) {
+                                  setState(() => _cascadeRootClass(acc, newRootClass!));
+                                }
+                              }
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text('✅ تم تعديل تبويب ${acc.code} — ${acc.name}'), backgroundColor: AppColors.greenC));
+                              }
                             },
                           )),
                         ]),
