@@ -716,15 +716,7 @@ async def classify(file: UploadFile = File(...)):
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 # --- User Security ---
-@app.get("/users/me/security", tags=["Account"])
-async def get_security(authorization: str = Query(None)):
-    return {
-        "active_sessions": 1,
-        "last_login": "2026-03-30T12:00:00",
-        "password_changed_at": None,
-        "mfa_enabled": False,
-        "suspicious_activity": []
-    }
+# GET /users/me/security is served by phase1_routes (AccountService.get_security_info)
 
 @app.put("/users/me/security/password", tags=["Account"])
 async def change_password(body: dict, authorization: str = Header(None)):
@@ -801,12 +793,17 @@ async def get_acceptable_use():
     return {"version": "1.0", "effective_date": "2026-01-01", "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„ ظ„ظ…ظ†طµط© APEX..."}
 
 @app.post("/legal/accept", tags=["Legal"])
-async def accept_legal(body: dict):
-    doc_type = body.get("document_type", "")
-    version = body.get("version", "")
-    if not doc_type or not version:
-        raise HTTPException(400, "document_type and version required")
-    return {"message": "Acceptance logged", "document_type": doc_type, "version": version, "accepted_at": "2026-03-30T12:00:00"}
+async def accept_legal(body: dict, authorization: str = Header(None)):
+    from app.phase1.routes.phase1_routes import get_current_user
+    user = await get_current_user(authorization)
+    doc_id = body.get("document_id", "")
+    if not doc_id:
+        raise HTTPException(400, "document_id required")
+    from app.phase11.services.legal_service import accept_document
+    result = accept_document(user["sub"], doc_id)
+    if result.get("status") == "error":
+        raise HTTPException(400, result.get("detail", "Failed"))
+    return result
 
 # --- Account Closure ---
 @app.post("/account/closure", tags=["Account"])
@@ -908,15 +905,31 @@ async def list_client_types():
         {"id": "legal_regulatory_entity", "name_ar": "ط¬ظ‡ط© ظ‚ط§ظ†ظˆظ†ظٹط©/طھظ†ط¸ظٹظ…ظٹط©", "knowledge_mode": True}
     ]}
 
-# --- Profile Update ---
+# --- Profile Update (alias for /users/me PUT) ---
 @app.put("/users/me/profile", tags=["Account"])
-async def update_profile(body: dict):
-    return {"message": "Profile updated", "profile": body}
+async def update_profile(body: dict, authorization: str = Header(None)):
+    from app.phase1.routes.phase1_routes import get_current_user
+    user = await get_current_user(authorization)
+    from app.phase1.services.account_service import AccountService
+    return AccountService().update_profile(user["sub"], body)
 
 # --- User Activity History ---
 @app.get("/users/me/activity", tags=["Account"])
-async def get_activity_history(limit: int = Query(20)):
-    return {"activities": [], "total": 0}
+async def get_activity_history(limit: int = Query(20), authorization: str = Header(None)):
+    from app.phase1.routes.phase1_routes import get_current_user
+    user = await get_current_user(authorization)
+    from app.phase1.models.platform_models import SessionLocal, UserSecurityEvent
+    db = SessionLocal()
+    try:
+        events = db.query(UserSecurityEvent).filter(
+            UserSecurityEvent.user_id == user["sub"]
+        ).order_by(UserSecurityEvent.created_at.desc()).limit(limit).all()
+        return {"activities": [
+            {"type": e.event_type, "ip": e.ip_address, "created_at": str(e.created_at)}
+            for e in events
+        ], "total": len(events)}
+    finally:
+        db.close()
 
 
 

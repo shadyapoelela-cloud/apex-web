@@ -1,6 +1,9 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'dart:html' as html;
 import '../../core/theme.dart';
 import '../../api_service.dart';
+import '../../main.dart';
 
 class EnhancedSettingsScreen extends StatefulWidget {
   const EnhancedSettingsScreen({super.key});
@@ -17,6 +20,38 @@ class _SettState extends State<EnhancedSettingsScreen> {
   String _region = 'SA';
 
   @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  String _name = '';
+  String _email = '';
+  String _mobile = '';
+
+  Future<void> _loadProfile() async {
+    _name = S.dname ?? S.uname ?? '';
+    _email = S.email ?? '';
+    try {
+      final r = await ApiService.getProfile();
+      if (r.success && r.data is Map) {
+        final d = r.data as Map;
+        setState(() {
+          _name = d['display_name'] ?? d['username'] ?? _name;
+          _email = d['email'] ?? _email;
+          _mobile = d['mobile'] ?? '';
+        });
+      }
+    } catch (_) {}
+  }
+
+  void _logout() {
+    S.clear();
+    ApiService.setToken('');
+    context.go('/login');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
@@ -26,15 +61,15 @@ class _SettState extends State<EnhancedSettingsScreen> {
       ),
       body: ListView(padding: const EdgeInsets.all(14), children: [
         _sectionCard('\u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0634\u062e\u0635\u064a\u0629', Icons.person, [
-          _infoRow('\u0627\u0644\u0627\u0633\u0645', '\u0645\u062d\u0645\u062f \u0623\u062d\u0645\u062f'),
-          _infoRow('\u0627\u0644\u0628\u0631\u064a\u062f', 'm.ahmed@company.sa'),
-          _infoRow('\u0627\u0644\u062c\u0648\u0627\u0644', '+966 5XXXXXXXX'),
-          _editButton('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a'),
+          _infoRow('\u0627\u0644\u0627\u0633\u0645', _name.isNotEmpty ? _name : '--'),
+          _infoRow('\u0627\u0644\u0628\u0631\u064a\u062f', _email.isNotEmpty ? _email : '--'),
+          _infoRow('\u0627\u0644\u062c\u0648\u0627\u0644', _mobile.isNotEmpty ? _mobile : '--'),
+          _editButton('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a', onTap: () => context.push('/profile/edit', extra: {'display_name': _name, 'email': _email, 'mobile': _mobile})),
         ]),
         _sectionCard('\u0627\u0644\u0623\u0645\u0627\u0646', Icons.security, [
           _toggleRow('\u0627\u0644\u0645\u0635\u0627\u062f\u0642\u0629 \u0627\u0644\u062b\u0646\u0627\u0626\u064a\u0629', _twoFactor, (v) => setState(() => _twoFactor = v)),
           _infoRow('\u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u0645\u0635\u0627\u062f\u0642\u0629', '\u0628\u0631\u064a\u062f \u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u2022 Google \u2022 \u0627\u0644\u062c\u0648\u0627\u0644'),
-          _editButton('\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631'),
+          _editButton('\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', onTap: () => context.push('/password/change')),
         ]),
         _sectionCard('\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', Icons.notifications, [
           _toggleRow('\u0625\u0634\u0639\u0627\u0631\u0627\u062a \u0627\u0644\u062a\u0637\u0628\u064a\u0642', _notifications, (v) => setState(() => _notifications = v)),
@@ -50,7 +85,7 @@ class _SettState extends State<EnhancedSettingsScreen> {
         ]),
         const SizedBox(height: 20),
         Center(child: TextButton.icon(
-          onPressed: () {},
+          onPressed: _logout,
           icon: const Icon(Icons.logout, color: AC.err),
           label: const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c', style: TextStyle(color: AC.err)),
         )),
@@ -104,10 +139,10 @@ class _SettState extends State<EnhancedSettingsScreen> {
     ]),
   );
 
-  Widget _editButton(String text) => Padding(
+  Widget _editButton(String text, {VoidCallback? onTap}) => Padding(
     padding: const EdgeInsets.only(top: 6),
     child: SizedBox(width: double.infinity, child: OutlinedButton(
-      onPressed: () {},
+      onPressed: onTap ?? () {},
       style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
       child: Text(text, style: const TextStyle(color: AC.gold, fontSize: 12)),
     )),
