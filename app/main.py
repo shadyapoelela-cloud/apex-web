@@ -191,22 +191,49 @@ async def global_exception_handler(request, exc):
 
 
 # ======================================================================
-# Simple in-memory rate limiter (per-IP, resets on restart)
+# In-memory rate limiter (per-IP, proxy-aware, resets on restart)
 # ======================================================================
 _rate_limits = defaultdict(list)  # ip -> [timestamp, ...]
 RATE_LIMIT_WINDOW = 60  # seconds
 RATE_LIMIT_MAX = 60  # max requests per window (per IP)
+_RATE_LIMIT_MAX_IPS = 10000  # prevent memory leak from IP flooding
+
+
+def _get_client_ip(request) -> str:
+    """Extract real client IP, handling proxied deployments (Render, Cloudflare, nginx)."""
+    for header in ("cf-connecting-ip", "x-real-ip", "x-forwarded-for"):
+        val = request.headers.get(header)
+        if val:
+            return val.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
 
 @app.middleware("http")
 async def rate_limit_middleware(request, call_next):
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = _get_client_ip(request)
     now = time.time()
-    # Clean old entries
+    # Prevent memory leak: evict oldest IPs if too many tracked
+    if len(_rate_limits) > _RATE_LIMIT_MAX_IPS:
+        oldest = sorted(_rate_limits.keys(), key=lambda k: _rate_limits[k][-1] if _rate_limits[k] else 0)
+        for ip in oldest[:_RATE_LIMIT_MAX_IPS // 2]:
+            del _rate_limits[ip]
+    # Clean old entries for this IP
     _rate_limits[client_ip] = [t for t in _rate_limits[client_ip] if now - t < RATE_LIMIT_WINDOW]
     if len(_rate_limits[client_ip]) >= RATE_LIMIT_MAX:
-        return JSONResponse(status_code=429, content={"success": False, "error": "Too many requests. Please wait."})
+        return JSONResponse(status_code=429, content={"success": False, "error": "طلبات كثيرة جداً. الرجاء الانتظار."})
     _rate_limits[client_ip].append(now)
     response = await call_next(request)
+    return response
+
+
+@app.middleware("http")
+async def security_headers_middleware(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Cache-Control"] = "no-store"
     return response
 
 
@@ -561,11 +588,24 @@ def seed_all_data(secret: str = Query(...)):
         raise HTTPException(status_code=403, detail="Invalid secret")
     from app.seed_runner import seed_all
     seed_all()
-    return {"status": "OK", "message": "All seed data loaded"}
+    return {"success": True, "data": {"message": "All seed data loaded"}}
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "10.2.0",
+    db_ok = False
+    try:
+        from app.phase1.models.platform_models import SessionLocal
+        from sqlalchemy import text as _txt
+        db = SessionLocal()
+        try:
+            db.execute(_txt("SELECT 1"))
+            db_ok = True
+        finally:
+            db.close()
+    except Exception:
+        pass
+    status = "ok" if db_ok else "degraded"
+    return {"status": status, "version": "10.2.0", "database": db_ok,
             "phases": {"p1": P1, "p2": P2, "p3": P3, "p4": P4, "p5": P5, "p6": P6,
                        "p7": HAS_P7, "p8": HAS_P8, "p9": HAS_P9, "p10": HAS_P10, "p11": HAS_P11},
             "sprints": {"s1": HAS_S1, "s2": HAS_S2, "s3": HAS_S3, "s4": HAS_S4,
@@ -586,7 +626,7 @@ def reset_postgres(secret: str = Query(...)):
     import os
     db_url = os.environ.get("DATABASE_URL", "")
     if "postgres" not in db_url:
-        return {"status": "error", "message": "Not a PostgreSQL database -- use reinit-db instead"}
+        return {"success": False, "error": "Not a PostgreSQL database -- use reinit-db instead"}
     try:
         with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
             # Drop all tables in public schema
@@ -600,10 +640,10 @@ def reset_postgres(secret: str = Query(...)):
             """))
         # Recreate all tables
         Base.metadata.create_all(bind=engine)
-        return {"status": "OK", "message": "All tables dropped and recreated on PostgreSQL"}
+        return {"success": True, "data": {"message": "All tables dropped and recreated on PostgreSQL"}}
     except Exception as e:
         logging.error("Database reset failed", exc_info=True)
-        return {"status": "error", "message": "Database reset failed"}
+        return {"success": False, "error": "Database reset failed"}
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ

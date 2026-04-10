@@ -7,6 +7,22 @@ Pipeline: Read → Classify → Tab Review → IS → BS → CF → Ratios → R
 
 import os
 import tempfile
+
+# ═══════════════════════════════════════════════════
+# Named constants for confidence calculation
+# ═══════════════════════════════════════════════════
+CONFIDENCE_ERROR_PENALTY = 0.15
+CONFIDENCE_WARNING_PENALTY = 0.03
+COMPLETENESS_MISSING_REVENUE_PENALTY = 0.3
+COMPLETENESS_MISSING_ASSETS_PENALTY = 0.3
+COMPLETENESS_UNBALANCED_PENALTY = 0.2
+COMPLETENESS_UNMAPPED_WEIGHT = 0.5
+WEIGHT_MAPPING = 0.4
+WEIGHT_VALIDATION = 0.3
+WEIGHT_COMPLETENESS = 0.3
+CONFIDENCE_EXCELLENT = 0.90
+CONFIDENCE_GOOD = 0.75
+CONFIDENCE_ACCEPTABLE = 0.60
 from app.services.ingestion.trial_balance_reader import TrialBalanceReader
 from app.services.classification.account_classifier import AccountClassifier
 from app.services.classification.tab_consistency_checker import TabConsistencyChecker
@@ -189,13 +205,13 @@ class AnalysisOrchestrator:
         mapping = cls_summary.get("average_confidence", 0)
         errs = sum(1 for v in validations if v.get("severity") == "ERROR")
         warns = sum(1 for v in validations if v.get("severity") == "WARNING")
-        val_conf = max(0, 1.0 - errs * 0.15 - warns * 0.03)
+        val_conf = max(0, 1.0 - errs * CONFIDENCE_ERROR_PENALTY - warns * CONFIDENCE_WARNING_PENALTY)
         comp = 1.0
-        if income.get("net_revenue", 0) == 0: comp -= 0.3
-        if balance.get("total_assets", 0) == 0: comp -= 0.3
-        if not balance.get("is_balanced", False): comp -= 0.2
+        if income.get("net_revenue", 0) == 0: comp -= COMPLETENESS_MISSING_REVENUE_PENALTY
+        if balance.get("total_assets", 0) == 0: comp -= COMPLETENESS_MISSING_ASSETS_PENALTY
+        if not balance.get("is_balanced", False): comp -= COMPLETENESS_UNBALANCED_PENALTY
         unmapped_pct = cls_summary.get("unmapped_accounts_count", 0) / max(cls_summary.get("total_accounts", 1), 1)
-        comp = max(0, comp - unmapped_pct * 0.5)
-        overall = mapping * 0.4 + val_conf * 0.3 + comp * 0.3
+        comp = max(0, comp - unmapped_pct * COMPLETENESS_UNMAPPED_WEIGHT)
+        overall = mapping * WEIGHT_MAPPING + val_conf * WEIGHT_VALIDATION + comp * WEIGHT_COMPLETENESS
         return {"overall": round(overall, 3), "mapping": round(mapping, 3), "validation": round(val_conf, 3), "completeness": round(comp, 3),
-                "label": "ممتاز" if overall >= 0.90 else "جيد" if overall >= 0.75 else "مقبول" if overall >= 0.60 else "يحتاج مراجعة"}
+                "label": "ممتاز" if overall >= CONFIDENCE_EXCELLENT else "جيد" if overall >= CONFIDENCE_GOOD else "مقبول" if overall >= CONFIDENCE_ACCEPTABLE else "يحتاج مراجعة"}

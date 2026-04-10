@@ -33,7 +33,7 @@ async def create_session(req: SessionRequest, user: dict = Depends(get_current_u
         return {'success': True, 'data': session}
     except Exception as e:
         logging.error("Copilot create_session route error", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to create session")
+        raise HTTPException(status_code=500, detail="فشل إنشاء الجلسة")
 
 
 @router.get('/sessions')
@@ -46,7 +46,7 @@ async def list_sessions(user: dict = Depends(get_current_user)):
 async def get_session(session_id: str):
     session = CopilotService.get_session(session_id)
     if not session:
-        raise HTTPException(status_code=404, detail='Session not found')
+        raise HTTPException(status_code=404, detail='الجلسة غير موجودة')
     return {'success': True, 'data': session}
 
 
@@ -76,7 +76,7 @@ async def chat(req: ChatRequest, user: dict = Depends(get_current_user)):
         raise
     except Exception as e:
         logging.error("Copilot chat error", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to process message")
+        raise HTTPException(status_code=500, detail="فشل معالجة الرسالة")
 
 
 @router.get('/sessions/{session_id}/messages')
@@ -96,7 +96,7 @@ async def get_session_summary(session_id: str, user: dict = Depends(get_current_
     """Get session summary with topic distribution and stats."""
     summary = CopilotService.get_session_summary(session_id)
     if not summary:
-        raise HTTPException(status_code=404, detail='Session not found')
+        raise HTTPException(status_code=404, detail='الجلسة غير موجودة')
     return {'success': True, 'data': summary}
 
 
@@ -104,7 +104,7 @@ async def get_session_summary(session_id: str, user: dict = Depends(get_current_
 async def close_session(session_id: str, user: dict = Depends(get_current_user)):
     success = CopilotService.close_session(session_id)
     if not success:
-        raise HTTPException(status_code=404, detail='Session not found')
+        raise HTTPException(status_code=404, detail='الجلسة غير موجودة')
     return {'success': True, 'data': {'status': 'closed'}}
 
 
