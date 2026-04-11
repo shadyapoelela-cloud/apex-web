@@ -31,7 +31,7 @@ void main() {
     padding: const EdgeInsets.only(left: 8),
     child: ActionChip(
       avatar: Icon(icon, color: AC.gold, size: 16),
-      label: Text(label, style: const TextStyle(color: AC.tp, fontSize: 11)),
+      label: Text(label, style: TextStyle(color: AC.tp, fontSize: 11)),
       backgroundColor: AC.navy3,
       side: BorderSide(color: AC.bdr),
       onPressed: () {
@@ -47,11 +47,11 @@ Widget _card(String t, List<Widget> c, {Color? accent}) => Container(
     border: Border.all(color: accent ?? AC.bdr)),
   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Text(t, style: TextStyle(color: accent ?? AC.gold, fontWeight: FontWeight.bold, fontSize: 15)),
-    const Divider(color: AC.bdr, height: 18), ...c]));
+    Divider(color: AC.bdr, height: 18), ...c]));
 
 Widget _kv(String k, String v, {Color? vc}) => Padding(padding: const EdgeInsets.only(bottom: 5),
   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-    Text(k, style: const TextStyle(color: AC.ts, fontSize: 13)),
+    Text(k, style: TextStyle(color: AC.ts, fontSize: 13)),
     Flexible(child: Text(v, style: TextStyle(color: vc ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
 
 Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -60,9 +60,9 @@ Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetri
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
-  filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+  filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)));
+  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)));
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // App Root
@@ -74,9 +74,12 @@ class ApexApp extends ConsumerWidget {
     final isDark = settings.isDarkMode;
     final isAr = settings.language == 'ar';
 
-    final darkTheme = ThemeData.dark().copyWith(scaffoldBackgroundColor: AC.navy,
+    // Update AC colors globally based on theme
+    AC.setLight(!isDark);
+
+    final darkTheme = ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color(0xFF050D1A),
       textTheme: GoogleFonts.tajawalTextTheme(ThemeData.dark().textTheme),
-      appBarTheme: const AppBarTheme(backgroundColor: AC.navy2, elevation: 0, centerTitle: true),
+      appBarTheme: AppBarTheme(backgroundColor: AC.navy2, elevation: 0, centerTitle: true),
       elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
         backgroundColor: AC.gold, foregroundColor: AC.navy,
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
@@ -172,9 +175,9 @@ class _LoginS extends State<LoginScreen> {
             border: Border.all(color: AC.gold.withValues(alpha: 0.2)),
           ),
           child: Column(children: [
-            const Icon(Icons.account_balance, color: AC.gold, size: 48),
+            Icon(Icons.account_balance, color: AC.gold, size: 48),
             const SizedBox(height: 8),
-            const Text('APEX', style: TextStyle(color: AC.gold, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 4)),
+            Text('APEX', style: TextStyle(color: AC.gold, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 4)),
             const SizedBox(height: 4),
             Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0648\u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0647\u0646\u064a\u0629',
               style: TextStyle(color: AC.ts, fontSize: 11)),
@@ -182,7 +185,7 @@ class _LoginS extends State<LoginScreen> {
         ),
         const SizedBox(height: 32),
         // Title
-        const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.tp, fontSize: 22, fontWeight: FontWeight.bold)),
+        Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.tp, fontSize: 22, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         Text('\u0623\u062f\u062e\u0644 \u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u0644\u0644\u0645\u062a\u0627\u0628\u0639\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
         const SizedBox(height: 24),
@@ -190,66 +193,66 @@ class _LoginS extends State<LoginScreen> {
         if (_e != null) Container(
           width: double.infinity, margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.err.withValues(alpha: 0.3))),
-          child: Row(children: [const Icon(Icons.error_outline, color: AC.err, size: 18), const SizedBox(width: 8),
-            Expanded(child: Text(_e!, style: const TextStyle(color: AC.err, fontSize: 12)))]),
+          child: Row(children: [Icon(Icons.error_outline, color: AC.err, size: 18), SizedBox(width: 8),
+            Expanded(child: Text(_e!, style: TextStyle(color: AC.err, fontSize: 12)))]),
         ),
         // Email field
-        TextField(controller: _u, style: const TextStyle(color: AC.tp),
+        TextField(controller: _u, style: TextStyle(color: AC.tp),
           textDirection: TextDirection.ltr,
           decoration: InputDecoration(
             labelText: '\u0627\u0644\u0628\u0631\u064a\u062f \u0623\u0648 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
-            prefixIcon: const Icon(Icons.email_outlined, color: AC.gold, size: 20),
-            filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+            prefixIcon: Icon(Icons.email_outlined, color: AC.gold, size: 20),
+            filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)),
           )),
         const SizedBox(height: 14),
         // Password field
-        TextField(controller: _p, obscureText: _obscure, style: const TextStyle(color: AC.tp),
+        TextField(controller: _p, obscureText: _obscure, style: TextStyle(color: AC.tp),
           decoration: InputDecoration(
             labelText: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-            prefixIcon: const Icon(Icons.lock_outlined, color: AC.gold, size: 20),
+            prefixIcon: Icon(Icons.lock_outlined, color: AC.gold, size: 20),
             suffixIcon: IconButton(icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20),
               onPressed: () => setState(() => _obscure = !_obscure)),
-            filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+            filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)),
           ),
           onSubmitted: (_) => _go()),
         // Forgot password
         Align(alignment: Alignment.centerLeft, child: TextButton(
           onPressed: () => context.go('/forgot-password'),
-          child: const Text('\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f', style: TextStyle(color: AC.gold, fontSize: 12)))),
+          child: Text('\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f', style: TextStyle(color: AC.gold, fontSize: 12)))),
         const SizedBox(height: 8),
         // Login button
         SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
           onPressed: _l ? null : _go,
           style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             disabledBackgroundColor: AC.gold.withValues(alpha: 0.5)),
-          child: _l ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
-            : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.navy, fontSize: 16, fontWeight: FontWeight.bold)),
+          child: _l ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
+            : Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.navy, fontSize: 16, fontWeight: FontWeight.bold)),
         )),
         const SizedBox(height: 20),
         // Divider
-        Row(children: [Expanded(child: Divider(color: AC.bdr)), Padding(padding: const EdgeInsets.symmetric(horizontal: 12),
+        Row(children: [Expanded(child: Divider(color: AC.bdr)), Padding(padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text('\u0623\u0648 \u0633\u062c\u0651\u0644 \u0628\u0648\u0627\u0633\u0637\u0629', style: TextStyle(color: AC.ts, fontSize: 11))), Expanded(child: Divider(color: AC.bdr))]),
         const SizedBox(height: 16),
         // Social Login Buttons (UI only - not functional yet)
         Row(children: [
           Expanded(child: OutlinedButton.icon(
-            onPressed: () => ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Google Sign-In'), backgroundColor: AC.navy3)),
-            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(vertical: 12),
+            onPressed: () => ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Google Sign-In'), backgroundColor: AC.navy3)),
+            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             icon: const Icon(Icons.g_mobiledata, color: Colors.red, size: 24),
-            label: const Text('Google', style: TextStyle(color: AC.tp, fontSize: 12)),
+            label: Text('Google', style: TextStyle(color: AC.tp, fontSize: 12)),
           )),
           const SizedBox(width: 10),
           Expanded(child: OutlinedButton.icon(
-            onPressed: () => ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Apple Sign-In'), backgroundColor: AC.navy3)),
-            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(vertical: 12),
+            onPressed: () => ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Apple Sign-In'), backgroundColor: AC.navy3)),
+            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            icon: const Icon(Icons.apple, color: AC.tp, size: 22),
-            label: const Text('Apple', style: TextStyle(color: AC.tp, fontSize: 12)),
+            icon: Icon(Icons.apple, color: AC.tp, size: 22),
+            label: Text('Apple', style: TextStyle(color: AC.tp, fontSize: 12)),
           )),
         ]),
         const SizedBox(height: 20),
@@ -257,7 +260,7 @@ class _LoginS extends State<LoginScreen> {
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f', style: TextStyle(color: AC.ts, fontSize: 13)),
           TextButton(onPressed: () => context.go('/register'),
-            child: const Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.bold))),
+            child: Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.bold))),
         ]),
       ]),
     )),
@@ -296,14 +299,14 @@ class _RegS extends State<RegScreen> {
     finally { if(mounted) setState(()=> _l=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold))),
     body: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(28), child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 400), child: Column(mainAxisSize: MainAxisSize.min, children: [
         TextField(controller:_un, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 *', ic: Icons.alternate_email)),
         const SizedBox(height:12), TextField(controller:_em, decoration:_inp('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a *', ic: Icons.email_outlined)),
         const SizedBox(height:12), TextField(controller:_dn, decoration:_inp('\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0638\u0627\u0647\u0631 *', ic: Icons.badge_outlined)),
         const SizedBox(height:12), TextField(controller:_pw, obscureText:true, decoration:_inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 *', ic: Icons.lock_outline)),
-        if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child:Text(_e!, style:const TextStyle(color:AC.err, fontSize:12))),
+        if(_e!=null) Padding(padding:EdgeInsets.only(top:10), child:Text(_e!, style:TextStyle(color:AC.err, fontSize:12))),
         const SizedBox(height:22),
         SizedBox(width:double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
           child: _l ? const CircularProgressIndicator(strokeWidth:2) : const Text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628'))),
@@ -484,7 +487,7 @@ class _MainNavS extends State<MainNav> {
 
                   Expanded(child: ListView(padding: EdgeInsets.zero, children: [
         ExpansionTile(
-          trailing: const Icon(Icons.expand_more, color: AC.ts, size: 18),
+          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
           title: Text('الأساسي', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           initiallyExpanded: true,
@@ -495,7 +498,7 @@ class _MainNavS extends State<MainNav> {
           ],
         ),
         ExpansionTile(
-          trailing: const Icon(Icons.expand_more, color: AC.ts, size: 18),
+          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
           title: Text('المسار المالي', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           initiallyExpanded: true,
@@ -507,7 +510,7 @@ class _MainNavS extends State<MainNav> {
           ],
         ),
         ExpansionTile(
-          trailing: const Icon(Icons.expand_more, color: AC.ts, size: 18),
+          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
           title: Text('الجاهزية والامتثال', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           children: [
@@ -519,7 +522,7 @@ class _MainNavS extends State<MainNav> {
           ],
         ),
         ExpansionTile(
-          trailing: const Icon(Icons.expand_more, color: AC.ts, size: 18),
+          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
           title: Text('السوق', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           children: [
@@ -529,7 +532,7 @@ class _MainNavS extends State<MainNav> {
           ],
         ),
         ExpansionTile(
-          trailing: const Icon(Icons.expand_more, color: AC.ts, size: 18),
+          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
           title: Text('التقارير والمعرفة', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           children: [
@@ -540,7 +543,7 @@ class _MainNavS extends State<MainNav> {
           ],
         ),
         ExpansionTile(
-          trailing: const Icon(Icons.expand_more, color: AC.ts, size: 18),
+          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
           title: Text('الإدارة', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           children: [
@@ -560,7 +563,7 @@ class _MainNavS extends State<MainNav> {
           Positioned(right: _fabX, bottom: _fabY,
             child: GestureDetector(
               onPanUpdate: (d) => setState(() { _fabX = (_fabX - d.delta.dx).clamp(0, 300); _fabY = (_fabY - d.delta.dy).clamp(0, 600); }),
-              child: FloatingActionButton(backgroundColor: AC.gold, onPressed: () => context.go('/copilot'), child: const Icon(Icons.smart_toy, color: AC.navy)),
+              child: FloatingActionButton(backgroundColor: AC.gold, onPressed: () => context.go('/copilot'), child: Icon(Icons.smart_toy, color: AC.navy)),
             ),
           ),
         ])),
@@ -691,35 +694,35 @@ class _DashS extends ConsumerState<DashTab> {
   }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(
-      title: Text('\u0645\u0631\u062d\u0628\u0627\u064b ${(S.dname != null && S.dname!.contains('?') ? S.uname : S.dname)??""} \u{1F44B}', style: const TextStyle(color: AC.gold, fontSize: 18)),
+      title: Text('\u0645\u0631\u062d\u0628\u0627\u064b ${(S.dname != null && S.dname!.contains('?') ? S.uname : S.dname)??""} \u{1F44B}', style: TextStyle(color: AC.gold, fontSize: 18)),
       actions: [
         Stack(children: [
-          IconButton(icon: const Icon(Icons.notifications_outlined, color: AC.tp),
+          IconButton(icon: Icon(Icons.notifications_outlined, color: AC.tp),
             onPressed: ()=>context.go('/notifications')),
           if(_notifCount>0) Positioned(right:8,top:8, child: Container(padding: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(color: AC.err, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: AC.err, shape: BoxShape.circle),
             child: Text('$_notifCount', style: const TextStyle(color: Colors.white, fontSize: 10))))]),
       ]),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
-      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(16), children: [
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
+      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
         // Current Plan Card
         _card('\u062e\u0637\u062a\u0643 \u0627\u0644\u062d\u0627\u0644\u064a\u0629', [
-          Row(children: [const Icon(Icons.workspace_premium, color: AC.gold, size: 28), const SizedBox(width: 10),
-            Text(_sub?['plan_name_ar'] ?? S.planAr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AC.tp)),
-            const Spacer(), _badge(_sub?['status']??'active', AC.ok)]),
+          Row(children: [Icon(Icons.workspace_premium, color: AC.gold, size: 28), SizedBox(width: 10),
+            Text(_sub?['plan_name_ar'] ?? S.planAr(), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AC.tp)),
+            Spacer(), _badge(_sub?['status']??'active', AC.ok)]),
           const SizedBox(height: 14),
           ...(_sub?['entitlements'] as Map<String,dynamic>? ?? {}).entries.take(6).map((e) => Padding(
             padding: const EdgeInsets.only(bottom: 4), child: Row(children: [
               Icon(e.value['value']=='true'||e.value['value']=='unlimited' ? Icons.check_circle : e.value['value']=='false' ? Icons.cancel : Icons.info_outline,
                 color: e.value['value']=='true'||e.value['value']=='unlimited' ? AC.ok : e.value['value']=='false' ? AC.err : AC.cyan, size: 15),
               const SizedBox(width: 8),
-              Expanded(child: Text('${e.key}: ${e.value['value']}', style: const TextStyle(color: AC.ts, fontSize: 11)))]))),
+              Expanded(child: Text('${e.key}: ${e.value['value']}', style: TextStyle(color: AC.ts, fontSize: 11)))]))),
           const SizedBox(height: 10),
           SizedBox(width: double.infinity, child: OutlinedButton.icon(
             onPressed: ()=>context.push('/upgrade-plan', extra: {'plans': _plans, 'currentPlan': _sub?['plan']}),
-            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
-            icon: const Icon(Icons.upgrade, color: AC.gold, size: 18),
-            label: const Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold)))),
+            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),
+            icon: Icon(Icons.upgrade, color: AC.gold, size: 18),
+            label: Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold)))),
         ]),
 
         // ── Copilot Quick Access Card ──
@@ -741,23 +744,23 @@ class _DashS extends ConsumerState<DashTab> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.smart_toy, color: AC.gold, size: 28),
+                child: Icon(Icons.smart_toy, color: AC.gold, size: 28),
               ),
               const SizedBox(width: 14),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  const Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
-                    child: const Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
+                    child: Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
                   ),
                 ]),
                 const SizedBox(height: 4),
-                const Text('\u0627\u0633\u0623\u0644 \u0639\u0646 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a\u060c \u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644\u060c \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629\u060c \u0648\u0623\u0643\u062b\u0631', style: TextStyle(color: AC.ts, fontSize: 12)),
+                Text('\u0627\u0633\u0623\u0644 \u0639\u0646 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a\u060c \u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644\u060c \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629\u060c \u0648\u0623\u0643\u062b\u0631', style: TextStyle(color: AC.ts, fontSize: 12)),
               ])),
-              const Icon(Icons.arrow_forward_ios, color: AC.gold, size: 16),
+              Icon(Icons.arrow_forward_ios, color: AC.gold, size: 16),
             ]),
           ),
         ),
@@ -776,7 +779,7 @@ class _DashS extends ConsumerState<DashTab> {
           ),
         ),
         // Plans Grid
-        const Text('\u0627\u0644\u062e\u0637\u0637 \u0627\u0644\u0645\u062a\u0627\u062d\u0629', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AC.tp)),
+        Text('\u0627\u0644\u062e\u0637\u0637 \u0627\u0644\u0645\u062a\u0627\u062d\u0629', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AC.tp)),
         const SizedBox(height: 8),
         ..._plans.map((p) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12),
@@ -785,11 +788,11 @@ class _DashS extends ConsumerState<DashTab> {
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [Text(p['name_ar']??'', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold,
                 color: p['code']==_sub?['plan'] ? AC.gold : AC.tp)),
-                if(p['code']==_sub?['plan']) ...[const SizedBox(width:8), _badge('\u0627\u0644\u062d\u0627\u0644\u064a\u0629', AC.gold)]]),
+                if(p['code']==_sub?['plan']) ...[SizedBox(width:8), _badge('\u0627\u0644\u062d\u0627\u0644\u064a\u0629', AC.gold)]]),
               const SizedBox(height: 4),
-              Text(p['target_user_ar']??'', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+              Text(p['target_user_ar']??'', style: TextStyle(color: AC.ts, fontSize: 11))])),
             Text(p['price_monthly_sar']==0 ? '\u0645\u062c\u0627\u0646\u064a' : '${p['price_monthly_sar']} \u0631.\u0633/\u0634\u0647\u0631',
-              style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold))]))),
+              style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))]))),
       ])));
 }
 
@@ -813,13 +816,13 @@ class _NotifS extends ConsumerState<NotificationsScreen> {
     _load();
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.gold)),
-      actions: [TextButton(onPressed: _markAllRead, child: const Text('\u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0643\u0644', style: TextStyle(color: AC.cyan, fontSize: 12)))]),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+    appBar: AppBar(title: Text('\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.gold)),
+      actions: [TextButton(onPressed: _markAllRead, child: Text('\u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0643\u0644', style: TextStyle(color: AC.cyan, fontSize: 12)))]),
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       _nots.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
         Icon(Icons.notifications_off_outlined, color: AC.ts, size: 60),
         const SizedBox(height: 12),
-        const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.ts, fontSize: 16))])) :
+        Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.ts, fontSize: 16))])) :
       ListView.builder(padding: const EdgeInsets.all(12), itemCount: _nots.length, itemBuilder: (_, i) {
         final n = _nots[i];
         final isRead = n['is_read'] == true;
@@ -832,10 +835,10 @@ class _NotifS extends ConsumerState<NotificationsScreen> {
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(n['title']??n['message']??'', style: TextStyle(color: isRead ? AC.ts : AC.tp, fontWeight: isRead ? FontWeight.normal : FontWeight.bold, fontSize: 13)),
               if(n['body']!=null) Padding(padding: const EdgeInsets.only(top: 4),
-                child: Text(n['body'], style: const TextStyle(color: AC.ts, fontSize: 11))),
+                child: Text(n['body'], style: TextStyle(color: AC.ts, fontSize: 11))),
               Padding(padding: const EdgeInsets.only(top: 6),
-                child: Text(n['created_at']?.toString().substring(0,16)??'', style: const TextStyle(color: AC.ts, fontSize: 10)))])),
-            if(!isRead) Container(width: 8, height: 8, decoration: const BoxDecoration(color: AC.gold, shape: BoxShape.circle))]));
+                child: Text(n['created_at']?.toString().substring(0,16)??'', style: TextStyle(color: AC.ts, fontSize: 10)))])),
+            if(!isRead) Container(width: 8, height: 8, decoration: BoxDecoration(color: AC.gold, shape: BoxShape.circle))]));
       }));
 
   IconData _notifIcon(String t) {
@@ -854,9 +857,9 @@ class UpgradePlanScreen extends StatelessWidget {
   final List plans; final String? currentPlan;
   const UpgradePlanScreen({super.key, required this.plans, this.currentPlan});
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold))),
     body: ListView(padding: const EdgeInsets.all(16), children: [
-      const Text('\u0627\u062e\u062a\u0631 \u0627\u0644\u062e\u0637\u0629 \u0627\u0644\u0645\u0646\u0627\u0633\u0628\u0629', style: TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.bold)),
+      Text('\u0627\u062e\u062a\u0631 \u0627\u0644\u062e\u0637\u0629 \u0627\u0644\u0645\u0646\u0627\u0633\u0628\u0629', style: TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.bold)),
       const SizedBox(height: 16),
       ...plans.map((p) {
         final isCurrent = p['code'] == currentPlan;
@@ -870,14 +873,14 @@ class UpgradePlanScreen extends StatelessWidget {
               if(isCurrent) _badge('\u0627\u0644\u062d\u0627\u0644\u064a\u0629', AC.gold)
               else _badge(p['price_monthly_sar']==0?'\u0645\u062c\u0627\u0646\u064a':'${p['price_monthly_sar']} \u0631.\u0633', AC.cyan)]),
             const SizedBox(height: 6),
-            Text(p['target_user_ar']??'', style: const TextStyle(color: AC.ts, fontSize: 12)),
+            Text(p['target_user_ar']??'', style: TextStyle(color: AC.ts, fontSize: 12)),
             const SizedBox(height: 12),
             ...features.take(8).map((f) => Padding(padding: const EdgeInsets.only(bottom: 3),
               child: Row(children: [
                 Icon(f.value['value']=='true'||f.value['value']=='unlimited'?Icons.check_circle:Icons.cancel,
                   color: f.value['value']=='true'||f.value['value']=='unlimited'?AC.ok:AC.err.withValues(alpha: 0.5), size: 14),
                 const SizedBox(width: 8),
-                Expanded(child: Text(f.value['name_ar']??f.key, style: const TextStyle(color: AC.ts, fontSize: 11)))]))),
+                Expanded(child: Text(f.value['name_ar']??f.key, style: TextStyle(color: AC.ts, fontSize: 11)))]))),
             if(!isCurrent) ...[const SizedBox(height: 12),
               SizedBox(width: double.infinity, child: ElevatedButton(
                 onPressed: () { ScaffoldMessenger.of(c).showSnackBar(SnackBar(
@@ -944,16 +947,16 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   Widget _wf(String label, TextEditingController ctrl, {bool ltr = false}) => Padding(
     padding: const EdgeInsets.only(bottom: 10),
     child: TextField(controller: ctrl, textDirection: ltr ? TextDirection.ltr : null,
-      style: const TextStyle(color: AC.tp, fontSize: 13),
-      decoration: InputDecoration(labelText: label, labelStyle: const TextStyle(color: AC.ts, fontSize: 12),
-        filled: true, fillColor: AC.navy3, isDense: true, contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+      style: TextStyle(color: AC.tp, fontSize: 13),
+      decoration: InputDecoration(labelText: label, labelStyle: TextStyle(color: AC.ts, fontSize: 12),
+        filled: true, fillColor: AC.navy3, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AC.gold)))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AC.gold)))),
   );
 
   Widget _wc(String label, List<String> opts, String sel, void Function(void Function()) ss, void Function(String) onSel) => Column(
     crossAxisAlignment: CrossAxisAlignment.end, children: [
-      Text(label, style: const TextStyle(color: AC.ts, fontSize: 12)),
+      Text(label, style: TextStyle(color: AC.ts, fontSize: 12)),
       const SizedBox(height: 8),
       Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.end, children: opts.map((o) =>
         ChoiceChip(label: Text(o, style: TextStyle(color: sel == o ? AC.navy : AC.tp, fontSize: 11)),
@@ -1025,9 +1028,9 @@ class _ClientsS extends ConsumerState<ClientsTab> {
         ], _cSector.contains('\u0634\u0631\u0643\u0629') ? '' : _cSector, ss, (v) => _cSector = _cSector.contains('\u0634\u0631\u0643\u0629') ? _cSector : v);
       case 5:
         // Step 6: Documents
-        return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+        return Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            const Text('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629', style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.bold)),
+            Text('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629', style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             _docRow('\u0635\u0648\u0631\u0629 \u0627\u0644\u0633\u062c\u0644 \u0627\u0644\u062a\u062c\u0627\u0631\u064a', Icons.description),
             _docRow('\u0634\u0647\u0627\u062f\u0629 \u0627\u0644\u0632\u0643\u0627\u0629 \u0648\u0627\u0644\u062f\u062e\u0644', Icons.receipt_long),
@@ -1038,9 +1041,9 @@ class _ClientsS extends ConsumerState<ClientsTab> {
         );
       case 6:
         // Step 7: Review
-        return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
+        return Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            const Text('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold)),
+            Text('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a', style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             _rv('\u0646\u0648\u0639 \u0627\u0644\u0643\u064a\u0627\u0646', _cType),
             _rv('\u0627\u0644\u0634\u0643\u0644 \u0627\u0644\u0642\u0627\u0646\u0648\u0646\u064a', _cSector),
@@ -1058,17 +1061,17 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   Widget _docRow(String label, IconData icon) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      OutlinedButton(style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
-        onPressed: () {}, child: const Text('\u0631\u0641\u0639', style: TextStyle(color: AC.gold, fontSize: 10))),
+      OutlinedButton(style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+        onPressed: () {}, child: Text('\u0631\u0641\u0639', style: TextStyle(color: AC.gold, fontSize: 10))),
       const SizedBox(width: 8),
-      Expanded(child: Text(label, textAlign: TextAlign.right, style: const TextStyle(color: AC.tp, fontSize: 12))),
+      Expanded(child: Text(label, textAlign: TextAlign.right, style: TextStyle(color: AC.tp, fontSize: 12))),
       const SizedBox(width: 8),
       Icon(icon, color: AC.gold, size: 18),
     ]),
   );
 
   Widget _rv(String l, String v) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-    Text(v.isEmpty ? '-' : v, style: const TextStyle(color: AC.tp, fontSize: 12)), const SizedBox(width: 8), Text(l, style: const TextStyle(color: AC.ts, fontSize: 11))]));
+    Text(v.isEmpty ? '-' : v, style: TextStyle(color: AC.tp, fontSize: 12)), SizedBox(width: 8), Text(l, style: TextStyle(color: AC.ts, fontSize: 11))]));
 
   void _showNewClientWizard(BuildContext ctx) {
     int _step = 0;
@@ -1090,9 +1093,9 @@ class _ClientsS extends ConsumerState<ClientsTab> {
           padding: const EdgeInsets.all(20),
           child: Column(children: [
             Row(children: [
-              const Text('\u062a\u0633\u062c\u064a\u0644 \u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('\u062a\u0633\u062c\u064a\u0644 \u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
               const Spacer(),
-              IconButton(icon: const Icon(Icons.close, color: AC.ts, size: 20), onPressed: () => Navigator.pop(dc)),
+              IconButton(icon: Icon(Icons.close, color: AC.ts, size: 20), onPressed: () => Navigator.pop(dc)),
             ]),
             const SizedBox(height: 16),
             SizedBox(height: 50, child: Row(children: List.generate(7, (idx) =>
@@ -1104,31 +1107,31 @@ class _ClientsS extends ConsumerState<ClientsTab> {
                       color: idx <= _step ? AC.gold : AC.navy3,
                       border: Border.all(color: idx == _step ? AC.gold : AC.bdr)),
                     child: Center(child: idx < _step
-                      ? const Icon(Icons.check, color: AC.navy, size: 14)
+                      ? Icon(Icons.check, color: AC.navy, size: 14)
                       : Text('${idx + 1}', style: TextStyle(color: idx == _step ? AC.navy : AC.ts, fontSize: 11, fontWeight: FontWeight.bold)))),
                   const SizedBox(height: 4),
-                  if (idx == _step) Text(steps[idx], style: const TextStyle(color: AC.gold, fontSize: 7), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
+                  if (idx == _step) Text(steps[idx], style: TextStyle(color: AC.gold, fontSize: 7), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
                 ]),
               )),
             ))),
-            const Divider(color: AC.bdr),
+            Divider(color: AC.bdr),
             Expanded(child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
             _buildWizardStep(_step, setSt),
               const SizedBox(height: 12),
-              Text(steps[_step], style: const TextStyle(color: AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(steps[_step], style: TextStyle(color: AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              Text('\u0627\u0644\u062e\u0637\u0648\u0629 ${_step + 1} \u0645\u0646 7', style: const TextStyle(color: AC.ts, fontSize: 12)),
+              Text('\u0627\u0644\u062e\u0637\u0648\u0629 ${_step + 1} \u0645\u0646 7', style: TextStyle(color: AC.ts, fontSize: 12)),
             ]))),
             Row(children: [
               if (_step > 0) Expanded(child: OutlinedButton(
-                style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(vertical: 12)),
+                style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 12)),
                 onPressed: () => setSt(() => _step--),
-                child: const Text('\u0627\u0644\u0633\u0627\u0628\u0642', style: TextStyle(color: AC.ts)))),
+                child: Text('\u0627\u0644\u0633\u0627\u0628\u0642', style: TextStyle(color: AC.ts)))),
               if (_step > 0) const SizedBox(width: 10),
               Expanded(child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: AC.gold, padding: const EdgeInsets.symmetric(vertical: 12)),
+                style: ElevatedButton.styleFrom(backgroundColor: AC.gold, padding: EdgeInsets.symmetric(vertical: 12)),
                 onPressed: () { if (_step < 6) { setSt(() => _step++); } else { _doCreateClient(dc); } },
-                child: Text(_step < 6 ? '\u0627\u0644\u062a\u0627\u0644\u064a' : '\u062a\u0623\u0643\u064a\u062f', style: const TextStyle(color: AC.navy, fontWeight: FontWeight.bold)))),
+                child: Text(_step < 6 ? '\u0627\u0644\u062a\u0627\u0644\u064a' : '\u062a\u0623\u0643\u064a\u062f', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold)))),
             ]),
           ]),
         ),
@@ -1143,38 +1146,38 @@ class _ClientsS extends ConsumerState<ClientsTab> {
     }).toList();
     return Scaffold(
       backgroundColor: AC.navy,
-      floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: const Icon(Icons.add, color: AC.navy),
+      floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: Icon(Icons.add, color: AC.navy),
         onPressed: () => _showNewClientWizard(c)),
       body: Column(children: [
         // Header with title + search
         Container(padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Row(children: [
-              const Expanded(child: Text('العملاء', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
-              Text('${_cl.length} عميل', style: const TextStyle(color: AC.ts, fontSize: 12)),
+              Expanded(child: Text('العملاء', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
+              Text('${_cl.length} عميل', style: TextStyle(color: AC.ts, fontSize: 12)),
             ]),
             const SizedBox(height: 12),
             TextField(
               onChanged: (v) => setState(() => _search = v),
-              style: const TextStyle(color: AC.tp, fontSize: 13),
+              style: TextStyle(color: AC.tp, fontSize: 13),
               textAlign: TextAlign.right,
               decoration: InputDecoration(
                 hintText: 'بحث عن عميل...',
-                hintStyle: const TextStyle(color: AC.ts, fontSize: 12),
-                prefixIcon: const Icon(Icons.search, color: AC.ts, size: 20),
+                hintStyle: TextStyle(color: AC.ts, fontSize: 12),
+                prefixIcon: Icon(Icons.search, color: AC.ts, size: 20),
                 filled: true, fillColor: AC.navy3, isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AC.gold)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: AC.gold)),
               ),
             ),
           ]),
         ),
         // Client list
-        Expanded(child: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+        Expanded(child: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
           filtered.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.business_outlined, color: AC.ts, size: 60), const SizedBox(height: 12),
-            Text(_cl.isEmpty ? 'لا يوجد عملاء بعد' : 'لا نتائج', style: const TextStyle(color: AC.ts, fontSize: 14)),
+            Icon(Icons.business_outlined, color: AC.ts, size: 60), SizedBox(height: 12),
+            Text(_cl.isEmpty ? 'لا يوجد عملاء بعد' : 'لا نتائج', style: TextStyle(color: AC.ts, fontSize: 14)),
           ])) :
           RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4), itemCount: filtered.length, itemBuilder: (_, i) {
@@ -1189,20 +1192,20 @@ class _ClientsS extends ConsumerState<ClientsTab> {
                     border: Border.all(color: AC.bdr)),
                   child: Row(children: [
                     CircleAvatar(backgroundColor: const Color(0xFFC9A84C).withValues(alpha: 0.15), radius: 24,
-                      child: Text(name.isNotEmpty ? name[0] : '?', style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16))),
+                      child: Text(name.isNotEmpty ? name[0] : '?', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16))),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: AC.tp, fontSize: 15)),
+                      Text(name, style: TextStyle(fontWeight: FontWeight.bold, color: AC.tp, fontSize: 15)),
                       const SizedBox(height: 4),
                       Row(children: [
                         if (type.isNotEmpty) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-                          child: Text(type, style: const TextStyle(color: AC.gold, fontSize: 10))),
+                          child: Text(type, style: TextStyle(color: AC.gold, fontSize: 10))),
                         if (type.isNotEmpty && role.isNotEmpty) const SizedBox(width: 8),
-                        if (role.isNotEmpty) Text(role, style: const TextStyle(color: AC.ts, fontSize: 11)),
+                        if (role.isNotEmpty) Text(role, style: TextStyle(color: AC.ts, fontSize: 11)),
                       ]),
                     ])),
-                    const Icon(Icons.chevron_left, color: AC.ts, size: 20),
+                    Icon(Icons.chevron_left, color: AC.ts, size: 20),
                   ])));
             }))),
       ]),
@@ -1230,10 +1233,10 @@ class _NewCS extends State<NewClientScreen> {
     finally { if(mounted) setState(()=> _l=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold))),
     body: SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       TextField(controller:_n, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629 *', ic: Icons.business)),
-      const SizedBox(height: 18), const Text('\u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644 *', style: TextStyle(color: AC.ts, fontSize: 14)),
+      SizedBox(height: 18), Text('\u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644 *', style: TextStyle(color: AC.ts, fontSize: 14)),
       const SizedBox(height: 8),
       ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_t=t['code']),
         child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
@@ -1244,8 +1247,8 @@ class _NewCS extends State<NewClientScreen> {
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(t['name_ar']??'', style: TextStyle(color: _t==t['code'] ? AC.gold : AC.tp, fontWeight: FontWeight.w600, fontSize: 13)),
-              if(t['knowledge_mode_eligible']==true) const Text('\u0648\u0636\u0639 \u0627\u0644\u0645\u0639\u0631\u0641\u0629', style: TextStyle(color: AC.cyan, fontSize: 10))]))]))))  ,
-      if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child:Text(_e!, style:const TextStyle(color:AC.err))),
+              if(t['knowledge_mode_eligible']==true) Text('\u0648\u0636\u0639 \u0627\u0644\u0645\u0639\u0631\u0641\u0629', style: TextStyle(color: AC.cyan, fontSize: 10))]))]))))  ,
+      if(_e!=null) Padding(padding:EdgeInsets.only(top:10), child:Text(_e!, style:TextStyle(color:AC.err))),
       const SizedBox(height: 20),
       SizedBox(width:double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
         child: _l ? const CircularProgressIndicator(strokeWidth:2) : const Text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644')))])));
@@ -1278,37 +1281,37 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
         builder: (_, sc) => ListView(controller: sc, padding: const EdgeInsets.all(20), children: [
           Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AC.ts, borderRadius: BorderRadius.circular(2)))),
           const SizedBox(height: 16),
-          Text(title, style: const TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
-          const Divider(color: AC.bdr, height: 24),
+          Text(title, style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
+          Divider(color: AC.bdr, height: 24),
           ...data.entries.map((e) => _kv(e.key, '${e.value}')),
           if(_r?['knowledge_brain']?['rules_applied']!=null) ...[
             const SizedBox(height: 12),
-            const Text('\u0627\u0644\u0642\u0648\u0627\u0639\u062f \u0627\u0644\u0645\u0637\u0628\u0642\u0629', style: TextStyle(color: AC.cyan, fontWeight: FontWeight.bold)),
+            Text('\u0627\u0644\u0642\u0648\u0627\u0639\u062f \u0627\u0644\u0645\u0637\u0628\u0642\u0629', style: TextStyle(color: AC.cyan, fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
             ...(_r!['knowledge_brain']['rules_applied'] as List? ?? []).map((r) =>
               Padding(padding: const EdgeInsets.only(bottom: 4), child: Row(children: [
-                const Icon(Icons.rule, color: AC.cyan, size: 14), const SizedBox(width: 8),
-                Expanded(child: Text('$r', style: const TextStyle(color: AC.ts, fontSize: 11)))])))],
+                Icon(Icons.rule, color: AC.cyan, size: 14), SizedBox(width: 8),
+                Expanded(child: Text('$r', style: TextStyle(color: AC.ts, fontSize: 11)))])))],
           if(_r?['warnings']!=null && (_r!['warnings'] as List).isNotEmpty) ...[
             const SizedBox(height: 12),
-            const Text('\u062a\u062d\u0630\u064a\u0631\u0627\u062a', style: TextStyle(color: AC.warn, fontWeight: FontWeight.bold)),
+            Text('\u062a\u062d\u0630\u064a\u0631\u0627\u062a', style: TextStyle(color: AC.warn, fontWeight: FontWeight.bold)),
             ...(_r!['warnings'] as List).map((w) => Padding(padding: const EdgeInsets.only(bottom: 4),
-              child: Row(children: [const Icon(Icons.warning_amber, color: AC.warn, size: 14), const SizedBox(width: 8),
-                Expanded(child: Text('$w', style: const TextStyle(color: AC.ts, fontSize: 11)))])))],
+              child: Row(children: [Icon(Icons.warning_amber, color: AC.warn, size: 14), SizedBox(width: 8),
+                Expanded(child: Text('$w', style: TextStyle(color: AC.ts, fontSize: 11)))])))],
         ])));
   }
 
   Widget _resultRow(BuildContext c, String label, String value, Map<String,dynamic> detailData) =>
     InkWell(onTap: ()=> _showDetail(c, label, detailData),
       child: Padding(padding: const EdgeInsets.only(bottom: 7), child: Row(children: [
-        Expanded(child: Text(label, style: const TextStyle(color: AC.ts, fontSize: 13))),
-        Text(value, style: const TextStyle(color: AC.tp, fontSize: 14)),
+        Expanded(child: Text(label, style: TextStyle(color: AC.ts, fontSize: 13))),
+        Text(value, style: TextStyle(color: AC.tp, fontSize: 14)),
         const SizedBox(width: 6),
         Container(width: 22, height: 22, decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), shape: BoxShape.circle),
-          child: const Icon(Icons.info_outline, color: AC.gold, size: 14))])));
+          child: Icon(Icons.info_outline, color: AC.gold, size: 14))])));
 
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a', style: TextStyle(color: AC.gold))),
     body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(children: [
       GestureDetector(onTap: _pick, child: Container(width: double.infinity, height: 110,
         decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(16),
@@ -1319,9 +1322,9 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
           Text(_f?.name ?? '\u0627\u0636\u063a\u0637 \u0644\u0631\u0641\u0639 \u0645\u064a\u0632\u0627\u0646 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: _f!=null?AC.tp:AC.ts, fontSize: 13))]))),
       const SizedBox(height: 14),
       if(_f!=null && _r==null) SizedBox(width: double.infinity, child: ElevatedButton.icon(
-        onPressed: _a?null:_run, icon: _a ? const SizedBox(height:18,width:18, child: CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Icon(Icons.play_arrow),
+        onPressed: _a?null:_run, icon: _a ? SizedBox(height:18,width:18, child: CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : Icon(Icons.play_arrow),
         label: Text(_a ? '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0644\u064a\u0644...' : '\u0628\u062f\u0621 \u0627\u0644\u062a\u062d\u0644\u064a\u0644'))),
-      if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child:Text(_e!, style:const TextStyle(color:AC.err))),
+      if(_e!=null) Padding(padding:EdgeInsets.only(top:10), child:Text(_e!, style:TextStyle(color:AC.err))),
       // RESULTS with ! icon
       if(_r!=null && _r!['success']==true) ...[
         const SizedBox(height: 18),
@@ -1356,18 +1359,18 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
         const SizedBox(height: 14),
         Row(children: [
           Expanded(child: OutlinedButton.icon(onPressed: ()=>setState((){ _f=null; _fb=null; _r=null; }),
-            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
-            icon: const Icon(Icons.refresh, color: AC.gold, size: 18),
-            label: const Text('\u062a\u062d\u0644\u064a\u0644 \u0622\u062e\u0631', style: TextStyle(color: AC.gold)))),
+            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),
+            icon: Icon(Icons.refresh, color: AC.gold, size: 18),
+            label: Text('\u062a\u062d\u0644\u064a\u0644 \u0622\u062e\u0631', style: TextStyle(color: AC.gold)))),
           const SizedBox(width: 10),
           Expanded(child: OutlinedButton.icon(onPressed: ()=>context.push('/knowledge/feedback-form', extra: {'resultId': _r?['result_id']}),
-            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.cyan)),
-            icon: const Icon(Icons.feedback_outlined, color: AC.cyan, size: 18),
-            label: const Text('\u0645\u0644\u0627\u062d\u0638\u0629 \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.cyan)))),
+            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.cyan)),
+            icon: Icon(Icons.feedback_outlined, color: AC.cyan, size: 18),
+            label: Text('\u0645\u0644\u0627\u062d\u0638\u0629 \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.cyan)))),
         ]),
         const SizedBox(height: 10),
         SizedBox(width: double.infinity, child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: const EdgeInsets.symmetric(vertical: 14)),
+          style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: EdgeInsets.symmetric(vertical: 14)),
           onPressed: () async {
             try {
               final result = await ApiService.analyzeReport(bytes: _fb!, fileName: 'tb.xlsx');
@@ -1422,16 +1425,16 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
     finally { if(mounted) setState(()=> _l=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0645\u0644\u0627\u062d\u0638\u0629 \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u0645\u0644\u0627\u062d\u0638\u0629 \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.gold))),
     body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
-      const Text('\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629 \u0628\u0646\u062c\u0627\u062d', style: TextStyle(color: AC.tp, fontSize: 18)),
+      Icon(Icons.check_circle, color: AC.ok, size: 60), SizedBox(height: 16),
+      Text('\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629 \u0628\u0646\u062c\u0627\u062d', style: TextStyle(color: AC.tp, fontSize: 18)),
       const SizedBox(height: 8),
-      const Text('\u0633\u062a\u062e\u0636\u0639 \u0644\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.ts)),
+      Text('\u0633\u062a\u062e\u0636\u0639 \u0644\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.ts)),
       const SizedBox(height: 20),
       ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('\u0646\u0648\u0639 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629', style: TextStyle(color: AC.ts, fontSize: 14)),
+      Text('\u0646\u0648\u0639 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629', style: TextStyle(color: AC.ts, fontSize: 14)),
       const SizedBox(height: 8),
       ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_type=t['code']!),
         child: Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -1439,15 +1442,15 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type==t['code'] ? AC.gold : AC.bdr)),
           child: Row(children: [
             Icon(_type==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _type==t['code'] ? AC.gold : AC.ts, size: 18),
-            const SizedBox(width: 10), Text(t['ar']!, style: TextStyle(color: _type==t['code'] ? AC.gold : AC.tp, fontSize: 13))])))),
+            SizedBox(width: 10), Text(t['ar']!, style: TextStyle(color: _type==t['code'] ? AC.gold : AC.tp, fontSize: 13))])))),
       const SizedBox(height: 16),
       TextField(controller: _title, decoration: _inp('\u0627\u0644\u0639\u0646\u0648\u0627\u0646 *', ic: Icons.title)),
       const SizedBox(height: 12),
       TextField(controller: _desc, maxLines: 4, decoration: _inp('\u0627\u0644\u0648\u0635\u0641 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a')),
-      if(_e!=null) Padding(padding:const EdgeInsets.only(top:10), child:Text(_e!, style:const TextStyle(color:AC.err))),
+      if(_e!=null) Padding(padding:EdgeInsets.only(top:10), child:Text(_e!, style:TextStyle(color:AC.err))),
       const SizedBox(height: 20),
       SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: _l?null:_submit,
-        icon: _l ? const SizedBox(height:18,width:18,child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : const Icon(Icons.send),
+        icon: _l ? SizedBox(height:18,width:18,child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : Icon(Icons.send),
         label: Text(_l ? '\u062c\u0627\u0631\u064a \u0627\u0644\u0625\u0631\u0633\u0627\u0644...' : '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629')))])));
 }
 
@@ -1470,33 +1473,33 @@ class _MarketS extends ConsumerState<MarketTab> {
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0627\u0644\u0645\u0639\u0631\u0636', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u0627\u0644\u0645\u0639\u0631\u0636', style: TextStyle(color: AC.gold))),
     floatingActionButton: FloatingActionButton.extended(backgroundColor: AC.gold,
       onPressed: ()=> context.push('/marketplace/new-request'),
-      icon: const Icon(Icons.add, color: AC.navy), label: const Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.navy))),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+      icon: Icon(Icons.add, color: AC.navy), label: Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.navy))),
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       ListView(padding: const EdgeInsets.all(14), children: [
-        Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [const Icon(Icons.store_mall_directory, color: AC.gold, size: 36), const SizedBox(height: 8), const Text("ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ ط§ظ„ظ…ظ‡ظ†ظٹط©", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), const Text("طھطµظپط­ 6 ط®ط¯ظ…ط§طھ: طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹطŒ ظ…ط±ط§ط¬ط¹ط©طŒ ط¶ط±ط§ط¦ط¨طŒ طھظ…ظˆظٹظ„طŒ ط¯ط¹ظ…طŒ طھط±ط§ط®ظٹطµ", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => context.push('/service-catalog', extra: {'clientId': '', 'token': S.token}), icon: const Icon(Icons.arrow_forward), label: const Text("ظپطھط­ ط§ظ„ظƒطھط§ظ„ظˆط¬")))])),
+        Container(margin: EdgeInsets.only(bottom: 14), padding: EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [Icon(Icons.store_mall_directory, color: AC.gold, size: 36), SizedBox(height: 8), Text("ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ ط§ظ„ظ…ظ‡ظ†ظٹط©", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), SizedBox(height: 4), Text("طھطµظپط­ 6 ط®ط¯ظ…ط§طھ: طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹطŒ ظ…ط±ط§ط¬ط¹ط©طŒ ط¶ط±ط§ط¦ط¨طŒ طھظ…ظˆظٹظ„طŒ ط¯ط¹ظ…طŒ طھط±ط§ط®ظٹطµ", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => context.push('/service-catalog', extra: {'clientId': '', 'token': S.token}), icon: Icon(Icons.arrow_forward), label: Text("ظپطھط­ ط§ظ„ظƒطھط§ظ„ظˆط¬")))])),
         _card('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0639\u062a\u0645\u062f\u0648\u0646', [
-          if(_provs.isEmpty) const Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0642\u062f\u0645\u0648 \u062e\u062f\u0645\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
+          if(_provs.isEmpty) Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0642\u062f\u0645\u0648 \u062e\u062f\u0645\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
           else ..._provs.take(5).map((p) => Padding(padding: const EdgeInsets.only(bottom: 8),
             child: Row(children: [CircleAvatar(backgroundColor: AC.navy4, radius: 18,
-              child: Text((p['display_name']??'?')[0], style: const TextStyle(color: AC.gold))),
+              child: Text((p['display_name']??'?')[0], style: TextStyle(color: AC.gold))),
               const SizedBox(width: 10),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(p['display_name']??'', style: const TextStyle(color: AC.tp, fontSize: 13)),
-                Text(p['category']??'', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+                Text(p['display_name']??'', style: TextStyle(color: AC.tp, fontSize: 13)),
+                Text(p['category']??'', style: TextStyle(color: AC.ts, fontSize: 11))])),
               if(p['rating']!=null) Row(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.star, color: AC.gold, size: 14),
-                Text('${p['rating']}', style: const TextStyle(color: AC.gold, fontSize: 12))])]))),
+                Icon(Icons.star, color: AC.gold, size: 14),
+                Text('${p['rating']}', style: TextStyle(color: AC.gold, fontSize: 12))])]))),
         ]),
         _card('\u0637\u0644\u0628\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0629', [
-          if(_reqs.isEmpty) const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0637\u0644\u0628\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
+          if(_reqs.isEmpty) Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0637\u0644\u0628\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
           else ..._reqs.take(5).map((r) => Padding(padding: const EdgeInsets.only(bottom: 8),
             child: Row(children: [
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(r['title']??'', style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
-                Text('${r['urgency']??''} \u2022 ${r['budget_sar']??0} \u0631.\u0633', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+                Text(r['title']??'', style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
+                Text('${r['urgency']??''} \u2022 ${r['budget_sar']??0} \u0631.\u0633', style: TextStyle(color: AC.ts, fontSize: 11))])),
               _badge(r['status']??'open', r['status']=='completed'?AC.ok:r['status']=='matched'?AC.cyan:AC.warn)]))),
         ]),
       ]));
@@ -1533,15 +1536,15 @@ class _NSRS extends State<NewServiceRequestScreen> {
     finally { if(mounted) setState(()=> _l=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold))),
     body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
-      const Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629', style: TextStyle(color: AC.tp, fontSize: 18)),
+      Icon(Icons.check_circle, color: AC.ok, size: 60), SizedBox(height: 16),
+      Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629', style: TextStyle(color: AC.tp, fontSize: 18)),
       const SizedBox(height: 20),
       ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       if(_clients.isNotEmpty) ...[
-        const Text('\u0627\u062e\u062a\u0631 \u0627\u0644\u0639\u0645\u064a\u0644', style: TextStyle(color: AC.ts, fontSize: 13)),
+        Text('\u0627\u062e\u062a\u0631 \u0627\u0644\u0639\u0645\u064a\u0644', style: TextStyle(color: AC.ts, fontSize: 13)),
         const SizedBox(height: 6),
         ..._clients.map((cl) => GestureDetector(onTap: ()=>setState(()=>_clientId=cl['id']),
           child: Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.all(10),
@@ -1555,7 +1558,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
       const SizedBox(height: 12),
       TextField(controller: _budget, keyboardType: TextInputType.number, decoration: _inp('\u0627\u0644\u0645\u064a\u0632\u0627\u0646\u064a\u0629 (\u0631.\u0633)', ic: Icons.attach_money)),
       const SizedBox(height: 12),
-      const Text('\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
+      Text('\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
       const SizedBox(height: 6),
       Row(children: ['low','medium','high'].map((u) => Expanded(child: GestureDetector(onTap: ()=>setState(()=>_urgency=u),
         child: Container(margin: const EdgeInsets.symmetric(horizontal: 3), padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1563,7 +1566,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
             borderRadius: BorderRadius.circular(8), border: Border.all(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok) : AC.bdr)),
           child: Center(child: Text(u=='high'?'\u0639\u0627\u0644\u064a\u0629':u=='medium'?'\u0645\u062a\u0648\u0633\u0637\u0629':'\u0645\u0646\u062e\u0641\u0636\u0629',
             style: TextStyle(color: _urgency==u ? AC.tp : AC.ts, fontSize: 12))))))).toList()),
-      if(_e!=null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_e!, style: const TextStyle(color: AC.err))),
+      if(_e!=null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_e!, style: TextStyle(color: AC.err))),
       const SizedBox(height: 20),
       SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_go,
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0637\u0644\u0628')))])));
@@ -1597,11 +1600,11 @@ class _ProvS extends State<ProviderTab> {
     if(r.success) _load();
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.gold))),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+    appBar: AppBar(title: Text('\u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.gold))),
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       _notProvider ? SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(children: [
-        const Icon(Icons.verified_user_outlined, color: AC.gold, size: 60), const SizedBox(height: 16),
-        const Text('\u0643\u0646 \u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629 \u0645\u0639\u062a\u0645\u062f', style: TextStyle(color: AC.tp, fontSize: 20, fontWeight: FontWeight.bold)),
+        Icon(Icons.verified_user_outlined, color: AC.gold, size: 60), SizedBox(height: 16),
+        Text('\u0643\u0646 \u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629 \u0645\u0639\u062a\u0645\u062f', style: TextStyle(color: AC.tp, fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 20),
         ..._cats.map((cat) => GestureDetector(onTap: ()=>setState(()=>_sel=cat['code']),
           child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
@@ -1609,7 +1612,7 @@ class _ProvS extends State<ProviderTab> {
               borderRadius: BorderRadius.circular(10), border: Border.all(color: _sel==cat['code']?AC.gold:AC.bdr)),
             child: Row(children: [
               Icon(_sel==cat['code']?Icons.radio_button_checked:Icons.radio_button_off, color: _sel==cat['code']?AC.gold:AC.ts, size: 18),
-              const SizedBox(width: 10), Text(cat['ar']!, style: TextStyle(color: _sel==cat['code']?AC.gold:AC.tp, fontSize: 13))])))),
+              SizedBox(width: 10), Text(cat['ar']!, style: TextStyle(color: _sel==cat['code']?AC.gold:AC.tp, fontSize: 13))])))),
         const SizedBox(height: 16),
         SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _sel!=null?_register:null,
           child: const Text('\u0627\u0644\u062a\u0633\u062c\u064a\u0644 \u0643\u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629')))])) :
@@ -1622,13 +1625,13 @@ class _ProvS extends State<ProviderTab> {
         ]),
         if(_p?['service_scopes']!=null) _card('\u0646\u0637\u0627\u0642\u0627\u062a \u0627\u0644\u062e\u062f\u0645\u0629', [
           ...(_p!['service_scopes'] as List).map((s) => Padding(padding: const EdgeInsets.only(bottom: 4),
-            child: Row(children: [const Icon(Icons.check, color: AC.ok, size: 14), const SizedBox(width: 8),
-              Text(s['name_ar']??s['code']??'', style: const TextStyle(color: AC.tp, fontSize: 12))])))]),
+            child: Row(children: [Icon(Icons.check, color: AC.ok, size: 14), SizedBox(width: 8),
+              Text(s['name_ar']??s['code']??'', style: TextStyle(color: AC.tp, fontSize: 12))])))]),
         if(_p?['required_documents']!=null) _card('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a', [
           ...(_p!['required_documents'] as List).map((d) => Padding(padding: const EdgeInsets.only(bottom: 4),
-            child: Row(children: [const Icon(Icons.description_outlined, color: AC.warn, size: 14), const SizedBox(width: 8),
-              Text('$d', style: const TextStyle(color: AC.tp, fontSize: 12)),
-              const Spacer(), _badge('\u0645\u0637\u0644\u0648\u0628', AC.warn)])))]),
+            child: Row(children: [Icon(Icons.description_outlined, color: AC.warn, size: 14), SizedBox(width: 8),
+              Text('$d', style: TextStyle(color: AC.tp, fontSize: 12)),
+              Spacer(), _badge('\u0645\u0637\u0644\u0648\u0628', AC.warn)])))]),
       ]));
 }
 
@@ -1649,26 +1652,26 @@ class _AccS extends ConsumerState<AccountTab> {
   void _logout() { ApiService.logout(); S.clear();
     ApiService.clearToken(); context.go('/login'); }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u062d\u0633\u0627\u0628\u064a', style: TextStyle(color: AC.gold)),
-      actions: [IconButton(onPressed: _logout, icon: const Icon(Icons.logout, color: AC.err))]),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
-      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(16), children: [
+    appBar: AppBar(title: Text('\u062d\u0633\u0627\u0628\u064a', style: TextStyle(color: AC.gold)),
+      actions: [IconButton(onPressed: _logout, icon: Icon(Icons.logout, color: AC.err))]),
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
+      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
         // Profile Card
-        Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: AC.navy3,
+        Container(padding: EdgeInsets.all(20), decoration: BoxDecoration(color: AC.navy3,
           borderRadius: BorderRadius.circular(16), border: Border.all(color: AC.bdr)),
           child: Column(children: [
             CircleAvatar(radius: 36, backgroundColor: AC.navy4,
-              child: Text((_p?['user']?['display_name']??'?')[0], style: const TextStyle(fontSize: 28, color: AC.gold))),
+              child: Text((_p?['user']?['display_name']??'?')[0], style: TextStyle(fontSize: 28, color: AC.gold))),
             const SizedBox(height: 12),
-            Text(_p?['user']?['display_name']??'', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AC.tp)),
-            Text('@${_p?['user']?['username']??''}', style: const TextStyle(color: AC.ts)),
+            Text(_p?['user']?['display_name']??'', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AC.tp)),
+            Text('@${_p?['user']?['username']??''}', style: TextStyle(color: AC.ts)),
             const SizedBox(height: 4),
-            Text(_p?['user']?['email']??'', style: const TextStyle(color: AC.ts, fontSize: 12)),
+            Text(_p?['user']?['email']??'', style: TextStyle(color: AC.ts, fontSize: 12)),
             const SizedBox(height: 12),
             OutlinedButton.icon(onPressed: ()=> context.push('/profile/edit', extra: _p),
-              style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
-              icon: const Icon(Icons.edit, color: AC.gold, size: 16),
-              label: const Text('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a', style: TextStyle(color: AC.gold, fontSize: 12)))])),
+              style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),
+              icon: Icon(Icons.edit, color: AC.gold, size: 16),
+              label: Text('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a', style: TextStyle(color: AC.gold, fontSize: 12)))])),
         const SizedBox(height: 14),
         // Security
         _card('\u0627\u0644\u0623\u0645\u0627\u0646', [
@@ -1700,9 +1703,9 @@ class _AccS extends ConsumerState<AccountTab> {
             ()=>context.go('/account/sessions')),
       ])));
   Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) => GestureDetector(onTap: onTap,
-    child: Container(margin: const EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
-      child: ListTile(leading: Icon(i, color: cl), title: Text(l, style: const TextStyle(color: AC.tp, fontSize: 14)),
-        trailing: const Icon(Icons.chevron_left, color: AC.ts))));
+    child: Container(margin: EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
+      child: ListTile(leading: Icon(i, color: cl), title: Text(l, style: TextStyle(color: AC.tp, fontSize: 14)),
+        trailing: Icon(Icons.chevron_left, color: AC.ts))));
 }
 
 
@@ -1725,23 +1728,23 @@ class _AdminS extends ConsumerState<AdminTab> {
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0644\u0648\u062d\u0629 \u0627\u0644\u0625\u062f\u0627\u0631\u0629', style: TextStyle(color: AC.gold)),
+    appBar: AppBar(title: Text('\u0644\u0648\u062d\u0629 \u0627\u0644\u0625\u062f\u0627\u0631\u0629', style: TextStyle(color: AC.gold)),
       actions: [
-        IconButton(icon: const Icon(Icons.rate_review, color: AC.cyan),
+        IconButton(icon: Icon(Icons.rate_review, color: AC.cyan),
           onPressed: ()=>context.go('/admin/reviewer')),
-        IconButton(icon: const Icon(Icons.verified_user, color: AC.ok),
+        IconButton(icon: Icon(Icons.verified_user, color: AC.ok),
           onPressed: ()=>context.go('/admin/providers/verify')),
-        IconButton(icon: const Icon(Icons.upload_file, color: AC.gold),
+        IconButton(icon: Icon(Icons.upload_file, color: AC.gold),
           onPressed: ()=>context.go('/admin/providers/documents')),
-        IconButton(icon: const Icon(Icons.shield, color: AC.gold),
+        IconButton(icon: Icon(Icons.shield, color: AC.gold),
           onPressed: ()=>context.go('/admin/providers/compliance')),
-        IconButton(icon: const Icon(Icons.psychology, color: AC.gold),
+        IconButton(icon: Icon(Icons.psychology, color: AC.gold),
           onPressed: ()=>context.go('/knowledge/console')),
-        IconButton(icon: const Icon(Icons.security, color: AC.gold),
+        IconButton(icon: Icon(Icons.security, color: AC.gold),
           onPressed: ()=>context.go('/admin/audit')),
       ]),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
-      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(14), children: [
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
+      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(14), children: [
         // Stats Grid
         GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.6,
@@ -1766,15 +1769,15 @@ class _AdminS extends ConsumerState<AdminTab> {
         const SizedBox(height: 16),
         // Users List
         _card('\u0622\u062e\u0631 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u064a\u0646', [
-          if(_users.isEmpty) const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u064a\u0627\u0646\u0627\u062a', style: TextStyle(color: AC.ts))
+          if(_users.isEmpty) Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u064a\u0627\u0646\u0627\u062a', style: TextStyle(color: AC.ts))
           else ..._users.take(10).map((u) => Padding(padding: const EdgeInsets.only(bottom: 8),
             child: Row(children: [
               CircleAvatar(backgroundColor: AC.navy4, radius: 16,
-                child: Text((u['display_name']??u['username']??'?')[0], style: const TextStyle(color: AC.gold, fontSize: 12))),
+                child: Text((u['display_name']??u['username']??'?')[0], style: TextStyle(color: AC.gold, fontSize: 12))),
               const SizedBox(width: 10),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(u['display_name']??u['username']??'', style: const TextStyle(color: AC.tp, fontSize: 13)),
-                Text('${u['email']??''} \u2022 ${u['plan']??'free'}', style: const TextStyle(color: AC.ts, fontSize: 10))])),
+                Text(u['display_name']??u['username']??'', style: TextStyle(color: AC.tp, fontSize: 13)),
+                Text('${u['email']??''} \u2022 ${u['plan']??'free'}', style: TextStyle(color: AC.ts, fontSize: 10))])),
               _badge(u['status']??'active', u['status']=='active'?AC.ok:AC.err)])))
         ]),
       ])));
@@ -1787,7 +1790,7 @@ class _AdminS extends ConsumerState<AdminTab> {
       Row(children: [Icon(icon, color: color, size: 22), const Spacer(),
         Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold))]),
       const SizedBox(height: 6),
-      Text(label, style: const TextStyle(color: AC.ts, fontSize: 11))]));
+      Text(label, style: TextStyle(color: AC.ts, fontSize: 11))]));
 
   Widget _actionTile(String label, IconData icon, Color color, VoidCallback onTap) =>
     GestureDetector(onTap: onTap, child: Padding(padding: const EdgeInsets.only(bottom: 8),
@@ -1795,7 +1798,7 @@ class _AdminS extends ConsumerState<AdminTab> {
         Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, color: color, size: 18)),
         const SizedBox(width: 12),
-        Expanded(child: Text(label, style: const TextStyle(color: AC.tp, fontSize: 14))),
-        const Icon(Icons.chevron_left, color: AC.ts, size: 20)])));
+        Expanded(child: Text(label, style: TextStyle(color: AC.tp, fontSize: 14))),
+        Icon(Icons.chevron_left, color: AC.ts, size: 20)])));
 }
 

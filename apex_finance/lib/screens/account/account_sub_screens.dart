@@ -6,9 +6,9 @@ import '../../core/theme.dart';
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
-  filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+  filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)));
+  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)));
 
 // ═══════════════════════════════════════════════════
 class EditProfileScreen extends StatefulWidget {
@@ -36,10 +36,10 @@ class _EditPS extends State<EditProfileScreen> {
     finally { if(mounted) setState(()=> _l=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a', style: TextStyle(color: AC.gold))),
     body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
-      const Text('\u062a\u0645 \u0627\u0644\u062d\u0641\u0638 \u0628\u0646\u062c\u0627\u062d', style: TextStyle(color: AC.tp, fontSize: 18)),
+      Icon(Icons.check_circle, color: AC.ok, size: 60), SizedBox(height: 16),
+      Text('\u062a\u0645 \u0627\u0644\u062d\u0641\u0638 \u0628\u0646\u062c\u0627\u062d', style: TextStyle(color: AC.tp, fontSize: 18)),
       const SizedBox(height: 16),
       ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(children: [
@@ -50,7 +50,7 @@ class _EditPS extends State<EditProfileScreen> {
       TextField(controller: _job, decoration: _inp('\u0627\u0644\u0645\u0633\u0645\u0649 \u0627\u0644\u0648\u0638\u064a\u0641\u064a', ic: Icons.work)),
       const SizedBox(height: 14),
       TextField(controller: _city, decoration: _inp('\u0627\u0644\u0645\u062f\u064a\u0646\u0629', ic: Icons.location_city)),
-      if(_e!=null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_e!, style: const TextStyle(color: AC.err))),
+      if(_e!=null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_e!, style: TextStyle(color: AC.err))),
       const SizedBox(height: 22),
       SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_save,
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062d\u0641\u0638 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a')))])));
@@ -78,10 +78,10 @@ class _ChPwS extends State<ChangePasswordScreen> {
     finally { if(mounted) setState(()=> _l=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', style: TextStyle(color: AC.gold))),
+    appBar: AppBar(title: Text('\u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', style: TextStyle(color: AC.gold))),
     body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
-      const Text('\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', style: TextStyle(color: AC.tp, fontSize: 18)),
+      Icon(Icons.check_circle, color: AC.ok, size: 60), SizedBox(height: 16),
+      Text('\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', style: TextStyle(color: AC.tp, fontSize: 18)),
       const SizedBox(height: 16),
       ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(children: [
@@ -90,7 +90,7 @@ class _ChPwS extends State<ChangePasswordScreen> {
       TextField(controller: _new1, obscureText: true, decoration: _inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629', ic: Icons.lock_outline)),
       const SizedBox(height: 14),
       TextField(controller: _new2, obscureText: true, decoration: _inp('\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', ic: Icons.lock_outline)),
-      if(_e!=null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_e!, style: const TextStyle(color: AC.err))),
+      if(_e!=null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_e!, style: TextStyle(color: AC.err))),
       const SizedBox(height: 22),
       SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_go,
         child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062a\u063a\u064a\u064a\u0631')))])));
@@ -115,27 +115,27 @@ class _CloseAS extends State<CloseAccountScreen> {
     finally { if(mounted) setState(()=> _l=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', style: TextStyle(color: AC.err))),
+    appBar: AppBar(title: Text('\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', style: TextStyle(color: AC.err))),
     body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
-      const Text('\u062a\u0645 \u062a\u0642\u062f\u064a\u0645 \u0637\u0644\u0628 \u0627\u0644\u0625\u063a\u0644\u0627\u0642', style: TextStyle(color: AC.tp, fontSize: 18)),
+      Icon(Icons.check_circle, color: AC.ok, size: 60), SizedBox(height: 16),
+      Text('\u062a\u0645 \u062a\u0642\u062f\u064a\u0645 \u0637\u0644\u0628 \u0627\u0644\u0625\u063a\u0644\u0627\u0642', style: TextStyle(color: AC.tp, fontSize: 18)),
       const SizedBox(height: 16),
       ElevatedButton(onPressed: (){ S.clear(); context.go('/login'); },
         child: const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-        child: const Row(children: [Icon(Icons.warning, color: AC.err), SizedBox(width: 10),
+      Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+        child: Row(children: [Icon(Icons.warning, color: AC.err), SizedBox(width: 10),
           Expanded(child: Text('\u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621 \u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646\u0647 \u0628\u0633\u0647\u0648\u0644\u0629', style: TextStyle(color: AC.err, fontSize: 13)))])),
       const SizedBox(height: 20),
-      const Text('\u0646\u0648\u0639 \u0627\u0644\u0625\u063a\u0644\u0627\u0642', style: TextStyle(color: AC.ts, fontSize: 14)),
+      Text('\u0646\u0648\u0639 \u0627\u0644\u0625\u063a\u0644\u0627\u0642', style: TextStyle(color: AC.ts, fontSize: 14)),
       const SizedBox(height: 10),
       GestureDetector(onTap: ()=>setState(()=>_type='temporary'),
         child: Container(padding: const EdgeInsets.all(14), margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(color: _type=='temporary'?AC.warn.withValues(alpha: 0.1):AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='temporary'?AC.warn:AC.bdr)),
           child: Row(children: [Icon(_type=='temporary'?Icons.radio_button_checked:Icons.radio_button_off,
-            color: _type=='temporary'?AC.warn:AC.ts, size: 18), const SizedBox(width: 10),
-            const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            color: _type=='temporary'?AC.warn:AC.ts, size: 18), SizedBox(width: 10),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('\u0645\u0624\u0642\u062a', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
               Text('\u064a\u0645\u0643\u0646\u0643 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0641\u0639\u064a\u0644 \u0644\u0627\u062d\u0642\u0627\u064b', style: TextStyle(color: AC.ts, fontSize: 11))]))]))),
       GestureDetector(onTap: ()=>setState(()=>_type='permanent'),
@@ -143,11 +143,11 @@ class _CloseAS extends State<CloseAccountScreen> {
           decoration: BoxDecoration(color: _type=='permanent'?AC.err.withValues(alpha: 0.1):AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='permanent'?AC.err:AC.bdr)),
           child: Row(children: [Icon(_type=='permanent'?Icons.radio_button_checked:Icons.radio_button_off,
-            color: _type=='permanent'?AC.err:AC.ts, size: 18), const SizedBox(width: 10),
-            const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            color: _type=='permanent'?AC.err:AC.ts, size: 18), SizedBox(width: 10),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('\u062f\u0627\u0626\u0645', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
               Text('\u0633\u064a\u062a\u0645 \u062d\u0630\u0641 \u062d\u0633\u0627\u0628\u0643 \u0646\u0647\u0627\u0626\u064a\u0627\u064b', style: TextStyle(color: AC.ts, fontSize: 11))]))]))),
-      if(_e!=null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_e!, style: const TextStyle(color: AC.err))),
+      if(_e!=null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_e!, style: TextStyle(color: AC.err))),
       const SizedBox(height: 24),
       SizedBox(width: double.infinity, child: ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: AC.err),
@@ -205,17 +205,17 @@ class _SessionsScreenState extends State<SessionsScreen> {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
-        title: const Text('الجلسات النشطة'), backgroundColor: AC.navy2,
+        title: Text('الجلسات النشطة'), backgroundColor: AC.navy2,
         actions: [
           TextButton.icon(
             onPressed: _logoutAll,
-            icon: const Icon(Icons.logout, color: AC.err, size: 18),
-            label: const Text('إنهاء الكل', style: TextStyle(color: AC.err, fontSize: 12)),
+            icon: Icon(Icons.logout, color: AC.err, size: 18),
+            label: Text('إنهاء الكل', style: TextStyle(color: AC.err, fontSize: 12)),
           ),
         ],
       ),
       body: _loading
-        ? const Center(child: CircularProgressIndicator(color: AC.gold))
+        ? Center(child: CircularProgressIndicator(color: AC.gold))
         : _sessions.isEmpty
           ? Center(child: Text('لا توجد جلسات نشطة', style: TextStyle(color: AC.ts)))
           : ListView.builder(
@@ -231,13 +231,13 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     border: Border.all(color: AC.bdr),
                   ),
                   child: Row(children: [
-                    const Icon(Icons.devices, color: AC.cyan, size: 32),
+                    Icon(Icons.devices, color: AC.cyan, size: 32),
                     const SizedBox(width: 12),
                     Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(s['device_info'] ?? 'جهاز غير معروف',
-                          style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+                          style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
                         Text('IP: ${s['ip_address'] ?? '—'}',
                           style: TextStyle(color: AC.ts, fontSize: 12)),
@@ -247,7 +247,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     )),
                     IconButton(
                       onPressed: () => _logoutOne(s['id']),
-                      icon: const Icon(Icons.close, color: AC.err),
+                      icon: Icon(Icons.close, color: AC.err),
                       tooltip: 'إنهاء الجلسة',
                     ),
                   ]),

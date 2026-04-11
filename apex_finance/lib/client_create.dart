@@ -37,7 +37,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('عميل جديد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      appBar: AppBar(title: Text('عميل جديد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
       body: Column(children: [
         Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 0), child: SizedBox(height: 56, child: TextField(
           controller: _nameC, style: const TextStyle(color: Colors.white),
@@ -47,7 +47,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
             enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(8)),
             focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(8)))))),
         if (_err != null) Padding(padding: const EdgeInsets.all(12), child: Text(_err!, style: const TextStyle(color: Colors.redAccent))),
-        Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 8), child: Text('* نوع العميل', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
+        Padding(padding: EdgeInsets.fromLTRB(16, 12, 16, 8), child: Text('* نوع العميل', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
         Expanded(child: ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: [
           _tc('standard_business', 'شركة تجارية عادية', false),
           _tc('financial_entity', 'جهة مالية', true),

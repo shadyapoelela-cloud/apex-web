@@ -67,12 +67,12 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
           if (_pending.isNotEmpty)
             TextButton(
               onPressed: _acceptAll,
-              child: const Text('\u0642\u0628\u0648\u0644 \u0627\u0644\u0643\u0644', style: TextStyle(color: AC.gold, fontSize: 12)),
+              child: Text('\u0642\u0628\u0648\u0644 \u0627\u0644\u0643\u0644', style: TextStyle(color: AC.gold, fontSize: 12)),
             ),
         ],
       ),
       body: _loading
-        ? const Center(child: CircularProgressIndicator(color: AC.gold))
+        ? Center(child: CircularProgressIndicator(color: AC.gold))
         : ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: _docs.length,
@@ -95,13 +95,13 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
-                        child: const Text('\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.warn, fontSize: 10)),
+                        child: Text('\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.warn, fontSize: 10)),
                       )
                     else
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: AC.ok.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
-                        child: const Text('\u0645\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.ok, fontSize: 10)),
+                        child: Text('\u0645\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.ok, fontSize: 10)),
                       ),
                   ]),
                   iconColor: AC.ts, collapsedIconColor: AC.ts,

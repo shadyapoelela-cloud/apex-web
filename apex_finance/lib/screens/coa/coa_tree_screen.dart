@@ -49,8 +49,8 @@ class _CoaTreeState extends State<CoaTreeScreen> {
       appBar: AppBar(
         backgroundColor: AC.navy2,
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('\u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
-          if (widget.clientName != null) Text(widget.clientName!, style: const TextStyle(color: AC.ts, fontSize: 11)),
+          Text('\u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
+          if (widget.clientName != null) Text(widget.clientName!, style: TextStyle(color: AC.ts, fontSize: 11)),
         ]),
         actions: [
           IconButton(icon: Icon(_expanded.isEmpty ? Icons.unfold_more : Icons.unfold_less, color: AC.ts), onPressed: () {
@@ -60,27 +60,27 @@ class _CoaTreeState extends State<CoaTreeScreen> {
       ),
       body: Column(children: [
         Padding(padding: const EdgeInsets.all(12), child: TextField(
-          controller: _searchCtrl, style: const TextStyle(color: AC.tp),
+          controller: _searchCtrl, style: TextStyle(color: AC.tp),
           decoration: InputDecoration(
-            hintText: '\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a...', hintStyle: const TextStyle(color: AC.ts),
-            prefixIcon: const Icon(Icons.search, color: AC.gold), filled: true, fillColor: AC.navy3,
+            hintText: '\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a...', hintStyle: TextStyle(color: AC.ts),
+            prefixIcon: Icon(Icons.search, color: AC.gold), filled: true, fillColor: AC.navy3,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
           onChanged: (v) => setState(() => _filter = v),
         )),
         Expanded(child: _loading
-          ? const Center(child: CircularProgressIndicator(color: AC.gold))
+          ? Center(child: CircularProgressIndicator(color: AC.gold))
           : _accounts.isEmpty
             ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.account_tree, color: AC.ts, size: 48),
+                Icon(Icons.account_tree, color: AC.ts, size: 48),
                 const SizedBox(height: 12),
-                const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062d\u0633\u0627\u0628\u0627\u062a', style: TextStyle(color: AC.ts)),
+                Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062d\u0633\u0627\u0628\u0627\u062a', style: TextStyle(color: AC.ts)),
               ]))
             : ListView(padding: const EdgeInsets.symmetric(horizontal: 12), children: _roots.map((a) => _buildNode(a, 0)).toList()),
         ),
-        Container(padding: const EdgeInsets.all(10), color: AC.navy2, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('\u0625\u062c\u0645\u0627\u0644\u064a:  \u062d\u0633\u0627\u0628', style: const TextStyle(color: AC.ts, fontSize: 12)),
-          Text('\u062c\u0630\u0631\u064a: ', style: const TextStyle(color: AC.gold, fontSize: 12)),
+        Container(padding: EdgeInsets.all(10), color: AC.navy2, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text('\u0625\u062c\u0645\u0627\u0644\u064a:  \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.ts, fontSize: 12)),
+          Text('\u062c\u0630\u0631\u064a: ', style: TextStyle(color: AC.gold, fontSize: 12)),
         ])),
       ]),
     );
@@ -103,12 +103,12 @@ class _CoaTreeState extends State<CoaTreeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(8), border: Border.all(color: AC.bdr)),
           child: Row(children: [
-            if (hasChildren) Icon(isExpanded ? Icons.expand_more : Icons.chevron_right, color: AC.ts, size: 18) else const SizedBox(width: 18),
+            if (hasChildren) Icon(isExpanded ? Icons.expand_more : Icons.chevron_right, color: AC.ts, size: 18) else SizedBox(width: 18),
             const SizedBox(width: 4),
             Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
               child: Text(code, style: TextStyle(color: typeColor, fontSize: 10, fontWeight: FontWeight.bold))),
             const SizedBox(width: 8),
-            Expanded(child: Text(name, style: const TextStyle(color: AC.tp, fontSize: 12), textDirection: TextDirection.rtl)),
+            Expanded(child: Text(name, style: TextStyle(color: AC.tp, fontSize: 12), textDirection: TextDirection.rtl)),
             Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
               child: Text(type, style: TextStyle(color: typeColor, fontSize: 9))),
           ]),

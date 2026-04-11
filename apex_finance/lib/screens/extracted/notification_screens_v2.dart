@@ -90,19 +90,19 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
           if (_unread > 0)
             TextButton(
               onPressed: _markAllRead,
-              child: const Text('قراءة الكل', style: TextStyle(color: AC.gold, fontSize: 12)),
+              child: Text('قراءة الكل', style: TextStyle(color: AC.gold, fontSize: 12)),
             ),
           IconButton(
             onPressed: () => context.push('/notifications/prefs'),
-            icon: const Icon(Icons.settings, color: AC.ts, size: 20),
+            icon: Icon(Icons.settings, color: AC.ts, size: 20),
           ),
         ],
       ),
       body: _loading
-        ? const Center(child: CircularProgressIndicator(color: AC.gold))
+        ? Center(child: CircularProgressIndicator(color: AC.gold))
         : _notifs.isEmpty
           ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.notifications_off, color: AC.ts, size: 48),
+              Icon(Icons.notifications_off, color: AC.ts, size: 48),
               const SizedBox(height: 12),
               Text('لا توجد إشعارات', style: TextStyle(color: AC.ts)),
             ]))
@@ -198,9 +198,9 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
   Widget build(BuildContext context) {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('تفضيلات الإشعارات'), backgroundColor: AC.navy2),
+      appBar: AppBar(title: Text('تفضيلات الإشعارات'), backgroundColor: AC.navy2),
       body: _loading
-        ? const Center(child: CircularProgressIndicator(color: AC.gold))
+        ? Center(child: CircularProgressIndicator(color: AC.gold))
         : ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: _prefs.length,
@@ -211,7 +211,7 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(p['title_ar'] ?? p['type'], style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(p['title_ar'] ?? p['type'], style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   Row(children: [
                     _chip('داخل التطبيق', p['in_app'] == true, () => _toggle(p['type'], 'in_app', !(p['in_app'] == true))),

@@ -90,15 +90,15 @@ class _CopilotScreenState extends State<CopilotScreen> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-            child: const Icon(Icons.smart_toy, color: AC.gold, size: 20),
+            child: Icon(Icons.smart_toy, color: AC.gold, size: 20),
           ),
           const SizedBox(width: 10),
-          const Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
+          Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
-            child: const Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
+            child: Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
           ),
         ]),
         actions: [
@@ -106,12 +106,12 @@ class _CopilotScreenState extends State<CopilotScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 8),
               child: Chip(
-                label: Text(_lastIntent!['intent'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 10)),
+                label: Text(_lastIntent!['intent'] ?? '', style: TextStyle(color: AC.tp, fontSize: 10)),
                 backgroundColor: AC.navy3,
                 side: BorderSide(color: AC.gold.withValues(alpha: 0.3)),
               ),
             ),
-          IconButton(icon: const Icon(Icons.refresh, color: AC.ts), onPressed: () {
+          IconButton(icon: Icon(Icons.refresh, color: AC.ts), onPressed: () {
             setState(() { _messages.clear(); _sessionId = null; _nextActions.clear(); _lastIntent = null; });
             _initSession();
           }),
@@ -150,10 +150,10 @@ class _CopilotScreenState extends State<CopilotScreen> {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
             ),
-            child: const Icon(Icons.smart_toy, color: AC.gold, size: 48),
+            child: Icon(Icons.smart_toy, color: AC.gold, size: 48),
           ),
           const SizedBox(height: 20),
-          const Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 22, fontWeight: FontWeight.bold)),
+          Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 22, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
             '\u0645\u0633\u0627\u0639\u062f\u0643 \u0627\u0644\u0630\u0643\u064a \u0644\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0648\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0648\u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644',
@@ -176,7 +176,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
   Widget _quickAction(String label, IconData icon) {
     return ActionChip(
       avatar: Icon(icon, color: AC.gold, size: 16),
-      label: Text(label, style: const TextStyle(color: AC.tp, fontSize: 12)),
+      label: Text(label, style: TextStyle(color: AC.tp, fontSize: 12)),
       backgroundColor: AC.navy3,
       side: BorderSide(color: AC.bdr),
       onPressed: () { _controller.text = label; _sendMessage(); },
@@ -217,7 +217,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
           if (!isUser && msg['references'] != null && (msg['references'] as List).isNotEmpty) ...[
             const SizedBox(height: 8),
             Wrap(spacing: 4, children: (msg['references'] as List).map<Widget>((r) =>
-              Chip(label: Text('', style: const TextStyle(color: AC.tp, fontSize: 9)),
+              Chip(label: Text('', style: TextStyle(color: AC.tp, fontSize: 9)),
                 backgroundColor: AC.navy4, side: BorderSide(color: AC.cyan.withValues(alpha: 0.3)),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
@@ -230,7 +230,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: AC.warn.withValues(alpha: 0.3))),
               child: Row(children: [
-                const Icon(Icons.warning_amber, color: AC.warn, size: 16),
+                Icon(Icons.warning_amber, color: AC.warn, size: 16),
                 const SizedBox(width: 6),
                 Expanded(child: Text('\u064a\u0646\u0635\u062d \u0628\u0645\u0631\u0627\u062c\u0639\u0629 \u0628\u0634\u0631\u064a\u0629 \u0644\u0647\u0630\u0647 \u0627\u0644\u0646\u062a\u064a\u062c\u0629', style: TextStyle(color: AC.warn, fontSize: 11))),
               ]),
@@ -269,7 +269,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
         padding: const EdgeInsets.only(left: 6),
         child: ActionChip(
           avatar: Icon(_getIcon(a['icon'] ?? ''), color: AC.gold, size: 15),
-          label: Text(a['label'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 11)),
+          label: Text(a['label'] ?? '', style: TextStyle(color: AC.tp, fontSize: 11)),
           backgroundColor: AC.navy3, side: BorderSide(color: AC.gold.withValues(alpha: 0.3)),
           onPressed: () { _controller.text = a['label'] ?? ''; _sendMessage(); },
         ),
@@ -283,14 +283,14 @@ class _CopilotScreenState extends State<CopilotScreen> {
     child: Row(children: [
       Expanded(child: TextField(
         controller: _controller,
-        style: const TextStyle(color: AC.tp, fontSize: 14),
+        style: TextStyle(color: AC.tp, fontSize: 14),
         textDirection: TextDirection.rtl,
         decoration: InputDecoration(
           hintText: '\u0627\u0633\u0623\u0644 \u0645\u0633\u0627\u0639\u062f Apex...',
           hintStyle: TextStyle(color: AC.ts),
           filled: true, fillColor: AC.navy3,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: const BorderSide(color: AC.gold)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: AC.gold)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         ),
         onSubmitted: (_) => _sendMessage(),
@@ -299,7 +299,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
       Container(
         decoration: BoxDecoration(color: AC.gold, borderRadius: BorderRadius.circular(20)),
         child: IconButton(
-          icon: const Icon(Icons.send, color: AC.navy, size: 20),
+          icon: Icon(Icons.send, color: AC.navy, size: 20),
           onPressed: _sendMessage,
         ),
       ),

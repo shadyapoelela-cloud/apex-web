@@ -32,13 +32,13 @@ class _ArchiveS extends State<ArchiveScreen> {
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
     appBar: AppBar(
-      title: Text(widget.clientId != null ? 'أرشيف العميل' : 'أرشيف حسابي', style: const TextStyle(color: AC.gold)),
+      title: Text(widget.clientId != null ? 'أرشيف العميل' : 'أرشيف حسابي', style: TextStyle(color: AC.gold)),
       backgroundColor: const Color(0xFF080F1F)),
-    body: _loading ? const Center(child: CircularProgressIndicator(color: AC.gold))
-      : _items.isEmpty ? const Center(child: Text('لا توجد ملفات في الأرشيف', style: TextStyle(color: AC.ts)))
+    body: _loading ? Center(child: CircularProgressIndicator(color: AC.gold))
+      : _items.isEmpty ? Center(child: Text('لا توجد ملفات في الأرشيف', style: TextStyle(color: AC.ts)))
       : Column(children: [
           Padding(padding: const EdgeInsets.all(12),
-            child: Text('إجمالي: ' + _total.toString() + ' ملف', style: const TextStyle(color: AC.ts, fontSize: 12))),
+            child: Text('إجمالي: ' + _total.toString() + ' ملف', style: TextStyle(color: AC.ts, fontSize: 12))),
           Expanded(child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             itemCount: _items.length,
@@ -54,26 +54,26 @@ class _ArchiveS extends State<ArchiveScreen> {
                   Icon(_fileIcon(item['file_name'] ?? ''), color: AC.gold, size: 28),
                   const SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(item['file_name'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold)),
-                    Text('المصدر: ' + (item['source_type'] ?? '').toString(), style: const TextStyle(color: AC.ts, fontSize: 11)),
+                    Text(item['file_name'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold)),
+                    Text('المصدر: ' + (item['source_type'] ?? '').toString(), style: TextStyle(color: AC.ts, fontSize: 11)),
                     Text('متبقي: ' + days.toString() + ' يوم',
                       style: TextStyle(color: urgent ? AC.warn : AC.ts, fontSize: 11, fontWeight: urgent ? FontWeight.bold : FontWeight.normal)),
                   ])),
                   PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: AC.ts),
+                    icon: Icon(Icons.more_vert, color: AC.ts),
                     color: AC.navy3,
                     onSelected: (v) { if (v == 'delete') _deleteItem(item['id']); },
-                    itemBuilder: (_) => const [
+                    itemBuilder: (_) => [
                       PopupMenuItem(value: 'attach', child: Text('إرفاق في عملية', style: TextStyle(color: AC.tp))),
                       PopupMenuItem(value: 'delete', child: Text('حذف', style: TextStyle(color: AC.err))),
                     ]),
                 ]));
             })),
           Padding(padding: const EdgeInsets.all(12), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            IconButton(icon: const Icon(Icons.chevron_right, color: AC.ts),
+            IconButton(icon: Icon(Icons.chevron_right, color: AC.ts),
               onPressed: _page > 1 ? () { setState(() => _page--); _load(); } : null),
-            Text('صفحة ' + _page.toString(), style: const TextStyle(color: AC.ts)),
-            IconButton(icon: const Icon(Icons.chevron_left, color: AC.ts),
+            Text('صفحة ' + _page.toString(), style: TextStyle(color: AC.ts)),
+            IconButton(icon: Icon(Icons.chevron_left, color: AC.ts),
               onPressed: _total > _page * 20 ? () { setState(() => _page++); _load(); } : null),
           ])),
         ]),

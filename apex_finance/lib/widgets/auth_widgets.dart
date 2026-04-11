@@ -21,15 +21,15 @@ class _PasswordFieldState extends State<PasswordField> {
     onSubmitted: widget.onSubmitted,
     decoration: InputDecoration(
       labelText: widget.label,
-      prefixIcon: const Icon(Icons.lock_outline, color: AC.gold, size: 20),
+      prefixIcon: Icon(Icons.lock_outline, color: AC.gold, size: 20),
       suffixIcon: IconButton(
         icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20),
         onPressed: () => setState(() => _obscure = !_obscure),
       ),
       filled: true, fillColor: AC.navy3,
-      labelStyle: const TextStyle(color: AC.ts),
+      labelStyle: TextStyle(color: AC.ts),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)),
     ),
   );
 }
@@ -113,7 +113,7 @@ class _PhoneFieldState extends State<PhoneFieldWithCountryCode> {
       child: DropdownButtonHideUnderline(child: DropdownButton<String>(
         value: _countryCode,
         dropdownColor: AC.navy3,
-        style: const TextStyle(color: AC.tp, fontSize: 14),
+        style: TextStyle(color: AC.tp, fontSize: 14),
         items: _codes.map((c) => DropdownMenuItem(
           value: c['code'] as String,
           child: Text((c['name'] as String) + ' ' + (c['code'] as String), style: const TextStyle(fontSize: 13)),
@@ -131,11 +131,11 @@ class _PhoneFieldState extends State<PhoneFieldWithCountryCode> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: 'رقم الجوال',
-        prefixIcon: const Icon(Icons.phone, color: AC.gold, size: 20),
+        prefixIcon: Icon(Icons.phone, color: AC.gold, size: 20),
         filled: true, fillColor: AC.navy3,
-        labelStyle: const TextStyle(color: AC.ts),
+        labelStyle: TextStyle(color: AC.ts),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)),
       ),
     )),
   ]);

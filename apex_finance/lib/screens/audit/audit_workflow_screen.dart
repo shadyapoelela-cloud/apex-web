@@ -118,11 +118,11 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
       appBar: AppBar(
         backgroundColor: AC.navy2,
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u062d\u0627\u0633\u0628\u064a\u0629', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
+          Text('\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u062d\u0627\u0633\u0628\u064a\u0629', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
           Text('\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u062d\u0627\u0633\u0628\u064a\u0629 \u2014 7 \u0645\u0631\u0627\u062d\u0644', style: TextStyle(color: AC.ts, fontSize: 11)),
         ]),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
+          IconButton(icon: Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
         ],
       ),
       body: Column(children: [
@@ -137,7 +137,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
             itemBuilder: (ctx, i) => _buildStageChip(i),
           ),
         ),
-        const Divider(color: AC.bdr, height: 1),
+        Divider(color: AC.bdr, height: 1),
         // Content
         Expanded(child: ListView(padding: const EdgeInsets.all(14), children: [
           _buildStageDetail(_stages[_currentStage]),
@@ -175,7 +175,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
               border: Border.all(color: color, width: 1.5),
             ),
             child: Center(child: isDone
-              ? const Icon(Icons.check, color: AC.ok, size: 16)
+              ? Icon(Icons.check, color: AC.ok, size: 16)
               : Text('', style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.bold))),
           ),
           const SizedBox(height: 4),
@@ -198,14 +198,14 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(stage['title'] as String, style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold)),
-            Text(stage['subtitle'] as String, style: const TextStyle(color: AC.ts, fontSize: 12)),
+            Text(stage['subtitle'] as String, style: TextStyle(color: AC.ts, fontSize: 12)),
           ])),
           _statusBadge(stage['status'] as String),
         ]),
       ),
       const SizedBox(height: 14),
       // Procedures
-      Text('\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
+      Text('\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
       const SizedBox(height: 8),
       ...procedures.map((p) => Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -214,7 +214,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
         child: Row(children: [
           _procedureIcon(p['status'] as String),
           const SizedBox(width: 10),
-          Expanded(child: Text(p['\u0646\u0648\u0639'] as String, style: const TextStyle(color: AC.tp, fontSize: 13))),
+          Expanded(child: Text(p['\u0646\u0648\u0639'] as String, style: TextStyle(color: AC.tp, fontSize: 13))),
           _statusBadge(p['status'] as String),
         ]),
       )),
@@ -224,14 +224,14 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
   Widget _buildFindingsSection() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
-        const Icon(Icons.find_in_page, color: AC.warn, size: 20),
+        Icon(Icons.find_in_page, color: AC.warn, size: 20),
         const SizedBox(width: 8),
-        Text('\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
+        Text('\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
         const Spacer(),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-          child: Text(' \u0645\u0644\u0627\u062d\u0638\u0627\u062a', style: const TextStyle(color: AC.warn, fontSize: 11, fontWeight: FontWeight.bold)),
+          child: Text(' \u0645\u0644\u0627\u062d\u0638\u0627\u062a', style: TextStyle(color: AC.warn, fontSize: 11, fontWeight: FontWeight.bold)),
         ),
       ]),
       const SizedBox(height: 10),
@@ -249,12 +249,12 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
             Row(children: [
               Container(width: 4, height: 30, decoration: BoxDecoration(color: sevColor, borderRadius: BorderRadius.circular(2))),
               const SizedBox(width: 10),
-              Expanded(child: Text(f['title'] as String, style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13))),
+              Expanded(child: Text(f['title'] as String, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13))),
               _statusBadge(f['status'] as String),
             ]),
             Padding(
               padding: const EdgeInsets.only(right: 14, top: 6),
-              child: Text(f['desc'] as String, style: const TextStyle(color: AC.ts, fontSize: 11)),
+              child: Text(f['desc'] as String, style: TextStyle(color: AC.ts, fontSize: 11)),
             ),
           ]),
         );
@@ -263,9 +263,9 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
   }
 
   Widget _procedureIcon(String status) {
-    if (status == 'done') return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.ok.withValues(alpha: 0.15), shape: BoxShape.circle), child: const Icon(Icons.check, color: AC.ok, size: 14));
-    if (status == 'in_progress') return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), shape: BoxShape.circle), child: const Icon(Icons.autorenew, color: AC.gold, size: 14));
-    return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.ts.withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.radio_button_unchecked, color: AC.ts, size: 14));
+    if (status == 'done') return Container(padding: EdgeInsets.all(4), decoration: BoxDecoration(color: AC.ok.withValues(alpha: 0.15), shape: BoxShape.circle), child: Icon(Icons.check, color: AC.ok, size: 14));
+    if (status == 'in_progress') return Container(padding: EdgeInsets.all(4), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), shape: BoxShape.circle), child: Icon(Icons.autorenew, color: AC.gold, size: 14));
+    return Container(padding: EdgeInsets.all(4), decoration: BoxDecoration(color: AC.ts.withValues(alpha: 0.1), shape: BoxShape.circle), child: Icon(Icons.radio_button_unchecked, color: AC.ts, size: 14));
   }
 
   Widget _statusBadge(String status) {
