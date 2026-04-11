@@ -1,10 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'screens/copilot/copilot_screen.dart';
-import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
-import 'core/api_config.dart';
+import 'api_service.dart';
 import 'analysis_full_screen.dart';
 
 class FinancialStatementsScreen extends StatefulWidget {
@@ -89,15 +88,9 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('جاري توليد تقرير ${type.toUpperCase()}...'),
         duration: const Duration(seconds: 60)));
-      final endpoint = type == 'pdf' ? '/reports/pdf' : '/reports/excel';
-      final request = http.MultipartRequest('POST',
-        Uri.parse('$apiBase$endpoint'));
-      request.files.add(http.MultipartFile.fromBytes(
-        'file', widget.pickedFile!.bytes!, filename: widget.pickedFile!.name));
-      final response = await request.send();
-      final bytes = await response.stream.toBytes();
+      final bytes = await ApiService.downloadReport(type: type, fileBytes: widget.pickedFile!.bytes!, fileName: widget.pickedFile!.name);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      if (response.statusCode == 200) {
+      if (bytes != null) {
         final mimeType = type == 'pdf' ? 'application/pdf'
           : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         final fileName = type == 'pdf' ? 'القوائم_المالية.pdf' : 'القوائم_المالية.xlsx';
@@ -112,7 +105,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
           content: Text('✅ تم تحميل $fileName'),
           backgroundColor: _success));
       } else {
-        throw Exception('فشل: ${response.statusCode}');
+        throw Exception('فشل التحميل');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();

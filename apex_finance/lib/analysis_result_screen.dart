@@ -2,8 +2,7 @@
 import 'dart:html' as html;
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'core/api_config.dart';
+import 'api_service.dart';
 
 class AnalysisResultScreen extends StatefulWidget {
   final Map<String,dynamic>? apiData;
@@ -18,7 +17,6 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> with Ticker
   late AnimationController _scoreAnim;
   late Animation<double> _scoreValue;
   static const _bg=Color(0xFF050D1A);static const _surface=Color(0xFF080F1F);static const _card=Color(0xFF0D1829);static const _gold=Color(0xFFC9A84C);static const _cyan=Color(0xFF00C2E0);static const _success=Color(0xFF2ECC8A);static const _danger=Color(0xFFE05050);static const _warning=Color(0xFFE8A838);static const _border=Color(0x26C9A84C);static const _textPri=Color(0xFFF0EDE6);static const _textSec=Color(0xFF8A8880);
-  static const _base=apiBase;
   static const _tabLabels=['الربحية','السيولة','الكفاءة','الرفع المالي'];
   List<dynamic> get _ratios=>widget.apiData?['data']?['ratios']??[];
   List<dynamic> get _insights=>widget.apiData?['data']?['ai_insights']??[];
@@ -32,7 +30,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> with Ticker
   List<dynamic> _filteredRatios(int tab){final cats={0:['Gross Profit Margin','Net Profit Margin','EBITDA Margin','Return on Equity','Return on Assets'],1:['Current Ratio','Quick Ratio','Cash Ratio'],2:['Asset Turnover','Days Sales Outstanding','Inventory Days','Working Capital to Assets'],3:['Debt to Equity','Debt to Assets','Interest Coverage','Revenue Growth Rate']};return _ratios.where((r)=>(cats[tab]??[]).contains(r['name_en'])).toList();}
   Color _statusColor(String? s){if(s=='good')return _success;if(s=='warning')return _warning;return _danger;}
   String _fmt(dynamic v){if(v==null)return '—';final n=(v is num)?v.toDouble():double.tryParse(v.toString())??0.0;if(n.abs()>=1e9)return '${(n/1e9).toStringAsFixed(1)}B';if(n.abs()>=1e6)return '${(n/1e6).toStringAsFixed(1)}M';if(n.abs()>=1e3)return '${(n/1e3).toStringAsFixed(1)}K';return n.toStringAsFixed(1);}
-  Future<void> _downloadReport(String type)async{if(widget.pickedFile==null)return;setState((){if(type=='pdf')_loadingPdf=true;else _loadingExcel=true;});try{final endpoint=type=='pdf'?'/reports/pdf':'/reports/excel';final request=http.MultipartRequest('POST',Uri.parse('$_base$endpoint'));request.files.add(http.MultipartFile.fromBytes('file',widget.pickedFile.bytes!,filename:widget.pickedFile.name));final response=await request.send();final bytes=await response.stream.toBytes();if(response.statusCode==200){final mime=type=='pdf'?'application/pdf':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';final blob=html.Blob([bytes],mime);final url=html.Url.createObjectUrlFromBlob(blob);(html.document.createElement('a')as html.AnchorElement)..href=url..download=type=='pdf'?'apex_report.pdf':'apex_report.xlsx'..click();html.Url.revokeObjectUrl(url);}}catch(_){}finally{setState((){_loadingPdf=false;_loadingExcel=false;});}}
+  Future<void> _downloadReport(String type)async{if(widget.pickedFile==null)return;setState((){if(type=='pdf')_loadingPdf=true;else _loadingExcel=true;});try{final bytes=await ApiService.downloadReport(type:type,fileBytes:widget.pickedFile.bytes!,fileName:widget.pickedFile.name);if(bytes!=null){final mime=type=='pdf'?'application/pdf':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';final blob=html.Blob([bytes],mime);final url=html.Url.createObjectUrlFromBlob(blob);(html.document.createElement('a')as html.AnchorElement)..href=url..download=type=='pdf'?'apex_report.pdf':'apex_report.xlsx'..click();html.Url.revokeObjectUrl(url);}}catch(_){}finally{setState((){_loadingPdf=false;_loadingExcel=false;});}}
   @override
   Widget build(BuildContext context){
     return Scaffold(backgroundColor:_bg,

@@ -1,8 +1,6 @@
-﻿import 'dart:convert';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:http/http.dart' as http;
-import 'core/api_config.dart';
+import 'api_service.dart';
 import 'shared_widgets.dart';
 import 'coa_quality_screen.dart';
 
@@ -17,7 +15,6 @@ class CoaMappingScreen extends StatefulWidget {
 class _CoaMappingScreenState extends State<CoaMappingScreen> {
   bool _parsing = false;
   String _errorMsg = '';
-  static const _base = apiBase;
   static const _bg      = Color(0xFF050D1A);
   static const _surface = Color(0xFF080F1F);
   static const _gold    = Color(0xFFC9A84C);
@@ -47,16 +44,15 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
     try {
       final uploadId = widget.uploadData['upload_id'];
       final cleanMapping = Map<String,String>.fromEntries(_mapping.entries.where((e) => e.value != null && e.value!.isNotEmpty).map((e) => MapEntry(e.key, e.value!)));
-      final res = await http.post(Uri.parse('$_base/coa/uploads/$uploadId/parse'), headers: {'Content-Type':'application/json'}, body: jsonEncode({'column_mapping': cleanMapping}));
-      final data = jsonDecode(res.body) as Map<String,dynamic>;
-      if (res.statusCode == 200) {
-        await http.post(Uri.parse('$_base/coa/classify/$uploadId'), headers: {'Content-Type':'application/json'});
-        final ar = await http.post(Uri.parse('$_base/coa/uploads/$uploadId/assess'), headers: {'Content-Type':'application/json'});
-        final ad = ar.statusCode == 200 ? jsonDecode(ar.body) as Map<String,dynamic> : <String,dynamic>{};
+      final parseResult = await ApiService.parseCoa(uploadId: uploadId, columnMapping: cleanMapping);
+      if (parseResult.success) {
+        await ApiService.classifyCoa(uploadId);
+        final assessResult = await ApiService.assessCoa(uploadId);
+        final ad = assessResult.success ? assessResult.data as Map<String,dynamic> : <String,dynamic>{};
         if (!mounted) return;
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => CoaQualityScreen(uploadId: uploadId, clientId: widget.clientId, clientName: widget.clientName, assessData: ad)));
       } else {
-        setState(() => _errorMsg = data['detail'] ?? data['message'] ?? 'فشل الـ Parse');
+        setState(() => _errorMsg = parseResult.error ?? 'فشل الـ Parse');
       }
     } catch (e) { setState(() => _errorMsg = 'خطأ: $e'); }
     finally { setState(() => _parsing = false); }

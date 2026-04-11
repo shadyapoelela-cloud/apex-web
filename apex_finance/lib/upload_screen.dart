@@ -1,10 +1,6 @@
-﻿import 'dart:convert';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:http/http.dart' as http;
-import 'core/api_config.dart';
+import 'api_service.dart';
 import 'financial_statements_screen.dart';
 import 'analysis_result_screen.dart';
 import 'coa_upload_screen.dart';
@@ -20,10 +16,9 @@ class _UploadScreenState extends State<UploadScreen> {
   String _fileName='';
   Map<String,dynamic>? _apiResult;
   FilePickerResult? _pickedFile;
-  static const _baseUrl=apiBase;
   static const _navy=Color(0xFF050D1A);static const _navy2=Color(0xFF080F1F);static const _navy3=Color(0xFF0D1829);static const _gold=Color(0xFFC9A84C);static const _border=Color(0x26C9A84C);static const _textPrimary=Color(0xFFF0EDE6);static const _textSecondary=Color(0xFF8A8880);static const _success=Color(0xFF2ECC8A);static const _cyan=Color(0xFF00C2E0);
 
-  Future<void> _downloadTemplate()async{try{final res=await http.get(Uri.parse('$_baseUrl/template/trial-balance'));if(res.statusCode==200){final blob=html.Blob([res.bodyBytes],'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');final url=html.Url.createObjectUrlFromBlob(blob);(html.document.createElement('a')as html.AnchorElement)..href=url..download='نموذج_ميزان_المراجعة.xlsx'..click();html.Url.revokeObjectUrl(url);}}catch(_){}}
+  Future<void> _downloadTemplate()async{await ApiService.downloadTrialBalanceTemplate();}
 
   Future<void> _pickFile()async{final result=await FilePicker.platform.pickFiles(type:FileType.custom,allowedExtensions:['xlsx','xls']);if(result!=null&&result.files.isNotEmpty){setState((){_fileSelected=true;_fileName=result.files.first.name;_pickedFile=result;_done=false;_apiResult=null;});}}
 
@@ -32,13 +27,10 @@ class _UploadScreenState extends State<UploadScreen> {
     setState((){_analyzing=true;_progress=0;});
     try{
       for(int i=1;i<=4;i++){await Future.delayed(const Duration(milliseconds:400));if(mounted)setState(()=>_progress=i/10);}
-      final request=http.MultipartRequest('POST',Uri.parse('$_baseUrl/analyze/full'));
-      request.files.add(http.MultipartFile.fromBytes('file',_pickedFile!.files.first.bytes!,filename:_pickedFile!.files.first.name));
-      final response=await request.send();
-      final body=await response.stream.bytesToString();
+      final result=await ApiService.analyzeFull(bytes:_pickedFile!.files.first.bytes!,fileName:_pickedFile!.files.first.name);
       for(int i=5;i<=10;i++){await Future.delayed(const Duration(milliseconds:200));if(mounted)setState(()=>_progress=i/10);}
-      if(response.statusCode==200){_apiResult=jsonDecode(body);if(mounted)setState((){_analyzing=false;_done=true;});}
-      else{throw Exception('خطأ ${response.statusCode}');}
+      if(result.success){_apiResult=result.data;if(mounted)setState((){_analyzing=false;_done=true;});}
+      else{throw Exception(result.error??'خطأ');}
     }catch(e){if(mounted){setState(()=>_analyzing=false);ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('خطأ: $e'),backgroundColor:Colors.red));}}
   }
 

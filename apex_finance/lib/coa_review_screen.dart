@@ -1,7 +1,5 @@
-﻿import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'core/api_config.dart';
+﻿import 'package:flutter/material.dart';
+import 'api_service.dart';
 import 'shared_widgets.dart';
 
 class CoaReviewScreen extends StatefulWidget {
@@ -26,14 +24,12 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
   static const _border  = Color(0x26C9A84C);
   static const _textPri = Color(0xFFF0EDE6);
   static const _textSec = Color(0xFF8A8880);
-  static const _base    = apiBase;
-
   @override void initState() { super.initState(); _loadSummary(); _loadAccounts(); }
 
   Future<void> _loadSummary() async {
     try {
-      final res = await http.get(Uri.parse('$_base/coa/classification-summary/${widget.uploadId}'));
-      if (res.statusCode == 200) setState(() => _summary = jsonDecode(res.body));
+      final r = await ApiService.getClassificationSummary(widget.uploadId);
+      if (r.success) setState(() => _summary = r.data as Map<String,dynamic>);
     } catch (_) {}
   }
 
@@ -41,14 +37,10 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
     if (reset) setState(() { _page = 1; _accounts = []; });
     setState(() => _loading = true);
     try {
-      final params = <String,String>{'page': _page.toString(), 'page_size': '40'};
-      if (_filter == 'low')         params['confidence_max'] = '0.74';
-      if (_filter == 'unclassified') params['confidence_max'] = '0.39';
-      if (_filter == 'manual')      params['review_status'] = 'manually_edited';
-      final uri = Uri.parse('$_base/coa/mapping/${widget.uploadId}').replace(queryParameters: params);
-      final res = await http.get(uri);
-      if (res.statusCode == 200) {
-        final data = jsonDecode(res.body) as Map<String,dynamic>;
+      final filterKey = _filter == 'manual' ? null : _filter;
+      final r = await ApiService.getCoaMappingPreview(uploadId: widget.uploadId, page: _page, filter: filterKey);
+      if (r.success) {
+        final data = r.data as Map<String,dynamic>;
         final items = (data['accounts'] as List).cast<Map<String,dynamic>>();
         setState(() { _total = data['total'] ?? 0; if (reset || _page == 1) _accounts = items; else _accounts.addAll(items); });
       }
@@ -58,10 +50,9 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
   Future<void> _bulkApproveHigh() async {
     setState(() => _bulkApproving = true);
     try {
-      final res = await http.post(Uri.parse('$_base/coa/bulk-approve/${widget.uploadId}'), headers: {'Content-Type':'application/json'}, body: jsonEncode({'min_confidence': 0.75}));
-      if (res.statusCode == 200) {
-        final data = jsonDecode(res.body);
-        if (mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ تم اعتماد ${data["approved_count"]} حساب', style: const TextStyle(fontFamily:'Tajawal')), backgroundColor: _success)); _loadSummary(); _loadAccounts(reset: true); }
+      final r = await ApiService.bulkApprove(uploadId: widget.uploadId);
+      if (r.success) {
+        if (mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ تم اعتماد ${r.data?["approved_count"]??0} حساب', style: const TextStyle(fontFamily:'Tajawal')), backgroundColor: _success)); _loadSummary(); _loadAccounts(reset: true); }
       }
     } catch (_) {} finally { setState(() => _bulkApproving = false); }
   }
@@ -78,8 +69,8 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
     if (confirmed != true) return;
     setState(() => _approving = true);
     try {
-      final res = await http.post(Uri.parse('$_base/coa/uploads/${widget.uploadId}/approve'), headers: {'Content-Type':'application/json'}, body: jsonEncode({}));
-      if (res.statusCode == 200) {
+      final r = await ApiService.approveCoa(widget.uploadId);
+      if (r.success) {
         setState(() => _approved = true);
         if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ تم اعتماد شجرة الحسابات — جاهزة للتحليل', style: TextStyle(fontFamily:'Tajawal')), backgroundColor: Color(0xFF2ECC8A))); Navigator.of(context).pop({'approved': true, 'upload_id': widget.uploadId}); }
       } else { setState(() => _errorMsg = 'فشل الاعتماد'); }
@@ -145,7 +136,7 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
                       Row(children: [
                         approved ? const Icon(Icons.check_circle_rounded, color:Color(0xFF2ECC8A), size:22)
                           : GestureDetector(onTap: () async {
-                              await http.post(Uri.parse('$_base/coa/approve/${acc['id']}'), headers: {'Content-Type':'application/json'});
+                              await ApiService.approveAccount(acc['id']);
                               _loadAccounts(reset: true);
                             }, child: Container(width:28,height:28, decoration: BoxDecoration(shape:BoxShape.circle, border:Border.all(color:_success.withOpacity(0.4))), child: const Icon(Icons.check_rounded, color:Color(0xFF2ECC8A), size:16))),
                         const SizedBox(width:10),
