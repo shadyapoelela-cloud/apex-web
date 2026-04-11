@@ -13,6 +13,7 @@ import pytest
 @pytest.fixture(autouse=True)
 def clear_rate_limits():
     from app.main import _rate_limits
+
     _rate_limits.clear()
     yield
     _rate_limits.clear()
@@ -20,8 +21,12 @@ def clear_rate_limits():
 
 def _register_and_login(client):
     uid = uuid.uuid4().hex[:8]
-    user = {"username": f"coa_{uid}", "email": f"coa_{uid}@test.com",
-            "password": "TestPass123!", "display_name": f"COA User {uid}"}
+    user = {
+        "username": f"coa_{uid}",
+        "email": f"coa_{uid}@test.com",
+        "password": "TestPass123!",
+        "display_name": f"COA User {uid}",
+    }
     client.post("/auth/register", json=user)
     resp = client.post("/auth/login", json={"username_or_email": user["username"], "password": user["password"]})
     tokens = resp.json().get("tokens", resp.json().get("data", {}).get("tokens", {}))
@@ -29,6 +34,7 @@ def _register_and_login(client):
 
 
 # ─── Client Types ───
+
 
 class TestClientTypes:
     def test_get_client_types(self, client, auth_header):
@@ -52,13 +58,21 @@ class TestClientTypes:
 
 # ─── Client CRUD ───
 
+
 class TestClientCrud:
     def test_create_client(self, client):
         h, _ = _register_and_login(client)
         uid = uuid.uuid4().hex[:6]
-        resp = client.post("/clients", headers={**h, "Content-Type": "application/json"},
-                           json={"client_code": f"C-{uid}", "name": f"Test Corp {uid}",
-                                 "name_ar": f"شركة اختبار {uid}", "client_type_code": "standard_business"})
+        resp = client.post(
+            "/clients",
+            headers={**h, "Content-Type": "application/json"},
+            json={
+                "client_code": f"C-{uid}",
+                "name": f"Test Corp {uid}",
+                "name_ar": f"شركة اختبار {uid}",
+                "client_type_code": "standard_business",
+            },
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data.get("success") is True
@@ -84,12 +98,20 @@ class TestClientCrud:
 
 # ─── COA Upload ───
 
+
 class TestCoaUpload:
     def _create_client(self, client, headers):
         uid = uuid.uuid4().hex[:6]
-        resp = client.post("/clients", headers={**headers, "Content-Type": "application/json"},
-                           json={"client_code": f"COA-{uid}", "name": f"COA Corp {uid}",
-                                 "name_ar": f"شركة {uid}", "client_type_code": "standard_business"})
+        resp = client.post(
+            "/clients",
+            headers={**headers, "Content-Type": "application/json"},
+            json={
+                "client_code": f"COA-{uid}",
+                "name": f"COA Corp {uid}",
+                "name_ar": f"شركة {uid}",
+                "client_type_code": "standard_business",
+            },
+        )
         data = resp.json()
         return data.get("data", {}).get("id") or data.get("client_id")
 
@@ -106,13 +128,15 @@ class TestCoaUpload:
         cid = self._create_client(client, h)
         if not cid:
             pytest.skip("Could not create client")
-        resp = client.post(f"/clients/{cid}/coa/upload", headers=h,
-                           files={"file": ("test.txt", b"hello world", "text/plain")})
+        resp = client.post(
+            f"/clients/{cid}/coa/upload", headers=h, files={"file": ("test.txt", b"hello world", "text/plain")}
+        )
         # Should reject non-Excel files or process them with error
         assert resp.status_code in (200, 400, 422)
 
 
 # ─── COA Classification Summary ───
+
 
 class TestCoaClassification:
     def test_classification_summary_nonexistent(self, client, auth_header):
@@ -124,17 +148,16 @@ class TestCoaClassification:
         assert resp.status_code in (200, 404)
 
     def test_bulk_approve_nonexistent(self, client, auth_header):
-        resp = client.post("/coa/bulk-approve/nonexistent-upload",
-                           headers=auth_header, json={"min_confidence": 0.75})
+        resp = client.post("/coa/bulk-approve/nonexistent-upload", headers=auth_header, json={"min_confidence": 0.75})
         assert resp.status_code in (200, 404)
 
     def test_approve_coa_nonexistent(self, client, auth_header):
-        resp = client.post("/coa/uploads/nonexistent-upload/approve",
-                           headers=auth_header, json={})
+        resp = client.post("/coa/uploads/nonexistent-upload/approve", headers=auth_header, json={})
         assert resp.status_code in (200, 404)
 
 
 # ─── TB Binding ───
+
 
 class TestTbBinding:
     def test_binding_summary_nonexistent(self, client, auth_header):
@@ -142,8 +165,7 @@ class TestTbBinding:
         assert resp.status_code in (200, 404)
 
     def test_bind_tb_nonexistent(self, client, auth_header):
-        resp = client.post("/tb/uploads/nonexistent-tb/bind",
-                           headers=auth_header, json={})
+        resp = client.post("/tb/uploads/nonexistent-tb/bind", headers=auth_header, json={})
         assert resp.status_code in (200, 404)
 
     def test_binding_results_nonexistent(self, client, auth_header):
@@ -151,12 +173,12 @@ class TestTbBinding:
         assert resp.status_code in (200, 404)
 
     def test_approve_binding_nonexistent(self, client, auth_header):
-        resp = client.post("/tb/uploads/nonexistent-tb/approve-binding",
-                           headers=auth_header, json={})
+        resp = client.post("/tb/uploads/nonexistent-tb/approve-binding", headers=auth_header, json={})
         assert resp.status_code in (200, 400, 404)
 
 
 # ─── Analysis ───
+
 
 class TestAnalysis:
     def test_analyze_no_file(self, client, auth_header):
@@ -170,6 +192,7 @@ class TestAnalysis:
 
 
 # ─── Onboarding ───
+
 
 class TestOnboarding:
     def test_get_legal_entity_types(self, client, auth_header):
@@ -191,12 +214,12 @@ class TestOnboarding:
 
     def test_save_onboarding_draft(self, client):
         h, _ = _register_and_login(client)
-        resp = client.post("/onboarding/draft", headers=h,
-                           json={"step_completed": 1, "draft_data": {"name": "test"}})
+        resp = client.post("/onboarding/draft", headers=h, json={"step_completed": 1, "draft_data": {"name": "test"}})
         assert resp.status_code == 200
 
 
 # ─── Archive ───
+
 
 class TestArchive:
     def test_get_user_archive(self, client):

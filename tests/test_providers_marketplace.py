@@ -13,6 +13,7 @@ import pytest
 @pytest.fixture(autouse=True)
 def clear_rate_limits():
     from app.main import _rate_limits
+
     _rate_limits.clear()
     yield
     _rate_limits.clear()
@@ -20,8 +21,12 @@ def clear_rate_limits():
 
 def _register_and_login(client):
     uid = uuid.uuid4().hex[:8]
-    user = {"username": f"prov_{uid}", "email": f"prov_{uid}@test.com",
-            "password": "TestPass123!", "display_name": f"Provider {uid}"}
+    user = {
+        "username": f"prov_{uid}",
+        "email": f"prov_{uid}@test.com",
+        "password": "TestPass123!",
+        "display_name": f"Provider {uid}",
+    }
     client.post("/auth/register", json=user)
     resp = client.post("/auth/login", json={"username_or_email": user["username"], "password": user["password"]})
     tokens = resp.json().get("tokens", resp.json().get("data", {}).get("tokens", {}))
@@ -30,19 +35,22 @@ def _register_and_login(client):
 
 # ─── Service Providers (Phase 4) ───
 
+
 class TestServiceProviders:
     def test_register_provider(self, client):
         h = _register_and_login(client)
-        resp = client.post("/service-providers/register", headers=h,
-                           json={"category": "accountant", "bio_ar": "محاسب قانوني", "years_experience": 5, "city": "الرياض"})
+        resp = client.post(
+            "/service-providers/register",
+            headers=h,
+            json={"category": "accountant", "bio_ar": "محاسب قانوني", "years_experience": 5, "city": "الرياض"},
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data.get("success") is True
 
     def test_register_provider_invalid_category(self, client):
         h = _register_and_login(client)
-        resp = client.post("/service-providers/register", headers=h,
-                           json={"category": "invalid_category_xyz"})
+        resp = client.post("/service-providers/register", headers=h, json={"category": "invalid_category_xyz"})
         data = resp.json()
         # Should fail — either success:false or 400/422
         if resp.status_code == 200:
@@ -52,10 +60,8 @@ class TestServiceProviders:
 
     def test_register_provider_duplicate(self, client):
         h = _register_and_login(client)
-        client.post("/service-providers/register", headers=h,
-                    json={"category": "accountant"})
-        resp = client.post("/service-providers/register", headers=h,
-                           json={"category": "tax_consultant"})
+        client.post("/service-providers/register", headers=h, json={"category": "accountant"})
+        resp = client.post("/service-providers/register", headers=h, json={"category": "tax_consultant"})
         data = resp.json()
         # Second registration should fail
         if resp.status_code == 200:
@@ -65,8 +71,7 @@ class TestServiceProviders:
 
     def test_get_my_provider_profile(self, client):
         h = _register_and_login(client)
-        client.post("/service-providers/register", headers=h,
-                    json={"category": "accountant"})
+        client.post("/service-providers/register", headers=h, json={"category": "accountant"})
         resp = client.get("/service-providers/me", headers=h)
         assert resp.status_code == 200
 
@@ -97,6 +102,7 @@ class TestServiceProviders:
 
 # ─── Marketplace Requests (Phase 5) ───
 
+
 class TestMarketplace:
     def test_create_service_request_no_auth(self, client):
         resp = client.post("/marketplace/requests", json={"task_type": "bookkeeping"})
@@ -114,6 +120,7 @@ class TestMarketplace:
 
 # ─── Task Types (Phase 7) ───
 
+
 class TestTaskTypes:
     def test_get_task_types(self, client, auth_header):
         resp = client.get("/task-types", headers=auth_header)
@@ -127,6 +134,7 @@ class TestTaskTypes:
 
 
 # ─── Subscriptions (Phase 8) ───
+
 
 class TestSubscriptions:
     def test_get_plans(self, client):
@@ -151,8 +159,7 @@ class TestSubscriptions:
 
     def test_upgrade_plan_invalid(self, client):
         h = _register_and_login(client)
-        resp = client.post("/subscriptions/upgrade", headers=h,
-                           json={"plan_id": "nonexistent_plan"})
+        resp = client.post("/subscriptions/upgrade", headers=h, json={"plan_id": "nonexistent_plan"})
         # Should fail gracefully
         assert resp.status_code in (200, 400, 404, 422)
 
@@ -162,6 +169,7 @@ class TestSubscriptions:
 
 
 # ─── Service Catalog ───
+
 
 class TestServiceCatalog:
     def test_get_service_catalog(self, client):
@@ -180,8 +188,9 @@ class TestServiceCatalog:
 
     def test_create_service_case(self, client):
         h = _register_and_login(client)
-        resp = client.post("/services/cases", headers=h,
-                           json={"client_id": "test-client", "service_code": "basic_audit"})
+        resp = client.post(
+            "/services/cases", headers=h, json={"client_id": "test-client", "service_code": "basic_audit"}
+        )
         # May fail if client doesn't exist, but should not 500
         assert resp.status_code in (200, 400, 404)
 
@@ -192,6 +201,7 @@ class TestServiceCatalog:
 
 
 # ─── Audit Templates ───
+
 
 class TestAuditTemplates:
     def test_get_audit_templates(self, client, auth_header):
