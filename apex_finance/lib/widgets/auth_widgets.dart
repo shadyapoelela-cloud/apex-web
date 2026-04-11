@@ -1,14 +1,5 @@
 import 'package:flutter/material.dart';
-
-class AC {
-  static const gold = Color(0xFFC9A84C);
-  static const navy3 = Color(0xFF0D1829);
-  static const tp = Color(0xFFF0EDE6);
-  static const ts = Color(0xFF8A8880);
-  static const ok = Color(0xFF2ECC8A);
-  static const warn = Color(0xFFF0A500);
-  static const err = Color(0xFFE05050);
-}
+import '../core/theme.dart';
 
 /// Password field with show/hide toggle eye icon
 class PasswordField extends StatefulWidget {

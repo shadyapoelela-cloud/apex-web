@@ -2,25 +2,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
+import '../../core/theme.dart';
 
 const _api = apiBase;
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
-  labelText: l, prefixIcon: ic != null ? Icon(ic, color: const Color(0xFFC9A84C), size: 20) : null,
-  filled: true, fillColor: const Color(0xFF0D1829), labelStyle: const TextStyle(color: Color(0xFF8A8880)),
+  labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
+  filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFC9A84C))));
-
-class AC {
-  static const gold = Color(0xFFC9A84C);
-  static const navy = Color(0xFF050D1A);
-  static const navy2 = Color(0xFF080F1F);
-  static const navy3 = Color(0xFF0D1829);
-  static const tp = Color(0xFFF0EDE6);
-  static const ts = Color(0xFF8A8880);
-  static const ok = Color(0xFF2ECC8A);
-  static const err = Color(0xFFE05050);
-}
+  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)));
 
 
 class ForgotPasswordScreen extends StatefulWidget {

@@ -226,11 +226,27 @@ class ProviderService:
                 q = q.filter(ServiceProvider.category == category)
             providers = q.order_by(ServiceProvider.listing_priority.desc(), ServiceProvider.rating_average.desc()).all()
 
+            # Batch fetch users and scopes to avoid N+1
+            provider_ids = [p.id for p in providers]
+            user_ids = [p.user_id for p in providers]
+
+            users_map = {}
+            if user_ids:
+                users = db.query(User).filter(User.id.in_(user_ids)).all()
+                users_map = {u.id: u for u in users}
+
+            scopes_map = {}
+            if provider_ids:
+                all_scopes = db.query(ServiceProviderScope).filter(
+                    ServiceProviderScope.provider_id.in_(provider_ids),
+                    ServiceProviderScope.is_approved == True).all()
+                for s in all_scopes:
+                    scopes_map.setdefault(s.provider_id, []).append(s)
+
             result = []
             for p in providers:
-                user = db.query(User).filter(User.id == p.user_id).first()
-                scopes = db.query(ServiceProviderScope).filter(
-                    ServiceProviderScope.provider_id == p.id, ServiceProviderScope.is_approved == True).all()
+                user = users_map.get(p.user_id)
+                scopes = scopes_map.get(p.id, [])
                 result.append({
                     "id": p.id, "display_name": user.display_name if user else "",
                     "category": p.category, "bio_ar": p.bio_ar,
@@ -254,10 +270,26 @@ class ProviderService:
                 ])
             ).order_by(ServiceProvider.created_at.asc()).all()
 
+            # Batch fetch users and docs to avoid N+1
+            provider_ids = [p.id for p in providers]
+            user_ids = [p.user_id for p in providers]
+
+            users_map = {}
+            if user_ids:
+                users = db.query(User).filter(User.id.in_(user_ids)).all()
+                users_map = {u.id: u for u in users}
+
+            docs_map = {}
+            if provider_ids:
+                all_docs = db.query(ProviderDocument).filter(
+                    ProviderDocument.provider_id.in_(provider_ids)).all()
+                for d in all_docs:
+                    docs_map.setdefault(d.provider_id, []).append(d)
+
             result = []
             for p in providers:
-                user = db.query(User).filter(User.id == p.user_id).first()
-                docs = db.query(ProviderDocument).filter(ProviderDocument.provider_id == p.id).all()
+                user = users_map.get(p.user_id)
+                docs = docs_map.get(p.id, [])
                 result.append({
                     "id": p.id, "display_name": user.display_name if user else "",
                     "category": p.category, "verification_status": p.verification_status,
