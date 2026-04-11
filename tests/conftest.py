@@ -21,6 +21,7 @@ def setup_test_db():
     """Create all tables once for the test session."""
     try:
         from app.phase1.models.platform_models import Base, engine
+
         Base.metadata.create_all(bind=engine)
     except Exception:
         pass
@@ -44,6 +45,7 @@ def client():
 def db_session():
     """Create a test database session. Caller must close."""
     from app.phase1.models.platform_models import SessionLocal
+
     session = SessionLocal()
     yield session
     session.rollback()

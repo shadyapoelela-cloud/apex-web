@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 def clear_rate_limits():
     """Clear the in-memory rate limit store before each test to prevent 429 errors."""
     from app.main import _rate_limits
+
     _rate_limits.clear()
     yield
     _rate_limits.clear()
@@ -26,27 +27,34 @@ def clear_rate_limits():
 # 1. Response Format Standardization (v10.3.0)
 # ---------------------------------------------------------------------------
 
+
 class TestResponseFormatStandardization:
     """Verify all endpoints follow {"success": bool, ...} envelope."""
 
     def test_register_returns_success_true(self, client):
         unique = uuid.uuid4().hex[:8]
-        resp = client.post("/auth/register", json={
-            "username": f"fmt_{unique}",
-            "email": f"fmt_{unique}@test.com",
-            "password": "TestPass123!",
-            "display_name": "Format Test",
-        })
+        resp = client.post(
+            "/auth/register",
+            json={
+                "username": f"fmt_{unique}",
+                "email": f"fmt_{unique}@test.com",
+                "password": "TestPass123!",
+                "display_name": "Format Test",
+            },
+        )
         data = resp.json()
         assert "success" in data, "Register response must include 'success' key"
         if resp.status_code == 200:
             assert data["success"] is True
 
     def test_login_error_returns_success_false(self, client):
-        resp = client.post("/auth/login", json={
-            "username_or_email": "nonexistent_user_xyz",
-            "password": "wrongpass",
-        })
+        resp = client.post(
+            "/auth/login",
+            json={
+                "username_or_email": "nonexistent_user_xyz",
+                "password": "wrongpass",
+            },
+        )
         # Login failure should return 401 with error detail
         assert resp.status_code == 401
         data = resp.json()
@@ -92,6 +100,7 @@ class TestResponseFormatStandardization:
 # 2. Pydantic Validation (v10.3.1)
 # ---------------------------------------------------------------------------
 
+
 class TestPydanticValidation:
     """Verify request body validation returns proper 422 errors."""
 
@@ -100,29 +109,38 @@ class TestPydanticValidation:
         assert resp.status_code == 422
 
     def test_register_missing_password_returns_422(self, client):
-        resp = client.post("/auth/register", json={
-            "username": "test",
-            "email": "test@test.com",
-            # missing password and display_name
-        })
+        resp = client.post(
+            "/auth/register",
+            json={
+                "username": "test",
+                "email": "test@test.com",
+                # missing password and display_name
+            },
+        )
         assert resp.status_code == 422
 
     def test_register_short_password_returns_422(self, client):
-        resp = client.post("/auth/register", json={
-            "username": "testuser",
-            "email": "test@test.com",
-            "password": "ab",  # too short (min_length=8)
-            "display_name": "Test User",
-        })
+        resp = client.post(
+            "/auth/register",
+            json={
+                "username": "testuser",
+                "email": "test@test.com",
+                "password": "ab",  # too short (min_length=8)
+                "display_name": "Test User",
+            },
+        )
         assert resp.status_code == 422
 
     def test_register_short_username_returns_422(self, client):
-        resp = client.post("/auth/register", json={
-            "username": "ab",  # too short (min_length=3)
-            "email": "test@test.com",
-            "password": "TestPass123!",
-            "display_name": "Test User",
-        })
+        resp = client.post(
+            "/auth/register",
+            json={
+                "username": "ab",  # too short (min_length=3)
+                "email": "test@test.com",
+                "password": "TestPass123!",
+                "display_name": "Test User",
+            },
+        )
         assert resp.status_code == 422
 
     def test_login_missing_fields_returns_422(self, client):
@@ -142,32 +160,43 @@ class TestPydanticValidation:
         assert len(data["detail"]) > 0, "Validation detail should not be empty"
 
     def test_invalid_field_type_returns_422(self, client):
-        resp = client.post("/auth/register", json={
-            "username": 12345,  # should be string, but Pydantic may coerce
-            "email": "test@test.com",
-            "password": "TestPass123!",
-            "display_name": "Test",
-        })
+        resp = client.post(
+            "/auth/register",
+            json={
+                "username": 12345,  # should be string, but Pydantic may coerce
+                "email": "test@test.com",
+                "password": "TestPass123!",
+                "display_name": "Test",
+            },
+        )
         # If the int is coerced, try with a clearly invalid type for a structured field
-        resp2 = client.post("/auth/login", json={
-            "username_or_email": ["not", "a", "string"],
-            "password": "test",
-        })
+        resp2 = client.post(
+            "/auth/login",
+            json={
+                "username_or_email": ["not", "a", "string"],
+                "password": "test",
+            },
+        )
         assert resp2.status_code == 422
 
     def test_change_password_short_new_password_returns_422(self, client, auth_header):
         """The ChangePasswordRequest in main.py requires new_password min_length=6."""
-        resp = client.put("/users/me/security/password", json={
-            "current_password": "oldpass",
-            "new_password": "ab",  # too short
-            "confirm_password": "ab",
-        }, headers=auth_header)
+        resp = client.put(
+            "/users/me/security/password",
+            json={
+                "current_password": "oldpass",
+                "new_password": "ab",  # too short
+                "confirm_password": "ab",
+            },
+            headers=auth_header,
+        )
         assert resp.status_code == 422
 
 
 # ---------------------------------------------------------------------------
 # 3. Admin Auth Header (v10.4.0)
 # ---------------------------------------------------------------------------
+
 
 class TestAdminAuthHeader:
     """Verify admin endpoints accept X-Admin-Secret header and query param."""
@@ -212,6 +241,7 @@ class TestAdminAuthHeader:
 # 4. CORS Configuration (v10.4.0)
 # ---------------------------------------------------------------------------
 
+
 class TestCORSConfiguration:
     """Verify CORS middleware is correctly configured."""
 
@@ -239,9 +269,7 @@ class TestCORSConfiguration:
         )
         # With wildcard origins, allow-credentials should be absent or 'false'
         creds = resp.headers.get("access-control-allow-credentials", "")
-        assert creds != "true", (
-            "access-control-allow-credentials must not be 'true' with wildcard origin"
-        )
+        assert creds != "true", "access-control-allow-credentials must not be 'true' with wildcard origin"
 
     def test_cors_allows_standard_methods(self, client):
         resp = client.options(
@@ -259,6 +287,7 @@ class TestCORSConfiguration:
 # 5. Rate Limiting (v10.2.1)
 # ---------------------------------------------------------------------------
 
+
 class TestRateLimiting:
     """Verify rate limiting middleware exists and works."""
 
@@ -271,6 +300,7 @@ class TestRateLimiting:
     def test_rate_limit_variables_exist(self):
         """Verify rate limit configuration is defined in the app."""
         from app.main import RATE_LIMIT_WINDOW, RATE_LIMIT_MAX
+
         assert isinstance(RATE_LIMIT_WINDOW, int)
         assert isinstance(RATE_LIMIT_MAX, int)
         assert RATE_LIMIT_WINDOW > 0
@@ -279,17 +309,20 @@ class TestRateLimiting:
     def test_rate_limit_tracking_dict_exists(self):
         """Verify the in-memory rate limit store is initialized."""
         from app.main import _rate_limits
+
         assert _rate_limits is not None
 
     def test_get_client_ip_function_exists(self):
         """Verify the IP extraction helper exists."""
         from app.main import _get_client_ip
+
         assert callable(_get_client_ip)
 
 
 # ---------------------------------------------------------------------------
 # 6. Security Headers (v10.2.1)
 # ---------------------------------------------------------------------------
+
 
 class TestSecurityHeaders:
     """Verify security headers are present on all responses."""
@@ -325,6 +358,7 @@ class TestSecurityHeaders:
 # ---------------------------------------------------------------------------
 # 7. Health Check (v10.2.1)
 # ---------------------------------------------------------------------------
+
 
 class TestHealthCheck:
     """Verify health and root endpoints return expected data."""
@@ -383,11 +417,13 @@ class TestHealthCheck:
 # 8. Utility Functions (v10.5.0)
 # ---------------------------------------------------------------------------
 
+
 class TestTextUtils:
     """Test text_utils.remove_diacritics and normalize_arabic."""
 
     def test_remove_diacritics_basic(self):
         from app.core.text_utils import remove_diacritics
+
         # Arabic text with fatha (U+064E) and kasra (U+0650)
         text = "\u0645\u064e\u0631\u0652\u062d\u064e\u0628\u064b\u0627"  # مَرْحَبًا
         result = remove_diacritics(text)
@@ -398,19 +434,23 @@ class TestTextUtils:
 
     def test_remove_diacritics_empty_string(self):
         from app.core.text_utils import remove_diacritics
+
         assert remove_diacritics("") == ""
 
     def test_remove_diacritics_no_diacritics(self):
         from app.core.text_utils import remove_diacritics
+
         text = "\u0645\u0631\u062d\u0628\u0627"  # مرحبا (no diacritics)
         assert remove_diacritics(text) == text
 
     def test_remove_diacritics_none(self):
         from app.core.text_utils import remove_diacritics
+
         assert remove_diacritics(None) == ""
 
     def test_normalize_arabic_hamza_variants(self):
         from app.core.text_utils import normalize_arabic
+
         # All hamza variants should normalize to plain alef
         alef_hamza_above = "\u0623"  # أ
         alef_hamza_below = "\u0625"  # إ
@@ -422,25 +462,30 @@ class TestTextUtils:
 
     def test_normalize_arabic_taa_marbuta(self):
         from app.core.text_utils import normalize_arabic
+
         # ة (taa marbuta) -> ه (haa)
         assert normalize_arabic("\u0629") == "\u0647"
 
     def test_normalize_arabic_alef_maqsura(self):
         from app.core.text_utils import normalize_arabic
+
         # ى (alef maqsura) -> ي (yaa)
         assert normalize_arabic("\u0649") == "\u064a"
 
     def test_normalize_arabic_whitespace_collapse(self):
         from app.core.text_utils import normalize_arabic
+
         result = normalize_arabic("  \u0645\u0631\u062d\u0628\u0627   \u0628\u0643  ")
         assert "  " not in result  # no double spaces
 
     def test_normalize_arabic_empty_string(self):
         from app.core.text_utils import normalize_arabic
+
         assert normalize_arabic("") == ""
 
     def test_normalize_arabic_none(self):
         from app.core.text_utils import normalize_arabic
+
         assert normalize_arabic(None) == ""
 
 
@@ -449,27 +494,32 @@ class TestDbUtils:
 
     def test_utc_now_is_timezone_aware(self):
         from app.core.db_utils import utc_now
+
         now = utc_now()
         assert now.tzinfo is not None
         assert now.tzinfo == timezone.utc
 
     def test_utc_now_returns_datetime(self):
         from app.core.db_utils import utc_now
+
         now = utc_now()
         assert isinstance(now, datetime)
 
     def test_utc_now_iso_returns_string(self):
         from app.core.db_utils import utc_now_iso
+
         result = utc_now_iso()
         assert isinstance(result, str)
         assert "T" in result  # ISO format has T separator
 
     def test_get_db_session_returns_valid_session(self):
         from app.core.db_utils import get_db_session
+
         session = get_db_session()
         assert session is not None
         try:
             from sqlalchemy import text
+
             result = session.execute(text("SELECT 1"))
             assert result is not None
         finally:
@@ -477,6 +527,7 @@ class TestDbUtils:
 
     def test_exec_sql_basic(self):
         from app.core.db_utils import get_db_session, exec_sql
+
         session = get_db_session()
         try:
             result = exec_sql(session, "SELECT 1 AS val")
@@ -490,6 +541,7 @@ class TestDbUtils:
 # 9. Auth Flow (v10.0.0)
 # ---------------------------------------------------------------------------
 
+
 class TestAuthFlow:
     """Test full authentication flow: register -> login -> profile -> change password."""
 
@@ -500,21 +552,27 @@ class TestAuthFlow:
         password = "FlowTestPass123!"
 
         # Step 1: Register
-        reg_resp = client.post("/auth/register", json={
-            "username": username,
-            "email": email,
-            "password": password,
-            "display_name": "Flow Test User",
-        })
+        reg_resp = client.post(
+            "/auth/register",
+            json={
+                "username": username,
+                "email": email,
+                "password": password,
+                "display_name": "Flow Test User",
+            },
+        )
         assert reg_resp.status_code == 200
         reg_data = reg_resp.json()
         assert reg_data["success"] is True
 
         # Step 2: Login
-        login_resp = client.post("/auth/login", json={
-            "username_or_email": username,
-            "password": password,
-        })
+        login_resp = client.post(
+            "/auth/login",
+            json={
+                "username_or_email": username,
+                "password": password,
+            },
+        )
         assert login_resp.status_code == 200
         login_data = login_resp.json()
         assert login_data["success"] is True
@@ -523,18 +581,25 @@ class TestAuthFlow:
         assert token is not None, "Login should return a token"
 
         # Step 3: Access profile
-        profile_resp = client.get("/users/me", headers={
-            "Authorization": f"Bearer {token}",
-        })
+        profile_resp = client.get(
+            "/users/me",
+            headers={
+                "Authorization": f"Bearer {token}",
+            },
+        )
         assert profile_resp.status_code == 200
 
         # Step 4: Change password
         new_password = "NewFlowPass456!"
-        chg_resp = client.put("/users/me/security/password", json={
-            "current_password": password,
-            "new_password": new_password,
-            "confirm_password": new_password,
-        }, headers={"Authorization": f"Bearer {token}"})
+        chg_resp = client.put(
+            "/users/me/security/password",
+            json={
+                "current_password": password,
+                "new_password": new_password,
+                "confirm_password": new_password,
+            },
+            headers={"Authorization": f"Bearer {token}"},
+        )
         # Should succeed or return a clear error
         assert chg_resp.status_code in (200, 400)
 
@@ -543,9 +608,12 @@ class TestAuthFlow:
         assert resp.status_code == 401
 
     def test_protected_endpoint_with_invalid_token_returns_401(self, client):
-        resp = client.get("/users/me", headers={
-            "Authorization": "Bearer invalid.token.here",
-        })
+        resp = client.get(
+            "/users/me",
+            headers={
+                "Authorization": "Bearer invalid.token.here",
+            },
+        )
         assert resp.status_code == 401
 
     def test_notifications_without_token_returns_401(self, client):
@@ -560,6 +628,7 @@ class TestAuthFlow:
         """A token with past expiration should be rejected."""
         import jwt as pyjwt
         from datetime import timedelta
+
         payload = {
             "sub": "expired-user",
             "username": "expired",
@@ -569,15 +638,19 @@ class TestAuthFlow:
             "iat": datetime.now(timezone.utc) - timedelta(hours=2),
         }
         token = pyjwt.encode(payload, os.environ["JWT_SECRET"], algorithm="HS256")
-        resp = client.get("/users/me", headers={
-            "Authorization": f"Bearer {token}",
-        })
+        resp = client.get(
+            "/users/me",
+            headers={
+                "Authorization": f"Bearer {token}",
+            },
+        )
         assert resp.status_code == 401
 
 
 # ---------------------------------------------------------------------------
 # 10. Legal Acceptance (v10.3.0)
 # ---------------------------------------------------------------------------
+
 
 class TestLegalAcceptance:
     """Test Phase 11 legal acceptance endpoints."""
@@ -642,6 +715,7 @@ class TestLegalAcceptance:
 # 11. Notifications (v10.3.0)
 # ---------------------------------------------------------------------------
 
+
 class TestNotifications:
     """Test Phase 10 notification endpoints."""
 
@@ -702,6 +776,7 @@ class TestNotifications:
 # 12. Account Management (v10.3.0)
 # ---------------------------------------------------------------------------
 
+
 class TestAccountManagement:
     """Test account profile and password management endpoints."""
 
@@ -717,35 +792,50 @@ class TestAccountManagement:
         assert resp.status_code in (200, 404, 500)
 
     def test_change_password_with_auth(self, client, auth_header):
-        resp = client.put("/users/me/security/password", json={
-            "current_password": "OldPass123!",
-            "new_password": "NewPass456!",
-            "confirm_password": "NewPass456!",
-        }, headers=auth_header)
+        resp = client.put(
+            "/users/me/security/password",
+            json={
+                "current_password": "OldPass123!",
+                "new_password": "NewPass456!",
+                "confirm_password": "NewPass456!",
+            },
+            headers=auth_header,
+        )
         # May fail because test user doesn't exist in DB,
         # but should not be 401 (auth should pass) or 422 (validation should pass)
         assert resp.status_code not in (401, 422)
 
     def test_change_password_mismatch(self, client, auth_header):
-        resp = client.put("/users/me/security/password", json={
-            "current_password": "OldPass123!",
-            "new_password": "NewPass456!",
-            "confirm_password": "DifferentPass789!",
-        }, headers=auth_header)
+        resp = client.put(
+            "/users/me/security/password",
+            json={
+                "current_password": "OldPass123!",
+                "new_password": "NewPass456!",
+                "confirm_password": "DifferentPass789!",
+            },
+            headers=auth_header,
+        )
         assert resp.status_code == 400
 
     def test_change_password_without_auth_returns_401(self, client):
-        resp = client.put("/users/me/security/password", json={
-            "current_password": "old",
-            "new_password": "newpass",
-            "confirm_password": "newpass",
-        })
+        resp = client.put(
+            "/users/me/security/password",
+            json={
+                "current_password": "old",
+                "new_password": "newpass",
+                "confirm_password": "newpass",
+            },
+        )
         assert resp.status_code == 401
 
     def test_update_profile_via_phase9(self, client, auth_header):
-        resp = client.put("/account/profile", json={
-            "display_name": "Updated Name",
-        }, headers=auth_header)
+        resp = client.put(
+            "/account/profile",
+            json={
+                "display_name": "Updated Name",
+            },
+            headers=auth_header,
+        )
         # May fail due to test user not in DB, but auth/validation should pass
         assert resp.status_code not in (401, 422)
 
@@ -762,10 +852,14 @@ class TestAccountManagement:
         assert data["success"] is True
 
     def test_account_closure_with_valid_type(self, client, auth_header):
-        resp = client.post("/account/closure", json={
-            "closure_type": "temporary",
-            "reason": "testing",
-        }, headers=auth_header)
+        resp = client.post(
+            "/account/closure",
+            json={
+                "closure_type": "temporary",
+                "reason": "testing",
+            },
+            headers=auth_header,
+        )
         # Phase9 route requires auth and a valid DB user; accept 200 or 400/500
         assert resp.status_code != 401, "Auth should pass with valid token"
         assert resp.status_code != 422, "Validation should pass with valid fields"
