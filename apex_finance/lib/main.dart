@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'core/api_config.dart';
 import 'api_service.dart';
 import 'screens/dashboard/enhanced_dashboard.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,15 +6,11 @@ import 'core/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'core/router.dart';
 import 'core/session.dart';
-import 'core/api_retry.dart';
-import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'dart:html' as html;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/app_providers.dart';
-
-const _api = apiBase;
 
 void main() {
   // Restore session from localStorage
@@ -123,18 +118,16 @@ class _LoginS extends State<LoginScreen> {
   Future<void> _go() async {
     setState(() { _l = true; _e = null; });
     try {
-      final r = await ApiRetry.post(Uri.parse('$_api/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username_or_email': _u.text.trim(), 'password': _p.text}));
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
-        S.token = d['tokens']['access_token']; ApiService.setToken(S.token!); S.uid = d['user']['id'];
+      final res = await ApiService.login(_u.text.trim(), _p.text);
+      if (res.success) {
+        final d = res.data;
+        S.token = d['tokens']['access_token']; S.uid = d['user']['id'];
         S.uname = d['user']['username']; S.dname = d['user']['display_name'];
         S.plan = d['user']['plan']; S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
-ApiService.setToken(S.token!);
-S.save();
-      } else { setState(() { _e = d['detail'] ?? '\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u062f\u062e\u0648\u0644'; _l = false; }); }
+        ApiService.setToken(S.token!);
+        S.save();
+      } else { setState(() { _e = res.error ?? '\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u062f\u062e\u0648\u0644'; _l = false; }); }
     } catch (e) { setState(() { _e = '\u062e\u0637\u0623 \u0627\u0644\u0627\u062a\u0635\u0627\u0644: $e'; _l = false; }); }
   }
 
@@ -263,17 +256,16 @@ class _RegS extends State<RegScreen> {
   Future<void> _go() async {
     setState((){ _l=true; _e=null; });
     try {
-      final r = await ApiRetry.post(Uri.parse('$_api/auth/register'), headers:{'Content-Type':'application/json'},
-        body: jsonEncode({'username':_un.text.trim(),'email':_em.text.trim(),'display_name':_dn.text.trim(),'password':_pw.text}));
-      final d = jsonDecode(r.body);
-      if(r.statusCode==200 && d['success']==true) {
-        S.token=d['tokens']['access_token']; ApiService.setToken(S.token!); S.uid=d['user']['id'];
+      final res = await ApiService.register(username: _un.text.trim(), email: _em.text.trim(), displayName: _dn.text.trim(), password: _pw.text);
+      if(res.success) {
+        final d = res.data;
+        S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
         S.uname=d['user']['username']; S.dname=d['user']['display_name'];
-        S.plan=d['user']['plan']; S.email=d['user']['email']; S.save();
-ApiService.setToken(S.token!);
-S.save();
+        S.plan=d['user']['plan']; S.email=d['user']['email'];
+        ApiService.setToken(S.token!);
+        S.save();
         if(mounted) context.go('/home');
-      } else { setState(()=> _e=d['detail']??d['error']??'\u062e\u0637\u0623'); }
+      } else { setState(()=> _e=res.error??'\u062e\u0637\u0623'); }
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -1205,10 +1197,9 @@ class _NewCS extends State<NewClientScreen> {
     if(_n.text.trim().isEmpty||_t==null){ setState(()=> _e='\u0627\u0644\u0627\u0633\u0645 \u0648\u0627\u0644\u0646\u0648\u0639 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await ApiRetry.post(Uri.parse('$_api/clients'), headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-        body: jsonEncode({'name_ar':_n.text.trim(),'client_type_code':_t}));
-      if(jsonDecode(r.body)['success']==true) { if(mounted) Navigator.pop(context); }
-      else { setState(()=> _e=jsonDecode(r.body)['detail']); }
+      final res = await ApiService.createClient(clientCode: _n.text.trim().replaceAll(' ', '_'), name: _n.text.trim(), nameAr: _n.text.trim(), clientType: _t!);
+      if(res.success) { if(mounted) Navigator.pop(context); }
+      else { setState(()=> _e=res.error); }
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }

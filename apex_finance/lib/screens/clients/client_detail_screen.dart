@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
-import 'dart:html' as html;
-import '../../core/api_config.dart';
-import '../../core/api_retry.dart';
+import '../../api_service.dart';
 
 // ════════════════════════════════════════
 // APEX Client Detail Screen v5.2 — Visual Alignment
@@ -52,13 +48,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   bool isLoadingReadiness = true;
   bool isLoadingDocuments = true;
 
-  String get _token => html.window.localStorage['apex_token'] ?? '';
-  Map<String, String> get _authHeaders => {
-    'Authorization': 'Bearer $_token',
-    'Content-Type': 'application/json',
-  };
-
-
   @override
   void initState() {
     super.initState();
@@ -69,13 +58,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
 
   Future<void> _loadReadiness() async {
     try {
-      final response = await ApiRetry.get(
-        Uri.parse('$apiBase/clients/${widget.clientId}/readiness'),
-        headers: _authHeaders,
-      );
-      if (response.statusCode == 200) {
+      final res = await ApiService.getClientReadiness(widget.clientId);
+      if (res.success) {
         setState(() {
-          readinessData = jsonDecode(response.body);
+          readinessData = res.data;
           isLoadingReadiness = false;
         });
       }
@@ -97,13 +83,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
 
   Future<void> _loadDocuments() async {
     try {
-      final response = await ApiRetry.get(
-        Uri.parse('$apiBase/clients/${widget.clientId}/documents'),
-        headers: _authHeaders,
-      );
-      if (response.statusCode == 200) {
+      final res = await ApiService.getClientDocuments(widget.clientId);
+      if (res.success) {
         setState(() {
-          documentsData = List<Map<String, dynamic>>.from(jsonDecode(response.body));
+          documentsData = res.data is List ? List<Map<String, dynamic>>.from(res.data) : [];
           isLoadingDocuments = false;
         });
       }
@@ -757,16 +740,8 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       }
       
       // Upload to API
-      final uri = Uri.parse('$apiBase/clients/${widget.clientId}/documents');
-      final request = http.MultipartRequest('POST', uri);
-      request.headers['Authorization'] = 'Bearer $_token';
-      request.fields['doc_type'] = docName;
-      request.files.add(http.MultipartFile.fromBytes(
-        'file', file.bytes!, filename: file.name,
-      ));
-      
-      final response = await request.send();
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      final res = await ApiService.uploadDocument(widget.clientId, docName, file.bytes!, file.name);
+      if (res.success) {
         _loadDocuments();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -774,7 +749,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               backgroundColor: const Color(0xFF1A2536)));
         }
       } else {
-        throw Exception('خطأ ${response.statusCode}');
+        throw Exception(res.error ?? 'خطأ في الرفع');
       }
     } catch (e) {
       if (mounted) {
@@ -847,9 +822,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 onPressed: () async {
                   Navigator.pop(ctx);
                   try {
-                    await http.put(Uri.parse('$apiBase/clients/${widget.clientId}'),
-                      headers: _authHeaders,
-                      body: jsonEncode({'name_ar': nameCtrl.text, 'sector': sectorCtrl.text}));
+                    await ApiService.updateClient(widget.clientId, {'name_ar': nameCtrl.text, 'sector': sectorCtrl.text});
                     _loadReadiness();
                     if (mounted) ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('تم التحديث بنجاح'), backgroundColor: Color(0xFF1A2536)));

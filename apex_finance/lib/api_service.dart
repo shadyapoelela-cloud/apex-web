@@ -23,7 +23,7 @@ class ApiService {
   static Future<ApiResult> getProfile() => _get('/users/me');
   static Future<ApiResult> updateProfile(Map b) => _put('/users/me/profile', b);
   static Future<ApiResult> getSecuritySettings() => _get('/users/me/security');
-  static Future<ApiResult> getActivityHistory({int limit=20}) => _get('/users/me/activity?limit=$limit');
+  static Future<ApiResult> getActivityHistory({int limit=20}) => _get('/account/activity?limit=$limit');
   static Future<ApiResult> requestClosure({required String type, String? reason}) => _post('/account/closure', {'type':type,if(reason!=null)'reason':reason});
 
   // ── Plans ──
@@ -49,6 +49,7 @@ class ApiService {
   static Future<ApiResult> listClients() => _get('/clients');
   static Future<ApiResult> getClient(String id) => _get('/clients/$id');
   static Future<ApiResult> createClient({required String clientCode, required String name, required String clientType, String? nameAr, String? industry, String? country, String? currency}) => _post('/clients', {'client_code':clientCode,'name':name,'name_ar':nameAr ?? name,'client_type_code':clientType,if(industry!=null)'industry':industry,if(country!=null)'country':country,if(currency!=null)'currency':currency});
+  static Future<ApiResult> updateClient(String id, Map body) => _put('/clients/$id', body);
 
 
   // ── Client Onboarding (New) ──
@@ -230,6 +231,20 @@ class ApiService {
   }
   static String _parseErr(String body, int code) { try { final d=jsonDecode(body); return d['detail']??d['message']??'خطأ $code'; } catch(_){return 'خطأ $code';} }
 
+  // ── File Upload ──
+  static Future<ApiResult> uploadDocument(String clientId, String docType, List<int> bytes, String fileName) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse('$_base/clients/$clientId/documents'));
+      request.headers.addAll(_h);
+      request.fields['doc_type'] = docType;
+      request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fileName));
+      final streamed = await request.send();
+      final body = await streamed.stream.bytesToString();
+      if (streamed.statusCode >= 200 && streamed.statusCode < 300) return ApiResult.ok(jsonDecode(body));
+      return ApiResult.error(_parseErr(body, streamed.statusCode));
+    } catch (e) { return ApiResult.error('خطأ: $e'); }
+  }
+
   // ── Phase 1: Client Readiness + Documents + Approval Gate ──
   static Future<ApiResult> getClientReadiness(String clientId) => _get('/clients/$clientId/readiness');
   static Future<ApiResult> getClientDocuments(String clientId) => _get('/clients/$clientId/documents');
@@ -240,10 +255,10 @@ class ApiService {
 
   // ── Admin ──
   static Future<ApiResult> adminUsers() => _get('/admin/users');
-  static Future<ApiResult> adminKnowledgeFeedback() => _get('/admin/knowledge-feedback');
-  static Future<ApiResult> adminReviewFeedback(String id, Map body) => _post('/admin/knowledge-feedback/$id/review', body);
-  static Future<ApiResult> adminProviders() => _get('/admin/providers');
-  static Future<ApiResult> adminProviderAction(String id, String action) => _post('/admin/providers/$id/$action', {});
+  static Future<ApiResult> adminKnowledgeFeedback() => _get('/knowledge-feedback/review-queue');
+  static Future<ApiResult> adminReviewFeedback(String id, Map body) => _post('/knowledge-feedback/$id/review', body);
+  static Future<ApiResult> adminProviders() => _get('/service-providers/verification-queue');
+  static Future<ApiResult> adminProviderAction(String id, String action) => _post('/service-providers/$id/$action', {});
   static Future<ApiResult> adminAuditEvents({int limit = 100}) => _get('/audit/events?limit=$limit');
 
   // ── Marketplace ──
