@@ -1,7 +1,5 @@
-﻿import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'core/api_config.dart';
+﻿import 'package:flutter/material.dart';
+import 'api_service.dart';
 
 class TbBindingScreen extends StatefulWidget {
   final String tbUploadId;
@@ -28,47 +26,38 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
   static const _border  = Color(0x26C9A84C);
   static const _textPri = Color(0xFFF0EDE6);
   static const _textSec = Color(0xFF8A8880);
-  static const _base    = apiBase;
-
   @override void initState() { super.initState(); _checkExisting(); }
 
   Future<void> _checkExisting() async {
     setState(() => _loadingResults = true);
     try {
-      final res = await http.get(Uri.parse('$_base/tb/uploads/${widget.tbUploadId}/binding-summary'));
-      if (res.statusCode == 200) { setState(() { _summary = jsonDecode(res.body); _bound = true; }); await _loadResults(); }
+      final r = await ApiService.getBindingSummary(widget.tbUploadId);
+      if (r.success) { setState(() { _summary = r.data as Map<String,dynamic>; _bound = true; }); await _loadResults(); }
     } catch (_) {} finally { setState(() => _loadingResults = false); }
   }
 
   Future<void> _runBinding() async {
     setState(() { _loadingBind = true; _errorMsg = null; });
     try {
-      final body = <String,dynamic>{};
-      if (widget.coaUploadId != null) body['coa_upload_id'] = widget.coaUploadId;
-      final res = await http.post(Uri.parse('$_base/tb/uploads/${widget.tbUploadId}/bind'), headers: {'Content-Type':'application/json'}, body: jsonEncode(body));
-      if (res.statusCode == 200) {
+      final r = await ApiService.bindTb(tbUploadId: widget.tbUploadId, coaUploadId: widget.coaUploadId);
+      if (r.success) {
         setState(() => _bound = true);
         await _loadSummary(); await _loadResults();
-      } else { final e = jsonDecode(res.body); setState(() => _errorMsg = e['detail'] ?? 'فشل الـ Binding'); }
+      } else { setState(() => _errorMsg = r.error ?? 'فشل الـ Binding'); }
     } catch (e) { setState(() => _errorMsg = 'خطأ: $e'); } finally { setState(() => _loadingBind = false); }
   }
 
   Future<void> _loadSummary() async {
-    try { final res = await http.get(Uri.parse('$_base/tb/uploads/${widget.tbUploadId}/binding-summary')); if (res.statusCode == 200) setState(() => _summary = jsonDecode(res.body)); } catch (_) {}
+    try { final r = await ApiService.getBindingSummary(widget.tbUploadId); if (r.success) setState(() => _summary = r.data as Map<String,dynamic>); } catch (_) {}
   }
 
   Future<void> _loadResults({bool reset = false}) async {
     if (reset) setState(() { _page = 1; _results = []; });
     setState(() => _loadingResults = true);
     try {
-      final params = <String,String>{'page': _page.toString(), 'page_size': '30'};
-      if (_filter == 'matched')   params['matched_only'] = 'true';
-      if (_filter == 'unmatched') params['matched_only'] = 'false';
-      if (_filter == 'review')    params['requires_review'] = 'true';
-      final uri = Uri.parse('$_base/tb/uploads/${widget.tbUploadId}/binding-results').replace(queryParameters: params);
-      final res = await http.get(uri);
-      if (res.statusCode == 200) {
-        final data = jsonDecode(res.body) as Map<String,dynamic>;
+      final r = await ApiService.getBindingResults(tbUploadId: widget.tbUploadId, page: _page, filter: _filter);
+      if (r.success) {
+        final data = r.data as Map<String,dynamic>;
         final items = (data['results'] as List).cast<Map<String,dynamic>>();
         setState(() { _total = data['total'] ?? 0; if (reset || _page == 1) _results = items; else _results.addAll(items); });
       }
@@ -78,8 +67,8 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
   Future<void> _approveBinding() async {
     setState(() => _approving = true);
     try {
-      final res = await http.post(Uri.parse('$_base/tb/uploads/${widget.tbUploadId}/approve-binding'), headers: {'Content-Type':'application/json'}, body: jsonEncode({}));
-      if (res.statusCode == 200) {
+      final r = await ApiService.approveBinding(widget.tbUploadId);
+      if (r.success) {
         setState(() => _approved = true);
         if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ تم اعتماد الربط — جاهز للتحليل', style: TextStyle(fontFamily:'Tajawal')), backgroundColor: _success)); Navigator.of(context).pop({'approved': true}); }
       } else { if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل الاعتماد'), backgroundColor: _danger)); }

@@ -1,10 +1,6 @@
-﻿import 'dart:convert';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:http/http.dart' as http;
-import 'core/api_config.dart';
+import 'api_service.dart';
 import 'coa_mapping_screen.dart';
 
 class CoaUploadScreen extends StatefulWidget {
@@ -31,8 +27,6 @@ class _CoaUploadScreenState extends State<CoaUploadScreen> {
   static const _border  = Color(0x26C9A84C);
   static const _textPri = Color(0xFFF0EDE6);
   static const _textSec = Color(0xFF8A8880);
-  static const _base    = apiBase;
-
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom, allowedExtensions: ['xlsx','xls','csv']);
@@ -45,33 +39,20 @@ class _CoaUploadScreenState extends State<CoaUploadScreen> {
     if (_picked == null) return;
     setState(() { _uploading=true; _errorMsg=''; });
     try {
-      final uri = Uri.parse('$_base/clients/${widget.clientId}/coa/upload');
-      final request = http.MultipartRequest('POST', uri);
-      request.files.add(http.MultipartFile.fromBytes('file', _picked!.files.first.bytes!, filename: _picked!.files.first.name));
-      final response = await request.send();
-      final body = await response.stream.bytesToString();
-      if (response.statusCode == 200) {
-        final data = jsonDecode(body) as Map<String,dynamic>;
+      final result = await ApiService.uploadCoa(clientId: widget.clientId, bytes: _picked!.files.first.bytes!, fileName: _picked!.files.first.name);
+      if (result.success) {
+        final data = result.data as Map<String,dynamic>;
         if (!mounted) return;
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => CoaMappingScreen(uploadData: data, clientId: widget.clientId, clientName: widget.clientName, pickedFile: _picked!.files.first)));
       } else {
-        final err = jsonDecode(body);
-        setState(() => _errorMsg = err['detail'] ?? err['message'] ?? 'فشل الرفع');
+        setState(() => _errorMsg = result.error ?? 'فشل الرفع');
       }
     } catch (e) { setState(() => _errorMsg = 'خطأ: $e'); }
     finally { setState(() => _uploading = false); }
   }
 
   Future<void> _downloadTemplate() async {
-    try {
-      final res = await http.get(Uri.parse('$_base/template/trial-balance'));
-      if (res.statusCode == 200) {
-        final blob = html.Blob([res.bodyBytes], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        (html.document.createElement('a') as html.AnchorElement)..href=url..download='نموذج_شجرة_الحسابات.xlsx'..click();
-        html.Url.revokeObjectUrl(url);
-      }
-    } catch (_) {}
+    await ApiService.downloadTrialBalanceTemplate(downloadName: 'نموذج_شجرة_الحسابات.xlsx');
   }
 
   @override

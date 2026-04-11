@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'core/api_config.dart';
+import 'api_service.dart';
 import 'main.dart';
 
 class ClientCreateScreen2 extends StatefulWidget {
@@ -23,14 +21,11 @@ class _CCS2 extends State<ClientCreateScreen2> {
     }
     setState(() { _ld = true; _err = null; });
     try {
-      final r = await http.post(Uri.parse('$apiBase/clients'),
-        headers: {...S.h(), 'Content-Type': 'application/json'},
-        body: jsonEncode({'name_ar': _nameC.text.trim(), 'client_type_code': _sel}));
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
+      final r = await ApiService.createClient(clientCode: '', name: _nameC.text.trim(), clientType: _sel!, nameAr: _nameC.text.trim());
+      if (r.success) {
         if (mounted) Navigator.pop(context, true);
       } else {
-        setState(() { _err = d['detail'] ?? 'فشل'; _ld = false; });
+        setState(() { _err = r.error ?? 'فشل'; _ld = false; });
       }
     } catch (e) { setState(() { _err = e.toString(); _ld = false; }); }
   }

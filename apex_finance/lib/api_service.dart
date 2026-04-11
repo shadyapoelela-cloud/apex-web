@@ -139,14 +139,40 @@ class ApiService {
     } catch(e) { return ApiResult.error('خطأ: $e'); }
   }
 
+  // ── Full Analysis ──
+  static Future<ApiResult> analyzeFull({required List<int> bytes, required String fileName}) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse('$_base/analyze/full'));
+      request.headers['Authorization']='Bearer ${_token ?? S.token ?? ""}';
+      request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fileName));
+      final res = await request.send();
+      final body = await res.stream.bytesToString();
+      if(res.statusCode==200) return ApiResult.ok(jsonDecode(body));
+      return ApiResult.error(_parseErr(body,res.statusCode));
+    } catch(e) { return ApiResult.error('خطأ: $e'); }
+  }
+
+  // ── Reports ──
+  static Future<List<int>?> downloadReport({required String type, required List<int> fileBytes, required String fileName}) async {
+    try {
+      final endpoint = type == 'pdf' ? '/reports/pdf' : '/reports/excel';
+      final request = http.MultipartRequest('POST', Uri.parse('$_base$endpoint'));
+      request.headers['Authorization']='Bearer ${_token ?? S.token ?? ""}';
+      request.files.add(http.MultipartFile.fromBytes('file', fileBytes, filename: fileName));
+      final res = await request.send();
+      if(res.statusCode==200) return await res.stream.toBytes();
+      return null;
+    } catch(_) { return null; }
+  }
+
   // ── Templates ──
-  static Future<void> downloadTrialBalanceTemplate() async {
+  static Future<void> downloadTrialBalanceTemplate({String downloadName = 'نموذج_ميزان_المراجعة.xlsx'}) async {
     try {
       final res = await http.get(Uri.parse('$_base/template/trial-balance'));
       if(res.statusCode==200) {
         final blob = html.Blob([res.bodyBytes],'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         final url = html.Url.createObjectUrlFromBlob(blob);
-        (html.document.createElement('a') as html.AnchorElement)..href=url..download='نموذج_ميزان_المراجعة.xlsx'..click();
+        (html.document.createElement('a') as html.AnchorElement)..href=url..download=downloadName..click();
         html.Url.revokeObjectUrl(url);
       }
     } catch(_) {}
