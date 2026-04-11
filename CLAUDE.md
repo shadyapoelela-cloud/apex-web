@@ -52,15 +52,18 @@
 
 ## Testing
 
-- **120+ automated tests** in `tests/` directory:
-  - `test_integration_v10.py`: 93 comprehensive integration tests
-  - `test_auth.py`: Authentication flow tests
-  - `test_admin.py`: Admin endpoint tests
-  - `test_health.py`: Health check tests
-  - `test_utils.py`: Utility function tests
-- Run: `pytest tests/ -v`
-- CI/CD: GitHub Actions (`.github/workflows/ci.yml`) runs tests on every push
-- Coverage: ~14% endpoint coverage (P2-P8 need more tests)
+- **204 automated tests** across 8 test files:
+  - `test_integration_v10.py`: 93 integration tests (response format, CORS, security, auth, legal, account)
+  - `test_clients_coa.py`: 26 tests (clients, COA upload/classify/approve, TB binding, onboarding, archive)
+  - `test_providers_marketplace.py`: 25 tests (providers, marketplace, subscriptions, service catalog, audit)
+  - `test_copilot_notifications.py`: 33 tests (copilot AI, notifications, admin, legal docs, knowledge brain)
+  - `test_auth.py`: 6 auth flow tests
+  - `test_admin.py`: 4 admin endpoint tests
+  - `test_health.py`: 3 health check tests
+  - `test_utils.py` + `test_core.py`: 14 utility tests
+- Run: `pytest tests/ -v` or `pytest tests/ --cov=app --cov-report=term-missing`
+- CI/CD: GitHub Actions (`.github/workflows/ci.yml`) — lint (Black, Ruff, Bandit) + tests + coverage + deploy
+- Config: `pyproject.toml` for Black (120 chars), Ruff, pytest, coverage settings
 
 ## Common Pitfalls
 
