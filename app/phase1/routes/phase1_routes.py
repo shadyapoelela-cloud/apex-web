@@ -148,12 +148,12 @@ async def logout_all(user: dict = Depends(get_current_user)):
 
 @router.post("/auth/forgot-password", tags=["Auth"])
 async def forgot_password(req: ForgotPasswordRequest):
-    return auth_service.request_password_reset(req.email)
+    return auth_service.forgot_password(req.email)
 
 
 @router.post("/auth/reset-password", tags=["Auth"])
 async def reset_password(req: ResetPasswordRequest):
-    return auth_service.complete_password_reset(req.token, req.new_password)
+    return auth_service.reset_password(req.token, req.new_password)
 
 
 # ─── Account / Profile APIs ─────────────────────────────────

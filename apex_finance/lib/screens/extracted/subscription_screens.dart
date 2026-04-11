@@ -55,13 +55,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       appBar: AppBar(title: const Text('خطتي والاشتراك'), backgroundColor: const Color(0xFF1E1E2E),
-        iconTheme: const IconThemeData(color: AC.gold)),
+        iconTheme: IconThemeData(color: AC.gold)),
       backgroundColor: const Color(0xFF0D0D1A),
       body: _loading
-        ? const Center(child: CircularProgressIndicator(color: AC.gold))
+        ? Center(child: CircularProgressIndicator(color: AC.gold))
         : _error != null
-          ? Center(child: Text(_error!, style: const TextStyle(color: AC.err)))
-          : RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: const EdgeInsets.all(16), children: [
+          ? Center(child: Text(_error!, style: TextStyle(color: AC.err)))
+          : RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
               // Current Plan Card
               Container(
                 padding: const EdgeInsets.all(20),
@@ -72,11 +72,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    const Icon(Icons.workspace_premium, color: AC.gold, size: 32),
+                    Icon(Icons.workspace_premium, color: AC.gold, size: 32),
                     const SizedBox(width: 12),
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       const Text('الخطة الحالية', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text(currentPlan, style: const TextStyle(color: AC.gold, fontSize: 24, fontWeight: FontWeight.bold)),
+                      Text(currentPlan, style: TextStyle(color: AC.gold, fontSize: 24, fontWeight: FontWeight.bold)),
                     ]),
                   ]),
                   const SizedBox(height: 16),
@@ -100,7 +100,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               ),
 
               const SizedBox(height: 24),
-              const Text('ترقية خطتك', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('ترقية خطتك', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
 
               // Available Plans
@@ -117,7 +117,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isCurrent ? AC.gold.withValues(alpha: 0.1) : const Color(0xFF1E1E2E),
+                    color: isCurrent ? AC.gold.withValues(alpha: 0.1) : Color(0xFF1E1E2E),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: isCurrent ? AC.gold : Colors.white12),
                   ),
@@ -197,17 +197,17 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   Widget build(BuildContext context) {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       appBar: AppBar(title: const Text('مقارنة الخطط'), backgroundColor: const Color(0xFF1E1E2E),
-        iconTheme: const IconThemeData(color: AC.gold)),
+        iconTheme: IconThemeData(color: AC.gold)),
       backgroundColor: const Color(0xFF0D0D1A),
       body: _loading
-        ? const Center(child: CircularProgressIndicator(color: AC.gold))
+        ? Center(child: CircularProgressIndicator(color: AC.gold))
         : SingleChildScrollView(scrollDirection: Axis.horizontal, child: SingleChildScrollView(child:
             DataTable(
               headingRowColor: WidgetStateProperty.all(const Color(0xFF1E1E2E)),
               columns: [
-                const DataColumn(label: Text('الميزة', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
+                DataColumn(label: Text('الميزة', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
                 ..._planNames.map((p) => DataColumn(
-                  label: Text(p, style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold)))),
+                  label: Text(p, style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)))),
               ],
               rows: _comparison.map<DataRow>((row) => DataRow(cells: [
                 DataCell(Text(row['name_ar'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 12))),

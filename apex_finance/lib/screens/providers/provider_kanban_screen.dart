@@ -56,9 +56,9 @@ class _PKState extends State<ProviderKanbanScreen> {
       backgroundColor: AC.navy,
       appBar: AppBar(
         backgroundColor: AC.navy2,
-        title: const Text('\u0645\u0632\u0648\u062f\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
+        title: Text('\u0645\u0632\u0648\u062f\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
+          IconButton(icon: Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
         ],
       ),
       body: ListView(
@@ -92,7 +92,7 @@ class _PKState extends State<ProviderKanbanScreen> {
         ),
         // Items
         Expanded(child: Container(
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)), border: Border(left: BorderSide(color: color.withValues(alpha: 0.3)), right: BorderSide(color: color.withValues(alpha: 0.3)), bottom: BorderSide(color: color.withValues(alpha: 0.3)))),
+          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.vertical(bottom: Radius.circular(14)), border: Border(left: BorderSide(color: color.withValues(alpha: 0.3)), right: BorderSide(color: color.withValues(alpha: 0.3)), bottom: BorderSide(color: color.withValues(alpha: 0.3)))),
           child: ListView.builder(
             padding: const EdgeInsets.all(8),
             itemCount: items.length,
@@ -109,21 +109,21 @@ class _PKState extends State<ProviderKanbanScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.bdr)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(item['\u0646'] as String, style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 12)),
+        Text(item['\u0646'] as String, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 12)),
         const SizedBox(height: 6),
         Row(children: [
           Icon(Icons.payments_outlined, color: AC.gold, size: 14),
           const SizedBox(width: 4),
-          Text(' \u0631.\u0633', style: const TextStyle(color: AC.gold, fontSize: 11)),
+          Text(' \u0631.\u0633', style: TextStyle(color: AC.gold, fontSize: 11)),
           const Spacer(),
-          Text(item['time'] as String, style: const TextStyle(color: AC.ts, fontSize: 10)),
+          Text(item['time'] as String, style: TextStyle(color: AC.ts, fontSize: 10)),
         ]),
         if (item.containsKey('rating')) ...[
           const SizedBox(height: 4),
           Row(children: [
-            const Icon(Icons.star, color: AC.gold, size: 14),
+            Icon(Icons.star, color: AC.gold, size: 14),
             const SizedBox(width: 2),
-            Text('', style: const TextStyle(color: AC.gold, fontSize: 11)),
+            Text('', style: TextStyle(color: AC.gold, fontSize: 11)),
           ]),
         ],
       ]),

@@ -4,20 +4,20 @@ import '../../core/theme.dart';
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
-  filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+  filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)));
+  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)));
 
 Widget _card(String t, List<Widget> c, {Color? accent}) => Container(
   margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: accent ?? AC.bdr)),
   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Text(t, style: TextStyle(color: accent ?? AC.gold, fontWeight: FontWeight.bold, fontSize: 15)),
-    const Divider(color: AC.bdr, height: 18), ...c]));
+    Divider(color: AC.bdr, height: 18), ...c]));
 
 Widget _kv(String k, String v, {Color? vc}) => Padding(padding: const EdgeInsets.only(bottom: 5),
   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-    Text(k, style: const TextStyle(color: AC.ts, fontSize: 13)),
+    Text(k, style: TextStyle(color: AC.ts, fontSize: 13)),
     Flexible(child: Text(v, style: TextStyle(color: vc ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
 
 Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -44,8 +44,8 @@ class _RevCS extends State<ReviewerConsoleScreen> {
   }
   List get _filtered => _filter == 'all' ? _items : _items.where((i) => i['status'] == _filter).toList();
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.gold))),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+    appBar: AppBar(title: Text('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.gold))),
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       Column(children: [
         // Filter chips
         SingleChildScrollView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.all(12),
@@ -59,8 +59,8 @@ class _RevCS extends State<ReviewerConsoleScreen> {
         // Items list
         Expanded(child: _filtered.isEmpty ?
           Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.inbox_outlined, color: AC.ts, size: 50), const SizedBox(height: 10),
-            const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0644\u0627\u062d\u0638\u0627\u062a', style: TextStyle(color: AC.ts))])) :
+            Icon(Icons.inbox_outlined, color: AC.ts, size: 50), SizedBox(height: 10),
+            Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0644\u0627\u062d\u0638\u0627\u062a', style: TextStyle(color: AC.ts))])) :
           RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 12), itemCount: _filtered.length,
             itemBuilder: (_, i) {
@@ -70,25 +70,25 @@ class _RevCS extends State<ReviewerConsoleScreen> {
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    Expanded(child: Text(item['title']??'', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14))),
+                    Expanded(child: Text(item['title']??'', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14))),
                     _badge(status == 'submitted' ? '\u0645\u0642\u062f\u0645\u0629' : status == 'accepted' ? '\u0645\u0642\u0628\u0648\u0644\u0629' : status == 'rejected' ? '\u0645\u0631\u0641\u0648\u0636\u0629' : status,
                       status == 'accepted' ? AC.ok : status == 'rejected' ? AC.err : AC.warn)]),
                   const SizedBox(height: 6),
-                  Text(item['feedback_type']??'', style: const TextStyle(color: AC.cyan, fontSize: 11)),
+                  Text(item['feedback_type']??'', style: TextStyle(color: AC.cyan, fontSize: 11)),
                   if(item['description']!=null && item['description'].toString().isNotEmpty)
                     Padding(padding: const EdgeInsets.only(top: 6),
-                      child: Text(item['description'], style: const TextStyle(color: AC.ts, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis)),
-                  Text('\u0628\u0648\u0627\u0633\u0637\u0629: ${item['submitted_by_name']??item['submitted_by']??''}', style: const TextStyle(color: AC.ts, fontSize: 10)),
+                      child: Text(item['description'], style: TextStyle(color: AC.ts, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis)),
+                  Text('\u0628\u0648\u0627\u0633\u0637\u0629: ${item['submitted_by_name']??item['submitted_by']??''}', style: TextStyle(color: AC.ts, fontSize: 10)),
                   if(status == 'submitted') ...[
                     const SizedBox(height: 10),
                     Row(children: [
                       Expanded(child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: const EdgeInsets.symmetric(vertical: 8)),
+                        style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: EdgeInsets.symmetric(vertical: 8)),
                         onPressed: ()=> _review(item['id']??item['feedback_id']??'', 'accepted'),
                         icon: const Icon(Icons.check, size: 16), label: const Text('\u0642\u0628\u0648\u0644', style: TextStyle(fontSize: 12)))),
                       const SizedBox(width: 8),
                       Expanded(child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(backgroundColor: AC.err, padding: const EdgeInsets.symmetric(vertical: 8)),
+                        style: ElevatedButton.styleFrom(backgroundColor: AC.err, padding: EdgeInsets.symmetric(vertical: 8)),
                         onPressed: ()=> _review(item['id']??item['feedback_id']??'', 'rejected'),
                         icon: const Icon(Icons.close, size: 16), label: const Text('\u0631\u0641\u0636', style: TextStyle(fontSize: 12)))),
                     ])],
@@ -118,11 +118,11 @@ class _PVS extends State<ProviderVerificationScreen> {
     _load();
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u062a\u062d\u0642\u0642 \u0645\u0642\u062f\u0645\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.gold))),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+    appBar: AppBar(title: Text('\u062a\u062d\u0642\u0642 \u0645\u0642\u062f\u0645\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.gold))),
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       _provs.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.verified_user_outlined, color: AC.ts, size: 50), const SizedBox(height: 10),
-        const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0637\u0644\u0628\u0627\u062a \u062a\u062d\u0642\u0642', style: TextStyle(color: AC.ts))])) :
+        Icon(Icons.verified_user_outlined, color: AC.ts, size: 50), SizedBox(height: 10),
+        Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0637\u0644\u0628\u0627\u062a \u062a\u062d\u0642\u0642', style: TextStyle(color: AC.ts))])) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
         padding: const EdgeInsets.all(12), itemCount: _provs.length,
         itemBuilder: (_, i) {
@@ -133,11 +133,11 @@ class _PVS extends State<ProviderVerificationScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 CircleAvatar(backgroundColor: AC.navy4, radius: 20,
-                  child: Text((p['display_name']??p['username']??'?')[0], style: const TextStyle(color: AC.gold, fontSize: 16))),
+                  child: Text((p['display_name']??p['username']??'?')[0], style: TextStyle(color: AC.gold, fontSize: 16))),
                 const SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(p['display_name']??p['username']??'', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text(p['category']??'', style: const TextStyle(color: AC.cyan, fontSize: 11))])),
+                  Text(p['display_name']??p['username']??'', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(p['category']??'', style: TextStyle(color: AC.cyan, fontSize: 11))])),
                 _badge(vStatus == 'approved' ? '\u0645\u0639\u062a\u0645\u062f' : vStatus == 'pending' ? '\u0642\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631' : vStatus,
                   vStatus == 'approved' ? AC.ok : vStatus == 'rejected' ? AC.err : AC.warn)]),
               if(p['service_scopes']!=null) ...[
@@ -145,20 +145,20 @@ class _PVS extends State<ProviderVerificationScreen> {
                 Wrap(spacing: 6, runSpacing: 4, children: (p['service_scopes'] as List).map((s) =>
                   Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                    child: Text(s['name_ar']??s['code']??'', style: const TextStyle(color: AC.cyan, fontSize: 10)))).toList())],
+                    child: Text(s['name_ar']??s['code']??'', style: TextStyle(color: AC.cyan, fontSize: 10)))).toList())],
               if(p['required_documents']!=null) ...[
                 const SizedBox(height: 6),
-                Text('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a: ${(p['required_documents'] as List).join(", ")}', style: const TextStyle(color: AC.ts, fontSize: 10))],
+                Text('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a: ${(p['required_documents'] as List).join(", ")}', style: TextStyle(color: AC.ts, fontSize: 10))],
               if(vStatus == 'pending') ...[
                 const SizedBox(height: 10),
                 Row(children: [
                   Expanded(child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: const EdgeInsets.symmetric(vertical: 8)),
+                    style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: EdgeInsets.symmetric(vertical: 8)),
                     onPressed: ()=> _action(p['provider_id']??p['id']??'', 'approve'),
                     icon: const Icon(Icons.check, size: 16), label: const Text('\u0627\u0639\u062a\u0645\u0627\u062f', style: TextStyle(fontSize: 12)))),
                   const SizedBox(width: 8),
                   Expanded(child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(backgroundColor: AC.err, padding: const EdgeInsets.symmetric(vertical: 8)),
+                    style: ElevatedButton.styleFrom(backgroundColor: AC.err, padding: EdgeInsets.symmetric(vertical: 8)),
                     onPressed: ()=> _action(p['provider_id']??p['id']??'', 'reject'),
                     icon: const Icon(Icons.close, size: 16), label: const Text('\u0631\u0641\u0636', style: TextStyle(fontSize: 12)))),
                 ])],
@@ -183,11 +183,11 @@ class _PMS extends State<PolicyManagementScreen> {
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: const Text('\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.gold))),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
+    appBar: AppBar(title: Text('\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.gold))),
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       _policies.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.policy_outlined, color: AC.ts, size: 50), const SizedBox(height: 10),
-        const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.ts))])) :
+        Icon(Icons.policy_outlined, color: AC.ts, size: 50), SizedBox(height: 10),
+        Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.ts))])) :
       ListView.builder(padding: const EdgeInsets.all(14), itemCount: _policies.length,
         itemBuilder: (_, i) {
           final p = _policies[i];
@@ -198,18 +198,18 @@ class _PMS extends State<PolicyManagementScreen> {
                 Icon(_policyIcon(p['policy_type']??''), color: AC.gold, size: 24),
                 const SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(p['title_ar']??p['title']??p['policy_type']??'', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text('\u0627\u0644\u0625\u0635\u062f\u0627\u0631: ${p['version']??'1.0'}', style: const TextStyle(color: AC.ts, fontSize: 11))])),
+                  Text(p['title_ar']??p['title']??p['policy_type']??'', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text('\u0627\u0644\u0625\u0635\u062f\u0627\u0631: ${p['version']??'1.0'}', style: TextStyle(color: AC.ts, fontSize: 11))])),
                 _badge(p['is_active']==true?'\u0641\u0639\u0627\u0644':'\u063a\u064a\u0631 \u0641\u0639\u0627\u0644', p['is_active']==true?AC.ok:AC.ts)]),
               if(p['summary_ar']!=null || p['content_preview']!=null) ...[
                 const SizedBox(height: 8),
-                Text(p['summary_ar']??p['content_preview']??'', style: const TextStyle(color: AC.ts, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis)],
+                Text(p['summary_ar']??p['content_preview']??'', style: TextStyle(color: AC.ts, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis)],
               const SizedBox(height: 8),
               Row(children: [
-                const Icon(Icons.calendar_today, color: AC.ts, size: 12), const SizedBox(width: 4),
-                Text(p['effective_date']?.toString().substring(0,10)??p['created_at']?.toString().substring(0,10)??'', style: const TextStyle(color: AC.ts, fontSize: 10)),
+                Icon(Icons.calendar_today, color: AC.ts, size: 12), SizedBox(width: 4),
+                Text(p['effective_date']?.toString().substring(0,10)??p['created_at']?.toString().substring(0,10)??'', style: TextStyle(color: AC.ts, fontSize: 10)),
                 const Spacer(),
-                if(p['acceptance_count']!=null) Text('\u0645\u0648\u0627\u0641\u0642\u0627\u062a: ${p['acceptance_count']}', style: const TextStyle(color: AC.ts, fontSize: 10)),
+                if(p['acceptance_count']!=null) Text('\u0645\u0648\u0627\u0641\u0642\u0627\u062a: ${p['acceptance_count']}', style: TextStyle(color: AC.ts, fontSize: 10)),
               ]),
             ]));
         }));
@@ -259,7 +259,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -310,7 +310,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white, borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: value ? AC.gold : const Color(0xFFE0E0E0), width: value ? 2 : 1),
+        border: Border.all(color: value ? AC.gold : Color(0xFFE0E0E0), width: value ? 2 : 1),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -371,7 +371,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
           width: double.infinity, padding: const EdgeInsets.all(16), color: const Color(0xFFF0F4FF),
@@ -389,12 +389,12 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: selected ? AC.gold : const Color(0xFFE0E0E0), width: selected ? 2 : 1),
+                  border: Border.all(color: selected ? AC.gold : Color(0xFFE0E0E0), width: selected ? 2 : 1),
                 ),
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: CircleAvatar(
-                    backgroundColor: selected ? AC.gold.withValues(alpha: 0.15) : const Color(0xFFF5F5F5),
+                    backgroundColor: selected ? AC.gold.withValues(alpha: 0.15) : Color(0xFFF5F5F5),
                     child: Icon(t['icon'] as IconData, color: selected ? AC.gold : AC.navy, size: 24),
                   ),
                   title: Text(t['name'] as String, style: TextStyle(
@@ -461,7 +461,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
           width: double.infinity, padding: const EdgeInsets.all(16),
@@ -494,7 +494,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
                   CircleAvatar(
                     backgroundColor: doc['uploaded'] == true ? const Color(0xFFE8F5E9) : const Color(0xFFF5F5F5),
                     child: Icon(doc['icon'] as IconData,
-                      color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : AC.navy),
+                      color: doc['uploaded'] == true ? Color(0xFF2ECC8A) : AC.navy),
                   ),
                   const SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -657,7 +657,7 @@ class ProviderComplianceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -743,7 +743,7 @@ class ActivityHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(title: const Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: activities.length,
@@ -811,27 +811,27 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12)),
     child: _loading 
-      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      ? Center(child: CircularProgressIndicator(color: AC.gold))
       : _detail == null 
-        ? const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062a\u0641\u0627\u0635\u064a\u0644 \u0645\u062a\u0627\u062d\u0629', style: TextStyle(color: AC.tp))
+        ? Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062a\u0641\u0627\u0635\u064a\u0644 \u0645\u062a\u0627\u062d\u0629', style: TextStyle(color: AC.tp))
         : Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
             Row(children: [
-              const Icon(Icons.info_outline, color: AC.gold, size: 20),
+              Icon(Icons.info_outline, color: AC.gold, size: 20),
               const SizedBox(width: 8),
               Expanded(child: Text(_detail!['summary_ar'] ?? _detail!['result_key'] ?? '',
-                style: const TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold))),
+                style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold))),
             ]),
             const SizedBox(height: 12),
             if (_detail!['source_rows'] != null) ...[
-              const Text('\u0627\u0644\u0635\u0641\u0648\u0641 \u0627\u0644\u0645\u0635\u062f\u0631\u064a\u0629:', style: TextStyle(color: AC.cyan, fontSize: 13)),
+              Text('\u0627\u0644\u0635\u0641\u0648\u0641 \u0627\u0644\u0645\u0635\u062f\u0631\u064a\u0629:', style: TextStyle(color: AC.cyan, fontSize: 13)),
               const SizedBox(height: 4),
-              Text(_detail!['source_rows'], style: const TextStyle(color: AC.tp, fontSize: 12)),
+              Text(_detail!['source_rows'], style: TextStyle(color: AC.tp, fontSize: 12)),
               const SizedBox(height: 8),
             ],
             if (_detail!['applied_rules'] != null) ...[
-              const Text('\u0627\u0644\u0642\u0648\u0627\u0639\u062f \u0627\u0644\u0645\u0637\u0628\u0642\u0629:', style: TextStyle(color: AC.cyan, fontSize: 13)),
+              Text('\u0627\u0644\u0642\u0648\u0627\u0639\u062f \u0627\u0644\u0645\u0637\u0628\u0642\u0629:', style: TextStyle(color: AC.cyan, fontSize: 13)),
               const SizedBox(height: 4),
-              Text(_detail!['applied_rules'], style: const TextStyle(color: AC.tp, fontSize: 12)),
+              Text(_detail!['applied_rules'], style: TextStyle(color: AC.tp, fontSize: 12)),
               const SizedBox(height: 8),
             ],
             Row(children: [
@@ -922,25 +922,25 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
   
   @override Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0627\u0644\u0645\u0647\u0645\u0629', style: TextStyle(color: AC.tp)),
-      backgroundColor: AC.navy2, iconTheme: const IconThemeData(color: AC.gold)),
+    appBar: AppBar(title: Text('\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0627\u0644\u0645\u0647\u0645\u0629', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy2, iconTheme: IconThemeData(color: AC.gold)),
     body: _loading 
-      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      ? Center(child: CircularProgressIndicator(color: AC.gold))
       : _taskType == null
-        ? const Center(child: Text('\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0646\u0648\u0639 \u0627\u0644\u0645\u0647\u0645\u0629', style: TextStyle(color: AC.tp)))
+        ? Center(child: Text('\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0646\u0648\u0639 \u0627\u0644\u0645\u0647\u0645\u0629', style: TextStyle(color: AC.tp)))
         : ListView(padding: const EdgeInsets.all(16), children: [
             // Task type header
             Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(
               color: AC.navy2, borderRadius: BorderRadius.circular(12)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(_taskType!['name_ar'] ?? '', style: const TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(_taskType!['name_ar'] ?? '', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text(_taskType!['code'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 12)),
+                Text(_taskType!['code'] ?? '', style: TextStyle(color: AC.ts, fontSize: 12)),
               ])),
             const SizedBox(height: 16),
             
             // Input Requirements
-            const Text('\u0627\u0644\u0645\u062f\u062e\u0644\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629', style: TextStyle(color: AC.cyan, fontSize: 16, fontWeight: FontWeight.bold)),
+            Text('\u0627\u0644\u0645\u062f\u062e\u0644\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629', style: TextStyle(color: AC.cyan, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             ...(_taskType!['input_requirements'] as List? ?? []).map((req) => _docTile(req, true)),
             
@@ -966,13 +966,13 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AC.navy3, borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: uploaded ? const Color(0xFF2ECC8A) : (mandatory ? const Color(0x33F39C12) : AC.navy4))),
+        border: Border.all(color: uploaded ? Color(0xFF2ECC8A) : (mandatory ? Color(0x33F39C12) : AC.navy4))),
       child: Row(children: [
         Icon(uploaded ? Icons.check_circle : (isInput ? Icons.upload_file : Icons.download),
-          color: uploaded ? const Color(0xFF2ECC8A) : AC.gold, size: 24),
+          color: uploaded ? Color(0xFF2ECC8A) : AC.gold, size: 24),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(req['name_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 14)),
+          Text(req['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 14)),
           if (mandatory) const Text('* \u0625\u0644\u0632\u0627\u0645\u064a', style: TextStyle(color: Color(0xFFF39C12), fontSize: 11)),
         ])),
         if (!uploaded)
@@ -999,10 +999,10 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
       color: AC.navy2, borderRadius: BorderRadius.circular(12)),
       child: Column(children: [
         Text('\u0627\u0644\u062a\u0642\u062f\u0645: $done / $total \u0645\u0633\u062a\u0646\u062f \u0625\u0644\u0632\u0627\u0645\u064a',
-          style: const TextStyle(color: AC.tp, fontSize: 14)),
+          style: TextStyle(color: AC.tp, fontSize: 14)),
         const SizedBox(height: 8),
         LinearProgressIndicator(value: progress, backgroundColor: AC.navy4,
-          valueColor: AlwaysStoppedAnimation(progress >= 1.0 ? const Color(0xFF2ECC8A) : AC.gold)),
+          valueColor: AlwaysStoppedAnimation(progress >= 1.0 ? Color(0xFF2ECC8A) : AC.gold)),
         const SizedBox(height: 8),
         if (progress >= 1.0)
           ElevatedButton.icon(
@@ -1043,10 +1043,10 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
   
   @override Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('\u0623\u0646\u0648\u0627\u0639 \u0627\u0644\u0645\u0647\u0627\u0645', style: TextStyle(color: AC.tp)),
-      backgroundColor: AC.navy2, iconTheme: const IconThemeData(color: AC.gold)),
+    appBar: AppBar(title: Text('\u0623\u0646\u0648\u0627\u0639 \u0627\u0644\u0645\u0647\u0627\u0645', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy2, iconTheme: IconThemeData(color: AC.gold)),
     body: _loading
-      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      ? Center(child: CircularProgressIndicator(color: AC.gold))
       : ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: _types.length,
@@ -1060,18 +1060,18 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
               child: ExpansionTile(
                 tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 iconColor: AC.gold, collapsedIconColor: AC.ts,
-                title: Text(tt['name_ar'] ?? '', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
-                subtitle: Text('${inputs.length} \u0645\u062f\u062e\u0644 \u2022 ${outputs.length} \u0645\u062e\u0631\u062c', style: const TextStyle(color: AC.ts, fontSize: 12)),
+                title: Text(tt['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+                subtitle: Text('${inputs.length} \u0645\u062f\u062e\u0644 \u2022 ${outputs.length} \u0645\u062e\u0631\u062c', style: TextStyle(color: AC.ts, fontSize: 12)),
                 children: [
                   Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     if (inputs.isNotEmpty) ...[
-                      const Text('\u0627\u0644\u0645\u062f\u062e\u0644\u0627\u062a:', style: TextStyle(color: AC.cyan, fontSize: 13, fontWeight: FontWeight.bold)),
+                      Text('\u0627\u0644\u0645\u062f\u062e\u0644\u0627\u062a:', style: TextStyle(color: AC.cyan, fontSize: 13, fontWeight: FontWeight.bold)),
                       ...inputs.map((r) => Padding(padding: const EdgeInsets.only(right: 16, top: 4),
                         child: Row(children: [
                           Icon(r['is_mandatory'] == true ? Icons.star : Icons.star_border, size: 14,
-                            color: r['is_mandatory'] == true ? const Color(0xFFF39C12) : AC.ts),
+                            color: r['is_mandatory'] == true ? Color(0xFFF39C12) : AC.ts),
                           const SizedBox(width: 6),
-                          Text(r['name_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13)),
+                          Text(r['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13)),
                         ]))),
                     ],
                     if (outputs.isNotEmpty) ...[
@@ -1080,9 +1080,9 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
                       ...outputs.map((r) => Padding(padding: const EdgeInsets.only(right: 16, top: 4),
                         child: Row(children: [
                           Icon(r['is_mandatory'] == true ? Icons.star : Icons.star_border, size: 14,
-                            color: r['is_mandatory'] == true ? const Color(0xFFF39C12) : AC.ts),
+                            color: r['is_mandatory'] == true ? Color(0xFFF39C12) : AC.ts),
                           const SizedBox(width: 6),
-                          Text(r['name_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13)),
+                          Text(r['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13)),
                         ]))),
                     ],
                   ])),
@@ -1122,11 +1122,11 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
   @override Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
     appBar: AppBar(
-      title: const Text('\u0648\u062d\u062f\u0629 \u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp)),
-      backgroundColor: AC.navy2, iconTheme: const IconThemeData(color: AC.gold),
+      title: Text('\u0648\u062d\u062f\u0629 \u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy2, iconTheme: IconThemeData(color: AC.gold),
       actions: [
         PopupMenuButton<String>(
-          icon: const Icon(Icons.filter_list, color: AC.gold),
+          icon: Icon(Icons.filter_list, color: AC.gold),
           onSelected: (v) { _filter = v; _load(); },
           itemBuilder: (c) => [
             const PopupMenuItem(value: 'all', child: Text('\u0627\u0644\u0643\u0644')),
@@ -1139,12 +1139,12 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
       ],
     ),
     body: _loading
-      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      ? Center(child: CircularProgressIndicator(color: AC.gold))
       : _feedbacks.isEmpty
         ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.psychology, color: AC.ts, size: 64),
+            Icon(Icons.psychology, color: AC.ts, size: 64),
             const SizedBox(height: 16),
-            const Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 16)),
+            Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 16)),
           ]))
         : ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -1166,16 +1166,16 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
                     Icon(Icons.lightbulb_outline, color: statusColor, size: 20),
                     const SizedBox(width: 8),
                     Expanded(child: Text(fb['feedback_type'] ?? '\u0645\u0644\u0627\u062d\u0638\u0629',
-                      style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold))),
+                      style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold))),
                     Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                       child: Text(status, style: TextStyle(color: statusColor, fontSize: 11))),
                   ]),
                   const SizedBox(height: 8),
-                  Text(fb['content'] ?? fb['description'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13),
+                  Text(fb['content'] ?? fb['description'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13),
                     maxLines: 3, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 6),
-                  Text(fb['created_at'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 11)),
+                  Text(fb['created_at'] ?? '', style: TextStyle(color: AC.ts, fontSize: 11)),
                 ]),
               );
             }),
@@ -1215,12 +1215,12 @@ class _AuditLogS extends State<AuditLogScreen> {
   
   @override Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('\u0633\u062c\u0644 \u0627\u0644\u062a\u062f\u0642\u064a\u0642', style: TextStyle(color: AC.tp)),
-      backgroundColor: AC.navy2, iconTheme: const IconThemeData(color: AC.gold)),
+    appBar: AppBar(title: Text('\u0633\u062c\u0644 \u0627\u0644\u062a\u062f\u0642\u064a\u0642', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy2, iconTheme: IconThemeData(color: AC.gold)),
     body: _loading
-      ? const Center(child: CircularProgressIndicator(color: AC.gold))
+      ? Center(child: CircularProgressIndicator(color: AC.gold))
       : _events.isEmpty
-        ? const Center(child: Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0623\u062d\u062f\u0627\u062b', style: TextStyle(color: AC.ts)))
+        ? Center(child: Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0623\u062d\u062f\u0627\u062b', style: TextStyle(color: AC.ts)))
         : ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: _events.length,
@@ -1234,9 +1234,9 @@ class _AuditLogS extends State<AuditLogScreen> {
                   Icon(_actionIcon(e['action'] ?? ''), color: AC.cyan, size: 20),
                   const SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(e['action'] ?? '', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
-                    if (e['details'] != null) Text(e['details'], style: const TextStyle(color: AC.ts, fontSize: 12), maxLines: 2),
-                    Text(e['created_at'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 10)),
+                    Text(e['action'] ?? '', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
+                    if (e['details'] != null) Text(e['details'], style: TextStyle(color: AC.ts, fontSize: 12), maxLines: 2),
+                    Text(e['created_at'] ?? '', style: TextStyle(color: AC.ts, fontSize: 10)),
                   ])),
                 ]),
               );

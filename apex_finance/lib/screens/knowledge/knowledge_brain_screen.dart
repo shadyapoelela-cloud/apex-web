@@ -97,10 +97,10 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
             child: const Icon(Icons.psychology, color: Color(0xFFE91E63), size: 20),
           ),
           const SizedBox(width: 10),
-          const Text('\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
+          Text('\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
         ]),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
+          IconButton(icon: Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -145,14 +145,14 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
                 child: Text(a['code'] as String, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
               ),
               const SizedBox(width: 8),
-              Expanded(child: Text(a['name'] as String, style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold))),
+              Expanded(child: Text(a['name'] as String, style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold))),
             ]),
-            subtitle: Text(a['desc'] as String, style: const TextStyle(color: AC.ts, fontSize: 11)),
+            subtitle: Text(a['desc'] as String, style: TextStyle(color: AC.ts, fontSize: 11)),
             iconColor: AC.ts,
             children: [
               Padding(padding: const EdgeInsets.all(14), child: Column(children: [
                 Wrap(spacing: 6, runSpacing: 6, children: (a['tags'] as List).map<Widget>((t) => Chip(
-                  label: Text(t, style: const TextStyle(color: AC.tp, fontSize: 10)),
+                  label: Text(t, style: TextStyle(color: AC.tp, fontSize: 10)),
                   backgroundColor: AC.navy4, side: BorderSide(color: color.withValues(alpha: 0.3)),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, visualDensity: VisualDensity.compact,
                 )).toList()),
@@ -199,13 +199,13 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-                  child: Text('', style: const TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Text('', style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
               ]),
               const Spacer(),
-              Text(d['name'] as String, style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
+              Text(d['name'] as String, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
               const SizedBox(height: 4),
-              Text(d['desc'] as String, style: const TextStyle(color: AC.ts, fontSize: 10), maxLines: 2, overflow: TextOverflow.ellipsis),
+              Text(d['desc'] as String, style: TextStyle(color: AC.ts, fontSize: 10), maxLines: 2, overflow: TextOverflow.ellipsis),
             ])),
           ),
         );
@@ -217,24 +217,24 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
     return Padding(padding: const EdgeInsets.all(14), child: Column(children: [
       TextField(
         controller: _searchCtrl,
-        style: const TextStyle(color: AC.tp),
+        style: TextStyle(color: AC.tp),
         textDirection: TextDirection.rtl,
         decoration: InputDecoration(
           hintText: '\u0627\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u0642\u0627\u0639\u062f\u0629 \u0627\u0644\u0645\u0639\u0631\u0641\u064a\u0629...',
-          hintStyle: const TextStyle(color: AC.ts),
-          prefixIcon: const Icon(Icons.search, color: AC.gold),
+          hintStyle: TextStyle(color: AC.ts),
+          prefixIcon: Icon(Icons.search, color: AC.gold),
           filled: true, fillColor: AC.navy3,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AC.gold)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.gold)),
         ),
         onChanged: (v) => setState(() => _searchQuery = v),
       ),
       const SizedBox(height: 16),
       Expanded(child: _searchQuery.isEmpty
         ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.search, color: AC.ts, size: 48),
+            Icon(Icons.search, color: AC.ts, size: 48),
             const SizedBox(height: 12),
-            const Text('\u0627\u0628\u062d\u062b \u0639\u0646 \u0645\u0639\u0627\u064a\u064a\u0631\u060c \u0642\u0648\u0627\u0639\u062f\u060c \u0623\u0646\u0638\u0645\u0629\u060c \u0645\u0641\u0627\u0647\u064a\u0645', style: TextStyle(color: AC.ts, fontSize: 13)),
+            Text('\u0627\u0628\u062d\u062b \u0639\u0646 \u0645\u0639\u0627\u064a\u064a\u0631\u060c \u0642\u0648\u0627\u0639\u062f\u060c \u0623\u0646\u0638\u0645\u0629\u060c \u0645\u0641\u0627\u0647\u064a\u0645', style: TextStyle(color: AC.ts, fontSize: 13)),
           ]))
         : ListView(children: _authorities.where((a) =>
             (a['name'] as String).contains(_searchQuery) ||
@@ -245,9 +245,9 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
             final color = Color(a['color'] as int);
             return ListTile(
               leading: Icon(a['icon'] as IconData, color: color),
-              title: Text(a['name'] as String, style: const TextStyle(color: AC.tp, fontSize: 13)),
+              title: Text(a['name'] as String, style: TextStyle(color: AC.tp, fontSize: 13)),
               subtitle: Text(a['code'] as String, style: TextStyle(color: color, fontSize: 11)),
-              trailing: const Icon(Icons.chevron_right, color: AC.ts),
+              trailing: Icon(Icons.chevron_right, color: AC.ts),
               onTap: () {},
             );
           }).toList()),

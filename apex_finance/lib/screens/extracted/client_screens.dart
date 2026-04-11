@@ -30,18 +30,18 @@ class _ClientListS extends State<ClientListScreen> {
   @override
   Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('العملاء', style: TextStyle(color: AC.gold)),
-      actions: [IconButton(icon: const Icon(Icons.add_circle, color: AC.gold),
+    appBar: AppBar(title: Text('العملاء', style: TextStyle(color: AC.gold)),
+      actions: [IconButton(icon: Icon(Icons.add_circle, color: AC.gold),
         onPressed: () async {
           final created = await context.push('/clients/create');
           if (created == true) _load();
         })]),
-    body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
+    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold))
       : _clients.isEmpty
         ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.business, size: 64, color: AC.ts),
+            Icon(Icons.business, size: 64, color: AC.ts),
             const SizedBox(height: 16),
-            const Text('لا يوجد عملاء بعد', style: TextStyle(color: AC.ts, fontSize: 16)),
+            Text('لا يوجد عملاء بعد', style: TextStyle(color: AC.ts, fontSize: 16)),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               icon: const Icon(Icons.add),
@@ -73,12 +73,12 @@ class _ClientListS extends State<ClientListScreen> {
                     child: Text((cl['name_ar'] ?? cl['name'] ?? '?')[0], style: TextStyle(color: AC.gold))),
                   const SizedBox(width: 16),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(cl['name_ar'] ?? cl['name'] ?? '', style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
+                    Text(cl['name_ar'] ?? cl['name'] ?? '', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     Text('${cl['client_type_code'] ?? cl['client_type'] ?? ''} • ${cl['role'] ?? 'owner'}',
                       style: TextStyle(color: AC.ts, fontSize: 12)),
                   ])),
-                  const Icon(Icons.chevron_right, color: AC.ts),
+                  Icon(Icons.chevron_right, color: AC.ts),
                 ]),
               ),
             );            },
@@ -127,7 +127,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(title: const Text('عميل جديد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      appBar: AppBar(title: Text('عميل جديد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
       body: Column(
         children: [
           Padding(

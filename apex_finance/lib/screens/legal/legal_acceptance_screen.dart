@@ -25,14 +25,14 @@ class _LALState extends State<LegalAcceptanceLogger> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(backgroundColor: AC.navy2, title: const Text('\u0627\u0644\u0634\u0631\u0648\u0637 \u0648\u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold))),
+      appBar: AppBar(backgroundColor: AC.navy2, title: Text('\u0627\u0644\u0634\u0631\u0648\u0637 \u0648\u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold))),
       body: ListView(padding: const EdgeInsets.all(14), children: [
         Container(
           padding: const EdgeInsets.all(14),
           margin: const EdgeInsets.only(bottom: 14),
           decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.cyan.withValues(alpha: 0.3))),
           child: Row(children: [
-            const Icon(Icons.info_outline, color: AC.cyan, size: 20),
+            Icon(Icons.info_outline, color: AC.cyan, size: 20),
             const SizedBox(width: 10),
             Expanded(child: Text('\u0643\u0644 \u0642\u0628\u0648\u0644 \u0645\u0633\u062c\u0644 \u0628\u0627\u0644\u0646\u0633\u062e\u0629 \u0648\u0627\u0644\u062a\u0627\u0631\u064a\u062e \u0648\u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.cyan, fontSize: 12))),
           ]),
@@ -45,17 +45,17 @@ class _LALState extends State<LegalAcceptanceLogger> {
             Row(children: [
               Icon(p['accepted'] == true ? Icons.check_circle : Icons.pending, color: p['accepted'] == true ? AC.ok : AC.warn, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(p['title'] as String, style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13))),
+              Expanded(child: Text(p['title'] as String, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13))),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(color: AC.navy4, borderRadius: BorderRadius.circular(6)),
-                child: Text('v', style: const TextStyle(color: AC.gold, fontSize: 10)),
+                child: Text('v', style: TextStyle(color: AC.gold, fontSize: 10)),
               ),
             ]),
             const SizedBox(height: 6),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('\u0627\u0644\u0646\u0648\u0639: ', style: const TextStyle(color: AC.ts, fontSize: 11)),
-              Text('\u0627\u0644\u062a\u0627\u0631\u064a\u062e: ', style: const TextStyle(color: AC.ts, fontSize: 11)),
+              Text('\u0627\u0644\u0646\u0648\u0639: ', style: TextStyle(color: AC.ts, fontSize: 11)),
+              Text('\u0627\u0644\u062a\u0627\u0631\u064a\u062e: ', style: TextStyle(color: AC.ts, fontSize: 11)),
             ]),
             if (p['accepted'] != true) ...[
               const SizedBox(height: 8),
@@ -65,7 +65,7 @@ class _LALState extends State<LegalAcceptanceLogger> {
                   setState(() => p['accepted'] = true);
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: AC.gold),
-                child: const Text('\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.navy)),
+                child: Text('\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.navy)),
               )),
             ],
           ]),

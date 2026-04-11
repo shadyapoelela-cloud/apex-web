@@ -4,9 +4,9 @@ import '../../core/theme.dart';
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
-  filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+  filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)),
+  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)),
 );
 
 class ClientOnboardingWizard extends StatefulWidget {
@@ -174,17 +174,17 @@ class _WizardState extends State<ClientOnboardingWizard> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(backgroundColor: AC.navy,
-        body: const Center(child: CircularProgressIndicator(color: AC.gold)));
+        body: Center(child: CircularProgressIndicator(color: AC.gold)));
     }
 
     return Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
-        title: const Text('تسجيل عميل جديد', style: TextStyle(color: AC.gold)),
-        leading: _step > 0 ? IconButton(icon: const Icon(Icons.arrow_back, color: AC.gold), onPressed: _back) : null,
+        title: Text('تسجيل عميل جديد', style: TextStyle(color: AC.gold)),
+        leading: _step > 0 ? IconButton(icon: Icon(Icons.arrow_back, color: AC.gold), onPressed: _back) : null,
         actions: [
           if (_stageNote != null) IconButton(
-            icon: const Icon(Icons.help_outline, color: AC.gold),
+            icon: Icon(Icons.help_outline, color: AC.gold),
             tooltip: 'لماذا هذه الخطوة؟',
             onPressed: () => _showStageNote(context)),
         ],
@@ -195,16 +195,16 @@ class _WizardState extends State<ClientOnboardingWizard> {
           margin: const EdgeInsets.all(12), padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
           child: Row(children: [
-            const Icon(Icons.error_outline, color: AC.err, size: 18),
+            Icon(Icons.error_outline, color: AC.err, size: 18),
             const SizedBox(width: 8),
-            Expanded(child: Text(_error!, style: const TextStyle(color: AC.err, fontSize: 12))),
+            Expanded(child: Text(_error!, style: TextStyle(color: AC.err, fontSize: 12))),
           ])),
         Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: _buildStep())),
         Padding(padding: const EdgeInsets.all(16), child: Row(children: [
           if (_step > 0) Expanded(child: OutlinedButton(
             onPressed: _back,
-            style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold), padding: const EdgeInsets.symmetric(vertical: 14)),
-            child: const Text('السابق', style: TextStyle(color: AC.gold)))),
+            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold), padding: EdgeInsets.symmetric(vertical: 14)),
+            child: Text('السابق', style: TextStyle(color: AC.gold)))),
           if (_step > 0) const SizedBox(width: 12),
           Expanded(child: ElevatedButton(
             onPressed: _step == 6 ? _submit : _next,
@@ -224,15 +224,15 @@ class _WizardState extends State<ClientOnboardingWizard> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('خطوة ' + (_step + 1).toString() + ' من 7', style: const TextStyle(color: AC.ts, fontSize: 12)),
-          Text(percent.toString() + '%', style: const TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
+          Text('خطوة ' + (_step + 1).toString() + ' من 7', style: TextStyle(color: AC.ts, fontSize: 12)),
+          Text(percent.toString() + '%', style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
         ]),
         const SizedBox(height: 6),
         ClipRRect(borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(value: (_step + 1) / 7, minHeight: 6,
-            backgroundColor: AC.navy3, valueColor: const AlwaysStoppedAnimation(AC.gold))),
+            backgroundColor: AC.navy3, valueColor: AlwaysStoppedAnimation(AC.gold))),
         const SizedBox(height: 4),
-        Text(_stepTitle(), style: const TextStyle(color: AC.tp, fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(_stepTitle(), style: TextStyle(color: AC.tp, fontSize: 14, fontWeight: FontWeight.bold)),
       ]),
     );
   }
@@ -278,7 +278,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
         _loadSubSectors(v!).then((_) { if (mounted) setState(() {}); }); })).toList());
 
   Widget _stepSubSector() => _subSectors.isEmpty
-    ? const Center(child: Padding(padding: EdgeInsets.all(32), child: Text('اختر النشاط الرئيسي أولاً أو لا توجد أنشطة فرعية', style: TextStyle(color: AC.ts))))
+    ? Center(child: Padding(padding: EdgeInsets.all(32), child: Text('اختر النشاط الرئيسي أولاً أو لا توجد أنشطة فرعية', style: TextStyle(color: AC.ts))))
     : Column(children: _subSectors.map((s) {
         final hasLicense = s['requires_license'] == true;
         return _radioTile(s['code'], s['name_ar'], hasLicense ? 'يتطلب ترخيص' : '', _selectedSubSector,
@@ -302,15 +302,15 @@ class _WizardState extends State<ClientOnboardingWizard> {
   }
 
   Widget _stepDocuments() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-    const Icon(Icons.cloud_upload, size: 48, color: AC.gold),
+    Icon(Icons.cloud_upload, size: 48, color: AC.gold),
     const SizedBox(height: 12),
-    const Text('المستندات المطلوبة ستظهر بناءً على نوع الكيان والنشاط',
+    Text('المستندات المطلوبة ستظهر بناءً على نوع الكيان والنشاط',
       textAlign: TextAlign.center, style: TextStyle(color: AC.ts, fontSize: 14)),
     const SizedBox(height: 12),
     Container(padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('المستندات الأساسية:', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)),
+        Text('المستندات الأساسية:', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         _docRow('السجل التجاري', _crC.text.isNotEmpty),
         _docRow('الرقم الضريبي', _taxC.text.isNotEmpty),
@@ -329,9 +329,9 @@ class _WizardState extends State<ClientOnboardingWizard> {
     ]));
 
   Widget _stepReview() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-    const Icon(Icons.verified, size: 48, color: AC.ok),
+    Icon(Icons.verified, size: 48, color: AC.ok),
     const SizedBox(height: 12),
-    const Text('مراجعة البيانات قبل الإنشاء', textAlign: TextAlign.center,
+    Text('مراجعة البيانات قبل الإنشاء', textAlign: TextAlign.center,
       style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
     const SizedBox(height: 16),
     _reviewRow('الاسم العربي', _nameArC.text),
@@ -348,9 +348,9 @@ class _WizardState extends State<ClientOnboardingWizard> {
   Widget _reviewRow(String label, String value) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: const TextStyle(color: AC.ts, fontSize: 13)),
+      Text(label, style: TextStyle(color: AC.ts, fontSize: 13)),
       Flexible(child: Text(value.isEmpty ? '—' : value,
-        style: const TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold), textAlign: TextAlign.end)),
+        style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold), textAlign: TextAlign.end)),
     ]));
 
   Widget _radioTile(String code, String label, String desc, String? selected, ValueChanged<String?> onChanged, {String? badge}) {
@@ -369,12 +369,12 @@ class _WizardState extends State<ClientOnboardingWizard> {
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label, style: TextStyle(color: sel ? AC.gold : AC.tp, fontSize: 14, fontWeight: sel ? FontWeight.bold : FontWeight.normal)),
-            if (desc.isNotEmpty) Text(desc, style: const TextStyle(color: AC.ts, fontSize: 11)),
+            if (desc.isNotEmpty) Text(desc, style: TextStyle(color: AC.ts, fontSize: 11)),
           ])),
           if (badge != null) Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-            child: Text(badge, style: const TextStyle(color: AC.gold, fontSize: 10))),
+            child: Text(badge, style: TextStyle(color: AC.gold, fontSize: 10))),
         ])));
   }
 
@@ -385,21 +385,21 @@ class _WizardState extends State<ClientOnboardingWizard> {
       builder: (_) => Padding(padding: const EdgeInsets.all(20), child: Column(
         mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
-            const Icon(Icons.help_outline, color: AC.gold),
+            Icon(Icons.help_outline, color: AC.gold),
             const SizedBox(width: 8),
-            Expanded(child: Text(_stageNote!['title_ar'] ?? '', style: const TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold))),
+            Expanded(child: Text(_stageNote!['title_ar'] ?? '', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold))),
           ]),
           const SizedBox(height: 12),
-          Text(_stageNote!['body_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 13, height: 1.6)),
+          Text(_stageNote!['body_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13, height: 1.6)),
           if (_stageNote!['common_errors_ar'] != null) ...[
             const SizedBox(height: 12),
-            const Text('أخطاء شائعة:', style: TextStyle(color: AC.warn, fontWeight: FontWeight.bold, fontSize: 12)),
-            Text(_stageNote!['common_errors_ar'], style: const TextStyle(color: AC.warn, fontSize: 12)),
+            Text('أخطاء شائعة:', style: TextStyle(color: AC.warn, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(_stageNote!['common_errors_ar'], style: TextStyle(color: AC.warn, fontSize: 12)),
           ],
           if (_stageNote!['impact_ar'] != null) ...[
             const SizedBox(height: 12),
-            const Text('أثر عدم الإكمال:', style: TextStyle(color: AC.err, fontWeight: FontWeight.bold, fontSize: 12)),
-            Text(_stageNote!['impact_ar'], style: const TextStyle(color: AC.err, fontSize: 12)),
+            Text('أثر عدم الإكمال:', style: TextStyle(color: AC.err, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(_stageNote!['impact_ar'], style: TextStyle(color: AC.err, fontSize: 12)),
           ],
           const SizedBox(height: 20),
         ])));

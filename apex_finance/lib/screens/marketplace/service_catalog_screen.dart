@@ -32,7 +32,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: const Text('ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.gold)), backgroundColor: const Color(0xFF080F1F)),
+    appBar: AppBar(title: Text('ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.gold)), backgroundColor: Color(0xFF080F1F)),
     body: Column(children: [
       SingleChildScrollView(scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.all(12),
@@ -48,9 +48,9 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
             onSelected: (_) { setState(() => _selectedCategory = e.key); _load(); },
           ))).toList())),
       Expanded(child: _loading
-        ? const Center(child: CircularProgressIndicator(color: AC.gold))
+        ? Center(child: CircularProgressIndicator(color: AC.gold))
         : _services.isEmpty
-          ? const Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.ts)))
+          ? Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.ts)))
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               itemCount: _services.length,
@@ -64,10 +64,10 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
                   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
-                      Expanded(child: Text(s['title_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
+                      Expanded(child: Text(s['title_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
                       Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-                        child: Text(stagesCount + ' ظ…ط±ط§ط­ظ„', style: const TextStyle(color: AC.cyan, fontSize: 11))),
+                        child: Text(stagesCount + ' ظ…ط±ط§ط­ظ„', style: TextStyle(color: AC.cyan, fontSize: 11))),
                     ]),
                     const SizedBox(height: 6),
                     Row(children: [

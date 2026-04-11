@@ -56,7 +56,7 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
       backgroundColor: AC.navy,
       appBar: AppBar(
         backgroundColor: AC.navy2,
-        title: const Text('\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u062d\u0633\u0627\u0628', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
+        title: Text('\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u062d\u0633\u0627\u0628', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
       ),
       body: ListView(padding: const EdgeInsets.all(14), children: [
         _sectionCard('\u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0634\u062e\u0635\u064a\u0629', Icons.person, [
@@ -85,8 +85,8 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
         const SizedBox(height: 20),
         Center(child: TextButton.icon(
           onPressed: _logout,
-          icon: const Icon(Icons.logout, color: AC.err),
-          label: const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c', style: TextStyle(color: AC.err)),
+          icon: Icon(Icons.logout, color: AC.err),
+          label: Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c', style: TextStyle(color: AC.err)),
         )),
       ]),
     );
@@ -100,9 +100,9 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
       Row(children: [
         Icon(icon, color: AC.gold, size: 20),
         const SizedBox(width: 10),
-        Text(title, style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 15)),
+        Text(title, style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 15)),
       ]),
-      const Divider(color: AC.bdr, height: 20),
+      Divider(color: AC.bdr, height: 20),
       ...children,
     ]),
   );
@@ -110,15 +110,15 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   Widget _infoRow(String key, String val) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(key, style: const TextStyle(color: AC.ts, fontSize: 13)),
-      Text(val, style: const TextStyle(color: AC.tp, fontSize: 13)),
+      Text(key, style: TextStyle(color: AC.ts, fontSize: 13)),
+      Text(val, style: TextStyle(color: AC.tp, fontSize: 13)),
     ]),
   );
 
   Widget _toggleRow(String label, bool value, Function(bool) onChanged) => Padding(
     padding: const EdgeInsets.only(bottom: 4),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: const TextStyle(color: AC.tp, fontSize: 13)),
+      Text(label, style: TextStyle(color: AC.tp, fontSize: 13)),
       Switch(value: value, onChanged: onChanged, activeColor: AC.gold),
     ]),
   );
@@ -126,11 +126,11 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   Widget _dropdownRow(String label, String value, Map<String, String> opts, Function(String?) onChanged) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: const TextStyle(color: AC.tp, fontSize: 13)),
+      Text(label, style: TextStyle(color: AC.tp, fontSize: 13)),
       DropdownButton<String>(
         value: value,
         dropdownColor: AC.navy2,
-        style: const TextStyle(color: AC.tp, fontSize: 13),
+        style: TextStyle(color: AC.tp, fontSize: 13),
         underline: const SizedBox(),
         items: opts.entries.map((e) => DropdownMenuItem(value: e.value, child: Text(e.key))).toList(),
         onChanged: onChanged,
@@ -142,8 +142,8 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
     padding: const EdgeInsets.only(top: 6),
     child: SizedBox(width: double.infinity, child: OutlinedButton(
       onPressed: onTap ?? () {},
-      style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
-      child: Text(text, style: const TextStyle(color: AC.gold, fontSize: 12)),
+      style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),
+      child: Text(text, style: TextStyle(color: AC.gold, fontSize: 12)),
     )),
   );
 }

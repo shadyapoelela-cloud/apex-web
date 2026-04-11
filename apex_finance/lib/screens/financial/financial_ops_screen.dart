@@ -66,13 +66,13 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       appBar: AppBar(
         backgroundColor: AC.navy2,
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0645\u0627\u0644\u064a\u0629', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
+          Text('\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0645\u0627\u0644\u064a\u0629', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
           if (widget.clientName != null)
-            Text(widget.clientName!, style: const TextStyle(color: AC.ts, fontSize: 12)),
+            Text(widget.clientName!, style: TextStyle(color: AC.ts, fontSize: 12)),
         ]),
         actions: [
           IconButton(
-            icon: const Icon(Icons.smart_toy, color: AC.gold),
+            icon: Icon(Icons.smart_toy, color: AC.gold),
             tooltip: 'Apex Copilot',
             onPressed: () => context.push('/copilot'),
           ),
@@ -90,7 +90,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
             itemBuilder: (ctx, i) => _buildSectionTab(i),
           ),
         ),
-        const Divider(color: AC.bdr, height: 1),
+        Divider(color: AC.bdr, height: 1),
         // Content
         Expanded(child: _buildContent()),
       ]),
@@ -222,7 +222,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       const SizedBox(width: 10),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 14)),
-        Text(desc, style: const TextStyle(color: AC.ts, fontSize: 11)),
+        Text(desc, style: TextStyle(color: AC.ts, fontSize: 11)),
       ])),
     ]),
   );
@@ -243,8 +243,8 @@ class _FinOpsState extends State<FinancialOpsScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
-            Text(desc, style: const TextStyle(color: AC.ts, fontSize: 11)),
+            Text(title, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(desc, style: TextStyle(color: AC.ts, fontSize: 11)),
           ])),
           Icon(icon, color: color, size: 22),
         ]),
@@ -268,10 +268,10 @@ class _FinOpsState extends State<FinancialOpsScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
-            Text(subtitle, style: const TextStyle(color: AC.ts, fontSize: 11)),
+            Text(title, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(subtitle, style: TextStyle(color: AC.ts, fontSize: 11)),
           ])),
-          const Icon(Icons.chevron_right, color: AC.ts, size: 20),
+          Icon(Icons.chevron_right, color: AC.ts, size: 20),
         ]),
       ),
     ),

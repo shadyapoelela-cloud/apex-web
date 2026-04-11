@@ -5,9 +5,9 @@ import '../../core/theme.dart';
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
-  filled: true, fillColor: AC.navy3, labelStyle: const TextStyle(color: AC.ts),
+  filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AC.gold)));
+  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)));
 
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -49,7 +49,7 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
       body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const SizedBox(height: 24),
-          const Icon(Icons.lock_reset, size: 72, color: AC.gold),
+          Icon(Icons.lock_reset, size: 72, color: AC.gold),
           const SizedBox(height: 24),
           const Text('أدخل بريدك الإلكتروني المسجل \nسنرسل لك رمز إعادة التعيين',
             style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
@@ -61,12 +61,12 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(labelText: 'البريد الإلكتروني',
               labelStyle: const TextStyle(color: Colors.white54),
-              prefixIcon: const Icon(Icons.email_outlined, color: AC.gold),
+              prefixIcon: Icon(Icons.email_outlined, color: AC.gold),
               enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
-              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
           const SizedBox(height: 24),
           SizedBox(height: 52, child: ElevatedButton(onPressed: _ld ? null : _send,
-            child: _ld ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
+            child: _ld ? SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
               : const Text('إرسال رمز التحقق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
         ]))));
   }
@@ -106,7 +106,7 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
       body: Padding(padding: const EdgeInsets.all(24), child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const SizedBox(height: 24),
-          const Icon(Icons.verified_user, size: 72, color: AC.gold),
+          Icon(Icons.verified_user, size: 72, color: AC.gold),
           const SizedBox(height: 24),
           Text('تم إرسال رمز التحقق إلى\n${widget.email}',
             style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
@@ -122,15 +122,15 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
             decoration: InputDecoration(
               hintText: 'رمز التحقق',
               hintStyle: const TextStyle(color: Colors.white30, letterSpacing: 1),
-              prefixIcon: const Icon(Icons.pin, color: AC.gold),
+              prefixIcon: Icon(Icons.pin, color: AC.gold),
               enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
-              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
+              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
           const SizedBox(height: 24),
           SizedBox(height: 52, child: ElevatedButton(onPressed: _verify,
             child: const Text('تحقق واستمر', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
           const SizedBox(height: 16),
           TextButton(onPressed: () => Navigator.pop(context),
-            child: const Text('إعادة إرسال الرمز', style: TextStyle(color: AC.gold, fontSize: 14))),
+            child: Text('إعادة إرسال الرمز', style: TextStyle(color: AC.gold, fontSize: 14))),
         ]))));
   }
 }
@@ -201,16 +201,16 @@ class _NewPwS extends State<NewPasswordScreen> {
             TextField(controller: _pw1, obscureText: true, style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(labelText: 'كلمة المرور الجديدة',
                 labelStyle: const TextStyle(color: Colors.white54),
-                prefixIcon: const Icon(Icons.lock_outline, color: AC.gold),
+                prefixIcon: Icon(Icons.lock_outline, color: AC.gold),
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
-                focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
+                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
             const SizedBox(height: 16),
             TextField(controller: _pw2, obscureText: true, style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(labelText: 'تأكيد كلمة المرور',
                 labelStyle: const TextStyle(color: Colors.white54),
-                prefixIcon: const Icon(Icons.lock, color: AC.gold),
+                prefixIcon: Icon(Icons.lock, color: AC.gold),
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(14)),
-                focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
+                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold, width: 2), borderRadius: BorderRadius.circular(14)))),
             const SizedBox(height: 24),
             SizedBox(height: 52, child: ElevatedButton(onPressed: _ld ? null : _resetPw,
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade700),
