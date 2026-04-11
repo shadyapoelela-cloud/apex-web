@@ -1,21 +1,21 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../core/session.dart';
 import '../../api_service.dart';
+import '../../providers/app_providers.dart';
 
-class EnhancedSettingsScreen extends StatefulWidget {
+class EnhancedSettingsScreen extends ConsumerStatefulWidget {
   const EnhancedSettingsScreen({super.key});
-  @override State<EnhancedSettingsScreen> createState() => _SettState();
+  @override ConsumerState<EnhancedSettingsScreen> createState() => _SettState();
 }
 
-class _SettState extends State<EnhancedSettingsScreen> {
-  bool _darkMode = true;
+class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   bool _notifications = true;
   bool _emailNotifs = true;
   bool _smsNotifs = false;
   bool _twoFactor = false;
-  String _language = 'ar';
   String _region = 'SA';
 
   @override
@@ -76,11 +76,11 @@ class _SettState extends State<EnhancedSettingsScreen> {
           _toggleRow('\u0625\u0634\u0639\u0627\u0631\u0627\u062a SMS', _smsNotifs, (v) => setState(() => _smsNotifs = v)),
         ]),
         _sectionCard('\u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0648\u0627\u0644\u0644\u063a\u0629', Icons.language, [
-          _dropdownRow('\u0627\u0644\u0644\u063a\u0629', _language, {'\u0627\u0644\u0639\u0631\u0628\u064a\u0629': 'ar', 'English': 'en'}, (v) => setState(() => _language = v!)),
+          _dropdownRow('\u0627\u0644\u0644\u063a\u0629', ref.watch(appSettingsProvider).language, {'\u0627\u0644\u0639\u0631\u0628\u064a\u0629': 'ar', 'English': 'en'}, (v) => ref.read(appSettingsProvider.notifier).setLanguage(v!)),
           _dropdownRow('\u0627\u0644\u0645\u0646\u0637\u0642\u0629', _region, {'\u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629': 'SA', '\u0627\u0644\u0625\u0645\u0627\u0631\u0627\u062a': 'AE', '\u0645\u0635\u0631': 'EG'}, (v) => setState(() => _region = v!)),
         ]),
         _sectionCard('\u0627\u0644\u0645\u0638\u0647\u0631', Icons.palette, [
-          _toggleRow('\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u062f\u0627\u0643\u0646', _darkMode, (v) => setState(() => _darkMode = v)),
+          _toggleRow('\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u062f\u0627\u0643\u0646', ref.watch(appSettingsProvider).isDarkMode, (v) => ref.read(appSettingsProvider.notifier).toggleDarkMode(v)),
         ]),
         const SizedBox(height: 20),
         Center(child: TextButton.icon(
