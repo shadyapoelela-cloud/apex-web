@@ -120,13 +120,13 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
                     decoration: BoxDecoration(
                       color: isRead ? AC.navy2 : AC.navy3,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: isRead ? Colors.transparent : AC.gold.withOpacity(0.3)),
+                      border: Border.all(color: isRead ? Colors.transparent : AC.gold.withValues(alpha: 0.3)),
                     ),
                     child: Row(children: [
                       Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(
-                          color: _colorFor(n['type']).withOpacity(0.15),
+                          color: _colorFor(n['type']).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(_iconFor(n['icon']), color: _colorFor(n['type']), size: 20),
@@ -233,9 +233,9 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? AC.gold.withOpacity(0.2) : Colors.transparent,
+          color: active ? AC.gold.withValues(alpha: 0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: active ? AC.gold : AC.ts.withOpacity(0.3)),
+          border: Border.all(color: active ? AC.gold : AC.ts.withValues(alpha: 0.3)),
         ),
         child: Text(label, style: TextStyle(color: active ? AC.gold : AC.ts, fontSize: 11)),
       ),

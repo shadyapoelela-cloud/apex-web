@@ -24,7 +24,7 @@ Widget _kv(String k, String v, {Color? vc}) => Padding(padding: const EdgeInsets
     Flexible(child: Text(v, style: TextStyle(color: vc ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
 
 Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+  decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
   child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
 // ═══════════════════════════════════════════════════
@@ -147,7 +147,7 @@ class _PVS extends State<ProviderVerificationScreen> {
                 const SizedBox(height: 8),
                 Wrap(spacing: 6, runSpacing: 4, children: (p['service_scopes'] as List).map((s) =>
                   Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                     child: Text(s['name_ar']??s['code']??'', style: const TextStyle(color: AC.cyan, fontSize: 10)))).toList())],
               if(p['required_documents']!=null) ...[
                 const SizedBox(height: 6),
@@ -314,7 +314,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
       decoration: BoxDecoration(
         color: Colors.white, borderRadius: BorderRadius.circular(12),
         border: Border.all(color: value ? AC.gold : const Color(0xFFE0E0E0), width: value ? 2 : 1),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -397,7 +397,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: CircleAvatar(
-                    backgroundColor: selected ? AC.gold.withOpacity(0.15) : const Color(0xFFF5F5F5),
+                    backgroundColor: selected ? AC.gold.withValues(alpha: 0.15) : const Color(0xFFF5F5F5),
                     child: Icon(t['icon'] as IconData, color: selected ? AC.gold : AC.navy, size: 24),
                   ),
                   title: Text(t['name'] as String, style: TextStyle(
@@ -758,7 +758,7 @@ class ActivityHistoryScreen extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
             child: Row(children: [
               CircleAvatar(
-                backgroundColor: (a['color'] as Color).withOpacity(0.1),
+                backgroundColor: (a['color'] as Color).withValues(alpha: 0.1),
                 radius: 20,
                 child: Icon(a['icon'] as IconData, color: a['color'] as Color, size: 20),
               ),
@@ -858,7 +858,7 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
   
   Widget _chip(String t, Color c) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+    decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
     child: Text(t, style: TextStyle(color: c, fontSize: 11)));
 }
 
@@ -1171,7 +1171,7 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
                     Expanded(child: Text(fb['feedback_type'] ?? '\u0645\u0644\u0627\u062d\u0638\u0629',
                       style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold))),
                     Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                       child: Text(status, style: TextStyle(color: statusColor, fontSize: 11))),
                   ]),
                   const SizedBox(height: 8),

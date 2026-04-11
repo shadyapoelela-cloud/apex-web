@@ -71,14 +71,14 @@ class _CCS2 extends State<ClientCreateScreen2> {
     final sel = _sel == code;
     return GestureDetector(onTap: () => setState(() => _sel = code),
       child: Container(height: 52, margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(color: sel ? AC.gold.withOpacity(0.15) : AC.navy3,
+        decoration: BoxDecoration(color: sel ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
           border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1), borderRadius: BorderRadius.circular(10)),
         child: Row(children: [
           Icon(sel ? Icons.radio_button_checked : Icons.radio_button_off, color: sel ? AC.gold : AC.ts, size: 20),
           const SizedBox(width: 12),
           Expanded(child: Text(label, style: TextStyle(color: sel ? AC.gold : AC.tp, fontSize: 14, fontWeight: sel ? FontWeight.bold : FontWeight.normal))),
           if (isKm) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
             child: Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)))])));
   }
 }

@@ -905,7 +905,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           decoration: BoxDecoration(
                             color: AppColors.navy,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+                            border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
                           ),
                           child: DropdownButton<int>(
                             value: tmpCode,
@@ -928,7 +928,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           decoration: BoxDecoration(
                             color: AppColors.navy,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+                            border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
                           ),
                           child: DropdownButton<int>(
                             value: tmpName,
@@ -951,7 +951,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppColors.blueC.withOpacity(0.2),
+                                color: AppColors.blueC.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text('اختياري', style: TextStyle(color: AppColors.blueC, fontSize: 10)),
@@ -1340,9 +1340,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.greenC.withOpacity(0.15),
+                color: AppColors.greenC.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.greenC.withOpacity(0.3)),
+                border: Border.all(color: AppColors.greenC.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1396,7 +1396,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               return Container(
                 width: 32, height: 3,
                 margin: const EdgeInsets.only(bottom: 20),
-                color: (ci == 5 && _currentStage >= 6) ? AppColors.greenC : (ci < _currentStage ? AppColors.greenC : AppColors.textDim.withOpacity(0.3)),
+                color: (ci == 5 && _currentStage >= 6) ? AppColors.greenC : (ci < _currentStage ? AppColors.greenC : AppColors.textDim.withValues(alpha: 0.3)),
               );
             }
             final si = index ~/ 2;
@@ -1412,7 +1412,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   width: 44, height: 44,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle, color: bgColor,
-                    boxShadow: isTbReady ? [BoxShadow(color: AppColors.greenC.withOpacity(0.45), blurRadius: 12)] : (isCurrent ? [BoxShadow(color: AppColors.gold.withOpacity(0.4), blurRadius: 10)] : []),
+                    boxShadow: isTbReady ? [BoxShadow(color: AppColors.greenC.withValues(alpha: 0.45), blurRadius: 12)] : (isCurrent ? [BoxShadow(color: AppColors.gold.withValues(alpha: 0.4), blurRadius: 10)] : []),
                   ),
                   child: Center(child: isComplete
                       ? Icon(Icons.check, color: textCol, size: 22)
@@ -1446,8 +1446,8 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   decoration: BoxDecoration(
                     color: AppColors.cardBg,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.gold.withOpacity(0.3), width: 2),
-                    boxShadow: [BoxShadow(color: AppColors.gold.withOpacity(0.05), blurRadius: 20)],
+                    border: Border.all(color: AppColors.gold.withValues(alpha: 0.3), width: 2),
+                    boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: 0.05), blurRadius: 20)],
                   ),
                   child: Column(
                     children: [
@@ -1455,7 +1455,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         width: 80, height: 80,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.gold.withOpacity(0.1),
+                          color: AppColors.gold.withValues(alpha: 0.1),
                         ),
                         child: _isLoading
                             ? Padding(
@@ -1495,9 +1495,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.gold.withOpacity(0.08),
+        color: AppColors.gold.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.gold.withOpacity(0.35)),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
       ),
       child: Row(
         children: [
@@ -1548,7 +1548,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           labelColor: AppColors.gold,
           unselectedLabelColor: AppColors.textMid,
           indicator: BoxDecoration(
-            color: AppColors.gold.withOpacity(0.12),
+            color: AppColors.gold.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
           ),
           indicatorSize: TabBarIndicatorSize.tab,
@@ -1710,10 +1710,10 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             color: acc.isDuplicateCode
-                ? AppColors.redC.withOpacity(0.08)
+                ? AppColors.redC.withValues(alpha: 0.08)
                 : (depth == 0 ? AppColors.navyMid : AppColors.cardBg),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: dupColor.withOpacity(0.3)),
+            border: Border.all(color: dupColor.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -1729,7 +1729,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_left,
                           color: nodeColor, size: 20,
                         )
-                      : Icon(Icons.circle, color: nodeColor.withOpacity(0.3), size: 6),
+                      : Icon(Icons.circle, color: nodeColor.withValues(alpha: 0.3), size: 6),
                 ),
               ),
               // Level badge
@@ -1737,7 +1737,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 width: 22, height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: nodeColor.withOpacity(0.15),
+                  color: nodeColor.withValues(alpha: 0.15),
                 ),
                 child: Center(
                   child: Text('${acc.level}',
@@ -1761,11 +1761,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                     fillColor: AppColors.navy,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
-                      borderSide: BorderSide(color: dupColor.withOpacity(0.4)),
+                      borderSide: BorderSide(color: dupColor.withValues(alpha: 0.4)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
-                      borderSide: BorderSide(color: dupColor.withOpacity(0.4)),
+                      borderSide: BorderSide(color: dupColor.withValues(alpha: 0.4)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
@@ -1809,7 +1809,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: nodeColor.withOpacity(0.1),
+                    color: nodeColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text('${acc.children.length}',
@@ -1917,7 +1917,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -2033,7 +2033,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.gold.withOpacity(0.12),
+                      color: AppColors.gold.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text('${filtered.length} حساب',
@@ -2096,7 +2096,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: AppColors.borderColor.withOpacity(0.3))),
+                    border: Border(bottom: BorderSide(color: AppColors.borderColor.withValues(alpha: 0.3))),
                     color: i.isEven ? AppColors.cardBg : AppColors.navy,
                   ),
                   child: Row(
@@ -2150,7 +2150,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.12),
+                              color: statusColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(statusText,
@@ -2286,9 +2286,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: overall >= 70 ? AppColors.greenC.withOpacity(0.08) : AppColors.redC.withOpacity(0.08),
+              color: overall >= 70 ? AppColors.greenC.withValues(alpha: 0.08) : AppColors.redC.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: (overall >= 70 ? AppColors.greenC : AppColors.redC).withOpacity(0.3)),
+              border: Border.all(color: (overall >= 70 ? AppColors.greenC : AppColors.redC).withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -2367,9 +2367,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
@@ -2474,7 +2474,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.gold.withOpacity(0.2) : AppColors.navy,
+          color: isActive ? AppColors.gold.withValues(alpha: 0.2) : AppColors.navy,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: isActive ? AppColors.gold : AppColors.borderColor),
         ),
@@ -2490,7 +2490,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(
-                  color: (isActive ? AppColors.gold : AppColors.textDim).withOpacity(0.2),
+                  color: (isActive ? AppColors.gold : AppColors.textDim).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text('$count', style: TextStyle(fontSize: 10, color: isActive ? AppColors.gold : AppColors.textDim)),
@@ -2568,7 +2568,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       decoration: BoxDecoration(
                         color: AppColors.navyLight,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: isLast ? AppColors.gold.withOpacity(0.5) : AppColors.textDim.withOpacity(0.15)),
+                        border: Border.all(color: isLast ? AppColors.gold.withValues(alpha: 0.5) : AppColors.textDim.withValues(alpha: 0.15)),
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                         Row(children: [
@@ -2581,12 +2581,12 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                           const Spacer(),
                           if (isLast) Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(color: AppColors.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                            decoration: BoxDecoration(color: AppColors.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
                             child: Text('الحساب المحدد', style: TextStyle(color: AppColors.gold, fontSize: 9, fontWeight: FontWeight.bold)),
                           ),
                           if (childCount > 0 && !isLast) Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(color: AppColors.greenC.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+                            decoration: BoxDecoration(color: AppColors.greenC.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
                             child: Text('$childCount فرعي', style: TextStyle(color: AppColors.greenC, fontSize: 9, fontWeight: FontWeight.bold)),
                           ),
                         ]),
@@ -2639,12 +2639,12 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
                   return Container(
                     decoration: BoxDecoration(color: AppColors.navyMid,
-                      border: Border(left: BorderSide(color: AppColors.gold.withOpacity(0.4), width: 2))),
+                      border: Border(left: BorderSide(color: AppColors.gold.withValues(alpha: 0.4), width: 2))),
                     child: Column(children: [
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(color: AppColors.navyLight,
-                          border: Border(bottom: BorderSide(color: AppColors.gold.withOpacity(0.3)))),
+                          border: Border(bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.3)))),
                         child: Row(children: [
                           Icon(Icons.account_tree_outlined, color: AppColors.gold, size: 22),
                           const SizedBox(width: 10),
@@ -2659,15 +2659,15 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        color: AppColors.navy.withOpacity(0.5),
+                        color: AppColors.navy.withValues(alpha: 0.5),
                         child: Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
                           for (int i = 0; i < selectedCodes.length; i++) ...[
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: i == selectedCodes.length - 1 ? AppColors.gold.withOpacity(0.18) : AppColors.navyLight,
+                                color: i == selectedCodes.length - 1 ? AppColors.gold.withValues(alpha: 0.18) : AppColors.navyLight,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: i == selectedCodes.length - 1 ? AppColors.gold : AppColors.textDim.withOpacity(0.3))),
+                                border: Border.all(color: i == selectedCodes.length - 1 ? AppColors.gold : AppColors.textDim.withValues(alpha: 0.3))),
                               child: Text('L${i + 1} · ${selectedCodes[i]}',
                                 style: TextStyle(color: i == selectedCodes.length - 1 ? AppColors.gold : AppColors.textMid, fontSize: 10, fontWeight: FontWeight.bold)),
                             ),
@@ -2679,12 +2679,12 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(color: AppColors.navyLight,
-                          border: Border(top: BorderSide(color: AppColors.gold.withOpacity(0.3)))),
+                          border: Border(top: BorderSide(color: AppColors.gold.withValues(alpha: 0.3)))),
                         child: Row(children: [
                           Expanded(child: OutlinedButton.icon(
                             icon: Icon(Icons.close, color: AppColors.textMid, size: 16),
                             label: Text('إلغاء', style: TextStyle(color: AppColors.textMid)),
-                            style: OutlinedButton.styleFrom(side: BorderSide(color: AppColors.textDim.withOpacity(0.4)), padding: const EdgeInsets.symmetric(vertical: 12)),
+                            style: OutlinedButton.styleFrom(side: BorderSide(color: AppColors.textDim.withValues(alpha: 0.4)), padding: const EdgeInsets.symmetric(vertical: 12)),
                             onPressed: () => Navigator.pop(ctx),
                           )),
                           const SizedBox(width: 10),
@@ -2750,7 +2750,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   Widget _infoChip(String label, String value, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
       child: Text('$label: $value', style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.bold)),
     );
   }
@@ -2772,7 +2772,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: statusColor.withOpacity(0.2)),
+        border: Border.all(color: statusColor.withValues(alpha: 0.2)),
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
@@ -2786,7 +2786,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
               width: 40, height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: scoreColor.withOpacity(0.15),
+                color: scoreColor.withValues(alpha: 0.15),
                 border: Border.all(color: scoreColor, width: 2),
               ),
               child: Center(
@@ -2807,7 +2807,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                           decoration: BoxDecoration(
-                            color: AppColors.redC.withOpacity(0.15),
+                            color: AppColors.redC.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text('مكرر', style: TextStyle(fontSize: 9, color: AppColors.redC, fontWeight: FontWeight.bold)),
@@ -2822,9 +2822,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.15),
+                color: statusColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: statusColor.withOpacity(0.3)),
+                border: Border.all(color: statusColor.withValues(alpha: 0.3)),
               ),
               child: Text(statusText, style: TextStyle(fontSize: 10, color: statusColor, fontWeight: FontWeight.bold)),
             ),
@@ -2856,9 +2856,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.redC.withOpacity(0.08),
+                color: AppColors.redC.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.redC.withOpacity(0.2)),
+                border: Border.all(color: AppColors.redC.withValues(alpha: 0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2958,9 +2958,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.redC.withOpacity(0.1),
+                      color: AppColors.redC.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.redC.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.redC.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3131,9 +3131,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.greenC.withOpacity(0.08),
+                      color: AppColors.greenC.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.greenC.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.greenC.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3376,7 +3376,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         icon: Icon(Icons.table_chart, size: 14, color: AppColors.greenC),
                         label: Text('Excel', style: TextStyle(color: AppColors.greenC, fontSize: 11)),
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: AppColors.greenC.withOpacity(0.4)),
+                          side: BorderSide(color: AppColors.greenC.withValues(alpha: 0.4)),
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         ),
                       ),
@@ -3386,7 +3386,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         icon: Icon(Icons.picture_as_pdf, size: 14, color: AppColors.redC),
                         label: Text('PDF', style: TextStyle(color: AppColors.redC, fontSize: 11)),
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: AppColors.redC.withOpacity(0.4)),
+                          side: BorderSide(color: AppColors.redC.withValues(alpha: 0.4)),
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         ),
                       ),
@@ -3447,7 +3447,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(a.code,
@@ -3548,13 +3548,13 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: acc.isDuplicateCode
-                  ? AppColors.redC.withOpacity(0.08)
+                  ? AppColors.redC.withValues(alpha: 0.08)
                   : (depth == 0 ? AppColors.navyMid : AppColors.cardBg),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: acc.isDuplicateCode
-                    ? AppColors.redC.withOpacity(0.6)
-                    : (acc.flags.isNotEmpty ? AppColors.redC.withOpacity(0.4) : nodeColor.withOpacity(0.15)),
+                    ? AppColors.redC.withValues(alpha: 0.6)
+                    : (acc.flags.isNotEmpty ? AppColors.redC.withValues(alpha: 0.4) : nodeColor.withValues(alpha: 0.15)),
                 width: acc.isDuplicateCode ? 1.5 : 1.0,
               ),
             ),
@@ -3570,14 +3570,14 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                         color: nodeColor, size: 20,
                       )
                     else
-                      SizedBox(width: 20, child: Icon(Icons.circle, color: nodeColor.withOpacity(0.4), size: 6)),
+                      SizedBox(width: 20, child: Icon(Icons.circle, color: nodeColor.withValues(alpha: 0.4), size: 6)),
                     const SizedBox(width: 8),
                     // Level indicator
                     Container(
                       width: 24, height: 24,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: nodeColor.withOpacity(0.15),
+                        color: nodeColor.withValues(alpha: 0.15),
                       ),
                       child: Center(
                         child: Text('${acc.level}',
@@ -3590,9 +3590,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppColors.redC.withOpacity(0.15),
+                          color: AppColors.redC.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: AppColors.redC.withOpacity(0.4)),
+                          border: Border.all(color: AppColors.redC.withValues(alpha: 0.4)),
                         ),
                         child: Text(acc.code,
                             style: TextStyle(fontSize: 12, color: AppColors.redC, fontWeight: FontWeight.bold)),
@@ -3617,7 +3617,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: nodeColor.withOpacity(0.1),
+                          color: nodeColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text('${acc.children.length}',
@@ -3630,7 +3630,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                       width: 28, height: 28,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: scoreColor.withOpacity(0.1),
+                        color: scoreColor.withValues(alpha: 0.1),
                         border: Border.all(color: scoreColor, width: 1.5),
                       ),
                       child: Center(
@@ -3657,7 +3657,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.redC.withOpacity(0.08),
+                      color: AppColors.redC.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -3677,9 +3677,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: AppColors.orangeC.withOpacity(0.2),
+                                color: AppColors.orangeC.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: AppColors.orangeC.withOpacity(0.5)),
+                                border: Border.all(color: AppColors.orangeC.withValues(alpha: 0.5)),
                               ),
                               child: Text('نقل / إعادة تبويب',
                                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.orangeC)),

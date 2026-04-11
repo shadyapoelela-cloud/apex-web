@@ -182,7 +182,7 @@ Widget _kv(String k, String v, {Color? vc}) => Padding(padding: const EdgeInsets
     Flexible(child: Text(v, style: TextStyle(color: vc ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
 
 Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+  decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
   child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
@@ -270,9 +270,9 @@ S.save();
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AC.gold.withOpacity(0.08),
+            color: AC.gold.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AC.gold.withOpacity(0.2)),
+            border: Border.all(color: AC.gold.withValues(alpha: 0.2)),
           ),
           child: Column(children: [
             const Icon(Icons.account_balance, color: AC.gold, size: 48),
@@ -292,7 +292,7 @@ S.save();
         // Error
         if (_e != null) Container(
           width: double.infinity, margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.err.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.err.withValues(alpha: 0.3))),
           child: Row(children: [const Icon(Icons.error_outline, color: AC.err, size: 18), const SizedBox(width: 8),
             Expanded(child: Text(_e!, style: const TextStyle(color: AC.err, fontSize: 12)))]),
         ),
@@ -328,7 +328,7 @@ S.save();
         SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
           onPressed: _l ? null : _go,
           style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            disabledBackgroundColor: AC.gold.withOpacity(0.5)),
+            disabledBackgroundColor: AC.gold.withValues(alpha: 0.5)),
           child: _l ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
             : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.navy, fontSize: 16, fontWeight: FontWeight.bold)),
         )),
@@ -832,11 +832,11 @@ class _DashS extends ConsumerState<DashTab> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AC.gold.withOpacity(0.12), AC.navy3],
+              colors: [AC.gold.withValues(alpha: 0.12), AC.navy3],
               begin: Alignment.topRight, end: Alignment.bottomLeft,
             ),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AC.gold.withOpacity(0.3)),
+            border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
           ),
           child: InkWell(
             onTap: () => context.go('/copilot'),
@@ -844,7 +844,7 @@ class _DashS extends ConsumerState<DashTab> {
             child: Row(children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                 child: const Icon(Icons.smart_toy, color: AC.gold, size: 28),
               ),
               const SizedBox(width: 14),
@@ -854,7 +854,7 @@ class _DashS extends ConsumerState<DashTab> {
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
                     child: const Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
                   ),
                 ]),
@@ -929,7 +929,7 @@ class _NotifS extends ConsumerState<NotificationsScreen> {
         final isRead = n['is_read'] == true;
         return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(color: isRead ? AC.navy3 : AC.navy4, borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isRead ? AC.bdr : AC.gold.withOpacity(0.3))),
+            border: Border.all(color: isRead ? AC.bdr : AC.gold.withValues(alpha: 0.3))),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(_notifIcon(n['type']??''), color: isRead ? AC.ts : AC.gold, size: 22),
             const SizedBox(width: 12),
@@ -979,7 +979,7 @@ class UpgradePlanScreen extends StatelessWidget {
             ...features.take(8).map((f) => Padding(padding: const EdgeInsets.only(bottom: 3),
               child: Row(children: [
                 Icon(f.value['value']=='true'||f.value['value']=='unlimited'?Icons.check_circle:Icons.cancel,
-                  color: f.value['value']=='true'||f.value['value']=='unlimited'?AC.ok:AC.err.withOpacity(0.5), size: 14),
+                  color: f.value['value']=='true'||f.value['value']=='unlimited'?AC.ok:AC.err.withValues(alpha: 0.5), size: 14),
                 const SizedBox(width: 8),
                 Expanded(child: Text(f.value['name_ar']??f.key, style: const TextStyle(color: AC.ts, fontSize: 11)))]))),
             if(!isCurrent) ...[const SizedBox(height: 12),
@@ -1190,7 +1190,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
       Dialog(backgroundColor: Colors.transparent, insetPadding: const EdgeInsets.all(24),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 500, maxHeight: 550),
-          decoration: BoxDecoration(color: AC.navy2.withOpacity(0.95), borderRadius: BorderRadius.circular(20), border: Border.all(color: AC.gold.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AC.navy2.withValues(alpha: 0.95), borderRadius: BorderRadius.circular(20), border: Border.all(color: AC.gold.withValues(alpha: 0.3))),
           padding: const EdgeInsets.all(20),
           child: Column(children: [
             Row(children: [
@@ -1292,7 +1292,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
                   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AC.bdr)),
                   child: Row(children: [
-                    CircleAvatar(backgroundColor: const Color(0xFFC9A84C).withOpacity(0.15), radius: 24,
+                    CircleAvatar(backgroundColor: const Color(0xFFC9A84C).withValues(alpha: 0.15), radius: 24,
                       child: Text(name.isNotEmpty ? name[0] : '?', style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16))),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1300,7 +1300,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
                       const SizedBox(height: 4),
                       Row(children: [
                         if (type.isNotEmpty) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                          decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                           child: Text(type, style: const TextStyle(color: AC.gold, fontSize: 10))),
                         if (type.isNotEmpty && role.isNotEmpty) const SizedBox(width: 8),
                         if (role.isNotEmpty) Text(role, style: const TextStyle(color: AC.ts, fontSize: 11)),
@@ -1342,7 +1342,7 @@ class _NewCS extends State<NewClientScreen> {
       const SizedBox(height: 8),
       ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_t=t['code']),
         child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: _t==t['code'] ? AC.gold.withOpacity(0.1) : AC.navy3,
+          decoration: BoxDecoration(color: _t==t['code'] ? AC.gold.withValues(alpha: 0.1) : AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _t==t['code'] ? AC.gold : AC.bdr)),
           child: Row(children: [
             Icon(_t==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _t==t['code'] ? AC.gold : AC.ts, size: 20),
@@ -1409,7 +1409,7 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
         Expanded(child: Text(label, style: const TextStyle(color: AC.ts, fontSize: 13))),
         Text(value, style: const TextStyle(color: AC.tp, fontSize: 14)),
         const SizedBox(width: 6),
-        Container(width: 22, height: 22, decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), shape: BoxShape.circle),
+        Container(width: 22, height: 22, decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), shape: BoxShape.circle),
           child: const Icon(Icons.info_outline, color: AC.gold, size: 14))])));
 
   @override Widget build(BuildContext c) => Scaffold(
@@ -1540,7 +1540,7 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
       const SizedBox(height: 8),
       ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_type=t['code']!),
         child: Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(color: _type==t['code'] ? AC.gold.withOpacity(0.1) : AC.navy3,
+          decoration: BoxDecoration(color: _type==t['code'] ? AC.gold.withValues(alpha: 0.1) : AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type==t['code'] ? AC.gold : AC.bdr)),
           child: Row(children: [
             Icon(_type==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _type==t['code'] ? AC.gold : AC.ts, size: 18),
@@ -1581,7 +1581,7 @@ class _MarketS extends ConsumerState<MarketTab> {
       icon: const Icon(Icons.add, color: AC.navy), label: const Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.navy))),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       ListView(padding: const EdgeInsets.all(14), children: [
-        Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [const Icon(Icons.store_mall_directory, color: AC.gold, size: 36), const SizedBox(height: 8), const Text("ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ ط§ظ„ظ…ظ‡ظ†ظٹط©", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), const Text("طھطµظپط­ 6 ط®ط¯ظ…ط§طھ: طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹطŒ ظ…ط±ط§ط¬ط¹ط©طŒ ط¶ط±ط§ط¦ط¨طŒ طھظ…ظˆظٹظ„طŒ ط¯ط¹ظ…طŒ طھط±ط§ط®ظٹطµ", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => context.push('/service-catalog', extra: {'clientId': '', 'token': S.token}), icon: const Icon(Icons.arrow_forward), label: const Text("ظپطھط­ ط§ظ„ظƒطھط§ظ„ظˆط¬")))])),
+        Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [const Icon(Icons.store_mall_directory, color: AC.gold, size: 36), const SizedBox(height: 8), const Text("ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ ط§ظ„ظ…ظ‡ظ†ظٹط©", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), const Text("طھطµظپط­ 6 ط®ط¯ظ…ط§طھ: طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹطŒ ظ…ط±ط§ط¬ط¹ط©طŒ ط¶ط±ط§ط¦ط¨طŒ طھظ…ظˆظٹظ„طŒ ط¯ط¹ظ…طŒ طھط±ط§ط®ظٹطµ", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => context.push('/service-catalog', extra: {'clientId': '', 'token': S.token}), icon: const Icon(Icons.arrow_forward), label: const Text("ظپطھط­ ط§ظ„ظƒطھط§ظ„ظˆط¬")))])),
         _card('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0639\u062a\u0645\u062f\u0648\u0646', [
           if(_provs.isEmpty) const Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0642\u062f\u0645\u0648 \u062e\u062f\u0645\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
           else ..._provs.take(5).map((p) => Padding(padding: const EdgeInsets.only(bottom: 8),
@@ -1650,7 +1650,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
         const SizedBox(height: 6),
         ..._clients.map((cl) => GestureDetector(onTap: ()=>setState(()=>_clientId=cl['id']),
           child: Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: _clientId==cl['id']?AC.gold.withOpacity(0.1):AC.navy3,
+            decoration: BoxDecoration(color: _clientId==cl['id']?AC.gold.withValues(alpha: 0.1):AC.navy3,
               borderRadius: BorderRadius.circular(8), border: Border.all(color: _clientId==cl['id']?AC.gold:AC.bdr)),
             child: Text(cl['name_ar']??'', style: TextStyle(color: _clientId==cl['id']?AC.gold:AC.tp, fontSize: 13))))),
         const SizedBox(height: 12)],
@@ -1664,7 +1664,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
       const SizedBox(height: 6),
       Row(children: ['low','medium','high'].map((u) => Expanded(child: GestureDetector(onTap: ()=>setState(()=>_urgency=u),
         child: Container(margin: const EdgeInsets.symmetric(horizontal: 3), padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok).withOpacity(0.15) : AC.navy3,
+          decoration: BoxDecoration(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok).withValues(alpha: 0.15) : AC.navy3,
             borderRadius: BorderRadius.circular(8), border: Border.all(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok) : AC.bdr)),
           child: Center(child: Text(u=='high'?'\u0639\u0627\u0644\u064a\u0629':u=='medium'?'\u0645\u062a\u0648\u0633\u0637\u0629':'\u0645\u0646\u062e\u0641\u0636\u0629',
             style: TextStyle(color: _urgency==u ? AC.tp : AC.ts, fontSize: 12))))))).toList()),
@@ -1710,7 +1710,7 @@ class _ProvS extends State<ProviderTab> {
         const SizedBox(height: 20),
         ..._cats.map((cat) => GestureDetector(onTap: ()=>setState(()=>_sel=cat['code']),
           child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: _sel==cat['code']?AC.gold.withOpacity(0.1):AC.navy3,
+            decoration: BoxDecoration(color: _sel==cat['code']?AC.gold.withValues(alpha: 0.1):AC.navy3,
               borderRadius: BorderRadius.circular(10), border: Border.all(color: _sel==cat['code']?AC.gold:AC.bdr)),
             child: Row(children: [
               Icon(_sel==cat['code']?Icons.radio_button_checked:Icons.radio_button_off, color: _sel==cat['code']?AC.gold:AC.ts, size: 18),
@@ -1938,7 +1938,7 @@ class _CloseAS extends State<CloseAccountScreen> {
       ElevatedButton(onPressed: (){ S.clear(); context.go('/login'); },
         child: const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
         child: const Row(children: [Icon(Icons.warning, color: AC.err), SizedBox(width: 10),
           Expanded(child: Text('\u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621 \u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646\u0647 \u0628\u0633\u0647\u0648\u0644\u0629', style: TextStyle(color: AC.err, fontSize: 13)))])),
       const SizedBox(height: 20),
@@ -1946,7 +1946,7 @@ class _CloseAS extends State<CloseAccountScreen> {
       const SizedBox(height: 10),
       GestureDetector(onTap: ()=>setState(()=>_type='temporary'),
         child: Container(padding: const EdgeInsets.all(14), margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(color: _type=='temporary'?AC.warn.withOpacity(0.1):AC.navy3,
+          decoration: BoxDecoration(color: _type=='temporary'?AC.warn.withValues(alpha: 0.1):AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='temporary'?AC.warn:AC.bdr)),
           child: Row(children: [Icon(_type=='temporary'?Icons.radio_button_checked:Icons.radio_button_off,
             color: _type=='temporary'?AC.warn:AC.ts, size: 18), const SizedBox(width: 10),
@@ -1955,7 +1955,7 @@ class _CloseAS extends State<CloseAccountScreen> {
               Text('\u064a\u0645\u0643\u0646\u0643 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0641\u0639\u064a\u0644 \u0644\u0627\u062d\u0642\u0627\u064b', style: TextStyle(color: AC.ts, fontSize: 11))]))]))),
       GestureDetector(onTap: ()=>setState(()=>_type='permanent'),
         child: Container(padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: _type=='permanent'?AC.err.withOpacity(0.1):AC.navy3,
+          decoration: BoxDecoration(color: _type=='permanent'?AC.err.withValues(alpha: 0.1):AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='permanent'?AC.err:AC.bdr)),
           child: Row(children: [Icon(_type=='permanent'?Icons.radio_button_checked:Icons.radio_button_off,
             color: _type=='permanent'?AC.err:AC.ts, size: 18), const SizedBox(width: 10),
@@ -2048,7 +2048,7 @@ class _AdminS extends ConsumerState<AdminTab> {
   Widget _statCard(String label, String value, IconData icon, Color color) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: color.withOpacity(0.3))),
+      border: Border.all(color: color.withValues(alpha: 0.3))),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
       Row(children: [Icon(icon, color: color, size: 22), const Spacer(),
         Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold))]),
@@ -2058,7 +2058,7 @@ class _AdminS extends ConsumerState<AdminTab> {
   Widget _actionTile(String label, IconData icon, Color color, VoidCallback onTap) =>
     GestureDetector(onTap: onTap, child: Padding(padding: const EdgeInsets.only(bottom: 8),
       child: Row(children: [
-        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, color: color, size: 18)),
         const SizedBox(width: 12),
         Expanded(child: Text(label, style: const TextStyle(color: AC.tp, fontSize: 14))),
@@ -2187,7 +2187,7 @@ class _PVS extends State<ProviderVerificationScreen> {
                 const SizedBox(height: 8),
                 Wrap(spacing: 6, runSpacing: 4, children: (p['service_scopes'] as List).map((s) =>
                   Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                     child: Text(s['name_ar']??s['code']??'', style: const TextStyle(color: AC.cyan, fontSize: 10)))).toList())],
               if(p['required_documents']!=null) ...[
                 const SizedBox(height: 6),
@@ -2354,7 +2354,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
       decoration: BoxDecoration(
         color: Colors.white, borderRadius: BorderRadius.circular(12),
         border: Border.all(color: value ? AC.gold : const Color(0xFFE0E0E0), width: value ? 2 : 1),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -2437,7 +2437,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: CircleAvatar(
-                    backgroundColor: selected ? AC.gold.withOpacity(0.15) : const Color(0xFFF5F5F5),
+                    backgroundColor: selected ? AC.gold.withValues(alpha: 0.15) : const Color(0xFFF5F5F5),
                     child: Icon(t['icon'] as IconData, color: selected ? AC.gold : AC.navy, size: 24),
                   ),
                   title: Text(t['name'] as String, style: TextStyle(
@@ -2798,7 +2798,7 @@ class ActivityHistoryScreen extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
             child: Row(children: [
               CircleAvatar(
-                backgroundColor: (a['color'] as Color).withOpacity(0.1),
+                backgroundColor: (a['color'] as Color).withValues(alpha: 0.1),
                 radius: 20,
                 child: Icon(a['icon'] as IconData, color: a['color'] as Color, size: 20),
               ),
@@ -2898,7 +2898,7 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
   
   Widget _chip(String t, Color c) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+    decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
     child: Text(t, style: TextStyle(color: c, fontSize: 11)));
 }
 
@@ -3211,7 +3211,7 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
                     Expanded(child: Text(fb['feedback_type'] ?? '\u0645\u0644\u0627\u062d\u0638\u0629',
                       style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold))),
                     Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                       child: Text(status, style: TextStyle(color: statusColor, fontSize: 11))),
                   ]),
                   const SizedBox(height: 8),
@@ -3335,7 +3335,7 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
             style: TextStyle(color: Colors.white38, fontSize: 13), textAlign: TextAlign.center),
           const SizedBox(height: 24),
           if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(color: Colors.red.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
           TextField(controller: _codeC, textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 4),
@@ -3423,7 +3423,7 @@ class _NewPwS extends State<NewPasswordScreen> {
               style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
             const SizedBox(height: 24),
             if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
               child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
             TextField(controller: _pw1, obscureText: true, style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(labelText: 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط©',

@@ -70,7 +70,7 @@ class _ClientListS extends State<ClientListScreen> {
                   border: Border.all(color: Colors.white12),
                 ),
                 child: Row(children: [
-                  CircleAvatar(backgroundColor: AC.gold.withOpacity(0.2),
+                  CircleAvatar(backgroundColor: AC.gold.withValues(alpha: 0.2),
                     child: Text((cl['name_ar'] ?? cl['name'] ?? '?')[0], style: TextStyle(color: AC.gold))),
                   const SizedBox(width: 16),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -213,7 +213,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: sel ? AC.gold.withOpacity(0.15) : AC.navy3,
+          color: sel ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
           border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -233,7 +233,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
             if (isKm)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                 child: Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)),
               ),
           ],

@@ -91,16 +91,16 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
   }
 
   Widget _buildPrompt() => Center(child: Padding(padding: const EdgeInsets.all(32), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-    Container(width:72,height:72, decoration: BoxDecoration(color:_gold.withOpacity(0.08), shape:BoxShape.circle, border:Border.all(color:_gold.withOpacity(0.3))), child: const Icon(Icons.link_rounded, color:Color(0xFFC9A84C), size:34)),
+    Container(width:72,height:72, decoration: BoxDecoration(color:_gold.withValues(alpha: 0.08), shape:BoxShape.circle, border:Border.all(color:_gold.withValues(alpha: 0.3))), child: const Icon(Icons.link_rounded, color:Color(0xFFC9A84C), size:34)),
     const SizedBox(height:20),
     const Text('ربط ميزان المراجعة بشجرة الحسابات', textDirection:TextDirection.rtl, textAlign:TextAlign.center, style:TextStyle(fontSize:17, fontWeight:FontWeight.w700, color:Color(0xFFF0EDE6), fontFamily:'Tajawal')),
     const SizedBox(height:10),
     const Text('سيتم مطابقة كل حساب في الميزان بالحسابات المعتمدة في شجرة الحسابات تلقائياً', textDirection:TextDirection.rtl, textAlign:TextAlign.center, style:TextStyle(fontSize:13, color:Color(0xFF8A8880), fontFamily:'Tajawal', height:1.6)),
-    if (_errorMsg != null) ...[const SizedBox(height:16), Container(padding:const EdgeInsets.all(12), decoration:BoxDecoration(color:_danger.withOpacity(0.08), borderRadius:BorderRadius.circular(10), border:Border.all(color:_danger.withOpacity(0.3))), child:Row(children:[const Icon(Icons.error_outline_rounded,color:Color(0xFFE05050),size:16),const SizedBox(width:8),Expanded(child:Text(_errorMsg!,textDirection:TextDirection.rtl,style:const TextStyle(fontSize:12,color:Color(0xFFE05050),fontFamily:'Tajawal')))]))],
+    if (_errorMsg != null) ...[const SizedBox(height:16), Container(padding:const EdgeInsets.all(12), decoration:BoxDecoration(color:_danger.withValues(alpha: 0.08), borderRadius:BorderRadius.circular(10), border:Border.all(color:_danger.withValues(alpha: 0.3))), child:Row(children:[const Icon(Icons.error_outline_rounded,color:Color(0xFFE05050),size:16),const SizedBox(width:8),Expanded(child:Text(_errorMsg!,textDirection:TextDirection.rtl,style:const TextStyle(fontSize:12,color:Color(0xFFE05050),fontFamily:'Tajawal')))]))],
     const SizedBox(height:28),
     GestureDetector(onTap: _loadingBind ? null : _runBinding,
       child: Container(width:double.infinity, height:54,
-        decoration: BoxDecoration(gradient:const LinearGradient(colors:[Color(0xFFC9A84C),Color(0xFF8B6F35)]), borderRadius:BorderRadius.circular(14), boxShadow:[BoxShadow(color:_gold.withOpacity(0.3),blurRadius:16,offset:const Offset(0,4))]),
+        decoration: BoxDecoration(gradient:const LinearGradient(colors:[Color(0xFFC9A84C),Color(0xFF8B6F35)]), borderRadius:BorderRadius.circular(14), boxShadow:[BoxShadow(color:_gold.withValues(alpha: 0.3),blurRadius:16,offset:const Offset(0,4))]),
         child: Center(child: _loadingBind ? const SizedBox(width:22,height:22,child:CircularProgressIndicator(color:Color(0xFF050D1A),strokeWidth:2.5))
           : const Row(mainAxisAlignment:MainAxisAlignment.center, children:[Icon(Icons.link_rounded,color:Color(0xFF050D1A),size:20),SizedBox(width:8),Text('تشغيل الربط الآن',style:TextStyle(color:Color(0xFF050D1A),fontSize:15,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
   ])));
@@ -135,7 +135,7 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
           for(final f in [('all','الكل'),('matched','مطابق'),('unmatched','غير مطابق'),('review','مراجعة')]) Padding(padding:const EdgeInsets.only(left:8),
             child:GestureDetector(onTap:(){setState(()=>_filter=f.$1);_loadResults(reset:true);},
               child:AnimatedContainer(duration:const Duration(milliseconds:150),padding:const EdgeInsets.symmetric(horizontal:10,vertical:4),
-                decoration:BoxDecoration(color:_filter==f.$1?_gold.withOpacity(0.1):Colors.transparent,borderRadius:BorderRadius.circular(6),border:Border.all(color:_filter==f.$1?_gold:_border)),
+                decoration:BoxDecoration(color:_filter==f.$1?_gold.withValues(alpha: 0.1):Colors.transparent,borderRadius:BorderRadius.circular(6),border:Border.all(color:_filter==f.$1?_gold:_border)),
                 child:Text(f.$2,style:TextStyle(fontSize:11,color:_filter==f.$1?_gold:_textSec,fontFamily:'Tajawal'))))),
         ])),
       Expanded(child: _loadingResults && _results.isEmpty ? const Center(child:CircularProgressIndicator(color:Color(0xFFC9A84C)))
@@ -152,11 +152,11 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
               final label=matched?(mt=='exact'?'مطابقة تامة':mt=='normalized'?'مطابقة بعد التطبيع':'مطابقة تقريبية'):'غير مطابق';
               final net=((r['tb_net']??0.0)as num).toDouble();
               return Container(margin:const EdgeInsets.only(bottom:8),padding:const EdgeInsets.all(12),
-                decoration:BoxDecoration(color:_card,borderRadius:BorderRadius.circular(12),border:Border.all(color:review?_warning.withOpacity(0.3):color.withOpacity(0.2))),
+                decoration:BoxDecoration(color:_card,borderRadius:BorderRadius.circular(12),border:Border.all(color:review?_warning.withValues(alpha: 0.3):color.withValues(alpha: 0.2))),
                 child:Column(children:[
                   Row(children:[
-                    Container(padding:const EdgeInsets.symmetric(horizontal:7,vertical:2),decoration:BoxDecoration(color:color.withOpacity(0.1),borderRadius:BorderRadius.circular(4),border:Border.all(color:color.withOpacity(0.3))),child:Text(label,style:TextStyle(fontSize:10,color:color,fontFamily:'Tajawal',fontWeight:FontWeight.w600))),
-                    if(review)...[const SizedBox(width:6),Container(padding:const EdgeInsets.symmetric(horizontal:6,vertical:2),decoration:BoxDecoration(color:_warning.withOpacity(0.08),borderRadius:BorderRadius.circular(4)),child:const Text('يحتاج مراجعة',style:TextStyle(fontSize:9,color:Color(0xFFE8A838),fontFamily:'Tajawal')))],
+                    Container(padding:const EdgeInsets.symmetric(horizontal:7,vertical:2),decoration:BoxDecoration(color:color.withValues(alpha: 0.1),borderRadius:BorderRadius.circular(4),border:Border.all(color:color.withValues(alpha: 0.3))),child:Text(label,style:TextStyle(fontSize:10,color:color,fontFamily:'Tajawal',fontWeight:FontWeight.w600))),
+                    if(review)...[const SizedBox(width:6),Container(padding:const EdgeInsets.symmetric(horizontal:6,vertical:2),decoration:BoxDecoration(color:_warning.withValues(alpha: 0.08),borderRadius:BorderRadius.circular(4)),child:const Text('يحتاج مراجعة',style:TextStyle(fontSize:9,color:Color(0xFFE8A838),fontFamily:'Tajawal')))],
                     const Spacer(),
                     Expanded(flex:3,child:Text(r['tb_account_name']??'—',textDirection:TextDirection.rtl,textAlign:TextAlign.end,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:13,fontWeight:FontWeight.w600,color:Color(0xFFF0EDE6),fontFamily:'Tajawal'))),
                   ]),
@@ -167,7 +167,7 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
                     const Spacer(),
                     SizedBox(width:60,child:Column(crossAxisAlignment:CrossAxisAlignment.end,children:[Text('${(conf*100).toInt()}%',style:TextStyle(fontSize:10,color:color,fontFamily:'Tajawal')),const SizedBox(height:2),ClipRRect(borderRadius:BorderRadius.circular(2),child:LinearProgressIndicator(value:conf.clamp(0.0,1.0),minHeight:3,backgroundColor:_border,valueColor:AlwaysStoppedAnimation(color)))])),
                   ]),
-                  if(matched&&r['coa_class']!=null)...[const SizedBox(height:5),Align(alignment:Alignment.centerRight,child:Container(padding:const EdgeInsets.symmetric(horizontal:7,vertical:2),decoration:BoxDecoration(color:_gold.withOpacity(0.06),borderRadius:BorderRadius.circular(4),border:Border.all(color:_gold.withOpacity(0.15))),child:Text('${r["coa_class"]} — ${r["coa_section"]??""}',style:const TextStyle(fontSize:10,color:Color(0xFFC9A84C),fontFamily:'Tajawal'))))],
+                  if(matched&&r['coa_class']!=null)...[const SizedBox(height:5),Align(alignment:Alignment.centerRight,child:Container(padding:const EdgeInsets.symmetric(horizontal:7,vertical:2),decoration:BoxDecoration(color:_gold.withValues(alpha: 0.06),borderRadius:BorderRadius.circular(4),border:Border.all(color:_gold.withValues(alpha: 0.15))),child:Text('${r["coa_class"]} — ${r["coa_section"]??""}',style:const TextStyle(fontSize:10,color:Color(0xFFC9A84C),fontFamily:'Tajawal'))))],
                 ]));
             })),
     ]);
@@ -184,11 +184,11 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
             decoration: BoxDecoration(
               gradient: canApprove ? const LinearGradient(colors:[Color(0xFF2ECC8A),Color(0xFF1A8C5C)]) : const LinearGradient(colors:[Color(0xFF444444),Color(0xFF333333)]),
               borderRadius: BorderRadius.circular(14),
-              boxShadow: canApprove ? [BoxShadow(color:const Color(0xFF2ECC8A).withOpacity(0.3),blurRadius:12,offset:const Offset(0,4))] : []),
+              boxShadow: canApprove ? [BoxShadow(color:const Color(0xFF2ECC8A).withValues(alpha: 0.3),blurRadius:12,offset:const Offset(0,4))] : []),
             child: Center(child: _approving ? const SizedBox(width:22,height:22,child:CircularProgressIndicator(color:Colors.white,strokeWidth:2.5))
               : Row(mainAxisAlignment:MainAxisAlignment.center, children:[Icon(Icons.check_circle_rounded,color:canApprove?Colors.white:Colors.white38,size:20),const SizedBox(width:8),Text('اعتماد الربط والمتابعة للتحليل',style:TextStyle(color:canApprove?Colors.white:Colors.white38,fontSize:15,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
       ]));
   }
 
-  Widget _sChip(String label, String value, Color color) => Expanded(child: Container(padding: const EdgeInsets.symmetric(vertical:7), decoration: BoxDecoration(color:color.withOpacity(0.06), borderRadius:BorderRadius.circular(8), border:Border.all(color:color.withOpacity(0.2))), child: Column(children: [Text(value,style:TextStyle(fontSize:14,fontWeight:FontWeight.w800,color:color,fontFamily:'Tajawal')),const SizedBox(height:2),Text(label,textAlign:TextAlign.center,style:const TextStyle(fontSize:9,color:Color(0xFF8A8880),fontFamily:'Tajawal'))])));
+  Widget _sChip(String label, String value, Color color) => Expanded(child: Container(padding: const EdgeInsets.symmetric(vertical:7), decoration: BoxDecoration(color:color.withValues(alpha: 0.06), borderRadius:BorderRadius.circular(8), border:Border.all(color:color.withValues(alpha: 0.2))), child: Column(children: [Text(value,style:TextStyle(fontSize:14,fontWeight:FontWeight.w800,color:color,fontFamily:'Tajawal')),const SizedBox(height:2),Text(label,textAlign:TextAlign.center,style:const TextStyle(fontSize:9,color:Color(0xFF8A8880),fontFamily:'Tajawal'))])));
 }

@@ -42,7 +42,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
           child: ChoiceChip(
             label: Text(e.value),
             selected: _selectedCategory == e.key,
-            selectedColor: AC.gold.withOpacity(0.2),
+            selectedColor: AC.gold.withValues(alpha: 0.2),
             labelStyle: TextStyle(color: _selectedCategory == e.key ? AC.gold : AC.ts),
             backgroundColor: AC.navy3,
             side: BorderSide(color: _selectedCategory == e.key ? AC.gold : Colors.white12),
@@ -67,7 +67,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
                     Row(children: [
                       Expanded(child: Text(s['title_ar'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
                       Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                         child: Text(stagesCount + ' ظ…ط±ط§ط­ظ„', style: const TextStyle(color: AC.cyan, fontSize: 11))),
                     ]),
                     const SizedBox(height: 6),
@@ -92,7 +92,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   Widget _tag(String text, Color color) => Container(
     margin: const EdgeInsets.only(left: 6),
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-    decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+    decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
     child: Text(text, style: TextStyle(color: color, fontSize: 10)));
 
   Future<void> _startService(String code) async {

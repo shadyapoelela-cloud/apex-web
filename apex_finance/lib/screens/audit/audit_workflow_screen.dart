@@ -163,7 +163,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
         width: 72,
         margin: const EdgeInsets.only(left: 6),
         decoration: BoxDecoration(
-          color: isActive ? color.withOpacity(0.15) : AC.navy3,
+          color: isActive ? color.withValues(alpha: 0.15) : AC.navy3,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: isActive ? color : AC.bdr, width: isActive ? 2 : 1),
         ),
@@ -171,7 +171,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
           Container(
             width: 30, height: 30,
             decoration: BoxDecoration(
-              color: isDone ? AC.ok.withOpacity(0.2) : isProgress ? AC.gold.withOpacity(0.2) : Colors.transparent,
+              color: isDone ? AC.ok.withValues(alpha: 0.2) : isProgress ? AC.gold.withValues(alpha: 0.2) : Colors.transparent,
               shape: BoxShape.circle,
               border: Border.all(color: color, width: 1.5),
             ),
@@ -193,7 +193,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
       // Stage Header
       Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withOpacity(0.3))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withValues(alpha: 0.3))),
         child: Row(children: [
           Icon(stage['icon'] as IconData, color: color, size: 28),
           const SizedBox(width: 12),
@@ -231,7 +231,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
         const Spacer(),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(color: AC.warn.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
           child: Text(' \u0645\u0644\u0627\u062d\u0638\u0627\u062a', style: const TextStyle(color: AC.warn, fontSize: 11, fontWeight: FontWeight.bold)),
         ),
       ]),
@@ -244,7 +244,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
           decoration: BoxDecoration(
             color: AC.navy3,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: sevColor.withOpacity(0.3)),
+            border: Border.all(color: sevColor.withValues(alpha: 0.3)),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
@@ -264,9 +264,9 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
   }
 
   Widget _procedureIcon(String status) {
-    if (status == 'done') return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.ok.withOpacity(0.15), shape: BoxShape.circle), child: const Icon(Icons.check, color: AC.ok, size: 14));
-    if (status == 'in_progress') return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), shape: BoxShape.circle), child: const Icon(Icons.autorenew, color: AC.gold, size: 14));
-    return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.ts.withOpacity(0.1), shape: BoxShape.circle), child: const Icon(Icons.radio_button_unchecked, color: AC.ts, size: 14));
+    if (status == 'done') return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.ok.withValues(alpha: 0.15), shape: BoxShape.circle), child: const Icon(Icons.check, color: AC.ok, size: 14));
+    if (status == 'in_progress') return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), shape: BoxShape.circle), child: const Icon(Icons.autorenew, color: AC.gold, size: 14));
+    return Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: AC.ts.withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.radio_button_unchecked, color: AC.ts, size: 14));
   }
 
   Widget _statusBadge(String status) {
@@ -281,7 +281,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
     final m = map[status] ?? {'text': status, 'color': AC.ts};
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: (m['color'] as Color).withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: (m['color'] as Color).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
       child: Text(m['text'] as String, style: TextStyle(color: m['color'] as Color, fontSize: 10, fontWeight: FontWeight.w600)),
     );
   }

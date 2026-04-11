@@ -107,7 +107,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
         width: 90,
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.15) : AC.navy3,
+          color: isSelected ? color.withValues(alpha: 0.15) : AC.navy3,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: isSelected ? color : AC.bdr, width: isSelected ? 1.5 : 1),
         ),
@@ -213,9 +213,9 @@ class _FinOpsState extends State<FinancialOpsScreen> {
   Widget _infoCard(String title, String desc, IconData icon, Color color) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.08),
+      color: color.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: color.withOpacity(0.3)),
+      border: Border.all(color: color.withValues(alpha: 0.3)),
     ),
     child: Row(children: [
       Icon(icon, color: color, size: 20),
@@ -238,7 +238,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
         child: Row(children: [
           Container(
             width: 36, height: 36,
-            decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Center(child: Text('', style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 16))),
           ),
           const SizedBox(width: 12),
@@ -263,7 +263,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
         child: Row(children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
             child: Icon(icon, color: color, size: 22),
           ),
           const SizedBox(width: 12),

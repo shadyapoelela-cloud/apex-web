@@ -68,7 +68,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(colors: [Color(0xFF1A1A2E), Color(0xFF16213E)]),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AC.gold.withOpacity(0.3)),
+                  border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
@@ -115,7 +115,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isCurrent ? AC.gold.withOpacity(0.1) : const Color(0xFF1E1E2E),
+                    color: isCurrent ? AC.gold.withValues(alpha: 0.1) : const Color(0xFF1E1E2E),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: isCurrent ? AC.gold : Colors.white12),
                   ),

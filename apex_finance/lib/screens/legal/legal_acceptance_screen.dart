@@ -30,7 +30,7 @@ class _LALState extends State<LegalAcceptanceLogger> {
         Container(
           padding: const EdgeInsets.all(14),
           margin: const EdgeInsets.only(bottom: 14),
-          decoration: BoxDecoration(color: AC.cyan.withOpacity(0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.cyan.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.cyan.withValues(alpha: 0.3))),
           child: Row(children: [
             const Icon(Icons.info_outline, color: AC.cyan, size: 20),
             const SizedBox(width: 10),
@@ -40,7 +40,7 @@ class _LALState extends State<LegalAcceptanceLogger> {
         ..._policies.map((p) => Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: p['accepted'] == true ? AC.ok.withOpacity(0.3) : AC.warn.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: p['accepted'] == true ? AC.ok.withValues(alpha: 0.3) : AC.warn.withValues(alpha: 0.3))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Icon(p['accepted'] == true ? Icons.check_circle : Icons.pending, color: p['accepted'] == true ? AC.ok : AC.warn, size: 20),

@@ -51,7 +51,7 @@ class ResultDetailPanel extends StatelessWidget {
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: AC.warn.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.warn.withOpacity(0.3))),
+              decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.warn.withValues(alpha: 0.3))),
               child: Row(children: [
                 const Icon(Icons.person_search, color: AC.warn, size: 20),
                 const SizedBox(width: 8),
@@ -81,7 +81,7 @@ class ResultDetailPanel extends StatelessWidget {
 
   Widget _metricCard(String label, String value, Color color) => Container(
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.3))),
+    decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.3))),
     child: Column(children: [
       Text(value, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w900)),
       const SizedBox(height: 4),
@@ -116,7 +116,7 @@ class ResultDetailPanel extends StatelessWidget {
 
   Widget _warningCard(dynamic w) => Container(
     margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.all(8),
-    decoration: BoxDecoration(color: AC.warn.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+    decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [
       const Icon(Icons.warning_amber, color: AC.warn, size: 14),
       const SizedBox(width: 6),

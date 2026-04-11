@@ -193,7 +193,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
         _buildProgressBar(),
         if (_error != null) Container(
           margin: const EdgeInsets.all(12), padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
           child: Row(children: [
             const Icon(Icons.error_outline, color: AC.err, size: 18),
             const SizedBox(width: 8),
@@ -361,7 +361,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: sel ? AC.gold.withOpacity(0.12) : AC.navy3,
+          color: sel ? AC.gold.withValues(alpha: 0.12) : AC.navy3,
           border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1),
           borderRadius: BorderRadius.circular(10)),
         child: Row(children: [
@@ -373,7 +373,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
           ])),
           if (badge != null) Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
             child: Text(badge, style: const TextStyle(color: AC.gold, fontSize: 10))),
         ])));
   }

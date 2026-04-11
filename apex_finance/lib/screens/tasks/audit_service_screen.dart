@@ -18,7 +18,7 @@ Widget _kv(String k, String v, {Color? vc}) => Padding(
 
 Widget _badge(String t, Color c) => Container(
   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+  decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
   child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
 class AuditServiceScreen extends StatefulWidget {
@@ -123,8 +123,8 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
               _kv('ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ', _findings.length.toString(), vc: _findings.isNotEmpty ? AC.warn : AC.ok),
             ]),
             Container(padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: AC.warn.withOpacity(0.1), borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AC.warn.withOpacity(0.3))),
+              decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AC.warn.withValues(alpha: 0.3))),
               child: const Row(children: [Icon(Icons.person_search, color: AC.warn, size: 20), SizedBox(width: 8),
                 Expanded(child: Text('ط§ظ„طھظ‚ط±ظٹط± ظٹطھط·ظ„ط¨ ط§ط¹طھظ…ط§ط¯ ط§ظ„ظ…ط´ط±ظپ ظ‚ط¨ظ„ ط§ظ„ط¥طµط¯ط§ط±', style: TextStyle(color: AC.warn, fontSize: 12)))])),
           ]),

@@ -49,7 +49,7 @@ class _ArchiveS extends State<ArchiveScreen> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: urgent ? AC.warn.withOpacity(0.5) : AC.bdr)),
+                  border: Border.all(color: urgent ? AC.warn.withValues(alpha: 0.5) : AC.bdr)),
                 child: Row(children: [
                   Icon(_fileIcon(item['file_name'] ?? ''), color: AC.gold, size: 28),
                   const SizedBox(width: 12),

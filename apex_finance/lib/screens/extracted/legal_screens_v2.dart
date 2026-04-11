@@ -83,7 +83,7 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: AC.navy3, borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: pending ? AC.warn.withOpacity(0.5) : AC.bdr),
+                  border: Border.all(color: pending ? AC.warn.withValues(alpha: 0.5) : AC.bdr),
                 ),
                 child: ExpansionTile(
                   leading: Icon(_iconFor(d['type']), color: pending ? AC.warn : AC.gold),
@@ -94,13 +94,13 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
                     if (pending)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: AC.warn.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                         child: const Text('\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.warn, fontSize: 10)),
                       )
                     else
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: AC.ok.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(color: AC.ok.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                         child: const Text('\u0645\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.ok, fontSize: 10)),
                       ),
                   ]),
