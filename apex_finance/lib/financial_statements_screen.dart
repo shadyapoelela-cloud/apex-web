@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'screens/copilot/copilot_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 // ignore: avoid_web_libraries_in_flutter

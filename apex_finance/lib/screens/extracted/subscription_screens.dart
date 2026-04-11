@@ -28,7 +28,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       // Load available plans
       final r2 = await ApiService.getPlans();
       if (r2.success) {
-        _plans = r2.data['plans'] ?? [];
+        _plans = r2.data is List ? r2.data : (r2.data['plans'] ?? []);
       }
     } catch (e) {
       _error = e.toString();
@@ -92,7 +92,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       const SizedBox(width: 8),
                       Expanded(child: Text(f['name_ar'] ?? f['key'],
                         style: const TextStyle(color: Colors.white, fontSize: 13))),
-                      Text(f['display_value'] ?? f['value'],
+                      Text('${f['display_value'] ?? f['value'] ?? ''}',
                         style: TextStyle(color: f['is_available'] == true ? AC.ok : Colors.grey, fontSize: 12)),
                     ]),
                   )),
@@ -105,11 +105,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
               // Available Plans
               ..._plans.map<Widget>((plan) {
-                final name = plan['name'];
-                final isCurrent = name == currentPlan;
-                final price = plan['pricing']?['monthly'] ?? 0;
-                final featureCount = plan['feature_count'] ?? 0;
-                final note = plan['pricing']?['note'];
+                final name = plan['name_ar'] ?? plan['name_en'] ?? plan['name'] ?? plan['code'] ?? '';
+                final code = plan['code'] ?? '';
+                final isCurrent = name == currentPlan || code == currentPlan;
+                final price = plan['price_monthly_sar'] ?? plan['pricing']?['monthly'] ?? 0;
+                final featuresMap = plan['features'] as Map<String, dynamic>? ?? {};
+                final featureCount = featuresMap.length;
+                final desc = plan['description_ar'] ?? '';
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
@@ -132,15 +134,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         ],
                       ]),
                       const SizedBox(height: 4),
-                      Text(price > 0 ? '$price ر.س/شهرياً' : (note ?? 'مجاني'),
+                      Text(price is num && price > 0 ? '$price ر.س/شهرياً' : (desc.isNotEmpty ? desc : 'مجاني'),
                         style: const TextStyle(color: Colors.grey, fontSize: 12)),
                       Text('$featureCount ميزة متاحة', style: const TextStyle(color: Colors.grey, fontSize: 11)),
                     ])),
                     if (!isCurrent)
                       ElevatedButton(
-                        onPressed: () => _upgrade(name),
+                        onPressed: () => _upgrade(code.isNotEmpty ? code : name),
                         style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: Colors.black),
-                        child: Text(name == 'Enterprise' ? 'تواصل معنا' : 'ترقية'),
+                        child: Text(code == 'enterprise' ? 'تواصل معنا' : 'ترقية'),
                       ),
                   ]),
                 );

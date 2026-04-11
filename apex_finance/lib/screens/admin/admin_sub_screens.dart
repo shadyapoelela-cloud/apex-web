@@ -1,9 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../api_service.dart';
-import '../../core/api_config.dart';
 import '../../core/theme.dart';
-
-const _api = apiBase;
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,

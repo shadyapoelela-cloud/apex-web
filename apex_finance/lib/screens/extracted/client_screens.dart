@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
-import '../../core/session.dart';
 import '../../core/shared_constants.dart';
 
 // ── 1. Client List Screen ──

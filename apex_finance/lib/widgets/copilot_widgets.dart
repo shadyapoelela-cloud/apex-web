@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../api_service.dart';
 import '../../core/theme.dart';
 
 class CopilotFileHelper extends StatelessWidget {

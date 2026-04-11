@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import '../copilot/copilot_screen.dart';
 import '../../core/theme.dart';
 import '../../api_service.dart';
 
