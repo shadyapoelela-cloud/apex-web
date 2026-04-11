@@ -3,9 +3,10 @@ import 'dart:convert';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:http/http.dart' as http;
+import 'core/api_config.dart';
 
 class ApiService {
-  static const _base = 'https://apex-api-ootk.onrender.com';
+  static const _base = apiBase;
   static String? _token;
     static void setToken(String t) => _token = t;
   static void clearToken() => _token = null;

@@ -3,6 +3,7 @@ import 'dart:html' as html;
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'core/api_config.dart';
 
 class AnalysisResultScreen extends StatefulWidget {
   final Map<String,dynamic>? apiData;
@@ -17,7 +18,7 @@ class _AnalysisResultScreenState extends State<AnalysisResultScreen> with Ticker
   late AnimationController _scoreAnim;
   late Animation<double> _scoreValue;
   static const _bg=Color(0xFF050D1A);static const _surface=Color(0xFF080F1F);static const _card=Color(0xFF0D1829);static const _gold=Color(0xFFC9A84C);static const _cyan=Color(0xFF00C2E0);static const _success=Color(0xFF2ECC8A);static const _danger=Color(0xFFE05050);static const _warning=Color(0xFFE8A838);static const _border=Color(0x26C9A84C);static const _textPri=Color(0xFFF0EDE6);static const _textSec=Color(0xFF8A8880);
-  static const _base='https://apex-api-ootk.onrender.com';
+  static const _base=apiBase;
   static const _tabLabels=['الربحية','السيولة','الكفاءة','الرفع المالي'];
   List<dynamic> get _ratios=>widget.apiData?['data']?['ratios']??[];
   List<dynamic> get _insights=>widget.apiData?['data']?['ai_insights']??[];

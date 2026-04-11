@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+import 'core/api_config.dart';
 import 'analysis_full_screen.dart';
 
 class FinancialStatementsScreen extends StatefulWidget {
@@ -90,7 +91,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
         duration: const Duration(seconds: 60)));
       final endpoint = type == 'pdf' ? '/reports/pdf' : '/reports/excel';
       final request = http.MultipartRequest('POST',
-        Uri.parse('https://apex-api-ootk.onrender.com$endpoint'));
+        Uri.parse('$apiBase$endpoint'));
       request.files.add(http.MultipartFile.fromBytes(
         'file', widget.pickedFile!.bytes!, filename: widget.pickedFile!.name));
       final response = await request.send();

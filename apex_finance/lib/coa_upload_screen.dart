@@ -4,6 +4,7 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'core/api_config.dart';
 import 'coa_mapping_screen.dart';
 
 class CoaUploadScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _CoaUploadScreenState extends State<CoaUploadScreen> {
   static const _border  = Color(0x26C9A84C);
   static const _textPri = Color(0xFFF0EDE6);
   static const _textSec = Color(0xFF8A8880);
-  static const _base    = 'https://apex-api-ootk.onrender.com';
+  static const _base    = apiBase;
 
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(

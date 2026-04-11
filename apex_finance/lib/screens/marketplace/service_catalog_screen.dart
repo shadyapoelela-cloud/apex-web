@@ -2,8 +2,9 @@
 import '../copilot/copilot_screen.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../core/api_config.dart';
 
-const _api = 'https://apex-api-ootk.onrender.com';
+const _api = apiBase;
 
 class AC {
   static const gold = Color(0xFFC9A84C);

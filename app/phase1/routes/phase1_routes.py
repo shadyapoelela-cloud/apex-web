@@ -272,14 +272,14 @@ async def reactivate(user: dict = Depends(get_current_user)):
 
 @router.post("/auth/change-password", tags=["Auth"])
 async def api_change_password(request: Request):
-    import jwt, os, traceback
+    from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
+    import jwt, traceback
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
         raise HTTPException(401, "Missing token")
     token = auth.replace("Bearer ", "")
-    secret = os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION")
     try:
-        payload = jwt.decode(token, secret, algorithms=["HS256"])
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload.get("user_id") or payload.get("sub")
     except Exception as e:
         raise HTTPException(401, "Invalid or expired token")

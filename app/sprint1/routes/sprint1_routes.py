@@ -47,13 +47,12 @@ MAX_FILE_SIZE = 15 * 1024 * 1024  # 15MB
 def get_current_user(authorization: str = None):
     """Extract user from JWT."""
     if not authorization:
-        from fastapi import Header
         return None
+    from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
     import jwt
     token = authorization.replace("Bearer ", "").strip()
-    secret = os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION")
     try:
-        payload = jwt.decode(token, secret, algorithms=["HS256"])
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload
     except Exception:
         raise HTTPException(401, "Invalid token")

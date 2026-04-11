@@ -4,6 +4,7 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'core/api_config.dart';
 import 'financial_statements_screen.dart';
 import 'analysis_result_screen.dart';
 import 'coa_upload_screen.dart';
@@ -19,7 +20,7 @@ class _UploadScreenState extends State<UploadScreen> {
   String _fileName='';
   Map<String,dynamic>? _apiResult;
   FilePickerResult? _pickedFile;
-  static const _baseUrl='https://apex-api-ootk.onrender.com';
+  static const _baseUrl=apiBase;
   static const _navy=Color(0xFF050D1A);static const _navy2=Color(0xFF080F1F);static const _navy3=Color(0xFF0D1829);static const _gold=Color(0xFFC9A84C);static const _border=Color(0x26C9A84C);static const _textPrimary=Color(0xFFF0EDE6);static const _textSecondary=Color(0xFF8A8880);static const _success=Color(0xFF2ECC8A);static const _cyan=Color(0xFF00C2E0);
 
   Future<void> _downloadTemplate()async{try{final res=await http.get(Uri.parse('$_baseUrl/template/trial-balance'));if(res.statusCode==200){final blob=html.Blob([res.bodyBytes],'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');final url=html.Url.createObjectUrlFromBlob(blob);(html.document.createElement('a')as html.AnchorElement)..href=url..download='نموذج_ميزان_المراجعة.xlsx'..click();html.Url.revokeObjectUrl(url);}}catch(_){}}
