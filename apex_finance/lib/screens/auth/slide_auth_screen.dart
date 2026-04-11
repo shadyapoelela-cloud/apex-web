@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../core/api_config.dart';
 import '../../main.dart' show AC, S;
 import '../../api_service.dart';
 import '../../core/router.dart' show authRefresh;
@@ -32,7 +33,7 @@ class _SAS extends State<SlideAuthScreen> {
     setState(() { _ll = true; _le = null; });
     try {
       final r = await http.post(
-        Uri.parse('https://apex-api-ootk.onrender.com/auth/login'),
+        Uri.parse('$apiBase/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username_or_email': _lu.text.trim(), 'password': _lp.text}),
       );
@@ -64,7 +65,7 @@ class _SAS extends State<SlideAuthScreen> {
     try {
       final ph = _cc + _rph.text.trim();
       final r = await http.post(
-        Uri.parse('https://apex-api-ootk.onrender.com/auth/register'),
+        Uri.parse('$apiBase/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username': _ru.text.trim(), 'email': _rem.text.trim(), 'password': _rp.text, 'display_name': _rn.text.trim(), 'phone': ph}),
       );

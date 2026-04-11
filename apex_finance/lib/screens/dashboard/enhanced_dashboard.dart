@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:html' as html;
+import '../../core/api_config.dart';
 import '../clients/client_detail_screen.dart';
 import '../extracted/coa_screens.dart';
 
@@ -11,7 +12,7 @@ import '../extracted/coa_screens.dart';
 // يستخدم نفس طريقة ClientsTab لجلب العملاء
 // localStorage['apex_token'] + http.get مباشرة
 
-const String _api = 'https://apex-api-ootk.onrender.com';
+const String _api = apiBase;
 
 class EnhancedDashboard extends StatefulWidget {
   final VoidCallback? onSwitchToClients;

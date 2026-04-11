@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'core/api_config.dart';
 import 'shared_widgets.dart';
 import 'coa_quality_screen.dart';
 
@@ -16,7 +17,7 @@ class CoaMappingScreen extends StatefulWidget {
 class _CoaMappingScreenState extends State<CoaMappingScreen> {
   bool _parsing = false;
   String _errorMsg = '';
-  static const _base = 'https://apex-api-ootk.onrender.com';
+  static const _base = apiBase;
   static const _bg      = Color(0xFF050D1A);
   static const _surface = Color(0xFF080F1F);
   static const _gold    = Color(0xFFC9A84C);

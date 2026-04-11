@@ -1,8 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../core/api_config.dart';
 
-const _api = 'https://apex-api-ootk.onrender.com';
+const _api = apiBase;
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: const Color(0xFFC9A84C), size: 20) : null,

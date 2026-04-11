@@ -1,6 +1,7 @@
 ﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'core/api_config.dart';
 import 'shared_widgets.dart';
 
 class CoaReviewScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
   static const _border  = Color(0x26C9A84C);
   static const _textPri = Color(0xFFF0EDE6);
   static const _textSec = Color(0xFF8A8880);
-  static const _base    = 'https://apex-api-ootk.onrender.com';
+  static const _base    = apiBase;
 
   @override void initState() { super.initState(); _loadSummary(); _loadAccounts(); }
 

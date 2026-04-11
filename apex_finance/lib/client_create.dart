@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'core/api_config.dart';
 import 'main.dart';
 
 class ClientCreateScreen2 extends StatefulWidget {
@@ -22,7 +23,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
     }
     setState(() { _ld = true; _err = null; });
     try {
-      final r = await http.post(Uri.parse('https://apex-api-ootk.onrender.com/clients'),
+      final r = await http.post(Uri.parse('$apiBase/clients'),
         headers: {...S.h(), 'Content-Type': 'application/json'},
         body: jsonEncode({'name_ar': _nameC.text.trim(), 'client_type_code': _sel}));
       final d = jsonDecode(r.body);

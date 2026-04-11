@@ -19,8 +19,18 @@ from sqlalchemy import (
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 # ─── Database Setup ───
+import logging as _logging
+_kb_logger = _logging.getLogger(__name__)
+
 DB_PATH = os.environ.get("KB_DATABASE_URL", "sqlite:///knowledge_brain.db")
-engine = create_engine(DB_PATH, echo=False, connect_args={"check_same_thread": False} if "sqlite" in DB_PATH else {})
+# Render PostgreSQL fix: postgres:// -> postgresql://
+if DB_PATH.startswith("postgres://"):
+    DB_PATH = DB_PATH.replace("postgres://", "postgresql://", 1)
+if "sqlite" in DB_PATH:
+    _kb_logger.warning("Knowledge Brain using SQLite — set KB_DATABASE_URL for production PostgreSQL")
+    engine = create_engine(DB_PATH, echo=False, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(DB_PATH, echo=False, pool_size=5, max_overflow=10, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 Base = declarative_base()
 

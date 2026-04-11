@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'core/api_config.dart';
 import 'api_service.dart';
 import 'screens/dashboard/enhanced_dashboard.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -78,7 +79,7 @@ class ApiRetry {
 }
 // === end ApiRetry ===
 
-const _api = 'https://apex-api-ootk.onrender.com';
+const _api = apiBase;
 
 void main() {
   // Restore session from localStorage
@@ -2329,13 +2330,13 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
     if (!_allAccepted) return;
     setState(() => _loading = true);
     try {
-      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
+      await http.post(Uri.parse('$_api/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'terms', 'version': '1.0'}));
-      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
+      await http.post(Uri.parse('$_api/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'privacy', 'version': '1.0'}));
-      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
+      await http.post(Uri.parse('$_api/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'acceptable_use', 'version': '1.0'}));
       widget.onAccepted();

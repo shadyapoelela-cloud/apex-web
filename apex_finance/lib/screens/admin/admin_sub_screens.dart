@@ -1,8 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../core/api_config.dart';
 
-const _api = 'https://apex-api-ootk.onrender.com';
+const _api = apiBase;
 
 class AC {
   static const gold = Color(0xFFC9A84C);
@@ -271,13 +272,13 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
     if (!_allAccepted) return;
     setState(() => _loading = true);
     try {
-      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
+      await http.post(Uri.parse('$_api/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'terms', 'version': '1.0'}));
-      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
+      await http.post(Uri.parse('$_api/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'privacy', 'version': '1.0'}));
-      await http.post(Uri.parse('https://apex-api-ootk.onrender.com/legal/accept'),
+      await http.post(Uri.parse('$_api/legal/accept'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'document_type': 'acceptable_use', 'version': '1.0'}));
       widget.onAccepted();

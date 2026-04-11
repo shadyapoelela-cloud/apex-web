@@ -16,6 +16,7 @@ apex_finance/.dart_tool/
 _*.py
 *.tmp
 *.bak
+*.bak_*
 *.old
 
 # Deploy temp

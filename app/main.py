@@ -16,6 +16,7 @@ All 11 Phases + 6 Sprints:
 + Financial Engine v2 + Knowledge Brain + Copilot AI
 + Sprints 1-6: COA Workflow, Classification, Quality, KB, TB, Registry
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -189,7 +190,54 @@ except Exception as e:
     logging.warning(f"Phase 11 disabled: {e}")
 
 
-app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="10.4.0")
+def _run_startup():
+    """Initialize all phase databases and seed data."""
+    if KB:
+        try: init_kb()
+        except Exception as e: logging.error("Knowledge Brain init error", exc_info=True)
+    if P1:
+        try: t = init_platform_db(); logging.info(f"APEX: {len(t)} tables"); seed1()
+        except Exception as e: logging.error("Phase 1 startup error", exc_info=True)
+    if P2:
+        try: seed_client_types()
+        except Exception as e: logging.error("Phase 2 startup error", exc_info=True)
+    if P4:
+        try: init_phase4_db()
+        except Exception as e: logging.error("Phase 4 init error", exc_info=True)
+    if P5:
+        try: init_phase5_db()
+        except Exception as e: logging.error("Phase 5 init error", exc_info=True)
+    if HAS_P7:
+        try: init_phase7_db(); seed_task_types()
+        except Exception as e: logging.error("Phase 7 init error", exc_info=True)
+    if HAS_P8:
+        try: init_phase8_db(); seed_plan_limits()
+        except Exception as e: logging.error("Phase 8 init error", exc_info=True)
+    if HAS_P9:
+        try: init_phase9_db()
+        except Exception as e: logging.error("Phase 9 init error", exc_info=True)
+    if HAS_P10:
+        try: init_phase10_db(); seed_welcome_notification()
+        except Exception as e: logging.error("Phase 10 init error", exc_info=True)
+    if HAS_P11:
+        try: init_phase11_db(); seed_legal_documents()
+        except Exception as e: logging.error("Phase 11 init error", exc_info=True)
+    if HAS_S1:
+        try: init_sprint1_db()
+        except Exception as e: logging.error("Sprint 1 init error", exc_info=True)
+    try:
+        from app.copilot.models.copilot_models import init_copilot_db
+        init_copilot_db()
+    except Exception as e: logging.error("Copilot init error", exc_info=True)
+
+
+@asynccontextmanager
+async def lifespan(app):
+    _run_startup()
+    yield
+
+
+app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="11.3.0", lifespan=lifespan)
 _cors_env = os.environ.get("CORS_ORIGINS", "")
 _cors_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else ["*"]
 _allow_creds = "*" not in _cors_origins  # credentials forbidden with wildcard
@@ -271,45 +319,7 @@ async def security_headers_middleware(request, call_next):
     return response
 
 
-@app.on_event("startup")
-def startup():
-    if KB:
-        try: init_kb()
-        except Exception as e: logging.error("Knowledge Brain init error", exc_info=True)
-    if P1:
-        try: t = init_platform_db(); logging.info(f"APEX: {len(t)} tables"); seed1()
-        except Exception as e: logging.error("Phase 1 startup error", exc_info=True)
-    if P2:
-        try: seed_client_types()
-        except Exception as e: logging.error("Phase 2 startup error", exc_info=True)
-    if P4:
-        try: init_phase4_db()
-        except Exception as e: logging.error("Phase 4 init error", exc_info=True)
-    if P5:
-        try: init_phase5_db()
-        except Exception as e: logging.error("Phase 5 init error", exc_info=True)
-    if HAS_P7:
-        try: init_phase7_db(); seed_task_types()
-        except Exception as e: logging.error("Phase 7 init error", exc_info=True)
-    if HAS_P8:
-        try: init_phase8_db(); seed_plan_limits()
-        except Exception as e: logging.error("Phase 8 init error", exc_info=True)
-    if HAS_P9:
-        try: init_phase9_db()
-        except Exception as e: logging.error("Phase 9 init error", exc_info=True)
-    if HAS_P10:
-        try: init_phase10_db(); seed_welcome_notification()
-        except Exception as e: logging.error("Phase 10 init error", exc_info=True)
-    if HAS_P11:
-        try: init_phase11_db(); seed_legal_documents()
-        except Exception as e: logging.error("Phase 11 init error", exc_info=True)
-    if HAS_S1:
-        try: init_sprint1_db()
-        except Exception as e: logging.error("Sprint 1 init error", exc_info=True)
-    try:
-        from app.copilot.models.copilot_models import init_copilot_db
-        init_copilot_db()
-    except Exception as e: logging.error("Copilot init error", exc_info=True)
+# Startup logic moved to lifespan context manager (see above)
 
 for flag, r in [(KB, kb_r if KB else None), (P1, p1r if P1 else None), (P2, p2r if P2 else None),
                 (P3, p3r if P3 else None), (P4, p4r if P4 else None), (P5, p5r if P5 else None),

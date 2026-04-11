@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'dart:html' as html;
+import '../../core/api_config.dart';
 import '../extracted/coa_screens.dart';
 
 
@@ -112,7 +113,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   Future<void> _loadReadiness() async {
     try {
       final response = await ApiRetry.get(
-        Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/readiness'),
+        Uri.parse('$apiBase/clients/${widget.clientId}/readiness'),
         headers: _authHeaders,
       );
       if (response.statusCode == 200) {
@@ -140,7 +141,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   Future<void> _loadDocuments() async {
     try {
       final response = await ApiRetry.get(
-        Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/documents'),
+        Uri.parse('$apiBase/clients/${widget.clientId}/documents'),
         headers: _authHeaders,
       );
       if (response.statusCode == 200) {
@@ -803,7 +804,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       }
       
       // Upload to API
-      final uri = Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}/documents');
+      final uri = Uri.parse('$apiBase/clients/${widget.clientId}/documents');
       final request = http.MultipartRequest('POST', uri);
       request.headers['Authorization'] = 'Bearer $_token';
       request.fields['doc_type'] = docName;
@@ -893,7 +894,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 onPressed: () async {
                   Navigator.pop(ctx);
                   try {
-                    await http.put(Uri.parse('https://apex-api-ootk.onrender.com/clients/${widget.clientId}'),
+                    await http.put(Uri.parse('$apiBase/clients/${widget.clientId}'),
                       headers: _authHeaders,
                       body: jsonEncode({'name_ar': nameCtrl.text, 'sector': sectorCtrl.text}));
                     _loadReadiness();

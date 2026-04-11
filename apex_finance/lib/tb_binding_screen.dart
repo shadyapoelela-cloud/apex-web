@@ -1,6 +1,7 @@
 ﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'core/api_config.dart';
 
 class TbBindingScreen extends StatefulWidget {
   final String tbUploadId;
@@ -27,7 +28,7 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
   static const _border  = Color(0x26C9A84C);
   static const _textPri = Color(0xFFF0EDE6);
   static const _textSec = Color(0xFF8A8880);
-  static const _base    = 'https://apex-api-ootk.onrender.com';
+  static const _base    = apiBase;
 
   @override void initState() { super.initState(); _checkExisting(); }
 
