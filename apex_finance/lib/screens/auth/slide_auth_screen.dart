@@ -185,14 +185,24 @@ class _SAS extends State<SlideAuthScreen> {
     Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: Text('أو', style: const TextStyle(color: AC.ts, fontSize: 11))),
     Expanded(child: Divider(color: AC.bdr))]);
 
+  void _comingSoon(String provider) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('تسجيل الدخول عبر $provider سيكون متاحاً قريباً', style: const TextStyle(color: Colors.white)),
+      backgroundColor: const Color(0xFF2A2A3E),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
   Widget _socW() => Row(children: [
-    Expanded(child: OutlinedButton.icon(onPressed: () {},
+    Expanded(child: OutlinedButton.icon(onPressed: () => _comingSoon('Google'),
       style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
       icon: const Icon(Icons.g_mobiledata, color: Colors.red, size: 22),
       label: const Text('Google', style: TextStyle(color: AC.tp, fontSize: 11)))),
     const SizedBox(width: 8),
-    Expanded(child: OutlinedButton.icon(onPressed: () {},
+    Expanded(child: OutlinedButton.icon(onPressed: () => _comingSoon('Apple'),
       style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.bdr), padding: const EdgeInsets.symmetric(vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
       icon: const Icon(Icons.apple, color: AC.tp, size: 20),
