@@ -1,26 +1,39 @@
-﻿# Python
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
 
 # Databases
 *.db
 *.sqlite3
 
-# Flutter build
+# Flutter build & deploy duplicates
 apex_finance/build/
 apex_finance/.dart_tool/
+apex_finance/web_deploy/
 
-# Temp files
+# Temp / backup files
 _*.py
 *.tmp
 *.bak
 *.bak_*
 *.old
+*.orig
+*.patch
+
+# Data dumps (use templates/ for official templates)
+coa_dump.txt
+coa_b2.txt
 
 # Deploy temp
 gh-pages-temp/
+
+# Environment & secrets
+.env
+.env.local
+.env.production
 
 # OS
 .DS_Store
@@ -31,6 +44,10 @@ Thumbs.db
 .vscode/
 *.iml
 
+# Logs
+*.log
+
 # Phase 1 local backups
 _backups/
 phase1.ps1
+.claude/
