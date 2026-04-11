@@ -88,15 +88,15 @@ class _CopilotScreenState extends State<CopilotScreen> {
         backgroundColor: AC.navy2,
         title: Row(children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: EdgeInsets.all(6),
             decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
             child: Icon(Icons.smart_toy, color: AC.gold, size: 20),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
             child: Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
           ),
@@ -104,7 +104,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
         actions: [
           if (_lastIntent != null)
             Padding(
-              padding: const EdgeInsets.only(left: 8),
+              padding: EdgeInsets.only(left: 8),
               child: Chip(
                 label: Text(_lastIntent!['intent'] ?? '', style: TextStyle(color: AC.tp, fontSize: 10)),
                 backgroundColor: AC.navy3,
@@ -144,7 +144,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
         padding: const EdgeInsets.all(32),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AC.gold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
@@ -152,9 +152,9 @@ class _CopilotScreenState extends State<CopilotScreen> {
             ),
             child: Icon(Icons.smart_toy, color: AC.gold, size: 48),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Text('Apex Copilot', style: TextStyle(color: AC.tp, fontSize: 22, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             '\u0645\u0633\u0627\u0639\u062f\u0643 \u0627\u0644\u0630\u0643\u064a \u0644\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0648\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0648\u0627\u0644\u0627\u0645\u062a\u062b\u0627\u0644',
             style: TextStyle(color: AC.ts, fontSize: 14),
@@ -189,7 +189,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(14),
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
         decoration: BoxDecoration(
           color: isUser ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
@@ -199,23 +199,23 @@ class _CopilotScreenState extends State<CopilotScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(msg['content'] ?? '', style: TextStyle(color: AC.tp, fontSize: 14, height: 1.5), textDirection: TextDirection.rtl),
           if (!isUser && msg['confidence'] != null) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Row(children: [
               _metaBadge('\u062b\u0642\u0629: %',
                 (msg['confidence'] as num) > 0.7 ? AC.ok : (msg['confidence'] as num) > 0.5 ? AC.warn : AC.err),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               if (msg['risk_level'] != null) _metaBadge(
                 '\u062e\u0637\u0631: ',
                 msg['risk_level'] == 'high' ? AC.err : msg['risk_level'] == 'medium' ? AC.warn : AC.ok,
               ),
               if (msg['intent'] != null) ...[
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 _metaBadge(msg['intent'], AC.cyan),
               ],
             ]),
           ],
           if (!isUser && msg['references'] != null && (msg['references'] as List).isNotEmpty) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Wrap(spacing: 4, children: (msg['references'] as List).map<Widget>((r) =>
               Chip(label: Text('', style: TextStyle(color: AC.tp, fontSize: 9)),
                 backgroundColor: AC.navy4, side: BorderSide(color: AC.cyan.withValues(alpha: 0.3)),
@@ -225,13 +225,13 @@ class _CopilotScreenState extends State<CopilotScreen> {
             ).toList()),
           ],
           if (!isUser && msg['escalation'] != null && msg['escalation']['needed'] == true) ...[
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8),
               decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: AC.warn.withValues(alpha: 0.3))),
               child: Row(children: [
                 Icon(Icons.warning_amber, color: AC.warn, size: 16),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Expanded(child: Text('\u064a\u0646\u0635\u062d \u0628\u0645\u0631\u0627\u062c\u0639\u0629 \u0628\u0634\u0631\u064a\u0629 \u0644\u0647\u0630\u0647 \u0627\u0644\u0646\u062a\u064a\u062c\u0629', style: TextStyle(color: AC.warn, fontSize: 11))),
               ]),
             ),
@@ -250,23 +250,23 @@ class _CopilotScreenState extends State<CopilotScreen> {
   Widget _buildTypingIndicator() => Align(
     alignment: Alignment.centerLeft,
     child: Container(
-      margin: const EdgeInsets.only(bottom: 12), padding: const EdgeInsets.all(14),
+      margin: EdgeInsets.only(bottom: 12), padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AC.gold)),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Text('\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0644\u064a\u0644...', style: TextStyle(color: AC.ts, fontSize: 13)),
       ]),
     ),
   );
 
   Widget _buildNextActions() => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     color: AC.navy2,
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(children: _nextActions.map((a) => Padding(
-        padding: const EdgeInsets.only(left: 6),
+        padding: EdgeInsets.only(left: 6),
         child: ActionChip(
           avatar: Icon(_getIcon(a['icon'] ?? ''), color: AC.gold, size: 15),
           label: Text(a['label'] ?? '', style: TextStyle(color: AC.tp, fontSize: 11)),
@@ -278,7 +278,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
   );
 
   Widget _buildInput() => Container(
-    padding: const EdgeInsets.all(12),
+    padding: EdgeInsets.all(12),
     decoration: BoxDecoration(color: AC.navy2, border: Border(top: BorderSide(color: AC.bdr))),
     child: Row(children: [
       Expanded(child: TextField(
@@ -295,7 +295,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
         ),
         onSubmitted: (_) => _sendMessage(),
       )),
-      const SizedBox(width: 8),
+      SizedBox(width: 8),
       Container(
         decoration: BoxDecoration(color: AC.gold, borderRadius: BorderRadius.circular(20)),
         child: IconButton(

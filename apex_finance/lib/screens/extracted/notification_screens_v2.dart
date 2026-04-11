@@ -103,7 +103,7 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
         : _notifs.isEmpty
           ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.notifications_off, color: AC.ts, size: 48),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Text('لا توجد إشعارات', style: TextStyle(color: AC.ts)),
             ]))
           : RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView.builder(
@@ -115,8 +115,8 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
                 return GestureDetector(
                   onTap: () { if (!isRead) _markOneRead(n['id']); },
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(14),
+                    margin: EdgeInsets.only(bottom: 8),
+                    padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: isRead ? AC.navy2 : AC.navy3,
                       borderRadius: BorderRadius.circular(12),
@@ -131,7 +131,7 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
                         ),
                         child: Icon(_iconFor(n['icon']), color: _colorFor(n['type']), size: 20),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(n['title_ar'] ?? '', style: TextStyle(
                           color: AC.tp, fontWeight: isRead ? FontWeight.normal : FontWeight.bold, fontSize: 14)),
@@ -139,12 +139,12 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
                           Text(n['body_ar'], style: TextStyle(color: AC.ts, fontSize: 12),
                             maxLines: 2, overflow: TextOverflow.ellipsis),
                       ])),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Column(children: [
                         Text(n['created_at']?.toString().substring(11, 16) ?? '',
                           style: TextStyle(color: AC.ts, fontSize: 11)),
                         if (!isRead) Container(
-                          margin: const EdgeInsets.only(top: 6),
+                          margin: EdgeInsets.only(top: 6),
                           width: 8, height: 8,
                           decoration: BoxDecoration(color: AC.gold, shape: BoxShape.circle),
                         ),
@@ -207,8 +207,8 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
             itemBuilder: (_, i) {
               final p = _prefs[i];
               return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
+                margin: EdgeInsets.only(bottom: 8),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(p['title_ar'] ?? p['type'], style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
@@ -231,7 +231,7 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: active ? AC.gold.withValues(alpha: 0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),

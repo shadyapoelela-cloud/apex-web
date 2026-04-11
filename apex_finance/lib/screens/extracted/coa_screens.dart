@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'dart:html' as html;
+import '../../core/theme.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // APEX Phase 1 — COA Qualification v5.0
@@ -12,16 +13,16 @@ import 'dart:html' as html;
 // ═══════════════════════════════════════════════════════════════
 
 class AppColors {
-  static const navy = Color(0xFF050D1A);
-  static const navyLight = Color(0xFF0A1628);
-  static const navyMid = Color(0xFF111D2E);
-  static const gold = Color(0xFFC9A84C);
-  static const goldLight = Color(0xFFD4B96A);
-  static const textColor = Color(0xFFE8E0D0);
-  static const textMid = Color(0xFF9A917F);
-  static const textDim = Color(0xFF6B6355);
-  static const cardBg = Color(0xFF0D1825);
-  static const borderColor = Color(0x1FC9A84C);
+  static Color get navy => AC.navy;
+  static Color get navyLight => AC.navy3;
+  static Color get navyMid => AC.navy4;
+  static Color get gold => AC.gold;
+  static Color get goldLight => const Color(0xFFD4B96A);
+  static Color get textColor => AC.tp;
+  static Color get textMid => AC.ts;
+  static Color get textDim => AC.isLight ? const Color(0xFF9A917F) : const Color(0xFF6B6355);
+  static Color get cardBg => AC.navy3;
+  static Color get borderColor => AC.bdr;
   static const greenC = Color(0xFF34D399);
   static const cyanC = Color(0xFF34D399);
   static const redC = Color(0xFFF87171);
@@ -1171,7 +1172,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0D1825),
+        backgroundColor: AC.navy3,
         title: Text('تغييرات غير محفوظة', style: TextStyle(color: AppColors.gold)),
         content: Text('لديك تعديلات لم تُحفظ. هل تريد الخروج بدون حفظ؟',
           style: TextStyle(color: AppColors.textColor)),
@@ -1202,7 +1203,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     final proceed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0D1825),
+        backgroundColor: AC.navy3,
         title: Text('\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 TB', style: TextStyle(color: AppColors.gold)),
         content: Text('\u062a\u0645 \u0627\u0639\u062a\u0645\u0627\u062f $approved \u0645\u0646 $total \u062d\u0633\u0627\u0628.\n\u0647\u0644 \u062a\u0631\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0645\u0631\u062d\u0644\u0629 TB\u061f',
           style: TextStyle(color: AppColors.textColor)),
@@ -2663,7 +2664,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                                   builder: (dCtx) => Directionality(
                                     textDirection: TextDirection.rtl,
                                     child: AlertDialog(
-                                      backgroundColor: const Color(0xFF0D1825),
+                                      backgroundColor: AC.navy3,
                                       title: Text('تعميم التصنيف', style: TextStyle(color: AppColors.gold)),
                                       content: Text('هل تريد تطبيق التصنيف "$newRootClass" على ${children.length} حساب فرعي؟',
                                         style: TextStyle(color: AppColors.textColor)),

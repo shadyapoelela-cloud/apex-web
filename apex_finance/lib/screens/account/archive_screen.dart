@@ -33,11 +33,11 @@ class _ArchiveS extends State<ArchiveScreen> {
     backgroundColor: AC.navy,
     appBar: AppBar(
       title: Text(widget.clientId != null ? 'أرشيف العميل' : 'أرشيف حسابي', style: TextStyle(color: AC.gold)),
-      backgroundColor: const Color(0xFF080F1F)),
+      backgroundColor: AC.navy2),
     body: _loading ? Center(child: CircularProgressIndicator(color: AC.gold))
       : _items.isEmpty ? Center(child: Text('لا توجد ملفات في الأرشيف', style: TextStyle(color: AC.ts)))
       : Column(children: [
-          Padding(padding: const EdgeInsets.all(12),
+          Padding(padding: EdgeInsets.all(12),
             child: Text('إجمالي: ' + _total.toString() + ' ملف', style: TextStyle(color: AC.ts, fontSize: 12))),
           Expanded(child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -47,12 +47,12 @@ class _ArchiveS extends State<ArchiveScreen> {
               final days = item['days_remaining'] ?? 0;
               final urgent = (days is int) && days <= 7;
               return Container(
-                margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
+                margin: EdgeInsets.only(bottom: 8), padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: urgent ? AC.warn.withValues(alpha: 0.5) : AC.bdr)),
                 child: Row(children: [
                   Icon(_fileIcon(item['file_name'] ?? ''), color: AC.gold, size: 28),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(item['file_name'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold)),
                     Text('المصدر: ' + (item['source_type'] ?? '').toString(), style: TextStyle(color: AC.ts, fontSize: 11)),
@@ -69,7 +69,7 @@ class _ArchiveS extends State<ArchiveScreen> {
                     ]),
                 ]));
             })),
-          Padding(padding: const EdgeInsets.all(12), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Padding(padding: EdgeInsets.all(12), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             IconButton(icon: Icon(Icons.chevron_right, color: AC.ts),
               onPressed: _page > 1 ? () { setState(() => _page--); _load(); } : null),
             Text('صفحة ' + _page.toString(), style: TextStyle(color: AC.ts)),

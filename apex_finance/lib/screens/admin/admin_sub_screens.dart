@@ -9,13 +9,13 @@ InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)));
 
 Widget _card(String t, List<Widget> c, {Color? accent}) => Container(
-  margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
+  margin: EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: accent ?? AC.bdr)),
   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Text(t, style: TextStyle(color: accent ?? AC.gold, fontWeight: FontWeight.bold, fontSize: 15)),
     Divider(color: AC.bdr, height: 18), ...c]));
 
-Widget _kv(String k, String v, {Color? vc}) => Padding(padding: const EdgeInsets.only(bottom: 5),
+Widget _kv(String k, String v, {Color? vc}) => Padding(padding: EdgeInsets.only(bottom: 5),
   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
     Text(k, style: TextStyle(color: AC.ts, fontSize: 13)),
     Flexible(child: Text(v, style: TextStyle(color: vc ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
@@ -50,7 +50,7 @@ class _RevCS extends State<ReviewerConsoleScreen> {
         // Filter chips
         SingleChildScrollView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.all(12),
           child: Row(children: ['all','submitted','under_review','accepted','rejected'].map((f) =>
-            Padding(padding: const EdgeInsets.only(left: 6), child: FilterChip(
+            Padding(padding: EdgeInsets.only(left: 6), child: FilterChip(
               selected: _filter == f, onSelected: (_) => setState(()=> _filter = f),
               label: Text(f == 'all' ? '\u0627\u0644\u0643\u0644' : f == 'submitted' ? '\u0645\u0642\u062f\u0645\u0629' : f == 'under_review' ? '\u0642\u064a\u062f \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629' : f == 'accepted' ? '\u0645\u0642\u0628\u0648\u0644\u0629' : '\u0645\u0631\u0641\u0648\u0636\u0629',
                 style: TextStyle(color: _filter == f ? AC.navy : AC.tp, fontSize: 12)),
@@ -66,27 +66,27 @@ class _RevCS extends State<ReviewerConsoleScreen> {
             itemBuilder: (_, i) {
               final item = _filtered[i];
               final status = item['status'] ?? 'submitted';
-              return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
+              return Container(margin: EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Expanded(child: Text(item['title']??'', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14))),
                     _badge(status == 'submitted' ? '\u0645\u0642\u062f\u0645\u0629' : status == 'accepted' ? '\u0645\u0642\u0628\u0648\u0644\u0629' : status == 'rejected' ? '\u0645\u0631\u0641\u0648\u0636\u0629' : status,
                       status == 'accepted' ? AC.ok : status == 'rejected' ? AC.err : AC.warn)]),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(item['feedback_type']??'', style: TextStyle(color: AC.cyan, fontSize: 11)),
                   if(item['description']!=null && item['description'].toString().isNotEmpty)
-                    Padding(padding: const EdgeInsets.only(top: 6),
+                    Padding(padding: EdgeInsets.only(top: 6),
                       child: Text(item['description'], style: TextStyle(color: AC.ts, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis)),
                   Text('\u0628\u0648\u0627\u0633\u0637\u0629: ${item['submitted_by_name']??item['submitted_by']??''}', style: TextStyle(color: AC.ts, fontSize: 10)),
                   if(status == 'submitted') ...[
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     Row(children: [
                       Expanded(child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: EdgeInsets.symmetric(vertical: 8)),
                         onPressed: ()=> _review(item['id']??item['feedback_id']??'', 'accepted'),
-                        icon: const Icon(Icons.check, size: 16), label: const Text('\u0642\u0628\u0648\u0644', style: TextStyle(fontSize: 12)))),
-                      const SizedBox(width: 8),
+                        icon: Icon(Icons.check, size: 16), label: const Text('\u0642\u0628\u0648\u0644', style: TextStyle(fontSize: 12)))),
+                      SizedBox(width: 8),
                       Expanded(child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(backgroundColor: AC.err, padding: EdgeInsets.symmetric(vertical: 8)),
                         onPressed: ()=> _review(item['id']??item['feedback_id']??'', 'rejected'),
@@ -128,35 +128,35 @@ class _PVS extends State<ProviderVerificationScreen> {
         itemBuilder: (_, i) {
           final p = _provs[i];
           final vStatus = p['verification_status'] ?? 'pending';
-          return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
+          return Container(margin: EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 CircleAvatar(backgroundColor: AC.navy4, radius: 20,
                   child: Text((p['display_name']??p['username']??'?')[0], style: TextStyle(color: AC.gold, fontSize: 16))),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(p['display_name']??p['username']??'', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
                   Text(p['category']??'', style: TextStyle(color: AC.cyan, fontSize: 11))])),
                 _badge(vStatus == 'approved' ? '\u0645\u0639\u062a\u0645\u062f' : vStatus == 'pending' ? '\u0642\u064a\u062f \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631' : vStatus,
                   vStatus == 'approved' ? AC.ok : vStatus == 'rejected' ? AC.err : AC.warn)]),
               if(p['service_scopes']!=null) ...[
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Wrap(spacing: 6, runSpacing: 4, children: (p['service_scopes'] as List).map((s) =>
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  Container(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                     child: Text(s['name_ar']??s['code']??'', style: TextStyle(color: AC.cyan, fontSize: 10)))).toList())],
               if(p['required_documents']!=null) ...[
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text('\u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a: ${(p['required_documents'] as List).join(", ")}', style: TextStyle(color: AC.ts, fontSize: 10))],
               if(vStatus == 'pending') ...[
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Row(children: [
                   Expanded(child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: EdgeInsets.symmetric(vertical: 8)),
                     onPressed: ()=> _action(p['provider_id']??p['id']??'', 'approve'),
-                    icon: const Icon(Icons.check, size: 16), label: const Text('\u0627\u0639\u062a\u0645\u0627\u062f', style: TextStyle(fontSize: 12)))),
-                  const SizedBox(width: 8),
+                    icon: Icon(Icons.check, size: 16), label: const Text('\u0627\u0639\u062a\u0645\u0627\u062f', style: TextStyle(fontSize: 12)))),
+                  SizedBox(width: 8),
                   Expanded(child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(backgroundColor: AC.err, padding: EdgeInsets.symmetric(vertical: 8)),
                     onPressed: ()=> _action(p['provider_id']??p['id']??'', 'reject'),
@@ -191,24 +191,24 @@ class _PMS extends State<PolicyManagementScreen> {
       ListView.builder(padding: const EdgeInsets.all(14), itemCount: _policies.length,
         itemBuilder: (_, i) {
           final p = _policies[i];
-          return Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
+          return Container(margin: EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Icon(_policyIcon(p['policy_type']??''), color: AC.gold, size: 24),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(p['title_ar']??p['title']??p['policy_type']??'', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
                   Text('\u0627\u0644\u0625\u0635\u062f\u0627\u0631: ${p['version']??'1.0'}', style: TextStyle(color: AC.ts, fontSize: 11))])),
                 _badge(p['is_active']==true?'\u0641\u0639\u0627\u0644':'\u063a\u064a\u0631 \u0641\u0639\u0627\u0644', p['is_active']==true?AC.ok:AC.ts)]),
               if(p['summary_ar']!=null || p['content_preview']!=null) ...[
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text(p['summary_ar']??p['content_preview']??'', style: TextStyle(color: AC.ts, fontSize: 12), maxLines: 3, overflow: TextOverflow.ellipsis)],
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Row(children: [
                 Icon(Icons.calendar_today, color: AC.ts, size: 12), SizedBox(width: 4),
                 Text(p['effective_date']?.toString().substring(0,10)??p['created_at']?.toString().substring(0,10)??'', style: TextStyle(color: AC.ts, fontSize: 10)),
-                const Spacer(),
+                Spacer(),
                 if(p['acceptance_count']!=null) Text('\u0645\u0648\u0627\u0641\u0642\u0627\u062a: ${p['acceptance_count']}', style: TextStyle(color: AC.ts, fontSize: 10)),
               ]),
             ]));
@@ -258,7 +258,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(title: Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -307,7 +307,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
   Widget _buildPolicyCard(String title, String version, String desc, IconData icon, bool value, ValueChanged<bool?> onChanged) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white, borderRadius: BorderRadius.circular(12),
         border: Border.all(color: value ? AC.gold : Color(0xFFE0E0E0), width: value ? 2 : 1),
@@ -324,7 +324,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
         ]),
         const SizedBox(height: 8),
         Text(desc, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Row(children: [
           Checkbox(value: value, onChanged: onChanged, activeColor: AC.gold),
           const Text('أوافق على هذه السياسة', style: TextStyle(fontSize: 13)),
@@ -370,7 +370,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(title: Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
@@ -386,13 +386,13 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
               final t = _types[i];
               final selected = _selected == t['id'];
               return Container(
-                margin: const EdgeInsets.only(bottom: 12),
+                margin: EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: selected ? AC.gold : Color(0xFFE0E0E0), width: selected ? 2 : 1),
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: CircleAvatar(
                     backgroundColor: selected ? AC.gold.withValues(alpha: 0.15) : Color(0xFFF5F5F5),
                     child: Icon(t['icon'] as IconData, color: selected ? AC.gold : AC.navy, size: 24),
@@ -460,7 +460,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
     final uploadedRequired = _docs.where((d) => d['required'] == true && d['uploaded'] == true).length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(title: Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: Column(children: [
         Container(
@@ -492,7 +492,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
                 ),
                 child: Row(children: [
                   CircleAvatar(
-                    backgroundColor: doc['uploaded'] == true ? const Color(0xFFE8F5E9) : const Color(0xFFF5F5F5),
+                    backgroundColor: doc['uploaded'] == true ? Color(0xFFE8F5E9) : const Color(0xFFF5F5F5),
                     child: Icon(doc['icon'] as IconData,
                       color: doc['uploaded'] == true ? Color(0xFF2ECC8A) : AC.navy),
                   ),
@@ -508,7 +508,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
                   ElevatedButton.icon(
                     onPressed: () => setState(() => _docs[i] = {...doc, 'uploaded': true}),
                     icon: Icon(doc['uploaded'] == true ? Icons.refresh : Icons.upload_file, size: 16),
-                    label: Text(doc['uploaded'] == true ? 'تحديث' : 'رفع', style: const TextStyle(fontSize: 12)),
+                    label: Text(doc['uploaded'] == true ? 'تحديث' : 'رفع', style: TextStyle(fontSize: 12)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: doc['uploaded'] == true ? Colors.grey[200] : AC.navy,
                       foregroundColor: doc['uploaded'] == true ? Colors.black87 : Colors.white,
@@ -572,9 +572,9 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
     final outputsDone = _outputs.where((d) => d['uploaded'] == true).length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: const Text('مستندات المهمة'),
+        title: Text('مستندات المهمة'),
         backgroundColor: AC.navy, foregroundColor: Colors.white,
         bottom: TabBar(controller: _tabs, indicatorColor: AC.gold, labelColor: Colors.white, tabs: [
           Tab(text: 'المدخلات ($inputsDone/${_inputs.length})'),
@@ -636,8 +636,8 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
             if (doc['uploaded'] != true)
               ElevatedButton.icon(
                 onPressed: () => setState(() => docs[i] = {...doc, 'uploaded': true, 'date': '2026-03-30'}),
-                icon: const Icon(Icons.upload_file, size: 16),
-                label: const Text('رفع'),
+                icon: Icon(Icons.upload_file, size: 16),
+                label: Text('رفع'),
                 style: ElevatedButton.styleFrom(backgroundColor: AC.navy, foregroundColor: Colors.white),
               ),
           ]),
@@ -656,7 +656,7 @@ class ProviderComplianceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(title: Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -742,7 +742,7 @@ class ActivityHistoryScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(title: Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: Colors.white),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -808,7 +808,7 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
   }
   
   @override Widget build(BuildContext c) => Container(
-    padding: const EdgeInsets.all(16),
+    padding: EdgeInsets.all(16),
     decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12)),
     child: _loading 
       ? Center(child: CircularProgressIndicator(color: AC.gold))
@@ -817,26 +817,26 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
         : Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
             Row(children: [
               Icon(Icons.info_outline, color: AC.gold, size: 20),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(child: Text(_detail!['summary_ar'] ?? _detail!['result_key'] ?? '',
                 style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold))),
             ]),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             if (_detail!['source_rows'] != null) ...[
               Text('\u0627\u0644\u0635\u0641\u0648\u0641 \u0627\u0644\u0645\u0635\u062f\u0631\u064a\u0629:', style: TextStyle(color: AC.cyan, fontSize: 13)),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(_detail!['source_rows'], style: TextStyle(color: AC.tp, fontSize: 12)),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
             ],
             if (_detail!['applied_rules'] != null) ...[
               Text('\u0627\u0644\u0642\u0648\u0627\u0639\u062f \u0627\u0644\u0645\u0637\u0628\u0642\u0629:', style: TextStyle(color: AC.cyan, fontSize: 13)),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(_detail!['applied_rules'], style: TextStyle(color: AC.tp, fontSize: 12)),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
             ],
             Row(children: [
               _chip('\u0627\u0644\u062b\u0642\u0629: ${((_detail!['confidence'] ?? 0) * 100).toStringAsFixed(0)}%', AC.ok),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               if (_detail!['feedback_count'] != null && _detail!['feedback_count'] > 0)
                 _chip('\u0645\u0644\u0627\u062d\u0638\u0627\u062a: ${_detail!['feedback_count']}', AC.cyan),
             ]),
@@ -928,16 +928,16 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
       ? Center(child: CircularProgressIndicator(color: AC.gold))
       : _taskType == null
         ? Center(child: Text('\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0646\u0648\u0639 \u0627\u0644\u0645\u0647\u0645\u0629', style: TextStyle(color: AC.tp)))
-        : ListView(padding: const EdgeInsets.all(16), children: [
+        : ListView(padding: EdgeInsets.all(16), children: [
             // Task type header
-            Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(
+            Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(
               color: AC.navy2, borderRadius: BorderRadius.circular(12)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(_taskType!['name_ar'] ?? '', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(_taskType!['code'] ?? '', style: TextStyle(color: AC.ts, fontSize: 12)),
               ])),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             
             // Input Requirements
             Text('\u0627\u0644\u0645\u062f\u062e\u0644\u0627\u062a \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629', style: TextStyle(color: AC.cyan, fontSize: 16, fontWeight: FontWeight.bold)),
@@ -962,15 +962,15 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
     final uploaded = _isUploaded(req['id']);
     final mandatory = req['is_mandatory'] == true;
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AC.navy3, borderRadius: BorderRadius.circular(10),
         border: Border.all(color: uploaded ? Color(0xFF2ECC8A) : (mandatory ? Color(0x33F39C12) : AC.navy4))),
       child: Row(children: [
         Icon(uploaded ? Icons.check_circle : (isInput ? Icons.upload_file : Icons.download),
           color: uploaded ? Color(0xFF2ECC8A) : AC.gold, size: 24),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(req['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 14)),
           if (mandatory) const Text('* \u0625\u0644\u0632\u0627\u0645\u064a', style: TextStyle(color: Color(0xFFF39C12), fontSize: 11)),
@@ -995,12 +995,12 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
     final done = uploadedInputs + uploadedOutputs;
     final progress = total > 0 ? done / total : 0.0;
     
-    return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(
+    return Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(
       color: AC.navy2, borderRadius: BorderRadius.circular(12)),
       child: Column(children: [
         Text('\u0627\u0644\u062a\u0642\u062f\u0645: $done / $total \u0645\u0633\u062a\u0646\u062f \u0625\u0644\u0632\u0627\u0645\u064a',
           style: TextStyle(color: AC.tp, fontSize: 14)),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         LinearProgressIndicator(value: progress, backgroundColor: AC.navy4,
           valueColor: AlwaysStoppedAnimation(progress >= 1.0 ? Color(0xFF2ECC8A) : AC.gold)),
         const SizedBox(height: 8),
@@ -1055,33 +1055,33 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
             final inputs = tt['input_requirements'] ?? tt['input_documents'] ?? [] as List? ?? [];
             final outputs = tt['output_requirements'] ?? tt['output_documents'] ?? [] as List? ?? [];
             return Container(
-              margin: const EdgeInsets.only(bottom: 12),
+              margin: EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12)),
               child: ExpansionTile(
-                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 iconColor: AC.gold, collapsedIconColor: AC.ts,
                 title: Text(tt['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
                 subtitle: Text('${inputs.length} \u0645\u062f\u062e\u0644 \u2022 ${outputs.length} \u0645\u062e\u0631\u062c', style: TextStyle(color: AC.ts, fontSize: 12)),
                 children: [
-                  Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Padding(padding: EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     if (inputs.isNotEmpty) ...[
                       Text('\u0627\u0644\u0645\u062f\u062e\u0644\u0627\u062a:', style: TextStyle(color: AC.cyan, fontSize: 13, fontWeight: FontWeight.bold)),
-                      ...inputs.map((r) => Padding(padding: const EdgeInsets.only(right: 16, top: 4),
+                      ...inputs.map((r) => Padding(padding: EdgeInsets.only(right: 16, top: 4),
                         child: Row(children: [
                           Icon(r['is_mandatory'] == true ? Icons.star : Icons.star_border, size: 14,
                             color: r['is_mandatory'] == true ? Color(0xFFF39C12) : AC.ts),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           Text(r['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13)),
                         ]))),
                     ],
                     if (outputs.isNotEmpty) ...[
                       const SizedBox(height: 12),
-                      const Text('\u0627\u0644\u0645\u062e\u0631\u062c\u0627\u062a:', style: TextStyle(color: Color(0xFFF39C12), fontSize: 13, fontWeight: FontWeight.bold)),
-                      ...outputs.map((r) => Padding(padding: const EdgeInsets.only(right: 16, top: 4),
+                      Text('\u0627\u0644\u0645\u062e\u0631\u062c\u0627\u062a:', style: TextStyle(color: Color(0xFFF39C12), fontSize: 13, fontWeight: FontWeight.bold)),
+                      ...outputs.map((r) => Padding(padding: EdgeInsets.only(right: 16, top: 4),
                         child: Row(children: [
                           Icon(r['is_mandatory'] == true ? Icons.star : Icons.star_border, size: 14,
                             color: r['is_mandatory'] == true ? Color(0xFFF39C12) : AC.ts),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           Text(r['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13)),
                         ]))),
                     ],
@@ -1143,7 +1143,7 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
       : _feedbacks.isEmpty
         ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.psychology, color: AC.ts, size: 64),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 16)),
           ]))
         : ListView.builder(
@@ -1152,29 +1152,29 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
             itemBuilder: (c, i) {
               final fb = _feedbacks[i];
               final status = fb['status'] ?? 'submitted';
-              final statusColor = status == 'accepted' ? const Color(0xFF2ECC8A)
-                : status == 'rejected' ? const Color(0xFFE74C3C) 
+              final statusColor = status == 'accepted' ? Color(0xFF2ECC8A)
+                : status == 'rejected' ? Color(0xFFE74C3C) 
                 : status == 'under_review' ? AC.cyan : AC.ts;
               
               return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(14),
+                margin: EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.all(14),
                 decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12),
                   border: Border(right: BorderSide(color: statusColor, width: 3))),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Icon(Icons.lightbulb_outline, color: statusColor, size: 20),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Expanded(child: Text(fb['feedback_type'] ?? '\u0645\u0644\u0627\u062d\u0638\u0629',
                       style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold))),
                     Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                       child: Text(status, style: TextStyle(color: statusColor, fontSize: 11))),
                   ]),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(fb['content'] ?? fb['description'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13),
                     maxLines: 3, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(fb['created_at'] ?? '', style: TextStyle(color: AC.ts, fontSize: 11)),
                 ]),
               );
@@ -1227,12 +1227,12 @@ class _AuditLogS extends State<AuditLogScreen> {
             itemBuilder: (c, i) {
               final e = _events[i];
               return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
+                margin: EdgeInsets.only(bottom: 8),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(10)),
                 child: Row(children: [
                   Icon(_actionIcon(e['action'] ?? ''), color: AC.cyan, size: 20),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(e['action'] ?? '', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
                     if (e['details'] != null) Text(e['details'], style: TextStyle(color: AC.ts, fontSize: 12), maxLines: 2),

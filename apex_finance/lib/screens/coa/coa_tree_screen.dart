@@ -59,7 +59,7 @@ class _CoaTreeState extends State<CoaTreeScreen> {
         ],
       ),
       body: Column(children: [
-        Padding(padding: const EdgeInsets.all(12), child: TextField(
+        Padding(padding: EdgeInsets.all(12), child: TextField(
           controller: _searchCtrl, style: TextStyle(color: AC.tp),
           decoration: InputDecoration(
             hintText: '\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a...', hintStyle: TextStyle(color: AC.ts),
@@ -73,10 +73,10 @@ class _CoaTreeState extends State<CoaTreeScreen> {
           : _accounts.isEmpty
             ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Icon(Icons.account_tree, color: AC.ts, size: 48),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u062d\u0633\u0627\u0628\u0627\u062a', style: TextStyle(color: AC.ts)),
               ]))
-            : ListView(padding: const EdgeInsets.symmetric(horizontal: 12), children: _roots.map((a) => _buildNode(a, 0)).toList()),
+            : ListView(padding: EdgeInsets.symmetric(horizontal: 12), children: _roots.map((a) => _buildNode(a, 0)).toList()),
         ),
         Container(padding: EdgeInsets.all(10), color: AC.navy2, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('\u0625\u062c\u0645\u0627\u0644\u064a:  \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.ts, fontSize: 12)),
@@ -100,14 +100,14 @@ class _CoaTreeState extends State<CoaTreeScreen> {
         onTap: hasChildren ? () => setState(() { if (isExpanded) _expanded.remove(code); else _expanded.add(code); }) : null,
         child: Container(
           margin: EdgeInsets.only(right: depth * 16.0, bottom: 4),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(8), border: Border.all(color: AC.bdr)),
           child: Row(children: [
             if (hasChildren) Icon(isExpanded ? Icons.expand_more : Icons.chevron_right, color: AC.ts, size: 18) else SizedBox(width: 18),
             const SizedBox(width: 4),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
+            Container(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
               child: Text(code, style: TextStyle(color: typeColor, fontSize: 10, fontWeight: FontWeight.bold))),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(child: Text(name, style: TextStyle(color: AC.tp, fontSize: 12), textDirection: TextDirection.rtl)),
             Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
               child: Text(type, style: TextStyle(color: typeColor, fontSize: 9))),

@@ -22,9 +22,9 @@ class PasswordStrengthMeter extends StatelessWidget {
   Widget build(BuildContext context) {
     if (password.isEmpty) return const SizedBox();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const SizedBox(height: 8),
+      SizedBox(height: 8),
       Row(children: List.generate(5, (i) => Expanded(child: Container(
-        height: 4, margin: const EdgeInsets.only(left: 3),
+        height: 4, margin: EdgeInsets.only(left: 3),
         decoration: BoxDecoration(color: i < _strength ? _color : AC.navy4, borderRadius: BorderRadius.circular(2)),
       )))),
       const SizedBox(height: 4),

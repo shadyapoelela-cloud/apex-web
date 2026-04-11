@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../api_service.dart';
+import '../../core/theme.dart';
 
 // ════════════════════════════════════════
 // APEX Client Detail Screen v5.2 — Visual Alignment
@@ -9,16 +10,16 @@ import '../../api_service.dart';
 // يطابق النموذج المرجعي apex-phase1.jsx (ClientDetailPage)
 // Header + 3 info cards + Service Status Grid + Next Step + 4 tabs
 
-const Color navy = Color(0xFF050D1A);
-const Color navyLight = Color(0xFF0A1628);
-const Color navyMid = Color(0xFF111D2E);
-const Color gold = Color(0xFFC9A84C);
-const Color goldLight = Color(0xFFD4B96A);
-const Color textColor = Color(0xFFE8E0D0);
-const Color textMid = Color(0xFF9A917F);
-const Color textDim = Color(0xFF6B6355);
-const Color cardBg = Color(0xFF0D1825);
-const Color borderColor = Color(0x1FC9A84C);
+Color get navy => AC.navy;
+Color get navyLight => AC.navy3;
+Color get navyMid => AC.navy4;
+Color get gold => AC.gold;
+Color get goldLight => Color(0xFFD4B96A);
+Color get textColor => AC.tp;
+Color get textMid => AC.ts;
+Color get textDim => AC.isLight ? Color(0xFF9A917F) : Color(0xFF6B6355);
+Color get cardBg => AC.navy3;
+Color get borderColor => AC.bdr;
 const Color greenC = Color(0xFF34D399);
 const Color blueC = Color(0xFF60A5FA);
 const Color orangeC = Color(0xFFFBBF24);
@@ -156,7 +157,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(widget.clientName,
-                    style: const TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.w700)),
+                    style: TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -218,7 +219,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                       Text(c.label, style: TextStyle(color: textDim, fontSize: 11)),
                       const SizedBox(height: 4),
                       Text(c.value,
-                          style: const TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w600),
+                          style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w600),
                           maxLines: 1, overflow: TextOverflow.ellipsis),
                     ],
                   ),
@@ -496,7 +497,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(item.$1, style: TextStyle(color: textMid, fontSize: 12)),
-                Text(item.$2, style: const TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w500)),
+                Text(item.$2, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w500)),
               ],
             ),
           )),
@@ -590,7 +591,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('المستندات المطلوبة',
+                  Text('المستندات المطلوبة',
                       style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 4),
                   Text('$uploaded من $mandatory مكتملة',
@@ -662,7 +663,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               children: [
                 Row(
                   children: [
-                    Flexible(child: Text(doc['name'], style: const TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600))),
+                    Flexible(child: Text(doc['name'], style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600))),
                     if (doc['required'] == true) ...[
                       const SizedBox(width: 6),
                       Text('*', style: TextStyle(color: redC, fontSize: 14, fontWeight: FontWeight.bold)),
@@ -806,11 +807,11 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Text('تعديل بيانات العميل', style: TextStyle(color: gold, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            TextField(controller: nameCtrl, style: const TextStyle(color: textColor),
+            TextField(controller: nameCtrl, style: TextStyle(color: textColor),
               decoration: InputDecoration(labelText: 'اسم العميل', labelStyle: TextStyle(color: textMid),
                 filled: true, fillColor: navyMid, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none))),
             const SizedBox(height: 12),
-            TextField(controller: sectorCtrl, style: const TextStyle(color: textColor),
+            TextField(controller: sectorCtrl, style: TextStyle(color: textColor),
               decoration: InputDecoration(labelText: 'القطاع', labelStyle: TextStyle(color: textMid),
                 filled: true, fillColor: navyMid, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none))),
             const SizedBox(height: 20),
@@ -1058,7 +1059,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                         children: [
                           Expanded(
                             child: Text(a.$1,
-                                style: const TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
+                                style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
                           ),
                           Text(a.$3, style: TextStyle(color: textDim, fontSize: 11)),
                         ],

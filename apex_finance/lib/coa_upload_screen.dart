@@ -2,6 +2,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'api_service.dart';
+import 'core/theme.dart';
 
 class CoaUploadScreen extends StatefulWidget {
   final String clientId;
@@ -18,15 +19,15 @@ class _CoaUploadScreenState extends State<CoaUploadScreen> {
   String _errorMsg = '';
   FilePickerResult? _picked;
 
-  static const _bg      = Color(0xFF050D1A);
-  static const _surface = Color(0xFF080F1F);
-  static const _gold    = Color(0xFFC9A84C);
-  static const _cyan    = Color(0xFF00C2E0);
-  static const _success = Color(0xFF2ECC8A);
-  static const _danger  = Color(0xFFE05050);
-  static const _border  = Color(0x26C9A84C);
-  static const _textPri = Color(0xFFF0EDE6);
-  static const _textSec = Color(0xFF8A8880);
+  static Color get _bg => AC.navy;
+  static Color get _surface => AC.navy2;
+  static Color get _gold => AC.gold;
+  static const Color _cyan = Color(0xFF00C2E0);
+  static const Color _success = Color(0xFF2ECC8A);
+  static const Color _danger = Color(0xFFE05050);
+  static Color get _border => AC.bdr;
+  static Color get _textPri => AC.tp;
+  static Color get _textSec => AC.ts;
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom, allowedExtensions: ['xlsx','xls','csv']);
@@ -61,10 +62,10 @@ class _CoaUploadScreenState extends State<CoaUploadScreen> {
       backgroundColor: _bg,
       appBar: AppBar(backgroundColor: _surface,
         title: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          const Text('رفع شجرة الحسابات', style: TextStyle(fontFamily:'Tajawal', color:_textPri, fontSize:15, fontWeight:FontWeight.w700)),
-          Text(widget.clientName, style: const TextStyle(fontFamily:'Tajawal', color:_textSec, fontSize:12)),
+          Text('رفع شجرة الحسابات', style: TextStyle(fontFamily:'Tajawal', color:_textPri, fontSize:15, fontWeight:FontWeight.w700)),
+          Text(widget.clientName, style: TextStyle(fontFamily:'Tajawal', color:_textSec, fontSize:12)),
         ]),
-        bottom: PreferredSize(preferredSize: const Size.fromHeight(1), child: Container(color:_border,height:1))),
+        bottom: PreferredSize(preferredSize: Size.fromHeight(1), child: Container(color:_border,height:1))),
       body: SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(children: [
         StepIndicator(current: 0),
         const SizedBox(height:20),
@@ -72,38 +73,38 @@ class _CoaUploadScreenState extends State<CoaUploadScreen> {
         const SizedBox(height:16),
         StepCard(step:'1', color:_cyan, title:'حمّل النموذج المعتمد', subtitle:'Excel جاهز للتعبئة',
           child: ActionBtn(label:'تحميل نموذج شجرة الحسابات', icon:Icons.download_rounded, color:_cyan, onTap:_downloadTemplate)),
-        const SizedBox(height:14),
+        SizedBox(height:14),
         StepCard(step:'2', color:_gold, title:'ارفع ملف شجرة حساباتك', subtitle:'xlsx / xls / csv — 15MB',
           child: Column(children: [
             if (_fileSelected) ...[
-              Container(padding:const EdgeInsets.all(12),
+              Container(padding:EdgeInsets.all(12),
                 decoration:BoxDecoration(color:_gold.withValues(alpha: 0.07), borderRadius:BorderRadius.circular(10), border:Border.all(color:_gold.withValues(alpha: 0.3))),
                 child: Row(children:[
-                  const Icon(Icons.description_rounded, color:_gold, size:20), const SizedBox(width:10),
-                  Expanded(child:Text(_fileName, textDirection:TextDirection.rtl, style:const TextStyle(color:_textPri,fontSize:13,fontFamily:'Tajawal'), overflow:TextOverflow.ellipsis)),
-                  GestureDetector(onTap:()=>setState(()=>_fileSelected=false), child:const Icon(Icons.close,color:_textSec,size:18)),
-                ])), const SizedBox(height:10)],
+                  Icon(Icons.description_rounded, color:_gold, size:20), const SizedBox(width:10),
+                  Expanded(child:Text(_fileName, textDirection:TextDirection.rtl, style:TextStyle(color:_textPri,fontSize:13,fontFamily:'Tajawal'), overflow:TextOverflow.ellipsis)),
+                  GestureDetector(onTap:()=>setState(()=>_fileSelected=false), child:Icon(Icons.close,color:_textSec,size:18)),
+                ])), SizedBox(height:10)],
             ActionBtn(label:_fileSelected?'تغيير الملف':'اختر ملف شجرة الحسابات', icon:Icons.attach_file_rounded, color:_gold, outlined:_fileSelected, onTap:_pickFile),
           ])),
         const SizedBox(height:14),
         if (_errorMsg.isNotEmpty)
           Container(margin:const EdgeInsets.only(bottom:14), padding:const EdgeInsets.all(12),
             decoration:BoxDecoration(color:_danger.withValues(alpha: 0.08), borderRadius:BorderRadius.circular(10), border:Border.all(color:_danger.withValues(alpha: 0.3))),
-            child:Row(children:[const Icon(Icons.error_outline_rounded,color:_danger,size:16), const SizedBox(width:8), Expanded(child:Text(_errorMsg, textDirection:TextDirection.rtl, style:const TextStyle(fontSize:12,color:_danger,fontFamily:'Tajawal')))])),
+            child:Row(children:[Icon(Icons.error_outline_rounded,color:_danger,size:16), const SizedBox(width:8), Expanded(child:Text(_errorMsg, textDirection:TextDirection.rtl, style:const TextStyle(fontSize:12,color:_danger,fontFamily:'Tajawal')))])),
         GestureDetector(
           onTap: (_fileSelected && !_uploading) ? _uploadCoa : null,
-          child: AnimatedContainer(duration:const Duration(milliseconds:200), width:double.infinity, height:56,
+          child: AnimatedContainer(duration:Duration(milliseconds:200), width:double.infinity, height:56,
             decoration: BoxDecoration(
-              gradient:(_fileSelected&&!_uploading)?const LinearGradient(colors:[Color(0xFFC9A84C),Color(0xFF8B6F35)]):null,
+              gradient:(_fileSelected&&!_uploading)?LinearGradient(colors:[AC.gold,Color(0xFF8B6F35)]):null,
               color:(!_fileSelected||_uploading)?Colors.white.withValues(alpha: 0.05):null,
               borderRadius:BorderRadius.circular(14),
               border:(!_fileSelected||_uploading)?Border.all(color:Colors.white.withValues(alpha: 0.1)):null,
-              boxShadow:(_fileSelected&&!_uploading)?[BoxShadow(color:_gold.withValues(alpha: 0.3),blurRadius:16,offset:const Offset(0,4))]:[]),
+              boxShadow:(_fileSelected&&!_uploading)?[BoxShadow(color:_gold.withValues(alpha: 0.3),blurRadius:16,offset:Offset(0,4))]:[]),
             child: Center(child: _uploading
-              ? const SizedBox(width:22,height:22,child:CircularProgressIndicator(color:Color(0xFF050D1A),strokeWidth:2.5))
+              ? SizedBox(width:22,height:22,child:CircularProgressIndicator(color:AC.navy,strokeWidth:2.5))
               : Row(mainAxisAlignment:MainAxisAlignment.center, children:[
-                  Icon(Icons.upload_rounded, color:_fileSelected?const Color(0xFF050D1A):Colors.white24, size:20), const SizedBox(width:8),
-                  Text('رفع وتحليل الأعمدة', style:TextStyle(color:_fileSelected?const Color(0xFF050D1A):Colors.white24, fontSize:15, fontWeight:FontWeight.w700, fontFamily:'Tajawal'))])))),
+                  Icon(Icons.upload_rounded, color:_fileSelected?AC.navy:Colors.white24, size:20), SizedBox(width:8),
+                  Text('رفع وتحليل الأعمدة', style:TextStyle(color:_fileSelected?AC.navy:Colors.white24, fontSize:15, fontWeight:FontWeight.w700, fontFamily:'Tajawal'))])))),
         const SizedBox(height:40),
       ])));
   }
@@ -111,17 +112,17 @@ class _CoaUploadScreenState extends State<CoaUploadScreen> {
 
 class StepIndicator extends StatelessWidget {
   final int current;
-  const StepIndicator({required this.current});
-  static const _gold=Color(0xFFC9A84C); static const _success=Color(0xFF2ECC8A); static const _border=Color(0x26C9A84C); static const _textSec=Color(0xFF8A8880);
-  static const _steps=['رفع الملف','تأكيد الأعمدة','تصنيف','اعتماد'];
+  StepIndicator({required this.current});
+  static Color get _gold => AC.gold; static const Color _success = Color(0xFF2ECC8A); static Color get _border => AC.bdr; static Color get _textSec => AC.ts;
+  static final _steps=['رفع الملف','تأكيد الأعمدة','تصنيف','اعتماد'];
   @override
   Widget build(BuildContext context) => Row(children:List.generate(_steps.length*2-1,(i){
     if(i.isOdd) return Expanded(child:Container(height:1,color:i~/2<current?_success:_border));
     final idx=i~/2; final done=idx<current; final active=idx==current;
     return Column(children:[
       Container(width:28,height:28,decoration:BoxDecoration(shape:BoxShape.circle,color:done?_success.withValues(alpha: 0.15):active?_gold.withValues(alpha: 0.15):Colors.transparent,border:Border.all(color:done?_success:active?_gold:_border,width:active?2:1)),
-        child:Center(child:done?const Icon(Icons.check_rounded,size:14,color:Color(0xFF2ECC8A)):Text('${idx+1}',style:TextStyle(fontSize:11,color:active?_gold:_textSec,fontWeight:FontWeight.w700)))),
-      const SizedBox(height:4),
+        child:Center(child:done?Icon(Icons.check_rounded,size:14,color:Color(0xFF2ECC8A)):Text('${idx+1}',style:TextStyle(fontSize:11,color:active?_gold:_textSec,fontWeight:FontWeight.w700)))),
+      SizedBox(height:4),
       Text(_steps[idx],style:TextStyle(fontSize:9,color:active?_gold:done?_success:_textSec,fontFamily:'Tajawal')),
     ]);
   }));
@@ -129,20 +130,20 @@ class StepIndicator extends StatelessWidget {
 
 class StepCard extends StatelessWidget {
   final String step,title,subtitle; final Color color; final Widget child;
-  const StepCard({required this.step,required this.title,required this.subtitle,required this.color,required this.child});
-  @override Widget build(BuildContext context) => Container(padding:const EdgeInsets.all(16),decoration:BoxDecoration(color:const Color(0xFF0D1829),borderRadius:BorderRadius.circular(16),border:Border.all(color:color.withValues(alpha: 0.3))),
+  StepCard({required this.step,required this.title,required this.subtitle,required this.color,required this.child});
+  @override Widget build(BuildContext context) => Container(padding:EdgeInsets.all(16),decoration:BoxDecoration(color:Color(0xFF0D1829),borderRadius:BorderRadius.circular(16),border:Border.all(color:color.withValues(alpha: 0.3))),
     child:Column(crossAxisAlignment:CrossAxisAlignment.end,children:[
-      Row(children:[Container(width:30,height:30,decoration:BoxDecoration(color:color.withValues(alpha: 0.1),borderRadius:BorderRadius.circular(8),border:Border.all(color:color.withValues(alpha: 0.3))),child:Center(child:Text(step,style:TextStyle(color:color,fontSize:14,fontWeight:FontWeight.w900)))),const Spacer(),
-        Column(crossAxisAlignment:CrossAxisAlignment.end,children:[Text(title,textDirection:TextDirection.rtl,style:const TextStyle(fontSize:14,fontWeight:FontWeight.w700,color:Color(0xFFF0EDE6),fontFamily:'Tajawal')),Text(subtitle,textDirection:TextDirection.rtl,style:const TextStyle(fontSize:11,color:Color(0xFF8A8880),fontFamily:'Tajawal'))]),
+      Row(children:[Container(width:30,height:30,decoration:BoxDecoration(color:color.withValues(alpha: 0.1),borderRadius:BorderRadius.circular(8),border:Border.all(color:color.withValues(alpha: 0.3))),child:Center(child:Text(step,style:TextStyle(color:color,fontSize:14,fontWeight:FontWeight.w900)))),Spacer(),
+        Column(crossAxisAlignment:CrossAxisAlignment.end,children:[Text(title,textDirection:TextDirection.rtl,style:TextStyle(fontSize:14,fontWeight:FontWeight.w700,color:AC.tp,fontFamily:'Tajawal')),Text(subtitle,textDirection:TextDirection.rtl,style:TextStyle(fontSize:11,color:AC.ts,fontFamily:'Tajawal'))]),
         const SizedBox(width:10),Container(width:38,height:38,decoration:BoxDecoration(color:color.withValues(alpha: 0.07),borderRadius:BorderRadius.circular(10)),child:Icon(Icons.folder_open_rounded,color:color,size:18))]),
       const SizedBox(height:14), child]));
 }
 
 class HelpCard extends StatelessWidget {
   final IconData icon; final String title,body;
-  const HelpCard({required this.icon,required this.title,required this.body});
-  @override Widget build(BuildContext context) => Container(padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:const Color(0xFF00C2E0).withValues(alpha: 0.05),borderRadius:BorderRadius.circular(12),border:Border.all(color:const Color(0xFF00C2E0).withValues(alpha: 0.2))),
-    child:Row(crossAxisAlignment:CrossAxisAlignment.start,children:[const SizedBox(width:10),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.end,children:[Text(title,textDirection:TextDirection.rtl,style:const TextStyle(fontSize:13,fontWeight:FontWeight.w700,color:Color(0xFF00C2E0),fontFamily:'Tajawal')),const SizedBox(height:4),Text(body,textDirection:TextDirection.rtl,style:const TextStyle(fontSize:12,color:Color(0xFF8A8880),fontFamily:'Tajawal',height:1.5))])),const SizedBox(width:10),Icon(icon,color:const Color(0xFF00C2E0),size:20)]));
+  HelpCard({required this.icon,required this.title,required this.body});
+  @override Widget build(BuildContext context) => Container(padding:EdgeInsets.all(14),decoration:BoxDecoration(color:Color(0xFF00C2E0).withValues(alpha: 0.05),borderRadius:BorderRadius.circular(12),border:Border.all(color:const Color(0xFF00C2E0).withValues(alpha: 0.2))),
+    child:Row(crossAxisAlignment:CrossAxisAlignment.start,children:[SizedBox(width:10),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.end,children:[Text(title,textDirection:TextDirection.rtl,style:TextStyle(fontSize:13,fontWeight:FontWeight.w700,color:Color(0xFF00C2E0),fontFamily:'Tajawal')),SizedBox(height:4),Text(body,textDirection:TextDirection.rtl,style:TextStyle(fontSize:12,color:AC.ts,fontFamily:'Tajawal',height:1.5))])),SizedBox(width:10),Icon(icon,color:Color(0xFF00C2E0),size:20)]));
 }
 
 class ActionBtn extends StatelessWidget {

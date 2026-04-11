@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'shared_widgets.dart';
+import 'core/theme.dart';
 
 class CoaQualityScreen extends StatefulWidget {
   final String uploadId, clientId, clientName;
@@ -13,15 +14,15 @@ class CoaQualityScreen extends StatefulWidget {
 class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerProviderStateMixin {
   late AnimationController _anim;
   late Animation<double> _progress;
-  static const _bg      = Color(0xFF050D1A);
-  static const _surface = Color(0xFF080F1F);
-  static const _gold    = Color(0xFFC9A84C);
-  static const _success = Color(0xFF2ECC8A);
-  static const _danger  = Color(0xFFE05050);
-  static const _warning = Color(0xFFE8A838);
-  static const _border  = Color(0x26C9A84C);
-  static const _textPri = Color(0xFFF0EDE6);
-  static const _textSec = Color(0xFF8A8880);
+  static Color get _bg => AC.navy;
+  static Color get _surface => AC.navy2;
+  static Color get _gold => AC.gold;
+  static Color _success = Color(0xFF2ECC8A);
+  static Color _danger = Color(0xFFE05050);
+  static Color _warning = Color(0xFFE8A838);
+  static Color get _border => AC.bdr;
+  static Color get _textPri => AC.tp;
+  static Color get _textSec => AC.ts;
 
   double get _overall => ((widget.assessData['overall_score'] ?? 0.0) as num).toDouble();
 
@@ -47,33 +48,33 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
       backgroundColor: _bg,
       appBar: AppBar(backgroundColor: _surface,
         title: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          const Text('تقرير جودة شجرة الحسابات', style: TextStyle(fontFamily:'Tajawal', color:_textPri, fontSize:15, fontWeight:FontWeight.w700)),
-          Text(widget.clientName, style: const TextStyle(fontFamily:'Tajawal', color:_textSec, fontSize:12)),
+          Text('تقرير جودة شجرة الحسابات', style: TextStyle(fontFamily:'Tajawal', color:_textPri, fontSize:15, fontWeight:FontWeight.w700)),
+          Text(widget.clientName, style: TextStyle(fontFamily:'Tajawal', color:_textSec, fontSize:12)),
         ]),
-        bottom: PreferredSize(preferredSize: const Size.fromHeight(1), child: Container(color:_border, height:1))),
+        bottom: PreferredSize(preferredSize: Size.fromHeight(1), child: Container(color:_border, height:1))),
       body: Column(children: [
         Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(children: [
           StepIndicator(current: 2),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           // ── درجة كاملة ──
-          Container(padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(18), border: Border.all(color: _gold.withValues(alpha: 0.35))),
+          Container(padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(color: Color(0xFF0D1829), borderRadius: BorderRadius.circular(18), border: Border.all(color: _gold.withValues(alpha: 0.35))),
             child: Row(children: [
               AnimatedBuilder(animation: _progress, builder: (_, __) => SizedBox(width: 86, height: 86,
                 child: CustomPaint(painter: _RingPainter(_progress.value, _scoreColor(_overall)),
                   child: Center(child: Text('${(_progress.value * 100).toInt()}', style: TextStyle(color: _scoreColor(_overall), fontSize:22, fontWeight:FontWeight.w900, fontFamily:'Tajawal')))))),
-              const SizedBox(width:16),
+              SizedBox(width:16),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                const Text('درجة جودة شجرة الحسابات', textDirection: TextDirection.rtl, style: TextStyle(fontSize:11, color:Color(0xFF8A8880), fontFamily:'Tajawal')),
+                Text('درجة جودة شجرة الحسابات', textDirection: TextDirection.rtl, style: TextStyle(fontSize:11, color:AC.ts, fontFamily:'Tajawal')),
                 const SizedBox(height:4),
                 Text('${(_overall * 100).toInt()} / 100', style: TextStyle(fontSize:28, fontWeight:FontWeight.w900, color:_scoreColor(_overall), fontFamily:'Tajawal')),
                 const SizedBox(height:6),
-                Container(padding: const EdgeInsets.symmetric(horizontal:10, vertical:3),
+                Container(padding: EdgeInsets.symmetric(horizontal:10, vertical:3),
                   decoration: BoxDecoration(color: _scoreColor(_overall).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: _scoreColor(_overall).withValues(alpha: 0.3))),
                   child: Text(_overall >= 0.75 ? 'جودة مرتفعة — جاهز للتحليل' : _overall >= 0.50 ? 'جودة متوسطة — يُنصح بالمراجعة' : 'جودة منخفضة — مراجعة مطلوبة',
                     style: TextStyle(fontSize:11, color:_scoreColor(_overall), fontFamily:'Tajawal'))),
-                const SizedBox(height:4),
-                Text('${widget.assessData['total_accounts'] ?? 0} حساب', style: const TextStyle(fontSize:11, color:Color(0xFF8A8880), fontFamily:'Tajawal')),
+                SizedBox(height:4),
+                Text('${widget.assessData['total_accounts'] ?? 0} حساب', style: TextStyle(fontSize:11, color:AC.ts, fontFamily:'Tajawal')),
               ])),
             ])),
           const SizedBox(height:14),
@@ -88,14 +89,14 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
             ('duplication_risk_score','خطر التكرار',Icons.content_copy_outlined),
             ('reporting_readiness_score','جاهزية التقارير',Icons.assessment_rounded),
           ]),
-          const SizedBox(height:14),
+          SizedBox(height:14),
           // ── جاهزية القوائم ──
-          Container(padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(14), border: Border.all(color:_border)),
+          Container(padding: EdgeInsets.all(14),
+            decoration: BoxDecoration(color: Color(0xFF0D1829), borderRadius: BorderRadius.circular(14), border: Border.all(color:_border)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              const Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                Text('جاهزية إعداد القوائم المالية', textDirection: TextDirection.rtl, style: TextStyle(fontSize:13, fontWeight:FontWeight.w700, color:Color(0xFFF0EDE6), fontFamily:'Tajawal')),
-                SizedBox(width:6), Icon(Icons.assessment_rounded, color:Color(0xFFC9A84C), size:16),
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Text('جاهزية إعداد القوائم المالية', textDirection: TextDirection.rtl, style: TextStyle(fontSize:13, fontWeight:FontWeight.w700, color:AC.tp, fontFamily:'Tajawal')),
+                SizedBox(width:6), Icon(Icons.assessment_rounded, color:AC.gold, size:16),
               ]),
               const SizedBox(height:12),
               Row(children: [
@@ -126,11 +127,11 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
                   Text('توصيات التحسين', textDirection: TextDirection.rtl, style: TextStyle(fontSize:13, fontWeight:FontWeight.w700, color:Color(0xFFE8A838), fontFamily:'Tajawal')),
                   SizedBox(width:6), Icon(Icons.lightbulb_outline_rounded, color:Color(0xFFE8A838), size:16),
                 ]),
-                const SizedBox(height:10),
-                ...recs.map((r) => Padding(padding: const EdgeInsets.only(bottom:6),
+                SizedBox(height:10),
+                ...recs.map((r) => Padding(padding: EdgeInsets.only(bottom:6),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const SizedBox(width:8),
-                    Expanded(child: Text(r, textDirection: TextDirection.rtl, style: const TextStyle(fontSize:12, color:Color(0xFFF0EDE6), fontFamily:'Tajawal', height:1.5))),
+                    SizedBox(width:8),
+                    Expanded(child: Text(r, textDirection: TextDirection.rtl, style: TextStyle(fontSize:12, color:AC.tp, fontFamily:'Tajawal', height:1.5))),
                     const SizedBox(width:6), const Icon(Icons.chevron_left_rounded, color:Color(0xFFE8A838), size:14),
                   ]))),
               ])),
@@ -143,10 +144,10 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
             const SizedBox(height:8),
             _buildIssueList('حسابات مشتبه بتكرارها', Icons.content_copy_rounded, _danger, dupSuspects),
           ],
-          const SizedBox(height:80),
+          SizedBox(height:80),
         ]))),
-        Container(padding: const EdgeInsets.all(16),
-          decoration: const BoxDecoration(color: Color(0xFF080F1F), border: Border(top: BorderSide(color: Color(0x26C9A84C)))),
+        Container(padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(color: AC.navy2, border: Border(top: BorderSide(color: AC.bdr))),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             if (_overall < 0.5) Padding(padding: const EdgeInsets.only(bottom:10),
               child: Container(padding: const EdgeInsets.symmetric(horizontal:12, vertical:8),
@@ -178,10 +179,10 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
           Text('${(val*100).toInt()}%', style: TextStyle(fontSize:15, fontWeight:FontWeight.w800, color:color, fontFamily:'Tajawal')),
           Icon(s.$3, color:color, size:15),
         ]),
-        const SizedBox(height:4),
-        ClipRRect(borderRadius: BorderRadius.circular(2), child: LinearProgressIndicator(value: val.clamp(0.0,1.0), minHeight:3, backgroundColor: const Color(0x26C9A84C), valueColor: AlwaysStoppedAnimation(color))),
-        const SizedBox(height:4),
-        Text(s.$2, textDirection: TextDirection.rtl, style: const TextStyle(fontSize:9, color:Color(0xFF8A8880), fontFamily:'Tajawal')),
+        SizedBox(height:4),
+        ClipRRect(borderRadius: BorderRadius.circular(2), child: LinearProgressIndicator(value: val.clamp(0.0,1.0), minHeight:3, backgroundColor: AC.bdr, valueColor: AlwaysStoppedAnimation(color))),
+        SizedBox(height:4),
+        Text(s.$2, textDirection: TextDirection.rtl, style: TextStyle(fontSize:9, color:AC.ts, fontFamily:'Tajawal')),
       ])));
   }).toList());
 
@@ -192,11 +193,11 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
         Text(title, textDirection: TextDirection.rtl, style: TextStyle(fontSize:12, fontWeight:FontWeight.w700, color:color, fontFamily:'Tajawal')),
         const SizedBox(width:6), Icon(icon, color:color, size:14),
       ]),
-      const SizedBox(height:8),
-      ...items.map((item) => Padding(padding: const EdgeInsets.only(bottom:4),
+      SizedBox(height:8),
+      ...items.map((item) => Padding(padding: EdgeInsets.only(bottom:4),
         child: Row(children: [
-          Container(width:4, height:4, margin: const EdgeInsets.only(left:8), decoration: BoxDecoration(shape: BoxShape.circle, color:color)),
-          Expanded(child: Text(item, textDirection: TextDirection.rtl, style: const TextStyle(fontSize:11, color:Color(0xFF8A8880), fontFamily:'Tajawal'), overflow: TextOverflow.ellipsis)),
+          Container(width:4, height:4, margin: EdgeInsets.only(left:8), decoration: BoxDecoration(shape: BoxShape.circle, color:color)),
+          Expanded(child: Text(item, textDirection: TextDirection.rtl, style: TextStyle(fontSize:11, color:AC.ts, fontFamily:'Tajawal'), overflow: TextOverflow.ellipsis)),
         ]))),
     ]));
 }

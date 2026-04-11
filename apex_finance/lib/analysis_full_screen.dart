@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'core/theme.dart';
 import 'package:file_picker/file_picker.dart';
 
 class AnalysisFullScreen extends StatefulWidget {
@@ -14,13 +15,13 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
   late TabController _tabController;
   int _selectedTab = 0;
 
-  static const _navy = Color(0xFF050D1A);
-  static const _navy2 = Color(0xFF080F1F);
-  static const _navy3 = Color(0xFF0D1829);
-  static const _gold = Color(0xFFC9A84C);
-  static const _border = Color(0x26C9A84C);
-  static const _textPrimary = Color(0xFFF0EDE6);
-  static const _textSecondary = Color(0xFF8A8880);
+  static Color get _navy => AC.navy;
+  static Color get _navy2 => AC.navy2;
+  static Color get _navy3 => AC.navy3;
+  static Color get _gold => AC.gold;
+  static Color get _border => AC.bdr;
+  static Color get _textPrimary => AC.tp;
+  static Color get _textSecondary => AC.ts;
   static const _success = Color(0xFF2ECC8A);
   static const _warning = Color(0xFFF0A500);
   static const _danger = Color(0xFFE05050);
@@ -152,10 +153,10 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
       backgroundColor: _navy,
       appBar: AppBar(
         backgroundColor: _navy2,
-        title: const Text('التحليل المالي الكامل',
+        title: Text('التحليل المالي الكامل',
           style: TextStyle(fontFamily: 'Tajawal', color: _textPrimary)),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
+          preferredSize: Size.fromHeight(1),
           child: Container(color: _border, height: 1)),
       ),
       body: SingleChildScrollView(
@@ -173,7 +174,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
 
   Widget _buildScoreCard() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: _navy2,
         borderRadius: BorderRadius.circular(16),
@@ -184,15 +185,15 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
             child: CustomPaint(
               painter: _RingPainter(_score / 100),
               child: Center(child: Text('${_score.toInt()}',
-                style: const TextStyle(color: _gold, fontSize: 22,
+                style: TextStyle(color: _gold, fontSize: 22,
                   fontWeight: FontWeight.w900))))),
           const SizedBox(width: 16),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            const Text('درجة الجاهزية الاستثمارية',
+            Text('درجة الجاهزية الاستثمارية',
               textDirection: TextDirection.rtl,
               style: TextStyle(fontSize: 13, color: _textSecondary, fontFamily: 'Tajawal')),
             Text('${_score.toInt()} / 100',
-              style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w900,
+              style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900,
                 color: _gold, fontFamily: 'Tajawal')),
             const SizedBox(height: 6),
             Container(
@@ -205,8 +206,8 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
                 style: const TextStyle(fontSize: 12, color: _success, fontFamily: 'Tajawal'))),
           ])),
         ]),
-        const SizedBox(height: 16),
-        const Divider(color: _border),
+        SizedBox(height: 16),
+        Divider(color: _border),
         const SizedBox(height: 12),
         // ملخص سريع
         Row(children: [
@@ -228,12 +229,12 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
       Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700,
         color: color, fontFamily: 'Tajawal')),
       Text(label, textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 10, color: _textSecondary, fontFamily: 'Tajawal')),
+        style: TextStyle(fontSize: 10, color: _textSecondary, fontFamily: 'Tajawal')),
     ]));
 
   Widget _buildInsights() {
     return Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-      const Text('توصيات الذكاء الاصطناعي', textDirection: TextDirection.rtl,
+      Text('توصيات الذكاء الاصطناعي', textDirection: TextDirection.rtl,
         style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,
           color: _textPrimary, fontFamily: 'Tajawal')),
       const SizedBox(height: 10),
@@ -242,9 +243,9 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
         final color = type == 'strength' ? _success
           : type == 'opportunity' ? _cyan : _warning;
         return Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+          padding: EdgeInsets.only(bottom: 8),
           child: Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(color: _navy3,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: color.withValues(alpha: 0.3))),
@@ -253,9 +254,9 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
                 Text(ins['title'] ?? '', textDirection: TextDirection.rtl,
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700,
                     color: color, fontFamily: 'Tajawal')),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(ins['text'] ?? '', textDirection: TextDirection.rtl,
-                  style: const TextStyle(fontSize: 12, color: _textSecondary,
+                  style: TextStyle(fontSize: 12, color: _textSecondary,
                     fontFamily: 'Tajawal', height: 1.5)),
               ])),
               const SizedBox(width: 10),
@@ -274,7 +275,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
 
   Widget _buildRatiosTabs() {
     return Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-      const Text('النسب المالية التفصيلية', textDirection: TextDirection.rtl,
+      Text('النسب المالية التفصيلية', textDirection: TextDirection.rtl,
         style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,
           color: _textPrimary, fontFamily: 'Tajawal')),
       const SizedBox(height: 12),
@@ -289,8 +290,8 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(left: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              margin: EdgeInsets.only(left: 8),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: _selectedTab == i ? _gold.withValues(alpha: 0.1) : _navy3,
                 borderRadius: BorderRadius.circular(8),
@@ -309,8 +310,8 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
         final color = _statusColor(status);
         final explanation = _getExplanation(r['name_en']?.toString() ?? '');
         return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
+          margin: EdgeInsets.only(bottom: 12),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: _navy3,
             borderRadius: BorderRadius.circular(14),
@@ -328,7 +329,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
                     fontWeight: FontWeight.w700, fontFamily: 'Tajawal'))),
               Text(r['name_ar']?.toString() ?? '',
                 textDirection: TextDirection.rtl,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
                   color: _textPrimary, fontFamily: 'Tajawal')),
             ]),
             const SizedBox(height: 8),
@@ -348,7 +349,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
             // التفسير
             Text(r['interpretation']?.toString() ?? '',
               textDirection: TextDirection.rtl,
-              style: const TextStyle(fontSize: 12, color: _textSecondary,
+              style: TextStyle(fontSize: 12, color: _textSecondary,
                 fontFamily: 'Tajawal', height: 1.4)),
             // الشرح
             if (explanation.isNotEmpty) ...[
@@ -362,7 +363,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Expanded(child: Text(explanation,
                     textDirection: TextDirection.rtl,
-                    style: const TextStyle(fontSize: 11, color: _textSecondary,
+                    style: TextStyle(fontSize: 11, color: _textSecondary,
                       fontFamily: 'Tajawal', height: 1.5))),
                   const SizedBox(width: 6),
                   const Icon(Icons.info_outline, color: _cyan, size: 14),

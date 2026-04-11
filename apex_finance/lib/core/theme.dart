@@ -46,7 +46,7 @@ InputDecoration apexInput(String label, {IconData? icon}) => InputDecoration(
 );
 
 Widget apexCard(String title, List<Widget> children, {Color? accent}) => Container(
-  margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
+  margin: EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
     border: Border.all(color: accent ?? AC.bdr)),
   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -54,7 +54,7 @@ Widget apexCard(String title, List<Widget> children, {Color? accent}) => Contain
     Divider(color: AC.bdr, height: 18), ...children]));
 
 Widget apexKV(String key, String value, {Color? valueColor}) => Padding(
-  padding: const EdgeInsets.only(bottom: 5),
+  padding: EdgeInsets.only(bottom: 5),
   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
     Text(key, style: TextStyle(color: AC.ts, fontSize: 13)),
     Flexible(child: Text(value, style: TextStyle(color: valueColor ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
