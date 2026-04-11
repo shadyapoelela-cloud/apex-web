@@ -21,10 +21,12 @@ class RegisterProviderRequest(BaseModel):
     years_experience: Optional[int] = None
     city: Optional[str] = None
 
+
 class UploadDocRequest(BaseModel):
     document_type: str
     filename: str
     file_size: int = 0
+
 
 class ReviewProviderRequest(BaseModel):
     decision: str  # approved, rejected
@@ -33,6 +35,7 @@ class ReviewProviderRequest(BaseModel):
 
 
 # ─── Provider Self-Service ───────────────────────────────────
+
 
 @router.post("/service-providers/register", tags=["Providers"])
 async def register_provider(req: RegisterProviderRequest, user: dict = Depends(get_current_user)):
@@ -60,6 +63,7 @@ async def get_my_provider_profile(user: dict = Depends(get_current_user)):
 
 # ─── Marketplace ─────────────────────────────────────────────
 
+
 @router.get("/marketplace/providers", tags=["Marketplace"])
 async def list_marketplace_providers(category: Optional[str] = None):
     result = provider_service.list_providers(category=category)
@@ -67,6 +71,7 @@ async def list_marketplace_providers(category: Optional[str] = None):
 
 
 # ─── Admin: Verification ─────────────────────────────────────
+
 
 @router.get("/service-providers/verification-queue", tags=["Provider Admin"])
 async def verification_queue(user: dict = Depends(get_current_user)):
@@ -82,7 +87,9 @@ async def review_provider(provider_id: str, req: ReviewProviderRequest, user: di
     allowed = {"reviewer", "platform_admin", "super_admin"}
     if not set(user.get("roles", [])) & allowed:
         raise HTTPException(status_code=403, detail="ليس لديك صلاحية")
-    result = provider_service.review_provider(provider_id, user["sub"], req.decision, req.reviewer_notes, req.verification_score)
+    result = provider_service.review_provider(
+        provider_id, user["sub"], req.decision, req.reviewer_notes, req.verification_score
+    )
     if not result["success"]:
         raise HTTPException(status_code=400, detail=result["error"])
     return result

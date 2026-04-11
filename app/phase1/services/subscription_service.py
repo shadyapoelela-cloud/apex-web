@@ -10,10 +10,20 @@ Resolution chain (per execution document):
 import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
-    User, Plan, PlanFeature, UserSubscription, SubscriptionEntitlement,
-    UserRole, Role, Notification, AuditEvent,
-    PlanCode, SubscriptionStatus,
-    SessionLocal, gen_uuid, utcnow,
+    User,
+    Plan,
+    PlanFeature,
+    UserSubscription,
+    SubscriptionEntitlement,
+    UserRole,
+    Role,
+    Notification,
+    AuditEvent,
+    PlanCode,
+    SubscriptionStatus,
+    SessionLocal,
+    gen_uuid,
+    utcnow,
 )
 
 
@@ -34,19 +44,24 @@ class SubscriptionService:
             result = []
             for p in plans:
                 features = features_map.get(p.id, [])
-                result.append({
-                    "id": p.id,
-                    "code": p.code,
-                    "name_ar": p.name_ar,
-                    "name_en": p.name_en,
-                    "description_ar": p.description_ar,
-                    "description_en": p.description_en,
-                    "price_monthly_sar": p.price_monthly_sar,
-                    "price_yearly_sar": p.price_yearly_sar,
-                    "target_user_ar": p.target_user_ar,
-                    "target_user_en": p.target_user_en,
-                    "features": {f.feature_code: {"value": f.value, "type": f.value_type, "name_ar": f.feature_name_ar} for f in features},
-                })
+                result.append(
+                    {
+                        "id": p.id,
+                        "code": p.code,
+                        "name_ar": p.name_ar,
+                        "name_en": p.name_en,
+                        "description_ar": p.description_ar,
+                        "description_en": p.description_en,
+                        "price_monthly_sar": p.price_monthly_sar,
+                        "price_yearly_sar": p.price_yearly_sar,
+                        "target_user_ar": p.target_user_ar,
+                        "target_user_en": p.target_user_en,
+                        "features": {
+                            f.feature_code: {"value": f.value, "type": f.value_type, "name_ar": f.feature_name_ar}
+                            for f in features
+                        },
+                    }
+                )
             return result
         finally:
             db.close()
@@ -60,9 +75,7 @@ class SubscriptionService:
                 return {"plan": "free", "status": "none", "entitlements": {}}
 
             plan = db.query(Plan).filter(Plan.id == sub.plan_id).first()
-            entitlements = db.query(SubscriptionEntitlement).filter(
-                SubscriptionEntitlement.user_id == user_id
-            ).all()
+            entitlements = db.query(SubscriptionEntitlement).filter(SubscriptionEntitlement.user_id == user_id).all()
 
             return {
                 "subscription_id": sub.id,
@@ -73,10 +86,7 @@ class SubscriptionService:
                 "billing_cycle": sub.billing_cycle,
                 "started_at": sub.started_at.isoformat() if sub.started_at else None,
                 "expires_at": sub.expires_at.isoformat() if sub.expires_at else None,
-                "entitlements": {
-                    e.feature_code: {"value": e.value, "type": e.value_type}
-                    for e in entitlements
-                },
+                "entitlements": {e.feature_code: {"value": e.value, "type": e.value_type} for e in entitlements},
             }
         finally:
             db.close()
@@ -110,39 +120,43 @@ class SubscriptionService:
                 db.add(sub)
 
             # Refresh entitlements — delete old, insert new
-            db.query(SubscriptionEntitlement).filter(
-                SubscriptionEntitlement.user_id == user_id
-            ).delete()
+            db.query(SubscriptionEntitlement).filter(SubscriptionEntitlement.user_id == user_id).delete()
 
             features = db.query(PlanFeature).filter(PlanFeature.plan_id == new_plan.id).all()
             for f in features:
-                db.add(SubscriptionEntitlement(
-                    id=gen_uuid(),
-                    user_id=user_id,
-                    feature_code=f.feature_code,
-                    value_type=f.value_type,
-                    value=f.value,
-                    source_plan_id=new_plan.id,
-                ))
+                db.add(
+                    SubscriptionEntitlement(
+                        id=gen_uuid(),
+                        user_id=user_id,
+                        feature_code=f.feature_code,
+                        value_type=f.value_type,
+                        value=f.value,
+                        source_plan_id=new_plan.id,
+                    )
+                )
 
             # Audit
-            db.add(AuditEvent(
-                id=gen_uuid(),
-                user_id=user_id,
-                action="plan_upgrade",
-                resource_type="subscription",
-                details={"from": old_plan_code, "to": new_plan_code},
-            ))
+            db.add(
+                AuditEvent(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    action="plan_upgrade",
+                    resource_type="subscription",
+                    details={"from": old_plan_code, "to": new_plan_code},
+                )
+            )
 
             # Notification
-            db.add(Notification(
-                id=gen_uuid(),
-                user_id=user_id,
-                title_ar=f"تمت ترقية خطتك إلى {new_plan.name_ar}",
-                title_en=f"Plan upgraded to {new_plan.name_en}",
-                category="subscription",
-                source_type="plan_upgrade",
-            ))
+            db.add(
+                Notification(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    title_ar=f"تمت ترقية خطتك إلى {new_plan.name_ar}",
+                    title_en=f"Plan upgraded to {new_plan.name_en}",
+                    category="subscription",
+                    source_type="plan_upgrade",
+                )
+            )
 
             db.commit()
 
@@ -181,12 +195,16 @@ class EntitlementEngine:
         db = SessionLocal()
         try:
             from sqlalchemy import text
-            result = db.execute(text("""
+
+            result = db.execute(
+                text("""
                 SELECT COUNT(*) FROM role_permissions rp
                 JOIN user_roles ur ON ur.role_id = rp.role_id
                 JOIN permissions p ON p.id = rp.permission_id
                 WHERE ur.user_id = :uid AND p.code = :pcode
-            """), {"uid": user_id, "pcode": permission_code}).scalar()
+            """),
+                {"uid": user_id, "pcode": permission_code},
+            ).scalar()
             return result > 0
         except Exception:
             return False
@@ -197,10 +215,14 @@ class EntitlementEngine:
         """Check if user's plan includes the feature."""
         db = SessionLocal()
         try:
-            ent = db.query(SubscriptionEntitlement).filter(
-                SubscriptionEntitlement.user_id == user_id,
-                SubscriptionEntitlement.feature_code == feature_code,
-            ).first()
+            ent = (
+                db.query(SubscriptionEntitlement)
+                .filter(
+                    SubscriptionEntitlement.user_id == user_id,
+                    SubscriptionEntitlement.feature_code == feature_code,
+                )
+                .first()
+            )
 
             if not ent:
                 return {"allowed": False, "reason": "feature_not_in_plan", "value": None}

@@ -11,17 +11,26 @@ Migrations 05-07 per execution document:
 
 import enum
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index, UniqueConstraint,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
-
 # ═══════════════════════════════════════════════════════════════
 # Enums
 # ═══════════════════════════════════════════════════════════════
+
 
 class ClientType(str, enum.Enum):
     standard_business = "standard_business"
@@ -73,8 +82,10 @@ class ExplanationSeverity(str, enum.Enum):
 # Migration 05: Clients
 # ═══════════════════════════════════════════════════════════════
 
+
 class ClientTypeRef(Base):
     """Reference table for client types with metadata."""
+
     __tablename__ = "client_types"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -92,6 +103,7 @@ class ClientTypeRef(Base):
 
 class Client(Base):
     """Client entity — company/organization using analysis services."""
+
     __tablename__ = "clients"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -111,17 +123,19 @@ class Client(Base):
 
     # ── New fields (Architecture Doc v5 Section 29) ──
     legal_entity_type = Column(String(50), nullable=True, index=True)  # links to legal_entity_types.code
-    sector_main_code = Column(String(50), nullable=True, index=True)   # links to sector_main.code
-    sector_sub_code = Column(String(50), nullable=True, index=True)    # links to sector_sub.code
-    commercial_name = Column(String(200), nullable=True)               # trade name
-    legal_name = Column(String(200), nullable=True)                    # official legal name
-    national_address = Column(Text, nullable=True)                     # full address
-    registration_status = Column(String(30), default="draft")          # draft, pending_review, active, suspended
-    onboarding_step = Column(Integer, default=0)                       # wizard progress 0-7
+    sector_main_code = Column(String(50), nullable=True, index=True)  # links to sector_main.code
+    sector_sub_code = Column(String(50), nullable=True, index=True)  # links to sector_sub.code
+    commercial_name = Column(String(200), nullable=True)  # trade name
+    legal_name = Column(String(200), nullable=True)  # official legal name
+    national_address = Column(Text, nullable=True)  # full address
+    registration_status = Column(String(30), default="draft")  # draft, pending_review, active, suspended
+    onboarding_step = Column(Integer, default=0)  # wizard progress 0-7
     onboarding_completed = Column(Boolean, default=False)
     # ── Phase 1: Readiness + COA Stage (Integration Pack) ──
-    readiness_status = Column(String(30), default="not_ready")   # not_ready, documents_pending, ready_for_coa, coa_in_progress, ready_for_tb
-    coa_stage = Column(String(20), default="none")               # none, upload, parse, classify, quality, review, approve, ready
+    readiness_status = Column(
+        String(30), default="not_ready"
+    )  # not_ready, documents_pending, ready_for_coa, coa_in_progress, ready_for_tb
+    coa_stage = Column(String(20), default="none")  # none, upload, parse, classify, quality, review, approve, ready
     is_deleted = Column(Boolean, default=False)
     deleted_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
@@ -130,13 +144,12 @@ class Client(Base):
     memberships = relationship("ClientMembership", back_populates="client", cascade="all, delete-orphan")
     uploads = relationship("COAUpload", back_populates="client", cascade="all, delete-orphan")
 
-    __table_args__ = (
-        Index("ix_client_type_sector", "client_type_code", "sector"),
-    )
+    __table_args__ = (Index("ix_client_type_sector", "client_type_code", "sector"),)
 
 
 class ClientMembership(Base):
     """Links users to client entities with specific roles."""
+
     __tablename__ = "client_memberships"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -148,9 +161,7 @@ class ClientMembership(Base):
 
     client = relationship("Client", back_populates="memberships")
 
-    __table_args__ = (
-        UniqueConstraint("client_id", "user_id", name="uq_client_user"),
-    )
+    __table_args__ = (UniqueConstraint("client_id", "user_id", name="uq_client_user"),)
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -158,22 +169,25 @@ class ClientMembership(Base):
 # ═══════════════════════════════════════════════════════════════
 
 
-
 # ═══════════════════════════════════════════════════════════════
 # Phase 1: Client Documents (Integration Pack)
 # ═══════════════════════════════════════════════════════════════
 
+
 class ClientDocument(Base):
     """Client document with lifecycle: missing -> uploaded -> under_review -> accepted/rejected -> expired/replaced"""
+
     __tablename__ = "client_documents"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
-    document_type = Column(String(50), nullable=False)         # cr, tax, address, aoa, licenses, etc.
+    document_type = Column(String(50), nullable=False)  # cr, tax, address, aoa, licenses, etc.
     name_ar = Column(String(200), nullable=False)
     name_en = Column(String(200), nullable=True)
     required = Column(Boolean, default=False)
-    status = Column(String(20), default="missing")             # missing, uploaded, under_review, accepted, rejected, expired, replaced
+    status = Column(
+        String(20), default="missing"
+    )  # missing, uploaded, under_review, accepted, rejected, expired, replaced
     file_path = Column(String(500), nullable=True)
     uploaded_at = Column(DateTime, nullable=True)
     accepted_at = Column(DateTime, nullable=True)
@@ -181,17 +195,16 @@ class ClientDocument(Base):
     reject_reason = Column(Text, nullable=True)
     expires_at = Column(DateTime, nullable=True)
     replaced_at = Column(DateTime, nullable=True)
-    replaced_by_id = Column(String(36), nullable=True)         # links to new version
+    replaced_by_id = Column(String(36), nullable=True)  # links to new version
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_client_doc_type", "client_id", "document_type"),
-    )
+    __table_args__ = (Index("ix_client_doc_type", "client_id", "document_type"),)
 
 
 class COAUpload(Base):
     """Upload record — tracks each file upload and its processing."""
+
     __tablename__ = "coa_uploads"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -225,6 +238,7 @@ class COAUpload(Base):
 
 class COAAccount(Base):
     """Individual account from a parsed upload."""
+
     __tablename__ = "coa_accounts"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -246,17 +260,17 @@ class COAAccount(Base):
     warnings = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_coa_upload_class", "upload_id", "normalized_class"),
-    )
+    __table_args__ = (Index("ix_coa_upload_class", "upload_id", "normalized_class"),)
 
 
 # ═══════════════════════════════════════════════════════════════
 # Migration 07: Analysis Results + Explanations
 # ═══════════════════════════════════════════════════════════════
 
+
 class AnalysisResult(Base):
     """Complete analysis result for an upload."""
+
     __tablename__ = "analysis_results"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -322,6 +336,7 @@ class ResultExplanation(Base):
     Explainability Layer — per document section 6.
     Each major result gets an explanation accessible via ! icon.
     """
+
     __tablename__ = "result_explanations"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -363,6 +378,7 @@ class ResultExplanation(Base):
 
 class ResultWarning(Base):
     """Warnings/issues associated with analysis results."""
+
     __tablename__ = "result_warnings"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -374,6 +390,3 @@ class ResultWarning(Base):
     source_metric = Column(String(80), nullable=True)
     details = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
-
-
-

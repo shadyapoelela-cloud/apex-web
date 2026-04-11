@@ -1,4 +1,5 @@
 ﻿import json
+
 """
 APEX Platform — Client Service
 ═══════════════════════════════════════════════════════════════
@@ -9,10 +10,18 @@ Per execution document sections 5, 7.
 import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
-    User, AuditEvent, Notification, SessionLocal, gen_uuid, utcnow,
+    User,
+    AuditEvent,
+    Notification,
+    SessionLocal,
+    gen_uuid,
+    utcnow,
 )
 from app.phase2.models.phase2_models import (
-    Client, ClientTypeRef, ClientMembership, ClientType,
+    Client,
+    ClientTypeRef,
+    ClientMembership,
+    ClientType,
     KNOWLEDGE_MODE_ELIGIBLE_TYPES,
 )
 
@@ -23,23 +32,34 @@ class ClientService:
         """List all available client types."""
         db = SessionLocal()
         try:
-            types = db.query(ClientTypeRef).filter(ClientTypeRef.is_active == True).order_by(ClientTypeRef.sort_order).all()
-            return [{
-                "code": t.code,
-                "name_ar": t.name_ar,
-                "name_en": t.name_en,
-                "description_ar": t.description_ar,
-                "knowledge_mode_eligible": t.knowledge_mode_eligible,
-                "knowledge_mode_features_ar": t.knowledge_mode_features_ar,
-            } for t in types]
+            types = (
+                db.query(ClientTypeRef).filter(ClientTypeRef.is_active == True).order_by(ClientTypeRef.sort_order).all()
+            )
+            return [
+                {
+                    "code": t.code,
+                    "name_ar": t.name_ar,
+                    "name_en": t.name_en,
+                    "description_ar": t.description_ar,
+                    "knowledge_mode_eligible": t.knowledge_mode_eligible,
+                    "knowledge_mode_features_ar": t.knowledge_mode_features_ar,
+                }
+                for t in types
+            ]
         finally:
             db.close()
 
     def create_client(
-        self, user_id: str, name_ar: str, client_type_code: str,
-        name_en: Optional[str] = None, cr_number: Optional[str] = None,
-        tax_number: Optional[str] = None, sector: Optional[str] = None,
-        city: Optional[str] = None, inventory_system: Optional[str] = None,
+        self,
+        user_id: str,
+        name_ar: str,
+        client_type_code: str,
+        name_en: Optional[str] = None,
+        cr_number: Optional[str] = None,
+        tax_number: Optional[str] = None,
+        sector: Optional[str] = None,
+        city: Optional[str] = None,
+        inventory_system: Optional[str] = None,
     ) -> dict:
         """Create client entity with auto knowledge mode."""
         db = SessionLocal()
@@ -68,25 +88,37 @@ class ClientService:
             db.add(client)
 
             # Add creator as owner
-            db.add(ClientMembership(
-                id=gen_uuid(),
-                client_id=client.id,
-                user_id=user_id,
-                role_in_client="owner",
-            ))
+            db.add(
+                ClientMembership(
+                    id=gen_uuid(),
+                    client_id=client.id,
+                    user_id=user_id,
+                    role_in_client="owner",
+                )
+            )
 
-            db.add(AuditEvent(
-                id=gen_uuid(), user_id=user_id,
-                action="client_created", resource_type="client", resource_id=client.id,
-                details=json.dumps({"type": client_type_code, "knowledge_mode": knowledge_mode}),
-            ))
+            db.add(
+                AuditEvent(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    action="client_created",
+                    resource_type="client",
+                    resource_id=client.id,
+                    details=json.dumps({"type": client_type_code, "knowledge_mode": knowledge_mode}),
+                )
+            )
 
-            db.add(Notification(
-                id=gen_uuid(), user_id=user_id,
-                title_ar=f"تم إنشاء العميل: {name_ar}",
-                title_en=f"Client created: {name_en or name_ar}",
-                category="general", source_type="client_created", source_id=client.id,
-            ))
+            db.add(
+                Notification(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    title_ar=f"تم إنشاء العميل: {name_ar}",
+                    title_en=f"Client created: {name_en or name_ar}",
+                    category="general",
+                    source_type="client_created",
+                    source_id=client.id,
+                )
+            )
 
             db.commit()
 
@@ -114,11 +146,15 @@ class ClientService:
         """Get client details — checks membership."""
         db = SessionLocal()
         try:
-            membership = db.query(ClientMembership).filter(
-                ClientMembership.client_id == client_id,
-                ClientMembership.user_id == user_id,
-                ClientMembership.is_active == True,
-            ).first()
+            membership = (
+                db.query(ClientMembership)
+                .filter(
+                    ClientMembership.client_id == client_id,
+                    ClientMembership.user_id == user_id,
+                    ClientMembership.is_active == True,
+                )
+                .first()
+            )
             if not membership:
                 return {"success": False, "error": "ليس لديك صلاحية الوصول لهذا العميل"}
 
@@ -126,7 +162,11 @@ class ClientService:
             if not client:
                 return {"success": False, "error": "العميل غير موجود"}
 
-            members = db.query(ClientMembership).filter(ClientMembership.client_id == client_id, ClientMembership.is_active == True).all()
+            members = (
+                db.query(ClientMembership)
+                .filter(ClientMembership.client_id == client_id, ClientMembership.is_active == True)
+                .all()
+            )
 
             return {
                 "success": True,
@@ -154,21 +194,25 @@ class ClientService:
         """List all clients the user belongs to."""
         db = SessionLocal()
         try:
-            memberships = db.query(ClientMembership).filter(
-                ClientMembership.user_id == user_id, ClientMembership.is_active == True
-            ).all()
+            memberships = (
+                db.query(ClientMembership)
+                .filter(ClientMembership.user_id == user_id, ClientMembership.is_active == True)
+                .all()
+            )
 
             clients = []
             for m in memberships:
                 c = db.query(Client).filter(Client.id == m.client_id, Client.is_deleted == False).first()
                 if c:
-                    clients.append({
-                        "id": c.id,
-                        "name_ar": c.name_ar,
-                        "client_type": c.client_type_code,
-                        "knowledge_mode": c.knowledge_mode,
-                        "your_role": m.role_in_client,
-                    })
+                    clients.append(
+                        {
+                            "id": c.id,
+                            "name_ar": c.name_ar,
+                            "client_type": c.client_type_code,
+                            "knowledge_mode": c.knowledge_mode,
+                            "your_role": m.role_in_client,
+                        }
+                    )
             return clients
         finally:
             db.close()
@@ -178,25 +222,37 @@ class ClientService:
         db = SessionLocal()
         try:
             # Check requester is admin/owner
-            requester_membership = db.query(ClientMembership).filter(
-                ClientMembership.client_id == client_id,
-                ClientMembership.user_id == added_by,
-                ClientMembership.role_in_client.in_(["owner", "admin"]),
-            ).first()
+            requester_membership = (
+                db.query(ClientMembership)
+                .filter(
+                    ClientMembership.client_id == client_id,
+                    ClientMembership.user_id == added_by,
+                    ClientMembership.role_in_client.in_(["owner", "admin"]),
+                )
+                .first()
+            )
             if not requester_membership:
                 return {"success": False, "error": "ليس لديك صلاحية إضافة أعضاء"}
 
-            existing = db.query(ClientMembership).filter(
-                ClientMembership.client_id == client_id,
-                ClientMembership.user_id == target_user_id,
-            ).first()
+            existing = (
+                db.query(ClientMembership)
+                .filter(
+                    ClientMembership.client_id == client_id,
+                    ClientMembership.user_id == target_user_id,
+                )
+                .first()
+            )
             if existing:
                 return {"success": False, "error": "المستخدم عضو بالفعل"}
 
-            db.add(ClientMembership(
-                id=gen_uuid(), client_id=client_id,
-                user_id=target_user_id, role_in_client=role,
-            ))
+            db.add(
+                ClientMembership(
+                    id=gen_uuid(),
+                    client_id=client_id,
+                    user_id=target_user_id,
+                    role_in_client=role,
+                )
+            )
             db.commit()
             return {"success": True, "message": "تمت إضافة العضو"}
         except Exception as e:
@@ -210,16 +266,29 @@ class ClientService:
         """Update client settings."""
         db = SessionLocal()
         try:
-            membership = db.query(ClientMembership).filter(
-                ClientMembership.client_id == client_id,
-                ClientMembership.user_id == user_id,
-                ClientMembership.role_in_client.in_(["owner", "admin"]),
-            ).first()
+            membership = (
+                db.query(ClientMembership)
+                .filter(
+                    ClientMembership.client_id == client_id,
+                    ClientMembership.user_id == user_id,
+                    ClientMembership.role_in_client.in_(["owner", "admin"]),
+                )
+                .first()
+            )
             if not membership:
                 return {"success": False, "error": "ليس لديك صلاحية التعديل"}
 
             client = db.query(Client).filter(Client.id == client_id).first()
-            allowed = {"name_ar", "name_en", "sector", "city", "fiscal_year_end", "inventory_system", "cr_number", "tax_number"}
+            allowed = {
+                "name_ar",
+                "name_en",
+                "sector",
+                "city",
+                "fiscal_year_end",
+                "inventory_system",
+                "cr_number",
+                "tax_number",
+            }
             for k, v in updates.items():
                 if k in allowed and v is not None:
                     setattr(client, k, v)
@@ -232,5 +301,3 @@ class ClientService:
             return {"success": False, "error": "Internal server error"}
         finally:
             db.close()
-
-

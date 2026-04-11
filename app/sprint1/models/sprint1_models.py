@@ -13,15 +13,25 @@ handle the TB-first workflow. Sprint 1 builds the COA-first path.
 
 import enum
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index, UniqueConstraint, BigInteger,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
+    UniqueConstraint,
+    BigInteger,
 )
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
-
 
 # ═══════════════════════════════════════════════════════════════
 # Enums
 # ═══════════════════════════════════════════════════════════════
+
 
 class CoaUploadStatus(str, enum.Enum):
     uploaded = "uploaded"
@@ -68,8 +78,10 @@ class KnowledgeFeedbackStatus(str, enum.Enum):
 # Table: client_coa_uploads
 # ═══════════════════════════════════════════════════════════════
 
+
 class ClientCoaUpload(Base):
     """COA upload record — tracks file upload + column detection + parse status."""
+
     __tablename__ = "client_coa_uploads"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -108,13 +120,17 @@ class ClientCoaUpload(Base):
 # Table: client_chart_of_accounts
 # ═══════════════════════════════════════════════════════════════
 
+
 class ClientChartOfAccount(Base):
     """Parsed COA account — one row per account from the uploaded file."""
+
     __tablename__ = "client_chart_of_accounts"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
-    coa_upload_id = Column(String(36), ForeignKey("client_coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
+    coa_upload_id = Column(
+        String(36), ForeignKey("client_coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     source_row_number = Column(Integer, nullable=False)
 
     # Account fields
@@ -150,12 +166,16 @@ class ClientChartOfAccount(Base):
 # Table: rejected_coa_rows (optional but recommended)
 # ═══════════════════════════════════════════════════════════════
 
+
 class RejectedCoaRow(Base):
     """Rows that failed parsing — kept for debugging and user feedback."""
+
     __tablename__ = "rejected_coa_rows"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    coa_upload_id = Column(String(36), ForeignKey("client_coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
+    coa_upload_id = Column(
+        String(36), ForeignKey("client_coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     source_row_number = Column(Integer, nullable=False)
     raw_row_json = Column(JSON, nullable=False)
     rejection_reasons_json = Column(JSON, nullable=False)
@@ -166,8 +186,10 @@ class RejectedCoaRow(Base):
 # Table: coa_knowledge_feedback
 # ═══════════════════════════════════════════════════════════════
 
+
 class CoaKnowledgeFeedback(Base):
     """Structured knowledge feedback from eligible clients (per Sprint 1 Spec §28)."""
+
     __tablename__ = "coa_knowledge_feedback"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -198,6 +220,7 @@ class CoaKnowledgeFeedback(Base):
 def init_sprint1_db():
     """Create Sprint 1 tables."""
     from app.phase1.models.platform_models import engine, Base
+
     # Import to register models
     ClientCoaUpload.__table__.create(bind=engine, checkfirst=True)
     ClientChartOfAccount.__table__.create(bind=engine, checkfirst=True)

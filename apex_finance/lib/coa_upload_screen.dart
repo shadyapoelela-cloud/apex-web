@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 import 'api_service.dart';
-import 'coa_mapping_screen.dart';
 
 class CoaUploadScreen extends StatefulWidget {
   final String clientId;
@@ -43,7 +43,7 @@ class _CoaUploadScreenState extends State<CoaUploadScreen> {
       if (result.success) {
         final data = result.data as Map<String,dynamic>;
         if (!mounted) return;
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => CoaMappingScreen(uploadData: data, clientId: widget.clientId, clientName: widget.clientName, pickedFile: _picked!.files.first)));
+        context.push('/coa/mapping', extra: {'uploadData': data, 'clientId': widget.clientId, 'clientName': widget.clientName, 'pickedFile': _picked!.files.first});
       } else {
         setState(() => _errorMsg = result.error ?? 'فشل الرفع');
       }

@@ -8,10 +8,19 @@ Per execution document Section 9.
 from typing import Optional
 import logging
 from app.phase1.models.platform_models import (
-    User, UserProfile, UserSecurityEvent, Notification,
-    AccountClosureRequest, AuditEvent, UserSession,
-    UserStatus, ClosureType, ClosureStatus,
-    SessionLocal, gen_uuid, utcnow,
+    User,
+    UserProfile,
+    UserSecurityEvent,
+    Notification,
+    AccountClosureRequest,
+    AuditEvent,
+    UserSession,
+    UserStatus,
+    ClosureType,
+    ClosureStatus,
+    SessionLocal,
+    gen_uuid,
+    utcnow,
 )
 
 
@@ -43,16 +52,20 @@ class AccountService:
                     "last_login_at": user.last_login_at.isoformat() if user.last_login_at else None,
                     "created_at": user.created_at.isoformat(),
                 },
-                "profile": {
-                    "bio": profile.bio if profile else None,
-                    "organization_name": profile.organization_name if profile else None,
-                    "job_title": profile.job_title if profile else None,
-                    "city": profile.city if profile else None,
-                    "country": profile.country if profile else "SA",
-                    "notification_email": profile.notification_email if profile else True,
-                    "notification_sms": profile.notification_sms if profile else False,
-                    "notification_in_app": profile.notification_in_app if profile else True,
-                } if profile else {},
+                "profile": (
+                    {
+                        "bio": profile.bio if profile else None,
+                        "organization_name": profile.organization_name if profile else None,
+                        "job_title": profile.job_title if profile else None,
+                        "city": profile.city if profile else None,
+                        "country": profile.country if profile else "SA",
+                        "notification_email": profile.notification_email if profile else True,
+                        "notification_sms": profile.notification_sms if profile else False,
+                        "notification_in_app": profile.notification_in_app if profile else True,
+                    }
+                    if profile
+                    else {}
+                ),
             }
         finally:
             db.close()
@@ -77,18 +90,28 @@ class AccountService:
                 db.add(profile)
 
             profile_fields = {
-                "bio", "organization_name", "job_title", "city", "country",
-                "notification_email", "notification_sms", "notification_in_app",
+                "bio",
+                "organization_name",
+                "job_title",
+                "city",
+                "country",
+                "notification_email",
+                "notification_sms",
+                "notification_in_app",
             }
             for field in profile_fields:
                 if field in updates and updates[field] is not None:
                     setattr(profile, field, updates[field])
 
-            db.add(AuditEvent(
-                id=gen_uuid(), user_id=user_id,
-                action="profile_update", resource_type="user_profile",
-                details={"updated_fields": list(updates.keys())},
-            ))
+            db.add(
+                AuditEvent(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    action="profile_update",
+                    resource_type="user_profile",
+                    details={"updated_fields": list(updates.keys())},
+                )
+            )
 
             db.commit()
             return {"success": True, "message": "تم تحديث الملف الشخصي"}
@@ -109,24 +132,29 @@ class AccountService:
             if not user:
                 return {"success": False, "error": "المستخدم غير موجود"}
 
-            events = db.query(UserSecurityEvent).filter(
-                UserSecurityEvent.user_id == user_id
-            ).order_by(UserSecurityEvent.created_at.desc()).limit(20).all()
+            events = (
+                db.query(UserSecurityEvent)
+                .filter(UserSecurityEvent.user_id == user_id)
+                .order_by(UserSecurityEvent.created_at.desc())
+                .limit(20)
+                .all()
+            )
 
-            sessions = db.query(UserSession).filter(
-                UserSession.user_id == user_id, UserSession.is_active == True
-            ).all()
+            sessions = db.query(UserSession).filter(UserSession.user_id == user_id, UserSession.is_active == True).all()
 
             return {
                 "success": True,
                 "active_sessions": len(sessions),
                 "last_login": user.last_login_at.isoformat() if user.last_login_at else None,
                 "login_count": user.login_count,
-                "recent_events": [{
-                    "type": e.event_type,
-                    "ip": e.ip_address,
-                    "at": e.created_at.isoformat(),
-                } for e in events],
+                "recent_events": [
+                    {
+                        "type": e.event_type,
+                        "ip": e.ip_address,
+                        "at": e.created_at.isoformat(),
+                    }
+                    for e in events
+                ],
             }
         finally:
             db.close()
@@ -141,22 +169,25 @@ class AccountService:
                 q = q.filter(Notification.is_read == False)
             notifs = q.order_by(Notification.created_at.desc()).limit(limit).all()
 
-            unread_count = db.query(Notification).filter(
-                Notification.user_id == user_id, Notification.is_read == False
-            ).count()
+            unread_count = (
+                db.query(Notification).filter(Notification.user_id == user_id, Notification.is_read == False).count()
+            )
 
             return {
                 "success": True,
                 "unread_count": unread_count,
-                "notifications": [{
-                    "id": n.id,
-                    "title_ar": n.title_ar,
-                    "title_en": n.title_en,
-                    "body_ar": n.body_ar,
-                    "category": n.category,
-                    "is_read": n.is_read,
-                    "created_at": n.created_at.isoformat(),
-                } for n in notifs],
+                "notifications": [
+                    {
+                        "id": n.id,
+                        "title_ar": n.title_ar,
+                        "title_en": n.title_en,
+                        "body_ar": n.body_ar,
+                        "category": n.category,
+                        "is_read": n.is_read,
+                        "created_at": n.created_at.isoformat(),
+                    }
+                    for n in notifs
+                ],
             }
         finally:
             db.close()
@@ -164,9 +195,11 @@ class AccountService:
     def mark_notification_read(self, user_id: str, notification_id: str) -> dict:
         db = SessionLocal()
         try:
-            n = db.query(Notification).filter(
-                Notification.id == notification_id, Notification.user_id == user_id
-            ).first()
+            n = (
+                db.query(Notification)
+                .filter(Notification.id == notification_id, Notification.user_id == user_id)
+                .first()
+            )
             if n:
                 n.is_read = True
                 n.read_at = utcnow()
@@ -178,9 +211,11 @@ class AccountService:
     def mark_all_read(self, user_id: str) -> dict:
         db = SessionLocal()
         try:
-            count = db.query(Notification).filter(
-                Notification.user_id == user_id, Notification.is_read == False
-            ).update({"is_read": True, "read_at": utcnow()})
+            count = (
+                db.query(Notification)
+                .filter(Notification.user_id == user_id, Notification.is_read == False)
+                .update({"is_read": True, "read_at": utcnow()})
+            )
             db.commit()
             return {"success": True, "marked": count}
         finally:
@@ -196,10 +231,14 @@ class AccountService:
                 return {"success": False, "error": "المستخدم غير موجود"}
 
             # Check for existing pending request
-            existing = db.query(AccountClosureRequest).filter(
-                AccountClosureRequest.user_id == user_id,
-                AccountClosureRequest.status == ClosureStatus.requested.value,
-            ).first()
+            existing = (
+                db.query(AccountClosureRequest)
+                .filter(
+                    AccountClosureRequest.user_id == user_id,
+                    AccountClosureRequest.status == ClosureStatus.requested.value,
+                )
+                .first()
+            )
             if existing:
                 return {"success": False, "error": "يوجد طلب إغلاق معلّق بالفعل"}
 
@@ -217,23 +256,29 @@ class AccountService:
                 req.processed_at = utcnow()
 
                 # Revoke all sessions
-                db.query(UserSession).filter(
-                    UserSession.user_id == user_id, UserSession.is_active == True
-                ).update({"is_active": False})
+                db.query(UserSession).filter(UserSession.user_id == user_id, UserSession.is_active == True).update(
+                    {"is_active": False}
+                )
 
-            db.add(Notification(
-                id=gen_uuid(), user_id=user_id,
-                title_ar="تم استلام طلب إغلاق الحساب",
-                title_en="Account closure request received",
-                category="auth",
-                source_type="account_closure",
-            ))
+            db.add(
+                Notification(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    title_ar="تم استلام طلب إغلاق الحساب",
+                    title_en="Account closure request received",
+                    category="auth",
+                    source_type="account_closure",
+                )
+            )
 
-            db.add(AuditEvent(
-                id=gen_uuid(), user_id=user_id,
-                action="account_closure_request",
-                details={"type": closure_type, "reason": reason},
-            ))
+            db.add(
+                AuditEvent(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    action="account_closure_request",
+                    details={"type": closure_type, "reason": reason},
+                )
+            )
 
             db.commit()
 
@@ -264,10 +309,13 @@ class AccountService:
 
             user.status = UserStatus.active.value
 
-            db.add(AuditEvent(
-                id=gen_uuid(), user_id=user_id,
-                action="account_reactivation",
-            ))
+            db.add(
+                AuditEvent(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    action="account_reactivation",
+                )
+            )
 
             db.commit()
             return {"success": True, "message": "تم إعادة تفعيل الحساب"}

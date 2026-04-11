@@ -45,18 +45,22 @@ class ValidationEngine:
         diff = abs(total_assets - total_le)
 
         if diff > 100:
-            findings.append({
-                "code": "BALANCE_MISMATCH",
-                "severity": "ERROR",
-                "message": f"الميزانية غير متوازنة: أصول ({total_assets:,.0f}) ≠ التزامات + حقوق ملكية ({total_le:,.0f})",
-                "details": {"assets": total_assets, "liabilities_equity": total_le, "difference": round(diff, 2)},
-            })
+            findings.append(
+                {
+                    "code": "BALANCE_MISMATCH",
+                    "severity": "ERROR",
+                    "message": f"الميزانية غير متوازنة: أصول ({total_assets:,.0f}) ≠ التزامات + حقوق ملكية ({total_le:,.0f})",
+                    "details": {"assets": total_assets, "liabilities_equity": total_le, "difference": round(diff, 2)},
+                }
+            )
         elif diff > 1:
-            findings.append({
-                "code": "BALANCE_ROUNDING",
-                "severity": "INFO",
-                "message": f"فرق تقريب في التوازن: {diff:,.2f}",
-            })
+            findings.append(
+                {
+                    "code": "BALANCE_ROUNDING",
+                    "severity": "INFO",
+                    "message": f"فرق تقريب في التوازن: {diff:,.2f}",
+                }
+            )
 
     def _check_unmapped_accounts(self, cls_summary: dict, findings: list):
         """Check for unmapped accounts."""
@@ -66,55 +70,65 @@ class ValidationEngine:
 
         if unmapped > 0:
             severity = "ERROR" if pct > 20 else "WARNING" if pct > 5 else "INFO"
-            findings.append({
-                "code": "UNMAPPED_ACCOUNTS",
-                "severity": severity,
-                "message": f"{unmapped} حساب غير مصنّف من أصل {total} ({pct:.1f}%)",
-                "details": {
-                    "unmapped_count": unmapped,
-                    "total": total,
-                    "percentage": round(pct, 1),
-                    "accounts": cls_summary.get("unmapped_accounts", [])[:10],
-                },
-            })
+            findings.append(
+                {
+                    "code": "UNMAPPED_ACCOUNTS",
+                    "severity": severity,
+                    "message": f"{unmapped} حساب غير مصنّف من أصل {total} ({pct:.1f}%)",
+                    "details": {
+                        "unmapped_count": unmapped,
+                        "total": total,
+                        "percentage": round(pct, 1),
+                        "accounts": cls_summary.get("unmapped_accounts", [])[:10],
+                    },
+                }
+            )
 
     def _check_negative_anomalies(self, income: dict, balance: dict, findings: list):
         """Check for unexpected negative values."""
         # Revenue should be positive
         if income.get("net_revenue", 0) < 0:
-            findings.append({
-                "code": "NEGATIVE_REVENUE",
-                "severity": "WARNING",
-                "message": f"صافي الإيرادات سالب ({income['net_revenue']:,.0f}) — تحقق من تبويب الإيرادات والمرتجعات",
-            })
+            findings.append(
+                {
+                    "code": "NEGATIVE_REVENUE",
+                    "severity": "WARNING",
+                    "message": f"صافي الإيرادات سالب ({income['net_revenue']:,.0f}) — تحقق من تبويب الإيرادات والمرتجعات",
+                }
+            )
 
         # Total assets should be positive
         bs = balance
         if bs.get("total_assets", 0) < 0:
-            findings.append({
-                "code": "NEGATIVE_ASSETS",
-                "severity": "ERROR",
-                "message": "إجمالي الأصول سالب — خطأ جوهري في البيانات أو التبويب",
-            })
+            findings.append(
+                {
+                    "code": "NEGATIVE_ASSETS",
+                    "severity": "ERROR",
+                    "message": "إجمالي الأصول سالب — خطأ جوهري في البيانات أو التبويب",
+                }
+            )
 
         # Inventory should not be negative
         inv = bs.get("current_assets", {}).get("detail", {})
         for k, v in inv.items():
             if "inventory" in k and v < 0:
-                findings.append({
-                    "code": "NEGATIVE_INVENTORY",
-                    "severity": "WARNING",
-                    "message": f"المخزون سالب ({v:,.0f}) — تحقق من بيانات المخزون",
-                })
+                findings.append(
+                    {
+                        "code": "NEGATIVE_INVENTORY",
+                        "severity": "WARNING",
+                        "message": f"المخزون سالب ({v:,.0f}) — تحقق من بيانات المخزون",
+                    }
+                )
 
         # Equity check
         equity = bs.get("equity", {}).get("total", 0)
         if equity < 0:
-            findings.append({
-                "code": "NEGATIVE_EQUITY",
-                "severity": "WARNING",
-                "message": f"حقوق الملكية سالبة ({equity:,.0f}) — خسائر متراكمة تجاوزت رأس المال",
-            })
+            findings.append(
+                {
+                    "code": "NEGATIVE_EQUITY",
+                    "severity": "WARNING",
+                    "message": f"حقوق الملكية سالبة ({equity:,.0f}) — خسائر متراكمة تجاوزت رأس المال",
+                }
+            )
 
     def _check_sign_consistency(self, classified_rows: list, findings: list):
         """Check that debit/credit signs match expected patterns."""
@@ -124,6 +138,7 @@ class ValidationEngine:
             if not cls:
                 continue
             from app.core.constants import ACCOUNT_TAXONOMY
+
             tax = ACCOUNT_TAXONOMY.get(cls, {})
             expected_sign = tax.get("sign", "debit_normal")
             net = row.get("net_balance", 0)
@@ -137,12 +152,14 @@ class ValidationEngine:
                     sign_issues += 1
 
         if sign_issues > 5:
-            findings.append({
-                "code": "SIGN_INCONSISTENCY",
-                "severity": "WARNING",
-                "message": f"{sign_issues} حساب بإشارة معاكسة للمتوقع — قد يكون طبيعياً لبعض الحسابات أو يشير لخطأ في التبويب",
-                "details": {"count": sign_issues},
-            })
+            findings.append(
+                {
+                    "code": "SIGN_INCONSISTENCY",
+                    "severity": "WARNING",
+                    "message": f"{sign_issues} حساب بإشارة معاكسة للمتوقع — قد يكون طبيعياً لبعض الحسابات أو يشير لخطأ في التبويب",
+                    "details": {"count": sign_issues},
+                }
+            )
 
     def _check_duplicate_mapping(self, classified_rows: list, findings: list):
         """Check for same account appearing in multiple classifications."""
@@ -153,11 +170,13 @@ class ValidationEngine:
             if not name or not cls:
                 continue
             if name in seen and seen[name] != cls:
-                findings.append({
-                    "code": "DUPLICATE_DIFFERENT_CLASS",
-                    "severity": "WARNING",
-                    "message": f"الحساب '{name}' مصنّف في أكثر من فئة: {seen[name]} و {cls}",
-                })
+                findings.append(
+                    {
+                        "code": "DUPLICATE_DIFFERENT_CLASS",
+                        "severity": "WARNING",
+                        "message": f"الحساب '{name}' مصنّف في أكثر من فئة: {seen[name]} و {cls}",
+                    }
+                )
             seen[name] = cls
 
     def _check_profit_consistency(self, income: dict, balance: dict, findings: list):
@@ -167,36 +186,44 @@ class ValidationEngine:
         eq_profit = eq_detail.get("current_year_profit", eq_detail.get("current_year_profit_derived", 0))
 
         if eq_profit != 0 and abs(is_profit - eq_profit) > 100:
-            findings.append({
-                "code": "PROFIT_MISMATCH",
-                "severity": "WARNING",
-                "message": f"صافي الربح في قائمة الدخل ({is_profit:,.0f}) لا يطابق أرباح السنة في حقوق الملكية ({eq_profit:,.0f})",
-            })
+            findings.append(
+                {
+                    "code": "PROFIT_MISMATCH",
+                    "severity": "WARNING",
+                    "message": f"صافي الربح في قائمة الدخل ({is_profit:,.0f}) لا يطابق أرباح السنة في حقوق الملكية ({eq_profit:,.0f})",
+                }
+            )
 
     def _check_data_completeness(self, income: dict, balance: dict, findings: list):
         """Check if key financial data is missing."""
         if income.get("net_revenue", 0) == 0:
-            findings.append({
-                "code": "MISSING_REVENUE",
-                "severity": "WARNING",
-                "message": "لا توجد إيرادات — تحقق من تبويب حسابات الإيرادات",
-            })
+            findings.append(
+                {
+                    "code": "MISSING_REVENUE",
+                    "severity": "WARNING",
+                    "message": "لا توجد إيرادات — تحقق من تبويب حسابات الإيرادات",
+                }
+            )
 
         if balance.get("total_assets", 0) == 0:
-            findings.append({
-                "code": "MISSING_ASSETS",
-                "severity": "ERROR",
-                "message": "لا توجد أصول — تحقق من تبويب حسابات الأصول",
-            })
+            findings.append(
+                {
+                    "code": "MISSING_ASSETS",
+                    "severity": "ERROR",
+                    "message": "لا توجد أصول — تحقق من تبويب حسابات الأصول",
+                }
+            )
 
         ca = balance.get("current_assets", {}).get("total", 0)
         cl = balance.get("current_liabilities", {}).get("total", 0)
         if ca == 0 and cl == 0:
-            findings.append({
-                "code": "MISSING_CURRENT_SECTION",
-                "severity": "WARNING",
-                "message": "لا توجد أصول أو التزامات متداولة — لن يمكن حساب نسب السيولة",
-            })
+            findings.append(
+                {
+                    "code": "MISSING_CURRENT_SECTION",
+                    "severity": "WARNING",
+                    "message": "لا توجد أصول أو التزامات متداولة — لن يمكن حساب نسب السيولة",
+                }
+            )
 
     def get_severity_counts(self, findings: list) -> dict:
         """Get count of each severity level."""

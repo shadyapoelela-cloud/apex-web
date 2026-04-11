@@ -15,26 +15,86 @@
 
 REFERENCE_HIERARCHY = [
     # الأولوية الأعلى أولاً
-    {"level": 1, "type": "binding_law", "ar": "نظام/قانون ملزم", "trust": 1.0, "can_override": False,
-     "description": "نصوص قانونية صادرة بمرسوم ملكي أو قرار مجلس وزراء"},
-    {"level": 2, "type": "implementing_regulation", "ar": "لائحة تنفيذية", "trust": 0.98, "can_override": False,
-     "description": "لوائح تفصيلية صادرة من الجهة المختصة بموجب النظام"},
-    {"level": 3, "type": "professional_standard", "ar": "معيار مهني معتمد", "trust": 0.95, "can_override": False,
-     "description": "معايير IFRS المعتمدة من SOCPA أو معايير المراجعة"},
-    {"level": 4, "type": "regulatory_instruction", "ar": "تعليمات وقواعد تنظيمية", "trust": 0.92, "can_override": False,
-     "description": "قواعد وتعليمات من الجهات الرقابية"},
-    {"level": 5, "type": "official_guidance", "ar": "دليل/إرشاد رسمي", "trust": 0.88, "can_override": True,
-     "description": "أدلة إرشادية رسمية من الجهات"},
-    {"level": 6, "type": "official_bulletin", "ar": "نشرة/تعميم رسمي", "trust": 0.85, "can_override": True,
-     "description": "تعاميم ونشرات رسمية"},
-    {"level": 7, "type": "approved_case", "ar": "حالة/سابقة معتمدة", "trust": 0.80, "can_override": True,
-     "description": "حالات سابقة تم اعتمادها داخل المنصة"},
-    {"level": 8, "type": "best_practice", "ar": "أفضل ممارسة مهنية", "trust": 0.75, "can_override": True,
-     "description": "ممارسات مهنية متعارف عليها دولياً"},
-    {"level": 9, "type": "interpretive_note", "ar": "ملاحظة تفسيرية", "trust": 0.70, "can_override": True,
-     "description": "تفسيرات وشروحات داخلية معتمدة"},
-    {"level": 10, "type": "market_insight", "ar": "رؤية سوقية/اقتصادية", "trust": 0.60, "can_override": True,
-     "description": "تحليلات وأنماط سوقية داعمة للاستدلال"},
+    {
+        "level": 1,
+        "type": "binding_law",
+        "ar": "نظام/قانون ملزم",
+        "trust": 1.0,
+        "can_override": False,
+        "description": "نصوص قانونية صادرة بمرسوم ملكي أو قرار مجلس وزراء",
+    },
+    {
+        "level": 2,
+        "type": "implementing_regulation",
+        "ar": "لائحة تنفيذية",
+        "trust": 0.98,
+        "can_override": False,
+        "description": "لوائح تفصيلية صادرة من الجهة المختصة بموجب النظام",
+    },
+    {
+        "level": 3,
+        "type": "professional_standard",
+        "ar": "معيار مهني معتمد",
+        "trust": 0.95,
+        "can_override": False,
+        "description": "معايير IFRS المعتمدة من SOCPA أو معايير المراجعة",
+    },
+    {
+        "level": 4,
+        "type": "regulatory_instruction",
+        "ar": "تعليمات وقواعد تنظيمية",
+        "trust": 0.92,
+        "can_override": False,
+        "description": "قواعد وتعليمات من الجهات الرقابية",
+    },
+    {
+        "level": 5,
+        "type": "official_guidance",
+        "ar": "دليل/إرشاد رسمي",
+        "trust": 0.88,
+        "can_override": True,
+        "description": "أدلة إرشادية رسمية من الجهات",
+    },
+    {
+        "level": 6,
+        "type": "official_bulletin",
+        "ar": "نشرة/تعميم رسمي",
+        "trust": 0.85,
+        "can_override": True,
+        "description": "تعاميم ونشرات رسمية",
+    },
+    {
+        "level": 7,
+        "type": "approved_case",
+        "ar": "حالة/سابقة معتمدة",
+        "trust": 0.80,
+        "can_override": True,
+        "description": "حالات سابقة تم اعتمادها داخل المنصة",
+    },
+    {
+        "level": 8,
+        "type": "best_practice",
+        "ar": "أفضل ممارسة مهنية",
+        "trust": 0.75,
+        "can_override": True,
+        "description": "ممارسات مهنية متعارف عليها دولياً",
+    },
+    {
+        "level": 9,
+        "type": "interpretive_note",
+        "ar": "ملاحظة تفسيرية",
+        "trust": 0.70,
+        "can_override": True,
+        "description": "تفسيرات وشروحات داخلية معتمدة",
+    },
+    {
+        "level": 10,
+        "type": "market_insight",
+        "ar": "رؤية سوقية/اقتصادية",
+        "trust": 0.60,
+        "can_override": True,
+        "description": "تحليلات وأنماط سوقية داعمة للاستدلال",
+    },
 ]
 
 
@@ -174,6 +234,7 @@ OUTPUT_RULES = {
 #  Helper Functions
 # ═══════════════════════════════════════════
 
+
 def get_trust_level(source_type: str) -> float:
     """Get trust level for a source type."""
     for ref in REFERENCE_HIERARCHY:
@@ -181,12 +242,14 @@ def get_trust_level(source_type: str) -> float:
             return ref["trust"]
     return 0.5  # default
 
+
 def get_confidence_label(score: float) -> str:
     """Get label for a confidence score."""
     for label, info in CONFIDENCE_RULES["thresholds"].items():
         if score >= info["min"]:
             return info["ar"]
     return "يحتاج مراجعة"
+
 
 def get_entity_size(revenue: float = 0, employees: int = 0) -> str:
     """Determine entity size classification."""
@@ -198,6 +261,7 @@ def get_entity_size(revenue: float = 0, employees: int = 0) -> str:
     if revenue <= thresholds["medium"]["revenue_max"]:
         return "medium"
     return "large"
+
 
 def get_applicable_standards(entity_size: str) -> str:
     """Get applicable accounting standards for entity size."""

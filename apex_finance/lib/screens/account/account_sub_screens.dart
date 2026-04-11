@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
@@ -137,7 +138,7 @@ class _CloseAS extends State<CloseAccountScreen> {
       const Icon(Icons.check_circle, color: AC.ok, size: 60), const SizedBox(height: 16),
       const Text('\u062a\u0645 \u062a\u0642\u062f\u064a\u0645 \u0637\u0644\u0628 \u0627\u0644\u0625\u063a\u0644\u0627\u0642', style: TextStyle(color: AC.tp, fontSize: 18)),
       const SizedBox(height: 16),
-      ElevatedButton(onPressed: (){ S.clear(); Navigator.pushReplacement(c, MaterialPageRoute(builder:(_)=>const LoginScreen())); },
+      ElevatedButton(onPressed: (){ S.clear(); context.go('/login'); },
         child: const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),

@@ -7,9 +7,13 @@ APEX Balance Sheet Builder — بناء قائمة المركز المالي
 """
 
 from app.core.constants import (
-    ACCOUNT_TAXONOMY, BALANCE_SHEET, EQUITY,
-    get_current_assets, get_non_current_assets,
-    get_current_liabilities, get_non_current_liabilities,
+    ACCOUNT_TAXONOMY,
+    BALANCE_SHEET,
+    EQUITY,
+    get_current_assets,
+    get_non_current_assets,
+    get_current_liabilities,
+    get_non_current_liabilities,
     get_equity_classes,
 )
 
@@ -80,11 +84,13 @@ class BalanceSheetBuilder:
             current_assets_detail["inventory"] = round(closing_inventory_override, 2)
             total_current_assets = sum(current_assets_detail.values())
             if old_inv != closing_inventory_override:
-                warnings.append({
-                    "code": "BS_INVENTORY_OVERRIDE",
-                    "severity": "INFO",
-                    "message": f"تم استبدال مخزون الميزانية ({old_inv:,.0f}) بمخزون آخر المدة الفعلي ({closing_inventory_override:,.0f}) من الجرد الدوري",
-                })
+                warnings.append(
+                    {
+                        "code": "BS_INVENTORY_OVERRIDE",
+                        "severity": "INFO",
+                        "message": f"تم استبدال مخزون الميزانية ({old_inv:,.0f}) بمخزون آخر المدة الفعلي ({closing_inventory_override:,.0f}) من الجرد الدوري",
+                    }
+                )
 
         # ─── Non-Current Assets ───
         nca_classes = get_non_current_assets()
@@ -137,30 +143,36 @@ class BalanceSheetBuilder:
         balance_diff = round(total_assets - total_liab_equity, 2)
 
         if abs(balance_diff) > 1.0:
-            warnings.append({
-                "code": "BALANCE_MISMATCH",
-                "severity": "ERROR",
-                "message": f"إجمالي الأصول ({total_assets:,.2f}) لا يساوي الالتزامات + حقوق الملكية ({total_liab_equity:,.2f}). الفرق: {balance_diff:,.2f}",
-                "details": {
-                    "total_assets": total_assets,
-                    "total_liabilities_equity": total_liab_equity,
-                    "difference": balance_diff,
-                },
-            })
+            warnings.append(
+                {
+                    "code": "BALANCE_MISMATCH",
+                    "severity": "ERROR",
+                    "message": f"إجمالي الأصول ({total_assets:,.2f}) لا يساوي الالتزامات + حقوق الملكية ({total_liab_equity:,.2f}). الفرق: {balance_diff:,.2f}",
+                    "details": {
+                        "total_assets": total_assets,
+                        "total_liabilities_equity": total_liab_equity,
+                        "difference": balance_diff,
+                    },
+                }
+            )
         elif abs(balance_diff) > 0.01:
-            warnings.append({
-                "code": "BALANCE_ROUNDING",
-                "severity": "INFO",
-                "message": f"فرق تقريب بسيط: {balance_diff:,.2f}",
-            })
+            warnings.append(
+                {
+                    "code": "BALANCE_ROUNDING",
+                    "severity": "INFO",
+                    "message": f"فرق تقريب بسيط: {balance_diff:,.2f}",
+                }
+            )
 
         # Negative equity warning
         if total_equity < 0:
-            warnings.append({
-                "code": "NEGATIVE_EQUITY",
-                "severity": "WARNING",
-                "message": f"حقوق الملكية سالبة ({total_equity:,.2f}) — يشير إلى خسائر متراكمة تجاوزت رأس المال",
-            })
+            warnings.append(
+                {
+                    "code": "NEGATIVE_EQUITY",
+                    "severity": "WARNING",
+                    "message": f"حقوق الملكية سالبة ({total_equity:,.2f}) — يشير إلى خسائر متراكمة تجاوزت رأس المال",
+                }
+            )
 
         # ─── Build line items for traceability ───
         def build_detail(detail_dict: dict) -> dict:
@@ -189,7 +201,6 @@ class BalanceSheetBuilder:
                     "total": round(total_non_current_assets, 2),
                 },
                 "total_assets": round(total_assets, 2),
-
                 "current_liabilities": {
                     "detail": current_liab_detail,
                     "total": round(total_current_liabilities, 2),
@@ -199,7 +210,6 @@ class BalanceSheetBuilder:
                     "total": round(total_non_current_liabilities, 2),
                 },
                 "total_liabilities": round(total_liabilities, 2),
-
                 "equity": {
                     "detail": equity_detail,
                     "total": round(total_equity, 2),

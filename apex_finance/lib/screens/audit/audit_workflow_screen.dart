@@ -1,8 +1,7 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
-import '../../api_service.dart';
-import '../copilot/copilot_screen.dart';
 
 class AuditWorkflowScreen extends StatefulWidget {
   final String? clientId;
@@ -124,7 +123,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
           Text('\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u062d\u0627\u0633\u0628\u064a\u0629 \u2014 7 \u0645\u0631\u0627\u062d\u0644', style: TextStyle(color: AC.ts, fontSize: 11)),
         ]),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CopilotScreen(clientId: widget.clientId)))),
+          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
         ],
       ),
       body: Column(children: [

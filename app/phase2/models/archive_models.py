@@ -5,8 +5,16 @@ Retention: 30 days default, auto-purge, reuse from archive
 """
 
 from sqlalchemy import (
-    Column, String, Boolean, Integer, BigInteger,
-    DateTime, Text, ForeignKey, JSON, Index,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    BigInteger,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
 )
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
@@ -54,7 +62,9 @@ class ArchiveRetentionEvent(Base):
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     archive_item_id = Column(String(36), ForeignKey("archive_items.id", ondelete="CASCADE"), nullable=False, index=True)
-    event_type = Column(String(30), nullable=False)  # warning_30d, warning_7d, warning_3d, warning_1d, deleted, purged, hold_applied, hold_released
+    event_type = Column(
+        String(30), nullable=False
+    )  # warning_30d, warning_7d, warning_3d, warning_1d, deleted, purged, hold_applied, hold_released
     event_at = Column(DateTime, default=utcnow, nullable=False)
     actor_id = Column(String(36), nullable=True)  # system or user
     notes = Column(Text, nullable=True)

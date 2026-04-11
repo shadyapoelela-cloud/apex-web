@@ -12,19 +12,31 @@ These build on Sprint 1 (parsing) and Sprint 2 (classification).
 """
 
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index, UniqueConstraint,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
+    UniqueConstraint,
 )
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 
 class ClientCoaAssessment(Base):
     """Quality assessment result for a COA upload."""
+
     __tablename__ = "client_coa_assessments"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
-    coa_upload_id = Column(String(36), ForeignKey("client_coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
+    coa_upload_id = Column(
+        String(36), ForeignKey("client_coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     # Scores (0.0 - 1.0)
     overall_score = Column(Float, nullable=False, default=0.0)
@@ -58,6 +70,7 @@ class ClientCoaAssessment(Base):
 
 class ClientCoaRule(Base):
     """Client-specific classification rule or alias override."""
+
     __tablename__ = "client_coa_rules"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -77,17 +90,18 @@ class ClientCoaRule(Base):
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_client_rule_active", "client_id", "is_active"),
-    )
+    __table_args__ = (Index("ix_client_rule_active", "client_id", "is_active"),)
 
 
 class CoaApprovalRecord(Base):
     """Tracks COA upload approval history."""
+
     __tablename__ = "coa_approval_records"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    coa_upload_id = Column(String(36), ForeignKey("client_coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
+    coa_upload_id = Column(
+        String(36), ForeignKey("client_coa_uploads.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     client_id = Column(String(36), ForeignKey("clients.id"), nullable=False)
 
     action = Column(String(30), nullable=False)  # approved, rejected, returned_for_review
@@ -103,14 +117,13 @@ class CoaApprovalRecord(Base):
     is_current = Column(Boolean, default=True)  # latest approval record
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_approval_upload", "coa_upload_id", "is_current"),
-    )
+    __table_args__ = (Index("ix_approval_upload", "coa_upload_id", "is_current"),)
 
 
 def init_sprint3_db():
     """Create Sprint 3 tables."""
     from app.phase1.models.platform_models import engine
+
     ClientCoaAssessment.__table__.create(bind=engine, checkfirst=True)
     ClientCoaRule.__table__.create(bind=engine, checkfirst=True)
     CoaApprovalRecord.__table__.create(bind=engine, checkfirst=True)

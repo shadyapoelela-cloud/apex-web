@@ -14,8 +14,17 @@ Rules:
 
 import enum
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index, UniqueConstraint,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
@@ -70,6 +79,7 @@ class DocumentStatus(str, enum.Enum):
 
 class ServiceProvider(Base):
     """Provider entity — professional offering services on the platform."""
+
     __tablename__ = "service_providers"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -121,6 +131,7 @@ class ServiceProvider(Base):
 
 class ProviderDocument(Base):
     """Verification documents uploaded by provider."""
+
     __tablename__ = "service_provider_documents"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -140,6 +151,7 @@ class ProviderDocument(Base):
 
 class ServiceProviderScope(Base):
     """Approved service scopes for a provider."""
+
     __tablename__ = "service_provider_scopes"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -154,12 +166,11 @@ class ServiceProviderScope(Base):
 
     provider = relationship("ServiceProvider", back_populates="scopes")
 
-    __table_args__ = (
-        UniqueConstraint("provider_id", "scope_code", name="uq_provider_scope"),
-    )
+    __table_args__ = (UniqueConstraint("provider_id", "scope_code", name="uq_provider_scope"),)
 
 
 def init_phase4_db():
     from app.phase1.models.platform_models import engine
+
     Base.metadata.create_all(bind=engine)
     return ["service_providers", "service_provider_documents", "service_provider_scopes"]

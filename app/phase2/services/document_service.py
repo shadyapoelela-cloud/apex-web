@@ -2,16 +2,17 @@
 APEX — Document lifecycle service with status transition validation
 خدمة دورة حياة المستندات مع التحقق من صحة انتقالات الحالة
 """
+
 from datetime import datetime, timezone
 
 VALID_TRANSITIONS = {
-    "missing":      ["uploaded"],
-    "uploaded":     ["under_review", "accepted"],
+    "missing": ["uploaded"],
+    "uploaded": ["under_review", "accepted"],
     "under_review": ["accepted", "rejected"],
-    "accepted":     ["expired", "replaced"],
-    "rejected":     ["replaced"],
-    "expired":      ["replaced"],
-    "replaced":     ["uploaded"],
+    "accepted": ["expired", "replaced"],
+    "rejected": ["replaced"],
+    "expired": ["replaced"],
+    "replaced": ["uploaded"],
 }
 
 

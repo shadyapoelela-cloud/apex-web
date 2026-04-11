@@ -1,9 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 import 'api_service.dart';
-import 'financial_statements_screen.dart';
-import 'analysis_result_screen.dart';
-import 'coa_upload_screen.dart';
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({super.key});
@@ -59,11 +57,11 @@ class _UploadScreenState extends State<UploadScreen> {
             Container(padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:_success.withOpacity(0.08),borderRadius:BorderRadius.circular(12),border:Border.all(color:_success.withOpacity(0.3))),child:Row(children:[Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.end,children:[const Text('تم إعداد القوائم المالية بنجاح!',textDirection:TextDirection.rtl,style:TextStyle(fontSize:14,fontWeight:FontWeight.w700,color:Color(0xFF2ECC8A),fontFamily:'Tajawal')),const SizedBox(height:2),Text(_fileName,textDirection:TextDirection.rtl,style:const TextStyle(fontSize:12,color:Color(0xFF8A8880),fontFamily:'Tajawal'))])),const SizedBox(width:12),const Icon(Icons.check_circle_rounded,color:Color(0xFF2ECC8A),size:32)])),
             const SizedBox(height:12),
             GestureDetector(
-              onTap:()=>Navigator.of(context).push(MaterialPageRoute(builder:(_)=>AnalysisResultScreen(apiData:_apiResult,pickedFile:_pickedFile?.files.first))),
+              onTap:()=>context.push('/analysis/result', extra: {'apiData': _apiResult, 'pickedFile': _pickedFile?.files.first}),
               child:Container(width:double.infinity,height:54,decoration:BoxDecoration(gradient:const LinearGradient(colors:[Color(0xFFC9A84C),Color(0xFF8B6F35)]),borderRadius:BorderRadius.circular(14),boxShadow:[BoxShadow(color:_gold.withOpacity(0.3),blurRadius:16,offset:const Offset(0,4))]),child:const Center(child:Row(mainAxisAlignment:MainAxisAlignment.center,children:[Icon(Icons.bar_chart_rounded,color:Color(0xFF050D1A),size:20),SizedBox(width:8),Text('عرض نتائج التحليل',style:TextStyle(color:Color(0xFF050D1A),fontSize:16,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
             const SizedBox(height:10),
             GestureDetector(
-              onTap:()=>Navigator.of(context).push(MaterialPageRoute(builder:(_)=>CoaUploadScreen(clientId:'test-001',clientName:'عميل تجريبي'))),
+              onTap:()=>context.push('/coa/upload', extra: {'clientId': 'test-001', 'clientName': 'عميل تجريبي'}),
               child:Container(width:double.infinity,height:48,decoration:BoxDecoration(borderRadius:BorderRadius.circular(14),border:Border.all(color:_cyan.withOpacity(0.4),width:1.5)),child:const Center(child:Row(mainAxisAlignment:MainAxisAlignment.center,children:[Icon(Icons.account_tree_rounded,color:Color(0xFF00C2E0),size:18),SizedBox(width:8),Text('رفع شجرة الحسابات (COA)',style:TextStyle(color:Color(0xFF00C2E0),fontSize:14,fontWeight:FontWeight.w600,fontFamily:'Tajawal'))])))),
           ])
           :_btn(_fileSelected?'إعداد القوائم المالية':'ارفع الملف أولاً',Icons.analytics_rounded,_success,_fileSelected?_analyzeFile:null,disabled:!_fileSelected)),

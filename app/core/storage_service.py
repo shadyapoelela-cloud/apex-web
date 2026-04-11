@@ -43,6 +43,7 @@ def _get_s3_client():
         return _s3_client
     try:
         import boto3
+
         kwargs = {
             "aws_access_key_id": S3_ACCESS_KEY,
             "aws_secret_access_key": S3_SECRET_KEY,
@@ -59,6 +60,7 @@ def _get_s3_client():
 
 # ── Helpers ────────────────────────────────────────────────────
 
+
 def _generate_stored_name(filename: str) -> str:
     """Generate a unique filename preserving the original extension."""
     ext = os.path.splitext(filename)[1].lower() if filename else ""
@@ -68,6 +70,7 @@ def _generate_stored_name(filename: str) -> str:
 # ══════════════════════════════════════════════════════════════
 # Local Backend
 # ══════════════════════════════════════════════════════════════
+
 
 def _local_upload(content: bytes, filename: str, folder: str, content_type: Optional[str]) -> dict:
     stored_name = _generate_stored_name(filename)
@@ -118,6 +121,7 @@ def _local_get_url(path: str) -> str:
 # ══════════════════════════════════════════════════════════════
 # S3 Backend
 # ══════════════════════════════════════════════════════════════
+
 
 def _s3_upload(content: bytes, filename: str, folder: str, content_type: Optional[str]) -> dict:
     client = _get_s3_client()
@@ -187,6 +191,7 @@ def _s3_get_url(path: str) -> str:
 # ══════════════════════════════════════════════════════════════
 # Public API
 # ══════════════════════════════════════════════════════════════
+
 
 def upload_file(
     content: bytes,

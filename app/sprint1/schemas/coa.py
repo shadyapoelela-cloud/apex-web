@@ -1,12 +1,13 @@
 """
 APEX Sprint 1 — Pydantic Schemas for COA Workflow
 """
+
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
-
 # ── Upload & Detection ──
+
 
 class CoaUploadInitResponse(BaseModel):
     upload_id: str
@@ -22,6 +23,7 @@ class CoaUploadInitResponse(BaseModel):
 
 # ── Column Mapping ──
 
+
 class CoaColumnMappingRequest(BaseModel):
     header_row_index: Optional[int] = 0
     sheet_name: Optional[str] = None
@@ -29,6 +31,7 @@ class CoaColumnMappingRequest(BaseModel):
 
 
 # ── Parse Results ──
+
 
 class CoaAccountPreview(BaseModel):
     source_row_number: int
@@ -55,6 +58,7 @@ class CoaParseSummary(BaseModel):
 
 
 # ── Knowledge Feedback ──
+
 
 class KnowledgeFeedbackCreate(BaseModel):
     client_id: str

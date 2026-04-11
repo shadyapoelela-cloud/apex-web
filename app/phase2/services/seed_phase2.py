@@ -7,7 +7,6 @@ Client types per execution document section 5.
 from app.phase1.models.platform_models import SessionLocal, gen_uuid
 from app.phase2.models.phase2_models import ClientTypeRef, KNOWLEDGE_MODE_ELIGIBLE_TYPES
 
-
 CLIENT_TYPES = [
     {
         "code": "standard_business",
@@ -83,16 +82,18 @@ def seed_client_types():
         for i, ct in enumerate(CLIENT_TYPES):
             existing = db.query(ClientTypeRef).filter(ClientTypeRef.code == ct["code"]).first()
             if not existing:
-                db.add(ClientTypeRef(
-                    id=gen_uuid(),
-                    code=ct["code"],
-                    name_ar=ct["name_ar"],
-                    name_en=ct["name_en"],
-                    description_ar=ct["description_ar"],
-                    knowledge_mode_eligible=ct["code"] in KNOWLEDGE_MODE_ELIGIBLE_TYPES,
-                    knowledge_mode_features_ar=ct.get("knowledge_features_ar"),
-                    sort_order=i,
-                ))
+                db.add(
+                    ClientTypeRef(
+                        id=gen_uuid(),
+                        code=ct["code"],
+                        name_ar=ct["name_ar"],
+                        name_en=ct["name_en"],
+                        description_ar=ct["description_ar"],
+                        knowledge_mode_eligible=ct["code"] in KNOWLEDGE_MODE_ELIGIBLE_TYPES,
+                        knowledge_mode_features_ar=ct.get("knowledge_features_ar"),
+                        sort_order=i,
+                    )
+                )
                 count += 1
         db.commit()
         return count

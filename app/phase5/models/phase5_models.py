@@ -11,16 +11,24 @@ Migrations 11-13 per execution document:
 
 import enum
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
 )
 from sqlalchemy.orm import relationship
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
-
 # ═══════════════════════════════════════════════════════════════
 # Enums
 # ═══════════════════════════════════════════════════════════════
+
 
 class RequestStatus(str, enum.Enum):
     draft = "draft"
@@ -69,8 +77,10 @@ class AppealStatus(str, enum.Enum):
 # Migration 11: Service Requests
 # ═══════════════════════════════════════════════════════════════
 
+
 class ServiceRequest(Base):
     """Client request for a professional service."""
+
     __tablename__ = "service_requests"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -122,6 +132,7 @@ class ServiceRequest(Base):
 
 class ServiceRequestMessage(Base):
     """Messages between client and provider for a request."""
+
     __tablename__ = "service_request_messages"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -139,8 +150,10 @@ class ServiceRequestMessage(Base):
 # Migration 12: Task Compliance
 # ═══════════════════════════════════════════════════════════════
 
+
 class TaskComplianceEvent(Base):
     """Track compliance status for service requests."""
+
     __tablename__ = "task_compliance_events"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -152,13 +165,12 @@ class TaskComplianceEvent(Base):
     auto_generated = Column(Boolean, default=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_compliance_provider", "provider_id", "status"),
-    )
+    __table_args__ = (Index("ix_compliance_provider", "provider_id", "status"),)
 
 
 class ComplianceAction(Base):
     """Actions taken for compliance issues."""
+
     __tablename__ = "compliance_actions"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -173,8 +185,10 @@ class ComplianceAction(Base):
 # Migration 13: Suspension Engine
 # ═══════════════════════════════════════════════════════════════
 
+
 class SuspensionEvent(Base):
     """Suspension records for providers, clients, users."""
+
     __tablename__ = "suspension_events"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -192,17 +206,18 @@ class SuspensionEvent(Base):
 
     appeals = relationship("SuspensionAppeal", back_populates="suspension", cascade="all, delete-orphan")
 
-    __table_args__ = (
-        Index("ix_suspension_target", "target_type", "target_id", "is_active"),
-    )
+    __table_args__ = (Index("ix_suspension_target", "target_type", "target_id", "is_active"),)
 
 
 class SuspensionAppeal(Base):
     """Appeals against suspensions."""
+
     __tablename__ = "suspension_appeals"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    suspension_id = Column(String(36), ForeignKey("suspension_events.id", ondelete="CASCADE"), nullable=False, index=True)
+    suspension_id = Column(
+        String(36), ForeignKey("suspension_events.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     appealed_by = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     appeal_text = Column(Text, nullable=False)
     status = Column(String(20), default=AppealStatus.submitted.value, nullable=False)
@@ -216,6 +231,13 @@ class SuspensionAppeal(Base):
 
 def init_phase5_db():
     from app.phase1.models.platform_models import engine
+
     Base.metadata.create_all(bind=engine)
-    return ["service_requests", "service_request_messages", "task_compliance_events",
-            "compliance_actions", "suspension_events", "suspension_appeals"]
+    return [
+        "service_requests",
+        "service_request_messages",
+        "task_compliance_events",
+        "compliance_actions",
+        "suspension_events",
+        "suspension_appeals",
+    ]

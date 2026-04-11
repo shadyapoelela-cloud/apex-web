@@ -1,9 +1,9 @@
 ﻿import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'shared_widgets.dart';
-import 'coa_review_screen.dart';
 
 class CoaQualityScreen extends StatefulWidget {
   final String uploadId, clientId, clientName;
@@ -158,7 +158,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
                   Expanded(child: Text('درجة الجودة منخفضة — يُنصح بمراجعة شجرة الحسابات', textDirection: TextDirection.rtl, style: TextStyle(fontSize:11, color:Color(0xFFE8A838), fontFamily:'Tajawal'))),
                 ]))),
             GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => CoaReviewScreen(uploadId: widget.uploadId, clientId: widget.clientId, clientName: widget.clientName))),
+              onTap: () => context.push('/coa/review', extra: {'uploadId': widget.uploadId, 'clientId': widget.clientId, 'clientName': widget.clientName}),
               child: Container(width: double.infinity, height:54,
                 decoration: BoxDecoration(gradient: const LinearGradient(colors:[Color(0xFF2ECC8A),Color(0xFF1A8C5C)]), borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: _success.withOpacity(0.3), blurRadius:12, offset: const Offset(0,4))]),
                 child: const Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [

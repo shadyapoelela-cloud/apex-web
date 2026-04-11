@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/theme.dart';
 import '../../api_service.dart';
-import '../copilot/copilot_screen.dart';
 
 class ProviderKanbanScreen extends StatefulWidget {
   const ProviderKanbanScreen({super.key});
@@ -59,7 +59,7 @@ class _PKState extends State<ProviderKanbanScreen> {
         backgroundColor: AC.navy2,
         title: const Text('\u0645\u0632\u0648\u062f\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen()))),
+          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
         ],
       ),
       body: ListView(

@@ -1,10 +1,12 @@
 """
 APEX Phase 11 — Legal Acceptance Service
 """
+
 import logging
 from datetime import datetime
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase11.models.phase11_models import LegalDocumentV2, AcceptanceLogV2, LEGAL_DOC_TYPES
+
 
 def seed_legal_documents():
     """Seed initial policy documents."""
@@ -69,83 +71,103 @@ def seed_legal_documents():
     finally:
         db.close()
 
+
 def get_current_documents():
     """Get all current legal documents."""
     db = SessionLocal()
     try:
-        docs = db.query(LegalDocumentV2).filter(
-            LegalDocumentV2.is_current == True
-        ).all()
-        return [{
-            "id": d.id,
-            "type": d.doc_type,
-            "version": d.version,
-            "title_ar": d.title_ar,
-            "title_en": d.title_en,
-            "content_ar": d.content_ar,
-            "is_mandatory": d.is_mandatory,
-        } for d in docs]
+        docs = db.query(LegalDocumentV2).filter(LegalDocumentV2.is_current == True).all()
+        return [
+            {
+                "id": d.id,
+                "type": d.doc_type,
+                "version": d.version,
+                "title_ar": d.title_ar,
+                "title_en": d.title_en,
+                "content_ar": d.content_ar,
+                "is_mandatory": d.is_mandatory,
+            }
+            for d in docs
+        ]
     finally:
         db.close()
+
 
 def get_user_acceptances(user_id):
     """Get all acceptances for a user."""
     db = SessionLocal()
     try:
-        logs = db.query(AcceptanceLogV2).filter(
-            AcceptanceLogV2.user_id == user_id
-        ).order_by(AcceptanceLogV2.accepted_at.desc()).all()
-        return [{
-            "doc_type": l.doc_type,
-            "doc_version": l.doc_version,
-            "accepted_at": str(l.accepted_at) if l.accepted_at else None,
-        } for l in logs]
+        logs = (
+            db.query(AcceptanceLogV2)
+            .filter(AcceptanceLogV2.user_id == user_id)
+            .order_by(AcceptanceLogV2.accepted_at.desc())
+            .all()
+        )
+        return [
+            {
+                "doc_type": l.doc_type,
+                "doc_version": l.doc_version,
+                "accepted_at": str(l.accepted_at) if l.accepted_at else None,
+            }
+            for l in logs
+        ]
     finally:
         db.close()
+
 
 def check_pending_acceptances(user_id):
     """Check which mandatory documents the user hasn't accepted yet."""
     db = SessionLocal()
     try:
-        current_docs = db.query(LegalDocumentV2).filter(
-            LegalDocumentV2.is_current == True,
-            LegalDocumentV2.is_mandatory == True,
-        ).all()
+        current_docs = (
+            db.query(LegalDocumentV2)
+            .filter(
+                LegalDocumentV2.is_current == True,
+                LegalDocumentV2.is_mandatory == True,
+            )
+            .all()
+        )
 
-        user_logs = db.query(AcceptanceLogV2).filter(
-            AcceptanceLogV2.user_id == user_id
-        ).all()
+        user_logs = db.query(AcceptanceLogV2).filter(AcceptanceLogV2.user_id == user_id).all()
 
         accepted = {(l.doc_type, l.doc_version) for l in user_logs}
         pending = []
         for doc in current_docs:
             if (doc.doc_type, doc.version) not in accepted:
-                pending.append({
-                    "id": doc.id,
-                    "type": doc.doc_type,
-                    "version": doc.version,
-                    "title_ar": doc.title_ar,
-                    "content_ar": doc.content_ar,
-                    "is_mandatory": doc.is_mandatory,
-                })
+                pending.append(
+                    {
+                        "id": doc.id,
+                        "type": doc.doc_type,
+                        "version": doc.version,
+                        "title_ar": doc.title_ar,
+                        "content_ar": doc.content_ar,
+                        "is_mandatory": doc.is_mandatory,
+                    }
+                )
         return pending
     finally:
         db.close()
+
 
 def accept_document(user_id, document_id, ip_address=None):
     """Record user acceptance of a document."""
     db = SessionLocal()
     try:
-        doc = db.query(LegalDocumentV2).filter(
-            LegalDocumentV2.id == document_id
-        ).first()
+        doc = db.query(LegalDocumentV2).filter(LegalDocumentV2.id == document_id).first()
         if not doc:
-            return {"success": False, "error": "\u0627\u0644\u0648\u062b\u064a\u0642\u0629 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f\u0629"}
+            return {
+                "success": False,
+                "error": "\u0627\u0644\u0648\u062b\u064a\u0642\u0629 \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f\u0629",
+            }
 
-        existing = db.query(AcceptanceLogV2).filter(
-            AcceptanceLogV2.user_id == user_id,
-            AcceptanceLogV2.document_id == document_id,
-        ).first()
+        existing = (
+            db.query(AcceptanceLogV2)
+            .filter(
+                AcceptanceLogV2.user_id == user_id,
+                AcceptanceLogV2.document_id == document_id,
+            )
+            .first()
+        )
         if existing:
             return {"success": True, "already_accepted": True}
 
@@ -167,21 +189,30 @@ def accept_document(user_id, document_id, ip_address=None):
     finally:
         db.close()
 
+
 def accept_all_current(user_id, ip_address=None):
     """Accept all current mandatory documents at once (for registration)."""
     db = SessionLocal()
     try:
-        docs = db.query(LegalDocumentV2).filter(
-            LegalDocumentV2.is_current == True,
-            LegalDocumentV2.is_mandatory == True,
-        ).all()
+        docs = (
+            db.query(LegalDocumentV2)
+            .filter(
+                LegalDocumentV2.is_current == True,
+                LegalDocumentV2.is_mandatory == True,
+            )
+            .all()
+        )
 
         count = 0
         for doc in docs:
-            existing = db.query(AcceptanceLogV2).filter(
-                AcceptanceLogV2.user_id == user_id,
-                AcceptanceLogV2.document_id == doc.id,
-            ).first()
+            existing = (
+                db.query(AcceptanceLogV2)
+                .filter(
+                    AcceptanceLogV2.user_id == user_id,
+                    AcceptanceLogV2.document_id == doc.id,
+                )
+                .first()
+            )
             if not existing:
                 log = AcceptanceLogV2(
                     id=gen_uuid(),

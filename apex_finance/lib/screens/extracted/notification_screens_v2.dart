@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
@@ -106,8 +107,7 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
               child: const Text('قراءة الكل', style: TextStyle(color: AC.gold, fontSize: 12)),
             ),
           IconButton(
-            onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const NotificationPrefsScreen())),
+            onPressed: () => context.push('/notifications/prefs'),
             icon: const Icon(Icons.settings, color: AC.ts, size: 20),
           ),
         ],

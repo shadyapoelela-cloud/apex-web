@@ -10,21 +10,26 @@ from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now 
 
 def get_client_financial_snapshot(db, client_id: str) -> dict | None:
     """Get latest completed analysis for the client."""
-    row = _exec(db,
+    row = _exec(
+        db,
         """SELECT id, income_statement_json, balance_sheet_json,
                   ratios_json, overall_confidence, industry
            FROM analysis_runs
            WHERE client_id = :cid AND run_status = 'completed'
            ORDER BY created_at DESC LIMIT 1""",
-        {"cid": client_id}).fetchone()
+        {"cid": client_id},
+    ).fetchone()
     if not row:
         return None
 
     def _p(v):
-        if v is None: return {}
+        if v is None:
+            return {}
         if isinstance(v, str):
-            try: return json.loads(v)
-            except Exception: return {}
+            try:
+                return json.loads(v)
+            except Exception:
+                return {}
         return v if isinstance(v, dict) else {}
 
     return {
@@ -39,21 +44,27 @@ def get_client_financial_snapshot(db, client_id: str) -> dict | None:
 
 def get_client_profile(db, client_id: str) -> dict | None:
     """Get client profile info."""
-    row = _exec(db,
+    row = _exec(
+        db,
         """SELECT id, name, client_type, industry, country
            FROM clients WHERE id = :cid""",
-        {"cid": client_id}).fetchone()
+        {"cid": client_id},
+    ).fetchone()
     if not row:
         return None
     return {
-        "id": row[0], "name": row[1], "client_type": row[2],
-        "industry": row[3], "country": row[4],
+        "id": row[0],
+        "name": row[1],
+        "client_type": row[2],
+        "industry": row[3],
+        "country": row[4],
     }
 
 
 # ══════════════════════════════════════════════════════════════
 # FUNDING ELIGIBILITY ENGINE
 # ══════════════════════════════════════════════════════════════
+
 
 def assess_funding_eligibility(db, client_id: str, program_id: str | None = None) -> list[dict]:
     """
@@ -70,20 +81,18 @@ def assess_funding_eligibility(db, client_id: str, program_id: str | None = None
 
     # Get programs
     if program_id:
-        programs = _exec(db,
-            "SELECT * FROM funding_programs WHERE id = :id AND is_active = true",
-            {"id": program_id}).fetchall()
+        programs = _exec(
+            db, "SELECT * FROM funding_programs WHERE id = :id AND is_active = true", {"id": program_id}
+        ).fetchall()
     else:
-        programs = _exec(db,
-            "SELECT * FROM funding_programs WHERE is_active = true ORDER BY name_ar").fetchall()
+        programs = _exec(db, "SELECT * FROM funding_programs WHERE is_active = true ORDER BY name_ar").fetchall()
 
     if not programs:
         return [{"message": "لا توجد برامج تمويلية متاحة حالياً"}]
 
     results = []
     for prog in programs:
-        assessment = _evaluate_single_program(
-            client, financials, prog, "funding_program", db)
+        assessment = _evaluate_single_program(client, financials, prog, "funding_program", db)
         results.append(assessment)
 
     return results
@@ -98,20 +107,18 @@ def assess_support_eligibility(db, client_id: str, program_id: str | None = None
     financials = get_client_financial_snapshot(db, client_id)
 
     if program_id:
-        programs = _exec(db,
-            "SELECT * FROM support_programs WHERE id = :id AND is_active = true",
-            {"id": program_id}).fetchall()
+        programs = _exec(
+            db, "SELECT * FROM support_programs WHERE id = :id AND is_active = true", {"id": program_id}
+        ).fetchall()
     else:
-        programs = _exec(db,
-            "SELECT * FROM support_programs WHERE is_active = true ORDER BY name_ar").fetchall()
+        programs = _exec(db, "SELECT * FROM support_programs WHERE is_active = true ORDER BY name_ar").fetchall()
 
     if not programs:
         return [{"message": "لا توجد برامج دعم متاحة حالياً"}]
 
     results = []
     for prog in programs:
-        assessment = _evaluate_single_program(
-            client, financials, prog, "support_program", db)
+        assessment = _evaluate_single_program(client, financials, prog, "support_program", db)
         results.append(assessment)
 
     return results
@@ -126,27 +133,24 @@ def assess_license_eligibility(db, client_id: str, license_id: str | None = None
     financials = get_client_financial_snapshot(db, client_id)
 
     if license_id:
-        licenses = _exec(db,
-            "SELECT * FROM license_registry WHERE id = :id AND is_active = true",
-            {"id": license_id}).fetchall()
+        licenses = _exec(
+            db, "SELECT * FROM license_registry WHERE id = :id AND is_active = true", {"id": license_id}
+        ).fetchall()
     else:
-        licenses = _exec(db,
-            "SELECT * FROM license_registry WHERE is_active = true ORDER BY name_ar").fetchall()
+        licenses = _exec(db, "SELECT * FROM license_registry WHERE is_active = true ORDER BY name_ar").fetchall()
 
     if not licenses:
         return [{"message": "لا توجد تراخيص متاحة حالياً"}]
 
     results = []
     for lic in licenses:
-        assessment = _evaluate_single_program(
-            client, financials, lic, "license", db)
+        assessment = _evaluate_single_program(client, financials, lic, "license", db)
         results.append(assessment)
 
     return results
 
 
-def _evaluate_single_program(client: dict, financials: dict | None,
-                              program_row, program_type: str, db) -> dict:
+def _evaluate_single_program(client: dict, financials: dict | None, program_row, program_type: str, db) -> dict:
     """Evaluate a single program/license against client data."""
     import uuid
 
@@ -235,7 +239,8 @@ def _evaluate_single_program(client: dict, financials: dict | None,
     # Save assessment
     assessment_id = str(uuid.uuid4())
     try:
-        _exec(db,
+        _exec(
+            db,
             """INSERT INTO eligibility_assessments
                (id, client_id, assessment_type, target_program_id,
                 target_program_type, target_program_name,
@@ -270,7 +275,8 @@ def _evaluate_single_program(client: dict, financials: dict | None,
                 "review": 1 if status == "review_required" else 0,
                 "run_id": financials.get("analysis_run_id") if financials else None,
                 "now": _now().isoformat(),
-            })
+            },
+        )
         db.commit()
     except Exception:
         pass  # Assessment saved best-effort

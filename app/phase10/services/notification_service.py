@@ -2,12 +2,15 @@
 APEX Phase 10 — Notification Engine Service
 Handles: emit, list, mark-read, count, preferences
 """
+
 import logging
 from datetime import datetime, timezone
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase10.models.phase10_models import (
-    NotificationV2, NotificationPreference, NotificationDeliveryLog,
-    NOTIFICATION_TYPES
+    NotificationV2,
+    NotificationPreference,
+    NotificationDeliveryLog,
+    NOTIFICATION_TYPES,
 )
 
 # Arabic titles for each notification type
@@ -43,8 +46,10 @@ TYPE_ICONS = {
     "closure_requested": "delete_outline",
 }
 
-def emit_notification(user_id, notification_type, body_ar=None, body_en=None,
-                      reference_id=None, reference_type=None, action_url=None):
+
+def emit_notification(
+    user_id, notification_type, body_ar=None, body_en=None, reference_id=None, reference_type=None, action_url=None
+):
     """Create and deliver a notification."""
     if notification_type not in NOTIFICATION_TYPES:
         return {"success": False, "error": f"Unknown type: {notification_type}"}
@@ -78,18 +83,24 @@ def emit_notification(user_id, notification_type, body_ar=None, body_en=None,
 
         # Attempt email delivery if user preference has email enabled
         try:
-            pref = db.query(NotificationPreference).filter(
-                NotificationPreference.user_id == user_id,
-                NotificationPreference.notification_type == notification_type,
-            ).first()
+            pref = (
+                db.query(NotificationPreference)
+                .filter(
+                    NotificationPreference.user_id == user_id,
+                    NotificationPreference.notification_type == notification_type,
+                )
+                .first()
+            )
             # Default: email enabled unless explicitly disabled
             email_enabled = pref.channel_email if pref else True
 
             if email_enabled:
                 from app.phase1.models.platform_models import User
+
                 user = db.query(User).filter(User.id == user_id).first()
                 if user and user.email:
                     from app.core.email_service import send_notification_email
+
                     title = TYPE_TITLES.get(notification_type, notification_type)
                     body = body_ar or body_en or ""
                     email_result = send_notification_email(user.email, title, body)
@@ -103,8 +114,7 @@ def emit_notification(user_id, notification_type, body_ar=None, body_en=None,
                         db.add(email_log)
                         db.commit()
         except Exception as email_err:
-            logging.error("Email delivery failed for notification %s: %s",
-                          notif.id, email_err)
+            logging.error("Email delivery failed for notification %s: %s", notif.id, email_err)
 
         return {"success": True, "notification_id": notif.id}
     except Exception as e:
@@ -113,6 +123,7 @@ def emit_notification(user_id, notification_type, body_ar=None, body_en=None,
         return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
+
 
 def get_notifications(user_id, page=1, page_size=20, unread_only=False):
     """Get notifications for a user with pagination."""
@@ -123,23 +134,26 @@ def get_notifications(user_id, page=1, page_size=20, unread_only=False):
             query = query.filter(NotificationV2.is_read == False)
 
         total = query.count()
-        notifications = query.order_by(
-            NotificationV2.created_at.desc()
-        ).offset((page - 1) * page_size).limit(page_size).all()
+        notifications = (
+            query.order_by(NotificationV2.created_at.desc()).offset((page - 1) * page_size).limit(page_size).all()
+        )
 
         return {
-            "notifications": [{
-                "id": n.id,
-                "type": n.notification_type,
-                "title_ar": n.title_ar,
-                "title_en": n.title_en,
-                "body_ar": n.body_ar,
-                "body_en": n.body_en,
-                "icon": n.icon,
-                "action_url": n.action_url,
-                "is_read": n.is_read,
-                "created_at": str(n.created_at) if n.created_at else None,
-            } for n in notifications],
+            "notifications": [
+                {
+                    "id": n.id,
+                    "type": n.notification_type,
+                    "title_ar": n.title_ar,
+                    "title_en": n.title_en,
+                    "body_ar": n.body_ar,
+                    "body_en": n.body_en,
+                    "icon": n.icon,
+                    "action_url": n.action_url,
+                    "is_read": n.is_read,
+                    "created_at": str(n.created_at) if n.created_at else None,
+                }
+                for n in notifications
+            ],
             "total": total,
             "page": page,
             "page_size": page_size,
@@ -147,27 +161,37 @@ def get_notifications(user_id, page=1, page_size=20, unread_only=False):
     finally:
         db.close()
 
+
 def get_unread_count(user_id):
     """Get count of unread notifications."""
     db = SessionLocal()
     try:
-        count = db.query(NotificationV2).filter(
-            NotificationV2.user_id == user_id,
-            NotificationV2.is_read == False,
-        ).count()
+        count = (
+            db.query(NotificationV2)
+            .filter(
+                NotificationV2.user_id == user_id,
+                NotificationV2.is_read == False,
+            )
+            .count()
+        )
         return count
     finally:
         db.close()
+
 
 def mark_as_read(user_id, notification_id=None):
     """Mark one or all notifications as read."""
     db = SessionLocal()
     try:
         if notification_id:
-            n = db.query(NotificationV2).filter(
-                NotificationV2.id == notification_id,
-                NotificationV2.user_id == user_id,
-            ).first()
+            n = (
+                db.query(NotificationV2)
+                .filter(
+                    NotificationV2.id == notification_id,
+                    NotificationV2.user_id == user_id,
+                )
+                .first()
+            )
             if n:
                 n.is_read = True
                 n.read_at = datetime.now(timezone.utc)
@@ -175,10 +199,14 @@ def mark_as_read(user_id, notification_id=None):
                 return {"success": True, "marked": 1}
             return {"success": False, "error": "الإشعار غير موجود"}
         else:
-            count = db.query(NotificationV2).filter(
-                NotificationV2.user_id == user_id,
-                NotificationV2.is_read == False,
-            ).update({"is_read": True, "read_at": datetime.now(timezone.utc)})
+            count = (
+                db.query(NotificationV2)
+                .filter(
+                    NotificationV2.user_id == user_id,
+                    NotificationV2.is_read == False,
+                )
+                .update({"is_read": True, "read_at": datetime.now(timezone.utc)})
+            )
             db.commit()
             return {"success": True, "marked": count}
     except Exception as e:
@@ -188,13 +216,12 @@ def mark_as_read(user_id, notification_id=None):
     finally:
         db.close()
 
+
 def get_preferences(user_id):
     """Get notification preferences for a user."""
     db = SessionLocal()
     try:
-        prefs = db.query(NotificationPreference).filter(
-            NotificationPreference.user_id == user_id
-        ).all()
+        prefs = db.query(NotificationPreference).filter(NotificationPreference.user_id == user_id).all()
 
         # Build defaults for missing types
         existing = {p.notification_type: p for p in prefs}
@@ -202,24 +229,29 @@ def get_preferences(user_id):
         for ntype in NOTIFICATION_TYPES:
             if ntype in existing:
                 p = existing[ntype]
-                result.append({
-                    "type": ntype,
-                    "title_ar": TYPE_TITLES.get(ntype, ntype),
-                    "in_app": p.channel_in_app,
-                    "email": p.channel_email,
-                    "sms": p.channel_sms,
-                })
+                result.append(
+                    {
+                        "type": ntype,
+                        "title_ar": TYPE_TITLES.get(ntype, ntype),
+                        "in_app": p.channel_in_app,
+                        "email": p.channel_email,
+                        "sms": p.channel_sms,
+                    }
+                )
             else:
-                result.append({
-                    "type": ntype,
-                    "title_ar": TYPE_TITLES.get(ntype, ntype),
-                    "in_app": True,
-                    "email": True,
-                    "sms": False,
-                })
+                result.append(
+                    {
+                        "type": ntype,
+                        "title_ar": TYPE_TITLES.get(ntype, ntype),
+                        "in_app": True,
+                        "email": True,
+                        "sms": False,
+                    }
+                )
         return result
     finally:
         db.close()
+
 
 def update_preference(user_id, notification_type, in_app=True, email=True, sms=False):
     """Update notification preference for a specific type."""
@@ -228,10 +260,14 @@ def update_preference(user_id, notification_type, in_app=True, email=True, sms=F
 
     db = SessionLocal()
     try:
-        pref = db.query(NotificationPreference).filter(
-            NotificationPreference.user_id == user_id,
-            NotificationPreference.notification_type == notification_type,
-        ).first()
+        pref = (
+            db.query(NotificationPreference)
+            .filter(
+                NotificationPreference.user_id == user_id,
+                NotificationPreference.notification_type == notification_type,
+            )
+            .first()
+        )
 
         if pref:
             pref.channel_in_app = in_app
@@ -257,6 +293,7 @@ def update_preference(user_id, notification_type, in_app=True, email=True, sms=F
         return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
+
 
 def seed_welcome_notification(user_id):
     """Send welcome notification on registration."""

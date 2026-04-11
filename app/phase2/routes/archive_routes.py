@@ -12,13 +12,17 @@ import logging
 from app.phase1.routes.phase1_routes import get_current_user
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase2.models.archive_models import (
-    ArchiveItem, ArchiveLink, ArchiveRetentionEvent, ArchivePolicy,
+    ArchiveItem,
+    ArchiveLink,
+    ArchiveRetentionEvent,
+    ArchivePolicy,
 )
 
 router = APIRouter()
 
 
 # ── Schemas ──
+
 
 class ArchiveUploadRequest(BaseModel):
     client_id: Optional[str] = None
@@ -29,12 +33,14 @@ class ArchiveUploadRequest(BaseModel):
     size_bytes: Optional[int] = None
     mime_type: Optional[str] = None
 
+
 class AttachFromArchiveRequest(BaseModel):
     target_process_type: str
     target_process_id: str
 
 
 # ── User Archive ──
+
 
 @router.get("/account/archive", tags=["Archive"])
 async def get_user_archive(
@@ -45,25 +51,44 @@ async def get_user_archive(
 ):
     db = SessionLocal()
     try:
-        q = db.query(ArchiveItem).filter(
-            ArchiveItem.owner_user_id == user["sub"],
-            ArchiveItem.status == status,
-        ).order_by(ArchiveItem.archived_at.desc())
+        q = (
+            db.query(ArchiveItem)
+            .filter(
+                ArchiveItem.owner_user_id == user["sub"],
+                ArchiveItem.status == status,
+            )
+            .order_by(ArchiveItem.archived_at.desc())
+        )
         total = q.count()
         items = q.offset((page - 1) * page_size).limit(page_size).all()
         now = datetime.now(timezone.utc)
-        return {"success": True, "total": total, "page": page, "data": [
-            {"id": i.id, "file_name": i.file_name, "source_type": i.source_type,
-             "client_id": i.client_id, "size_bytes": i.size_bytes, "status": i.status,
-             "archived_at": str(i.archived_at), "expires_at": str(i.expires_at),
-             "days_remaining": max(0, (i.expires_at.replace(tzinfo=timezone.utc) - now).days) if i.expires_at else None}
-            for i in items
-        ]}
+        return {
+            "success": True,
+            "total": total,
+            "page": page,
+            "data": [
+                {
+                    "id": i.id,
+                    "file_name": i.file_name,
+                    "source_type": i.source_type,
+                    "client_id": i.client_id,
+                    "size_bytes": i.size_bytes,
+                    "status": i.status,
+                    "archived_at": str(i.archived_at),
+                    "expires_at": str(i.expires_at),
+                    "days_remaining": (
+                        max(0, (i.expires_at.replace(tzinfo=timezone.utc) - now).days) if i.expires_at else None
+                    ),
+                }
+                for i in items
+            ],
+        }
     finally:
         db.close()
 
 
 # ── Client Archive ──
+
 
 @router.get("/clients/{client_id}/archive", tags=["Archive"])
 async def get_client_archive(
@@ -75,34 +100,53 @@ async def get_client_archive(
 ):
     db = SessionLocal()
     try:
-        q = db.query(ArchiveItem).filter(
-            ArchiveItem.client_id == client_id,
-            ArchiveItem.status == status,
-        ).order_by(ArchiveItem.archived_at.desc())
+        q = (
+            db.query(ArchiveItem)
+            .filter(
+                ArchiveItem.client_id == client_id,
+                ArchiveItem.status == status,
+            )
+            .order_by(ArchiveItem.archived_at.desc())
+        )
         total = q.count()
         items = q.offset((page - 1) * page_size).limit(page_size).all()
         now = datetime.now(timezone.utc)
-        return {"success": True, "total": total, "page": page, "data": [
-            {"id": i.id, "file_name": i.file_name, "source_type": i.source_type,
-             "size_bytes": i.size_bytes, "status": i.status,
-             "archived_at": str(i.archived_at), "expires_at": str(i.expires_at),
-             "days_remaining": max(0, (i.expires_at.replace(tzinfo=timezone.utc) - now).days) if i.expires_at else None}
-            for i in items
-        ]}
+        return {
+            "success": True,
+            "total": total,
+            "page": page,
+            "data": [
+                {
+                    "id": i.id,
+                    "file_name": i.file_name,
+                    "source_type": i.source_type,
+                    "size_bytes": i.size_bytes,
+                    "status": i.status,
+                    "archived_at": str(i.archived_at),
+                    "expires_at": str(i.expires_at),
+                    "days_remaining": (
+                        max(0, (i.expires_at.replace(tzinfo=timezone.utc) - now).days) if i.expires_at else None
+                    ),
+                }
+                for i in items
+            ],
+        }
     finally:
         db.close()
 
 
 # ── Upload to Archive ──
 
+
 @router.post("/archive/upload", tags=["Archive"])
 async def upload_to_archive(req: ArchiveUploadRequest, user: dict = Depends(get_current_user)):
     db = SessionLocal()
     try:
-        policy = db.query(ArchivePolicy).filter(
-            ArchivePolicy.is_active == True,
-            ArchivePolicy.scope_type == "global"
-        ).first()
+        policy = (
+            db.query(ArchivePolicy)
+            .filter(ArchivePolicy.is_active == True, ArchivePolicy.scope_type == "global")
+            .first()
+        )
         retention_days = policy.retention_days if policy else 30
 
         now = datetime.now(timezone.utc)
@@ -132,6 +176,7 @@ async def upload_to_archive(req: ArchiveUploadRequest, user: dict = Depends(get_
 
 
 # ── Attach from Archive ──
+
 
 @router.post("/archive/items/{archive_item_id}/attach", tags=["Archive"])
 async def attach_from_archive(
@@ -168,14 +213,19 @@ async def attach_from_archive(
 
 # ── Delete Archive Item ──
 
+
 @router.delete("/archive/items/{archive_item_id}", tags=["Archive"])
 async def delete_archive_item(archive_item_id: str, user: dict = Depends(get_current_user)):
     db = SessionLocal()
     try:
-        item = db.query(ArchiveItem).filter(
-            ArchiveItem.id == archive_item_id,
-            ArchiveItem.owner_user_id == user["sub"],
-        ).first()
+        item = (
+            db.query(ArchiveItem)
+            .filter(
+                ArchiveItem.id == archive_item_id,
+                ArchiveItem.owner_user_id == user["sub"],
+            )
+            .first()
+        )
         if not item:
             raise HTTPException(status_code=404, detail="Archive item not found or not yours")
         if item.status == "locked_by_process":
@@ -184,12 +234,14 @@ async def delete_archive_item(archive_item_id: str, user: dict = Depends(get_cur
         item.status = "deleted"
         item.deleted_at = datetime.now(timezone.utc)
 
-        db.add(ArchiveRetentionEvent(
-            archive_item_id=archive_item_id,
-            event_type="deleted",
-            actor_id=user["sub"],
-            notes="Manual deletion by user",
-        ))
+        db.add(
+            ArchiveRetentionEvent(
+                archive_item_id=archive_item_id,
+                event_type="deleted",
+                actor_id=user["sub"],
+                notes="Manual deletion by user",
+            )
+        )
         db.commit()
         return {"success": True, "message": "Item marked as deleted"}
     except HTTPException:

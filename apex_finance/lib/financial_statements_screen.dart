@@ -1,10 +1,10 @@
 ﻿import 'package:flutter/material.dart';
 import 'screens/copilot/copilot_screen.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'api_service.dart';
-import 'analysis_full_screen.dart';
 
 class FinancialStatementsScreen extends StatefulWidget {
   final Map<String, dynamic>? apiData;
@@ -299,10 +299,10 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
         const SizedBox(height: 10),
         // زر التحليل المالي
         GestureDetector(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => AnalysisFullScreen(
-              apiData: widget.apiData,
-              pickedFile: widget.pickedFile))),
+          onTap: () => context.push('/analysis/full', extra: {
+            'apiData': widget.apiData,
+            'pickedFile': widget.pickedFile,
+          }),
           child: Container(
             width: double.infinity, height: 54,
             decoration: BoxDecoration(

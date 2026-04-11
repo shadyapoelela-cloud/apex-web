@@ -16,7 +16,6 @@ from typing import List, Dict, Any, Optional, Tuple
 from difflib import SequenceMatcher
 from app.core.text_utils import normalize_arabic
 
-
 # ── Essential categories for a complete COA ──
 
 ESSENTIAL_CATEGORIES = {
@@ -38,15 +37,28 @@ CONDITIONAL_CATEGORIES = {
 
 # ── Ambiguous name patterns ──
 AMBIGUOUS_PATTERNS_AR = [
-    r"^حساب عام$", r"^متنوعات$", r"^أخرى$", r"^عهد$", r"^ذمم$",
-    r"^حساب \d+$", r"^بند \d+$", r"^أخرى.*أخرى$", r"^حسابات$",
-    r"^مصروفات$", r"^إيرادات$",
+    r"^حساب عام$",
+    r"^متنوعات$",
+    r"^أخرى$",
+    r"^عهد$",
+    r"^ذمم$",
+    r"^حساب \d+$",
+    r"^بند \d+$",
+    r"^أخرى.*أخرى$",
+    r"^حسابات$",
+    r"^مصروفات$",
+    r"^إيرادات$",
 ]
 AMBIGUOUS_PATTERNS_EN = [
-    r"^other$", r"^misc", r"^general$", r"^account \d+$",
-    r"^sundry$", r"^various$", r"^expenses$", r"^revenues$",
+    r"^other$",
+    r"^misc",
+    r"^general$",
+    r"^account \d+$",
+    r"^sundry$",
+    r"^various$",
+    r"^expenses$",
+    r"^revenues$",
 ]
-
 
 
 def assess_completeness(accounts: List[Dict], activity: str = "general") -> Dict:
@@ -74,7 +86,13 @@ def assess_completeness(accounts: List[Dict], activity: str = "general") -> Dict
         if not cat_found:
             missing.append(cat_key)
 
-    total_expected = len([k for k in ESSENTIAL_CATEGORIES if k not in CONDITIONAL_CATEGORIES or activity in CONDITIONAL_CATEGORIES.get(k, [])])
+    total_expected = len(
+        [
+            k
+            for k in ESSENTIAL_CATEGORIES
+            if k not in CONDITIONAL_CATEGORIES or activity in CONDITIONAL_CATEGORIES.get(k, [])
+        ]
+    )
     found_count = total_expected - len(missing)
     score = round(found_count / max(total_expected, 1), 3)
 
@@ -126,14 +144,16 @@ def assess_consistency(accounts: List[Dict]) -> Dict:
         if compatible:
             passed_checks += 1
         else:
-            issues.append({
-                "type": "parent_child_mismatch",
-                "account_code": a.get("account_code"),
-                "account_name": a.get("account_name_raw", "")[:80],
-                "account_class": nc,
-                "parent_code": parent_code,
-                "parent_class": parent_nc,
-            })
+            issues.append(
+                {
+                    "type": "parent_child_mismatch",
+                    "account_code": a.get("account_code"),
+                    "account_name": a.get("account_name_raw", "")[:80],
+                    "account_class": nc,
+                    "parent_code": parent_code,
+                    "parent_class": parent_nc,
+                }
+            )
 
     # Check sign rule consistency within sections
     section_signs = {}
@@ -152,11 +172,13 @@ def assess_consistency(accounts: List[Dict]) -> Dict:
             if minority_count > 0:
                 total_checks += 1
                 if minority_count / sum(signs.values()) > 0.3:
-                    issues.append({
-                        "type": "sign_rule_inconsistency",
-                        "section": section,
-                        "sign_distribution": signs,
-                    })
+                    issues.append(
+                        {
+                            "type": "sign_rule_inconsistency",
+                            "section": section,
+                            "sign_distribution": signs,
+                        }
+                    )
                 else:
                     passed_checks += 1
 
@@ -202,11 +224,13 @@ def assess_naming_clarity(accounts: List[Dict]) -> Dict:
             reason = "name_too_long"
 
         if is_ambiguous:
-            ambiguous.append({
-                "account_code": a.get("account_code"),
-                "account_name": name[:80],
-                "reason": reason,
-            })
+            ambiguous.append(
+                {
+                    "account_code": a.get("account_code"),
+                    "account_name": name[:80],
+                    "reason": reason,
+                }
+            )
 
     clear_count = total - len(ambiguous)
     score = round(clear_count / max(total, 1), 3)
@@ -240,11 +264,19 @@ def assess_duplication_risk(accounts: List[Dict]) -> Dict:
                 acc_b = accounts[idx_b]
                 # Different codes but similar names = suspect
                 if acc_a.get("account_code") != acc_b.get("account_code"):
-                    suspects.append({
-                        "account_a": {"code": acc_a.get("account_code"), "name": acc_a.get("account_name_raw", "")[:60]},
-                        "account_b": {"code": acc_b.get("account_code"), "name": acc_b.get("account_name_raw", "")[:60]},
-                        "similarity": round(ratio, 3),
-                    })
+                    suspects.append(
+                        {
+                            "account_a": {
+                                "code": acc_a.get("account_code"),
+                                "name": acc_a.get("account_name_raw", "")[:60],
+                            },
+                            "account_b": {
+                                "code": acc_b.get("account_code"),
+                                "name": acc_b.get("account_name_raw", "")[:60],
+                            },
+                            "similarity": round(ratio, 3),
+                        }
+                    )
 
     # Exact code duplicates
     code_counts = {}
@@ -348,7 +380,7 @@ def run_full_assessment(
         + naming["score"] * weights["naming_clarity"]
         + duplication["score"] * weights["duplication_risk"]
         + readiness["score"] * weights["reporting_readiness"],
-        3
+        3,
     )
 
     # Build recommendations

@@ -2,6 +2,7 @@
 APEX — Sprint 2 models for COA account classification and review workflow
 نماذج السبرنت الثاني لتصنيف الحسابات ومراجعة شجرة الحسابات
 """
+
 import enum
 from sqlalchemy import Column, String, Float, Text, DateTime, Boolean, Integer, Enum as SAEnum, func
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,12 +10,14 @@ from sqlalchemy.ext.declarative import declarative_base
 # We'll add classification columns to the existing ClientChartOfAccount
 # via ALTER TABLE in init_sprint2_db()
 
+
 class ReviewStatus(str, enum.Enum):
     draft = "draft"
     auto_classified = "auto_classified"
     manually_edited = "manually_edited"
     approved = "approved"
     rejected = "rejected"
+
 
 class MappingSource(str, enum.Enum):
     auto_rule = "auto_rule"
@@ -24,6 +27,7 @@ class MappingSource(str, enum.Enum):
     code_prefix = "code_prefix"
     manual = "manual"
     bulk_approve = "bulk_approve"
+
 
 # Classification columns to add to client_chart_of_accounts
 CLASSIFICATION_COLUMNS = {
@@ -41,18 +45,22 @@ CLASSIFICATION_COLUMNS = {
     "classification_issues_json": "TEXT DEFAULT '[]'",
 }
 
+
 def init_sprint2_db(engine=None):
     """Add classification columns to existing client_chart_of_accounts table."""
     if engine is None:
         try:
             from app.phase1.models.platform_models import engine as eng
+
             engine = eng
         except Exception:
             from app.phase1.models.platform_models import SessionLocal
+
             db = SessionLocal()
             engine = db.bind
             db.close()
     import sqlite3
+
     conn = engine.raw_connection()
     cursor = conn.cursor()
 

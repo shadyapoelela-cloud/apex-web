@@ -1,4 +1,5 @@
 """Sprint 2 -- COA Classification APIs"""
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -21,7 +22,9 @@ class BulkApproveBody(BaseModel):
     min_confidence: Optional[float] = Field(None, description="Minimum confidence threshold for approval")
     approve_all_above: Optional[float] = Field(None, description="Alias for min_confidence threshold")
 
+
 router = APIRouter()
+
 
 # ── POST /coa/uploads/{upload_id}/classify ──
 @router.post("/coa/classify/{upload_id}")
@@ -33,9 +36,8 @@ def classify_upload(upload_id: str):
     db = SessionLocal()
     try:
         # Get upload
-        row = _exec(db, 
-            "SELECT id, upload_status, client_id FROM client_coa_uploads WHERE id = :uid",
-            {"uid": upload_id}
+        row = _exec(
+            db, "SELECT id, upload_status, client_id FROM client_coa_uploads WHERE id = :uid", {"uid": upload_id}
         ).fetchone()
 
         if not row:
@@ -46,14 +48,15 @@ def classify_upload(upload_id: str):
             raise HTTPException(400, f"Upload must be parsed first. Current status: {status}")
 
         # Get all parsed accounts
-        accounts = _exec(db, 
+        accounts = _exec(
+            db,
             """SELECT id, account_code, account_name_raw, account_name_normalized,
                       parent_code, parent_name, account_level, account_type_raw, 
                       normal_balance, source_row_number, issues_json
                FROM client_chart_of_accounts 
                WHERE coa_upload_id = :uid AND record_status != 'rejected'
                ORDER BY source_row_number""",
-            {"uid": upload_id}
+            {"uid": upload_id},
         ).fetchall()
 
         if not accounts:
@@ -62,17 +65,19 @@ def classify_upload(upload_id: str):
         # Build account dicts
         acc_list = []
         for a in accounts:
-            acc_list.append({
-                "id": a[0],
-                "account_code": a[1],
-                "account_name_raw": a[2],
-                "account_name_normalized": a[3],
-                "parent_code": a[4],
-                "parent_name": a[5],
-                "account_level": a[6],
-                "account_type_raw": a[7],
-                "normal_balance": a[8],
-            })
+            acc_list.append(
+                {
+                    "id": a[0],
+                    "account_code": a[1],
+                    "account_name_raw": a[2],
+                    "account_name_normalized": a[3],
+                    "parent_code": a[4],
+                    "parent_name": a[5],
+                    "account_level": a[6],
+                    "account_type_raw": a[7],
+                    "normal_balance": a[8],
+                }
+            )
 
         # Run classifier
         results = run_classify(acc_list)
@@ -103,7 +108,8 @@ def classify_upload(upload_id: str):
             if ss:
                 section_dist[ss] = section_dist.get(ss, 0) + 1
 
-            _exec(db, 
+            _exec(
+                db,
                 """UPDATE client_chart_of_accounts SET
                     normalized_class = :nc,
                     statement_section = :ss,
@@ -128,7 +134,7 @@ def classify_upload(upload_id: str):
                     "rs": cls_result["review_status"],
                     "ci": json.dumps(cls_result["classification_issues"]),
                     "aid": acc_id,
-                }
+                },
             )
 
         db.commit()
@@ -136,19 +142,23 @@ def classify_upload(upload_id: str):
         total = len(acc_list)
         avg_conf = round(total_conf / total, 3) if total > 0 else 0.0
 
-        return {"success": True, "data": {
-            "upload_id": upload_id,
-            "total_accounts": total,
-            "classified": high_conf + low_conf,
-            "high_confidence": high_conf,
-            "low_confidence": low_conf,
-            "unclassified": unclassified,
-            "avg_confidence": avg_conf,
-            "class_distribution": class_dist,
-            "section_distribution": section_dist,
-        }}
+        return {
+            "success": True,
+            "data": {
+                "upload_id": upload_id,
+                "total_accounts": total,
+                "classified": high_conf + low_conf,
+                "high_confidence": high_conf,
+                "low_confidence": low_conf,
+                "unclassified": unclassified,
+                "avg_confidence": avg_conf,
+                "class_distribution": class_dist,
+                "section_distribution": section_dist,
+            },
+        }
     finally:
         db.close()
+
 
 # ── GET /coa/uploads/{upload_id}/mapping ──
 @router.get("/coa/mapping/{upload_id}")
@@ -191,15 +201,13 @@ def get_mapping_preview(
         where_sql = " AND ".join(where)
 
         # Count
-        count_row = _exec(db, 
-            f"SELECT COUNT(*) FROM client_chart_of_accounts WHERE {where_sql}",
-            params
-        ).fetchone()
+        count_row = _exec(db, f"SELECT COUNT(*) FROM client_chart_of_accounts WHERE {where_sql}", params).fetchone()
         total = count_row[0]
 
         # Fetch page
         offset = (page - 1) * page_size
-        rows = _exec(db, 
+        rows = _exec(
+            db,
             f"""SELECT id, source_row_number, account_code, account_name_raw,
                        parent_code, account_level, account_type_raw, normal_balance,
                        normalized_class, statement_section, subcategory,
@@ -210,7 +218,7 @@ def get_mapping_preview(
                 WHERE {where_sql}
                 ORDER BY source_row_number
                 LIMIT :lim OFFSET :off""",
-            {**params, "lim": page_size, "off": offset}
+            {**params, "lim": page_size, "off": offset},
         ).fetchall()
 
         accounts = []
@@ -219,42 +227,50 @@ def get_mapping_preview(
             cls_issues = []
             try:
                 issues = json.loads(r[17] or "[]")
-            except Exception: logging.warning("Failed to parse issues JSON for row %s", r[0], exc_info=True)
+            except Exception:
+                logging.warning("Failed to parse issues JSON for row %s", r[0], exc_info=True)
             try:
                 cls_issues = json.loads(r[18] or "[]")
-            except Exception: logging.warning("Failed to parse classification issues JSON for row %s", r[0], exc_info=True)
+            except Exception:
+                logging.warning("Failed to parse classification issues JSON for row %s", r[0], exc_info=True)
 
-            accounts.append({
-                "id": r[0],
-                "source_row_number": r[1],
-                "account_code": r[2],
-                "account_name_raw": r[3],
-                "parent_code": r[4],
-                "account_level": r[5],
-                "account_type_raw": r[6],
-                "normal_balance": r[7],
-                "normalized_class": r[8],
-                "statement_section": r[9],
-                "subcategory": r[10],
-                "current_noncurrent": r[11],
-                "cashflow_role": r[12],
-                "sign_rule": r[13],
-                "mapping_confidence": r[14] or 0.0,
-                "mapping_source": r[15],
-                "review_status": r[16],
-                "issues": issues,
-                "classification_issues": cls_issues,
-            })
+            accounts.append(
+                {
+                    "id": r[0],
+                    "source_row_number": r[1],
+                    "account_code": r[2],
+                    "account_name_raw": r[3],
+                    "parent_code": r[4],
+                    "account_level": r[5],
+                    "account_type_raw": r[6],
+                    "normal_balance": r[7],
+                    "normalized_class": r[8],
+                    "statement_section": r[9],
+                    "subcategory": r[10],
+                    "current_noncurrent": r[11],
+                    "cashflow_role": r[12],
+                    "sign_rule": r[13],
+                    "mapping_confidence": r[14] or 0.0,
+                    "mapping_source": r[15],
+                    "review_status": r[16],
+                    "issues": issues,
+                    "classification_issues": cls_issues,
+                }
+            )
 
-        return {"success": True, "data": {
-            "upload_id": upload_id,
-            "total": total,
-            "page": page,
-            "page_size": page_size,
-            "accounts": accounts,
-        }}
+        return {
+            "success": True,
+            "data": {
+                "upload_id": upload_id,
+                "total": total,
+                "page": page,
+                "page_size": page_size,
+                "accounts": accounts,
+            },
+        }
     finally:
         db.close()
+
 
 # ── PUT /coa/accounts/{account_id} ──
 @router.put("/coa/account/{account_id}")
@@ -264,15 +280,18 @@ def edit_account_classification(account_id: str, body: EditAccountClassification
 
     db = SessionLocal()
     try:
-        row = _exec(db,
-            "SELECT id FROM client_chart_of_accounts WHERE id = :aid",
-            {"aid": account_id}
-        ).fetchone()
+        row = _exec(db, "SELECT id FROM client_chart_of_accounts WHERE id = :aid", {"aid": account_id}).fetchone()
         if not row:
             raise HTTPException(404, "Account not found")
 
-        allowed = ["normalized_class", "statement_section", "subcategory",
-                    "current_noncurrent", "cashflow_role", "sign_rule"]
+        allowed = [
+            "normalized_class",
+            "statement_section",
+            "subcategory",
+            "current_noncurrent",
+            "cashflow_role",
+            "sign_rule",
+        ]
         updates = []
         params = {"aid": account_id}
         body_data = body.model_dump(exclude_unset=True)
@@ -289,15 +308,13 @@ def edit_account_classification(account_id: str, body: EditAccountClassification
         updates.append("mapping_confidence = 1.0")
         updates.append("review_status = 'manually_edited'")
 
-        _exec(db, 
-            f"UPDATE client_chart_of_accounts SET {', '.join(updates)} WHERE id = :aid",
-            params
-        )
+        _exec(db, f"UPDATE client_chart_of_accounts SET {', '.join(updates)} WHERE id = :aid", params)
         db.commit()
 
         return {"success": True, "data": {"id": account_id, "status": "updated", "review_status": "manually_edited"}}
     finally:
         db.close()
+
 
 # ── POST /coa/accounts/{account_id}/approve ──
 @router.post("/coa/approve/{account_id}")
@@ -307,24 +324,25 @@ def approve_account(account_id: str):
 
     db = SessionLocal()
     try:
-        row = _exec(db, 
-            "SELECT id, review_status FROM client_chart_of_accounts WHERE id = :aid",
-            {"aid": account_id}
+        row = _exec(
+            db, "SELECT id, review_status FROM client_chart_of_accounts WHERE id = :aid", {"aid": account_id}
         ).fetchone()
         if not row:
             raise HTTPException(404, "Account not found")
 
         now = datetime.now(timezone.utc).isoformat()
-        _exec(db, 
+        _exec(
+            db,
             """UPDATE client_chart_of_accounts SET
                 record_status = 'approved', approved_at = :now
             WHERE id = :aid""",
-            {"aid": account_id, "now": now}
+            {"aid": account_id, "now": now},
         )
         db.commit()
         return {"success": True, "data": {"id": account_id, "review_status": "approved"}}
     finally:
         db.close()
+
 
 # ── POST /coa/uploads/{upload_id}/bulk-approve ──
 @router.post("/coa/bulk-approve/{upload_id}")
@@ -343,20 +361,22 @@ def bulk_approve(upload_id: str, body: BulkApproveBody = BulkApproveBody()):
             params = {f"id{i}": aid for i, aid in enumerate(account_ids)}
             params["now"] = now
             params["uid"] = upload_id
-            _exec(db, 
+            _exec(
+                db,
                 f"""UPDATE client_chart_of_accounts SET
                     record_status = 'approved'
                 WHERE coa_upload_id = :uid AND id IN ({placeholders})""",
-                params
+                params,
             )
         elif min_confidence is not None:
-            _exec(db, 
+            _exec(
+                db,
                 """UPDATE client_chart_of_accounts SET
                     record_status = 'approved'
                 WHERE coa_upload_id = :uid 
                 AND mapping_confidence >= :mc
                 AND record_status != 'rejected'""",
-                {"uid": upload_id, "now": now, "mc": min_confidence}
+                {"uid": upload_id, "now": now, "mc": min_confidence},
             )
         else:
             raise HTTPException(400, "Provide account_ids or min_confidence")
@@ -364,30 +384,36 @@ def bulk_approve(upload_id: str, body: BulkApproveBody = BulkApproveBody()):
         db.commit()
 
         # Count approved
-        count = _exec(db, 
+        count = _exec(
+            db,
             """SELECT COUNT(*) FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status = 'approved'""",
-            {"uid": upload_id}
+            {"uid": upload_id},
         ).fetchone()[0]
 
-        total = _exec(db, 
+        total = _exec(
+            db,
             """SELECT COUNT(*) FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status != 'rejected'""",
-            {"uid": upload_id}
+            {"uid": upload_id},
         ).fetchone()[0]
 
-        return {"success": True, "data": {
-            "upload_id": upload_id,
-            "approved_count": count,
-            "total_accounts": total,
-            "approval_percentage": round(count / total * 100, 1) if total > 0 else 0,
-        }}
+        return {
+            "success": True,
+            "data": {
+                "upload_id": upload_id,
+                "approved_count": count,
+                "total_accounts": total,
+                "approval_percentage": round(count / total * 100, 1) if total > 0 else 0,
+            },
+        }
     except Exception as e:
         db.rollback()
         logging.error("Batch approve error", exc_info=True)
         raise HTTPException(500, "Batch approval failed")
     finally:
         db.close()
+
 
 # ── GET /coa/uploads/{upload_id}/classification-summary ──
 @router.get("/coa/classification-summary/{upload_id}")
@@ -397,12 +423,13 @@ def classification_summary(upload_id: str):
 
     db = SessionLocal()
     try:
-        rows = _exec(db, 
+        rows = _exec(
+            db,
             """SELECT normalized_class, statement_section, mapping_confidence, 
                       review_status, mapping_source
                FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status != 'rejected'""",
-            {"uid": upload_id}
+            {"uid": upload_id},
         ).fetchall()
 
         if not rows:
@@ -430,55 +457,61 @@ def classification_summary(upload_id: str):
             review_dist[rs] = review_dist.get(rs, 0) + 1
             source_dist[ms] = source_dist.get(ms, 0) + 1
 
-        return {"success": True, "data": {
-            "upload_id": upload_id,
-            "total_accounts": total,
-            "high_confidence": high,
-            "low_confidence": low,
-            "unclassified": unclassified,
-            "avg_confidence": avg_conf,
-            "class_distribution": class_dist,
-            "section_distribution": section_dist,
-            "review_status_distribution": review_dist,
-            "source_distribution": source_dist,
-        }}
+        return {
+            "success": True,
+            "data": {
+                "upload_id": upload_id,
+                "total_accounts": total,
+                "high_confidence": high,
+                "low_confidence": low,
+                "unclassified": unclassified,
+                "avg_confidence": avg_conf,
+                "class_distribution": class_dist,
+                "section_distribution": section_dist,
+                "review_status_distribution": review_dist,
+                "source_distribution": source_dist,
+            },
+        }
     finally:
         db.close()
+
 
 @router.post("/coa/debug-classify/{upload_id}")
 def debug_classify(upload_id: str):
     """Debug classify with full traceback."""
     try:
         from app.phase1.models.platform_models import SessionLocal
+
         db = SessionLocal()
-        
+
         # Check upload exists
-        row = _exec(db, 
-            "SELECT id, upload_status FROM client_coa_uploads WHERE id = :uid",
-            {"uid": upload_id}
+        row = _exec(
+            db, "SELECT id, upload_status FROM client_coa_uploads WHERE id = :uid", {"uid": upload_id}
         ).fetchone()
-        
+
         if not row:
             return {"error": "Upload not found", "upload_id": upload_id}
-        
+
         # Check accounts exist
-        accounts = _exec(db, 
+        accounts = _exec(
+            db,
             "SELECT id, account_code, account_name_raw, account_name_normalized, parent_code, normal_balance, account_level, account_type_raw FROM client_chart_of_accounts WHERE coa_upload_id = :uid AND record_status != 'rejected' LIMIT 3",
-            {"uid": upload_id}
+            {"uid": upload_id},
         ).fetchall()
-        
+
         if not accounts:
             return {"error": "No accounts found", "upload_status": row[1]}
-        
+
         # Check columns exist
         try:
             _exec(db, "SELECT normalized_class FROM client_chart_of_accounts LIMIT 1").fetchone()
             cols_ok = True
         except Exception as ce:
             cols_ok = str(ce)
-        
+
         # Try classify one account
         from app.sprint2.services.coa_classifier import classify_account
+
         sample = accounts[0]
         cls_result = classify_account(
             account_name_raw=sample[2],
@@ -488,7 +521,7 @@ def debug_classify(upload_id: str):
             account_level=sample[6],
             account_type_raw=sample[7],
         )
-        
+
         db.close()
         return {
             "upload_found": True,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
-import '../copilot/copilot_screen.dart';
 
 class KnowledgeBrainScreen extends StatefulWidget {
   const KnowledgeBrainScreen({super.key});
@@ -101,7 +101,7 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
           const Text('\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
         ]),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen()))),
+          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
         ],
         bottom: TabBar(
           controller: _tabController,

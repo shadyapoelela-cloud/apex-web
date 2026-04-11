@@ -38,85 +38,101 @@ class ReadinessEngine:
 
         # ═══ 1. Profitability (20%) ═══
         prof_score = self._score_profitability(income, ratios, benchmarks, negative_drivers)
-        components.append({
-            "name": "الربحية",
-            "name_en": "Profitability",
-            "score": prof_score,
-            "max_score": 20,
-            "weight": 0.20,
-        })
+        components.append(
+            {
+                "name": "الربحية",
+                "name_en": "Profitability",
+                "score": prof_score,
+                "max_score": 20,
+                "weight": 0.20,
+            }
+        )
 
         # ═══ 2. Liquidity (15%) ═══
         liq_score = self._score_liquidity(ratios, benchmarks, negative_drivers)
-        components.append({
-            "name": "السيولة",
-            "name_en": "Liquidity",
-            "score": liq_score,
-            "max_score": 15,
-            "weight": 0.15,
-        })
+        components.append(
+            {
+                "name": "السيولة",
+                "name_en": "Liquidity",
+                "score": liq_score,
+                "max_score": 15,
+                "weight": 0.15,
+            }
+        )
 
         # ═══ 3. Leverage (15%) ═══
         lev_score = self._score_leverage(ratios, benchmarks, negative_drivers)
-        components.append({
-            "name": "المديونية",
-            "name_en": "Leverage",
-            "score": lev_score,
-            "max_score": 15,
-            "weight": 0.15,
-        })
+        components.append(
+            {
+                "name": "المديونية",
+                "name_en": "Leverage",
+                "score": lev_score,
+                "max_score": 15,
+                "weight": 0.15,
+            }
+        )
 
         # ═══ 4. Efficiency (10%) ═══
         eff_score = self._score_efficiency(ratios, benchmarks, negative_drivers)
-        components.append({
-            "name": "الكفاءة التشغيلية",
-            "name_en": "Efficiency",
-            "score": eff_score,
-            "max_score": 10,
-            "weight": 0.10,
-        })
+        components.append(
+            {
+                "name": "الكفاءة التشغيلية",
+                "name_en": "Efficiency",
+                "score": eff_score,
+                "max_score": 10,
+                "weight": 0.10,
+            }
+        )
 
         # ═══ 5. Earnings Quality (10%) ═══
         eq_score = self._score_earnings_quality(income, balance, negative_drivers)
-        components.append({
-            "name": "جودة الأرباح",
-            "name_en": "Earnings Quality",
-            "score": eq_score,
-            "max_score": 10,
-            "weight": 0.10,
-        })
+        components.append(
+            {
+                "name": "جودة الأرباح",
+                "name_en": "Earnings Quality",
+                "score": eq_score,
+                "max_score": 10,
+                "weight": 0.10,
+            }
+        )
 
         # ═══ 6. Data Completeness (15%) ═══
         data_score = self._score_data_completeness(confidence, negative_drivers)
-        components.append({
-            "name": "اكتمال البيانات",
-            "name_en": "Data Completeness",
-            "score": data_score,
-            "max_score": 15,
-            "weight": 0.15,
-        })
+        components.append(
+            {
+                "name": "اكتمال البيانات",
+                "name_en": "Data Completeness",
+                "score": data_score,
+                "max_score": 15,
+                "weight": 0.15,
+            }
+        )
 
         # ═══ 7. Accounting Integrity (10%) ═══
         integ_score = self._score_integrity(validations, negative_drivers)
-        components.append({
-            "name": "سلامة التوازن المحاسبي",
-            "name_en": "Accounting Integrity",
-            "score": integ_score,
-            "max_score": 10,
-            "weight": 0.10,
-        })
+        components.append(
+            {
+                "name": "سلامة التوازن المحاسبي",
+                "name_en": "Accounting Integrity",
+                "score": integ_score,
+                "max_score": 10,
+                "weight": 0.10,
+            }
+        )
 
         # ═══ 8. Trend Stability (5%) ═══
         # Without multi-period data, give neutral score
         trend_score = 3  # Neutral — needs multi-period
-        components.append({
-            "name": "استقرار الاتجاهات",
-            "name_en": "Trend Stability",
-            "score": trend_score,
-            "max_score": 5,
-            "weight": 0.05,
-            "note": "يحتاج بيانات أكثر من فترة للحساب الدقيق",
-        })
+        components.append(
+            {
+                "name": "استقرار الاتجاهات",
+                "name_en": "Trend Stability",
+                "score": trend_score,
+                "max_score": 5,
+                "weight": 0.05,
+                "note": "يحتاج بيانات أكثر من فترة للحساب الدقيق",
+            }
+        )
 
         # ═══ Final Score ═══
         final_score = sum(c["score"] for c in components)

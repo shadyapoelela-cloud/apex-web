@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 import 'api_service.dart';
 import 'shared_widgets.dart';
-import 'coa_quality_screen.dart';
 
 class CoaMappingScreen extends StatefulWidget {
   final Map<String,dynamic> uploadData;
@@ -50,7 +50,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
         final assessResult = await ApiService.assessCoa(uploadId);
         final ad = assessResult.success ? assessResult.data as Map<String,dynamic> : <String,dynamic>{};
         if (!mounted) return;
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => CoaQualityScreen(uploadId: uploadId, clientId: widget.clientId, clientName: widget.clientName, assessData: ad)));
+        context.pushReplacement('/coa/quality', extra: {'uploadId': uploadId, 'clientId': widget.clientId, 'clientName': widget.clientName, 'assessData': ad});
       } else {
         setState(() => _errorMsg = parseResult.error ?? 'فشل الـ Parse');
       }

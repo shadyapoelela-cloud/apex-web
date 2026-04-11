@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:html' as html;
@@ -346,12 +347,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
 
               return GestureDetector(
                 onTap: () async {
-                  await Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => ClientDetailScreen(
-                      clientId: clientId.toString(),
-                      clientName: clientName,
-                    ),
-                  ));
+                  await context.push('/client-detail', extra: {'id': clientId.toString(), 'name': clientName});
                   if (mounted) _loadClients();
                 },
                 child: Container(
@@ -395,9 +391,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   Future<void> _navigateToCoa(dynamic client) async {
     final clientId = client['id'] ?? client['client_code'] ?? '1';
     final clientName = client['name_ar'] ?? client['name'] ?? 'عميل';
-    await Navigator.push(context, MaterialPageRoute(
-      builder: (_) => CoaJourneyScreen(clientId: '$clientId', clientName: clientName),
-    ));
+    await context.push('/coa/journey', extra: {'clientId': '$clientId', 'clientName': clientName});
     if (mounted) _loadClients();
 }
 

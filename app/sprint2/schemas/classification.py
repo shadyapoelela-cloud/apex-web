@@ -2,8 +2,10 @@
 APEX — Pydantic schemas for COA classification results and summaries
 مخططات التحقق لنتائج وملخصات تصنيف شجرة الحسابات
 """
+
 from pydantic import BaseModel
 from typing import Optional, List
+
 
 class ClassificationResult(BaseModel):
     normalized_class: Optional[str] = None
@@ -17,6 +19,7 @@ class ClassificationResult(BaseModel):
     classification_issues: List[str] = []
     review_status: str = "draft"
 
+
 class ClassifySummary(BaseModel):
     upload_id: str
     total_accounts: int
@@ -27,6 +30,7 @@ class ClassifySummary(BaseModel):
     avg_confidence: float
     class_distribution: dict
     section_distribution: dict
+
 
 class AccountMappingPreview(BaseModel):
     id: str
@@ -49,6 +53,7 @@ class AccountMappingPreview(BaseModel):
     issues: List[str] = []
     classification_issues: List[str] = []
 
+
 class AccountEditRequest(BaseModel):
     normalized_class: Optional[str] = None
     statement_section: Optional[str] = None
@@ -56,6 +61,7 @@ class AccountEditRequest(BaseModel):
     current_noncurrent: Optional[str] = None
     cashflow_role: Optional[str] = None
     sign_rule: Optional[str] = None
+
 
 class BulkApproveRequest(BaseModel):
     account_ids: List[str] = []

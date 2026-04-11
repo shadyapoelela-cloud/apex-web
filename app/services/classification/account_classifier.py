@@ -24,7 +24,6 @@ import re
 from typing import Optional, Tuple
 from app.core.constants import ACCOUNT_TAXONOMY
 
-
 # ═══════════════════════════════════════════════════════════════════════════════
 #  Level 1: Exact Tab Match — أعلى ثقة
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -41,7 +40,6 @@ TAB_EXACT_MAP = {
     "إيرادات - إيرادات تشغيلية أخرى": "other_revenue",
     "إيرادات - مبيعات محلية": "revenue",
     "إيرادات - مردودات ومسموحات مبيعات": "sales_returns",
-
     "تكلفة المبيعات - تكلفة البضاعة المباعة": "cogs",
     "تكلفة مبيعات - تكلفة بضاعة مباعة": "cogs",
     "تكلفة المبيعات - مشتريات": "purchases",
@@ -59,7 +57,6 @@ TAB_EXACT_MAP = {
     "تكلفة مبيعات - تكلفة بضاعة مباعة": "cogs",
     "تكلفة المبيعات - مصاريف شحن ونقل للداخل": "freight_in",
     "تكلفة المبيعات - تكلفة عمالة مباشرة": "direct_labor",
-
     "مصروفات إدارية وعمومية - رواتب وأجور": "payroll",
     "مصروفات إدارية وعمومية - رواتب وأجور إدارية": "payroll",
     "مصروفات إدارية - رواتب وأجور": "payroll",
@@ -96,7 +93,6 @@ TAB_EXACT_MAP = {
     "مصروفات إدارية - صيانة وإصلاحات": "misc_admin_expense",
     "مصروفات إدارية - أتعاب مهنية": "professional_fees",
     "مصروفات إدارية - مرافق": "utilities",
-
     "مصروفات بيع وتسويق - رواتب موظفي المبيعات": "selling_expenses",
     "مصروفات بيع - رواتب موظفي المبيعات": "selling_expenses",
     "مصروفات بيع وتسويق - عمولات مبيعات": "sales_commission",
@@ -109,7 +105,6 @@ TAB_EXACT_MAP = {
     "مصروفات بيع وتوزيع - رواتب ومزايا": "selling_expenses",
     "مصروفات بيع وتوزيع - تسويق وإعلان": "marketing_expense",
     "مصروفات بيع وتوزيع - نقل وشحن": "selling_expenses",
-
     "إيرادات ومصروفات أخرى - أرباح بيع أصول ثابتة": "gains_asset_disposal",
     "إيرادات ومصروفات أخرى - إيرادات استثمار": "finance_income",
     "إيرادات ومصروفات أخرى - أرباح فروقات عملة": "forex_gain",
@@ -122,7 +117,6 @@ TAB_EXACT_MAP = {
     "إيرادات ومصروفات أخرى - مصروفات غير تشغيلية أخرى": "other_expenses",
     "إيرادات ومصروفات أخرى - إيرادات متنوعة أخرى": "other_income",
     "إيرادات ومصروفات أخرى - مخصص زكاة وضريبة دخل": "zakat_tax",
-
     "تكاليف تمويل": "finance_cost",
     "تكاليف تمويل - تمويل قروض بنكية": "finance_cost",
     "تكاليف تمويل - رسوم بنكية": "finance_cost",
@@ -134,7 +128,6 @@ TAB_EXACT_MAP = {
     "زكاة وضرائب - استقطاع": "zakat_tax",
     "مصروفات إدارية": "admin_expenses",
     "مصروفات إدارية - إهلاك أصول حق استخدام": "depreciation_expense",
-
     # ──── أصول متداولة ────
     "أصول متداولة - نقد وما في حكمه": "bank_accounts",
     "أصول متداولة - نقد في الصندوق": "cash_on_hand",
@@ -148,7 +141,6 @@ TAB_EXACT_MAP = {
     "أصول متداولة - مصروفات مدفوعة": "prepayments",
     "أصول متداولة - ضريبة قيمة مضافة مدخلات": "vat_receivable",
     "أصول متداولة - استثمارات قصيرة الأجل": "short_term_investments",
-
     # ──── أصول غير متداولة ────
     "أصول غير متداولة - ممتلكات وآلات ومعدات": "machinery",
     "أصول غير متداولة - أراضي": "land",
@@ -166,7 +158,6 @@ TAB_EXACT_MAP = {
     "أصول غير متداولة - أصول غير ملموسة": "intangible_assets",
     "أصول غير متداولة - أصول حق استخدام": "rou_assets",
     "أصول غير متداولة - استثمارات طويلة الأجل": "long_term_investments",
-
     # ──── التزامات متداولة ────
     "التزامات متداولة - ذمم دائنة تجارية": "trade_payables",
     "التزامات متداولة - ذمم دائنة أخرى": "other_payables",
@@ -185,7 +176,6 @@ TAB_EXACT_MAP = {
     "التزامات متداولة - صافي ضريبة قيمة مضافة مستحقة": "net_vat_payable",
     "التزامات متداولة - زكاة مستحقة": "zakat_payable",
     "التزامات متداولة - ضريبة دخل مستحقة": "income_tax_payable",
-
     # ──── التزامات غير متداولة ────
     "التزامات غير متداولة - قروض بنكية طويلة الأجل": "long_term_loans",
     "التزامات غير متداولة - قروض طويلة الأجل": "long_term_loans",
@@ -193,7 +183,6 @@ TAB_EXACT_MAP = {
     "التزامات غير متداولة - التزامات إيجارية طويلة الأجل": "non_current_lease_liabilities",
     "التزامات غير متداولة - مخصص مكافأة نهاية الخدمة": "end_of_service",
     "التزامات غير متداولة - مكافأة نهاية الخدمة": "end_of_service",
-
     # ──── حقوق ملكية ────
     "حقوق ملكية - رأس المال المدفوع": "share_capital",
     "حقوق ملكية - رأس المال": "share_capital",
@@ -230,7 +219,6 @@ ALIAS_MAP = {
     "بنك الانماء": "bank_accounts",
     "بنك البلاد": "bank_accounts",
     "بنك الجزيرة": "bank_accounts",
-
     # ─── ذمم مدينة ───
     "مدينون": "trade_receivables",
     "عملاء": "trade_receivables",
@@ -241,7 +229,6 @@ ALIAS_MAP = {
     "مخصص ديون معدومة": "allowance_doubtful",
     "allowance for doubtful": "allowance_doubtful",
     "provision for bad debt": "allowance_doubtful",
-
     # ─── مخزون ───
     "بضاعة اول المدة": "inventory",
     "بضاعة أول المدة": "inventory",
@@ -252,7 +239,6 @@ ALIAS_MAP = {
     "inventory": "inventory",
     "مواد خام": "inventory_raw",
     "raw material": "inventory_raw",
-
     # ─── مصروفات مدفوعة مقدماً ───
     "مدفوعة مقدما": "prepayments",
     "مقدمة": "prepayments",
@@ -262,13 +248,11 @@ ALIAS_MAP = {
     "deposit": "prepaid_rent",
     "فوائد مؤجلة": "prepayments",
     "فؤائد مؤجلة": "prepayments",
-
     # ─── عهد وسلف ───
     "عهدة": "employee_advances",
     "سلفة": "employee_advances",
     "عهد موظفين": "employee_advances",
     "employee advance": "employee_advances",
-
     # ─── أصول ثابتة ───
     "ديكور": "leasehold_improvements",
     "decoration": "leasehold_improvements",
@@ -290,7 +274,6 @@ ALIAS_MAP = {
     "أراضي": "land",
     "اراضي": "land",
     "land": "land",
-
     # ─── مجمع إهلاك ───
     "مجمع إهلاك": "accum_depr_general",
     "مجمع اهلاك": "accum_depr_general",
@@ -298,7 +281,6 @@ ALIAS_MAP = {
     "مجمع الاهلاك": "accum_depr_general",
     "accumulated depreciation": "accum_depr_general",
     "acc. depr": "accum_depr_general",
-
     # ─── التزامات ───
     "دائنون": "trade_payables",
     "موردين": "trade_payables",
@@ -319,7 +301,6 @@ ALIAS_MAP = {
     "مكافأة نهاية": "end_of_service",
     "مكافاة نهاية": "end_of_service",
     "end of service": "end_of_service",
-
     # ─── حقوق ملكية ───
     "رأس المال": "share_capital",
     "راس المال": "share_capital",
@@ -338,7 +319,6 @@ ALIAS_MAP = {
     "owner equity": "partners_current_account",
     "مسحوبات": "drawings",
     "drawings": "drawings",
-
     # ─── إيرادات ───
     "مبيعات": "revenue",
     "sales": "revenue",
@@ -348,7 +328,6 @@ ALIAS_MAP = {
     "sales return": "sales_returns",
     "خصم مسموح": "sales_discounts",
     "discount allowed": "sales_discounts",
-
     # ─── تكلفة مبيعات ───
     "مشتريات": "purchases",
     "purchase": "purchases",
@@ -365,7 +344,6 @@ ALIAS_MAP = {
     "خصم مكتسب": "purchases_returns",
     "purchase return": "purchases_returns",
     "purchase discount": "purchases_returns",
-
     # ─── مصروفات ───
     "رواتب": "payroll",
     "أجور": "payroll",
@@ -397,7 +375,6 @@ ALIAS_MAP = {
     "penalties": "penalties",
     "ديون معدومة": "bad_debts",
     "bad debt": "bad_debts",
-
     # ─── ض.ق.م ───
     "ضريبة قيمة مضافة مدخلات": "vat_receivable",
     "vat input": "vat_receivable",
@@ -415,7 +392,6 @@ REGEX_PATTERNS = [
     # Bank accounts — أي نص يحتوي على رقم حساب بنكي
     (re.compile(r"بنك.*\d{5,}|حساب.*بنك", re.IGNORECASE), "bank_accounts"),
     (re.compile(r"bank.*\d{5,}", re.IGNORECASE), "bank_accounts"),
-
     # Accumulated depreciation
     (re.compile(r"مجمع.*(?:إهلاك|اهلاك).*(?:سيارات|نقل)", re.IGNORECASE), "accum_depr_vehicles"),
     (re.compile(r"مجمع.*(?:إهلاك|اهلاك).*(?:مباني|مبانى)", re.IGNORECASE), "accum_depr_buildings"),
@@ -424,11 +400,9 @@ REGEX_PATTERNS = [
     (re.compile(r"مجمع.*(?:إهلاك|اهلاك).*(?:آلات|الات|معدات)", re.IGNORECASE), "accum_depr_machinery"),
     (re.compile(r"مجمع.*(?:إهلاك|اهلاك).*حق.*استخدام", re.IGNORECASE), "accum_depr_rou"),
     (re.compile(r"مجمع.*(?:إهلاك|اهلاك)", re.IGNORECASE), "accum_depr_general"),
-
     # VAT patterns
     (re.compile(r"ض.*ق.*م.*مدخل|vat.*input", re.IGNORECASE), "vat_receivable"),
     (re.compile(r"ض.*ق.*م.*مخرج|vat.*output", re.IGNORECASE), "vat_payable"),
-
     # Partner current accounts
     (re.compile(r"جاري\s+(?:الشريك|شريك)", re.IGNORECASE), "partners_current_account"),
 ]
@@ -493,6 +467,7 @@ CODE_PREFIX_MAP = {
 # ═══════════════════════════════════════════════════════════════════════════════
 #  Classifier — المحرك الرئيسي
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class AccountClassifier:
     """
@@ -607,7 +582,8 @@ class AccountClassifier:
 
         unmapped_accounts = [
             {"name": r.get("account_name", ""), "tab": r.get("tab_raw", "")}
-            for r in classified_rows if not r.get("normalized_class")
+            for r in classified_rows
+            if not r.get("normalized_class")
         ]
 
         return {
@@ -618,10 +594,9 @@ class AccountClassifier:
             "average_confidence": round(avg_confidence, 3),
             "mapping_sources": sources,
             "quality_label": (
-                "ممتاز" if avg_confidence >= 0.90 else
-                "جيد" if avg_confidence >= 0.80 else
-                "مقبول" if avg_confidence >= 0.60 else
-                "يحتاج مراجعة"
+                "ممتاز"
+                if avg_confidence >= 0.90
+                else "جيد" if avg_confidence >= 0.80 else "مقبول" if avg_confidence >= 0.60 else "يحتاج مراجعة"
             ),
         }
 

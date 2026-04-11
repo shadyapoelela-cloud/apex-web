@@ -15,8 +15,19 @@ All tables use:
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import (
-    create_engine, Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, Enum, JSON, Index, UniqueConstraint,
+    create_engine,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    Enum,
+    JSON,
+    Index,
+    UniqueConstraint,
     event,
 )
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
@@ -60,6 +71,7 @@ def utcnow():
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 # ENUMS â€” Centralized (per execution document rule)
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
 
 class UserStatus(str, enum.Enum):
     active = "active"
@@ -136,8 +148,10 @@ class ClosureStatus(str, enum.Enum):
 # Migration 01: Users + Auth Core
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
+
 class User(Base):
     """Primary user account â€” unique identity for login."""
+
     __tablename__ = "users"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -161,7 +175,7 @@ class User(Base):
     auth_provider = Column(String(20), nullable=True)  # local, google, apple
     google_sub = Column(String(100), nullable=True)
     apple_sub = Column(String(100), nullable=True)
-    mobile_country_code = Column(String(10), nullable=True, default='+966')
+    mobile_country_code = Column(String(10), nullable=True, default="+966")
     mobile_number = Column(String(20), nullable=True)
     mobile_verified = Column(Boolean, default=False)
     is_deleted = Column(Boolean, default=False)
@@ -185,6 +199,7 @@ class User(Base):
 
 class UserProfile(Base):
     """Extended profile â€” personal info, preferences."""
+
     __tablename__ = "user_profiles"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -206,6 +221,7 @@ class UserProfile(Base):
 
 class UserSession(Base):
     """Active login sessions â€” for session management & security."""
+
     __tablename__ = "user_sessions"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -224,6 +240,7 @@ class UserSession(Base):
 
 class PasswordReset(Base):
     """Password reset tokens."""
+
     __tablename__ = "password_resets"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -237,6 +254,7 @@ class PasswordReset(Base):
 
 class UserSecurityEvent(Base):
     """Audit log for security-sensitive actions."""
+
     __tablename__ = "user_security_events"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -249,17 +267,17 @@ class UserSecurityEvent(Base):
 
     user = relationship("User", back_populates="security_events")
 
-    __table_args__ = (
-        Index("ix_security_events_user_type", "user_id", "event_type"),
-    )
+    __table_args__ = (Index("ix_security_events_user_type", "user_id", "event_type"),)
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 # Migration 02: Roles + Permissions
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
+
 class Role(Base):
     """Platform roles â€” 10 defined in execution document."""
+
     __tablename__ = "roles"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -273,6 +291,7 @@ class Role(Base):
 
 class Permission(Base):
     """Granular permissions."""
+
     __tablename__ = "permissions"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -283,13 +302,12 @@ class Permission(Base):
     action = Column(String(30), nullable=False)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_perm_resource_action", "resource", "action"),
-    )
+    __table_args__ = (Index("ix_perm_resource_action", "resource", "action"),)
 
 
 class RolePermission(Base):
     """Many-to-many: Role â†” Permission."""
+
     __tablename__ = "role_permissions"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -297,13 +315,12 @@ class RolePermission(Base):
     permission_id = Column(String(36), ForeignKey("permissions.id", ondelete="CASCADE"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
 
-    __table_args__ = (
-        UniqueConstraint("role_id", "permission_id", name="uq_role_perm"),
-    )
+    __table_args__ = (UniqueConstraint("role_id", "permission_id", name="uq_role_perm"),)
 
 
 class UserRole(Base):
     """Many-to-many: User â†” Role."""
+
     __tablename__ = "user_roles"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -315,17 +332,17 @@ class UserRole(Base):
     user = relationship("User", back_populates="roles")
     role = relationship("Role")
 
-    __table_args__ = (
-        UniqueConstraint("user_id", "role_id", name="uq_user_role"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "role_id", name="uq_user_role"),)
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 # Migration 03: Subscription + Entitlements
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
+
 class Plan(Base):
     """Subscription plans â€” 5 defined in execution document."""
+
     __tablename__ = "plans"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -348,6 +365,7 @@ class Plan(Base):
 
 class PlanFeature(Base):
     """Feature flags per plan â€” entitlement definitions."""
+
     __tablename__ = "plan_features"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -361,13 +379,12 @@ class PlanFeature(Base):
 
     plan = relationship("Plan", back_populates="features")
 
-    __table_args__ = (
-        UniqueConstraint("plan_id", "feature_code", name="uq_plan_feature"),
-    )
+    __table_args__ = (UniqueConstraint("plan_id", "feature_code", name="uq_plan_feature"),)
 
 
 class UserSubscription(Base):
     """One active subscription per user."""
+
     __tablename__ = "user_subscriptions"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -389,6 +406,7 @@ class UserSubscription(Base):
 
 class SubscriptionEntitlement(Base):
     """Resolved entitlements snapshot â€” updated on plan change."""
+
     __tablename__ = "subscription_entitlements"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -412,8 +430,10 @@ class SubscriptionEntitlement(Base):
 # Migration 04: Legal Acceptance
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
+
 class PolicyDocument(Base):
     """Versioned legal documents â€” terms, privacy, etc."""
+
     __tablename__ = "policy_documents"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -436,6 +456,7 @@ class PolicyDocument(Base):
 
 class PolicyAcceptanceLog(Base):
     """Proof of user accepting specific policy version."""
+
     __tablename__ = "policy_acceptance_logs"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -448,17 +469,17 @@ class PolicyAcceptanceLog(Base):
     user = relationship("User", back_populates="acceptance_logs")
     policy = relationship("PolicyDocument")
 
-    __table_args__ = (
-        Index("ix_acceptance_user_policy", "user_id", "policy_document_id"),
-    )
+    __table_args__ = (Index("ix_acceptance_user_policy", "user_id", "policy_document_id"),)
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 # Notifications (Migration 14 â€” but needed early)
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
+
 class Notification(Base):
     """Platform notifications linked to user."""
+
     __tablename__ = "notifications"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -476,17 +497,17 @@ class Notification(Base):
 
     user = relationship("User", back_populates="notifications")
 
-    __table_args__ = (
-        Index("ix_notification_user_read", "user_id", "is_read"),
-    )
+    __table_args__ = (Index("ix_notification_user_read", "user_id", "is_read"),)
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 # Account Closure (Migration 15)
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
+
 class AccountClosureRequest(Base):
     """Temporary or permanent account closure workflow."""
+
     __tablename__ = "account_closure_requests"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -508,8 +529,10 @@ class AccountClosureRequest(Base):
 # Audit Events (general purpose)
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
+
 class AuditEvent(Base):
     """General audit trail for sensitive operations."""
+
     __tablename__ = "audit_events"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -531,10 +554,11 @@ class AuditEvent(Base):
 # Database Initialization
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
+
 def init_platform_db():
     """Create all tables."""
     Base.metadata.create_all(bind=engine)
-    import logging; logging.info(f"APEX Platform DB initialized: {len(Base.metadata.tables)} tables")
+    import logging
+
+    logging.info(f"APEX Platform DB initialized: {len(Base.metadata.tables)} tables")
     return list(Base.metadata.tables.keys())
-
-

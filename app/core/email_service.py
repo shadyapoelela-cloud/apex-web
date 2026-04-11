@@ -3,6 +3,7 @@ APEX Platform -- Email Service
 Supports SMTP, SendGrid, and Console (dev) backends.
 Config via environment variables.
 """
+
 import os
 import logging
 import smtplib
@@ -33,11 +34,15 @@ PLATFORM_URL = os.environ.get("PLATFORM_URL", "https://apex-app.com")
 
 # ── Backend Implementations ───────────────────────────────────
 
+
 def _send_via_console(to: str, subject: str, body_html: str, body_text: str = None) -> dict:
     """Development backend -- logs email to console."""
     logger.info(
         "EMAIL [console] To=%s Subject=%s\n--- TEXT ---\n%s\n--- HTML ---\n%s",
-        to, subject, body_text or "(none)", body_html[:500],
+        to,
+        subject,
+        body_text or "(none)",
+        body_html[:500],
     )
     return {"success": True, "backend": "console"}
 
@@ -192,11 +197,7 @@ def send_password_reset_email(to: str, token: str) -> dict:
         </p>
     </div>
     """
-    body_text = (
-        f"إعادة تعيين كلمة المرور\n"
-        f"اضغط على الرابط التالي: {reset_url}\n"
-        f"صالح لمدة ساعة واحدة."
-    )
+    body_text = f"إعادة تعيين كلمة المرور\n" f"اضغط على الرابط التالي: {reset_url}\n" f"صالح لمدة ساعة واحدة."
     return send_email(to, subject, body_html, body_text)
 
 

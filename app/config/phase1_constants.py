@@ -49,8 +49,15 @@ REQUIRED_DOCUMENTS = [
 ]
 
 NOTIFICATION_EVENTS = [
-    "client_ready_for_coa", "coa_file_uploaded", "coa_parsing_failed",
-    "coa_quality_below_threshold", "coa_review_required", "coa_returned_for_fix",
-    "coa_approved", "coa_ready_for_tb", "document_expired",
-    "document_rejected", "alias_promotion_proposed",
+    "client_ready_for_coa",
+    "coa_file_uploaded",
+    "coa_parsing_failed",
+    "coa_quality_below_threshold",
+    "coa_review_required",
+    "coa_returned_for_fix",
+    "coa_approved",
+    "coa_ready_for_tb",
+    "document_expired",
+    "document_rejected",
+    "alias_promotion_proposed",
 ]

@@ -226,6 +226,75 @@ class ApiService {
   static Future<ApiResult> checkApprovalGates(String uploadId) => _get('/coa/uploads/$uploadId/approval-check');
 
   static Future<ApiResult> adminStats() => _get('/admin/stats');
+
+  // ── Admin ──
+  static Future<ApiResult> adminUsers() => _get('/admin/users');
+  static Future<ApiResult> adminKnowledgeFeedback() => _get('/admin/knowledge-feedback');
+  static Future<ApiResult> adminReviewFeedback(String id, Map body) => _post('/admin/knowledge-feedback/$id/review', body);
+  static Future<ApiResult> adminProviders() => _get('/admin/providers');
+  static Future<ApiResult> adminProviderAction(String id, String action) => _post('/admin/providers/$id/$action', {});
+  static Future<ApiResult> adminAuditEvents({int limit = 100}) => _get('/audit/events?limit=$limit');
+
+  // ── Marketplace ──
+  static Future<ApiResult> listMarketplaceProviders() => _get('/marketplace/providers');
+  static Future<ApiResult> listMyRequests() => _get('/marketplace/my-requests');
+  static Future<ApiResult> createServiceRequest(Map body) => _post('/marketplace/requests', body);
+
+  // ── Service Providers ──
+  static Future<ApiResult> getProviderMe() => _get('/service-providers/me');
+  static Future<ApiResult> registerProvider(Map body) => _post('/service-providers/register', body);
+
+  // ── Legal Policies ──
+  static Future<ApiResult> getLegalPolicies() => _get('/legal/policies');
+
+  // ── Auth Extended ──
+  static Future<ApiResult> logout() => _post('/auth/logout', {});
+  static Future<ApiResult> resetPassword({required String token, required String newPassword}) => _post('/account/reset-password', {'token': token, 'new_password': newPassword});
+
+  // ── Users ──
+  static Future<ApiResult> updateUser(Map body) => _put('/users/me', body);
+
+  // ── Notifications Extended ──
+  static Future<ApiResult> markNotificationsReadAll() => _post('/notifications/read-all', {});
+
+  // ── Results & Tasks ──
+  static Future<ApiResult> getResultDetails(String analysisId) => _get('/results/$analysisId/details');
+  static Future<ApiResult> getTaskType(String code) => _get('/task-types/$code');
+  static Future<ApiResult> getTaskSubmission(String id) => _get('/task-submissions/$id');
+  static Future<ApiResult> createTaskSubmission(Map body) => _post('/task-submissions', body);
+
+  // ── Sessions ──
+  static Future<ApiResult> getSessions() => _get('/account/sessions');
+  static Future<ApiResult> logoutAllSessions() => _post('/account/sessions/logout-all', {});
+  static Future<ApiResult> logoutSession(String id) => _post('/account/sessions/$id/logout', {});
+
+  // ── Knowledge Feedback (non-COA) ──
+  static Future<ApiResult> submitKnowledgeFeedback(Map body) => _post('/knowledge-feedback', body);
+
+  // ── Quick Analysis (MultipartRequest) ──
+  static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse('$_base/analyze?industry=$industry'));
+      request.headers['Authorization'] = 'Bearer ${_token ?? S.token ?? ""}';
+      request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fileName));
+      final res = await request.send();
+      final body = await res.stream.bytesToString();
+      if (res.statusCode == 200) return ApiResult.ok(jsonDecode(body));
+      return ApiResult.error(_parseErr(body, res.statusCode));
+    } catch (e) { return ApiResult.error('خطأ: $e'); }
+  }
+
+  static Future<ApiResult> analyzeReport({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse('$_base/analyze/report?industry=$industry'));
+      request.headers['Authorization'] = 'Bearer ${_token ?? S.token ?? ""}';
+      request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fileName));
+      final res = await request.send();
+      final body = await res.stream.bytesToString();
+      if (res.statusCode == 200) return ApiResult.ok(jsonDecode(body));
+      return ApiResult.error(_parseErr(body, res.statusCode));
+    } catch (e) { return ApiResult.error('خطأ: $e'); }
+  }
 }
 
 

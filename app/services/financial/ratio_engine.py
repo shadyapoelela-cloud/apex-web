@@ -44,13 +44,11 @@ class RatioEngine:
 
         total_assets = balance.get("total_assets", 0)
         ca = balance.get("current_assets", {}).get("total", 0)
-        inventory = sum(
-            v for k, v in balance.get("current_assets", {}).get("detail", {}).items()
-            if "inventory" in k
-        )
+        inventory = sum(v for k, v in balance.get("current_assets", {}).get("detail", {}).items() if "inventory" in k)
         trade_recv = balance.get("current_assets", {}).get("detail", {}).get("trade_receivables", 0)
         cash = sum(
-            v for k, v in balance.get("current_assets", {}).get("detail", {}).items()
+            v
+            for k, v in balance.get("current_assets", {}).get("detail", {}).items()
             if k in ("cash_on_hand", "bank_accounts", "demand_deposits")
         )
 
@@ -83,7 +81,9 @@ class RatioEngine:
             "debt_to_equity": self._ratio(total_liab, total_equity, warnings, "debt_to_equity"),
             "debt_to_assets_pct": self._pct(total_liab, total_assets, warnings, "debt_to_assets"),
             "liabilities_to_assets_pct": self._pct(total_liab, total_assets, warnings, "liab_to_assets"),
-            "interest_coverage": self._ratio(operating_profit, finance_cost, warnings, "interest_coverage") if finance_cost > 0 else None,
+            "interest_coverage": (
+                self._ratio(operating_profit, finance_cost, warnings, "interest_coverage") if finance_cost > 0 else None
+            ),
         }
 
         # ─── Efficiency ───
@@ -165,36 +165,44 @@ class RatioEngine:
     def _pct(self, numerator: float, denominator: float, warnings: list, label: str) -> Optional[float]:
         if denominator == 0:
             if numerator != 0:
-                warnings.append({
-                    "code": f"ZERO_DENOMINATOR_{label.upper()}",
-                    "severity": "WARNING",
-                    "message": f"مقام النسبة {label} يساوي صفر — لا يمكن حساب النسبة",
-                })
+                warnings.append(
+                    {
+                        "code": f"ZERO_DENOMINATOR_{label.upper()}",
+                        "severity": "WARNING",
+                        "message": f"مقام النسبة {label} يساوي صفر — لا يمكن حساب النسبة",
+                    }
+                )
             return None
         result = round(numerator / denominator * 100, 2)
         # Sanity check
         if abs(result) > 1000:
-            warnings.append({
-                "code": f"OUTLIER_{label.upper()}",
-                "severity": "WARNING",
-                "message": f"النسبة {label} = {result}% — قيمة غير اعتيادية قد تشير لخطأ في البيانات",
-            })
+            warnings.append(
+                {
+                    "code": f"OUTLIER_{label.upper()}",
+                    "severity": "WARNING",
+                    "message": f"النسبة {label} = {result}% — قيمة غير اعتيادية قد تشير لخطأ في البيانات",
+                }
+            )
         return result
 
     def _ratio(self, numerator: float, denominator: float, warnings: list, label: str) -> Optional[float]:
         if denominator == 0:
             if numerator != 0:
-                warnings.append({
-                    "code": f"ZERO_DENOMINATOR_{label.upper()}",
-                    "severity": "WARNING",
-                    "message": f"مقام {label} يساوي صفر",
-                })
+                warnings.append(
+                    {
+                        "code": f"ZERO_DENOMINATOR_{label.upper()}",
+                        "severity": "WARNING",
+                        "message": f"مقام {label} يساوي صفر",
+                    }
+                )
             return None
         result = round(numerator / denominator, 2)
         if abs(result) > 100:
-            warnings.append({
-                "code": f"OUTLIER_{label.upper()}",
-                "severity": "WARNING",
-                "message": f"{label} = {result} — قيمة غير اعتيادية",
-            })
+            warnings.append(
+                {
+                    "code": f"OUTLIER_{label.upper()}",
+                    "severity": "WARNING",
+                    "message": f"{label} = {result} — قيمة غير اعتيادية",
+                }
+            )
         return result

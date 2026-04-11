@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
@@ -199,7 +200,7 @@ class _NewPwS extends State<NewPasswordScreen> {
               style: TextStyle(color: Colors.white70, fontSize: 14), textAlign: TextAlign.center),
             const SizedBox(height: 32),
             SizedBox(height: 52, child: ElevatedButton(
-              onPressed: () { Navigator.of(context).popUntil((route) => route.isFirst); },
+              onPressed: () { context.go('/login'); },
               child: const Text('العودة لتسجيل الدخول', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)))),
           ] else ...[
             Text('أدخل كلمة المرور الجديدة لـ\n${widget.email}',

@@ -7,9 +7,16 @@ Per execution document sections 3, 4, 5, 10, 13, 15.
 
 import logging
 from app.phase1.models.platform_models import (
-    Role, Permission, RolePermission, Plan, PlanFeature,
-    PolicyDocument, PolicyType,
-    SessionLocal, gen_uuid, utcnow,
+    Role,
+    Permission,
+    RolePermission,
+    Plan,
+    PlanFeature,
+    PolicyDocument,
+    PolicyType,
+    SessionLocal,
+    gen_uuid,
+    utcnow,
 )
 
 
@@ -103,7 +110,9 @@ def _seed_permissions(db) -> int:
     count = 0
     for code, name_ar, name_en, resource, action in PERMISSIONS:
         if not db.query(Permission).filter(Permission.code == code).first():
-            db.add(Permission(id=gen_uuid(), code=code, name_ar=name_ar, name_en=name_en, resource=resource, action=action))
+            db.add(
+                Permission(id=gen_uuid(), code=code, name_ar=name_ar, name_en=name_en, resource=resource, action=action)
+            )
             count += 1
     return count
 
@@ -115,35 +124,69 @@ def _seed_permissions(db) -> int:
 ROLE_PERM_MAP = {
     "registered_user": ["result_view"],
     "client_user": [
-        "coa_upload", "coa_view", "analysis_run", "result_view", "result_details_view",
-        "client_view_own", "service_request_create", "knowledge_feedback_submit",
+        "coa_upload",
+        "coa_view",
+        "analysis_run",
+        "result_view",
+        "result_details_view",
+        "client_view_own",
+        "service_request_create",
+        "knowledge_feedback_submit",
     ],
     "client_admin": [
-        "coa_upload", "coa_view", "analysis_run", "result_view", "result_details_view",
-        "result_export", "client_create", "client_view_own", "client_manage",
-        "service_request_create", "service_request_manage", "knowledge_feedback_submit",
+        "coa_upload",
+        "coa_view",
+        "analysis_run",
+        "result_view",
+        "result_details_view",
+        "result_export",
+        "client_create",
+        "client_view_own",
+        "client_manage",
+        "service_request_create",
+        "service_request_manage",
+        "knowledge_feedback_submit",
     ],
     "provider_user": [
-        "service_task_accept", "result_view",
+        "service_task_accept",
+        "result_view",
     ],
     "provider_admin": [
-        "service_task_accept", "service_task_manage", "result_view", "provider_register",
+        "service_task_accept",
+        "service_task_manage",
+        "result_view",
+        "provider_register",
     ],
     "reviewer": [
-        "result_view", "result_details_view", "knowledge_feedback_review",
+        "result_view",
+        "result_details_view",
+        "knowledge_feedback_review",
         "provider_review",
     ],
     "knowledge_reviewer": [
-        "result_view", "result_details_view", "knowledge_feedback_review",
+        "result_view",
+        "result_details_view",
+        "knowledge_feedback_review",
         "knowledge_rules_manage",
     ],
     "platform_admin": [
-        "coa_upload", "coa_view", "analysis_run", "result_view", "result_details_view",
-        "result_export", "client_view_all", "client_manage",
-        "service_request_manage", "service_task_manage",
-        "knowledge_feedback_review", "knowledge_rules_manage",
-        "provider_review", "provider_suspend",
-        "plans_manage", "users_manage", "policies_manage",
+        "coa_upload",
+        "coa_view",
+        "analysis_run",
+        "result_view",
+        "result_details_view",
+        "result_export",
+        "client_view_all",
+        "client_manage",
+        "service_request_manage",
+        "service_task_manage",
+        "knowledge_feedback_review",
+        "knowledge_rules_manage",
+        "provider_review",
+        "provider_suspend",
+        "plans_manage",
+        "users_manage",
+        "policies_manage",
     ],
     "super_admin": [p[0] for p in PERMISSIONS],  # All permissions
 }
@@ -159,9 +202,11 @@ def _seed_role_permissions(db) -> int:
             perm = db.query(Permission).filter(Permission.code == perm_code).first()
             if not perm:
                 continue
-            existing = db.query(RolePermission).filter(
-                RolePermission.role_id == role.id, RolePermission.permission_id == perm.id
-            ).first()
+            existing = (
+                db.query(RolePermission)
+                .filter(RolePermission.role_id == role.id, RolePermission.permission_id == perm.id)
+                .first()
+            )
             if not existing:
                 db.add(RolePermission(id=gen_uuid(), role_id=role.id, permission_id=perm.id))
                 count += 1
@@ -173,16 +218,56 @@ def _seed_role_permissions(db) -> int:
 # ═══════════════════════════════════════════════════════════════
 
 PLANS = [
-    {"code": "free", "name_ar": "مجاني", "name_en": "Free", "price_m": 0, "price_y": 0,
-     "target_ar": "فرد أو جهة تريد التجربة", "target_en": "Individual or entity trying the platform", "sort": 0},
-    {"code": "pro", "name_ar": "احترافي", "name_en": "Pro", "price_m": 99, "price_y": 990,
-     "target_ar": "محترف فردي", "target_en": "Individual professional", "sort": 1},
-    {"code": "business", "name_ar": "أعمال", "name_en": "Business", "price_m": 299, "price_y": 2990,
-     "target_ar": "مكتب / شركة", "target_en": "Office / Company", "sort": 2},
-    {"code": "expert", "name_ar": "خبير", "name_en": "Expert", "price_m": 0, "price_y": 0,
-     "target_ar": "مقدم خدمة معتمد", "target_en": "Verified service provider", "sort": 3},
-    {"code": "enterprise", "name_ar": "مؤسسي", "name_en": "Enterprise", "price_m": 0, "price_y": 0,
-     "target_ar": "جهة كبيرة أو تنظيمية", "target_en": "Large or regulatory entity", "sort": 4},
+    {
+        "code": "free",
+        "name_ar": "مجاني",
+        "name_en": "Free",
+        "price_m": 0,
+        "price_y": 0,
+        "target_ar": "فرد أو جهة تريد التجربة",
+        "target_en": "Individual or entity trying the platform",
+        "sort": 0,
+    },
+    {
+        "code": "pro",
+        "name_ar": "احترافي",
+        "name_en": "Pro",
+        "price_m": 99,
+        "price_y": 990,
+        "target_ar": "محترف فردي",
+        "target_en": "Individual professional",
+        "sort": 1,
+    },
+    {
+        "code": "business",
+        "name_ar": "أعمال",
+        "name_en": "Business",
+        "price_m": 299,
+        "price_y": 2990,
+        "target_ar": "مكتب / شركة",
+        "target_en": "Office / Company",
+        "sort": 2,
+    },
+    {
+        "code": "expert",
+        "name_ar": "خبير",
+        "name_en": "Expert",
+        "price_m": 0,
+        "price_y": 0,
+        "target_ar": "مقدم خدمة معتمد",
+        "target_en": "Verified service provider",
+        "sort": 3,
+    },
+    {
+        "code": "enterprise",
+        "name_ar": "مؤسسي",
+        "name_en": "Enterprise",
+        "price_m": 0,
+        "price_y": 0,
+        "target_ar": "جهة كبيرة أو تنظيمية",
+        "target_en": "Large or regulatory entity",
+        "sort": 4,
+    },
 ]
 
 
@@ -190,13 +275,19 @@ def _seed_plans(db) -> int:
     count = 0
     for p in PLANS:
         if not db.query(Plan).filter(Plan.code == p["code"]).first():
-            db.add(Plan(
-                id=gen_uuid(), code=p["code"],
-                name_ar=p["name_ar"], name_en=p["name_en"],
-                price_monthly_sar=p["price_m"], price_yearly_sar=p["price_y"],
-                target_user_ar=p["target_ar"], target_user_en=p["target_en"],
-                sort_order=p["sort"],
-            ))
+            db.add(
+                Plan(
+                    id=gen_uuid(),
+                    code=p["code"],
+                    name_ar=p["name_ar"],
+                    name_en=p["name_en"],
+                    price_monthly_sar=p["price_m"],
+                    price_yearly_sar=p["price_y"],
+                    target_user_ar=p["target_ar"],
+                    target_user_en=p["target_en"],
+                    sort_order=p["sort"],
+                )
+            )
             count += 1
     return count
 
@@ -303,18 +394,23 @@ def _seed_plan_features(db) -> int:
         if not plan:
             continue
         for feat_code, value in features.items():
-            existing = db.query(PlanFeature).filter(
-                PlanFeature.plan_id == plan.id, PlanFeature.feature_code == feat_code
-            ).first()
+            existing = (
+                db.query(PlanFeature)
+                .filter(PlanFeature.plan_id == plan.id, PlanFeature.feature_code == feat_code)
+                .first()
+            )
             if not existing:
                 feat_def = FEATURE_DEFS.get(feat_code, ("", "string"))
-                db.add(PlanFeature(
-                    id=gen_uuid(), plan_id=plan.id,
-                    feature_code=feat_code,
-                    feature_name_ar=feat_def[0],
-                    value_type=feat_def[1] if value not in ("unlimited",) else "string",
-                    value=value,
-                ))
+                db.add(
+                    PlanFeature(
+                        id=gen_uuid(),
+                        plan_id=plan.id,
+                        feature_code=feat_code,
+                        feature_name_ar=feat_def[0],
+                        value_type=feat_def[1] if value not in ("unlimited",) else "string",
+                        value=value,
+                    )
+                )
                 count += 1
     return count
 
@@ -322,6 +418,7 @@ def _seed_plan_features(db) -> int:
 # ═══════════════════════════════════════════════════════════════
 # Legal Policies — per document section 15
 # ═══════════════════════════════════════════════════════════════
+
 
 def _seed_policies(db) -> int:
     count = 0
@@ -391,21 +488,27 @@ def _seed_policies(db) -> int:
     ]
 
     for p in policies:
-        existing = db.query(PolicyDocument).filter(
-            PolicyDocument.policy_type == p["type"],
-            PolicyDocument.version == p["version"],
-        ).first()
+        existing = (
+            db.query(PolicyDocument)
+            .filter(
+                PolicyDocument.policy_type == p["type"],
+                PolicyDocument.version == p["version"],
+            )
+            .first()
+        )
         if not existing:
-            db.add(PolicyDocument(
-                id=gen_uuid(),
-                policy_type=p["type"],
-                version=p["version"],
-                title_ar=p["title_ar"],
-                title_en=p["title_en"],
-                content_ar=p["content_ar"],
-                content_en=p.get("content_en", ""),
-                is_current=True,
-            ))
+            db.add(
+                PolicyDocument(
+                    id=gen_uuid(),
+                    policy_type=p["type"],
+                    version=p["version"],
+                    title_ar=p["title_ar"],
+                    title_en=p["title_en"],
+                    content_ar=p["content_ar"],
+                    content_en=p.get("content_en", ""),
+                    is_current=True,
+                )
+            )
             count += 1
 
     return count

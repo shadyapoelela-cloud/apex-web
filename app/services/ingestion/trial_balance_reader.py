@@ -32,7 +32,7 @@ class TrialBalanceReader:
         if not rows:
             rows = self._read_generic_format(ws, warnings)
             if rows:
-                format_type = 'generic'
+                format_type = "generic"
 
         wb.close()
 
@@ -130,19 +130,21 @@ class TrialBalanceReader:
             else:
                 net = (open_d - open_c) + (mov_d - mov_c)
 
-            rows.append({
-                "code": str(row_data[0]).strip() if row_data[0] else "",
-                "tab": tab_clean,
-                "sub_tab": "",
-                "name": name_clean,
-                "open_debit": open_d,
-                "open_credit": open_c,
-                "movement_debit": mov_d,
-                "movement_credit": mov_c,
-                "close_debit": close_d,
-                "close_credit": close_c,
-                "net_balance": net,
-            })
+            rows.append(
+                {
+                    "code": str(row_data[0]).strip() if row_data[0] else "",
+                    "tab": tab_clean,
+                    "sub_tab": "",
+                    "name": name_clean,
+                    "open_debit": open_d,
+                    "open_credit": open_c,
+                    "movement_debit": mov_d,
+                    "movement_credit": mov_c,
+                    "close_debit": close_d,
+                    "close_credit": close_c,
+                    "net_balance": net,
+                }
+            )
 
         if not rows:
             warnings.append("لم يتم العثور على بيانات في الملف")
@@ -173,19 +175,21 @@ class TrialBalanceReader:
             mov_c = self._to_float(row_data[7])
             net = (open_d - open_c) + (mov_d - mov_c)
 
-            rows.append({
-                "code": code,
-                "tab": tab_raw,
-                "sub_tab": sub,
-                "name": str(name).strip(),
-                "open_debit": open_d,
-                "open_credit": open_c,
-                "movement_debit": mov_d,
-                "movement_credit": mov_c,
-                "close_debit": max(net, 0),
-                "close_credit": abs(min(net, 0)),
-                "net_balance": net,
-            })
+            rows.append(
+                {
+                    "code": code,
+                    "tab": tab_raw,
+                    "sub_tab": sub,
+                    "name": str(name).strip(),
+                    "open_debit": open_d,
+                    "open_credit": open_c,
+                    "movement_debit": mov_d,
+                    "movement_credit": mov_c,
+                    "close_debit": max(net, 0),
+                    "close_credit": abs(min(net, 0)),
+                    "net_balance": net,
+                }
+            )
 
         if not rows:
             warnings.append("لم يتم العثور على بيانات في الملف")
@@ -194,15 +198,26 @@ class TrialBalanceReader:
     def _filter_summary_rows(self, rows: list) -> list:
         """Remove total/summary rows and category header rows."""
         skip_name_keywords = [
-            "فحص التوازن", "balance check", "✓", "✗",
-            "متوازن", "غير متوازن",
+            "فحص التوازن",
+            "balance check",
+            "✓",
+            "✗",
+            "متوازن",
+            "غير متوازن",
         ]
 
         # Generic top-level tabs that are category headers, not real accounts
         summary_tabs = [
-            "الأصول", "الالتزامات", "حقوق الملكية", "الإيرادات",
-            "تكلفة المبيعات", "المصروفات التشغيلية", "تكاليف التمويل",
-            "الزكاة والضرائب", "المصروفات", "الإيرادات الأخرى",
+            "الأصول",
+            "الالتزامات",
+            "حقوق الملكية",
+            "الإيرادات",
+            "تكلفة المبيعات",
+            "المصروفات التشغيلية",
+            "تكاليف التمويل",
+            "الزكاة والضرائب",
+            "المصروفات",
+            "الإيرادات الأخرى",
         ]
 
         filtered = []
@@ -229,7 +244,6 @@ class TrialBalanceReader:
             filtered.append(row)
         return filtered
 
-
     def _read_generic_format(self, ws, warnings: list) -> list:
         """
         Generic TB reader: auto-detect header row and columns.
@@ -237,11 +251,11 @@ class TrialBalanceReader:
         """
         # Find header row by looking for keywords
         header_keywords = {
-            'name': ['account', 'name', 'description', 'اسم', 'الحساب', 'اسم الحساب', 'البيان'],
-            'code': ['code', 'number', 'رقم', 'كود', 'رقم الحساب'],
-            'debit': ['debit', 'مدين', 'مدينة', 'dr'],
-            'credit': ['credit', 'دائن', 'دائنة', 'cr'],
-            'balance': ['balance', 'net', 'رصيد', 'صافي', 'الرصيد'],
+            "name": ["account", "name", "description", "اسم", "الحساب", "اسم الحساب", "البيان"],
+            "code": ["code", "number", "رقم", "كود", "رقم الحساب"],
+            "debit": ["debit", "مدين", "مدينة", "dr"],
+            "credit": ["credit", "دائن", "دائنة", "cr"],
+            "balance": ["balance", "net", "رصيد", "صافي", "الرصيد"],
         }
 
         header_row_idx = None
@@ -250,7 +264,7 @@ class TrialBalanceReader:
         for row_idx, row_data in enumerate(ws.iter_rows(min_row=1, max_row=15, values_only=True), start=1):
             if not row_data:
                 continue
-            cells = [str(c).strip().lower() if c else '' for c in row_data]
+            cells = [str(c).strip().lower() if c else "" for c in row_data]
             matches = 0
             temp_map = {}
             for ci, cell_text in enumerate(cells):
@@ -263,12 +277,12 @@ class TrialBalanceReader:
                                 temp_map[field] = ci
                                 matches += 1
                                 break
-            if matches >= 2 and 'name' in temp_map:
+            if matches >= 2 and "name" in temp_map:
                 header_row_idx = row_idx
                 col_map = temp_map
                 break
 
-        if not header_row_idx or 'name' not in col_map:
+        if not header_row_idx or "name" not in col_map:
             warnings.append("Could not detect TB header row automatically")
             return []
 
@@ -276,41 +290,43 @@ class TrialBalanceReader:
         for row_data in ws.iter_rows(min_row=header_row_idx + 1, values_only=True):
             if not row_data:
                 continue
-            name_val = row_data[col_map['name']] if col_map['name'] < len(row_data) else None
+            name_val = row_data[col_map["name"]] if col_map["name"] < len(row_data) else None
             if not name_val or not str(name_val).strip():
                 continue
 
-            code_val = ''
-            if 'code' in col_map and col_map['code'] < len(row_data):
-                code_val = str(row_data[col_map['code']] or '').strip()
-                if code_val.endswith('.0'):
+            code_val = ""
+            if "code" in col_map and col_map["code"] < len(row_data):
+                code_val = str(row_data[col_map["code"]] or "").strip()
+                if code_val.endswith(".0"):
                     code_val = code_val[:-2]
 
             dr = 0.0
             cr = 0.0
             bal = 0.0
-            if 'debit' in col_map and col_map['debit'] < len(row_data):
-                dr = self._to_float(row_data[col_map['debit']])
-            if 'credit' in col_map and col_map['credit'] < len(row_data):
-                cr = self._to_float(row_data[col_map['credit']])
-            if 'balance' in col_map and col_map['balance'] < len(row_data):
-                bal = self._to_float(row_data[col_map['balance']])
+            if "debit" in col_map and col_map["debit"] < len(row_data):
+                dr = self._to_float(row_data[col_map["debit"]])
+            if "credit" in col_map and col_map["credit"] < len(row_data):
+                cr = self._to_float(row_data[col_map["credit"]])
+            if "balance" in col_map and col_map["balance"] < len(row_data):
+                bal = self._to_float(row_data[col_map["balance"]])
 
             net = bal if bal != 0 else (dr - cr)
 
-            rows.append({
-                "code": code_val,
-                "tab": "",
-                "sub_tab": "",
-                "name": str(name_val).strip(),
-                "open_debit": 0.0,
-                "open_credit": 0.0,
-                "movement_debit": 0.0,
-                "movement_credit": 0.0,
-                "close_debit": dr,
-                "close_credit": cr,
-                "net_balance": net,
-            })
+            rows.append(
+                {
+                    "code": code_val,
+                    "tab": "",
+                    "sub_tab": "",
+                    "name": str(name_val).strip(),
+                    "open_debit": 0.0,
+                    "open_credit": 0.0,
+                    "movement_debit": 0.0,
+                    "movement_credit": 0.0,
+                    "close_debit": dr,
+                    "close_credit": cr,
+                    "net_balance": net,
+                }
+            )
 
         if not rows:
             warnings.append("Generic reader found no data rows")

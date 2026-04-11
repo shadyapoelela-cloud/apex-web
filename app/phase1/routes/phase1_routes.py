@@ -19,6 +19,7 @@ from app.phase1.services.legal_service import LegalService
 # Dependency: Current User from JWT
 # ═══════════════════════════════════════════════════════════════
 
+
 async def get_current_user(authorization: Optional[str] = Header(None)) -> dict:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="غير مصرّح — يرجى تسجيل الدخول")
@@ -33,6 +34,7 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> dict:
 # Schemas (DTOs)
 # ═══════════════════════════════════════════════════════════════
 
+
 class RegisterRequest(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: str
@@ -40,20 +42,25 @@ class RegisterRequest(BaseModel):
     display_name: str = Field(..., min_length=2, max_length=100)
     mobile: Optional[str] = None
 
+
 class LoginRequest(BaseModel):
     username_or_email: str
     password: str
+
 
 class ChangePasswordRequest(BaseModel):
     current_password: str
     new_password: str = Field(..., min_length=8)
 
+
 class ForgotPasswordRequest(BaseModel):
     email: str
+
 
 class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str = Field(..., min_length=8)
+
 
 class UpdateProfileRequest(BaseModel):
     display_name: Optional[str] = None
@@ -68,11 +75,14 @@ class UpdateProfileRequest(BaseModel):
     notification_sms: Optional[bool] = None
     notification_in_app: Optional[bool] = None
 
+
 class UpgradePlanRequest(BaseModel):
     plan_code: str
 
+
 class AcceptPolicyRequest(BaseModel):
     policy_document_id: str
+
 
 class ClosureRequest(BaseModel):
     closure_type: str  # temporary, permanent
@@ -93,6 +103,7 @@ legal_service = LegalService()
 
 
 # ─── Auth APIs ───────────────────────────────────────────────
+
 
 @router.post("/auth/register", tags=["Auth"])
 async def register(req: RegisterRequest, request: Request):
@@ -135,7 +146,6 @@ async def logout_all(user: dict = Depends(get_current_user)):
     return auth_service.logout_all(user["sub"])
 
 
-
 @router.post("/auth/forgot-password", tags=["Auth"])
 async def forgot_password(req: ForgotPasswordRequest):
     return auth_service.request_password_reset(req.email)
@@ -147,6 +157,7 @@ async def reset_password(req: ResetPasswordRequest):
 
 
 # ─── Account / Profile APIs ─────────────────────────────────
+
 
 @router.get("/users/me", tags=["Account"])
 async def get_my_profile(user: dict = Depends(get_current_user)):
@@ -171,6 +182,7 @@ async def get_active_sessions(user: dict = Depends(get_current_user)):
 
 # ─── Subscription APIs ──────────────────────────────────────
 
+
 @router.get("/plans", tags=["Subscriptions"])
 async def list_plans():
     return subscription_service.get_plans()
@@ -179,39 +191,39 @@ async def list_plans():
 # [DISABLED - moved to Phase 8] @router.get("/subscriptions/me", tags=["Subscriptions"])
 # [DISABLED] async def get_my_subscription(user: dict = Depends(get_current_user)):
 # [DISABLED]     return subscription_service.get_user_subscription(user["sub"])
-# [DISABLED] 
-# [DISABLED] 
+# [DISABLED]
+# [DISABLED]
 # [DISABLED - moved to Phase 8] @router.get("/entitlements/me", tags=["Subscriptions"])
 # [DISABLED] async def get_my_entitlements(user: dict = Depends(get_current_user)):
 # [DISABLED]     sub = subscription_service.get_user_subscription(user["sub"])
 # [DISABLED]     return {"entitlements": sub.get("entitlements", {})}
-# [DISABLED] 
-# [DISABLED] 
+# [DISABLED]
+# [DISABLED]
 # [DISABLED - moved to Phase 8] @router.post("/subscriptions/upgrade", tags=["Subscriptions"])
 # [DISABLED] async def upgrade_plan(req: UpgradePlanRequest, user: dict = Depends(get_current_user)):
 # [DISABLED]     result = subscription_service.upgrade_plan(user["sub"], req.plan_code)
 # [DISABLED]     if not result["success"]:
 # [DISABLED]         raise HTTPException(status_code=400, detail=result["error"])
 # [DISABLED]     return result
-# [DISABLED] 
-# [DISABLED] 
+# [DISABLED]
+# [DISABLED]
 # [DISABLED - moved to Phase 8] @router.post("/subscriptions/downgrade", tags=["Subscriptions"])
 # [DISABLED] async def downgrade_plan(req: UpgradePlanRequest, user: dict = Depends(get_current_user)):
 # [DISABLED]     result = subscription_service.downgrade_plan(user["sub"], req.plan_code)
 # [DISABLED]     if not result["success"]:
 # [DISABLED]         raise HTTPException(status_code=400, detail=result["error"])
 # [DISABLED]     return result
-# [DISABLED] 
-# [DISABLED] 
+# [DISABLED]
+# [DISABLED]
 # [DISABLED] # ─── Entitlement Check API ──────────────────────────────────
-# [DISABLED] 
+# [DISABLED]
 # [DISABLED - moved to Phase 8] @router.get("/entitlements/check", tags=["Subscriptions"])
 # [DISABLED] async def check_entitlement(feature_code: str, user: dict = Depends(get_current_user)):
 # [DISABLED]     return entitlement_engine.check_entitlement(user["sub"], feature_code)
-# [DISABLED] 
-# [DISABLED] 
+# [DISABLED]
+# [DISABLED]
 # [DISABLED] # ─── Notifications APIs ─────────────────────────────────────
-# [DISABLED] 
+# [DISABLED]
 # [DISABLED-P10] @router.get("/notifications", tags=["Notifications"])
 # [DISABLED-P10] async def get_notifications(unread_only: bool = False, limit: int = 50, user: dict = Depends(get_current_user)):
 # [DISABLED-P10]     return account_service.get_notifications(user["sub"], unread_only=unread_only, limit=limit)
@@ -228,6 +240,7 @@ async def list_plans():
 
 
 # ─── Legal / Policy APIs ────────────────────────────────────
+
 
 @router.get("/legal/policies", tags=["Legal"])
 async def get_current_policies():
@@ -261,6 +274,7 @@ async def get_acceptance_history(user: dict = Depends(get_current_user)):
 
 # ─── Account Closure APIs ───────────────────────────────────
 
+
 @router.post("/account/closure", tags=["Account"])
 async def request_closure(req: ClosureRequest, user: dict = Depends(get_current_user)):
     return account_service.request_closure(user["sub"], req.closure_type, req.reason)
@@ -270,10 +284,12 @@ async def request_closure(req: ClosureRequest, user: dict = Depends(get_current_
 async def reactivate(user: dict = Depends(get_current_user)):
     return account_service.reactivate_account(user["sub"])
 
+
 @router.post("/auth/change-password", tags=["Auth"])
 async def api_change_password(request: Request):
     from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
     import jwt, traceback
+
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
         raise HTTPException(401, "Missing token")
@@ -290,6 +306,7 @@ async def api_change_password(request: Request):
         raise HTTPException(400, "current_password and new_password required")
     from app.phase1.services.auth_service import verify_password, hash_password
     from app.phase1.models.platform_models import SessionLocal, User
+
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.id == user_id).first()

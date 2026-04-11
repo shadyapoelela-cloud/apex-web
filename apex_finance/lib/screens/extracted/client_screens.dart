@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/api_config.dart';
 import '../../core/session.dart';
 import '../../core/shared_constants.dart';
-import '../../client_create.dart';
-import 'coa_screens.dart';
-import '../clients/client_detail_screen.dart';
 
 final _api = apiBase;
 
@@ -40,7 +38,7 @@ class _ClientListS extends State<ClientListScreen> {
     appBar: AppBar(title: const Text('العملاء', style: TextStyle(color: AC.gold)),
       actions: [IconButton(icon: const Icon(Icons.add_circle, color: AC.gold),
         onPressed: () async {
-          final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen2()));
+          final created = await context.push('/clients/create');
           if (created == true) _load();
         })]),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
@@ -54,7 +52,7 @@ class _ClientListS extends State<ClientListScreen> {
               icon: const Icon(Icons.add),
               label: const Text('إنشاء عميل جديد'),
               onPressed: () async {
-                final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen2()));
+                final created = await context.push('/clients/create');
                 if (created == true) _load();
               }),
           ]))
@@ -66,8 +64,7 @@ class _ClientListS extends State<ClientListScreen> {
               final cl = _clients[i];
               final km = cl['knowledge_mode'] == true;
               return InkWell(
-              onTap: () => Navigator.push(c, MaterialPageRoute(
-                builder: (_) => ClientDetailScreen(clientId: cl['id'], clientName: cl['name_ar'] ?? cl['name'] ?? ''))),
+              onTap: () => context.push('/client-detail', extra: {'id': cl['id'], 'name': cl['name_ar'] ?? cl['name'] ?? ''}),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 padding: const EdgeInsets.all(16),
