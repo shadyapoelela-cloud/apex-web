@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../main.dart' show AC, S;
 import '../../api_service.dart';
-import '../../core/router.dart' show authRefresh;
 import '../../core/session.dart';
 import '../../core/theme.dart';
 

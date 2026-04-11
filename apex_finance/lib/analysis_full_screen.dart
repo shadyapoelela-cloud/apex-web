@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'screens/copilot/copilot_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 class AnalysisFullScreen extends StatefulWidget {

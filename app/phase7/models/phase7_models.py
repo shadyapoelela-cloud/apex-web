@@ -184,6 +184,5 @@ def init_phase7_db():
             ProviderComplianceFlag,
             ProviderSuspension,
             AuditEvent,
-            ResultExplanation,
         ]
     ]

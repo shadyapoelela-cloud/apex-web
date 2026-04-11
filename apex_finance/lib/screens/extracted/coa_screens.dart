@@ -1,13 +1,10 @@
 ﻿import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
 import 'package:excel/excel.dart' hide Border;
-import 'package:intl/intl.dart' as intl;
 import 'dart:html' as html;
-import '../../core/api_retry.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // APEX Phase 1 — COA Qualification v5.0

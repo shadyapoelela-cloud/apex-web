@@ -1,5 +1,4 @@
-﻿import 'main.dart';
-import 'dart:convert';
+﻿import 'dart:convert';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:http/http.dart' as http;

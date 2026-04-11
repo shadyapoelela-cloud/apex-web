@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
-import '../../widgets/copilot_widgets.dart';
-import '../shared/result_detail_panel.dart';
 
 class CopilotScreen extends StatefulWidget {
   final String? clientId;

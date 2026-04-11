@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
-import '../clients/client_detail_screen.dart';
-import '../extracted/coa_screens.dart';
 
 // ════════════════════════════════════════
 // ENHANCED DASHBOARD v5.3b — Live API (ApiService)

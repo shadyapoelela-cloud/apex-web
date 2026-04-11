@@ -17,9 +17,6 @@ class S {
   }
   static List<String> roles = [];
   static String get liveToken => html.window.localStorage['apex_token'] ?? '';
-  static Map<String,String> lh() => {'Authorization':'Bearer $liveToken','Content-Type':'application/json'};
-  static Map<String,String> h() => {'Authorization':'Bearer $liveToken'};
-  static Map<String,String> hj() => {'Authorization':'Bearer $liveToken','Content-Type':'application/json'};
   static void clear() {
     token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[];
     final st = html.window.localStorage;

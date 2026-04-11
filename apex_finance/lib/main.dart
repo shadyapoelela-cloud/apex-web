@@ -8,19 +8,12 @@ import 'package:go_router/go_router.dart';
 import 'core/router.dart';
 import 'core/session.dart';
 import 'core/api_retry.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/app_providers.dart';
-import 'screens/extracted/subscription_screens.dart';
-import 'screens/extracted/notification_screens_v2.dart';
-import 'screens/extracted/legal_screens_v2.dart';
-import 'screens/extracted/client_screens.dart';
-import 'screens/extracted/coa_screens.dart';
 
 const _api = apiBase;
 
