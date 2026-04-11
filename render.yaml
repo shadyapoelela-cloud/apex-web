@@ -20,7 +20,7 @@ services:
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: CORS_ORIGINS
-        value: "https://apex-app.com"
+        value: "https://shadyapoelela-cloud.github.io,https://apex-app.com"
 
 databases:
   - name: apex-db

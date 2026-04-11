@@ -335,7 +335,7 @@ async def lifespan(app):
 app = FastAPI(
     title="APEX Financial Platform API",
     description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints",
-    version="11.4.0",
+    version="11.5.0",
     lifespan=lifespan,
 )
 _cors_env = os.environ.get("CORS_ORIGINS", "")
@@ -484,7 +484,7 @@ def root():
     phases = [P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8, HAS_P9, HAS_P10, HAS_P11]
     return {
         "name": "APEX Financial Platform API",
-        "version": "10.2.0",
+        "version": "11.5.0",
         "status": "running",
         "phases_active": sum(phases),
         "phases_total": 11,
@@ -963,7 +963,7 @@ def health():
     status = "ok" if db_ok else "degraded"
     return {
         "status": status,
-        "version": "10.2.0",
+        "version": "11.5.0",
         "database": db_ok,
         "phases": {
             "p1": P1,
