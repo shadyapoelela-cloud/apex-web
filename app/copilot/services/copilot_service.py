@@ -192,7 +192,27 @@ class CopilotService:
         except Exception:
             db.rollback()
             logging.error("Copilot process_message error", exc_info=True)
-            raise
+            # Return a graceful fallback instead of crashing
+            return {
+                "message": {
+                    "id": gen_uuid(),
+                    "role": "assistant",
+                    "content": "عذرًا، حدث خطأ تقني مؤقت. يرجى المحاولة مرة أخرى بعد قليل.\n\nإذا استمرت المشكلة، يرجى التواصل مع فريق الدعم الفني.",
+                    "intent": "error",
+                    "confidence": 0,
+                    "risk_level": "low",
+                    "tools_used": [],
+                    "references": [],
+                    "next_actions": [
+                        {"label": "إعادة المحاولة", "action": "retry"},
+                        {"label": "بدء محادثة جديدة", "action": "new_session"},
+                    ],
+                },
+                "session_id": session_id,
+                "intent": {"intent": "error", "confidence": 0},
+                "context": {},
+                "needs_escalation": True,
+            }
         finally:
             db.close()
 

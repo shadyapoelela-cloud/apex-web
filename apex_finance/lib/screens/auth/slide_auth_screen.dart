@@ -73,18 +73,18 @@ class _SAS extends State<SlideAuthScreen> {
     return Scaffold(
       backgroundColor: AC.navy,
       body: SafeArea(child: Center(child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+        padding: EdgeInsets.symmetric(vertical: 30, horizontal: 16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Text('APEX', style: TextStyle(color: AC.gold, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: 6)),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text('منصة التحليل المالي والحوكمة المعرفية — السوق السعودي', style: TextStyle(color: AC.ts, fontSize: 11)),
-          const SizedBox(height: 24),
-          Container(width: 420, padding: const EdgeInsets.all(24),
+          SizedBox(height: 24),
+          Container(width: 420, padding: EdgeInsets.all(24),
             decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(24),
               border: Border.all(color: AC.gold.withAlpha(38)),
-              boxShadow: [BoxShadow(color: Colors.black.withAlpha(77), blurRadius: 30, offset: const Offset(0, 10))]),
+              boxShadow: [BoxShadow(color: Colors.black.withAlpha(77), blurRadius: 30, offset: Offset(0, 10))]),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Container(padding: const EdgeInsets.all(4),
+              Container(padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
                 child: Row(children: [_tb('تسجيل دخول', 0), _tb('إنشاء حساب', 1)]),
               ),
@@ -99,8 +99,8 @@ class _SAS extends State<SlideAuthScreen> {
 
   Widget _tb(String l, int i) => Expanded(child: GestureDetector(
     onTap: () => setState(() => _pg = i),
-    child: AnimatedContainer(duration: const Duration(milliseconds: 250),
-      padding: const EdgeInsets.symmetric(vertical: 10),
+    child: AnimatedContainer(duration: Duration(milliseconds: 250),
+      padding: EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(color: _pg == i ? AC.gold : Colors.transparent, borderRadius: BorderRadius.circular(10)),
       child: Center(child: Text(l, style: TextStyle(color: _pg == i ? AC.navy : AC.ts, fontSize: 13, fontWeight: FontWeight.bold)))),
   ));
@@ -131,9 +131,9 @@ class _SAS extends State<SlideAuthScreen> {
     _pf(_rp, 'كلمة المرور', _ro, () => setState(() => _ro = !_ro)),
     const SizedBox(height: 10),
     _pf(_rp2, 'تأكيد كلمة المرور', _ro, () => setState(() => _ro = !_ro)),
-    const SizedBox(height: 10),
+    SizedBox(height: 10),
     Row(children: [
-      Container(width: 100, height: 48, padding: const EdgeInsets.symmetric(horizontal: 8),
+      Container(width: 100, height: 48, padding: EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
         child: DropdownButtonHideUnderline(child: DropdownButton<String>(
           value: _cc, isExpanded: true, dropdownColor: AC.navy3,
@@ -154,7 +154,7 @@ class _SAS extends State<SlideAuthScreen> {
     controller: c, style: TextStyle(color: AC.tp), textDirection: ltr ? TextDirection.ltr : null,
     decoration: InputDecoration(labelText: l, prefixIcon: Icon(ic, color: AC.gold, size: 20),
       filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
-      isDense: true, contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold))));
 
@@ -163,7 +163,7 @@ class _SAS extends State<SlideAuthScreen> {
     decoration: InputDecoration(labelText: l, prefixIcon: Icon(Icons.lock_outlined, color: AC.gold, size: 20),
       suffixIcon: IconButton(icon: Icon(o ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20), onPressed: t),
       filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
-      isDense: true, contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold))),
     onSubmitted: sub != null ? (_) => sub() : null);
@@ -176,7 +176,7 @@ class _SAS extends State<SlideAuthScreen> {
       child: ld ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
         : Text(l, style: TextStyle(color: AC.navy, fontSize: 15, fontWeight: FontWeight.bold))));
 
-  Widget _errW(String m) => Container(width: double.infinity, margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(10),
+  Widget _errW(String m) => Container(width: double.infinity, margin: EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(color: AC.err.withAlpha(26), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.err.withAlpha(77))),
     child: Row(children: [Icon(Icons.error_outline, color: AC.err, size: 16), SizedBox(width: 6),
       Expanded(child: Text(m, style: TextStyle(color: AC.err, fontSize: 11)))]));
@@ -199,9 +199,9 @@ class _SAS extends State<SlideAuthScreen> {
     Expanded(child: OutlinedButton.icon(onPressed: () => _comingSoon('Google'),
       style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-      icon: const Icon(Icons.g_mobiledata, color: Colors.red, size: 22),
+      icon: Icon(Icons.g_mobiledata, color: Colors.red, size: 22),
       label: Text('Google', style: TextStyle(color: AC.tp, fontSize: 11)))),
-    const SizedBox(width: 8),
+    SizedBox(width: 8),
     Expanded(child: OutlinedButton.icon(onPressed: () => _comingSoon('Apple'),
       style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),

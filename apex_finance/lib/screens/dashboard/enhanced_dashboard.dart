@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
+import '../../core/theme.dart';
 
 // ════════════════════════════════════════
 // ENHANCED DASHBOARD v5.3b — Live API (ApiService)
@@ -17,15 +18,15 @@ class EnhancedDashboard extends StatefulWidget {
 }
 
 class _EnhancedDashboardState extends State<EnhancedDashboard> {
-  static const navy = Color(0xFF050D1A);
-  static const navyMid = Color(0xFF111D2E);
-  static const gold = Color(0xFFC9A84C);
-  static const goldLight = Color(0xFFD4B96A);
-  static const textColor = Color(0xFFE8E0D0);
-  static const textMid = Color(0xFF9A917F);
-  static const textDim = Color(0xFF6B6355);
-  static const cardBg = Color(0xFF0D1825);
-  static const borderColor = Color(0x1FC9A84C);
+  static Color get navy => AC.navy;
+  static Color get navyMid => AC.navy4;
+  static Color get gold => AC.gold;
+  static Color get goldLight => Color(0xFFD4B96A);
+  static Color get textColor => AC.tp;
+  static Color get textMid => AC.ts;
+  static Color get textDim => AC.isLight ? Color(0xFF9A917F) : Color(0xFF6B6355);
+  static Color get cardBg => AC.navy3;
+  static Color get borderColor => AC.bdr;
   static const greenC = Color(0xFF34D399);
   static const redC = Color(0xFFF87171);
   static const blueC = Color(0xFF60A5FA);
@@ -69,7 +70,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CircularProgressIndicator(color: gold),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text('جارٍ تحميل البيانات...', style: TextStyle(color: textMid, fontSize: 13)),
                 ],
               ))
@@ -84,7 +85,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                     children: [
                       Text('مرحبًا بك في Apex',
                           style: TextStyle(color: textColor, fontSize: 22, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text('لوحة القيادة الرئيسية — نظرة سريعة على حالة العمليات',
                           style: TextStyle(color: textMid, fontSize: 13)),
                       const SizedBox(height: 24),
@@ -133,9 +134,9 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
     return Row(
       children: kpis.map((k) => Expanded(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
+          padding: EdgeInsets.symmetric(horizontal: 6),
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
             decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,11 +146,11 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                   decoration: BoxDecoration(color: k.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
                   child: Icon(k.icon, color: k.color, size: 22),
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
                 Text(k.value, style: TextStyle(color: k.color, fontSize: 32, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(k.label, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(k.subtitle, style: TextStyle(color: textDim, fontSize: 11)),
               ],
             ),
@@ -189,7 +190,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
         children: [
           Row(children: [
             Icon(Icons.flash_on, color: gold, size: 18),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text('إجراءات سريعة', style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w700)),
           ]),
           const SizedBox(height: 16),
@@ -199,7 +200,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
             children: actions.map((a) => GestureDetector(
               onTap: a.onTap,
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(color: navyMid, borderRadius: BorderRadius.circular(10), border: Border.all(color: borderColor)),
                 child: Row(children: [
                   Container(
@@ -212,7 +213,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                     crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(a.label, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2),
                       Text(a.desc, style: TextStyle(color: textDim, fontSize: 10)),
                     ],
                   )),
@@ -238,12 +239,12 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
             children: [
               Row(children: [
                 Icon(Icons.timeline, color: gold, size: 18),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text('حالة العملاء', style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w700)),
               ]),
               Row(children: [
                 _badge('${_clients.length} عملاء', textDim),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 GestureDetector(
                   onTap: _loadClients,
                   child: Icon(Icons.refresh, color: textDim, size: 16),
@@ -275,10 +276,10 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
           // Empty state
           else if (_clients.isEmpty) ...[
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               child: Column(children: [
                 Icon(Icons.people_outline, color: textDim, size: 40),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 Text('لا يوجد عملاء بعد', style: TextStyle(color: textMid, fontSize: 13)),
                 const SizedBox(height: 8),
                 ElevatedButton.icon(
@@ -315,7 +316,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                   if (mounted) _loadClients();
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(border: isLast ? null : Border(bottom: BorderSide(color: borderColor))),
                   child: Row(children: [
                     Container(
@@ -340,7 +341,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
               );
             }),
             if (_clients.length > 5) ...[
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Center(child: TextButton(
                 onPressed: widget.onSwitchToClients,
                 child: Text('عرض جميع العملاء (${_clients.length})', style: TextStyle(color: gold, fontSize: 12)),
@@ -384,7 +385,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
         children: [
           Row(children: [
             Icon(Icons.description, color: gold, size: 18),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text('النشاط الأخير', style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w700)),
           ]),
           const SizedBox(height: 12),
@@ -392,7 +393,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
             final a = e.value;
             final isLast = e.key == activities.length - 1;
             return Container(
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(border: isLast ? null : Border(bottom: BorderSide(color: borderColor))),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Container(
@@ -400,10 +401,10 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                   decoration: BoxDecoration(color: a.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                   child: Icon(a.icon, color: a.color, size: 16),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(a.title, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 3),
+                  SizedBox(height: 3),
                   Text(a.detail, style: TextStyle(color: textDim, fontSize: 11)),
                 ])),
                 Text(a.time, style: TextStyle(color: textDim, fontSize: 11)),
@@ -443,7 +444,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [gold.withValues(alpha: 0.12), Colors.transparent], begin: Alignment.topRight, end: Alignment.bottomLeft),
         borderRadius: BorderRadius.circular(12),
@@ -455,16 +456,16 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
           decoration: BoxDecoration(color: gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
           child: Icon(Icons.auto_awesome, color: gold, size: 22),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title, style: TextStyle(color: gold, fontSize: 15, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 3),
+          SizedBox(height: 3),
           Text(desc, style: TextStyle(color: textMid, fontSize: 12)),
         ])),
         const SizedBox(width: 12),
         ElevatedButton.icon(
           onPressed: action,
-          icon: const Icon(Icons.arrow_back, size: 14),
+          icon: Icon(Icons.arrow_back, size: 14),
           label: Text(btn),
           style: ElevatedButton.styleFrom(
             backgroundColor: gold, foregroundColor: navy,
@@ -496,18 +497,18 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
     return Row(
       children: services.map((s) => Expanded(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: EdgeInsets.symmetric(horizontal: 4),
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor)),
             child: Column(children: [
-              Container(height: 3, color: s.color, margin: const EdgeInsets.only(bottom: 12)),
+              Container(height: 3, color: s.color, margin: EdgeInsets.only(bottom: 12)),
               Text(s.label, textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
               Text(s.labelEn, style: TextStyle(color: textDim, fontSize: 10)),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _badge(s.status, s.color),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(s.detail, style: TextStyle(color: textDim, fontSize: 10)),
             ]),
           ),
@@ -520,7 +521,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   // HELPERS
   // ════════════════════════════════════════
   Widget _card({required Widget child}) => Container(
-    padding: const EdgeInsets.all(20),
+    padding: EdgeInsets.all(20),
     decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor)),
     child: child,
   );

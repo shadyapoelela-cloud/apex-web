@@ -39,14 +39,14 @@ class _CCS2 extends State<ClientCreateScreen2> {
       backgroundColor: AC.navy,
       appBar: AppBar(title: Text('عميل جديد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
       body: Column(children: [
-        Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 0), child: SizedBox(height: 56, child: TextField(
-          controller: _nameC, style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(labelText: 'اسم الشركة *', labelStyle: const TextStyle(color: Colors.white54),
+        Padding(padding: EdgeInsets.fromLTRB(16, 16, 16, 0), child: SizedBox(height: 56, child: TextField(
+          controller: _nameC, style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(labelText: 'اسم الشركة *', labelStyle: TextStyle(color: Colors.white54),
             prefixIcon: Icon(Icons.business, color: AC.gold),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(8)),
+            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(8)),
             focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(8)))))),
-        if (_err != null) Padding(padding: const EdgeInsets.all(12), child: Text(_err!, style: const TextStyle(color: Colors.redAccent))),
+        if (_err != null) Padding(padding: EdgeInsets.all(12), child: Text(_err!, style: const TextStyle(color: Colors.redAccent))),
         Padding(padding: EdgeInsets.fromLTRB(16, 12, 16, 8), child: Text('* نوع العميل', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
         Expanded(child: ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: [
           _tc('standard_business', 'شركة تجارية عادية', false),
@@ -58,10 +58,10 @@ class _CCS2 extends State<ClientCreateScreen2> {
           _tc('sector_consulting_entity', 'جهة استشارية', true),
           _tc('government_entity', 'جهة حكومية', true),
           _tc('legal_regulatory_entity', 'جهة قانونية أو تنظيمية', true)])),
-        Padding(padding: const EdgeInsets.all(16), child: SizedBox(height: 52, width: double.infinity, child: ElevatedButton(
+        Padding(padding: EdgeInsets.all(16), child: SizedBox(height: 52, width: double.infinity, child: ElevatedButton(
           onPressed: _ld ? null : _create,
           style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-          child: _ld ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          child: _ld ? SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
               : Text('انشاء العميل', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16))))),
       ]),
     );
@@ -70,14 +70,14 @@ class _CCS2 extends State<ClientCreateScreen2> {
   Widget _tc(String code, String label, bool isKm) {
     final sel = _sel == code;
     return GestureDetector(onTap: () => setState(() => _sel = code),
-      child: Container(height: 52, margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(height: 52, margin: EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(color: sel ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
           border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1), borderRadius: BorderRadius.circular(10)),
         child: Row(children: [
           Icon(sel ? Icons.radio_button_checked : Icons.radio_button_off, color: sel ? AC.gold : AC.ts, size: 20),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(child: Text(label, style: TextStyle(color: sel ? AC.gold : AC.tp, fontSize: 14, fontWeight: sel ? FontWeight.bold : FontWeight.normal))),
-          if (isKm) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          if (isKm) Container(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
             child: Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)))])));
   }

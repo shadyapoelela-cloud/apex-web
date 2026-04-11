@@ -28,31 +28,31 @@ class _LALState extends State<LegalAcceptanceLogger> {
       appBar: AppBar(backgroundColor: AC.navy2, title: Text('\u0627\u0644\u0634\u0631\u0648\u0637 \u0648\u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold))),
       body: ListView(padding: const EdgeInsets.all(14), children: [
         Container(
-          padding: const EdgeInsets.all(14),
-          margin: const EdgeInsets.only(bottom: 14),
+          padding: EdgeInsets.all(14),
+          margin: EdgeInsets.only(bottom: 14),
           decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.cyan.withValues(alpha: 0.3))),
           child: Row(children: [
             Icon(Icons.info_outline, color: AC.cyan, size: 20),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(child: Text('\u0643\u0644 \u0642\u0628\u0648\u0644 \u0645\u0633\u062c\u0644 \u0628\u0627\u0644\u0646\u0633\u062e\u0629 \u0648\u0627\u0644\u062a\u0627\u0631\u064a\u062e \u0648\u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.cyan, fontSize: 12))),
           ]),
         ),
         ..._policies.map((p) => Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(14),
+          margin: EdgeInsets.only(bottom: 10),
+          padding: EdgeInsets.all(14),
           decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: p['accepted'] == true ? AC.ok.withValues(alpha: 0.3) : AC.warn.withValues(alpha: 0.3))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Icon(p['accepted'] == true ? Icons.check_circle : Icons.pending, color: p['accepted'] == true ? AC.ok : AC.warn, size: 20),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(child: Text(p['title'] as String, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13))),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(color: AC.navy4, borderRadius: BorderRadius.circular(6)),
                 child: Text('v', style: TextStyle(color: AC.gold, fontSize: 10)),
               ),
             ]),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('\u0627\u0644\u0646\u0648\u0639: ', style: TextStyle(color: AC.ts, fontSize: 11)),
               Text('\u0627\u0644\u062a\u0627\u0631\u064a\u062e: ', style: TextStyle(color: AC.ts, fontSize: 11)),

@@ -8,7 +8,7 @@ class CopilotFileHelper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('\u0631\u0641\u0639 \u0645\u0644\u0641 \u0644\u0644\u062a\u062d\u0644\u064a\u0644', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 13)),
@@ -29,11 +29,11 @@ class CopilotFileHelper extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(color: AC.navy4, borderRadius: BorderRadius.circular(8)),
         child: Column(children: [
           Icon(icon, color: AC.cyan, size: 20),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(label, style: TextStyle(color: AC.tp, fontSize: 10), textAlign: TextAlign.center),
         ]),
       ),
@@ -50,8 +50,8 @@ class EscalationBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     if (escalation['needed'] != true) return const SizedBox();
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AC.warn.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
@@ -60,13 +60,13 @@ class EscalationBanner extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Icon(Icons.warning_amber_rounded, color: AC.warn, size: 20),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(child: Text('\u064a\u0646\u0635\u062d \u0628\u0645\u0631\u0627\u062c\u0639\u0629 \u0628\u0634\u0631\u064a\u0629', style: TextStyle(color: AC.warn, fontWeight: FontWeight.bold, fontSize: 13))),
         ]),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(escalation['reason'] ?? '', style: TextStyle(color: AC.ts, fontSize: 11)),
         if (onRequestReview != null) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           SizedBox(width: double.infinity, child: OutlinedButton.icon(
             onPressed: onRequestReview,
             style: OutlinedButton.styleFrom(side: BorderSide(color: AC.warn)),

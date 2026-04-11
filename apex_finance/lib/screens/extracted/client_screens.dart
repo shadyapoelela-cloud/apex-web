@@ -40,7 +40,7 @@ class _ClientListS extends State<ClientListScreen> {
       : _clients.isEmpty
         ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.business, size: 64, color: AC.ts),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text('لا يوجد عملاء بعد', style: TextStyle(color: AC.ts, fontSize: 16)),
             const SizedBox(height: 16),
             ElevatedButton.icon(
@@ -61,8 +61,8 @@ class _ClientListS extends State<ClientListScreen> {
               return InkWell(
               onTap: () => context.push('/client-detail', extra: {'id': cl['id'], 'name': cl['name_ar'] ?? cl['name'] ?? ''}),
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                padding: const EdgeInsets.all(16),
+                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AC.navy3,
                   borderRadius: BorderRadius.circular(12),
@@ -71,10 +71,10 @@ class _ClientListS extends State<ClientListScreen> {
                 child: Row(children: [
                   CircleAvatar(backgroundColor: AC.gold.withValues(alpha: 0.2),
                     child: Text((cl['name_ar'] ?? cl['name'] ?? '?')[0], style: TextStyle(color: AC.gold))),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(cl['name_ar'] ?? cl['name'] ?? '', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text('${cl['client_type_code'] ?? cl['client_type'] ?? ''} • ${cl['role'] ?? 'owner'}',
                       style: TextStyle(color: AC.ts, fontSize: 12)),
                   ])),
@@ -139,11 +139,11 @@ class _ClientCreateS extends State<ClientCreateScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'اسم الشركة *',
-                  labelStyle: const TextStyle(color: Colors.white54),
+                  labelStyle: TextStyle(color: Colors.white54),
                   prefixIcon: Icon(Icons.business, color: AC.gold),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(8)),
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(8)),
                   focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(8)),
                 ),
               ),
@@ -155,11 +155,11 @@ class _ClientCreateS extends State<ClientCreateScreen> {
               child: Text(_err!, style: const TextStyle(color: Colors.redAccent), textAlign: TextAlign.center),
             ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(
               children: [
                 Icon(Icons.category, color: AC.gold, size: 20),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text('نوع العميل *', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 14)),
               ],
             ),
@@ -193,7 +193,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _ld
-                    ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                     : Text('انشاء العميل', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ),
@@ -209,8 +209,8 @@ class _ClientCreateS extends State<ClientCreateScreen> {
       onTap: () => setState(() => _selectedType = code),
       child: Container(
         height: 52,
-        margin: const EdgeInsets.only(bottom: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        margin: EdgeInsets.only(bottom: 6),
+        padding: EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: sel ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
           border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1),
@@ -219,9 +219,9 @@ class _ClientCreateS extends State<ClientCreateScreen> {
         child: Row(
           children: [
             Icon(sel ? Icons.radio_button_checked : Icons.radio_button_off, color: sel ? AC.gold : AC.ts, size: 20),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Icon(icon, color: sel ? AC.gold : AC.ts, size: 18),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: Text(label, style: TextStyle(
                 color: sel ? AC.gold : AC.tp,
@@ -231,7 +231,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
             ),
             if (isKm)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                 child: Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)),
               ),

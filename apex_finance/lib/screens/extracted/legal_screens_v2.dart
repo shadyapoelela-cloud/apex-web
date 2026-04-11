@@ -61,7 +61,7 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
-        title: const Text('\u0627\u0644\u0634\u0631\u0648\u0637 \u0648\u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a'),
+        title: Text('\u0627\u0644\u0634\u0631\u0648\u0637 \u0648\u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a'),
         backgroundColor: AC.navy2,
         actions: [
           if (_pending.isNotEmpty)
@@ -80,7 +80,7 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
               final d = _docs[i];
               final pending = _isPending(d['id']);
               return Container(
-                margin: const EdgeInsets.only(bottom: 12),
+                margin: EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: AC.navy3, borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: pending ? AC.warn.withValues(alpha: 0.5) : AC.bdr),
@@ -93,13 +93,13 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
                     const SizedBox(width: 8),
                     if (pending)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                         child: Text('\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.warn, fontSize: 10)),
                       )
                     else
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: AC.ok.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                         child: Text('\u0645\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.ok, fontSize: 10)),
                       ),
@@ -107,11 +107,11 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
                   iconColor: AC.ts, collapsedIconColor: AC.ts,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(16),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(d['content_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 13, height: 1.6)),
                         if (pending) ...[
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           SizedBox(width: double.infinity, child: ElevatedButton(
                             onPressed: () => _acceptOne(d['id']),
                             style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy),

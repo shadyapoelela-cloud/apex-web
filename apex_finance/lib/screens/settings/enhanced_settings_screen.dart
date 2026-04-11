@@ -82,7 +82,7 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
         _sectionCard('\u0627\u0644\u0645\u0638\u0647\u0631', Icons.palette, [
           _toggleRow('\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u062f\u0627\u0643\u0646', ref.watch(appSettingsProvider).isDarkMode, (v) => ref.read(appSettingsProvider.notifier).toggleDarkMode(v)),
         ]),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         Center(child: TextButton.icon(
           onPressed: _logout,
           icon: Icon(Icons.logout, color: AC.err),
@@ -93,13 +93,13 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   }
 
   Widget _sectionCard(String title, IconData icon, List<Widget> children) => Container(
-    margin: const EdgeInsets.only(bottom: 14),
-    padding: const EdgeInsets.all(16),
+    margin: EdgeInsets.only(bottom: 14),
+    padding: EdgeInsets.all(16),
     decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         Icon(icon, color: AC.gold, size: 20),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Text(title, style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 15)),
       ]),
       Divider(color: AC.bdr, height: 20),
@@ -108,7 +108,7 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   );
 
   Widget _infoRow(String key, String val) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
+    padding: EdgeInsets.only(bottom: 8),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(key, style: TextStyle(color: AC.ts, fontSize: 13)),
       Text(val, style: TextStyle(color: AC.tp, fontSize: 13)),
@@ -116,7 +116,7 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   );
 
   Widget _toggleRow(String label, bool value, Function(bool) onChanged) => Padding(
-    padding: const EdgeInsets.only(bottom: 4),
+    padding: EdgeInsets.only(bottom: 4),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(label, style: TextStyle(color: AC.tp, fontSize: 13)),
       Switch(value: value, onChanged: onChanged, activeColor: AC.gold),
@@ -124,7 +124,7 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   );
 
   Widget _dropdownRow(String label, String value, Map<String, String> opts, Function(String?) onChanged) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
+    padding: EdgeInsets.only(bottom: 8),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(label, style: TextStyle(color: AC.tp, fontSize: 13)),
       DropdownButton<String>(
@@ -139,7 +139,7 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   );
 
   Widget _editButton(String text, {VoidCallback? onTap}) => Padding(
-    padding: const EdgeInsets.only(top: 6),
+    padding: EdgeInsets.only(top: 6),
     child: SizedBox(width: double.infinity, child: OutlinedButton(
       onPressed: onTap ?? () {},
       style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),

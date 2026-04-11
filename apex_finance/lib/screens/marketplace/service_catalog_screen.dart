@@ -32,12 +32,12 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.gold)), backgroundColor: Color(0xFF080F1F)),
+    appBar: AppBar(title: Text('ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy2),
     body: Column(children: [
       SingleChildScrollView(scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.all(12),
         child: Row(children: _categories.entries.map((e) => Padding(
-          padding: const EdgeInsets.only(left: 8),
+          padding: EdgeInsets.only(left: 8),
           child: ChoiceChip(
             label: Text(e.value),
             selected: _selectedCategory == e.key,
@@ -59,25 +59,25 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
                 final stagesCount = (s['stages_count'] ?? 0).toString();
                 final minPlan = (s['min_plan'] ?? 'pro').toString();
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(14),
+                  margin: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(14),
                   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
                       Expanded(child: Text(s['title_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      Container(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                         child: Text(stagesCount + ' ظ…ط±ط§ط­ظ„', style: TextStyle(color: AC.cyan, fontSize: 11))),
                     ]),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Row(children: [
                       if (s['requires_coa'] == true) _tag('ظٹطھط·ظ„ط¨ COA', AC.warn),
                       if (s['requires_tb'] == true) _tag('ظٹطھط·ظ„ط¨ TB', AC.warn),
                       _tag(s['category'] ?? '', AC.gold),
-                      const Spacer(),
+                      Spacer(),
                       _tag('ط§ظ„ط­ط¯ ط§ظ„ط£ط¯ظ†ظ‰: ' + minPlan, AC.ts),
                     ]),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     SizedBox(width: double.infinity, child: ElevatedButton(
                       onPressed: () => _startService(s['service_code']),
                       style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy),

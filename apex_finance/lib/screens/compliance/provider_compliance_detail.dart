@@ -23,11 +23,11 @@ class ProviderComplianceDetailScreen extends StatelessWidget {
       body: ListView(padding: const EdgeInsets.all(14), children: [
         // Warning banner if overdue
         if (overdue > 0) Container(
-          padding: const EdgeInsets.all(14), margin: const EdgeInsets.only(bottom: 14),
+          padding: EdgeInsets.all(14), margin: const EdgeInsets.only(bottom: 14),
           decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.err.withValues(alpha: 0.4))),
           child: Row(children: [
             Icon(Icons.error_outline, color: AC.err, size: 22),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(' \u0645\u0647\u0627\u0645 \u0645\u062a\u0623\u062e\u0631\u0629', style: TextStyle(color: AC.err, fontWeight: FontWeight.bold, fontSize: 14)),
               Text('\u0642\u062f \u064a\u062a\u0645 \u062a\u0639\u0644\u064a\u0642 \u062d\u0633\u0627\u0628\u0643 \u0639\u0646\u062f \u0639\u062f\u0645 \u0627\u0644\u0627\u0644\u062a\u0632\u0627\u0645', style: TextStyle(color: AC.ts, fontSize: 11)),
@@ -37,24 +37,24 @@ class ProviderComplianceDetailScreen extends StatelessWidget {
         // Stats
         Row(children: [
           _stat('\u0645\u062a\u0623\u062e\u0631', '', AC.err),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           _stat('\u0645\u0639\u0644\u0642', '', AC.warn),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           _stat('\u0645\u0643\u062a\u0645\u0644', '', AC.ok),
         ].map((w) => Expanded(child: w)).toList()),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         // Items
         ...items.map((item) {
           final color = item['status'] == 'overdue' ? AC.err : item['status'] == 'pending' ? AC.warn : AC.ok;
           final icon = item['type'] == 'output' ? Icons.upload_file : item['type'] == 'document' ? Icons.description : Icons.star;
           return Container(
-            margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
+            margin: EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.3))),
             child: Row(children: [
               Container(width: 4, height: 40, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
               const SizedBox(width: 10),
               Icon(icon, color: color, size: 18),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(item['task'] as String, style: TextStyle(color: AC.tp, fontSize: 12, fontWeight: FontWeight.bold)),
                 Text('\u0627\u0644\u0645\u0648\u0639\u062f: ', style: TextStyle(color: AC.ts, fontSize: 10)),

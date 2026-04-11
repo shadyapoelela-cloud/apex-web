@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'api_service.dart';
+import 'core/theme.dart';
 
 class FinancialStatementsScreen extends StatefulWidget {
   final Map<String, dynamic>? apiData;
@@ -19,13 +20,13 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
   bool _loadingPdf = false;
   bool _loadingExcel = false;
 
-  static const _navy = Color(0xFF050D1A);
-  static const _navy2 = Color(0xFF080F1F);
-  static const _navy3 = Color(0xFF0D1829);
-  static const _gold = Color(0xFFC9A84C);
-  static const _border = Color(0x26C9A84C);
-  static const _textPrimary = Color(0xFFF0EDE6);
-  static const _textSecondary = Color(0xFF8A8880);
+  static Color get _navy => AC.navy;
+  static Color get _navy2 => AC.navy2;
+  static Color get _navy3 => AC.navy3;
+  static Color get _gold => AC.gold;
+  static Color get _border => AC.bdr;
+  static Color get _textPrimary => AC.tp;
+  static Color get _textSecondary => AC.ts;
   static const _success = Color(0xFF2ECC8A);
   static const _cyan = Color(0xFF00C2E0);
   static const _danger = Color(0xFFE05050);
@@ -121,7 +122,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
       backgroundColor: _navy,
       appBar: AppBar(
         backgroundColor: _navy2,
-        title: const Text('القوائم المالية',
+        title: Text('القوائم المالية',
           style: TextStyle(fontFamily: 'Tajawal', color: _textPrimary)),
         bottom: TabBar(
           controller: _tabController,
@@ -154,7 +155,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
       padding: const EdgeInsets.all(16),
       child: Column(children: [
         _sectionTitle('قائمة الدخل'),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         _statementCard([
           _StatRow('إجمالي المبيعات', fmt(revenue), _gold, true),
           _StatRow('تكلفة البضاعة المباعة', fmt(cogs), _textSecondary, false),
@@ -174,7 +175,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
           _StatRow('هامش صافي الربح', '${netMargin.toStringAsFixed(1)}%',
             netProfit >= 0 ? _success : _danger, false),
         ]),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         _summaryCards([
           _SummaryData('إجمالي المبيعات', fmt(revenue), _gold),
           _SummaryData('مجمل الربح', fmt(grossProfit),
@@ -190,7 +191,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
       padding: const EdgeInsets.all(16),
       child: Column(children: [
         _sectionTitle('قائمة المركز المالي'),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         _subTitle('الأصول'),
         _statementCard([
           _StatRow('الأصول الثابتة', fmt(fixedAssets), _textSecondary, false),
@@ -201,7 +202,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
           _StatRow('إجمالي الأصول المتداولة', fmt(currentAssets), _gold, true),
           _StatRow('إجمالي الأصول', fmt(totalAssets), _gold, true),
         ]),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         _subTitle('الخصوم وحقوق الملكية'),
         _statementCard([
           _StatRow('الالتزامات المتداولة', fmt(currentLiabilities), _textSecondary, false),
@@ -214,7 +215,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
           _StatRow('إجمالي الخصوم وحقوق الملكية',
             fmt(totalLiabilities + equity), _gold, true),
         ]),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         _summaryCards([
           _SummaryData('إجمالي الأصول', fmt(totalAssets), _gold),
           _SummaryData('إجمالي الالتزامات', fmt(totalLiabilities), _cyan),
@@ -229,7 +230,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
       padding: const EdgeInsets.all(16),
       child: Column(children: [
         _sectionTitle('قائمة التدفقات النقدية'),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         _statementCard([
           _StatRow('التدفقات من الأنشطة التشغيلية', '', _gold, true),
           _StatRow('صافي الربح', fmt(netProfit), _textSecondary, false),
@@ -255,7 +256,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
         ]),
         const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: _navy3,
             borderRadius: BorderRadius.circular(12),
@@ -263,7 +264,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
           child: Row(children: [
             const Icon(Icons.info_outline, color: _cyan, size: 18),
             const SizedBox(width: 10),
-            const Expanded(child: Text(
+            Expanded(child: Text(
               'التدفقات النقدية محسوبة بطريقة غير المباشرة بناءً على بيانات ميزان المراجعة',
               textDirection: TextDirection.rtl,
               style: TextStyle(fontSize: 12, color: _textSecondary, fontFamily: 'Tajawal'))),
@@ -273,10 +274,10 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
 
   Widget _buildBottomButtons() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        color: Color(0xFF080F1F),
-        border: Border(top: BorderSide(color: Color(0x26C9A84C)))),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AC.navy2,
+        border: Border(top: BorderSide(color: AC.bdr))),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         // أزرار التحميل
         Row(children: [
@@ -326,35 +327,35 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
   Widget _sectionTitle(String title) => Align(
     alignment: Alignment.centerRight,
     child: Text(title, textDirection: TextDirection.rtl,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
         color: _textPrimary, fontFamily: 'Tajawal')));
 
   Widget _subTitle(String title) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Align(alignment: Alignment.centerRight,
       child: Text(title, textDirection: TextDirection.rtl,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
           color: _gold, fontFamily: 'Tajawal'))));
 
   Widget _statementCard(List<Widget> rows) => Container(
-    padding: const EdgeInsets.all(16),
+    padding: EdgeInsets.all(16),
     decoration: BoxDecoration(color: _navy3, borderRadius: BorderRadius.circular(16),
       border: Border.all(color: _border)),
     child: Column(children: rows));
 
   Widget _divider() => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+    padding: EdgeInsets.symmetric(vertical: 6),
     child: Divider(color: _border, height: 1));
 
   Widget _summaryCards(List<_SummaryData> items) => Row(
     children: items.map((s) => Expanded(child: Container(
-      margin: const EdgeInsets.only(left: 8),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(left: 8),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(color: _navy3, borderRadius: BorderRadius.circular(12),
         border: Border.all(color: s.color.withValues(alpha: 0.3))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text(s.label, textDirection: TextDirection.rtl,
-          style: const TextStyle(fontSize: 10, color: _textSecondary, fontFamily: 'Tajawal')),
+          style: TextStyle(fontSize: 10, color: _textSecondary, fontFamily: 'Tajawal')),
         const SizedBox(height: 4),
         Text(s.value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700,
           color: s.color, fontFamily: 'Tajawal')),
@@ -375,7 +376,7 @@ class _StatRow extends StatelessWidget {
         fontFamily: 'Tajawal')),
       Text(label, textDirection: TextDirection.rtl,
         style: TextStyle(fontSize: 13,
-          color: bold ? const Color(0xFFF0EDE6) : const Color(0xFF8A8880),
+          color: bold ? AC.tp : AC.ts,
           fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
           fontFamily: 'Tajawal')),
     ]));

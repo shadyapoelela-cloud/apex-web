@@ -108,7 +108,7 @@ class _PhoneFieldState extends State<PhoneFieldWithCountryCode> {
   @override
   Widget build(BuildContext context) => Row(children: [
     Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
       child: DropdownButtonHideUnderline(child: DropdownButton<String>(
         value: _countryCode,
@@ -128,7 +128,7 @@ class _PhoneFieldState extends State<PhoneFieldWithCountryCode> {
     Expanded(child: TextField(
       controller: widget.phoneController,
       keyboardType: TextInputType.phone,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: 'رقم الجوال',
         prefixIcon: Icon(Icons.phone, color: AC.gold, size: 20),

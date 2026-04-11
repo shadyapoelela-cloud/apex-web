@@ -160,7 +160,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
       onTap: () => setState(() => _currentStage = i),
       child: Container(
         width: 72,
-        margin: const EdgeInsets.only(left: 6),
+        margin: EdgeInsets.only(left: 6),
         decoration: BoxDecoration(
           color: isActive ? color.withValues(alpha: 0.15) : AC.navy3,
           borderRadius: BorderRadius.circular(12),
@@ -178,7 +178,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
               ? Icon(Icons.check, color: AC.ok, size: 16)
               : Text('', style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.bold))),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(s['title'] as String, style: TextStyle(color: isActive ? color : AC.ts, fontSize: 9, fontWeight: isActive ? FontWeight.bold : FontWeight.normal), textAlign: TextAlign.center, maxLines: 1),
         ]),
       ),
@@ -195,7 +195,7 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
         decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withValues(alpha: 0.3))),
         child: Row(children: [
           Icon(stage['icon'] as IconData, color: color, size: 28),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(stage['title'] as String, style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold)),
             Text(stage['subtitle'] as String, style: TextStyle(color: AC.ts, fontSize: 12)),
@@ -203,17 +203,17 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
           _statusBadge(stage['status'] as String),
         ]),
       ),
-      const SizedBox(height: 14),
+      SizedBox(height: 14),
       // Procedures
       Text('\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
       const SizedBox(height: 8),
       ...procedures.map((p) => Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(12),
+        margin: EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.all(12),
         decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.bdr)),
         child: Row(children: [
           _procedureIcon(p['status'] as String),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(child: Text(p['\u0646\u0648\u0639'] as String, style: TextStyle(color: AC.tp, fontSize: 13))),
           _statusBadge(p['status'] as String),
         ]),
@@ -225,21 +225,21 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         Icon(Icons.find_in_page, color: AC.warn, size: 20),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Text('\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14)),
-        const Spacer(),
+        Spacer(),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
           child: Text(' \u0645\u0644\u0627\u062d\u0638\u0627\u062a', style: TextStyle(color: AC.warn, fontSize: 11, fontWeight: FontWeight.bold)),
         ),
       ]),
-      const SizedBox(height: 10),
+      SizedBox(height: 10),
       ..._findings.map((f) {
         final sevColor = f['severity'] == 'high' ? AC.err : f['severity'] == 'medium' ? AC.warn : AC.ok;
         return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
+          margin: EdgeInsets.only(bottom: 8),
+          padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AC.navy3,
             borderRadius: BorderRadius.circular(10),
@@ -248,12 +248,12 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Container(width: 4, height: 30, decoration: BoxDecoration(color: sevColor, borderRadius: BorderRadius.circular(2))),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(child: Text(f['title'] as String, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13))),
               _statusBadge(f['status'] as String),
             ]),
             Padding(
-              padding: const EdgeInsets.only(right: 14, top: 6),
+              padding: EdgeInsets.only(right: 14, top: 6),
               child: Text(f['desc'] as String, style: TextStyle(color: AC.ts, fontSize: 11)),
             ),
           ]),

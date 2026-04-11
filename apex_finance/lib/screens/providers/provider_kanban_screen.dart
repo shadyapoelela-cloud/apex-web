@@ -105,24 +105,24 @@ class _PKState extends State<ProviderKanbanScreen> {
 
   Widget _buildCard(Map<String, dynamic> item, Color color) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.bdr)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(item['\u0646'] as String, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 12)),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Row(children: [
           Icon(Icons.payments_outlined, color: AC.gold, size: 14),
-          const SizedBox(width: 4),
+          SizedBox(width: 4),
           Text(' \u0631.\u0633', style: TextStyle(color: AC.gold, fontSize: 11)),
-          const Spacer(),
+          Spacer(),
           Text(item['time'] as String, style: TextStyle(color: AC.ts, fontSize: 10)),
         ]),
         if (item.containsKey('rating')) ...[
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Row(children: [
             Icon(Icons.star, color: AC.gold, size: 14),
-            const SizedBox(width: 2),
+            SizedBox(width: 2),
             Text('', style: TextStyle(color: AC.gold, fontSize: 11)),
           ]),
         ],

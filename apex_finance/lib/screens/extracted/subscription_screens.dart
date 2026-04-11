@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/shared_constants.dart';
+import '../../core/theme.dart';
 
 // Per Execution Master §4, §9 + Zero Ambiguity §5, §6
 // ═══════════════════════════════════════════════════════════
@@ -54,9 +55,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     final features = _sub?['plan_features'] as List<dynamic>? ?? [];
 
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(title: const Text('خطتي والاشتراك'), backgroundColor: const Color(0xFF1E1E2E),
+      appBar: AppBar(title: Text('خطتي والاشتراك'), backgroundColor: AC.navy3,
         iconTheme: IconThemeData(color: AC.gold)),
-      backgroundColor: const Color(0xFF0D0D1A),
+      backgroundColor: AC.navy,
       body: _loading
         ? Center(child: CircularProgressIndicator(color: AC.gold))
         : _error != null
@@ -64,18 +65,18 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           : RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
               // Current Plan Card
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFF1A1A2E), Color(0xFF16213E)]),
+                  gradient: LinearGradient(colors: [Color(0xFF1A1A2E), Color(0xFF16213E)]),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Icon(Icons.workspace_premium, color: AC.gold, size: 32),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text('الخطة الحالية', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text('الخطة الحالية', style: TextStyle(color: Colors.grey, fontSize: 12)),
                       Text(currentPlan, style: TextStyle(color: AC.gold, fontSize: 24, fontWeight: FontWeight.bold)),
                     ]),
                   ]),
@@ -83,15 +84,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   const Divider(color: Colors.white12),
                   const SizedBox(height: 12),
                   const Text('الميزات المتاحة:', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   ...features.map<Widget>((f) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    padding: EdgeInsets.symmetric(vertical: 3),
                     child: Row(children: [
                       Icon(f['is_available'] == true ? Icons.check_circle : Icons.cancel,
                         color: f['is_available'] == true ? AC.ok : AC.err, size: 18),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(child: Text(f['name_ar'] ?? f['key'],
-                        style: const TextStyle(color: Colors.white, fontSize: 13))),
+                        style: TextStyle(color: Colors.white, fontSize: 13))),
                       Text('${f['display_value'] ?? f['value'] ?? ''}',
                         style: TextStyle(color: f['is_available'] == true ? AC.ok : Colors.grey, fontSize: 12)),
                     ]),
@@ -99,7 +100,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ]),
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               Text('ترقية خطتك', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
 
@@ -114,10 +115,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 final desc = plan['description_ar'] ?? '';
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
+                  margin: EdgeInsets.only(bottom: 12),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isCurrent ? AC.gold.withValues(alpha: 0.1) : Color(0xFF1E1E2E),
+                    color: isCurrent ? AC.gold.withValues(alpha: 0.1) : AC.navy3,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: isCurrent ? AC.gold : Colors.white12),
                   ),
@@ -127,8 +128,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         Text(name, style: TextStyle(
                           color: isCurrent ? AC.gold : Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                         if (isCurrent) ...[
-                          const SizedBox(width: 8),
-                          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          SizedBox(width: 8),
+                          Container(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(color: AC.gold, borderRadius: BorderRadius.circular(8)),
                             child: const Text('الحالية', style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold))),
                         ],
@@ -136,7 +137,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       const SizedBox(height: 4),
                       Text(price is num && price > 0 ? '$price ر.س/شهرياً' : (desc.isNotEmpty ? desc : 'مجاني'),
                         style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text('$featureCount ميزة متاحة', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                      Text('$featureCount ميزة متاحة', style: TextStyle(color: Colors.grey, fontSize: 11)),
                     ])),
                     if (!isCurrent)
                       ElevatedButton(
@@ -196,14 +197,14 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   @override
   Widget build(BuildContext context) {
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(title: const Text('مقارنة الخطط'), backgroundColor: const Color(0xFF1E1E2E),
+      appBar: AppBar(title: Text('مقارنة الخطط'), backgroundColor: AC.navy3,
         iconTheme: IconThemeData(color: AC.gold)),
-      backgroundColor: const Color(0xFF0D0D1A),
+      backgroundColor: AC.navy,
       body: _loading
         ? Center(child: CircularProgressIndicator(color: AC.gold))
         : SingleChildScrollView(scrollDirection: Axis.horizontal, child: SingleChildScrollView(child:
             DataTable(
-              headingRowColor: WidgetStateProperty.all(const Color(0xFF1E1E2E)),
+              headingRowColor: WidgetStateProperty.all(AC.navy3),
               columns: [
                 DataColumn(label: Text('الميزة', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
                 ..._planNames.map((p) => DataColumn(

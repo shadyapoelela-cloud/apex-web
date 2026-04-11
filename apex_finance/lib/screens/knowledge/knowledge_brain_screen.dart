@@ -94,9 +94,9 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(color: const Color(0xFFE91E63).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-            child: const Icon(Icons.psychology, color: Color(0xFFE91E63), size: 20),
+            child: Icon(Icons.psychology, color: Color(0xFFE91E63), size: 20),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Text('\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
         ]),
         actions: [
@@ -130,7 +130,7 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
         final a = _authorities[i];
         final color = Color(a['color'] as int);
         return Container(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withValues(alpha: 0.3))),
           child: ExpansionTile(
             leading: Container(
@@ -144,13 +144,13 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
                 decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                 child: Text(a['code'] as String, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(child: Text(a['name'] as String, style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.bold))),
             ]),
             subtitle: Text(a['desc'] as String, style: TextStyle(color: AC.ts, fontSize: 11)),
             iconColor: AC.ts,
             children: [
-              Padding(padding: const EdgeInsets.all(14), child: Column(children: [
+              Padding(padding: EdgeInsets.all(14), child: Column(children: [
                 Wrap(spacing: 6, runSpacing: 6, children: (a['tags'] as List).map<Widget>((t) => Chip(
                   label: Text(t, style: TextStyle(color: AC.tp, fontSize: 10)),
                   backgroundColor: AC.navy4, side: BorderSide(color: color.withValues(alpha: 0.3)),
@@ -192,19 +192,19 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
           child: InkWell(
             onTap: () {},
             borderRadius: BorderRadius.circular(14),
-            child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child: Padding(padding: EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Icon(d['icon'] as IconData, color: AC.gold, size: 24),
-                const Spacer(),
+                Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
                   child: Text('', style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
               ]),
-              const Spacer(),
+              Spacer(),
               Text(d['name'] as String, style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 13)),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(d['desc'] as String, style: TextStyle(color: AC.ts, fontSize: 10), maxLines: 2, overflow: TextOverflow.ellipsis),
             ])),
           ),
@@ -214,7 +214,7 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
   }
 
   Widget _buildSearchTab() {
-    return Padding(padding: const EdgeInsets.all(14), child: Column(children: [
+    return Padding(padding: EdgeInsets.all(14), child: Column(children: [
       TextField(
         controller: _searchCtrl,
         style: TextStyle(color: AC.tp),
@@ -229,11 +229,11 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
         ),
         onChanged: (v) => setState(() => _searchQuery = v),
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: 16),
       Expanded(child: _searchQuery.isEmpty
         ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Icon(Icons.search, color: AC.ts, size: 48),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Text('\u0627\u0628\u062d\u062b \u0639\u0646 \u0645\u0639\u0627\u064a\u064a\u0631\u060c \u0642\u0648\u0627\u0639\u062f\u060c \u0623\u0646\u0638\u0645\u0629\u060c \u0645\u0641\u0627\u0647\u064a\u0645', style: TextStyle(color: AC.ts, fontSize: 13)),
           ]))
         : ListView(children: _authorities.where((a) =>

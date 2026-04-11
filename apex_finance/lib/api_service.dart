@@ -275,7 +275,7 @@ class ApiService {
 
   // ── Auth Extended ──
   static Future<ApiResult> logout() => _post('/auth/logout', {});
-  static Future<ApiResult> resetPassword({required String token, required String newPassword}) => _post('/account/reset-password', {'token': token, 'new_password': newPassword});
+  static Future<ApiResult> resetPassword({required String token, required String newPassword}) => _post('/auth/reset-password', {'token': token, 'new_password': newPassword});
 
   // ── Users ──
   static Future<ApiResult> updateUser(Map body) => _put('/users/me', body);
