@@ -31,6 +31,7 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
   final _eC = TextEditingController();
   bool _ld = false;
   String? _err, _ok;
+  @override void dispose() { _eC.dispose(); super.dispose(); }
 
   Future<void> _send() async {
     if (_eC.text.trim().isEmpty) {
@@ -96,6 +97,7 @@ class VerifyResetCodeScreen extends StatefulWidget {
 class _VerifyRCS extends State<VerifyResetCodeScreen> {
   final _codeC = TextEditingController();
   String? _err;
+  @override void dispose() { _codeC.dispose(); super.dispose(); }
 
   void _verify() {
     final entered = _codeC.text.trim();
@@ -160,6 +162,7 @@ class _NewPwS extends State<NewPasswordScreen> {
   final _pw2 = TextEditingController();
   bool _ld = false, _done = false;
   String? _err;
+  @override void dispose() { _pw1.dispose(); _pw2.dispose(); super.dispose(); }
 
   Future<void> _resetPw() async {
     if (_pw1.text.length < 6) {
@@ -171,7 +174,7 @@ class _NewPwS extends State<NewPasswordScreen> {
       return;
     }
     setState(() { _ld = true; _err = null; });
-    print('TOKEN: [${widget.token}] LEN: ${widget.token.length}');
+    // Token debug removed for security
     try {
       final r = await http.post(Uri.parse('$_api/account/reset-password'),
         headers: {'Content-Type': 'application/json'},

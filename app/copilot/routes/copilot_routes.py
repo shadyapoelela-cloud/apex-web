@@ -135,7 +135,13 @@ async def get_session_escalations(session_id: str, limit: int = 50, offset: int 
 
 @router.get('/escalations')
 async def list_all_escalations(status: str = "pending", user: dict = Depends(get_current_user)):
-    """List all escalations (for admin/reviewer dashboard)."""
+    """List all escalations (admin/reviewer only)."""
+    import os
+    # RBAC: Only admins can see all escalations
+    user_roles = user.get("roles", [])
+    if "admin" not in user_roles and "reviewer" not in user_roles:
+        from fastapi import HTTPException
+        raise HTTPException(403, "هذه الخدمة متاحة للمسؤولين فقط")
     db = SessionLocal()
     try:
         query = db.query(CopilotEscalation)

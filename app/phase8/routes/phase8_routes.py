@@ -35,9 +35,9 @@ PLAN_PRICES = {
     "Enterprise": {"monthly": 0, "yearly": 0},    # custom pricing
 }
 
-# ─── Helper: Extract user_id from token ───────────────────
+# ─── Helper: Extract user_id from token (SECURE) ─────────
 def get_current_user_id(authorization: str = None):
-    """Extract user_id from JWT — simplified"""
+    """Extract user_id from JWT with proper signature verification."""
     if not authorization:
         return None
     # Clean up Bearer prefix if doubled
@@ -45,30 +45,15 @@ def get_current_user_id(authorization: str = None):
         authorization = authorization.replace("Bearer Bearer ", "Bearer ")
     try:
         import jwt
+        from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
         token = authorization.replace("Bearer ", "")
-        payload = jwt.decode(token, options={"verify_signature": False})
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload.get("sub") or payload.get("user_id")
     except Exception:
         return None
 
 # ─── GET /subscriptions/me ────────────────────────────────
-
-@router.get("/subscriptions/debug")
-def debug_subscription(authorization: str = None):
-    """Debug endpoint to trace errors"""
-    result = {}
-    try:
-        result["step1_auth"] = authorization[:50] if authorization else "None"
-        uid = get_current_user_id(authorization)
-        result["step2_user_id"] = uid
-        sub = get_user_subscription(uid) if uid else None
-        result["step3_subscription"] = sub
-        ents = get_all_user_entitlements(uid) if uid else None
-        result["step4_entitlements"] = ents
-    except Exception as e:
-        logging.error("Entitlement debug error", exc_info=True)
-        result["error"] = "Debug check failed"
-    return result
+# NOTE: /subscriptions/debug REMOVED (v11.4.0) — exposed sensitive data without auth
 
 @router.get("/subscriptions/me")
 def get_my_subscription(authorization: str = None, x_token: str = Header(None, alias="Authorization")):

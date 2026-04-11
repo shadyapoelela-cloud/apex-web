@@ -45,6 +45,12 @@ class _WizardState extends State<ClientOnboardingWizard> {
   final _addressC = TextEditingController();
   final _cityC = TextEditingController();
 
+  @override void dispose() {
+    _nameArC.dispose(); _nameEnC.dispose(); _crC.dispose();
+    _taxC.dispose(); _addressC.dispose(); _cityC.dispose();
+    super.dispose();
+  }
+
   List<dynamic> _entityTypes = [];
   String? _selectedEntityType;
 

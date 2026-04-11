@@ -48,9 +48,11 @@ class LinkSocialAccountRequest(BaseModel):
 async def google_sign_in(req: GoogleSignInRequest):
     """
     Google Sign-In: creates account if new, or logs in if exists.
-    In production, validate id_token with Google API.
-    For now, accepts token and creates/finds user by email.
+
+    ⚠ WARNING: id_token is NOT validated against Google API.
+    Production requires: google-auth library to verify token signature + audience.
     """
+    logging.warning("Google sign-in: id_token NOT verified (production must validate)")
     db = SessionLocal()
     try:
         if not req.email:
@@ -115,8 +117,11 @@ async def google_sign_in(req: GoogleSignInRequest):
 async def apple_sign_in(req: AppleSignInRequest):
     """
     Apple Sign-In: creates account if new, or logs in if exists.
-    In production, validate identity_token with Apple API.
+
+    ⚠ WARNING: identity_token is NOT validated against Apple API.
+    Production requires: PyJWT + Apple public key validation.
     """
+    logging.warning("Apple sign-in: identity_token NOT verified (production must validate)")
     db = SessionLocal()
     try:
         if not req.email:
@@ -174,21 +179,36 @@ async def apple_sign_in(req: AppleSignInRequest):
 
 @router.post("/auth/mobile/send-code", tags=["Social Auth"])
 async def send_mobile_code(req: MobileVerifyRequest):
-    """Send verification code to mobile. In production, integrate with SMS provider."""
+    """Send verification code to mobile.
+
+    ⚠ STUB: Returns success without actually sending SMS.
+    Production requires: Twilio/MessageBird integration + OTP storage.
+    """
+    logging.warning("SMS send-code called (STUB) — no real SMS sent to %s%s",
+                    req.mobile_country_code, req.mobile_number[-4:].rjust(len(req.mobile_number), '*'))
     return {
         "success": True,
         "message": "Verification code sent",
         "mobile": f"{req.mobile_country_code}{req.mobile_number}",
-        "note": "In production, this will send actual SMS via Twilio/MessageBird",
+        "_stub": True,
     }
 
 @router.post("/auth/mobile/verify", tags=["Social Auth"])
 async def verify_mobile_code(req: MobileVerifyRequest):
-    """Verify mobile code. In production, check against stored code."""
+    """Verify mobile code.
+
+    ⚠ STUB: Accepts any 6-digit code without real verification.
+    Production requires: OTP validation against stored code + expiry.
+    """
     if not req.verification_code:
         raise HTTPException(status_code=400, detail="Verification code required")
+    if len(req.verification_code) < 4:
+        raise HTTPException(status_code=400, detail="رمز التحقق قصير جداً")
+    logging.warning("SMS verify called (STUB) — no real verification for %s%s",
+                    req.mobile_country_code, req.mobile_number[-4:].rjust(len(req.mobile_number), '*'))
     return {
         "success": True,
         "verified": True,
         "mobile": f"{req.mobile_country_code}{req.mobile_number}",
+        "_stub": True,
     }

@@ -24,9 +24,16 @@ class SubscriptionService:
         db = SessionLocal()
         try:
             plans = db.query(Plan).filter(Plan.is_active == True).order_by(Plan.sort_order).all()
+            # Batch-fetch ALL features in one query (fixes N+1)
+            plan_ids = [p.id for p in plans]
+            all_features = db.query(PlanFeature).filter(PlanFeature.plan_id.in_(plan_ids)).all() if plan_ids else []
+            features_map = {}
+            for f in all_features:
+                features_map.setdefault(f.plan_id, []).append(f)
+
             result = []
             for p in plans:
-                features = db.query(PlanFeature).filter(PlanFeature.plan_id == p.id).all()
+                features = features_map.get(p.id, [])
                 result.append({
                     "id": p.id,
                     "code": p.code,
