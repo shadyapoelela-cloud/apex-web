@@ -67,18 +67,44 @@ InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // App Root
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-class ApexApp extends StatelessWidget {
+class ApexApp extends ConsumerWidget {
   const ApexApp({super.key});
-  @override Widget build(BuildContext context) => MaterialApp.router(
-    title: 'APEX', debugShowCheckedModeBanner: false,
-    routerConfig: appRouter,
-    theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: AC.navy,
+  @override Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(appSettingsProvider);
+    final isDark = settings.isDarkMode;
+    final isAr = settings.language == 'ar';
+
+    final darkTheme = ThemeData.dark().copyWith(scaffoldBackgroundColor: AC.navy,
       textTheme: GoogleFonts.tajawalTextTheme(ThemeData.dark().textTheme),
       appBarTheme: const AppBarTheme(backgroundColor: AC.navy2, elevation: 0, centerTitle: true),
       elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
         backgroundColor: AC.gold, foregroundColor: AC.navy,
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))))));
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))));
+
+    final lightTheme = ThemeData.light().copyWith(
+      scaffoldBackgroundColor: const Color(0xFFF5F5F0),
+      textTheme: GoogleFonts.tajawalTextTheme(ThemeData.light().textTheme),
+      appBarTheme: const AppBarTheme(backgroundColor: Color(0xFFFFFFFF), elevation: 1, centerTitle: true,
+        foregroundColor: Color(0xFF1A1A2E), iconTheme: IconThemeData(color: Color(0xFFC9A84C))),
+      elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
+        backgroundColor: AC.gold, foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
+      cardColor: Colors.white,
+      dividerColor: const Color(0xFFE0E0E0),
+    );
+
+    return Directionality(
+      textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+      child: MaterialApp.router(
+        title: 'APEX', debugShowCheckedModeBanner: false,
+        routerConfig: appRouter,
+        theme: isDark ? darkTheme : lightTheme,
+        locale: isAr ? const Locale('ar') : const Locale('en'),
+      ),
+    );
+  }
 }
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ

@@ -66,6 +66,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) => AuthNotifier());
 
+// ── Theme & Language State ──
+class AppSettingsState {
+  final bool isDarkMode;
+  final String language; // 'ar' or 'en'
+  const AppSettingsState({this.isDarkMode = true, this.language = 'ar'});
+  AppSettingsState copyWith({bool? isDarkMode, String? language}) =>
+    AppSettingsState(isDarkMode: isDarkMode ?? this.isDarkMode, language: language ?? this.language);
+}
+
+class AppSettingsNotifier extends StateNotifier<AppSettingsState> {
+  AppSettingsNotifier() : super(const AppSettingsState());
+
+  void toggleDarkMode(bool v) => state = state.copyWith(isDarkMode: v);
+  void setLanguage(String lang) => state = state.copyWith(language: lang);
+}
+
+final appSettingsProvider = StateNotifierProvider<AppSettingsNotifier, AppSettingsState>(
+  (ref) => AppSettingsNotifier(),
+);
+
 // ── Client State ──
 final clientsProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
   final r = await ApiService.listClients();
