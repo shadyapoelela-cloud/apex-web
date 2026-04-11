@@ -39,7 +39,7 @@ class ServiceRequestDetail extends StatelessWidget {
     ]));
 
   Widget _step(String label, bool done) => Padding(padding: const EdgeInsets.only(bottom: 8), child: Row(children: [
-    Container(width: 24, height: 24, decoration: BoxDecoration(color: done ? AC.ok.withOpacity(0.15) : AC.navy4, shape: BoxShape.circle, border: Border.all(color: done ? AC.ok : AC.ts)),
+    Container(width: 24, height: 24, decoration: BoxDecoration(color: done ? AC.ok.withValues(alpha: 0.15) : AC.navy4, shape: BoxShape.circle, border: Border.all(color: done ? AC.ok : AC.ts)),
       child: done ? const Icon(Icons.check, color: AC.ok, size: 14) : null),
     const SizedBox(width: 10), Text(label, style: TextStyle(color: done ? AC.ok : AC.ts, fontSize: 12))]));
 }

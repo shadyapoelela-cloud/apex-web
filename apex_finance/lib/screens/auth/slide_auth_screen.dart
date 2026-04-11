@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
 import '../../main.dart' show AC, S;
 import '../../api_service.dart';
 import '../../core/router.dart' show authRefresh;
@@ -31,28 +28,20 @@ class _SAS extends State<SlideAuthScreen> {
 
   Future<void> _login() async {
     setState(() { _ll = true; _le = null; });
-    try {
-      final r = await http.post(
-        Uri.parse('$apiBase/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username_or_email': _lu.text.trim(), 'password': _lp.text}),
-      );
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
-        S.token = d['tokens']['access_token'];
-        ApiService.setToken(S.token!);
-        S.uid = d['user']['id'];
-        S.uname = d['user']['username'];
-        S.dname = d['user']['display_name'];
-        S.plan = d['user']['plan'];
-        S.email = d['user']['email'];
-        S.roles = List<String>.from(d['user']['roles'] ?? []);
-        if (mounted) context.go('/home');
-      } else {
-        setState(() { _le = d['detail'] ?? 'خطأ في الدخول'; _ll = false; });
-      }
-    } catch (e) {
-      setState(() { _le = e.toString(); _ll = false; });
+    final res = await ApiService.login(_lu.text.trim(), _lp.text);
+    if (res.success) {
+      final d = res.data;
+      S.token = d['tokens']['access_token'];
+      ApiService.setToken(S.token!);
+      S.uid = d['user']['id'];
+      S.uname = d['user']['username'];
+      S.dname = d['user']['display_name'];
+      S.plan = d['user']['plan'];
+      S.email = d['user']['email'];
+      S.roles = List<String>.from(d['user']['roles'] ?? []);
+      if (mounted) context.go('/home');
+    } else {
+      setState(() { _le = res.error ?? 'خطأ في الدخول'; _ll = false; });
     }
   }
 
@@ -62,23 +51,20 @@ class _SAS extends State<SlideAuthScreen> {
       return;
     }
     setState(() { _rl = true; _re = null; });
-    try {
-      final ph = _cc + _rph.text.trim();
-      final r = await http.post(
-        Uri.parse('$apiBase/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username': _ru.text.trim(), 'email': _rem.text.trim(), 'password': _rp.text, 'display_name': _rn.text.trim(), 'phone': ph}),
-      );
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 || r.statusCode == 201) {
-        setState(() { _rl = false; _pg = 0; });
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم إنشاء الحساب!'), backgroundColor: AC.ok));
-      } else {
-        setState(() { _re = d['detail'] ?? 'خطأ'; _rl = false; });
-      }
-    } catch (e) {
-      setState(() { _re = e.toString(); _rl = false; });
+    final ph = _cc + _rph.text.trim();
+    final res = await ApiService.register(
+      username: _ru.text.trim(),
+      email: _rem.text.trim(),
+      password: _rp.text,
+      displayName: _rn.text.trim(),
+      mobile: ph,
+    );
+    if (res.success) {
+      setState(() { _rl = false; _pg = 0; });
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('تم إنشاء الحساب!'), backgroundColor: AC.ok));
+    } else {
+      setState(() { _re = res.error ?? 'خطأ'; _rl = false; });
     }
   }
 

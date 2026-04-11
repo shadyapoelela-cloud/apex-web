@@ -16,9 +16,9 @@ Outputs per row:
 If unmatched accounts exceed 15%, analysis is blocked.
 """
 
-import re, json
+import json
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 from difflib import SequenceMatcher
 from app.core.text_utils import normalize_arabic
 
@@ -40,13 +40,14 @@ def bind_tb_to_coa(
     db = SessionLocal()
     try:
         # ── Load approved COA accounts ──
-        coa_rows = db.execute(_t(
-            """SELECT id, account_code, account_name_raw, account_name_normalized,
+        coa_rows = db.execute(
+            _t("""SELECT id, account_code, account_name_raw, account_name_normalized,
                       normalized_class, statement_section, cashflow_role
                FROM client_chart_of_accounts
                WHERE coa_upload_id = :cid AND record_status != 'rejected'
-               ORDER BY source_row_number"""
-        ), {"cid": coa_upload_id}).fetchall()
+               ORDER BY source_row_number"""),
+            {"cid": coa_upload_id},
+        ).fetchall()
 
         if not coa_rows:
             return {"success": False, "error": "No COA accounts found for this upload"}
@@ -59,9 +60,13 @@ def bind_tb_to_coa(
 
         for r in coa_rows:
             entry = {
-                "id": r[0], "code": (r[1] or "").strip(),
-                "name_raw": r[2], "name_norm": normalize_arabic(r[2] or ""),
-                "nc": r[4], "section": r[5], "cashflow": r[6],
+                "id": r[0],
+                "code": (r[1] or "").strip(),
+                "name_raw": r[2],
+                "name_norm": normalize_arabic(r[2] or ""),
+                "nc": r[4],
+                "section": r[5],
+                "cashflow": r[6],
             }
             coa_list.append(entry)
             if entry["code"]:
@@ -74,10 +79,11 @@ def bind_tb_to_coa(
         # ── Load client-specific rules ──
         client_rules = []
         try:
-            rule_rows = db.execute(_t(
-                """SELECT condition_json, action_json FROM client_coa_rules
-                   WHERE client_id = :cid AND is_active = true ORDER BY priority DESC"""
-            ), {"cid": client_id}).fetchall()
+            rule_rows = db.execute(
+                _t("""SELECT condition_json, action_json FROM client_coa_rules
+                   WHERE client_id = :cid AND is_active = true ORDER BY priority DESC"""),
+                {"cid": client_id},
+            ).fetchall()
             for rr in rule_rows:
                 cond = rr[0] if isinstance(rr[0], dict) else json.loads(rr[0] or "{}")
                 act = rr[1] if isinstance(rr[1], dict) else json.loads(rr[1] or "{}")
@@ -86,21 +92,20 @@ def bind_tb_to_coa(
             pass
 
         # ── Load TB parsed rows ──
-        tb_rows = db.execute(_t(
-            """SELECT id, account_code, account_name_raw, account_name_normalized,
+        tb_rows = db.execute(
+            _t("""SELECT id, account_code, account_name_raw, account_name_normalized,
                       close_debit, close_credit, net_balance
                FROM tb_parsed_rows
                WHERE tb_upload_id = :uid AND is_summary_row = false
-               ORDER BY source_row_number"""
-        ), {"uid": tb_upload_id}).fetchall()
+               ORDER BY source_row_number"""),
+            {"uid": tb_upload_id},
+        ).fetchall()
 
         if not tb_rows:
             return {"success": False, "error": "No TB rows found"}
 
         # ── Clear previous binding results ──
-        db.execute(_t(
-            "DELETE FROM tb_binding_results WHERE tb_upload_id = :uid"
-        ), {"uid": tb_upload_id})
+        db.execute(_t("DELETE FROM tb_binding_results WHERE tb_upload_id = :uid"), {"uid": tb_upload_id})
 
         # ── Run matching ──
         stats = {"matched": 0, "unmatched": 0, "new_accounts": 0, "total_conf": 0.0}
@@ -165,12 +170,17 @@ def bind_tb_to_coa(
             if match:
                 coa_entry, match_type, confidence = match
                 binding = {
-                    "id": gen_uuid(), "tb_upload_id": tb_upload_id,
-                    "tb_row_id": tb_id, "coa_account_id": coa_entry["id"],
-                    "tb_account_code": tb_code, "tb_account_name_raw": tb_name,
-                    "tb_amount_debit": tb_debit, "tb_amount_credit": tb_credit,
+                    "id": gen_uuid(),
+                    "tb_upload_id": tb_upload_id,
+                    "tb_row_id": tb_id,
+                    "coa_account_id": coa_entry["id"],
+                    "tb_account_code": tb_code,
+                    "tb_account_name_raw": tb_name,
+                    "tb_amount_debit": tb_debit,
+                    "tb_amount_credit": tb_credit,
                     "tb_net_balance": tb_net,
-                    "matched": True, "match_type": match_type,
+                    "matched": True,
+                    "match_type": match_type,
                     "binding_confidence": confidence,
                     "mismatch_reason": None,
                     "requires_review": confidence < 0.85,
@@ -183,12 +193,17 @@ def bind_tb_to_coa(
                 stats["total_conf"] += confidence
             else:
                 binding = {
-                    "id": gen_uuid(), "tb_upload_id": tb_upload_id,
-                    "tb_row_id": tb_id, "coa_account_id": None,
-                    "tb_account_code": tb_code, "tb_account_name_raw": tb_name,
-                    "tb_amount_debit": tb_debit, "tb_amount_credit": tb_credit,
+                    "id": gen_uuid(),
+                    "tb_upload_id": tb_upload_id,
+                    "tb_row_id": tb_id,
+                    "coa_account_id": None,
+                    "tb_account_code": tb_code,
+                    "tb_account_name_raw": tb_name,
+                    "tb_amount_debit": tb_debit,
+                    "tb_amount_credit": tb_credit,
                     "tb_net_balance": tb_net,
-                    "matched": False, "match_type": "unmatched",
+                    "matched": False,
+                    "match_type": "unmatched",
                     "binding_confidence": 0.0,
                     "mismatch_reason": "no_matching_coa_account",
                     "requires_review": True,
@@ -203,8 +218,8 @@ def bind_tb_to_coa(
 
         # ── Save all binding results ──
         for b in results:
-            db.execute(_t(
-                """INSERT INTO tb_binding_results
+            db.execute(
+                _t("""INSERT INTO tb_binding_results
                    (id, tb_upload_id, tb_row_id, coa_account_id,
                     tb_account_code, tb_account_name_raw,
                     tb_amount_debit, tb_amount_credit, tb_net_balance,
@@ -216,27 +231,32 @@ def bind_tb_to_coa(
                            :tb_amount_debit, :tb_amount_credit, :tb_net_balance,
                            :matched, :match_type, :binding_confidence, :mismatch_reason,
                            :requires_review, :coa_normalized_class, :coa_statement_section,
-                           :coa_cashflow_role, :review_status, CURRENT_TIMESTAMP)"""
-            ), b)
+                           :coa_cashflow_role, :review_status, CURRENT_TIMESTAMP)"""),
+                b,
+            )
 
         # ── Update TB upload summary ──
         total = len(tb_rows)
         avg_conf = round(stats["total_conf"] / max(stats["matched"], 1), 3)
         status = "bound" if stats["unmatched"] == 0 else "bound_with_issues"
 
-        db.execute(_t(
-            """UPDATE trial_balance_uploads SET
+        db.execute(
+            _t("""UPDATE trial_balance_uploads SET
                 upload_status = :status,
                 total_matched = :matched,
                 total_unmatched = :unmatched,
                 total_new_accounts = :new_acc,
                 binding_confidence_avg = :avg_conf
-            WHERE id = :uid"""
-        ), {
-            "status": status, "matched": stats["matched"],
-            "unmatched": stats["unmatched"], "new_acc": stats["new_accounts"],
-            "avg_conf": avg_conf, "uid": tb_upload_id,
-        })
+            WHERE id = :uid"""),
+            {
+                "status": status,
+                "matched": stats["matched"],
+                "unmatched": stats["unmatched"],
+                "new_acc": stats["new_accounts"],
+                "avg_conf": avg_conf,
+                "uid": tb_upload_id,
+            },
+        )
 
         db.commit()
 
@@ -254,7 +274,9 @@ def bind_tb_to_coa(
             "unmatched_percentage": unmatched_pct,
             "avg_binding_confidence": avg_conf,
             "can_proceed_to_analysis": can_analyze,
-            "analysis_blocked_reason": f"نسبة الحسابات غير المطابقة {unmatched_pct}% تتجاوز الحد المسموح (15%)" if not can_analyze else None,
+            "analysis_blocked_reason": (
+                f"نسبة الحسابات غير المطابقة {unmatched_pct}% تتجاوز الحد المسموح (15%)" if not can_analyze else None
+            ),
             "status": status,
             "match_type_distribution": _count_match_types(results),
         }
@@ -281,17 +303,18 @@ def manually_match_tb_row(binding_id: str, coa_account_id: str, matched_by: str 
 
     db = SessionLocal()
     try:
-        coa = db.execute(_t(
-            """SELECT id, normalized_class, statement_section, cashflow_role
-               FROM client_chart_of_accounts WHERE id = :cid"""
-        ), {"cid": coa_account_id}).fetchone()
+        coa = db.execute(
+            _t("""SELECT id, normalized_class, statement_section, cashflow_role
+               FROM client_chart_of_accounts WHERE id = :cid"""),
+            {"cid": coa_account_id},
+        ).fetchone()
 
         if not coa:
             return {"success": False, "error": "COA account not found"}
 
         now = datetime.now(timezone.utc).isoformat()
-        db.execute(_t(
-            """UPDATE tb_binding_results SET
+        db.execute(
+            _t("""UPDATE tb_binding_results SET
                 coa_account_id = :cid, matched = true,
                 match_type = 'manual', binding_confidence = 1.0,
                 mismatch_reason = NULL, requires_review = false,
@@ -299,14 +322,20 @@ def manually_match_tb_row(binding_id: str, coa_account_id: str, matched_by: str 
                 coa_cashflow_role = :cf,
                 review_status = 'manually_matched',
                 reviewed_by = :by, reviewed_at = :now
-            WHERE id = :bid"""
-        ), {
-            "cid": coa_account_id, "nc": coa[1], "ss": coa[2], "cf": coa[3],
-            "by": matched_by, "now": now, "bid": binding_id,
-        })
+            WHERE id = :bid"""),
+            {
+                "cid": coa_account_id,
+                "nc": coa[1],
+                "ss": coa[2],
+                "cf": coa[3],
+                "by": matched_by,
+                "now": now,
+                "bid": binding_id,
+            },
+        )
         db.commit()
         return {"success": True, "binding_id": binding_id, "status": "manually_matched"}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -321,31 +350,37 @@ def approve_binding(tb_upload_id: str, approved_by: str = None) -> Dict:
 
     db = SessionLocal()
     try:
-        unmatched = db.execute(_t(
-            "SELECT COUNT(*) FROM tb_binding_results WHERE tb_upload_id = :uid AND matched = false"
-        ), {"uid": tb_upload_id}).fetchone()[0]
+        unmatched = db.execute(
+            _t("SELECT COUNT(*) FROM tb_binding_results WHERE tb_upload_id = :uid AND matched = false"),
+            {"uid": tb_upload_id},
+        ).fetchone()[0]
 
-        total = db.execute(_t(
-            "SELECT COUNT(*) FROM tb_binding_results WHERE tb_upload_id = :uid"
-        ), {"uid": tb_upload_id}).fetchone()[0]
+        total = db.execute(
+            _t("SELECT COUNT(*) FROM tb_binding_results WHERE tb_upload_id = :uid"), {"uid": tb_upload_id}
+        ).fetchone()[0]
 
         if total == 0:
             return {"success": False, "error": "No binding results found. Run binding first."}
 
         unmatched_pct = round(unmatched / total * 100, 1)
 
-        db.execute(_t(
-            "UPDATE trial_balance_uploads SET upload_status = 'approved', binding_approved = true WHERE id = :uid"
-        ), {"uid": tb_upload_id})
+        db.execute(
+            _t("UPDATE trial_balance_uploads SET upload_status = 'approved', binding_approved = true WHERE id = :uid"),
+            {"uid": tb_upload_id},
+        )
         db.commit()
 
         return {
-            "success": True, "tb_upload_id": tb_upload_id, "status": "approved",
-            "total_rows": total, "unmatched_remaining": unmatched,
-            "unmatched_percentage": unmatched_pct, "ready_for_analysis": True,
+            "success": True,
+            "tb_upload_id": tb_upload_id,
+            "status": "approved",
+            "total_rows": total,
+            "unmatched_remaining": unmatched,
+            "unmatched_percentage": unmatched_pct,
+            "ready_for_analysis": True,
             "warning": f"لا يزال هناك {unmatched} حساب غير مطابق ({unmatched_pct}%)" if unmatched > 0 else None,
         }
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}

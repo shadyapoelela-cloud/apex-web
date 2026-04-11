@@ -14,13 +14,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
 
 
-// DISABLED: import 'client_create_screen.dart';
-import 'client_create.dart';
 
-import 'screens/marketplace/service_catalog_screen.dart' as catalog;
-import 'screens/account/archive_screen.dart' as archive;
-import 'screens/tasks/audit_service_screen.dart' as audit;
-import 'widgets/auth_widgets.dart' as authw;
+// auth_widgets imported via router.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/app_providers.dart';
 import 'screens/extracted/subscription_screens.dart';
@@ -28,15 +23,7 @@ import 'screens/extracted/notification_screens_v2.dart';
 import 'screens/extracted/legal_screens_v2.dart';
 import 'screens/extracted/client_screens.dart';
 import 'screens/extracted/coa_screens.dart';
-import 'screens/clients/client_detail_screen.dart';
-import 'screens/auth/forgot_password_flow.dart';
-import 'screens/copilot/copilot_screen.dart';
-import 'screens/settings/enhanced_settings_screen.dart';
-import 'screens/providers/provider_kanban_screen.dart';
-import 'screens/dashboard/enhanced_dashboard.dart';
-import 'screens/knowledge/knowledge_brain_screen.dart';
-import 'screens/audit/audit_workflow_screen.dart';
-import 'screens/financial/financial_ops_screen.dart';
+// Note: Most screen navigation uses GoRouter (context.push) — no direct imports needed
 
 // === v7.5 ApiRetry helper (cold-start tolerance for Render free tier) ===
 class ApiRetry {
@@ -195,7 +182,7 @@ Widget _kv(String k, String v, {Color? vc}) => Padding(padding: const EdgeInsets
     Flexible(child: Text(v, style: TextStyle(color: vc ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
 
 Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+  decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
   child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
@@ -283,9 +270,9 @@ S.save();
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AC.gold.withOpacity(0.08),
+            color: AC.gold.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AC.gold.withOpacity(0.2)),
+            border: Border.all(color: AC.gold.withValues(alpha: 0.2)),
           ),
           child: Column(children: [
             const Icon(Icons.account_balance, color: AC.gold, size: 48),
@@ -305,7 +292,7 @@ S.save();
         // Error
         if (_e != null) Container(
           width: double.infinity, margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.err.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.err.withValues(alpha: 0.3))),
           child: Row(children: [const Icon(Icons.error_outline, color: AC.err, size: 18), const SizedBox(width: 8),
             Expanded(child: Text(_e!, style: const TextStyle(color: AC.err, fontSize: 12)))]),
         ),
@@ -341,7 +328,7 @@ S.save();
         SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
           onPressed: _l ? null : _go,
           style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            disabledBackgroundColor: AC.gold.withOpacity(0.5)),
+            disabledBackgroundColor: AC.gold.withValues(alpha: 0.5)),
           child: _l ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
             : const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.navy, fontSize: 16, fontWeight: FontWeight.bold)),
         )),
@@ -486,8 +473,8 @@ class _MainNavS extends State<MainNav> {
     super.initState();
       Future.delayed(const Duration(milliseconds: 500), () {
       if(S.token!=null) ApiService.setToken(S.token!);
-      http.get(Uri.parse('$_api/clients'), headers: S.lh()).then((r) { if (r.statusCode == 200 && mounted) { final d = jsonDecode(r.body); setState(() => _cl = d is List ? d : []); } });
-      http.get(Uri.parse('$_api/notifications'), headers: S.lh()).then((r) { if (r.statusCode == 200 && mounted) { final d = jsonDecode(r.body); setState(() => _notifs = d is List ? d : []); } });
+      ApiService.listClients().then((r) { if (r.success && mounted) { final d = r.data; setState(() => _cl = d is List ? d : []); } });
+      ApiService.getNotifications().then((r) { if (r.success && mounted) { final d = r.data; setState(() => _notifs = d is List ? d : []); } });
       if (mounted) setState(() {});
     });
   }
@@ -607,7 +594,7 @@ class _MainNavS extends State<MainNav> {
           initiallyExpanded: true,
           children: [
           _drawerItem(Icons.dashboard_rounded, 'الرئيسية', () { setState(() { _i = 0; _dr = false; }); }),
-          _drawerItem(Icons.smart_toy, 'Apex Copilot', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen())); setState(() => _dr = false); }, isGold: true),
+          _drawerItem(Icons.smart_toy, 'Apex Copilot', () { context.push('/copilot'); setState(() => _dr = false); }, isGold: true),
           _drawerItem(Icons.business_rounded, 'العملاء', () { setState(() { _i = 1; _dr = false; }); }),
           ],
         ),
@@ -618,8 +605,8 @@ class _MainNavS extends State<MainNav> {
           initiallyExpanded: true,
           children: [
           _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () => _goToCoa(), isGold: true),
-          _drawerItem(Icons.table_chart, 'ميزان المراجعة TB', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
-          _drawerItem(Icons.receipt_long, 'القوائم المالية', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialOpsScreen())); setState(() => _dr = false); }),
+          _drawerItem(Icons.table_chart, 'ميزان المراجعة TB', () { context.push('/financial-ops'); setState(() => _dr = false); }),
+          _drawerItem(Icons.receipt_long, 'القوائم المالية', () { context.push('/financial-ops'); setState(() => _dr = false); }),
           _drawerItem(Icons.analytics_rounded, 'التحليل المالي', () { setState(() { _i = 2; _dr = false; }); }),
           ],
         ),
@@ -632,7 +619,7 @@ class _MainNavS extends State<MainNav> {
           _drawerItem(Icons.checklist_rounded, 'الامتثال', () { _comingSoon(); }),
           _drawerItem(Icons.workspace_premium, 'الأهلية الترخيصية', () { _comingSoon(); }),
           _drawerItem(Icons.volunteer_activism, 'الدعم والحوافز', () { _comingSoon(); }),
-          _drawerItem(Icons.gavel_rounded, 'المراجعة المحاسبية والقانونية', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const AuditWorkflowScreen())); setState(() => _dr = false); }),
+          _drawerItem(Icons.gavel_rounded, 'المراجعة المحاسبية والقانونية', () { context.push('/audit-workflow'); setState(() => _dr = false); }),
           ],
         ),
         ExpansionTile(
@@ -641,7 +628,7 @@ class _MainNavS extends State<MainNav> {
           title: Text('السوق', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           children: [
           _drawerItem(Icons.store_rounded, 'سوق الخدمات', () { setState(() { _i = 3; _dr = false; }); }),
-          _drawerItem(Icons.work_rounded, 'مقدمو الخدمات', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProviderKanbanScreen())); setState(() => _dr = false); }),
+          _drawerItem(Icons.work_rounded, 'مقدمو الخدمات', () { context.push('/provider-kanban'); setState(() => _dr = false); }),
           _drawerItem(Icons.menu_book, 'Bookkeeping', () { _comingSoon(); }),
           ],
         ),
@@ -652,7 +639,7 @@ class _MainNavS extends State<MainNav> {
           children: [
           _drawerItem(Icons.bar_chart_rounded, 'التقارير', () { _comingSoon(); }),
           _drawerItem(Icons.folder_outlined, 'الأرشيف', () { context.go('/archive'); setState(() => _dr = false); }),
-          _drawerItem(Icons.psychology, 'العقل المعرفي', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const KnowledgeBrainScreen())); setState(() => _dr = false); }),
+          _drawerItem(Icons.psychology, 'العقل المعرفي', () { context.push('/knowledge-brain'); setState(() => _dr = false); }),
           _drawerItem(Icons.admin_panel_settings, 'Reviewer Console', () { context.go('/admin/reviewer'); setState(() => _dr = false); }),
           ],
         ),
@@ -661,7 +648,7 @@ class _MainNavS extends State<MainNav> {
           tilePadding: const EdgeInsets.symmetric(horizontal: 16),
           title: Text('الإدارة', textAlign: TextAlign.right, style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12, fontWeight: FontWeight.w700)),
           children: [
-          _drawerItem(Icons.settings, 'الإدارة والإعدادات', () { Navigator.push(context, MaterialPageRoute(builder: (_) => const EnhancedSettingsScreen())); setState(() => _dr = false); }),
+          _drawerItem(Icons.settings, 'الإدارة والإعدادات', () { context.push('/settings'); setState(() => _dr = false); }),
           _drawerItem(Icons.diamond_outlined, 'الحساب والاشتراكات', () { setState(() { _i = 5; _dr = false; }); }),
           ],
         ),
@@ -720,12 +707,10 @@ class _MainNavS extends State<MainNav> {
       orElse: () => null,
     );
     if (client != null) {
-      Navigator.push(context, MaterialPageRoute(
-        builder: (_) => CoaJourneyScreen(
-          clientId: (client['id'] ?? client['client_code'] ?? '1').toString(),
-          clientName: client['name_ar'] ?? client['name'] ?? '',
-        ),
-      ));
+      context.push('/coa/journey', extra: {
+        'clientId': (client['id'] ?? client['client_code'] ?? '1').toString(),
+        'clientName': client['name_ar'] ?? client['name'] ?? '',
+      });
     } else {
       _showCoaDialog(
         '\u062e\u0637\u0623',
@@ -835,7 +820,7 @@ class _DashS extends ConsumerState<DashTab> {
               Expanded(child: Text('${e.key}: ${e.value['value']}', style: const TextStyle(color: AC.ts, fontSize: 11)))]))),
           const SizedBox(height: 10),
           SizedBox(width: double.infinity, child: OutlinedButton.icon(
-            onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>UpgradePlanScreen(plans: _plans, currentPlan: _sub?['plan']))),
+            onPressed: ()=>context.push('/upgrade-plan', extra: {'plans': _plans, 'currentPlan': _sub?['plan']}),
             style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
             icon: const Icon(Icons.upgrade, color: AC.gold, size: 18),
             label: const Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold)))),
@@ -847,11 +832,11 @@ class _DashS extends ConsumerState<DashTab> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AC.gold.withOpacity(0.12), AC.navy3],
+              colors: [AC.gold.withValues(alpha: 0.12), AC.navy3],
               begin: Alignment.topRight, end: Alignment.bottomLeft,
             ),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AC.gold.withOpacity(0.3)),
+            border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
           ),
           child: InkWell(
             onTap: () => context.go('/copilot'),
@@ -859,7 +844,7 @@ class _DashS extends ConsumerState<DashTab> {
             child: Row(children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                 child: const Icon(Icons.smart_toy, color: AC.gold, size: 28),
               ),
               const SizedBox(width: 14),
@@ -869,7 +854,7 @@ class _DashS extends ConsumerState<DashTab> {
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
                     child: const Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
                   ),
                 ]),
@@ -923,12 +908,12 @@ class _NotifS extends ConsumerState<NotificationsScreen> {
   List _nots = []; bool _ld = true;
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
-    try { final r = await http.get(Uri.parse('$_api/notifications'), headers: S.h());
-      if(mounted) setState(() { try { _nots = jsonDecode(r.body); } catch(_) { _nots = []; } _ld = false; });
+    try { final r = await ApiService.getNotifications();
+      if(mounted) setState(() { final d = r.data; _nots = d is List ? d : []; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   Future<void> _markAllRead() async {
-    await http.post(Uri.parse('$_api/notifications/read-all'), headers: S.h());
+    await ApiService.markNotificationsReadAll();
     _load();
   }
   @override Widget build(BuildContext c) => Scaffold(
@@ -944,7 +929,7 @@ class _NotifS extends ConsumerState<NotificationsScreen> {
         final isRead = n['is_read'] == true;
         return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(color: isRead ? AC.navy3 : AC.navy4, borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isRead ? AC.bdr : AC.gold.withOpacity(0.3))),
+            border: Border.all(color: isRead ? AC.bdr : AC.gold.withValues(alpha: 0.3))),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(_notifIcon(n['type']??''), color: isRead ? AC.ts : AC.gold, size: 22),
             const SizedBox(width: 12),
@@ -994,7 +979,7 @@ class UpgradePlanScreen extends StatelessWidget {
             ...features.take(8).map((f) => Padding(padding: const EdgeInsets.only(bottom: 3),
               child: Row(children: [
                 Icon(f.value['value']=='true'||f.value['value']=='unlimited'?Icons.check_circle:Icons.cancel,
-                  color: f.value['value']=='true'||f.value['value']=='unlimited'?AC.ok:AC.err.withOpacity(0.5), size: 14),
+                  color: f.value['value']=='true'||f.value['value']=='unlimited'?AC.ok:AC.err.withValues(alpha: 0.5), size: 14),
                 const SizedBox(width: 8),
                 Expanded(child: Text(f.value['name_ar']??f.key, style: const TextStyle(color: AC.ts, fontSize: 11)))]))),
             if(!isCurrent) ...[const SizedBox(height: 12),
@@ -1018,17 +1003,8 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   Future<void> _load() async {
     setState(() => _ld = true);
     try {
-      final tk = html.window.localStorage['apex_token'] ?? '';
-      final r = await ApiRetry.get(
-        Uri.parse('$_api/clients'),
-        headers: {'Authorization': 'Bearer $tk', 'Content-Type': 'application/json'},
-      );
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        if (mounted) setState(() { _cl = data is List ? data : []; _ld = false; });
-      } else {
-        if (mounted) setState(() { _cl = []; _ld = false; });
-      }
+      final r = await ApiService.listClients();
+      if (mounted) setState(() { final d = r.data; _cl = d is List ? d : []; _ld = false; });
     } catch(e) {
       if (mounted) setState(() { _cl = []; _ld = false; });
     }
@@ -1042,6 +1018,11 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   final _cAddress = TextEditingController();
   String _cType = '';
   String _cSector = '';
+  @override void dispose() {
+    _cName.dispose(); _cNameAr.dispose(); _cEmail.dispose();
+    _cPhone.dispose(); _cCR.dispose(); _cVAT.dispose(); _cAddress.dispose();
+    super.dispose();
+  }
 
   Future<void> _doCreateClient(BuildContext dc) async {
     Navigator.pop(dc);
@@ -1209,7 +1190,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
       Dialog(backgroundColor: Colors.transparent, insetPadding: const EdgeInsets.all(24),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 500, maxHeight: 550),
-          decoration: BoxDecoration(color: AC.navy2.withOpacity(0.95), borderRadius: BorderRadius.circular(20), border: Border.all(color: AC.gold.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AC.navy2.withValues(alpha: 0.95), borderRadius: BorderRadius.circular(20), border: Border.all(color: AC.gold.withValues(alpha: 0.3))),
           padding: const EdgeInsets.all(20),
           child: Column(children: [
             Row(children: [
@@ -1306,13 +1287,12 @@ class _ClientsS extends ConsumerState<ClientsTab> {
               final type = c2['client_type'] ?? '';
               final role = c2['your_role'] ?? '';
               return InkWell(
-                onTap: () => Navigator.push(c, MaterialPageRoute(
-                  builder: (_) => ClientDetailScreen(clientId: (c2['id'] ?? '').toString(), clientName: name))),
+                onTap: () => context.push('/client-detail', extra: {'id': (c2['id'] ?? '').toString(), 'name': name}),
                 child: Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AC.bdr)),
                   child: Row(children: [
-                    CircleAvatar(backgroundColor: const Color(0xFFC9A84C).withOpacity(0.15), radius: 24,
+                    CircleAvatar(backgroundColor: const Color(0xFFC9A84C).withValues(alpha: 0.15), radius: 24,
                       child: Text(name.isNotEmpty ? name[0] : '?', style: const TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16))),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1320,7 +1300,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
                       const SizedBox(height: 4),
                       Row(children: [
                         if (type.isNotEmpty) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                          decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                           child: Text(type, style: const TextStyle(color: AC.gold, fontSize: 10))),
                         if (type.isNotEmpty && role.isNotEmpty) const SizedBox(width: 8),
                         if (role.isNotEmpty) Text(role, style: const TextStyle(color: AC.ts, fontSize: 11)),
@@ -1337,7 +1317,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
 class NewClientScreen extends StatefulWidget { const NewClientScreen({super.key}); @override State<NewClientScreen> createState()=>_NewCS(); }
 class _NewCS extends State<NewClientScreen> {
   final _n=TextEditingController(); List _types=[]; String? _t; bool _l=false; String? _e;
-  @override void initState() { super.initState(); http.get(Uri.parse('$_api/client-types')).then((r){ if(mounted) setState(()=> _types=jsonDecode(r.body)); }); }
+  @override void initState() { super.initState(); ApiService.getClientTypes().then((r){ if(r.success && mounted) { final d = r.data; setState(()=> _types = d is List ? d : []); } }); }
   @override
   void dispose() {
     _n.dispose();
@@ -1362,7 +1342,7 @@ class _NewCS extends State<NewClientScreen> {
       const SizedBox(height: 8),
       ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_t=t['code']),
         child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: _t==t['code'] ? AC.gold.withOpacity(0.1) : AC.navy3,
+          decoration: BoxDecoration(color: _t==t['code'] ? AC.gold.withValues(alpha: 0.1) : AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _t==t['code'] ? AC.gold : AC.bdr)),
           child: Row(children: [
             Icon(_t==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _t==t['code'] ? AC.gold : AC.ts, size: 20),
@@ -1389,11 +1369,8 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
   Future<void> _run() async {
     if(_fb==null) return; setState((){ _a=true; _e=null; });
     try {
-      final req = http.MultipartRequest('POST', Uri.parse('$_api/analyze?industry=retail'));
-      req.headers['Authorization']='Bearer ${S.token}';
-      req.files.add(http.MultipartFile.fromBytes('file', _fb!, filename:'tb.xlsx'));
-      final res = await req.send(); final body = await res.stream.bytesToString();
-      setState((){ _r=jsonDecode(body); _a=false; });
+      final result = await ApiService.analyzeQuick(bytes: _fb!, fileName: 'tb.xlsx');
+      setState((){ _r = result.data; _a=false; if(!result.success) _e = result.error; });
     } catch(e){ setState((){ _e='$e'; _a=false; }); }
   }
   String _fmt(dynamic v) { if(v==null) return '-'; final d=(v is int)?v.toDouble():(v is double)?v:0.0;
@@ -1432,7 +1409,7 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
         Expanded(child: Text(label, style: const TextStyle(color: AC.ts, fontSize: 13))),
         Text(value, style: const TextStyle(color: AC.tp, fontSize: 14)),
         const SizedBox(width: 6),
-        Container(width: 22, height: 22, decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), shape: BoxShape.circle),
+        Container(width: 22, height: 22, decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), shape: BoxShape.circle),
           child: const Icon(Icons.info_outline, color: AC.gold, size: 14))])));
 
   @override Widget build(BuildContext c) => Scaffold(
@@ -1488,7 +1465,7 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
             icon: const Icon(Icons.refresh, color: AC.gold, size: 18),
             label: const Text('\u062a\u062d\u0644\u064a\u0644 \u0622\u062e\u0631', style: TextStyle(color: AC.gold)))),
           const SizedBox(width: 10),
-          Expanded(child: OutlinedButton.icon(onPressed: ()=>Navigator.push(c, MaterialPageRoute(builder:(_)=>KnowledgeFeedbackScreen(resultId: _r?['result_id']))),
+          Expanded(child: OutlinedButton.icon(onPressed: ()=>context.push('/knowledge/feedback-form', extra: {'resultId': _r?['result_id']}),
             style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.cyan)),
             icon: const Icon(Icons.feedback_outlined, color: AC.cyan, size: 18),
             label: const Text('\u0645\u0644\u0627\u062d\u0638\u0629 \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.cyan)))),
@@ -1498,13 +1475,8 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
           style: ElevatedButton.styleFrom(backgroundColor: AC.ok, padding: const EdgeInsets.symmetric(vertical: 14)),
           onPressed: () async {
             try {
-              final req = http.MultipartRequest('POST', Uri.parse('$_api/analyze/report?industry=retail'));
-              // auth removed for CORS
-              req.files.add(http.MultipartFile.fromBytes('file', _fb!, filename: 'tb.xlsx'));
-              final res = await req.send();
-              final bytes = await res.stream.toBytes();
-              if (res.statusCode == 200) {
-                // PDF downloaded - show success
+              final result = await ApiService.analyzeReport(bytes: _fb!, fileName: 'tb.xlsx');
+              if (result.success) {
                 ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('طھظ… طھط­ظ…ظٹظ„ ط§ظ„طھظ‚ط±ظٹط± ط¨ظ†ط¬ط§ط­'), backgroundColor: Color(0xFF2ECC8A)));
               }
             } catch (e) {
@@ -1548,11 +1520,9 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
     if(_title.text.trim().isEmpty) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0645\u0637\u0644\u0648\u0628'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/knowledge-feedback'),
-        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-        body: jsonEncode({'feedback_type':_type,'title':_title.text.trim(),'description':_desc.text.trim()}));
-      if(jsonDecode(r.body)['success']==true) setState(()=> _done=true);
-      else setState(()=> _e=jsonDecode(r.body)['detail']);
+      final r = await ApiService.submitKnowledgeFeedback({'feedback_type':_type,'title':_title.text.trim(),'description':_desc.text.trim()});
+      if(r.success) setState(()=> _done=true);
+      else setState(()=> _e=r.error);
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -1570,7 +1540,7 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
       const SizedBox(height: 8),
       ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_type=t['code']!),
         child: Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(color: _type==t['code'] ? AC.gold.withOpacity(0.1) : AC.navy3,
+          decoration: BoxDecoration(color: _type==t['code'] ? AC.gold.withValues(alpha: 0.1) : AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type==t['code'] ? AC.gold : AC.bdr)),
           child: Row(children: [
             Icon(_type==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _type==t['code'] ? AC.gold : AC.ts, size: 18),
@@ -1595,11 +1565,11 @@ class _MarketS extends ConsumerState<MarketTab> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r1 = await http.get(Uri.parse('$_api/marketplace/providers'), headers: S.h());
-      final r2 = await http.get(Uri.parse('$_api/marketplace/my-requests'), headers: S.h());
+      final r1 = await ApiService.listMarketplaceProviders();
+      final r2 = await ApiService.listMyRequests();
       if(mounted) setState(() {
-        try { _provs = jsonDecode(r1.body); } catch(_) { _provs = []; }
-        try { _reqs = jsonDecode(r2.body); } catch(_) { _reqs = []; }
+        final d1 = r1.data; _provs = d1 is List ? d1 : [];
+        final d2 = r2.data; _reqs = d2 is List ? d2 : [];
         _ld = false;
       });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
@@ -1607,11 +1577,11 @@ class _MarketS extends ConsumerState<MarketTab> {
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: const Text('\u0627\u0644\u0645\u0639\u0631\u0636', style: TextStyle(color: AC.gold))),
     floatingActionButton: FloatingActionButton.extended(backgroundColor: AC.gold,
-      onPressed: ()=> Navigator.push(c, MaterialPageRoute(builder: (_) => const NewServiceRequestScreen())),
+      onPressed: ()=> context.push('/marketplace/new-request'),
       icon: const Icon(Icons.add, color: AC.navy), label: const Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.navy))),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold)) :
       ListView(padding: const EdgeInsets.all(14), children: [
-        Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [const Icon(Icons.store_mall_directory, color: AC.gold, size: 36), const SizedBox(height: 8), const Text("ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ ط§ظ„ظ…ظ‡ظ†ظٹط©", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), const Text("طھطµظپط­ 6 ط®ط¯ظ…ط§طھ: طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹطŒ ظ…ط±ط§ط¬ط¹ط©طŒ ط¶ط±ط§ط¦ط¨طŒ طھظ…ظˆظٹظ„طŒ ط¯ط¹ظ…طŒ طھط±ط§ط®ظٹطµ", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => catalog.ServiceCatalogScreen(clientId: '', token: S.token))), icon: const Icon(Icons.arrow_forward), label: const Text("ظپطھط­ ط§ظ„ظƒطھط§ظ„ظˆط¬")))])),
+        Container(margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [const Icon(Icons.store_mall_directory, color: AC.gold, size: 36), const SizedBox(height: 8), const Text("ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ ط§ظ„ظ…ظ‡ظ†ظٹط©", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 4), const Text("طھطµظپط­ 6 ط®ط¯ظ…ط§طھ: طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹطŒ ظ…ط±ط§ط¬ط¹ط©طŒ ط¶ط±ط§ط¦ط¨طŒ طھظ…ظˆظٹظ„طŒ ط¯ط¹ظ…طŒ طھط±ط§ط®ظٹطµ", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), const SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => context.push('/service-catalog', extra: {'clientId': '', 'token': S.token}), icon: const Icon(Icons.arrow_forward), label: const Text("ظپطھط­ ط§ظ„ظƒطھط§ظ„ظˆط¬")))])),
         _card('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0639\u062a\u0645\u062f\u0648\u0646', [
           if(_provs.isEmpty) const Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0642\u062f\u0645\u0648 \u062e\u062f\u0645\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
           else ..._provs.take(5).map((p) => Padding(padding: const EdgeInsets.only(bottom: 8),
@@ -1648,7 +1618,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
   final _title=TextEditingController(), _desc=TextEditingController(), _budget=TextEditingController();
   String _urgency='medium'; List _clients=[]; String? _clientId, _e; bool _l=false, _done=false;
   @override void initState() { super.initState();
-    http.get(Uri.parse('$_api/clients'), headers: S.lh()).then((r){ if(r.statusCode == 200 && mounted) setState((){ final d = jsonDecode(r.body); _clients = d is List ? d : (d['clients'] ?? d['data'] ?? []); }); }); }
+    ApiService.listClients().then((r){ if(r.success && mounted) { final d = r.data; setState((){ _clients = d is List ? d : []; }); } }); }
   @override
   void dispose() {
     _title.dispose();
@@ -1660,12 +1630,10 @@ class _NSRS extends State<NewServiceRequestScreen> {
     if(_title.text.isEmpty||_clientId==null) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0639\u0645\u064a\u0644 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/marketplace/requests'),
-        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-        body: jsonEncode({'client_id':_clientId,'title':_title.text.trim(),'description':_desc.text.trim(),
-          'urgency':_urgency,'budget_sar':double.tryParse(_budget.text)??0,'deadline_days':14}));
-      if(jsonDecode(r.body)['success']==true) setState(()=> _done=true);
-      else setState(()=> _e=jsonDecode(r.body)['detail']);
+      final r = await ApiService.createServiceRequest({'client_id':_clientId,'title':_title.text.trim(),'description':_desc.text.trim(),
+        'urgency':_urgency,'budget_sar':double.tryParse(_budget.text)??0,'deadline_days':14});
+      if(r.success) setState(()=> _done=true);
+      else setState(()=> _e=r.error);
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -1682,7 +1650,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
         const SizedBox(height: 6),
         ..._clients.map((cl) => GestureDetector(onTap: ()=>setState(()=>_clientId=cl['id']),
           child: Container(margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: _clientId==cl['id']?AC.gold.withOpacity(0.1):AC.navy3,
+            decoration: BoxDecoration(color: _clientId==cl['id']?AC.gold.withValues(alpha: 0.1):AC.navy3,
               borderRadius: BorderRadius.circular(8), border: Border.all(color: _clientId==cl['id']?AC.gold:AC.bdr)),
             child: Text(cl['name_ar']??'', style: TextStyle(color: _clientId==cl['id']?AC.gold:AC.tp, fontSize: 13))))),
         const SizedBox(height: 12)],
@@ -1696,7 +1664,7 @@ class _NSRS extends State<NewServiceRequestScreen> {
       const SizedBox(height: 6),
       Row(children: ['low','medium','high'].map((u) => Expanded(child: GestureDetector(onTap: ()=>setState(()=>_urgency=u),
         child: Container(margin: const EdgeInsets.symmetric(horizontal: 3), padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok).withOpacity(0.15) : AC.navy3,
+          decoration: BoxDecoration(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok).withValues(alpha: 0.15) : AC.navy3,
             borderRadius: BorderRadius.circular(8), border: Border.all(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok) : AC.bdr)),
           child: Center(child: Text(u=='high'?'\u0639\u0627\u0644\u064a\u0629':u=='medium'?'\u0645\u062a\u0648\u0633\u0637\u0629':'\u0645\u0646\u062e\u0641\u0636\u0629',
             style: TextStyle(color: _urgency==u ? AC.tp : AC.ts, fontSize: 12))))))).toList()),
@@ -1722,18 +1690,16 @@ class _ProvS extends State<ProviderTab> {
   ];
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
-    try { final r = await http.get(Uri.parse('$_api/service-providers/me'), headers: S.h());
-      if(r.statusCode==200) { if(mounted) setState((){ _p=jsonDecode(r.body); _ld=false; }); }
+    try { final r = await ApiService.getProviderMe();
+      if(r.success) { if(mounted) setState((){ _p=r.data; _ld=false; }); }
       else { if(mounted) setState((){ _notProvider=true; _ld=false; }); }
     } catch(_) { if(mounted) setState((){ _notProvider=true; _ld=false; }); }
   }
   String? _sel;
   Future<void> _register() async {
     if(_sel==null) return;
-    final r = await http.post(Uri.parse('$_api/service-providers/register'),
-      headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-      body: jsonEncode({'category':_sel}));
-    if(r.statusCode==200) _load();
+    final r = await ApiService.registerProvider({'category':_sel});
+    if(r.success) _load();
   }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: const Text('\u0645\u0642\u062f\u0645 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.gold))),
@@ -1744,7 +1710,7 @@ class _ProvS extends State<ProviderTab> {
         const SizedBox(height: 20),
         ..._cats.map((cat) => GestureDetector(onTap: ()=>setState(()=>_sel=cat['code']),
           child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: _sel==cat['code']?AC.gold.withOpacity(0.1):AC.navy3,
+            decoration: BoxDecoration(color: _sel==cat['code']?AC.gold.withValues(alpha: 0.1):AC.navy3,
               borderRadius: BorderRadius.circular(10), border: Border.all(color: _sel==cat['code']?AC.gold:AC.bdr)),
             child: Row(children: [
               Icon(_sel==cat['code']?Icons.radio_button_checked:Icons.radio_button_off, color: _sel==cat['code']?AC.gold:AC.ts, size: 18),
@@ -1780,13 +1746,13 @@ class _AccS extends ConsumerState<AccountTab> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r1 = await http.get(Uri.parse('$_api/users/me'), headers: S.h());
-      final r2 = await http.get(Uri.parse('$_api/users/me/security'), headers: S.h());
-      if(mounted) setState((){ _p=jsonDecode(r1.body); _s=jsonDecode(r2.body); _ld=false; });
+      final r1 = await ApiService.getProfile();
+      final r2 = await ApiService.getSecuritySettings();
+      if(mounted) setState((){ _p=r1.data is Map ? r1.data : null; _s=r2.data is Map ? r2.data : null; _ld=false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
-  void _logout() { http.post(Uri.parse('$_api/auth/logout'), headers: S.h()); S.clear();
-    S.clear(); ApiService.clearToken(); context.go('/login'); }
+  void _logout() { ApiService.logout(); S.clear();
+    ApiService.clearToken(); context.go('/login'); }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: const Text('\u062d\u0633\u0627\u0628\u064a', style: TextStyle(color: AC.gold)),
       actions: [IconButton(onPressed: _logout, icon: const Icon(Icons.logout, color: AC.err))]),
@@ -1804,14 +1770,14 @@ class _AccS extends ConsumerState<AccountTab> {
             const SizedBox(height: 4),
             Text(_p?['user']?['email']??'', style: const TextStyle(color: AC.ts, fontSize: 12)),
             const SizedBox(height: 12),
-            OutlinedButton.icon(onPressed: ()=> Navigator.push(c, MaterialPageRoute(builder:(_)=>EditProfileScreen(profile: _p))),
+            OutlinedButton.icon(onPressed: ()=> context.push('/profile/edit', extra: _p),
               style: OutlinedButton.styleFrom(side: const BorderSide(color: AC.gold)),
               icon: const Icon(Icons.edit, color: AC.gold, size: 16),
               label: const Text('\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a', style: TextStyle(color: AC.gold, fontSize: 12)))])),
         const SizedBox(height: 14),
         // Security
         _card('\u0627\u0644\u0623\u0645\u0627\u0646', [
-          InkWell(onTap:(){Navigator.push(c,MaterialPageRoute(builder:(_)=>const SessionsScreen()));},child:_kv('\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0646\u0634\u0637\u0629', '${_s?['active_sessions']??0}')),
+          InkWell(onTap:(){context.push('/account/sessions');},child:_kv('\u0627\u0644\u062c\u0644\u0633\u0627\u062a \u0627\u0644\u0646\u0634\u0637\u0629', '${_s?['active_sessions']??0}')),
           _kv('\u0639\u062f\u062f \u0645\u0631\u0627\u062a \u0627\u0644\u062f\u062e\u0648\u0644', '${_s?['login_count']??0}'),
           _kv('\u0622\u062e\u0631 \u062f\u062e\u0648\u0644', _s?['last_login']?.toString().substring(0,16)??'-'),
         ]),
@@ -1826,7 +1792,7 @@ class _AccS extends ConsumerState<AccountTab> {
           ()=>context.go('/password/change')),
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
           ()=>context.go('/account/close')),
-          _mi(Icons.archive, 'ط§ظ„ط£ط±ط´ظٹظپ', AC.cyan, () => Navigator.push(context, MaterialPageRoute(builder: (_) => archive.ArchiveScreen(token: S.token)))),
+          _mi(Icons.archive, 'ط§ظ„ط£ط±ط´ظٹظپ', AC.cyan, () => context.push('/archive')),
             _mi(Icons.history, 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·', const Color(0xFF9C27B0),
             ()=>context.go('/account/activity')),
           _mi(Icons.compare_arrows, 'ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·', AC.cyan,
@@ -1872,11 +1838,9 @@ class _EditPS extends State<EditProfileScreen> {
   Future<void> _save() async {
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.put(Uri.parse('$_api/users/me'),
-        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-        body: jsonEncode({'display_name':_dn.text.trim(),'organization_name':_org.text.trim(),'job_title':_job.text.trim(),'city':_city.text.trim()}));
-      if(r.statusCode==200) { S.dname=_dn.text.trim(); setState(()=> _done=true); }
-      else { setState(()=> _e=jsonDecode(r.body)['detail']); }
+      final r = await ApiService.updateUser({'display_name':_dn.text.trim(),'organization_name':_org.text.trim(),'job_title':_job.text.trim(),'city':_city.text.trim()});
+      if(r.success) { S.dname=_dn.text.trim(); setState(()=> _done=true); }
+      else { setState(()=> _e=r.error); }
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -1922,11 +1886,9 @@ class _ChPwS extends State<ChangePasswordScreen> {
     if(_new1.text!=_new2.text) { setState(()=> _e='\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/users/me/security/password'),
-        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-        body: jsonEncode({'current_password':_cur.text,'new_password':_new1.text,'confirm_password':_new2.text}));
-      if(r.statusCode==200) setState(()=> _done=true);
-      else setState(()=> _e=jsonDecode(r.body)['detail']);
+      final r = await ApiService.changePassword(current: _cur.text, newPw: _new1.text, confirm: _new2.text);
+      if(r.success) setState(()=> _done=true);
+      else setState(()=> _e=r.error);
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -1961,11 +1923,9 @@ class _CloseAS extends State<CloseAccountScreen> {
   Future<void> _go() async {
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/account/closure'),
-        headers:{'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-        body: jsonEncode({'closure_type':_type}));
-      if(r.statusCode==200) setState(()=> _done=true);
-      else setState(()=> _e=jsonDecode(r.body)['detail']??'\u062e\u0637\u0623');
+      final r = await ApiService.requestClosure(type: _type);
+      if(r.success) setState(()=> _done=true);
+      else setState(()=> _e=r.error??'\u062e\u0637\u0623');
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -1978,7 +1938,7 @@ class _CloseAS extends State<CloseAccountScreen> {
       ElevatedButton(onPressed: (){ S.clear(); context.go('/login'); },
         child: const Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.err.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
         child: const Row(children: [Icon(Icons.warning, color: AC.err), SizedBox(width: 10),
           Expanded(child: Text('\u0647\u0630\u0627 \u0627\u0644\u0625\u062c\u0631\u0627\u0621 \u0644\u0627 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u0631\u0627\u062c\u0639 \u0639\u0646\u0647 \u0628\u0633\u0647\u0648\u0644\u0629', style: TextStyle(color: AC.err, fontSize: 13)))])),
       const SizedBox(height: 20),
@@ -1986,7 +1946,7 @@ class _CloseAS extends State<CloseAccountScreen> {
       const SizedBox(height: 10),
       GestureDetector(onTap: ()=>setState(()=>_type='temporary'),
         child: Container(padding: const EdgeInsets.all(14), margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(color: _type=='temporary'?AC.warn.withOpacity(0.1):AC.navy3,
+          decoration: BoxDecoration(color: _type=='temporary'?AC.warn.withValues(alpha: 0.1):AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='temporary'?AC.warn:AC.bdr)),
           child: Row(children: [Icon(_type=='temporary'?Icons.radio_button_checked:Icons.radio_button_off,
             color: _type=='temporary'?AC.warn:AC.ts, size: 18), const SizedBox(width: 10),
@@ -1995,7 +1955,7 @@ class _CloseAS extends State<CloseAccountScreen> {
               Text('\u064a\u0645\u0643\u0646\u0643 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0641\u0639\u064a\u0644 \u0644\u0627\u062d\u0642\u0627\u064b', style: TextStyle(color: AC.ts, fontSize: 11))]))]))),
       GestureDetector(onTap: ()=>setState(()=>_type='permanent'),
         child: Container(padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: _type=='permanent'?AC.err.withOpacity(0.1):AC.navy3,
+          decoration: BoxDecoration(color: _type=='permanent'?AC.err.withValues(alpha: 0.1):AC.navy3,
             borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='permanent'?AC.err:AC.bdr)),
           child: Row(children: [Icon(_type=='permanent'?Icons.radio_button_checked:Icons.radio_button_off,
             color: _type=='permanent'?AC.err:AC.ts, size: 18), const SizedBox(width: 10),
@@ -2021,11 +1981,11 @@ class _AdminS extends ConsumerState<AdminTab> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r1 = await http.get(Uri.parse('$_api/admin/stats'), headers: S.h());
-      final r2 = await http.get(Uri.parse('$_api/admin/users'), headers: S.h());
+      final r1 = await ApiService.adminStats();
+      final r2 = await ApiService.adminUsers();
       if(mounted) setState(() {
-        try { _stats = jsonDecode(r1.body); } catch(_) {}
-        try { _users = jsonDecode(r2.body); } catch(_) { _users = []; }
+        _stats = r1.data is Map ? Map<String,dynamic>.from(r1.data) : {};
+        final d2 = r2.data; _users = d2 is List ? d2 : [];
         _ld = false;
       });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
@@ -2088,7 +2048,7 @@ class _AdminS extends ConsumerState<AdminTab> {
   Widget _statCard(String label, String value, IconData icon, Color color) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: color.withOpacity(0.3))),
+      border: Border.all(color: color.withValues(alpha: 0.3))),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
       Row(children: [Icon(icon, color: color, size: 22), const Spacer(),
         Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold))]),
@@ -2098,7 +2058,7 @@ class _AdminS extends ConsumerState<AdminTab> {
   Widget _actionTile(String label, IconData icon, Color color, VoidCallback onTap) =>
     GestureDetector(onTap: onTap, child: Padding(padding: const EdgeInsets.only(bottom: 8),
       child: Row(children: [
-        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, color: color, size: 18)),
         const SizedBox(width: 12),
         Expanded(child: Text(label, style: const TextStyle(color: AC.tp, fontSize: 14))),
@@ -2117,14 +2077,12 @@ class _RevCS extends State<ReviewerConsoleScreen> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/admin/knowledge-feedback'), headers: S.h());
-      if(mounted) setState(() { try { _items = jsonDecode(r.body); } catch(_) { _items = []; } _ld = false; });
+      final r = await ApiService.adminKnowledgeFeedback();
+      if(mounted) setState(() { final d = r.data; _items = d is List ? d : []; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   Future<void> _review(String id, String decision) async {
-    await http.post(Uri.parse('$_api/admin/knowledge-feedback/$id/review'),
-      headers: {'Authorization':'Bearer ${S.liveToken}','Content-Type':'application/json'},
-      body: jsonEncode({'decision': decision}));
+    await ApiService.adminReviewFeedback(id, {'decision': decision});
     _load();
   }
   List get _filtered => _filter == 'all' ? _items : _items.where((i) => i['status'] == _filter).toList();
@@ -2194,12 +2152,12 @@ class _PVS extends State<ProviderVerificationScreen> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/admin/providers'), headers: S.h());
-      if(mounted) setState(() { try { _provs = jsonDecode(r.body); } catch(_) { _provs = []; } _ld = false; });
+      final r = await ApiService.adminProviders();
+      if(mounted) setState(() { final d = r.data; _provs = d is List ? d : []; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   Future<void> _action(String id, String action) async {
-    await http.post(Uri.parse('$_api/admin/providers/$id/$action'), headers: S.h());
+    await ApiService.adminProviderAction(id, action);
     _load();
   }
   @override Widget build(BuildContext c) => Scaffold(
@@ -2229,7 +2187,7 @@ class _PVS extends State<ProviderVerificationScreen> {
                 const SizedBox(height: 8),
                 Wrap(spacing: 6, runSpacing: 4, children: (p['service_scopes'] as List).map((s) =>
                   Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                     child: Text(s['name_ar']??s['code']??'', style: const TextStyle(color: AC.cyan, fontSize: 10)))).toList())],
               if(p['required_documents']!=null) ...[
                 const SizedBox(height: 6),
@@ -2263,8 +2221,8 @@ class _PMS extends State<PolicyManagementScreen> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/legal/policies'), headers: S.h());
-      if(mounted) setState(() { try { _policies = jsonDecode(r.body); } catch(_) { _policies = []; } _ld = false; });
+      final r = await ApiService.getLegalPolicies();
+      if(mounted) setState(() { final d = r.data; _policies = d is List ? d : []; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
@@ -2330,15 +2288,9 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
     if (!_allAccepted) return;
     setState(() => _loading = true);
     try {
-      await http.post(Uri.parse('$_api/legal/accept'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'document_type': 'terms', 'version': '1.0'}));
-      await http.post(Uri.parse('$_api/legal/accept'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'document_type': 'privacy', 'version': '1.0'}));
-      await http.post(Uri.parse('$_api/legal/accept'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'document_type': 'acceptable_use', 'version': '1.0'}));
+      await ApiService.acceptLegal(documentType: 'terms', version: '1.0');
+      await ApiService.acceptLegal(documentType: 'privacy', version: '1.0');
+      await ApiService.acceptLegal(documentType: 'acceptable_use', version: '1.0');
       widget.onAccepted();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ط®ط·ط£: $e')));
@@ -2402,7 +2354,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
       decoration: BoxDecoration(
         color: Colors.white, borderRadius: BorderRadius.circular(12),
         border: Border.all(color: value ? AC.gold : const Color(0xFFE0E0E0), width: value ? 2 : 1),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -2485,7 +2437,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: CircleAvatar(
-                    backgroundColor: selected ? AC.gold.withOpacity(0.15) : const Color(0xFFF5F5F5),
+                    backgroundColor: selected ? AC.gold.withValues(alpha: 0.15) : const Color(0xFFF5F5F5),
                     child: Icon(t['icon'] as IconData, color: selected ? AC.gold : AC.navy, size: 24),
                   ),
                   title: Text(t['name'] as String, style: TextStyle(
@@ -2846,7 +2798,7 @@ class ActivityHistoryScreen extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
             child: Row(children: [
               CircleAvatar(
-                backgroundColor: (a['color'] as Color).withOpacity(0.1),
+                backgroundColor: (a['color'] as Color).withValues(alpha: 0.1),
                 radius: 20,
                 child: Icon(a['icon'] as IconData, color: a['color'] as Color, size: 20),
               ),
@@ -2884,11 +2836,9 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
   
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/results/${widget.analysisId}/details'),
-        headers: S.h());
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        final details = data['details'] as List? ?? [];
+      final r = await ApiService.getResultDetails(widget.analysisId);
+      if (r.success) {
+        final details = (r.data is Map ? r.data['details'] : null) as List? ?? [];
         for (var d in details) {
           if (d['result_key'] == widget.resultKey) {
             setState(() { _detail = d; _loading = false; });
@@ -2948,7 +2898,7 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
   
   Widget _chip(String t, Color c) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+    decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
     child: Text(t, style: TextStyle(color: c, fontSize: 11)));
 }
 
@@ -2985,13 +2935,12 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
     setState(() => _loading = true);
     try {
       // Load task type requirements
-      final r1 = await http.get(Uri.parse('$_api/task-types/${widget.taskTypeCode}'));
-      if (r1.statusCode == 200) _taskType = jsonDecode(r1.body);
-      
+      final r1 = await ApiService.getTaskType(widget.taskTypeCode);
+      if (r1.success) _taskType = r1.data;
+
       // Load existing submissions
-      final r2 = await http.get(Uri.parse('$_api/task-submissions/${widget.taskId}'),
-        headers: S.h());
-      if (r2.statusCode == 200) _submissions = jsonDecode(r2.body);
+      final r2 = await ApiService.getTaskSubmission(widget.taskId);
+      if (r2.success) _submissions = r2.data is List ? r2.data : [];
     } catch (e) { /* handle */ }
     setState(() => _loading = false);
   }
@@ -3001,14 +2950,12 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
   Future<void> _upload(String reqId, String docName) async {
     // Simulate upload â€” in production, use file picker
     try {
-      final r = await http.post(Uri.parse('$_api/task-submissions'),
-        headers: {...S.h(), 'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'service_task_id': widget.taskId,
-          'requirement_id': reqId,
-          'file_name': '$docName.pdf',
-        }));
-      if (r.statusCode == 200) {
+      final r = await ApiService.createTaskSubmission({
+        'service_task_id': widget.taskId,
+        'requirement_id': reqId,
+        'file_name': '$docName.pdf',
+      });
+      if (r.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('\u062a\u0645 \u0631\u0641\u0639 $docName'), backgroundColor: const Color(0xFF2ECC8A)));
         _load();
@@ -3126,9 +3073,9 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
   
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/task-types'));
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
+      final r = await ApiService.getTaskTypes();
+      if (r.success) {
+        final data = r.data;
         if (data is List) { _types = data; }
         else if (data is Map && data['task_types'] != null) { _types = data['task_types']; }
         else { _types = []; }
@@ -3206,12 +3153,10 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
   
   Future<void> _load() async {
     try {
-      String url = '$_api/knowledge-feedback/review-queue?status=$_filter';
-      if (_filter == 'all') url = '$_api/knowledge-feedback/review-queue';
-      final r = await http.get(Uri.parse(url), headers: S.h());
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        _feedbacks = data is List ? data : (data['items'] ?? []);
+      final r = await ApiService.getReviewQueue(status: _filter == 'all' ? 'submitted' : _filter);
+      if (r.success) {
+        final data = r.data;
+        _feedbacks = data is List ? data : (data is Map ? (data['items'] ?? []) : []);
       }
     } catch (e) { /* handle */ }
     setState(() => _loading = false);
@@ -3266,7 +3211,7 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
                     Expanded(child: Text(fb['feedback_type'] ?? '\u0645\u0644\u0627\u062d\u0638\u0629',
                       style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold))),
                     Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                       child: Text(status, style: TextStyle(color: statusColor, fontSize: 11))),
                   ]),
                   const SizedBox(height: 8),
@@ -3296,8 +3241,8 @@ class _AuditLogS extends State<AuditLogScreen> {
   
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/audit/events?limit=100'), headers: S.h());
-      if (r.statusCode == 200) _events = jsonDecode(r.body);
+      final r = await ApiService.adminAuditEvents();
+      if (r.success) { final d = r.data; _events = d is List ? d : []; }
     } catch (e) { /* handle */ }
     setState(() => _loading = false);
   }
@@ -3390,7 +3335,7 @@ class _VerifyRCS extends State<VerifyResetCodeScreen> {
             style: TextStyle(color: Colors.white38, fontSize: 13), textAlign: TextAlign.center),
           const SizedBox(height: 24),
           if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(color: Colors.red.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
           TextField(controller: _codeC, textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 4),
@@ -3441,14 +3386,11 @@ class _NewPwS extends State<NewPasswordScreen> {
     setState(() { _ld = true; _err = null; });
     // Token debug removed for security
     try {
-      final r = await http.post(Uri.parse('$_api/account/reset-password'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'token': widget.token, 'new_password': _pw1.text}));
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
+      final r = await ApiService.resetPassword(token: widget.token, newPassword: _pw1.text);
+      if (r.success) {
         setState(() { _done = true; });
       } else {
-        setState(() { _err = d['error'] ?? d['detail'] ?? 'فشلت إعادة التعيين'; });
+        setState(() { _err = r.error ?? 'فشلت إعادة التعيين'; });
       }
     } catch (e) {
       setState(() { _err = 'ط®ط·ط£ ظپظٹ ط§ظ„ط§طھطµط§ظ„'; });
@@ -3481,7 +3423,7 @@ class _NewPwS extends State<NewPasswordScreen> {
               style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6), textAlign: TextAlign.center),
             const SizedBox(height: 24),
             if (_err != null) Container(padding: const EdgeInsets.all(12), margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
               child: Text(_err!, style: const TextStyle(color: Colors.redAccent, fontSize: 14), textAlign: TextAlign.center)),
             TextField(controller: _pw1, obscureText: true, style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(labelText: 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¬ط¯ظٹط¯ط©',
@@ -3524,24 +3466,18 @@ class _SessionsScreenState extends State<SessionsScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final r = await http.get(
-        Uri.parse('$_api/account/sessions'),
-        headers: {'Authorization': 'Bearer ${S.token}'},
-      );
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        setState(() => _sessions = data['sessions'] ?? []);
+      final r = await ApiService.getSessions();
+      if (r.success) {
+        final data = r.data;
+        setState(() => _sessions = data is Map ? (data['sessions'] ?? []) : (data is List ? data : []));
       }
     } catch (_) {}
     setState(() => _loading = false);
   }
 
   Future<void> _logoutAll() async {
-    final r = await http.post(
-      Uri.parse('$_api/account/sessions/logout-all'),
-      headers: {'Authorization': 'Bearer ${S.token}'},
-    );
-    if (r.statusCode == 200) {
+    final r = await ApiService.logoutAllSessions();
+    if (r.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('طھظ… ط¥ظ†ظ‡ط§ط، ط¬ظ…ظٹط¹ ط§ظ„ط¬ظ„ط³ط§طھ'), backgroundColor: Colors.green));
       _load();
@@ -3549,11 +3485,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
   }
 
   Future<void> _logoutOne(String id) async {
-    final r = await http.post(
-      Uri.parse('$_api/account/sessions/$id/logout'),
-      headers: {'Authorization': 'Bearer ${S.token}'},
-    );
-    if (r.statusCode == 200) {
+    final r = await ApiService.logoutSession(id);
+    if (r.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('طھظ… ط¥ظ†ظ‡ط§ط، ط§ظ„ط¬ظ„ط³ط©'), backgroundColor: Colors.green));
       _load();

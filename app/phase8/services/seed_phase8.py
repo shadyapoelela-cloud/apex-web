@@ -5,9 +5,9 @@ Per Execution Master §4 + Zero Ambiguity §5, §10
 Plans: Free, Pro, Business, Expert, Enterprise
 Feature Keys per plan with limits
 """
+
 import logging
-from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow, UserSubscription, SubscriptionEntitlement
-from app.phase8.models.phase8_models import P8PlanLimit, P8EntitlementAuditLog
+from app.phase1.models.platform_models import SessionLocal, gen_uuid, SubscriptionEntitlement
 
 # ─── Plan Limits Matrix (Execution Master §4 + Zero Ambiguity §10) ─────
 PLAN_LIMITS = {
@@ -99,15 +99,17 @@ FEATURE_DESCRIPTIONS = {
     "provider_listing_priority": ("أولوية ظهور مقدم الخدمة", "Provider listing priority"),
 }
 
+
 def seed_plan_limits():
     """Seed plan_limits table with all plan features"""
     from app.phase8.models.phase8_models import PlanLimit
+
     db = SessionLocal()
     try:
         existing = db.query(PlanLimit).count()
         if existing > 0:
             return f"Already seeded: {existing} limits"
-        
+
         count = 0
         for plan_name, features in PLAN_LIMITS.items():
             for feature_key, feature_value in features.items():
@@ -122,7 +124,7 @@ def seed_plan_limits():
                 )
                 db.add(limit)
                 count += 1
-        
+
         db.commit()
         return f"Seeded {count} plan limits across {len(PLAN_LIMITS)} plans"
     except Exception as e:
@@ -135,13 +137,14 @@ def seed_plan_limits():
 def create_user_subscription(user_id, plan_name="Free"):
     """Create a default subscription for a new user"""
     from app.phase1.models.platform_models import UserSubscription
+
     db = SessionLocal()
     try:
         # Check if user already has subscription
         existing = db.query(UserSubscription).filter_by(user_id=user_id, status="active").first()
         if existing:
             return {"status": "exists", "plan": existing.plan_name}
-        
+
         # Create subscription
         sub = UserSubscription(
             id=gen_uuid(),
@@ -151,7 +154,7 @@ def create_user_subscription(user_id, plan_name="Free"):
             status="active",
         )
         db.add(sub)
-        
+
         # Resolve entitlements from plan limits
         limits = PLAN_LIMITS.get(plan_name, PLAN_LIMITS["Free"])
         for feature_key, feature_value in limits.items():
@@ -163,10 +166,10 @@ def create_user_subscription(user_id, plan_name="Free"):
                 source="plan",
             )
             db.add(ent)
-        
+
         db.commit()
         return {"success": True, "plan": plan_name, "entitlements": len(limits)}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -178,19 +181,18 @@ def upgrade_user_plan(user_id, new_plan_name):
     """Upgrade/downgrade user plan using Phase 1 models"""
     from app.phase1.models.platform_models import UserSubscription, Plan
     from app.phase8.models.phase8_models import P8EntitlementAuditLog
+
     db = SessionLocal()
     try:
         # Find new plan first
-        new_plan = db.query(Plan).filter(
-            (Plan.name_en == new_plan_name) | (Plan.code == new_plan_name.lower())
-        ).first()
-        
+        new_plan = db.query(Plan).filter((Plan.name_en == new_plan_name) | (Plan.code == new_plan_name.lower())).first()
+
         if not new_plan:
             return {"success": False, "error": f"Plan not found: {new_plan_name}"}
-        
+
         # Find current subscription
         current = db.query(UserSubscription).filter_by(user_id=user_id, status="active").first()
-        
+
         old_plan_name = "None"
         if current:
             old_plan = db.query(Plan).filter_by(id=current.plan_id).first()
@@ -206,7 +208,7 @@ def upgrade_user_plan(user_id, new_plan_name):
                 status="active",
             )
             db.add(sub)
-        
+
         # Audit log
         audit = P8EntitlementAuditLog(
             id=gen_uuid(),
@@ -217,13 +219,12 @@ def upgrade_user_plan(user_id, new_plan_name):
             performed_by=user_id,
         )
         db.add(audit)
-        
+
         db.commit()
         return {"success": True, "old_plan": old_plan_name, "new_plan": new_plan_name}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
     finally:
         db.close()
-

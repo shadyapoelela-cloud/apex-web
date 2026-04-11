@@ -2,7 +2,8 @@
 APEX — Copilot database models (sessions, messages, escalations)
 نماذج قاعدة بيانات المساعد الذكي (الجلسات، الرسائل، التصعيدات)
 """
-from sqlalchemy import Column, String, Text, JSON, DateTime, ForeignKey, Float, Index
+
+from sqlalchemy import Column, String, Text, JSON, DateTime, ForeignKey, Float
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 
@@ -49,5 +50,6 @@ class CopilotEscalation(Base):
 
 def init_copilot_db():
     from app.phase1.models.platform_models import engine
+
     Base.metadata.create_all(bind=engine)
     return ["copilot_sessions", "copilot_messages", "copilot_escalations"]

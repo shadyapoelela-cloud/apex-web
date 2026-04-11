@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/theme.dart';
 import '../../api_service.dart';
-import '../copilot/copilot_screen.dart';
 
 class ProviderKanbanScreen extends StatefulWidget {
   const ProviderKanbanScreen({super.key});
@@ -59,7 +59,7 @@ class _PKState extends State<ProviderKanbanScreen> {
         backgroundColor: AC.navy2,
         title: const Text('\u0645\u0632\u0648\u062f\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen()))),
+          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
         ],
       ),
       body: ListView(
@@ -80,20 +80,20 @@ class _PKState extends State<ProviderKanbanScreen> {
         // Header
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: const BorderRadius.vertical(top: Radius.circular(14)), border: Border.all(color: color.withOpacity(0.3))),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: const BorderRadius.vertical(top: Radius.circular(14)), border: Border.all(color: color.withValues(alpha: 0.3))),
           child: Row(children: [
             Text(col['title'] as String, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 14)),
             const Spacer(),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
               child: Text('', style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
             ),
           ]),
         ),
         // Items
         Expanded(child: Container(
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)), border: Border(left: BorderSide(color: color.withOpacity(0.3)), right: BorderSide(color: color.withOpacity(0.3)), bottom: BorderSide(color: color.withOpacity(0.3)))),
+          decoration: BoxDecoration(color: AC.navy3, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)), border: Border(left: BorderSide(color: color.withValues(alpha: 0.3)), right: BorderSide(color: color.withValues(alpha: 0.3)), bottom: BorderSide(color: color.withValues(alpha: 0.3)))),
           child: ListView.builder(
             padding: const EdgeInsets.all(8),
             itemCount: items.length,

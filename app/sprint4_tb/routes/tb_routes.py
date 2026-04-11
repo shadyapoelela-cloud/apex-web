@@ -11,18 +11,21 @@ APIs:
   GET  /tb/uploads/{tb_upload_id}/binding-summary  — Binding stats
 """
 
-import os, logging, json
+import os
+import logging
 from fastapi import APIRouter, File, UploadFile, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional
 from sqlalchemy import text as _t
 from app.core.db_utils import get_db_session
 
-
 # ── Request Models ────────────────────────────────────────
 
+
 class BindTBRequest(BaseModel):
-    coa_upload_id: Optional[str] = Field(None, description="COA upload ID to bind against (overrides the one from upload)")
+    coa_upload_id: Optional[str] = Field(
+        None, description="COA upload ID to bind against (overrides the one from upload)"
+    )
     fuzzy_threshold: float = Field(0.80, ge=0.0, le=1.0, description="Minimum fuzzy-match confidence threshold")
 
 
@@ -34,16 +37,17 @@ class ManualMatchRequest(BaseModel):
 class ApproveBindingRequest(BaseModel):
     approved_by: Optional[str] = Field(None, description="User/system that approved the binding")
 
+
 router = APIRouter(tags=["Sprint 4 — TB Upload & Binding"])
 
 SUPPORTED_EXTENSIONS = {".xlsx", ".xls"}
 MAX_FILE_SIZE = 15 * 1024 * 1024
 
 
-
 # ═══════════════════════════════════════════════════════════
 # POST /clients/{client_id}/tb/upload
 # ═══════════════════════════════════════════════════════════
+
 
 @router.post("/clients/{client_id}/tb/upload")
 async def upload_tb(
@@ -78,54 +82,67 @@ async def upload_tb(
         db = get_db_session()
         try:
             if not coa_upload_id:
-                coa_row = db.execute(_t(
-                    """SELECT id FROM client_coa_uploads
+                coa_row = db.execute(
+                    _t("""SELECT id FROM client_coa_uploads
                        WHERE client_id = :cid AND upload_status = 'approved'
-                       ORDER BY created_at DESC LIMIT 1"""
-                ), {"cid": client_id}).fetchone()
+                       ORDER BY created_at DESC LIMIT 1"""),
+                    {"cid": client_id},
+                ).fetchone()
                 if coa_row:
                     coa_upload_id = coa_row[0]
 
             # Create upload record
             tb_id = gen_uuid()
-            db.execute(_t(
-                """INSERT INTO trial_balance_uploads
+            db.execute(
+                _t("""INSERT INTO trial_balance_uploads
                    (id, client_id, coa_upload_id, file_name, stored_file_path,
                     file_extension, file_size_bytes, period_label,
                     upload_status, created_at, updated_at)
                    VALUES (:id, :cid, :coa, :fname, :path, :ext, :size, :period,
-                           'uploaded', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"""
-            ), {
-                "id": tb_id, "cid": client_id, "coa": coa_upload_id,
-                "fname": file.filename, "path": stored_path,
-                "ext": ext, "size": len(content), "period": period_label,
-            })
+                           'uploaded', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"""),
+                {
+                    "id": tb_id,
+                    "cid": client_id,
+                    "coa": coa_upload_id,
+                    "fname": file.filename,
+                    "path": stored_path,
+                    "ext": ext,
+                    "size": len(content),
+                    "period": period_label,
+                },
+            )
             db.commit()
         finally:
             db.close()
 
         # Parse the file
         from app.sprint4_tb.services.tb_file_service import read_and_save_tb
+
         parse_result = read_and_save_tb(content, file.filename, tb_id, stored_path)
 
-        return {"success": True, "data": {
-            "tb_upload_id": tb_id,
-            "client_id": client_id,
-            "coa_upload_id": coa_upload_id,
-            "file_name": file.filename,
-            "status": "parsed_with_warnings" if parse_result.get("warnings") else "parsed",
-            "total_rows_parsed": parse_result["total_rows_parsed"],
-            "total_rows_skipped": parse_result["total_rows_skipped"],
-            "file_format": parse_result["file_format"],
-            "company_name": parse_result["company_name"],
-            "period": parse_result["period"],
-            "warnings": parse_result["warnings"],
-            "next_step": "POST /tb/uploads/{tb_upload_id}/bind" if coa_upload_id else "Specify coa_upload_id to bind",
-        }}
+        return {
+            "success": True,
+            "data": {
+                "tb_upload_id": tb_id,
+                "client_id": client_id,
+                "coa_upload_id": coa_upload_id,
+                "file_name": file.filename,
+                "status": "parsed_with_warnings" if parse_result.get("warnings") else "parsed",
+                "total_rows_parsed": parse_result["total_rows_parsed"],
+                "total_rows_skipped": parse_result["total_rows_skipped"],
+                "file_format": parse_result["file_format"],
+                "company_name": parse_result["company_name"],
+                "period": parse_result["period"],
+                "warnings": parse_result["warnings"],
+                "next_step": (
+                    "POST /tb/uploads/{tb_upload_id}/bind" if coa_upload_id else "Specify coa_upload_id to bind"
+                ),
+            },
+        }
 
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("TB upload error", exc_info=True)
         raise HTTPException(500, "TB upload failed")
 
@@ -134,33 +151,46 @@ async def upload_tb(
 # GET /tb/uploads/{tb_upload_id}
 # ═══════════════════════════════════════════════════════════
 
+
 @router.get("/tb/uploads/{tb_upload_id}")
 def get_tb_upload(tb_upload_id: str):
     """Get TB upload metadata and status."""
     db = get_db_session()
     try:
-        row = db.execute(_t(
-            """SELECT id, client_id, coa_upload_id, file_name, file_format,
+        row = db.execute(
+            _t("""SELECT id, client_id, coa_upload_id, file_name, file_format,
                       upload_status, period_label, total_rows_detected,
                       total_rows_parsed, total_rows_skipped,
                       company_name_detected, total_matched, total_unmatched,
                       binding_confidence_avg, binding_approved, created_at
-               FROM trial_balance_uploads WHERE id = :uid"""
-        ), {"uid": tb_upload_id}).fetchone()
+               FROM trial_balance_uploads WHERE id = :uid"""),
+            {"uid": tb_upload_id},
+        ).fetchone()
 
         if not row:
             raise HTTPException(404, "TB upload not found")
 
-        return {"success": True, "data": {
-            "id": row[0], "client_id": row[1], "coa_upload_id": row[2],
-            "file_name": row[3], "file_format": row[4], "upload_status": row[5],
-            "period_label": row[6], "total_rows_detected": row[7],
-            "total_rows_parsed": row[8], "total_rows_skipped": row[9],
-            "company_name": row[10], "total_matched": row[11],
-            "total_unmatched": row[12], "binding_confidence_avg": row[13],
-            "binding_approved": bool(row[14]) if row[14] is not None else False,
-            "created_at": str(row[15]) if row[15] else None,
-        }}
+        return {
+            "success": True,
+            "data": {
+                "id": row[0],
+                "client_id": row[1],
+                "coa_upload_id": row[2],
+                "file_name": row[3],
+                "file_format": row[4],
+                "upload_status": row[5],
+                "period_label": row[6],
+                "total_rows_detected": row[7],
+                "total_rows_parsed": row[8],
+                "total_rows_skipped": row[9],
+                "company_name": row[10],
+                "total_matched": row[11],
+                "total_unmatched": row[12],
+                "binding_confidence_avg": row[13],
+                "binding_approved": bool(row[14]) if row[14] is not None else False,
+                "created_at": str(row[15]) if row[15] else None,
+            },
+        }
     finally:
         db.close()
 
@@ -169,6 +199,7 @@ def get_tb_upload(tb_upload_id: str):
 # POST /tb/uploads/{tb_upload_id}/bind
 # ═══════════════════════════════════════════════════════════
 
+
 @router.post("/tb/uploads/{tb_upload_id}/bind")
 def bind_tb(tb_upload_id: str, body: BindTBRequest = BindTBRequest()):
     """Run binding engine — match TB rows to approved COA accounts."""
@@ -176,9 +207,10 @@ def bind_tb(tb_upload_id: str, body: BindTBRequest = BindTBRequest()):
 
     db = get_db_session()
     try:
-        row = db.execute(_t(
-            "SELECT client_id, coa_upload_id, upload_status FROM trial_balance_uploads WHERE id = :uid"
-        ), {"uid": tb_upload_id}).fetchone()
+        row = db.execute(
+            _t("SELECT client_id, coa_upload_id, upload_status FROM trial_balance_uploads WHERE id = :uid"),
+            {"uid": tb_upload_id},
+        ).fetchone()
 
         if not row:
             raise HTTPException(404, "TB upload not found")
@@ -207,7 +239,7 @@ def bind_tb(tb_upload_id: str, body: BindTBRequest = BindTBRequest()):
         return result
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("TB binding error", exc_info=True)
         raise HTTPException(500, "TB binding failed")
 
@@ -215,6 +247,7 @@ def bind_tb(tb_upload_id: str, body: BindTBRequest = BindTBRequest()):
 # ═══════════════════════════════════════════════════════════
 # GET /tb/uploads/{tb_upload_id}/binding-results
 # ═══════════════════════════════════════════════════════════
+
 
 @router.get("/tb/uploads/{tb_upload_id}/binding-results")
 def get_binding_results(
@@ -247,13 +280,11 @@ def get_binding_results(
 
         where_sql = " AND ".join(where)
 
-        total = db.execute(_t(
-            f"SELECT COUNT(*) FROM tb_binding_results WHERE {where_sql}"
-        ), params).fetchone()[0]
+        total = db.execute(_t(f"SELECT COUNT(*) FROM tb_binding_results WHERE {where_sql}"), params).fetchone()[0]
 
         offset = (page - 1) * page_size
-        rows = db.execute(_t(
-            f"""SELECT id, tb_row_id, coa_account_id,
+        rows = db.execute(
+            _t(f"""SELECT id, tb_row_id, coa_account_id,
                        tb_account_code, tb_account_name_raw,
                        tb_amount_debit, tb_amount_credit, tb_net_balance,
                        matched, match_type, binding_confidence, mismatch_reason,
@@ -261,23 +292,44 @@ def get_binding_results(
                        coa_cashflow_role, review_status
                 FROM tb_binding_results WHERE {where_sql}
                 ORDER BY matched ASC, binding_confidence ASC
-                LIMIT :lim OFFSET :off"""
-        ), {**params, "lim": page_size, "off": offset}).fetchall()
+                LIMIT :lim OFFSET :off"""),
+            {**params, "lim": page_size, "off": offset},
+        ).fetchall()
 
         items = []
         for r in rows:
-            items.append({
-                "id": r[0], "tb_row_id": r[1], "coa_account_id": r[2],
-                "tb_account_code": r[3], "tb_account_name": r[4],
-                "tb_debit": r[5], "tb_credit": r[6], "tb_net": r[7],
-                "matched": bool(r[8]), "match_type": r[9],
-                "confidence": r[10], "mismatch_reason": r[11],
-                "requires_review": bool(r[12]),
-                "coa_class": r[13], "coa_section": r[14], "coa_cashflow": r[15],
-                "review_status": r[16],
-            })
+            items.append(
+                {
+                    "id": r[0],
+                    "tb_row_id": r[1],
+                    "coa_account_id": r[2],
+                    "tb_account_code": r[3],
+                    "tb_account_name": r[4],
+                    "tb_debit": r[5],
+                    "tb_credit": r[6],
+                    "tb_net": r[7],
+                    "matched": bool(r[8]),
+                    "match_type": r[9],
+                    "confidence": r[10],
+                    "mismatch_reason": r[11],
+                    "requires_review": bool(r[12]),
+                    "coa_class": r[13],
+                    "coa_section": r[14],
+                    "coa_cashflow": r[15],
+                    "review_status": r[16],
+                }
+            )
 
-        return {"success": True, "data": {"tb_upload_id": tb_upload_id, "total": total, "page": page, "page_size": page_size, "results": items}}
+        return {
+            "success": True,
+            "data": {
+                "tb_upload_id": tb_upload_id,
+                "total": total,
+                "page": page,
+                "page_size": page_size,
+                "results": items,
+            },
+        }
     finally:
         db.close()
 
@@ -285,6 +337,7 @@ def get_binding_results(
 # ═══════════════════════════════════════════════════════════
 # POST /tb/binding/{binding_id}/match
 # ═══════════════════════════════════════════════════════════
+
 
 @router.post("/tb/binding/{binding_id}/match")
 def manual_match(binding_id: str, body: ManualMatchRequest):
@@ -301,10 +354,12 @@ def manual_match(binding_id: str, body: ManualMatchRequest):
 # POST /tb/uploads/{tb_upload_id}/approve-binding
 # ═══════════════════════════════════════════════════════════
 
+
 @router.post("/tb/uploads/{tb_upload_id}/approve-binding")
 def approve_tb_binding(tb_upload_id: str, body: ApproveBindingRequest = ApproveBindingRequest()):
     """Approve TB binding — marks ready for analysis."""
     from app.sprint4_tb.services.tb_binding_engine import approve_binding
+
     result = approve_binding(tb_upload_id, body.approved_by)
     if not result.get("success"):
         raise HTTPException(400, result.get("error"))
@@ -315,16 +370,18 @@ def approve_tb_binding(tb_upload_id: str, body: ApproveBindingRequest = ApproveB
 # GET /tb/uploads/{tb_upload_id}/binding-summary
 # ═══════════════════════════════════════════════════════════
 
+
 @router.get("/tb/uploads/{tb_upload_id}/binding-summary")
 def binding_summary(tb_upload_id: str):
     """Get binding summary statistics."""
     db = get_db_session()
     try:
-        rows = db.execute(_t(
-            """SELECT matched, match_type, binding_confidence, requires_review,
+        rows = db.execute(
+            _t("""SELECT matched, match_type, binding_confidence, requires_review,
                       coa_normalized_class, tb_net_balance
-               FROM tb_binding_results WHERE tb_upload_id = :uid"""
-        ), {"uid": tb_upload_id}).fetchall()
+               FROM tb_binding_results WHERE tb_upload_id = :uid"""),
+            {"uid": tb_upload_id},
+        ).fetchall()
 
         if not rows:
             raise HTTPException(404, "No binding results found")
@@ -351,19 +408,22 @@ def binding_summary(tb_upload_id: str):
             else:
                 total_credit += abs(nb)
 
-        return {"success": True, "data": {
-            "tb_upload_id": tb_upload_id,
-            "total_rows": total,
-            "matched": matched,
-            "unmatched": unmatched,
-            "requires_review": review_needed,
-            "avg_confidence": avg_conf,
-            "match_percentage": round(matched / max(total, 1) * 100, 1),
-            "match_type_distribution": match_dist,
-            "class_distribution": class_dist,
-            "total_debit": round(total_debit, 2),
-            "total_credit": round(total_credit, 2),
-            "balance_diff": round(total_debit - total_credit, 2),
-        }}
+        return {
+            "success": True,
+            "data": {
+                "tb_upload_id": tb_upload_id,
+                "total_rows": total,
+                "matched": matched,
+                "unmatched": unmatched,
+                "requires_review": review_needed,
+                "avg_confidence": avg_conf,
+                "match_percentage": round(matched / max(total, 1) * 100, 1),
+                "match_type_distribution": match_dist,
+                "class_distribution": class_dist,
+                "total_debit": round(total_debit, 2),
+                "total_credit": round(total_credit, 2),
+                "balance_diff": round(total_debit - total_credit, 2),
+            },
+        }
     finally:
         db.close()

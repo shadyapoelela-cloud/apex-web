@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
-import '../../core/session.dart';
+import '../../api_service.dart';
 import '../../core/shared_constants.dart';
-
-final _api = apiBase;
 
 // Phase 11 Legal Acceptance §12
 // ═══════════════════════════════════════════════════════════
@@ -23,21 +18,17 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final h = {'Authorization': 'Bearer ${S.token}'};
-      final r1 = await http.get(Uri.parse('$_api/legal/documents'));
-      final r2 = await http.get(Uri.parse('$_api/legal/pending'), headers: h);
-      if (r1.statusCode == 200) setState(() => _docs = jsonDecode(r1.body)['documents'] ?? []);
-      if (r2.statusCode == 200) setState(() => _pending = jsonDecode(r2.body)['pending'] ?? []);
+      final r1 = await ApiService.getLegalDocuments();
+      final r2 = await ApiService.getLegalPending();
+      if (r1.success) setState(() => _docs = r1.data['documents'] ?? []);
+      if (r2.success) setState(() => _pending = r2.data['pending'] ?? []);
     } catch (_) {}
     setState(() => _loading = false);
   }
 
   Future<void> _acceptOne(String docId) async {
-    final r = await http.post(
-      Uri.parse('$_api/legal/accept/$docId'),
-      headers: {'Authorization': 'Bearer ${S.token}'},
-    );
-    if (r.statusCode == 200) {
+    final r = await ApiService.acceptLegalDoc(docId);
+    if (r.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('\u062a\u0645 \u0627\u0644\u0642\u0628\u0648\u0644'), backgroundColor: Colors.green));
       _load();
@@ -45,11 +36,8 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
   }
 
   Future<void> _acceptAll() async {
-    final r = await http.post(
-      Uri.parse('$_api/legal/accept-all'),
-      headers: {'Authorization': 'Bearer ${S.token}'},
-    );
-    if (r.statusCode == 200) {
+    final r = await ApiService.acceptAllLegal();
+    if (r.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('\u062a\u0645 \u0642\u0628\u0648\u0644 \u062c\u0645\u064a\u0639 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a'), backgroundColor: Colors.green));
       _load();
@@ -95,7 +83,7 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: AC.navy3, borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: pending ? AC.warn.withOpacity(0.5) : AC.bdr),
+                  border: Border.all(color: pending ? AC.warn.withValues(alpha: 0.5) : AC.bdr),
                 ),
                 child: ExpansionTile(
                   leading: Icon(_iconFor(d['type']), color: pending ? AC.warn : AC.gold),
@@ -106,13 +94,13 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
                     if (pending)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: AC.warn.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                         child: const Text('\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.warn, fontSize: 10)),
                       )
                     else
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: AC.ok.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(color: AC.ok.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                         child: const Text('\u0645\u0642\u0628\u0648\u0644', style: TextStyle(color: AC.ok, fontSize: 10)),
                       ),
                   ]),
@@ -140,4 +128,3 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
     ));
   }
 }
-

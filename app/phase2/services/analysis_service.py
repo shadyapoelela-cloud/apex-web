@@ -8,19 +8,33 @@ Per execution document section 6.
 
 from typing import Optional
 from app.phase1.models.platform_models import (
-    AuditEvent, Notification, SessionLocal, gen_uuid, utcnow,
+    AuditEvent,
+    Notification,
+    SessionLocal,
+    gen_uuid,
 )
 from app.phase2.models.phase2_models import (
-    COAUpload, COAAccount, AnalysisResult, ResultExplanation,
-    ResultWarning, UploadStatus, AnalysisStatus, ExplanationSeverity,
+    COAUpload,
+    AnalysisResult,
+    ResultExplanation,
+    ResultWarning,
+    UploadStatus,
+    AnalysisStatus,
 )
 
 
 class AnalysisService:
     """Wraps the existing orchestrator and stores results in DB."""
 
-    def store_upload(self, client_id: str, user_id: str, filename: str,
-                     file_size: int, industry: str, closing_inventory: Optional[float]) -> str:
+    def store_upload(
+        self,
+        client_id: str,
+        user_id: str,
+        filename: str,
+        file_size: int,
+        industry: str,
+        closing_inventory: Optional[float],
+    ) -> str:
         """Record upload in DB, return upload_id."""
         db = SessionLocal()
         try:
@@ -40,8 +54,7 @@ class AnalysisService:
         finally:
             db.close()
 
-    def store_analysis_result(self, upload_id: str, client_id: str, user_id: str,
-                              engine_result: dict) -> str:
+    def store_analysis_result(self, upload_id: str, client_id: str, user_id: str, engine_result: dict) -> str:
         """Store complete analysis result from orchestrator into DB."""
         db = SessionLocal()
         try:
@@ -112,27 +125,37 @@ class AnalysisService:
 
             # Store warnings
             for v in engine_result.get("validations", []):
-                db.add(ResultWarning(
-                    id=gen_uuid(),
-                    result_id=result.id,
-                    code=v.get("code", "UNKNOWN"),
-                    severity=v.get("severity", "info").lower(),
-                    message_ar=v.get("message", ""),
-                ))
+                db.add(
+                    ResultWarning(
+                        id=gen_uuid(),
+                        result_id=result.id,
+                        code=v.get("code", "UNKNOWN"),
+                        severity=v.get("severity", "info").lower(),
+                        message_ar=v.get("message", ""),
+                    )
+                )
 
             # Audit + Notification
-            db.add(AuditEvent(
-                id=gen_uuid(), user_id=user_id,
-                action="analysis_completed", resource_type="analysis_result",
-                resource_id=result.id,
-            ))
-            db.add(Notification(
-                id=gen_uuid(), user_id=user_id,
-                title_ar="اكتمل التحليل المالي",
-                title_en="Financial analysis completed",
-                category="general", source_type="analysis_completed",
-                source_id=result.id,
-            ))
+            db.add(
+                AuditEvent(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    action="analysis_completed",
+                    resource_type="analysis_result",
+                    resource_id=result.id,
+                )
+            )
+            db.add(
+                Notification(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    title_ar="اكتمل التحليل المالي",
+                    title_en="Financial analysis completed",
+                    category="general",
+                    source_type="analysis_completed",
+                    source_id=result.id,
+                )
+            )
 
             db.commit()
             return result.id
@@ -168,7 +191,11 @@ class AnalysisService:
                 "explanation_ar": self._explain_cogs(inc),
                 "source_accounts": self._get_accounts(li, ["cogs", "purchases", "purchases_returns"]),
                 "severity": "warning" if inc.get("cogs_method") == "none" else "info",
-                "warnings": [{"code": "NO_COGS", "message": "لم يتم حساب تكلفة المبيعات"}] if inc.get("cogs_method") == "none" else None,
+                "warnings": (
+                    [{"code": "NO_COGS", "message": "لم يتم حساب تكلفة المبيعات"}]
+                    if inc.get("cogs_method") == "none"
+                    else None
+                ),
             },
             {
                 "key": "gross_profit",
@@ -201,50 +228,58 @@ class AnalysisService:
                 "value": bs.get("balance_check"),
                 "explanation_ar": f"الأصول ({self._fmt(bs.get('total_assets'))}) {'=' if bs.get('is_balanced') else '≠'} الالتزامات + حقوق الملكية ({self._fmt(bs.get('total_liabilities_and_equity'))}). الفرق: {self._fmt(bs.get('balance_check'))}",
                 "severity": "success" if bs.get("is_balanced") else "error",
-                "warnings": [{"code": "UNBALANCED", "message": "الميزانية غير متوازنة"}] if not bs.get("is_balanced") else None,
+                "warnings": (
+                    [{"code": "UNBALANCED", "message": "الميزانية غير متوازنة"}] if not bs.get("is_balanced") else None
+                ),
             },
         ]
 
         # Add ratio explanations
         prof = ratios.get("profitability", {}) if isinstance(ratios, dict) else {}
         if prof:
-            explanations.append({
-                "key": "gross_margin",
-                "label_ar": "هامش الربح المجمل",
-                "label_en": "Gross Margin",
-                "value": prof.get("gross_margin"),
-                "explanation_ar": f"هامش الربح المجمل = مجمل الربح ÷ صافي الإيرادات × 100",
-                "severity": "info",
-            })
+            explanations.append(
+                {
+                    "key": "gross_margin",
+                    "label_ar": "هامش الربح المجمل",
+                    "label_en": "Gross Margin",
+                    "value": prof.get("gross_margin"),
+                    "explanation_ar": f"هامش الربح المجمل = مجمل الربح ÷ صافي الإيرادات × 100",
+                    "severity": "info",
+                }
+            )
 
         liq = ratios.get("liquidity", {}) if isinstance(ratios, dict) else {}
         if liq:
             cr = liq.get("current_ratio")
-            explanations.append({
-                "key": "current_ratio",
-                "label_ar": "نسبة التداول",
-                "label_en": "Current Ratio",
-                "value": cr,
-                "explanation_ar": f"نسبة التداول = الأصول المتداولة ÷ الالتزامات المتداولة. {'جيدة' if cr and cr >= 1.5 else 'ضعيفة — أقل من 1.5' if cr else 'غير محسوبة'}",
-                "severity": "success" if cr and cr >= 1.5 else "warning" if cr else "info",
-            })
+            explanations.append(
+                {
+                    "key": "current_ratio",
+                    "label_ar": "نسبة التداول",
+                    "label_en": "Current Ratio",
+                    "value": cr,
+                    "explanation_ar": f"نسبة التداول = الأصول المتداولة ÷ الالتزامات المتداولة. {'جيدة' if cr and cr >= 1.5 else 'ضعيفة — أقل من 1.5' if cr else 'غير محسوبة'}",
+                    "severity": "success" if cr and cr >= 1.5 else "warning" if cr else "info",
+                }
+            )
 
         for exp in explanations:
-            db.add(ResultExplanation(
-                id=gen_uuid(),
-                result_id=result_id,
-                metric_key=exp["key"],
-                metric_label_ar=exp["label_ar"],
-                metric_label_en=exp.get("label_en", ""),
-                metric_value=exp.get("value"),
-                metric_formatted=self._fmt(exp.get("value")),
-                explanation_ar=exp["explanation_ar"],
-                source_accounts=exp.get("source_accounts"),
-                source_rows_count=len(exp.get("source_accounts", []) or []),
-                confidence=engine_result.get("confidence", {}).get("overall"),
-                severity=exp.get("severity", "info"),
-                warnings=exp.get("warnings"),
-            ))
+            db.add(
+                ResultExplanation(
+                    id=gen_uuid(),
+                    result_id=result_id,
+                    metric_key=exp["key"],
+                    metric_label_ar=exp["label_ar"],
+                    metric_label_en=exp.get("label_en", ""),
+                    metric_value=exp.get("value"),
+                    metric_formatted=self._fmt(exp.get("value")),
+                    explanation_ar=exp["explanation_ar"],
+                    source_accounts=exp.get("source_accounts"),
+                    source_rows_count=len(exp.get("source_accounts", []) or []),
+                    confidence=engine_result.get("confidence", {}).get("overall"),
+                    severity=exp.get("severity", "info"),
+                    warnings=exp.get("warnings"),
+                )
+            )
 
     def get_result_details(self, result_id: str) -> dict:
         """Get result + all explanations (for ! icon panel)."""
@@ -254,39 +289,46 @@ class AnalysisService:
             if not result:
                 return {"success": False, "error": "النتيجة غير موجودة"}
 
-            explanations = db.query(ResultExplanation).filter(
-                ResultExplanation.result_id == result_id
-            ).order_by(ResultExplanation.metric_key).all()
+            explanations = (
+                db.query(ResultExplanation)
+                .filter(ResultExplanation.result_id == result_id)
+                .order_by(ResultExplanation.metric_key)
+                .all()
+            )
 
-            warnings = db.query(ResultWarning).filter(
-                ResultWarning.result_id == result_id
-            ).all()
+            warnings = db.query(ResultWarning).filter(ResultWarning.result_id == result_id).all()
 
             return {
                 "success": True,
                 "result_id": result.id,
                 "confidence": result.overall_confidence,
                 "confidence_label": result.confidence_label,
-                "explanations": [{
-                    "metric_key": e.metric_key,
-                    "metric_label_ar": e.metric_label_ar,
-                    "metric_label_en": e.metric_label_en,
-                    "value": e.metric_value,
-                    "formatted": e.metric_formatted,
-                    "explanation_ar": e.explanation_ar,
-                    "source_accounts": e.source_accounts,
-                    "source_rows_count": e.source_rows_count,
-                    "applied_rules": e.applied_rules,
-                    "confidence": e.confidence,
-                    "severity": e.severity,
-                    "warnings": e.warnings,
-                    "feedback_count": e.feedback_count,
-                } for e in explanations],
-                "warnings": [{
-                    "code": w.code,
-                    "severity": w.severity,
-                    "message_ar": w.message_ar,
-                } for w in warnings],
+                "explanations": [
+                    {
+                        "metric_key": e.metric_key,
+                        "metric_label_ar": e.metric_label_ar,
+                        "metric_label_en": e.metric_label_en,
+                        "value": e.metric_value,
+                        "formatted": e.metric_formatted,
+                        "explanation_ar": e.explanation_ar,
+                        "source_accounts": e.source_accounts,
+                        "source_rows_count": e.source_rows_count,
+                        "applied_rules": e.applied_rules,
+                        "confidence": e.confidence,
+                        "severity": e.severity,
+                        "warnings": e.warnings,
+                        "feedback_count": e.feedback_count,
+                    }
+                    for e in explanations
+                ],
+                "warnings": [
+                    {
+                        "code": w.code,
+                        "severity": w.severity,
+                        "message_ar": w.message_ar,
+                    }
+                    for w in warnings
+                ],
             }
         finally:
             db.close()
@@ -295,23 +337,29 @@ class AnalysisService:
         """List all analysis results for a client."""
         db = SessionLocal()
         try:
-            results = db.query(AnalysisResult).filter(
-                AnalysisResult.client_id == client_id
-            ).order_by(AnalysisResult.created_at.desc()).all()
-            return [{
-                "id": r.id,
-                "upload_id": r.upload_id,
-                "status": r.status,
-                "confidence": r.overall_confidence,
-                "confidence_label": r.confidence_label,
-                "net_revenue": r.net_revenue,
-                "net_profit": r.net_profit,
-                "is_balanced": r.is_balanced,
-                "errors": r.errors_count,
-                "warnings": r.warnings_count,
-                "has_narrative": r.has_narrative,
-                "created_at": r.created_at.isoformat(),
-            } for r in results]
+            results = (
+                db.query(AnalysisResult)
+                .filter(AnalysisResult.client_id == client_id)
+                .order_by(AnalysisResult.created_at.desc())
+                .all()
+            )
+            return [
+                {
+                    "id": r.id,
+                    "upload_id": r.upload_id,
+                    "status": r.status,
+                    "confidence": r.overall_confidence,
+                    "confidence_label": r.confidence_label,
+                    "net_revenue": r.net_revenue,
+                    "net_profit": r.net_profit,
+                    "is_balanced": r.is_balanced,
+                    "errors": r.errors_count,
+                    "warnings": r.warnings_count,
+                    "has_narrative": r.has_narrative,
+                    "created_at": r.created_at.isoformat(),
+                }
+                for r in results
+            ]
         finally:
             db.close()
 
@@ -333,10 +381,12 @@ class AnalysisService:
     def _explain_cogs(inc: dict) -> str:
         method = inc.get("cogs_method", "none")
         if method == "periodic_user_input":
-            return (f"تكلفة المبيعات (جرد دوري) = مخزون أول المدة ({AnalysisService._fmt(inc.get('opening_inventory'))}) "
-                    f"+ صافي المشتريات ({AnalysisService._fmt(inc.get('purchases'))}) "
-                    f"- مردودات المشتريات ({AnalysisService._fmt(inc.get('purchases_returns'))}) "
-                    f"- مخزون آخر المدة ({AnalysisService._fmt(inc.get('closing_inventory'))})")
+            return (
+                f"تكلفة المبيعات (جرد دوري) = مخزون أول المدة ({AnalysisService._fmt(inc.get('opening_inventory'))}) "
+                f"+ صافي المشتريات ({AnalysisService._fmt(inc.get('purchases'))}) "
+                f"- مردودات المشتريات ({AnalysisService._fmt(inc.get('purchases_returns'))}) "
+                f"- مخزون آخر المدة ({AnalysisService._fmt(inc.get('closing_inventory'))})"
+            )
         elif method == "direct":
             return "تكلفة المبيعات محسوبة مباشرة من حسابات تكلفة البضاعة المباعة"
         return "لم يتم حساب تكلفة المبيعات — قد يكون نظام الجرد دوري ولم يتم إدخال مخزون آخر المدة"

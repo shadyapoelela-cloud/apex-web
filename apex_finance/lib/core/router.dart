@@ -29,6 +29,17 @@ import '../screens/marketplace/service_catalog_screen.dart' as catalog;
 import '../screens/account/archive_screen.dart' as archive;
 import '../screens/tasks/audit_service_screen.dart' as audit;
 import '../core/session.dart' show S;
+import '../client_create.dart';
+import '../upload_screen.dart';
+import '../analysis_full_screen.dart';
+import '../analysis_result_screen.dart';
+import '../coa_upload_screen.dart';
+import '../coa_mapping_screen.dart';
+import '../coa_quality_screen.dart';
+import '../coa_review_screen.dart';
+import '../tb_binding_screen.dart';
+import '../financial_statements_screen.dart';
+import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
@@ -95,6 +106,109 @@ final appRouter = GoRouter(
     GoRoute(path: '/financial-ops', builder: (c, s) => const FinancialOpsScreen()),
     GoRoute(path: '/copilot', builder: (c, s) => const CopilotScreen()),
     GoRoute(path: '/admin/audit', builder: (c, s) => const AuditLogScreen()),
+
+    // ─── COA Workflow ───
+    GoRoute(path: '/upload', builder: (c, s) => const UploadScreen()),
+    GoRoute(path: '/coa/upload', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return CoaUploadScreen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? '');
+    }),
+    GoRoute(path: '/coa/mapping', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return CoaMappingScreen(
+        uploadData: args['uploadData'] as Map<String, dynamic>? ?? {},
+        clientId: args['clientId'] ?? '',
+        clientName: args['clientName'] ?? '',
+        pickedFile: args['pickedFile'] as PlatformFile,
+      );
+    }),
+    GoRoute(path: '/coa/quality', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return CoaQualityScreen(
+        uploadId: args['uploadId'] ?? '',
+        clientId: args['clientId'] ?? '',
+        clientName: args['clientName'] ?? '',
+        assessData: args['assessData'] as Map<String, dynamic>? ?? {},
+      );
+    }),
+    GoRoute(path: '/coa/review', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return CoaReviewScreen(
+        uploadId: args['uploadId'] ?? '',
+        clientId: args['clientId'] ?? '',
+        clientName: args['clientName'] ?? '',
+      );
+    }),
+
+    // ─── TB Binding ───
+    GoRoute(path: '/tb/binding', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return TbBindingScreen(tbUploadId: args['tbUploadId'] ?? '', coaUploadId: args['coaUploadId']);
+    }),
+
+    // ─── Analysis & Statements ───
+    GoRoute(path: '/analysis/full', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>?;
+      return AnalysisFullScreen(
+        apiData: args?['apiData'] as Map<String, dynamic>?,
+        pickedFile: args?['pickedFile'] as PlatformFile?,
+      );
+    }),
+    GoRoute(path: '/analysis/result', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>?;
+      return AnalysisResultScreen(
+        apiData: args?['apiData'] as Map<String, dynamic>?,
+        pickedFile: args?['pickedFile'],
+      );
+    }),
+    GoRoute(path: '/financial-statements', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>?;
+      return FinancialStatementsScreen(
+        apiData: args?['apiData'] as Map<String, dynamic>?,
+        pickedFile: args?['pickedFile'] as PlatformFile?,
+      );
+    }),
+
+    // ─── Detail Screens ───
+    GoRoute(path: '/service-request/detail', builder: (c, s) {
+      return ServiceRequestDetail(request: s.extra as Map<String, dynamic>? ?? {});
+    }),
+    GoRoute(path: '/notification/detail', builder: (c, s) {
+      return NotificationDetailScreen(notification: s.extra as Map<String, dynamic>? ?? {});
+    }),
+    GoRoute(path: '/provider/profile', builder: (c, s) {
+      return ProviderProfileScreen(provider: s.extra as Map<String, dynamic>? ?? {});
+    }),
+    GoRoute(path: '/onboarding/wizard', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>?;
+      return wizard.ClientOnboardingWizard(token: args?['token'] as String?);
+    }),
+    GoRoute(path: '/coa/journey', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return CoaJourneyScreen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? '');
+    }),
+    GoRoute(path: '/service-catalog', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>?;
+      return catalog.ServiceCatalogScreen(clientId: args?['clientId'] as String?, token: args?['token'] as String?);
+    }),
+    GoRoute(path: '/upgrade-plan', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return UpgradePlanScreen(plans: args['plans'] as List? ?? [], currentPlan: args['currentPlan'] as String?);
+    }),
+    GoRoute(path: '/knowledge/feedback-form', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>?;
+      return KnowledgeFeedbackScreen(resultId: args?['resultId'] as String?);
+    }),
+    GoRoute(path: '/marketplace/new-request', builder: (c, s) => const NewServiceRequestScreen()),
+    GoRoute(path: '/clients/create', builder: (c, s) => const ClientCreateScreen2()),
+    GoRoute(path: '/audit/service', builder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return audit.AuditServiceScreen(
+        caseId: args['caseId'] ?? '',
+        clientName: args['clientName'] ?? '',
+        token: args['token'] as String?,
+      );
+    }),
   ],
 );
 

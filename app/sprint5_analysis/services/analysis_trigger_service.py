@@ -5,18 +5,20 @@ Key rule: Analysis only runs if TB binding is approved and COA is approved.
 """
 
 import json
-from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now as _now
+from app.core.db_utils import exec_sql as _exec, utc_now as _now
 
 
 def get_approved_coa_for_client(db, client_id: str) -> dict | None:
     """Find the latest approved COA for a client."""
-    row = _exec(db,
+    row = _exec(
+        db,
         """SELECT ca.coa_upload_id, ca.id as approval_id, ca.overall_quality_score,
                   ca.approved_accounts, ca.total_accounts
            FROM coa_approval_records ca
            WHERE ca.client_id = :cid AND ca.action = 'approved' AND ca.is_current = true
            ORDER BY ca.created_at DESC LIMIT 1""",
-        {"cid": client_id}).fetchone()
+        {"cid": client_id},
+    ).fetchone()
     if not row:
         return None
     return {
@@ -30,12 +32,14 @@ def get_approved_coa_for_client(db, client_id: str) -> dict | None:
 
 def get_approved_tb_binding(db, tb_upload_id: str) -> dict | None:
     """Check if TB binding is approved."""
-    row = _exec(db,
+    row = _exec(
+        db,
         """SELECT id, upload_status, client_id, coa_upload_id,
                   total_rows_parsed, total_matched, total_unmatched, binding_confidence_avg
            FROM trial_balance_uploads
            WHERE id = :tid""",
-        {"tid": tb_upload_id}).fetchone()
+        {"tid": tb_upload_id},
+    ).fetchone()
     if not row:
         return None
     return {
@@ -57,7 +61,8 @@ def get_bound_rows_as_classified(db, tb_upload_id: str) -> list[dict]:
     Each row needs: account_name, normalized_class, statement_section,
     current_noncurrent, cashflow_role, sign_rule, debit, credit, net_balance.
     """
-    rows = _exec(db,
+    rows = _exec(
+        db,
         """SELECT
               tp.account_code, tp.account_name_raw,
               tp.close_debit, tp.close_credit, tp.net_balance,
@@ -72,28 +77,31 @@ def get_bound_rows_as_classified(db, tb_upload_id: str) -> list[dict]:
            LEFT JOIN client_chart_of_accounts ca ON ca.id = br.coa_account_id
            WHERE tp.tb_upload_id = :tid
            ORDER BY tp.source_row_number""",
-        {"tid": tb_upload_id}).fetchall()
+        {"tid": tb_upload_id},
+    ).fetchall()
 
     classified = []
     for r in rows:
-        classified.append({
-            "account_code": r[0] or "",
-            "account_name": r[1] or "",
-            "debit": float(r[2] or 0),
-            "credit": float(r[3] or 0),
-            "net_balance": float(r[4] or 0),
-            "coa_account_id": r[5],
-            "match_strategy": r[6],
-            "binding_confidence": float(r[7] or 0),
-            # From COA classification
-            "normalized_class": r[8] or "other",
-            "statement_section": r[9] or "other",
-            "subcategory": r[10] or "",
-            "current_noncurrent": r[11] or "",
-            "cashflow_role": r[12] or "",
-            "sign_rule": r[13] or "natural",
-            "coa_account_name": r[14] or "",
-        })
+        classified.append(
+            {
+                "account_code": r[0] or "",
+                "account_name": r[1] or "",
+                "debit": float(r[2] or 0),
+                "credit": float(r[3] or 0),
+                "net_balance": float(r[4] or 0),
+                "coa_account_id": r[5],
+                "match_strategy": r[6],
+                "binding_confidence": float(r[7] or 0),
+                # From COA classification
+                "normalized_class": r[8] or "other",
+                "statement_section": r[9] or "other",
+                "subcategory": r[10] or "",
+                "current_noncurrent": r[11] or "",
+                "cashflow_role": r[12] or "",
+                "sign_rule": r[13] or "natural",
+                "coa_account_name": r[14] or "",
+            }
+        )
     return classified
 
 
@@ -124,7 +132,9 @@ def validate_analysis_preconditions(db, client_id: str, tb_upload_id: str) -> di
     else:
         context["tb"] = tb
         if tb["binding_confidence_avg"] and tb["binding_confidence_avg"] < 85:
-            warnings.append(f"نسبة المطابقة منخفضة ({tb['binding_confidence_avg']:.0f}%). قد تكون هناك حسابات غير مربوطة.")
+            warnings.append(
+                f"نسبة المطابقة منخفضة ({tb['binding_confidence_avg']:.0f}%). قد تكون هناك حسابات غير مربوطة."
+            )
 
     # 3. Verify COA and TB belong to same client
     if coa and tb:
@@ -141,14 +151,17 @@ def validate_analysis_preconditions(db, client_id: str, tb_upload_id: str) -> di
     }
 
 
-def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
-                           industry: str = "general",
-                           closing_inventory: float | None = None,
-                           triggered_by: str | None = None) -> dict:
+def run_coa_aware_analysis(
+    db,
+    client_id: str,
+    tb_upload_id: str,
+    industry: str = "general",
+    closing_inventory: float | None = None,
+    triggered_by: str | None = None,
+) -> dict:
     """
     Main entry point: run financial analysis using approved COA + TB binding.
     """
-    from app.sprint5_analysis.models.analysis_models import AnalysisRun
     import uuid
 
     # Step 1: Validate preconditions
@@ -164,14 +177,23 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
 
     # Step 2: Create analysis run record
     run_id = str(uuid.uuid4())
-    _exec(db,
+    _exec(
+        db,
         """INSERT INTO analysis_runs
            (id, client_id, tb_upload_id, coa_upload_id, run_status,
             industry, closing_inventory, triggered_by, created_at)
            VALUES (:id, :cid, :tid, :coa, 'running', :ind, :inv, :by, :now)""",
-        {"id": run_id, "cid": client_id, "tid": tb_upload_id,
-         "coa": coa_upload_id, "ind": industry, "inv": closing_inventory,
-         "by": triggered_by, "now": _now().isoformat()})
+        {
+            "id": run_id,
+            "cid": client_id,
+            "tid": tb_upload_id,
+            "coa": coa_upload_id,
+            "ind": industry,
+            "inv": closing_inventory,
+            "by": triggered_by,
+            "now": _now().isoformat(),
+        },
+    )
     db.commit()
 
     try:
@@ -194,7 +216,8 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
 
         # Opening inventory from classified rows
         opening_inv = sum(
-            r.get("debit", 0) for r in classified_rows
+            r.get("debit", 0)
+            for r in classified_rows
             if r.get("normalized_class", "").lower() in ("inventory", "current_assets")
             and "inventory" in (r.get("subcategory", "") or r.get("account_name", "")).lower()
         )
@@ -217,7 +240,8 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
 
         cf_builder = CashFlowBuilder()
         cf_result = cf_builder.build(
-            income=income, balance_current=balance,
+            income=income,
+            balance_current=balance,
             classified_rows=classified_rows,
         )
         cash_flow = cf_result["cash_flow"]
@@ -229,15 +253,19 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
         validator = ValidationEngine()
         validations = validator.validate(
             classified_rows=classified_rows,
-            income=income, balance=balance,
+            income=income,
+            balance=balance,
             classification_summary=cls_summary,
         )
 
         readiness_engine = ReadinessEngine()
         confidence = _calc_run_confidence(cls_summary, validations, classified_rows, validation)
         readiness_result = readiness_engine.calculate(
-            income=income, balance=balance, ratios=ratios,
-            validations=validations, confidence=confidence,
+            income=income,
+            balance=balance,
+            ratios=ratios,
+            validations=validations,
+            confidence=confidence,
             industry=industry,
         )
 
@@ -245,14 +273,17 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
         brain_result = {}
         try:
             from app.knowledge_brain.services.brain_service import KnowledgeBrainService
+
             brain = KnowledgeBrainService()
-            brain_result = brain.evaluate_analysis({
-                "income_statement": income,
-                "balance_sheet": balance,
-                "ratios": ratios,
-                "meta": {"industry": industry},
-                "confidence": confidence,
-            })
+            brain_result = brain.evaluate_analysis(
+                {
+                    "income_statement": income,
+                    "balance_sheet": balance,
+                    "ratios": ratios,
+                    "meta": {"industry": industry},
+                    "confidence": confidence,
+                }
+            )
         except Exception:
             brain_result = {"brain_findings": [], "rules_evaluated": 0}
 
@@ -264,7 +295,8 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
         all_warnings.extend(ratio_result.get("warnings", []))
 
         # Step 5: Update run record with results
-        _exec(db,
+        _exec(
+            db,
             """UPDATE analysis_runs SET
                run_status = 'completed',
                overall_confidence = :conf,
@@ -300,7 +332,8 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
                 "warn_j": json.dumps(all_warnings, ensure_ascii=False, default=str),
                 "now": _now().isoformat(),
                 "id": run_id,
-            })
+            },
+        )
         db.commit()
 
         return {
@@ -326,12 +359,15 @@ def run_coa_aware_analysis(db, client_id: str, tb_upload_id: str,
 
     except Exception as e:
         import logging
+
         logging.error("Analysis run failed", exc_info=True)
         # Mark run as failed (store error internally for admin debugging)
-        _exec(db,
+        _exec(
+            db,
             """UPDATE analysis_runs SET run_status = 'failed',
                error_message = :err, completed_at = :now WHERE id = :id""",
-            {"err": str(e), "now": _now().isoformat(), "id": run_id})
+            {"err": str(e), "now": _now().isoformat(), "id": run_id},
+        )
         db.commit()
         return {
             "success": False,

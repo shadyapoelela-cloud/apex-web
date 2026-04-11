@@ -1,10 +1,10 @@
 ﻿import 'package:flutter/material.dart';
 import 'screens/copilot/copilot_screen.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'api_service.dart';
-import 'analysis_full_screen.dart';
 
 class FinancialStatementsScreen extends StatefulWidget {
   final Map<String, dynamic>? apiData;
@@ -260,7 +260,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
           decoration: BoxDecoration(
             color: _navy3,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _cyan.withOpacity(0.3))),
+            border: Border.all(color: _cyan.withValues(alpha: 0.3))),
           child: Row(children: [
             const Icon(Icons.info_outline, color: _cyan, size: 18),
             const SizedBox(width: 10),
@@ -299,10 +299,10 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
         const SizedBox(height: 10),
         // زر التحليل المالي
         GestureDetector(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => AnalysisFullScreen(
-              apiData: widget.apiData,
-              pickedFile: widget.pickedFile))),
+          onTap: () => context.push('/analysis/full', extra: {
+            'apiData': widget.apiData,
+            'pickedFile': widget.pickedFile,
+          }),
           child: Container(
             width: double.infinity, height: 54,
             decoration: BoxDecoration(
@@ -310,7 +310,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
                 colors: [Color(0xFF2ECC8A), Color(0xFF1A8C5C)]),
               borderRadius: BorderRadius.circular(14),
               boxShadow: [BoxShadow(
-                color: _success.withOpacity(0.3),
+                color: _success.withValues(alpha: 0.3),
                 blurRadius: 16, offset: const Offset(0, 4))]),
             child: const Center(child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -352,7 +352,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
       margin: const EdgeInsets.only(left: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: _navy3, borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: s.color.withOpacity(0.3))),
+        border: Border.all(color: s.color.withValues(alpha: 0.3))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text(s.label, textDirection: TextDirection.rtl,
           style: const TextStyle(fontSize: 10, color: _textSecondary, fontFamily: 'Tajawal')),
@@ -403,9 +403,9 @@ class _DownloadBtn extends StatelessWidget {
     onTap: loading ? null : onTap,
     child: Container(height: 48,
       decoration: BoxDecoration(
-        color: outlined ? Colors.transparent : color.withOpacity(0.15),
+        color: outlined ? Colors.transparent : color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.4), width: 1.5)),
+        border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5)),
       child: Center(child: loading
         ? SizedBox(width: 20, height: 20,
             child: CircularProgressIndicator(color: color, strokeWidth: 2))

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Sprint 4 — Knowledge Brain Pydantic schemas."""
+
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 

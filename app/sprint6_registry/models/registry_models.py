@@ -6,18 +6,27 @@ Models for: reference authorities, regulatory updates, approved cache,
 """
 
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
 )
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
-
 
 # ══════════════════════════════════════════════════════════════
 # OFFICIAL SOURCE REGISTRY
 # ══════════════════════════════════════════════════════════════
 
+
 class ReferenceAuthority(Base):
     """Official bodies whose publications are authoritative."""
+
     __tablename__ = "reference_authorities"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     name_ar = Column(String(300), nullable=False)
@@ -43,6 +52,7 @@ class ReferenceAuthority(Base):
 
 class ReferenceDocument(Base):
     """Approved reference documents from authorities."""
+
     __tablename__ = "reference_documents"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=False, index=True)
@@ -73,6 +83,7 @@ class ReferenceDocument(Base):
 
 class RegulatoryUpdateEvent(Base):
     """Detected changes in official sources."""
+
     __tablename__ = "regulatory_update_events"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     authority_id = Column(String(36), ForeignKey("reference_authorities.id"), nullable=False, index=True)
@@ -98,8 +109,10 @@ class RegulatoryUpdateEvent(Base):
 # ELIGIBILITY & READINESS ENGINES
 # ══════════════════════════════════════════════════════════════
 
+
 class FundingProgram(Base):
     """Funding programs from banks and financial institutions."""
+
     __tablename__ = "funding_programs"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     name_ar = Column(String(300), nullable=False)
@@ -136,6 +149,7 @@ class FundingProgram(Base):
 
 class SupportProgram(Base):
     """Government support programs, incentives, subsidies."""
+
     __tablename__ = "support_programs"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     name_ar = Column(String(300), nullable=False)
@@ -167,6 +181,7 @@ class SupportProgram(Base):
 
 class LicenseRegistry(Base):
     """License types: commercial, professional, medical, industrial."""
+
     __tablename__ = "license_registry"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     name_ar = Column(String(300), nullable=False)
@@ -197,6 +212,7 @@ class LicenseRegistry(Base):
 
 class EligibilityAssessment(Base):
     """Result of running eligibility check for a client against a program/license."""
+
     __tablename__ = "eligibility_assessments"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False)
@@ -242,6 +258,7 @@ class EligibilityAssessment(Base):
 
 def init_sprint6_db():
     from app.phase1.models.platform_models import engine
+
     ReferenceAuthority.__table__.create(bind=engine, checkfirst=True)
     ReferenceDocument.__table__.create(bind=engine, checkfirst=True)
     RegulatoryUpdateEvent.__table__.create(bind=engine, checkfirst=True)

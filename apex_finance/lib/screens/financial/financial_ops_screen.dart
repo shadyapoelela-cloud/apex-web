@@ -1,14 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
-import '../../coa_upload_screen.dart';
-import '../../coa_mapping_screen.dart';
-import '../../coa_quality_screen.dart';
-import '../../coa_review_screen.dart';
-import '../../tb_binding_screen.dart';
-import '../../financial_statements_screen.dart';
-import '../../analysis_full_screen.dart';
-import '../copilot/copilot_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class FinancialOpsScreen extends StatefulWidget {
   final String? clientId;
@@ -81,9 +74,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
           IconButton(
             icon: const Icon(Icons.smart_toy, color: AC.gold),
             tooltip: 'Apex Copilot',
-            onPressed: () => Navigator.push(context, MaterialPageRoute(
-              builder: (_) => CopilotScreen(clientId: widget.clientId),
-            )),
+            onPressed: () => context.push('/copilot'),
           ),
         ],
       ),
@@ -116,7 +107,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
         width: 90,
         margin: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.15) : AC.navy3,
+          color: isSelected ? color.withValues(alpha: 0.15) : AC.navy3,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: isSelected ? color : AC.bdr, width: isSelected ? 1.5 : 1),
         ),
@@ -152,7 +143,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       ),
       const SizedBox(height: 12),
       _stepCard(1, '\u0631\u0641\u0639 \u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', '\u0631\u0641\u0639 \u0645\u0644\u0641 CSV \u0623\u0648 Excel', Icons.upload_file, AC.cyan, () {
-        if (widget.clientId != null) Navigator.push(context, MaterialPageRoute(builder: (_) => CoaUploadScreen(clientId: widget.clientId!, clientName: widget.clientName ?? '')));
+        if (widget.clientId != null) context.push('/coa/upload', extra: {'clientId': widget.clientId!, 'clientName': widget.clientName ?? ''});
       }),
       _stepCard(2, '\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u062a\u0628\u0648\u064a\u0628', '\u0645\u0631\u0627\u062c\u0639\u0629 \u062a\u0635\u0646\u064a\u0641 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a', Icons.map, AC.gold, () {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u064a\u0631\u062c\u0649 \u0631\u0641\u0639 \u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a \u0623\u0648\u0644\u0627\u064b', style: TextStyle(fontFamily: 'Tajawal')), backgroundColor: Color(0xFFF0A500)));
@@ -191,7 +182,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       ),
       const SizedBox(height: 12),
       _actionCard('\u062a\u062d\u0644\u064a\u0644 \u0633\u0631\u064a\u0639', '\u0631\u0641\u0639 \u0645\u064a\u0632\u0627\u0646 \u0648\u062a\u062d\u0644\u064a\u0644 \u0641\u0648\u0631\u064a', Icons.flash_on, AC.gold, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const AnalysisFullScreen()));
+        context.push('/analysis/full');
       }),
       _actionCard('\u0627\u0644\u0646\u0633\u0628 \u0627\u0644\u0645\u0627\u0644\u064a\u0629', '\u0633\u064a\u0648\u0644\u0629\u060c \u0631\u0628\u062d\u064a\u0629\u060c \u0643\u0641\u0627\u0621\u0629\u060c \u0631\u0627\u0641\u0639\u0629', Icons.pie_chart, AC.cyan, () {}),
       _actionCard('\u0627\u0644\u0645\u0642\u0627\u0631\u0646\u0629 \u0627\u0644\u062f\u0648\u0631\u064a\u0629', '\u0645\u0642\u0627\u0631\u0646\u0629 \u0628\u064a\u0646 \u0627\u0644\u0641\u062a\u0631\u0627\u062a', Icons.compare_arrows, AC.warn, () {}),
@@ -207,13 +198,13 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       ),
       const SizedBox(height: 12),
       _actionCard('\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u0631\u0643\u0632 \u0627\u0644\u0645\u0627\u0644\u064a', 'Balance Sheet', Icons.account_balance_wallet, AC.gold, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialStatementsScreen()));
+        context.push('/financial-statements');
       }),
       _actionCard('\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062f\u062e\u0644', 'Income Statement', Icons.trending_up, AC.ok, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialStatementsScreen()));
+        context.push('/financial-statements');
       }),
       _actionCard('\u0627\u0644\u062a\u062f\u0641\u0642\u0627\u062a \u0627\u0644\u0646\u0642\u062f\u064a\u0629', 'Cash Flow', Icons.water_drop, AC.cyan, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialStatementsScreen()));
+        context.push('/financial-statements');
       }),
       _actionCard('\u062a\u0635\u062f\u064a\u0631 PDF', '\u062a\u0635\u062f\u064a\u0631 \u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0643\u0645\u0644\u0641 PDF', Icons.picture_as_pdf, AC.err, () {}),
     ]);
@@ -222,9 +213,9 @@ class _FinOpsState extends State<FinancialOpsScreen> {
   Widget _infoCard(String title, String desc, IconData icon, Color color) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.08),
+      color: color.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: color.withOpacity(0.3)),
+      border: Border.all(color: color.withValues(alpha: 0.3)),
     ),
     child: Row(children: [
       Icon(icon, color: color, size: 20),
@@ -247,7 +238,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
         child: Row(children: [
           Container(
             width: 36, height: 36,
-            decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Center(child: Text('', style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 16))),
           ),
           const SizedBox(width: 12),
@@ -272,7 +263,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
         child: Row(children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
             child: Icon(icon, color: color, size: 22),
           ),
           const SizedBox(width: 12),

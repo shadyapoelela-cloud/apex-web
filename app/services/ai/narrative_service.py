@@ -10,7 +10,6 @@ APEX AI Narrative Service — طبقة الذكاء الاصطناعي
 
 import os
 import json
-from typing import Optional
 
 
 class NarrativeService:
@@ -50,21 +49,21 @@ class NarrativeService:
             try:
                 narrative = await self._call_openai(prompt)
                 platform = "gpt4"
-            except Exception as e:
+            except Exception:
                 narrative = {"error": "AI narrative generation failed (GPT-4)"}
 
         if not narrative.get("executive_summary") and self.google_key:
             try:
                 narrative = await self._call_gemini(prompt)
                 platform = "gemini"
-            except Exception as e:
+            except Exception:
                 narrative = {"error": "AI narrative generation failed (Gemini)"}
 
         if not narrative.get("executive_summary") and self.anthropic_key:
             try:
                 narrative = await self._call_claude(prompt)
                 platform = "claude"
-            except Exception as e:
+            except Exception:
                 narrative = {"error": "AI narrative generation failed (Claude)"}
 
         narrative["platform"] = platform
@@ -217,6 +216,7 @@ Write a comprehensive analytical report. Respond with JSON only, no markdown:
 
     async def _call_openai(self, prompt: str) -> dict:
         from openai import OpenAI
+
         client = OpenAI(api_key=self.openai_key)
         response = client.chat.completions.create(
             model="gpt-4o",
@@ -230,12 +230,18 @@ Write a comprehensive analytical report. Respond with JSON only, no markdown:
 
     async def _call_gemini(self, prompt: str) -> dict:
         import requests as req
-        base_url = os.environ.get("GEMINI_API_URL", "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
+
+        base_url = os.environ.get(
+            "GEMINI_API_URL", "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+        )
         url = f"{base_url}?key={self.google_key}"
-        resp = req.post(url, json={
-            "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.3},
-        })
+        resp = req.post(
+            url,
+            json={
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"temperature": 0.3},
+            },
+        )
         rj = resp.json()
         if "candidates" in rj and len(rj["candidates"]) > 0:
             raw = rj["candidates"][0]["content"]["parts"][0]["text"].strip()
@@ -245,6 +251,7 @@ Write a comprehensive analytical report. Respond with JSON only, no markdown:
 
     async def _call_claude(self, prompt: str) -> dict:
         import anthropic
+
         client = anthropic.Anthropic(api_key=self.anthropic_key)
         message = client.messages.create(
             model="claude-sonnet-4-20250514",

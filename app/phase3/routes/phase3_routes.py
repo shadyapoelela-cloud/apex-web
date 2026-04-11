@@ -20,6 +20,7 @@ feedback_service = KnowledgeFeedbackService()
 # Schemas
 # ═══════════════════════════════════════════════════════════════
 
+
 class SubmitFeedbackRequest(BaseModel):
     feedback_type: str
     title: str = Field(..., min_length=5)
@@ -34,10 +35,12 @@ class SubmitFeedbackRequest(BaseModel):
     applicability_scope: str = "global"
     priority: str = "normal"
 
+
 class ReviewFeedbackRequest(BaseModel):
     decision: str  # accepted, rejected, needs_refinement, queued_for_rule_design
     reviewer_notes: Optional[str] = None
     quality_score: Optional[int] = Field(None, ge=1, le=5)
+
 
 class PromoteRuleRequest(BaseModel):
     rule_type: str
@@ -51,6 +54,7 @@ class PromoteRuleRequest(BaseModel):
 # ═══════════════════════════════════════════════════════════════
 # Knowledge Feedback APIs
 # ═══════════════════════════════════════════════════════════════
+
 
 @router.post("/knowledge-feedback", tags=["Knowledge"])
 async def submit_feedback(req: SubmitFeedbackRequest, user: dict = Depends(get_current_user)):

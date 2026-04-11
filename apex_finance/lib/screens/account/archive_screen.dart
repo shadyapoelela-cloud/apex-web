@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
+import '../../api_service.dart';
 import '../../core/theme.dart';
-
-const _api = apiBase;
 
 class ArchiveScreen extends StatefulWidget {
   final String? clientId;
@@ -18,20 +14,16 @@ class _ArchiveS extends State<ArchiveScreen> {
   bool _loading = true;
   int _page = 1, _total = 0;
 
-  Map<String, String> get _h => {'Authorization': 'Bearer ${widget.token ?? ""}'};
-
   @override void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final url = widget.clientId != null
-        ? '$_api/clients/${widget.clientId}/archive?page=$_page'
-        : '$_api/account/archive?page=$_page';
-      final r = await http.get(Uri.parse(url), headers: _h);
-      if (r.statusCode == 200) {
-        final d = jsonDecode(utf8.decode(r.bodyBytes));
-        setState(() { _items = d['data'] ?? []; _total = d['total'] ?? 0; _loading = false; });
+      final r = widget.clientId != null
+        ? await ApiService.getClientArchive(widget.clientId!, page: _page)
+        : await ApiService.getUserArchive(page: _page);
+      if (r.success) {
+        setState(() { _items = r.data['data'] ?? []; _total = r.data['total'] ?? 0; _loading = false; });
       } else { setState(() => _loading = false); }
     } catch (_) { setState(() => _loading = false); }
   }
@@ -57,7 +49,7 @@ class _ArchiveS extends State<ArchiveScreen> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: urgent ? AC.warn.withOpacity(0.5) : AC.bdr)),
+                  border: Border.all(color: urgent ? AC.warn.withValues(alpha: 0.5) : AC.bdr)),
                 child: Row(children: [
                   Icon(_fileIcon(item['file_name'] ?? ''), color: AC.gold, size: 28),
                   const SizedBox(width: 12),
@@ -96,8 +88,8 @@ class _ArchiveS extends State<ArchiveScreen> {
 
   Future<void> _deleteItem(String id) async {
     try {
-      final r = await http.delete(Uri.parse('$_api/archive/items/$id'), headers: _h);
-      if (r.statusCode == 200) { _load(); if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم الحذف'))); }
+      final r = await ApiService.deleteArchiveItem(id);
+      if (r.success) { _load(); if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم الحذف'))); }
     } catch (_) {}
   }
 }

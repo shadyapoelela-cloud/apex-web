@@ -49,15 +49,15 @@ class AnalysisOrchestrator:
         self.validator = ValidationEngine()
         self.brain = KnowledgeBrainService()
 
-    def analyze_bytes(self, file_bytes: bytes, filename: str, industry: str = "general",
-                      closing_inventory: float = None) -> dict:
+    def analyze_bytes(
+        self, file_bytes: bytes, filename: str, industry: str = "general", closing_inventory: float = None
+    ) -> dict:
         suffix = os.path.splitext(filename)[1]
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             tmp.write(file_bytes)
             tmp_path = tmp.name
         try:
-            result = self.analyze(filepath=tmp_path, industry=industry,
-                                  closing_inventory=closing_inventory)
+            result = self.analyze(filepath=tmp_path, industry=industry, closing_inventory=closing_inventory)
             result["meta"]["filename"] = filename
             return result
         finally:
@@ -66,8 +66,7 @@ class AnalysisOrchestrator:
             except OSError:
                 pass
 
-    def analyze(self, filepath: str, industry: str = "general",
-                closing_inventory: float = None) -> dict:
+    def analyze(self, filepath: str, industry: str = "general", closing_inventory: float = None) -> dict:
         all_warnings = []
 
         # Step 1: Read
@@ -98,11 +97,13 @@ class AnalysisOrchestrator:
             if inventory_system == "periodic" and effective_closing_inventory > 0:
                 # In periodic system, the inventory in TB is the opening inventory
                 # If no closing_inventory provided, we can't calculate COGS properly
-                all_warnings.append({
-                    "code": "PERIODIC_NO_CLOSING_INV",
-                    "severity": "WARNING",
-                    "message": f"نظام جرد دوري: مخزون آخر المدة في الميزان ({effective_closing_inventory:,.0f}) قد يكون رصيد أول المدة. يُنصح بإدخال مخزون آخر المدة الفعلي من الجرد.",
-                })
+                all_warnings.append(
+                    {
+                        "code": "PERIODIC_NO_CLOSING_INV",
+                        "severity": "WARNING",
+                        "message": f"نظام جرد دوري: مخزون آخر المدة في الميزان ({effective_closing_inventory:,.0f}) قد يكون رصيد أول المدة. يُنصح بإدخال مخزون آخر المدة الفعلي من الجرد.",
+                    }
+                )
 
         # Step 6: Income Statement
         is_result = self.is_builder.build(
@@ -114,8 +115,9 @@ class AnalysisOrchestrator:
         all_warnings.extend(is_result.get("warnings", []))
 
         # Step 7: Balance Sheet
-        bs_result = self.bs_builder.build(classified_rows, net_profit=income.get("net_profit", 0),
-                                          closing_inventory_override=closing_inventory)
+        bs_result = self.bs_builder.build(
+            classified_rows, net_profit=income.get("net_profit", 0), closing_inventory_override=closing_inventory
+        )
         balance = bs_result["balance_sheet"]
         all_warnings.extend(bs_result.get("warnings", []))
 
@@ -130,28 +132,50 @@ class AnalysisOrchestrator:
         all_warnings.extend(ratio_result.get("warnings", []))
 
         # Step 10: Validate
-        validations = self.validator.validate(classified_rows=classified_rows, income=income, balance=balance, classification_summary=cls_summary)
+        validations = self.validator.validate(
+            classified_rows=classified_rows, income=income, balance=balance, classification_summary=cls_summary
+        )
         severity_counts = self.validator.get_severity_counts(validations)
 
         # Step 11: Confidence
         confidence = self._calc_confidence(cls_summary, validations, income, balance)
 
         # Step 12: Readiness
-        readiness_result = self.readiness_engine.calculate(income=income, balance=balance, ratios=ratios, validations=validations, confidence=confidence, industry=industry)
+        readiness_result = self.readiness_engine.calculate(
+            income=income,
+            balance=balance,
+            ratios=ratios,
+            validations=validations,
+            confidence=confidence,
+            industry=industry,
+        )
 
         # Step 13: Knowledge Brain — evaluate against rules and regulations
         brain_result = {}
         try:
-            brain_result = self.brain.evaluate_analysis({
-                "income_statement": income,
-                "balance_sheet": balance,
-                "ratios": ratios,
-                "meta": {"company_name": meta.get("company_name", ""), "industry": industry, "inventory_system": inventory_system},
-                "confidence": confidence,
-                "tab_review": tab_review,
-            })
+            brain_result = self.brain.evaluate_analysis(
+                {
+                    "income_statement": income,
+                    "balance_sheet": balance,
+                    "ratios": ratios,
+                    "meta": {
+                        "company_name": meta.get("company_name", ""),
+                        "industry": industry,
+                        "inventory_system": inventory_system,
+                    },
+                    "confidence": confidence,
+                    "tab_review": tab_review,
+                }
+            )
         except Exception:
-            brain_result = {"brain_findings": [], "compliance_notes": [], "brain_recommendations": [], "citations": [], "rules_evaluated": 0, "rules_triggered": 0}
+            brain_result = {
+                "brain_findings": [],
+                "compliance_notes": [],
+                "brain_recommendations": [],
+                "citations": [],
+                "rules_evaluated": 0,
+                "rules_triggered": 0,
+            }
 
         return {
             "success": True,
@@ -181,7 +205,10 @@ class AnalysisOrchestrator:
                 "can_approve": self.validator.can_approve(validations),
             },
             "knowledge_brain": brain_result,
-            "line_items": {"income_statement": is_result.get("line_items", {}), "balance_sheet": bs_result.get("line_items", {})},
+            "line_items": {
+                "income_statement": is_result.get("line_items", {}),
+                "balance_sheet": bs_result.get("line_items", {}),
+            },
         }
 
     def _get_opening_inventory(self, raw_rows, classified_rows):
@@ -207,11 +234,27 @@ class AnalysisOrchestrator:
         warns = sum(1 for v in validations if v.get("severity") == "WARNING")
         val_conf = max(0, 1.0 - errs * CONFIDENCE_ERROR_PENALTY - warns * CONFIDENCE_WARNING_PENALTY)
         comp = 1.0
-        if income.get("net_revenue", 0) == 0: comp -= COMPLETENESS_MISSING_REVENUE_PENALTY
-        if balance.get("total_assets", 0) == 0: comp -= COMPLETENESS_MISSING_ASSETS_PENALTY
-        if not balance.get("is_balanced", False): comp -= COMPLETENESS_UNBALANCED_PENALTY
+        if income.get("net_revenue", 0) == 0:
+            comp -= COMPLETENESS_MISSING_REVENUE_PENALTY
+        if balance.get("total_assets", 0) == 0:
+            comp -= COMPLETENESS_MISSING_ASSETS_PENALTY
+        if not balance.get("is_balanced", False):
+            comp -= COMPLETENESS_UNBALANCED_PENALTY
         unmapped_pct = cls_summary.get("unmapped_accounts_count", 0) / max(cls_summary.get("total_accounts", 1), 1)
         comp = max(0, comp - unmapped_pct * COMPLETENESS_UNMAPPED_WEIGHT)
         overall = mapping * WEIGHT_MAPPING + val_conf * WEIGHT_VALIDATION + comp * WEIGHT_COMPLETENESS
-        return {"overall": round(overall, 3), "mapping": round(mapping, 3), "validation": round(val_conf, 3), "completeness": round(comp, 3),
-                "label": "ممتاز" if overall >= CONFIDENCE_EXCELLENT else "جيد" if overall >= CONFIDENCE_GOOD else "مقبول" if overall >= CONFIDENCE_ACCEPTABLE else "يحتاج مراجعة"}
+        return {
+            "overall": round(overall, 3),
+            "mapping": round(mapping, 3),
+            "validation": round(val_conf, 3),
+            "completeness": round(comp, 3),
+            "label": (
+                "ممتاز"
+                if overall >= CONFIDENCE_EXCELLENT
+                else (
+                    "جيد"
+                    if overall >= CONFIDENCE_GOOD
+                    else "مقبول" if overall >= CONFIDENCE_ACCEPTABLE else "يحتاج مراجعة"
+                )
+            ),
+        }

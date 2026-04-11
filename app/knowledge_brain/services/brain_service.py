@@ -8,7 +8,7 @@
 ╚════════════════════════════════════════════════════════════════╝
 """
 
-from typing import List, Dict, Optional
+from typing import List, Dict
 from app.knowledge_brain.rulebooks.tax_rulebook import TAX_RULES
 from app.knowledge_brain.rulebooks.accounting_rulebook import ACCOUNTING_RULES
 from app.knowledge_brain.rulebooks.governance_rulebook import GOVERNANCE_RULES
@@ -138,13 +138,15 @@ class KnowledgeBrainService:
             # Simple keyword match
             searchable = f"{rule.get('title', '')} {rule.get('description', '')} {rule.get('reference', '')}".lower()
             if query_lower in searchable:
-                results.append({
-                    "rule_id": rule_id,
-                    "domain": rule.get("domain"),
-                    "title": rule.get("title", ""),
-                    "reference": rule.get("reference", ""),
-                    "authority": rule.get("authority", ""),
-                    "obligation": rule.get("obligation", ""),
-                })
+                results.append(
+                    {
+                        "rule_id": rule_id,
+                        "domain": rule.get("domain"),
+                        "title": rule.get("title", ""),
+                        "reference": rule.get("reference", ""),
+                        "authority": rule.get("authority", ""),
+                        "obligation": rule.get("obligation", ""),
+                    }
+                )
 
         return results

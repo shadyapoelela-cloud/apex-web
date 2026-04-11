@@ -20,8 +20,9 @@ class IncomeStatementBuilder:
     - Returns/discounts are debit_normal → reduce revenue
     """
 
-    def build(self, classified_rows: list, opening_inventory: float = 0.0,
-              closing_inventory_override: float = None) -> dict:
+    def build(
+        self, classified_rows: list, opening_inventory: float = 0.0, closing_inventory_override: float = None
+    ) -> dict:
         """
         Build income statement from classified rows.
 
@@ -74,7 +75,7 @@ class IncomeStatementBuilder:
         purchases = sum_class("purchases")
         purchases_returns = sum_class("purchases_returns")
         freight_in = sum_class("freight_in")
-        direct_labor = sum_class("direct_labor")
+        sum_class("direct_labor")
 
         # Closing inventory: use override if provided (periodic system)
         if closing_inventory_override is not None:
@@ -94,17 +95,21 @@ class IncomeStatementBuilder:
                 cogs += cogs_direct  # Add any direct COGS items too
                 cogs_method = f"periodic_plus_direct_{inv_source}"
             if closing_inventory_override is not None:
-                warnings.append({
-                    "code": "PERIODIC_CLOSING_INV_USED",
-                    "severity": "INFO",
-                    "message": f"تم استخدام مخزون آخر المدة الفعلي ({closing_inventory_override:,.0f}) من الجرد الدوري لحساب تكلفة البضاعة المباعة",
-                })
+                warnings.append(
+                    {
+                        "code": "PERIODIC_CLOSING_INV_USED",
+                        "severity": "INFO",
+                        "message": f"تم استخدام مخزون آخر المدة الفعلي ({closing_inventory_override:,.0f}) من الجرد الدوري لحساب تكلفة البضاعة المباعة",
+                    }
+                )
             elif opening_inventory == 0 and closing_inventory == 0:
-                warnings.append({
-                    "code": "COGS_NO_INVENTORY",
-                    "severity": "WARNING",
-                    "message": "تكلفة البضاعة المباعة محسوبة بدون بيانات مخزون أول وآخر المدة",
-                })
+                warnings.append(
+                    {
+                        "code": "COGS_NO_INVENTORY",
+                        "severity": "WARNING",
+                        "message": "تكلفة البضاعة المباعة محسوبة بدون بيانات مخزون أول وآخر المدة",
+                    }
+                )
         elif cogs_direct > 0:
             # Perpetual system: direct COGS
             cogs = cogs_direct
@@ -116,16 +121,31 @@ class IncomeStatementBuilder:
         gross_profit = net_revenue - cogs
 
         # ─── Operating Expenses ───
-        admin_expenses = sum_classes([
-            "admin_expenses", "payroll", "rent_expense", "utilities",
-            "depreciation_expense", "amortization_expense", "government_fees",
-            "insurance_expense", "travel_expense", "professional_fees",
-            "misc_admin_expense", "gosi_expense", "medical_insurance",
-        ])
+        admin_expenses = sum_classes(
+            [
+                "admin_expenses",
+                "payroll",
+                "rent_expense",
+                "utilities",
+                "depreciation_expense",
+                "amortization_expense",
+                "government_fees",
+                "insurance_expense",
+                "travel_expense",
+                "professional_fees",
+                "misc_admin_expense",
+                "gosi_expense",
+                "medical_insurance",
+            ]
+        )
 
-        selling_expenses = sum_classes([
-            "selling_expenses", "sales_commission", "marketing_expense",
-        ])
+        selling_expenses = sum_classes(
+            [
+                "selling_expenses",
+                "sales_commission",
+                "marketing_expense",
+            ]
+        )
 
         total_opex = admin_expenses + selling_expenses
         operating_profit = gross_profit - total_opex  # EBIT
@@ -137,7 +157,9 @@ class IncomeStatementBuilder:
 
         # ─── Non-operating ───
         other_income = sum_classes(["other_income", "gains_asset_disposal", "forex_gain", "finance_income"])
-        other_expenses = sum_classes(["other_expenses", "losses_asset_disposal", "forex_loss", "penalties", "bad_debts"])
+        other_expenses = sum_classes(
+            ["other_expenses", "losses_asset_disposal", "forex_loss", "penalties", "bad_debts"]
+        )
         finance_cost = sum_class("finance_cost")
 
         profit_before_tax = operating_profit + other_income - other_expenses - finance_cost
@@ -153,10 +175,7 @@ class IncomeStatementBuilder:
                 "label_ar": ACCOUNT_TAXONOMY.get(cls, {}).get("ar_label", cls),
                 "label_en": ACCOUNT_TAXONOMY.get(cls, {}).get("en_label", cls),
                 "amount": round(sum_class(cls), 2),
-                "accounts": [
-                    {"name": r.get("name", ""), "balance": round(r.get("net_balance", 0), 2)}
-                    for r in rows
-                ],
+                "accounts": [{"name": r.get("name", ""), "balance": round(r.get("net_balance", 0), 2)} for r in rows],
             }
 
         return {
@@ -168,7 +187,6 @@ class IncomeStatementBuilder:
                 "sales_returns": round(sales_returns, 2),
                 "sales_discounts": round(sales_discounts, 2),
                 "net_revenue": round(net_revenue, 2),
-
                 "opening_inventory": round(opening_inventory, 2),
                 "purchases": round(purchases, 2),
                 "purchases_returns": round(purchases_returns, 2),
@@ -177,21 +195,17 @@ class IncomeStatementBuilder:
                 "cogs": round(cogs, 2),
                 "cogs_method": cogs_method,
                 "gross_profit": round(gross_profit, 2),
-
                 "admin_expenses": round(admin_expenses, 2),
                 "selling_expenses": round(selling_expenses, 2),
                 "total_operating_expenses": round(total_opex, 2),
                 "operating_profit": round(operating_profit, 2),
-
                 "ebitda": round(ebitda, 2),
                 "depreciation": round(depreciation, 2),
                 "amortization": round(amortization, 2),
-
                 "other_income": round(other_income, 2),
                 "other_expenses": round(other_expenses, 2),
                 "finance_cost": round(finance_cost, 2),
                 "profit_before_tax": round(profit_before_tax, 2),
-
                 "zakat_tax": round(zakat_tax, 2),
                 "net_profit": round(net_profit, 2),
             },

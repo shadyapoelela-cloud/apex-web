@@ -178,7 +178,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
       decoration: BoxDecoration(
         color: _navy2,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _gold.withOpacity(0.4))),
+        border: Border.all(color: _gold.withValues(alpha: 0.4))),
       child: Column(children: [
         Row(children: [
           SizedBox(width: 90, height: 90,
@@ -199,9 +199,9 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: _success.withOpacity(0.1),
+                color: _success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: _success.withOpacity(0.3))),
+                border: Border.all(color: _success.withValues(alpha: 0.3))),
               child: Text(_label,
                 style: const TextStyle(fontSize: 12, color: _success, fontFamily: 'Tajawal'))),
           ])),
@@ -248,7 +248,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(color: _navy3,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: color.withOpacity(0.3))),
+              border: Border.all(color: color.withValues(alpha: 0.3))),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Text(ins['title'] ?? '', textDirection: TextDirection.rtl,
@@ -261,7 +261,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
               ])),
               const SizedBox(width: 10),
               Container(width: 36, height: 36,
-                decoration: BoxDecoration(color: color.withOpacity(0.1),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8)),
                 child: Icon(
                   type == 'strength' ? Icons.trending_up_rounded
@@ -293,7 +293,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
               margin: const EdgeInsets.only(left: 8),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: _selectedTab == i ? _gold.withOpacity(0.1) : _navy3,
+                color: _selectedTab == i ? _gold.withValues(alpha: 0.1) : _navy3,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: _selectedTab == i ? _gold : _border)),
@@ -315,14 +315,14 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
           decoration: BoxDecoration(
             color: _navy3,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: color.withOpacity(0.2))),
+            border: Border.all(color: color.withValues(alpha: 0.2))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             // اسم النسبة والقيمة
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8)),
                 child: Text('${r['value']}${r['unit']}',
                   style: TextStyle(fontSize: 15, color: color,
@@ -342,7 +342,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
                 borderRadius: BorderRadius.circular(2),
                 child: LinearProgressIndicator(
                   value: score / 100, minHeight: 6,
-                  backgroundColor: Colors.white.withOpacity(0.06),
+                  backgroundColor: Colors.white.withValues(alpha: 0.06),
                   valueColor: AlwaysStoppedAnimation(color)))),
             ]),
             const SizedBox(height: 8),
@@ -357,7 +357,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.03),
+                  color: Colors.white.withValues(alpha: 0.03),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: _border)),
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -383,7 +383,7 @@ class _RingPainter extends CustomPainter {
     final center = Offset(s.width / 2, s.height / 2);
     final r = s.width / 2 - 6;
     c.drawCircle(center, r,
-      Paint()..color = const Color(0xFFC9A84C).withOpacity(0.1)
+      Paint()..color = const Color(0xFFC9A84C).withValues(alpha: 0.1)
         ..strokeWidth = 8..style = PaintingStyle.stroke);
     c.drawArc(Rect.fromCircle(center: center, radius: r),
       -1.5707963, 2 * 3.14159 * v, false,

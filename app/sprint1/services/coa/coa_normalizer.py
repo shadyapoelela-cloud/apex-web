@@ -5,8 +5,8 @@ Text normalization, account code cleanup, boolean parsing,
 normal balance parsing, level parsing.
 Per Sprint 1 Build Spec §9.3-9.7.
 """
+
 import re
-import unicodedata
 from typing import Any, Optional, Tuple, List
 
 
@@ -42,7 +42,7 @@ def normalize_account_name(value: Any) -> Tuple[Optional[str], Optional[str]]:
     raw = normalize_text(value)
     if raw is None:
         return (None, None)
-    
+
     # Build normalized version
     n = raw.lower()
     # Remove Arabic diacritics (tashkeel)
@@ -66,15 +66,15 @@ def normalize_normal_balance(value: Any) -> Tuple[Optional[str], List[str]]:
     s = str(value).strip().lower()
     if s in ("", "none", "null", "n/a", "-", "nan"):
         return (None, issues)
-    
+
     DEBIT_VALUES = {"debit", "dr", "مدين", "مد", "d", "debet"}
     CREDIT_VALUES = {"credit", "cr", "دائن", "دا", "c", "kredit"}
-    
+
     if s in DEBIT_VALUES:
         return ("debit", issues)
     if s in CREDIT_VALUES:
         return ("credit", issues)
-    
+
     issues.append("invalid_normal_balance")
     return (None, issues)
 
@@ -85,20 +85,20 @@ def normalize_active_flag(value: Any) -> Tuple[bool, List[str]]:
     if value is None:
         issues.append("active_flag_defaulted")
         return (True, issues)
-    
+
     s = str(value).strip().lower()
     if s in ("", "none", "null", "nan"):
         issues.append("active_flag_defaulted")
         return (True, issues)
-    
+
     TRUE_VALUES = {"true", "1", "yes", "active", "نعم", "مفعل", "فعال", "صح"}
     FALSE_VALUES = {"false", "0", "no", "inactive", "لا", "غير مفعل", "معطل", "خطأ"}
-    
+
     if s in TRUE_VALUES:
         return (True, issues)
     if s in FALSE_VALUES:
         return (False, issues)
-    
+
     issues.append("active_flag_defaulted")
     return (True, issues)
 

@@ -4,50 +4,107 @@ APEX Sprint 1 — COA File Reader
 Reads CSV/XLSX/XLS files, detects sheets, headers, columns.
 Per Sprint 1 Build Spec §17.1.
 """
+
 import os
-import io
 import csv
 from typing import Optional, List, Dict, Any, Iterable
-
 
 # ── Column Aliases (Arabic + English) per Sprint 1 Spec §8.3 ──
 
 COLUMN_ALIASES = {
     "account_code": [
-        "account_code", "code", "acc_code", "account number", "account_no",
-        "رقم الحساب", "كود الحساب", "رقم_الحساب", "الرقم", "رمز الحساب",
+        "account_code",
+        "code",
+        "acc_code",
+        "account number",
+        "account_no",
+        "رقم الحساب",
+        "كود الحساب",
+        "رقم_الحساب",
+        "الرقم",
+        "رمز الحساب",
     ],
     "account_name": [
-        "account_name", "name", "account title", "description", "account_title",
-        "اسم الحساب", "اسم_الحساب", "البيان", "الوصف", "مسمى الحساب", "اسم",
+        "account_name",
+        "name",
+        "account title",
+        "description",
+        "account_title",
+        "اسم الحساب",
+        "اسم_الحساب",
+        "البيان",
+        "الوصف",
+        "مسمى الحساب",
+        "اسم",
     ],
     "parent_code": [
-        "parent_code", "parent", "main_code", "parent account code", "parent_account",
-        "كود الأب", "رقم الحساب الأب", "الحساب الرئيسي", "رقم_الأب",
+        "parent_code",
+        "parent",
+        "main_code",
+        "parent account code",
+        "parent_account",
+        "كود الأب",
+        "رقم الحساب الأب",
+        "الحساب الرئيسي",
+        "رقم_الأب",
     ],
     "parent_name": [
-        "parent_name", "parent account name", "parent_account_name",
-        "اسم الأب", "اسم الحساب الأب", "اسم_الأب",
+        "parent_name",
+        "parent account name",
+        "parent_account_name",
+        "اسم الأب",
+        "اسم الحساب الأب",
+        "اسم_الأب",
     ],
     "level": [
-        "level", "account_level", "lvl", "depth",
-        "المستوى", "مستوى", "العمق",
+        "level",
+        "account_level",
+        "lvl",
+        "depth",
+        "المستوى",
+        "مستوى",
+        "العمق",
     ],
     "account_type": [
-        "account_type", "type", "category", "classification",
-        "نوع الحساب", "النوع", "التصنيف", "الفئة",
+        "account_type",
+        "type",
+        "category",
+        "classification",
+        "نوع الحساب",
+        "النوع",
+        "التصنيف",
+        "الفئة",
     ],
     "normal_balance": [
-        "normal_balance", "balance_type", "debit_credit", "nature",
-        "طبيعة الرصيد", "الطبيعة", "مدين_دائن", "طبيعة",
+        "normal_balance",
+        "balance_type",
+        "debit_credit",
+        "nature",
+        "طبيعة الرصيد",
+        "الطبيعة",
+        "مدين_دائن",
+        "طبيعة",
     ],
     "active_flag": [
-        "active", "is_active", "enabled", "active_flag", "status",
-        "مفعل", "نشط", "الحالة", "فعال",
+        "active",
+        "is_active",
+        "enabled",
+        "active_flag",
+        "status",
+        "مفعل",
+        "نشط",
+        "الحالة",
+        "فعال",
     ],
     "notes": [
-        "notes", "remarks", "comments", "memo",
-        "ملاحظات", "ملاحظه", "تعليقات", "بيان إضافي",
+        "notes",
+        "remarks",
+        "comments",
+        "memo",
+        "ملاحظات",
+        "ملاحظه",
+        "تعليقات",
+        "بيان إضافي",
     ],
 }
 
@@ -57,8 +114,9 @@ def _match_column(raw_col: str) -> Optional[str]:
     raw = raw_col.strip().lower()
     # Remove diacritics for matching
     import re
+
     raw_clean = re.sub(r"[\u0610-\u061A\u064B-\u065F\u0670]", "", raw)
-    
+
     for standard_field, aliases in COLUMN_ALIASES.items():
         for alias in aliases:
             if raw_clean == alias.lower() or raw == alias.lower():
@@ -71,18 +129,20 @@ def list_sheets(file_path: str) -> List[str]:
     ext = os.path.splitext(file_path)[1].lower()
     if ext == ".csv":
         return ["Sheet1"]
-    
+
     try:
         import openpyxl
+
         wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
         names = wb.sheetnames
         wb.close()
         return names
     except Exception:
         pass
-    
+
     try:
         import xlrd
+
         wb = xlrd.open_workbook(file_path)
         return wb.sheet_names()
     except Exception:
@@ -106,7 +166,7 @@ def detect_header_and_columns(
     """
     ext = os.path.splitext(file_path)[1].lower()
     rows = _read_first_rows(file_path, ext, sheet_name, max_rows=15)
-    
+
     if not rows:
         return {
             "detected_columns": [],
@@ -115,11 +175,11 @@ def detect_header_and_columns(
             "header_row_index": 0,
             "warnings": ["empty_file"],
         }
-    
+
     # Auto-detect header row (try first 5 rows)
     best_row_idx = header_row_index if header_row_index is not None else 0
     best_score = 0
-    
+
     if header_row_index is None:
         for i in range(min(5, len(rows))):
             row = rows[i]
@@ -127,9 +187,9 @@ def detect_header_and_columns(
             if score > best_score:
                 best_score = score
                 best_row_idx = i
-    
+
     headers = [str(cell or f"col_{j}").strip() for j, cell in enumerate(rows[best_row_idx])]
-    
+
     # Build suggested mapping
     suggested = {}
     used_raw = set()
@@ -138,21 +198,23 @@ def detect_header_and_columns(
         if match and match not in suggested and raw_col not in used_raw:
             suggested[match] = raw_col
             used_raw.add(raw_col)
-    
+
     # Fill unmapped standard fields with None
     for std_field in COLUMN_ALIASES:
         if std_field not in suggested:
             suggested[std_field] = None
-    
+
     # Sample rows (after header)
     sample = []
-    for row in rows[best_row_idx + 1: best_row_idx + 6]:
-        sample.append({headers[j]: (cell if cell is not None else "") for j, cell in enumerate(row) if j < len(headers)})
-    
+    for row in rows[best_row_idx + 1 : best_row_idx + 6]:
+        sample.append(
+            {headers[j]: (cell if cell is not None else "") for j, cell in enumerate(row) if j < len(headers)}
+        )
+
     warnings = []
     if "account_name" not in suggested or suggested["account_name"] is None:
         warnings.append("required_column_missing: account_name not detected")
-    
+
     return {
         "detected_columns": headers,
         "suggested_mapping": suggested,
@@ -169,7 +231,7 @@ def stream_rows(
 ) -> Iterable[Dict[str, Any]]:
     """Yield rows as dicts with header keys."""
     ext = os.path.splitext(file_path)[1].lower()
-    
+
     if ext == ".csv":
         yield from _stream_csv(file_path, header_row_index)
     elif ext == ".xlsx":
@@ -181,6 +243,7 @@ def stream_rows(
 
 
 # ── Internal readers ──
+
 
 def _read_first_rows(file_path, ext, sheet_name=None, max_rows=15):
     """Read first N rows from any supported file type."""
@@ -212,6 +275,7 @@ def _read_csv_rows(path, max_rows):
 
 def _read_xlsx_rows(path, sheet_name, max_rows):
     import openpyxl
+
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     ws = wb[sheet_name] if sheet_name and sheet_name in wb.sheetnames else wb.active
     rows = []
@@ -225,6 +289,7 @@ def _read_xlsx_rows(path, sheet_name, max_rows):
 
 def _read_xls_rows(path, sheet_name, max_rows):
     import xlrd
+
     wb = xlrd.open_workbook(path)
     ws = wb.sheet_by_name(sheet_name) if sheet_name else wb.sheet_by_index(0)
     rows = []
@@ -255,6 +320,7 @@ def _stream_csv(path, header_row_index):
 
 def _stream_xlsx(path, sheet_name, header_row_index):
     import openpyxl
+
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     ws = wb[sheet_name] if sheet_name and sheet_name in wb.sheetnames else wb.active
     headers = None
@@ -271,6 +337,7 @@ def _stream_xlsx(path, sheet_name, header_row_index):
 
 def _stream_xls(path, sheet_name, header_row_index):
     import xlrd
+
     wb = xlrd.open_workbook(path)
     ws = wb.sheet_by_name(sheet_name) if sheet_name else wb.sheet_by_index(0)
     headers = None

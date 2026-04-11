@@ -11,9 +11,9 @@ class ProviderProfileScreen extends StatelessWidget {
       backgroundColor: AC.navy,
       appBar: AppBar(backgroundColor: AC.navy2, title: const Text('\u0645\u0644\u0641 \u0645\u0642\u062f\u0645 \u0627\u0644\u062e\u062f\u0645\u0629', style: TextStyle(color: AC.tp))),
       body: ListView(padding: const EdgeInsets.all(14), children: [
-        Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold.withOpacity(0.3))),
+        Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold.withValues(alpha: 0.3))),
           child: Column(children: [
-            CircleAvatar(radius: 36, backgroundColor: AC.gold.withOpacity(0.15), child: Text((provider['name'] ?? 'P')[0], style: const TextStyle(color: AC.gold, fontSize: 28, fontWeight: FontWeight.bold))),
+            CircleAvatar(radius: 36, backgroundColor: AC.gold.withValues(alpha: 0.15), child: Text((provider['name'] ?? 'P')[0], style: const TextStyle(color: AC.gold, fontSize: 28, fontWeight: FontWeight.bold))),
             const SizedBox(height: 10),
             Text(provider['name'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.bold)),
             Text(provider['category'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 12)),
@@ -22,7 +22,7 @@ class ProviderProfileScreen extends StatelessWidget {
               const Icon(Icons.star, color: AC.gold, size: 18), const SizedBox(width: 4),
               Text('', style: const TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold)),
               const SizedBox(width: 12),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Text(provider['status'] ?? 'active', style: const TextStyle(color: AC.ok, fontSize: 11))),
             ]),
           ])),
@@ -42,6 +42,6 @@ class ProviderProfileScreen extends StatelessWidget {
   }
 
   Widget _stat(String label, String value, Color color) => Container(padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+    decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Column(children: [Text(value, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold)), Text(label, style: const TextStyle(color: AC.ts, fontSize: 9))]));
 }

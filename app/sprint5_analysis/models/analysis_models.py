@@ -5,18 +5,29 @@ Tables: analysis_runs, analysis_results_linked
 """
 
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
 )
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 
 class AnalysisRun(Base):
     """Each approved TB binding can trigger one or more analysis runs."""
+
     __tablename__ = "analysis_runs"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
-    tb_upload_id = Column(String(36), ForeignKey("trial_balance_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
+    tb_upload_id = Column(
+        String(36), ForeignKey("trial_balance_uploads.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     coa_upload_id = Column(String(36), ForeignKey("client_coa_uploads.id"), nullable=False, index=True)
     # Run metadata
     run_status = Column(String(30), nullable=False, default="pending")
@@ -53,6 +64,7 @@ class AnalysisRun(Base):
 
 class AnalysisResultExplanation(Base):
     """Per-line-item explanation linked to an analysis run + COA account."""
+
     __tablename__ = "analysis_result_explanations"
     id = Column(String(36), primary_key=True, default=gen_uuid)
     analysis_run_id = Column(String(36), ForeignKey("analysis_runs.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -78,6 +90,7 @@ class AnalysisResultExplanation(Base):
 
 def init_sprint5_analysis_db():
     from app.phase1.models.platform_models import engine
+
     AnalysisRun.__table__.create(bind=engine, checkfirst=True)
     AnalysisResultExplanation.__table__.create(bind=engine, checkfirst=True)
     return "Sprint 5 Analysis tables created"

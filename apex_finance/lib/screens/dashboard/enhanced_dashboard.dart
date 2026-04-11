@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:html' as html;
-import '../../core/api_config.dart';
+import 'package:go_router/go_router.dart';
+import '../../api_service.dart';
 import '../clients/client_detail_screen.dart';
 import '../extracted/coa_screens.dart';
 
 // ════════════════════════════════════════
-// ENHANCED DASHBOARD v5.3b — Live API (localStorage token)
+// ENHANCED DASHBOARD v5.3b — Live API (ApiService)
 // ════════════════════════════════════════
-// يستخدم نفس طريقة ClientsTab لجلب العملاء
-// localStorage['apex_token'] + http.get مباشرة
-
-const String _api = apiBase;
 
 class EnhancedDashboard extends StatefulWidget {
   final VoidCallback? onSwitchToClients;
@@ -51,46 +45,19 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   }
 
   Future<void> _loadClients() async {
-    final token = html.window.localStorage['apex_token'] ?? '';
-    if (token.isEmpty) {
-      if (mounted) setState(() { _loading = false; });
-      return;
-    }
-
-    // Retry logic for Render cold starts (up to 3 attempts)
-    for (int attempt = 1; attempt <= 3; attempt++) {
-      try {
-        final resp = await http.get(
-          Uri.parse('$_api/clients'),
-          headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
-        ).timeout(Duration(seconds: attempt == 1 ? 10 : 20));
-
-        if (resp.statusCode == 200) {
-          final data = jsonDecode(resp.body);
-          final list = data is List ? data : (data['clients'] ?? data['data'] ?? []);
-          if (mounted) {
-            setState(() {
-              _clients = List<Map<String, dynamic>>.from(list);
-              _loading = false;
-            });
-          }
-          return; // Success — exit retry loop
-        } else if (resp.statusCode == 401) {
-          // Token expired — clear and stop
-          html.window.localStorage.remove('apex_token');
-          if (mounted) setState(() { _loading = false; });
-          return;
-        }
-      } catch (e) {
-        if (attempt < 3) {
-          // Wait before retry (Render cold start)
-          await Future.delayed(Duration(seconds: attempt * 3));
-          continue;
-        }
+    final res = await ApiService.listClients();
+    if (mounted) {
+      if (res.success) {
+        final data = res.data;
+        final list = data is List ? data : (data['clients'] ?? data['data'] ?? []);
+        setState(() {
+          _clients = List<Map<String, dynamic>>.from(list);
+          _loading = false;
+        });
+      } else {
+        setState(() { _loading = false; });
       }
     }
-    // All retries failed
-    if (mounted) setState(() { _loading = false; });
   }
 
   @override
@@ -177,7 +144,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
               children: [
                 Container(
                   width: 48, height: 48,
-                  decoration: BoxDecoration(color: k.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: k.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
                   child: Icon(k.icon, color: k.color, size: 22),
                 ),
                 const SizedBox(height: 14),
@@ -239,7 +206,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 child: Row(children: [
                   Container(
                     width: 40, height: 40,
-                    decoration: BoxDecoration(color: a.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(color: a.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                     child: Icon(a.icon, color: a.color, size: 18),
                   ),
                   const SizedBox(width: 12),
@@ -292,7 +259,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
           if (_error != null) ...[
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: redC.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: redC.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
               child: Row(children: [
                 Icon(Icons.wifi_off, color: redC, size: 20),
                 const SizedBox(width: 12),
@@ -346,12 +313,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
 
               return GestureDetector(
                 onTap: () async {
-                  await Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => ClientDetailScreen(
-                      clientId: clientId.toString(),
-                      clientName: clientName,
-                    ),
-                  ));
+                  await context.push('/client-detail', extra: {'id': clientId.toString(), 'name': clientName});
                   if (mounted) _loadClients();
                 },
                 child: Container(
@@ -360,7 +322,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                   child: Row(children: [
                     Container(
                       width: 40, height: 40,
-                      decoration: BoxDecoration(color: gold.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: gold.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                       child: Center(child: Text(clientName.isNotEmpty ? clientName[0] : '?',
                           style: TextStyle(color: gold, fontSize: 14, fontWeight: FontWeight.w800))),
                     ),
@@ -395,9 +357,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   Future<void> _navigateToCoa(dynamic client) async {
     final clientId = client['id'] ?? client['client_code'] ?? '1';
     final clientName = client['name_ar'] ?? client['name'] ?? 'عميل';
-    await Navigator.push(context, MaterialPageRoute(
-      builder: (_) => CoaJourneyScreen(clientId: '$clientId', clientName: clientName),
-    ));
+    await context.push('/coa/journey', extra: {'clientId': '$clientId', 'clientName': clientName});
     if (mounted) _loadClients();
 }
 
@@ -439,7 +399,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Container(
                   width: 36, height: 36,
-                  decoration: BoxDecoration(color: a.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: a.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                   child: Icon(a.icon, color: a.color, size: 16),
                 ),
                 const SizedBox(width: 14),
@@ -487,14 +447,14 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [gold.withOpacity(0.12), Colors.transparent], begin: Alignment.topRight, end: Alignment.bottomLeft),
+        gradient: LinearGradient(colors: [gold.withValues(alpha: 0.12), Colors.transparent], begin: Alignment.topRight, end: Alignment.bottomLeft),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: gold.withOpacity(0.25)),
+        border: Border.all(color: gold.withValues(alpha: 0.25)),
       ),
       child: Row(children: [
         Container(
           width: 48, height: 48,
-          decoration: BoxDecoration(color: gold.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
           child: Icon(Icons.auto_awesome, color: gold, size: 22),
         ),
         const SizedBox(width: 14),
@@ -569,7 +529,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
 
   Widget _badge(String text, Color color) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-    decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(99), border: Border.all(color: color.withOpacity(0.2))),
+    decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(99), border: Border.all(color: color.withValues(alpha: 0.2))),
     child: Text(text, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
   );
 }

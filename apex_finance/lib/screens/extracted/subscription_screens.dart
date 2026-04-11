@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
-import '../../core/session.dart';
+import '../../api_service.dart';
 import '../../core/shared_constants.dart';
-
-final _api = apiBase;
 
 // Per Execution Master §4, §9 + Zero Ambiguity §5, §6
 // ═══════════════════════════════════════════════════════════
@@ -24,19 +19,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final token = S.token ?? '';
-      final h = {'Authorization': 'Bearer $token'};
-      
       // Load current subscription
-      final r1 = await http.get(Uri.parse('$_api/subscriptions/me'), headers: {'Authorization': 'Bearer $token'});
-      if (r1.statusCode == 200) {
-        _sub = jsonDecode(r1.body);
+      final r1 = await ApiService.getCurrentPlan();
+      if (r1.success) {
+        _sub = r1.data;
       }
-      
+
       // Load available plans
-      final r2 = await http.get(Uri.parse('$_api/plans'));
-      if (r2.statusCode == 200) {
-        _plans = jsonDecode(r2.body)['plans'] ?? [];
+      final r2 = await ApiService.getPlans();
+      if (r2.success) {
+        _plans = r2.data['plans'] ?? [];
       }
     } catch (e) {
       _error = e.toString();
@@ -45,18 +37,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Future<void> _upgrade(String planName) async {
-    final token = S.token ?? '';
-    final r = await http.post(
-      Uri.parse('$_api/subscriptions/upgrade?plan_name=$planName'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-    if (r.statusCode == 200) {
+    final r = await ApiService.upgradePlanByName(planName);
+    if (r.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('تم الترقية إلى $planName بنجاح!'), backgroundColor: AC.ok));
       _load();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشل الترقية: ${r.body}'), backgroundColor: AC.err));
+        SnackBar(content: Text('فشل الترقية: ${r.error}'), backgroundColor: AC.err));
     }
   }
 
@@ -64,12 +52,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget build(BuildContext context) {
     final currentPlan = _sub?['subscription']?['plan_name'] ?? 'Free';
     final features = _sub?['plan_features'] as List<dynamic>? ?? [];
-    
+
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
       appBar: AppBar(title: const Text('خطتي والاشتراك'), backgroundColor: const Color(0xFF1E1E2E),
         iconTheme: const IconThemeData(color: AC.gold)),
       backgroundColor: const Color(0xFF0D0D1A),
-      body: _loading 
+      body: _loading
         ? const Center(child: CircularProgressIndicator(color: AC.gold))
         : _error != null
           ? Center(child: Text(_error!, style: const TextStyle(color: AC.err)))
@@ -80,7 +68,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(colors: [Color(0xFF1A1A2E), Color(0xFF16213E)]),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AC.gold.withOpacity(0.3)),
+                  border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
@@ -102,19 +90,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       Icon(f['is_available'] == true ? Icons.check_circle : Icons.cancel,
                         color: f['is_available'] == true ? AC.ok : AC.err, size: 18),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(f['name_ar'] ?? f['key'], 
+                      Expanded(child: Text(f['name_ar'] ?? f['key'],
                         style: const TextStyle(color: Colors.white, fontSize: 13))),
-                      Text(f['display_value'] ?? f['value'], 
+                      Text(f['display_value'] ?? f['value'],
                         style: TextStyle(color: f['is_available'] == true ? AC.ok : Colors.grey, fontSize: 12)),
                     ]),
                   )),
                 ]),
               ),
-              
+
               const SizedBox(height: 24),
               const Text('ترقية خطتك', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              
+
               // Available Plans
               ..._plans.map<Widget>((plan) {
                 final name = plan['name'];
@@ -122,12 +110,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 final price = plan['pricing']?['monthly'] ?? 0;
                 final featureCount = plan['feature_count'] ?? 0;
                 final note = plan['pricing']?['note'];
-                
+
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isCurrent ? AC.gold.withOpacity(0.1) : const Color(0xFF1E1E2E),
+                    color: isCurrent ? AC.gold.withValues(alpha: 0.1) : const Color(0xFF1E1E2E),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: isCurrent ? AC.gold : Colors.white12),
                   ),
@@ -169,9 +157,9 @@ class EntitlementGate extends StatelessWidget {
   final String feature;
   final Widget child;
   final Widget? lockedWidget;
-  
+
   const EntitlementGate({super.key, required this.feature, required this.child, this.lockedWidget});
-  
+
   @override
   Widget build(BuildContext context) {
     // This would check entitlements from cached user data
@@ -195,11 +183,10 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   @override void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
-    final r = await http.get(Uri.parse('$_api/plans/compare'));
-    if (r.statusCode == 200) {
-      final data = jsonDecode(r.body);
-      _comparison = data['comparison'] ?? [];
-      _planNames = List<String>.from(data['plans'] ?? []);
+    final r = await ApiService.comparePlans();
+    if (r.success) {
+      _comparison = r.data['comparison'] ?? [];
+      _planNames = List<String>.from(r.data['plans'] ?? []);
     }
     setState(() { _loading = false; });
   }
@@ -223,7 +210,7 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
               rows: _comparison.map<DataRow>((row) => DataRow(cells: [
                 DataCell(Text(row['name_ar'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 12))),
                 ..._planNames.map((p) => DataCell(
-                  Text(_formatCellValue(row[p] ?? 'N/A'), 
+                  Text(_formatCellValue(row[p] ?? 'N/A'),
                     style: TextStyle(color: _cellColor(row[p] ?? ''), fontSize: 11)))),
               ])).toList(),
             ),

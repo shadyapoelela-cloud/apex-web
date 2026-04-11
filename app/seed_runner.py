@@ -5,10 +5,12 @@ Usage: python -m app.seed_runner
 """
 
 import logging
-import sys, os
+import sys
+import os
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.phase1.models.platform_models import Base, engine, SessionLocal, gen_uuid, utcnow
+from app.phase1.models.platform_models import Base, engine, SessionLocal, gen_uuid
 from app.phase2.models.onboarding_models import LegalEntityType, SectorMain, SectorSub, StageNote
 from app.phase2.models.archive_models import ArchivePolicy
 from app.phase2.models.service_catalog_models import ServiceCatalog, ServiceWorkflowStage, AuditProgramTemplate
@@ -44,7 +46,7 @@ def seed_all():
         existing = db.query(SectorSub).count()
         if existing == 0:
             for item in get_sector_sub():
-                db.add(SectorSub(id=gen_uuid(), **{k:v for k,v in item.items()}, is_active=True))
+                db.add(SectorSub(id=gen_uuid(), **{k: v for k, v in item.items()}, is_active=True))
             db.commit()
             logging.info(f"  Seeded {len(get_sector_sub())} sub sectors")
         else:
@@ -63,7 +65,16 @@ def seed_all():
         # 5. Default Archive Policy
         existing = db.query(ArchivePolicy).count()
         if existing == 0:
-            db.add(ArchivePolicy(id=gen_uuid(), scope_type="global", retention_days=30, allow_reuse=True, allow_download=True, is_active=True))
+            db.add(
+                ArchivePolicy(
+                    id=gen_uuid(),
+                    scope_type="global",
+                    retention_days=30,
+                    allow_reuse=True,
+                    allow_download=True,
+                    is_active=True,
+                )
+            )
             db.commit()
             logging.info("  Seeded default archive policy (30 days)")
         else:
@@ -73,12 +84,61 @@ def seed_all():
         existing = db.query(ServiceCatalog).count()
         if existing == 0:
             services = [
-                {"service_code": "financial_analysis", "title_ar": "التحليل المالي", "title_en": "Financial Analysis", "category": "financial", "requires_coa": True, "requires_tb": True, "min_plan": "pro", "sort_order": 1},
-                {"service_code": "funding_readiness", "title_ar": "الجاهزية التمويلية", "title_en": "Funding Readiness", "category": "readiness", "requires_coa": True, "requires_tb": True, "min_plan": "business", "sort_order": 2},
-                {"service_code": "accounting_audit", "title_ar": "المراجعة المحاسبية", "title_en": "Accounting Audit", "category": "audit", "requires_coa": True, "requires_tb": True, "min_plan": "business", "sort_order": 3},
-                {"service_code": "tax_zakat", "title_ar": "الخدمات الضريبية والزكوية", "title_en": "Tax & Zakat", "category": "compliance", "requires_coa": True, "min_plan": "pro", "sort_order": 4},
-                {"service_code": "support_readiness", "title_ar": "جاهزية الدعم والبرامج", "title_en": "Support Readiness", "category": "readiness", "min_plan": "pro", "sort_order": 5},
-                {"service_code": "license_readiness", "title_ar": "جاهزية التراخيص", "title_en": "License Readiness", "category": "readiness", "min_plan": "business", "sort_order": 6},
+                {
+                    "service_code": "financial_analysis",
+                    "title_ar": "التحليل المالي",
+                    "title_en": "Financial Analysis",
+                    "category": "financial",
+                    "requires_coa": True,
+                    "requires_tb": True,
+                    "min_plan": "pro",
+                    "sort_order": 1,
+                },
+                {
+                    "service_code": "funding_readiness",
+                    "title_ar": "الجاهزية التمويلية",
+                    "title_en": "Funding Readiness",
+                    "category": "readiness",
+                    "requires_coa": True,
+                    "requires_tb": True,
+                    "min_plan": "business",
+                    "sort_order": 2,
+                },
+                {
+                    "service_code": "accounting_audit",
+                    "title_ar": "المراجعة المحاسبية",
+                    "title_en": "Accounting Audit",
+                    "category": "audit",
+                    "requires_coa": True,
+                    "requires_tb": True,
+                    "min_plan": "business",
+                    "sort_order": 3,
+                },
+                {
+                    "service_code": "tax_zakat",
+                    "title_ar": "الخدمات الضريبية والزكوية",
+                    "title_en": "Tax & Zakat",
+                    "category": "compliance",
+                    "requires_coa": True,
+                    "min_plan": "pro",
+                    "sort_order": 4,
+                },
+                {
+                    "service_code": "support_readiness",
+                    "title_ar": "جاهزية الدعم والبرامج",
+                    "title_en": "Support Readiness",
+                    "category": "readiness",
+                    "min_plan": "pro",
+                    "sort_order": 5,
+                },
+                {
+                    "service_code": "license_readiness",
+                    "title_ar": "جاهزية التراخيص",
+                    "title_en": "License Readiness",
+                    "category": "readiness",
+                    "min_plan": "business",
+                    "sort_order": 6,
+                },
             ]
             for s in services:
                 db.add(ServiceCatalog(id=gen_uuid(), **s, is_active=True))
@@ -89,9 +149,24 @@ def seed_all():
             audit_svc = db.query(ServiceCatalog).filter(ServiceCatalog.service_code == "accounting_audit").first()
             if audit_svc:
                 stages = [
-                    {"stage_code": "coa_setup", "stage_order": 1, "title_ar": "تعريف شجرة الحسابات", "is_mandatory": True},
-                    {"stage_code": "tb_upload", "stage_order": 2, "title_ar": "رفع ميزان المراجعة", "is_mandatory": True},
-                    {"stage_code": "audit_program", "stage_order": 3, "title_ar": "بناء برنامج المراجعة", "is_mandatory": True},
+                    {
+                        "stage_code": "coa_setup",
+                        "stage_order": 1,
+                        "title_ar": "تعريف شجرة الحسابات",
+                        "is_mandatory": True,
+                    },
+                    {
+                        "stage_code": "tb_upload",
+                        "stage_order": 2,
+                        "title_ar": "رفع ميزان المراجعة",
+                        "is_mandatory": True,
+                    },
+                    {
+                        "stage_code": "audit_program",
+                        "stage_order": 3,
+                        "title_ar": "بناء برنامج المراجعة",
+                        "is_mandatory": True,
+                    },
                     {"stage_code": "sampling", "stage_order": 4, "title_ar": "اختيار العينات", "is_mandatory": True},
                     {"stage_code": "execution", "stage_order": 5, "title_ar": "تنفيذ الإجراءات", "is_mandatory": True},
                     {"stage_code": "findings", "stage_order": 6, "title_ar": "التجميع والتقييم", "is_mandatory": True},
@@ -108,16 +183,86 @@ def seed_all():
         existing = db.query(AuditProgramTemplate).count()
         if existing == 0:
             templates = [
-                {"procedure_code": "CASH-01", "area": "cash", "title_ar": "فحص الأرصدة النقدية", "risk_level": "medium", "local_std_ref": "SA-200", "international_ref": "ISA 500"},
-                {"procedure_code": "CASH-02", "area": "cash", "title_ar": "مطابقة كشوف البنك", "risk_level": "high", "local_std_ref": "SA-505", "international_ref": "ISA 505"},
-                {"procedure_code": "REC-01", "area": "receivables", "title_ar": "فحص أرصدة المدينين", "risk_level": "high", "local_std_ref": "SA-505", "international_ref": "ISA 505"},
-                {"procedure_code": "REC-02", "area": "receivables", "title_ar": "مصادقات المدينين", "risk_level": "high", "local_std_ref": "SA-505", "international_ref": "ISA 505"},
-                {"procedure_code": "INV-01", "area": "inventory", "title_ar": "جرد المخزون", "risk_level": "high", "local_std_ref": "SA-501", "international_ref": "ISA 501"},
-                {"procedure_code": "PAY-01", "area": "payables", "title_ar": "فحص أرصدة الدائنين", "risk_level": "medium", "local_std_ref": "SA-500", "international_ref": "ISA 500"},
-                {"procedure_code": "REV-01", "area": "revenue", "title_ar": "فحص الإيرادات وعقود العملاء", "risk_level": "high", "local_std_ref": "SA-315", "international_ref": "ISA 315"},
-                {"procedure_code": "EXP-01", "area": "expenses", "title_ar": "فحص المصروفات التشغيلية", "risk_level": "medium", "local_std_ref": "SA-500", "international_ref": "ISA 500"},
-                {"procedure_code": "FA-01", "area": "fixed_assets", "title_ar": "فحص الأصول الثابتة والاستهلاك", "risk_level": "medium", "local_std_ref": "SA-500", "international_ref": "ISA 500"},
-                {"procedure_code": "EQ-01", "area": "equity", "title_ar": "فحص حقوق الملكية والتغيرات", "risk_level": "low", "local_std_ref": "SA-500", "international_ref": "ISA 500"},
+                {
+                    "procedure_code": "CASH-01",
+                    "area": "cash",
+                    "title_ar": "فحص الأرصدة النقدية",
+                    "risk_level": "medium",
+                    "local_std_ref": "SA-200",
+                    "international_ref": "ISA 500",
+                },
+                {
+                    "procedure_code": "CASH-02",
+                    "area": "cash",
+                    "title_ar": "مطابقة كشوف البنك",
+                    "risk_level": "high",
+                    "local_std_ref": "SA-505",
+                    "international_ref": "ISA 505",
+                },
+                {
+                    "procedure_code": "REC-01",
+                    "area": "receivables",
+                    "title_ar": "فحص أرصدة المدينين",
+                    "risk_level": "high",
+                    "local_std_ref": "SA-505",
+                    "international_ref": "ISA 505",
+                },
+                {
+                    "procedure_code": "REC-02",
+                    "area": "receivables",
+                    "title_ar": "مصادقات المدينين",
+                    "risk_level": "high",
+                    "local_std_ref": "SA-505",
+                    "international_ref": "ISA 505",
+                },
+                {
+                    "procedure_code": "INV-01",
+                    "area": "inventory",
+                    "title_ar": "جرد المخزون",
+                    "risk_level": "high",
+                    "local_std_ref": "SA-501",
+                    "international_ref": "ISA 501",
+                },
+                {
+                    "procedure_code": "PAY-01",
+                    "area": "payables",
+                    "title_ar": "فحص أرصدة الدائنين",
+                    "risk_level": "medium",
+                    "local_std_ref": "SA-500",
+                    "international_ref": "ISA 500",
+                },
+                {
+                    "procedure_code": "REV-01",
+                    "area": "revenue",
+                    "title_ar": "فحص الإيرادات وعقود العملاء",
+                    "risk_level": "high",
+                    "local_std_ref": "SA-315",
+                    "international_ref": "ISA 315",
+                },
+                {
+                    "procedure_code": "EXP-01",
+                    "area": "expenses",
+                    "title_ar": "فحص المصروفات التشغيلية",
+                    "risk_level": "medium",
+                    "local_std_ref": "SA-500",
+                    "international_ref": "ISA 500",
+                },
+                {
+                    "procedure_code": "FA-01",
+                    "area": "fixed_assets",
+                    "title_ar": "فحص الأصول الثابتة والاستهلاك",
+                    "risk_level": "medium",
+                    "local_std_ref": "SA-500",
+                    "international_ref": "ISA 500",
+                },
+                {
+                    "procedure_code": "EQ-01",
+                    "area": "equity",
+                    "title_ar": "فحص حقوق الملكية والتغيرات",
+                    "risk_level": "low",
+                    "local_std_ref": "SA-500",
+                    "international_ref": "ISA 500",
+                },
             ]
             for t in templates:
                 db.add(AuditProgramTemplate(id=gen_uuid(), **t, is_active=True))
@@ -128,7 +273,7 @@ def seed_all():
 
         logging.info("Seed completed successfully!")
 
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Seed runner failed", exc_info=True)
         logging.error("ERROR: Seed runner failed. Check logs for details.")
@@ -138,4 +283,3 @@ def seed_all():
 
 if __name__ == "__main__":
     seed_all()
-

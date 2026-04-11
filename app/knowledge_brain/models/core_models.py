@@ -15,21 +15,22 @@ from typing import Optional, List, Dict
 from datetime import date
 from enum import Enum
 
-
 # ═══════════════════════════════════════════
 #  Enums
 # ═══════════════════════════════════════════
 
+
 class SourceType(str, Enum):
-    LAW = "law"                    # نظام
-    REGULATION = "regulation"       # لائحة تنفيذية
-    STANDARD = "standard"           # معيار محاسبي
-    GUIDE = "guide"                 # دليل إرشادي
-    BULLETIN = "bulletin"           # تعميم
-    BEST_PRACTICE = "best_practice" # أفضل ممارسة
-    CASE = "case"                   # حالة/سابقة
-    PATTERN = "pattern"             # نمط مستخلص
-    INTERNAL = "internal"           # سياسة داخلية
+    LAW = "law"  # نظام
+    REGULATION = "regulation"  # لائحة تنفيذية
+    STANDARD = "standard"  # معيار محاسبي
+    GUIDE = "guide"  # دليل إرشادي
+    BULLETIN = "bulletin"  # تعميم
+    BEST_PRACTICE = "best_practice"  # أفضل ممارسة
+    CASE = "case"  # حالة/سابقة
+    PATTERN = "pattern"  # نمط مستخلص
+    INTERNAL = "internal"  # سياسة داخلية
+
 
 class Status(str, Enum):
     DRAFT = "draft"
@@ -38,17 +39,19 @@ class Status(str, Enum):
     ARCHIVED = "archived"
     SUPERSEDED = "superseded"
 
+
 class Severity(str, Enum):
     ERROR = "error"
     WARNING = "warning"
     INFO = "info"
     CRITICAL = "critical"
 
+
 class ObligationLevel(str, Enum):
-    MANDATORY = "mandatory"         # إلزامي
-    RECOMMENDED = "recommended"     # موصى به
-    OPTIONAL = "optional"           # اختياري
-    PROHIBITED = "prohibited"       # محظور
+    MANDATORY = "mandatory"  # إلزامي
+    RECOMMENDED = "recommended"  # موصى به
+    OPTIONAL = "optional"  # اختياري
+    PROHIBITED = "prohibited"  # محظور
 
 
 # ═══════════════════════════════════════════
@@ -92,22 +95,24 @@ SECTORS = {
 #  Knowledge Entry Schema
 # ═══════════════════════════════════════════
 
+
 @dataclass
 class KnowledgeEntry:
     """وحدة معرفة واحدة — يمكن أن تكون مادة قانونية أو معيار أو قاعدة أو نمط"""
+
     entry_id: str
-    domain: str                          # tax, accounting, governance, etc.
-    subdomain: str                       # vat, zakat, ifrs_16, etc.
+    domain: str  # tax, accounting, governance, etc.
+    subdomain: str  # vat, zakat, ifrs_16, etc.
     title_ar: str
     title_en: str = ""
-    source_type: str = "standard"        # SourceType
-    authority: str = ""                  # الجهة المصدرة
-    official_reference: str = ""         # رقم النظام/المادة
+    source_type: str = "standard"  # SourceType
+    authority: str = ""  # الجهة المصدرة
+    official_reference: str = ""  # رقم النظام/المادة
     version: str = "1.0"
     issue_date: Optional[date] = None
     effective_date: Optional[date] = None
     expiry_date: Optional[date] = None
-    status: str = "approved"             # Status
+    status: str = "approved"  # Status
 
     # المحتوى المنظم
     summary: str = ""
@@ -123,8 +128,8 @@ class KnowledgeEntry:
 
     # الانطباق
     applicable_entities: List[str] = field(default_factory=list)  # llc, jsc, sole, all
-    applicable_sectors: List[str] = field(default_factory=list)   # retail, manufacturing, etc.
-    applicable_thresholds: Dict = field(default_factory=dict)     # revenue_min, employees_min, etc.
+    applicable_sectors: List[str] = field(default_factory=list)  # retail, manufacturing, etc.
+    applicable_thresholds: Dict = field(default_factory=dict)  # revenue_min, employees_min, etc.
 
     # الربط
     linked_rules: List[str] = field(default_factory=list)
@@ -143,9 +148,11 @@ class KnowledgeEntry:
 #  Executable Rule Schema
 # ═══════════════════════════════════════════
 
+
 @dataclass
 class ExecutableRule:
     """قاعدة تنفيذية قابلة للتطبيق داخل المحرك"""
+
     rule_id: str
     domain: str
     subdomain: str
@@ -153,8 +160,8 @@ class ExecutableRule:
     rule_name_en: str = ""
 
     # الشرط والفعل
-    condition: Dict = field(default_factory=dict)   # {"field": "net_revenue", "operator": ">", "value": 375000}
-    action: Dict = field(default_factory=dict)      # {"type": "flag", "severity": "warning", "message": "..."}
+    condition: Dict = field(default_factory=dict)  # {"field": "net_revenue", "operator": ">", "value": 375000}
+    action: Dict = field(default_factory=dict)  # {"type": "flag", "severity": "warning", "message": "..."}
     exceptions: List[Dict] = field(default_factory=list)
 
     # المصدر
@@ -173,9 +180,11 @@ class ExecutableRule:
 #  Sector Pattern
 # ═══════════════════════════════════════════
 
+
 @dataclass
 class SectorPattern:
     """نمط خاص بقطاع معيّن"""
+
     pattern_id: str
     sector: str
     pattern_name: str
@@ -191,9 +200,11 @@ class SectorPattern:
 #  Case Memory
 # ═══════════════════════════════════════════
 
+
 @dataclass
 class CaseMemory:
     """حالة/سابقة معتمدة"""
+
     case_id: str
     domain: str
     sector: str = ""
@@ -213,11 +224,13 @@ class CaseMemory:
 #  Knowledge Update
 # ═══════════════════════════════════════════
 
+
 @dataclass
 class KnowledgeUpdate:
     """تحديث نظامي أو معياري"""
+
     update_id: str
-    update_type: str              # regulatory, standard, tax, market
+    update_type: str  # regulatory, standard, tax, market
     title: str = ""
     authority: str = ""
     change_summary: str = ""
@@ -225,5 +238,5 @@ class KnowledgeUpdate:
     impacted_domains: List[str] = field(default_factory=list)
     impacted_rules: List[str] = field(default_factory=list)
     impacted_entries: List[str] = field(default_factory=list)
-    status: str = "detected"      # detected, under_review, approved, applied, archived
+    status: str = "detected"  # detected, under_review, approved, applied, archived
     source_url: str = ""

@@ -1,11 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../copilot/copilot_screen.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
 import '../../core/theme.dart';
-
-const _api = apiBase;
+import '../../api_service.dart';
 
 Widget _card(String t, List<Widget> c, {Color? accent}) => Container(
   margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
@@ -22,7 +18,7 @@ Widget _kv(String k, String v, {Color? vc}) => Padding(
 
 Widget _badge(String t, Color c) => Container(
   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+  decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
   child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
 class AuditServiceScreen extends StatefulWidget {
@@ -37,8 +33,6 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
   late TabController _tabC;
   bool _loading = true;
   List<dynamic> _templates = [], _samples = [], _workpapers = [], _findings = [];
-
-  Map<String, String> get _h => {'Authorization': 'Bearer ${widget.token ?? ""}'};
 
   static const _stages = [
     {'key': 'coa_setup', 'label': 'ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ', 'icon': Icons.account_tree},
@@ -59,16 +53,14 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
 
   Future<void> _loadAll() async {
     setState(() => _loading = true);
-    try {
-      final tR = await http.get(Uri.parse('$_api/audit/templates'), headers: _h);
-      if (tR.statusCode == 200) _templates = jsonDecode(tR.body)['data'] ?? [];
-      final sR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/samples'), headers: _h);
-      if (sR.statusCode == 200) _samples = jsonDecode(sR.body)['data'] ?? [];
-      final wR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/workpapers'), headers: _h);
-      if (wR.statusCode == 200) _workpapers = jsonDecode(wR.body)['data'] ?? [];
-      final fR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/findings'), headers: _h);
-      if (fR.statusCode == 200) _findings = jsonDecode(fR.body)['data'] ?? [];
-    } catch (_) {}
+    final tR = await ApiService.getAuditTemplates();
+    if (tR.success) _templates = tR.data['data'] ?? [];
+    final sR = await ApiService.getAuditSamples(widget.caseId);
+    if (sR.success) _samples = sR.data['data'] ?? [];
+    final wR = await ApiService.getWorkpapers(widget.caseId);
+    if (wR.success) _workpapers = wR.data['data'] ?? [];
+    final fR = await ApiService.getFindings(widget.caseId);
+    if (fR.success) _findings = fR.data['data'] ?? [];
     if (mounted) setState(() => _loading = false);
   }
 
@@ -131,8 +123,8 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
               _kv('ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ', _findings.length.toString(), vc: _findings.isNotEmpty ? AC.warn : AC.ok),
             ]),
             Container(padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: AC.warn.withOpacity(0.1), borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AC.warn.withOpacity(0.3))),
+              decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AC.warn.withValues(alpha: 0.3))),
               child: const Row(children: [Icon(Icons.person_search, color: AC.warn, size: 20), SizedBox(width: 8),
                 Expanded(child: Text('ط§ظ„طھظ‚ط±ظٹط± ظٹطھط·ظ„ط¨ ط§ط¹طھظ…ط§ط¯ ط§ظ„ظ…ط´ط±ظپ ظ‚ط¨ظ„ ط§ظ„ط¥طµط¯ط§ط±', style: TextStyle(color: AC.warn, fontSize: 12)))])),
           ]),

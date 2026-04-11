@@ -4,33 +4,50 @@ Sprint 4 — Knowledge Brain Engine
 Core logic for concept resolution, alias matching,
 conflict detection, and authority hierarchy.
 """
+
 import re
 from typing import Optional, List, Dict, Tuple
 
 # ── Authority hierarchy (lower number = higher authority) ──
 AUTHORITY_LEVELS = {
-    "law":        1,
+    "law": 1,
     "regulation": 2,
-    "standard":   3,
-    "policy":     4,
-    "platform":   5,
-    "expert":     6,
-    "ai":         7,
+    "standard": 3,
+    "policy": 4,
+    "platform": 5,
+    "expert": 6,
+    "ai": 7,
 }
 
 # ── Domain packs ──────────────────────────────────────────
 DOMAIN_PACKS = [
-    "accounting", "finance", "tax_zakat", "audit",
-    "compliance", "hr", "marketing", "operations",
-    "legal_regulatory", "funding", "support_incentives",
-    "licensing", "investment_residency",
+    "accounting",
+    "finance",
+    "tax_zakat",
+    "audit",
+    "compliance",
+    "hr",
+    "marketing",
+    "operations",
+    "legal_regulatory",
+    "funding",
+    "support_incentives",
+    "licensing",
+    "investment_residency",
 ]
 
 # ── Source systems (Sprint 4 awareness) ──────────────────
 SOURCE_SYSTEMS = [
-    "odoo", "sap", "oracle", "quickbooks",
-    "zoho", "xero", "qoyod", "daftra",
-    "custom_erp", "other",
+    "odoo",
+    "sap",
+    "oracle",
+    "quickbooks",
+    "zoho",
+    "xero",
+    "qoyod",
+    "daftra",
+    "custom_erp",
+    "other",
 ]
 
 # ── Boundary status values ────────────────────────────────
@@ -99,10 +116,10 @@ def resolve_concept(
         if confidence > best_confidence:
             best_confidence = confidence
             best = {
-                "concept_id":     alias.get("concept_id"),
-                "alias_id":       alias.get("id"),
-                "match_type":     match_type,
-                "confidence":     round(confidence, 3),
+                "concept_id": alias.get("concept_id"),
+                "alias_id": alias.get("id"),
+                "match_type": match_type,
+                "confidence": round(confidence, 3),
                 "boundary_status": "authoritative" if confidence >= 0.90 else "advisory",
             }
 
@@ -112,8 +129,8 @@ def resolve_concept(
             if c.get("id") == best["concept_id"]:
                 best["canonical_name_ar"] = c.get("canonical_name_ar")
                 best["canonical_name_en"] = c.get("canonical_name_en")
-                best["authority_level"]   = c.get("authority_level", "platform")
-                best["domain_pack"]       = c.get("domain_pack")
+                best["authority_level"] = c.get("authority_level", "platform")
+                best["domain_pack"] = c.get("domain_pack")
                 break
         return best
 
@@ -123,38 +140,38 @@ def resolve_concept(
         cn_en = normalize_text(c.get("canonical_name_en", ""))
         if normalized in cn_ar or cn_ar in normalized:
             return {
-                "concept_id":      c.get("id"),
+                "concept_id": c.get("id"),
                 "canonical_name_ar": c.get("canonical_name_ar"),
                 "canonical_name_en": c.get("canonical_name_en"),
                 "authority_level": c.get("authority_level", "platform"),
-                "domain_pack":     c.get("domain_pack"),
-                "match_type":      "partial_canonical",
-                "confidence":      0.60,
+                "domain_pack": c.get("domain_pack"),
+                "match_type": "partial_canonical",
+                "confidence": 0.60,
                 "boundary_status": "advisory",
             }
         if normalized in cn_en or cn_en in normalized:
             return {
-                "concept_id":      c.get("id"),
+                "concept_id": c.get("id"),
                 "canonical_name_ar": c.get("canonical_name_ar"),
                 "canonical_name_en": c.get("canonical_name_en"),
                 "authority_level": c.get("authority_level", "platform"),
-                "domain_pack":     c.get("domain_pack"),
-                "match_type":      "partial_english",
-                "confidence":      0.55,
+                "domain_pack": c.get("domain_pack"),
+                "match_type": "partial_english",
+                "confidence": 0.55,
                 "boundary_status": "advisory",
             }
 
     # No match — queue for review
     return {
-        "concept_id":      None,
+        "concept_id": None,
         "canonical_name_ar": None,
         "canonical_name_en": None,
         "authority_level": None,
-        "domain_pack":     None,
-        "match_type":      "no_match",
-        "confidence":      0.0,
+        "domain_pack": None,
+        "match_type": "no_match",
+        "confidence": 0.0,
         "boundary_status": "review_required",
-        "review_note":     f"Term '{raw_term}' not found — queued for terminology review",
+        "review_note": f"Term '{raw_term}' not found — queued for terminology review",
     }
 
 
@@ -189,18 +206,20 @@ def detect_conflicts(rules: list) -> List[Dict]:
                 lvl1 = AUTHORITY_LEVELS.get(r1.get("authority_level", "platform"), 5)
                 lvl2 = AUTHORITY_LEVELS.get(r2.get("authority_level", "platform"), 5)
                 winner_id = r1["id"] if lvl1 <= lvl2 else r2["id"]
-                loser_id  = r2["id"] if lvl1 <= lvl2 else r1["id"]
+                loser_id = r2["id"] if lvl1 <= lvl2 else r1["id"]
 
-                conflicts.append({
-                    "rule_1_id":   r1["id"],
-                    "rule_2_id":   r2["id"],
-                    "domain_pack": r1["domain_pack"],
-                    "target":      target1,
-                    "resolution":  "authority_hierarchy",
-                    "winner_rule_id": winner_id,
-                    "loser_rule_id":  loser_id,
-                    "requires_review": lvl1 == lvl2,
-                })
+                conflicts.append(
+                    {
+                        "rule_1_id": r1["id"],
+                        "rule_2_id": r2["id"],
+                        "domain_pack": r1["domain_pack"],
+                        "target": target1,
+                        "resolution": "authority_hierarchy",
+                        "winner_rule_id": winner_id,
+                        "loser_rule_id": loser_id,
+                        "requires_review": lvl1 == lvl2,
+                    }
+                )
 
     return conflicts
 

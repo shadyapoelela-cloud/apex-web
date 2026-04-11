@@ -8,10 +8,10 @@ Environment Variables:
 - STRIPE_WEBHOOK_SECRET: Stripe webhook signing secret
 - PAYMENT_CURRENCY: default "SAR"
 """
+
 import os
 import logging
 import uuid
-from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,7 @@ class StripeBackend:
     def __init__(self):
         try:
             import stripe
+
             stripe.api_key = STRIPE_SECRET_KEY
             self._stripe = stripe
             logger.info("Stripe payment backend initialized")
@@ -37,26 +38,27 @@ class StripeBackend:
             raise RuntimeError("stripe package is required for Stripe backend")
 
     def create_checkout_session(
-        self, user_id: str, plan_code: str, plan_name: str,
-        amount_sar: float, period: str = "monthly"
+        self, user_id: str, plan_code: str, plan_name: str, amount_sar: float, period: str = "monthly"
     ) -> dict:
         """Create a Stripe Checkout session."""
         try:
             # Stripe expects amounts in smallest currency unit (halalas for SAR)
             amount_units = int(amount_sar * 100)
 
-            line_items = [{
-                "price_data": {
-                    "currency": PAYMENT_CURRENCY.lower(),
-                    "product_data": {
-                        "name": f"APEX {plan_name} — {period}",
-                        "description": f"APEX Financial Platform — {plan_name} Plan ({period})",
+            line_items = [
+                {
+                    "price_data": {
+                        "currency": PAYMENT_CURRENCY.lower(),
+                        "product_data": {
+                            "name": f"APEX {plan_name} — {period}",
+                            "description": f"APEX Financial Platform — {plan_name} Plan ({period})",
+                        },
+                        "unit_amount": amount_units,
+                        "recurring": {"interval": "month" if period == "monthly" else "year"},
                     },
-                    "unit_amount": amount_units,
-                    "recurring": {"interval": "month" if period == "monthly" else "year"},
-                },
-                "quantity": 1,
-            }]
+                    "quantity": 1,
+                }
+            ]
 
             session = self._stripe.checkout.Session.create(
                 payment_method_types=["card"],
@@ -67,7 +69,8 @@ class StripeBackend:
                     "plan_code": plan_code,
                     "period": period,
                 },
-                success_url=os.getenv("PLATFORM_URL", "https://apex-app.com") + "/payment/success?session_id={CHECKOUT_SESSION_ID}",
+                success_url=os.getenv("PLATFORM_URL", "https://apex-app.com")
+                + "/payment/success?session_id={CHECKOUT_SESSION_ID}",
                 cancel_url=os.getenv("PLATFORM_URL", "https://apex-app.com") + "/payment/cancel",
             )
 
@@ -101,9 +104,7 @@ class StripeBackend:
         try:
             if not subscription_id:
                 return {"success": False, "error": "معرّف الاشتراك مطلوب"}
-            self._stripe.Subscription.modify(
-                subscription_id, cancel_at_period_end=True
-            )
+            self._stripe.Subscription.modify(subscription_id, cancel_at_period_end=True)
             return {"success": True}
         except Exception as e:
             logger.error("Stripe subscription cancellation failed: %s", e)
@@ -115,15 +116,19 @@ class MockBackend:
     """Mock payment backend for development and testing."""
 
     def create_checkout_session(
-        self, user_id: str, plan_code: str, plan_name: str,
-        amount_sar: float, period: str = "monthly"
+        self, user_id: str, plan_code: str, plan_name: str, amount_sar: float, period: str = "monthly"
     ) -> dict:
         """Create a fake checkout session."""
         session_id = f"mock_sess_{uuid.uuid4().hex[:16]}"
         checkout_url = f"/payment/mock-checkout?session_id={session_id}"
         logger.info(
             "MOCK PAYMENT: user=%s plan=%s amount=%.2f %s period=%s session=%s",
-            user_id, plan_code, amount_sar, PAYMENT_CURRENCY, period, session_id,
+            user_id,
+            plan_code,
+            amount_sar,
+            PAYMENT_CURRENCY,
+            period,
+            session_id,
         )
         return {
             "success": True,
@@ -165,9 +170,9 @@ def _get_backend():
 
 # ─── Public API ───────────────────────────────────────────────
 
+
 def create_checkout_session(
-    user_id: str, plan_code: str, plan_name: str,
-    amount_sar: float, period: str = "monthly"
+    user_id: str, plan_code: str, plan_name: str, amount_sar: float, period: str = "monthly"
 ) -> dict:
     """
     Create a payment checkout session.
@@ -180,9 +185,7 @@ def create_checkout_session(
             "session_id": f"free_{uuid.uuid4().hex[:12]}",
             "note": "الخطة المجانية لا تحتاج دفع",
         }
-    return _get_backend().create_checkout_session(
-        user_id, plan_code, plan_name, amount_sar, period
-    )
+    return _get_backend().create_checkout_session(user_id, plan_code, plan_name, amount_sar, period)
 
 
 def verify_payment(session_id: str) -> dict:
@@ -206,6 +209,7 @@ def get_payment_history(user_id: str) -> list:
     try:
         from app.phase1.models.platform_models import SessionLocal
         from app.phase8.models.phase8_models import PaymentRecord
+
         db = SessionLocal()
         try:
             records = (

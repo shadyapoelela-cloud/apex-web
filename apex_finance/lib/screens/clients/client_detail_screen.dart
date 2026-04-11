@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'dart:html' as html;
 import '../../core/api_config.dart';
-import '../extracted/coa_screens.dart';
 
 
 
@@ -204,7 +204,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           Container(
             width: 56, height: 56,
             decoration: BoxDecoration(
-              color: gold.withOpacity(0.12),
+              color: gold.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(Icons.business, color: gold, size: 28),
@@ -326,12 +326,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 return Expanded(
                   child: GestureDetector(
                     onTap: s.clickable ? () {
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (_) => CoaJourneyScreen(
-                          clientId: '${widget.clientId}',
-                          clientName: widget.clientName,
-                        ),
-                      ));
+                      context.push('/coa/journey', extra: {
+                        'clientId': '${widget.clientId}',
+                        'clientName': widget.clientName,
+                      });
                     } : null,
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -350,9 +348,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                             decoration: BoxDecoration(
-                              color: sColor.withOpacity(0.1),
+                              color: sColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(99),
-                              border: Border.all(color: sColor.withOpacity(0.2)),
+                              border: Border.all(color: sColor.withValues(alpha: 0.2)),
                             ),
                             child: Text(sLabel,
                                 style: TextStyle(color: sColor, fontSize: 10, fontWeight: FontWeight.w600)),
@@ -401,12 +399,12 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [gold.withOpacity(0.12), Colors.transparent],
+            colors: [gold.withValues(alpha: 0.12), Colors.transparent],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
           ),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: gold.withOpacity(0.25)),
+          border: Border.all(color: gold.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -429,12 +427,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
             const SizedBox(width: 12),
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => CoaJourneyScreen(
-                    clientId: '${widget.clientId}',
-                    clientName: widget.clientName,
-                  ),
-                ));
+                context.push('/coa/journey', extra: {
+                  'clientId': '${widget.clientId}',
+                  'clientName': widget.clientName,
+                });
               },
               icon: Icon(Icons.arrow_back, size: 14),
               label: Text(hasCoA ? 'متابعة COA' : 'رفع COA'),
@@ -467,9 +463,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
         child: TabBar(
           controller: _tabController,
           indicator: BoxDecoration(
-            color: gold.withOpacity(0.15),
+            color: gold.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: gold.withOpacity(0.3)),
+            border: Border.all(color: gold.withValues(alpha: 0.3)),
           ),
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: gold,
@@ -664,9 +660,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: gold.withOpacity(0.1),
+                  color: gold.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: gold.withOpacity(0.3)),
+                  border: Border.all(color: gold.withValues(alpha: 0.3)),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.folder_open, color: gold, size: 16),
@@ -707,14 +703,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isMissing ? gold.withOpacity(0.3) : borderColor),
+        border: Border.all(color: isMissing ? gold.withValues(alpha: 0.3) : borderColor),
       ),
       child: Row(
         children: [
           Container(
             width: 40, height: 40,
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.12),
+              color: statusColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(statusIcon, color: statusColor, size: 18),
@@ -746,9 +742,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(99),
-              border: Border.all(color: statusColor.withOpacity(0.2)),
+              border: Border.all(color: statusColor.withValues(alpha: 0.2)),
             ),
             child: Text(statusLabel,
                 style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.w600)),
@@ -775,7 +771,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                   label: Text(isUploaded ? '\u0639\u0631\u0636' : '\u0625\u0639\u0627\u062f\u0629',
                     style: TextStyle(fontSize: 11, color: gold)),
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: gold.withOpacity(0.4)),
+                    side: BorderSide(color: gold.withValues(alpha: 0.4)),
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
@@ -845,9 +841,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       child: Container(
         width: 80, height: 80,
         decoration: BoxDecoration(
-          color: gold.withOpacity(0.08),
+          color: gold.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: gold.withOpacity(0.25)),
+          border: Border.all(color: gold.withValues(alpha: 0.25)),
         ),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(icon, color: gold, size: 28),
@@ -872,7 +868,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       context: context,
       builder: (ctx) => Dialog(
         backgroundColor: cardBg,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: gold.withOpacity(0.3))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: gold.withValues(alpha: 0.3))),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -973,7 +969,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 Container(
                   width: 48, height: 48,
                   decoration: BoxDecoration(
-                    color: s.color.withOpacity(0.12),
+                    color: s.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(s.icon, color: s.color, size: 22),
@@ -998,9 +994,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: s.color.withOpacity(0.1),
+                    color: s.color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(99),
-                    border: Border.all(color: s.color.withOpacity(0.2)),
+                    border: Border.all(color: s.color.withValues(alpha: 0.2)),
                   ),
                   child: Text(s.status,
                       style: TextStyle(color: s.color, fontSize: 10, fontWeight: FontWeight.w600)),
@@ -1049,7 +1045,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                     width: 28, height: 28,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: step.$3.withOpacity(isCompleted ? 1.0 : 0.15),
+                      color: step.$3.withValues(alpha: isCompleted ? 1.0 : 0.15),
                       border: Border.all(color: step.$3, width: 2),
                     ),
                     child: Center(
@@ -1068,7 +1064,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: step.$3.withOpacity(0.1),
+                      color: step.$3.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(99),
                     ),
                     child: Text(step.$2,
@@ -1111,7 +1107,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                   Container(
                     width: 38, height: 38,
                     decoration: BoxDecoration(
-                      color: a.$5.withOpacity(0.12),
+                      color: a.$5.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(a.$4, color: a.$5, size: 16),
@@ -1157,9 +1153,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(text,
           style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),

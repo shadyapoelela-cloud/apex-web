@@ -105,11 +105,11 @@ class _CoaTreeState extends State<CoaTreeScreen> {
           child: Row(children: [
             if (hasChildren) Icon(isExpanded ? Icons.expand_more : Icons.chevron_right, color: AC.ts, size: 18) else const SizedBox(width: 18),
             const SizedBox(width: 4),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: typeColor.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
               child: Text(code, style: TextStyle(color: typeColor, fontSize: 10, fontWeight: FontWeight.bold))),
             const SizedBox(width: 8),
             Expanded(child: Text(name, style: const TextStyle(color: AC.tp, fontSize: 12), textDirection: TextDirection.rtl)),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: typeColor.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
               child: Text(type, style: TextStyle(color: typeColor, fontSize: 9))),
           ]),
         ),

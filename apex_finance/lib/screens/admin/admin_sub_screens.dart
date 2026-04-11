@@ -1,17 +1,9 @@
 ﻿import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import '../../api_service.dart';
 import '../../core/api_config.dart';
 import '../../core/theme.dart';
 
 const _api = apiBase;
-
-class S {
-  static String? token, uid, uname, dname, plan, email;
-  static List<String> roles = [];
-  static Map<String,String> h() => {'Authorization': 'Bearer ${token ?? ""}'};
-  static Map<String,String> hj() => {'Authorization': 'Bearer ${token ?? ""}', 'Content-Type': 'application/json'};
-}
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
@@ -32,7 +24,7 @@ Widget _kv(String k, String v, {Color? vc}) => Padding(padding: const EdgeInsets
     Flexible(child: Text(v, style: TextStyle(color: vc ?? AC.tp, fontSize: 13), textAlign: TextAlign.end))]));
 
 Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+  decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
   child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
 // ═══════════════════════════════════════════════════
@@ -45,14 +37,12 @@ class _RevCS extends State<ReviewerConsoleScreen> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/admin/knowledge-feedback'), headers: S.h());
-      if(mounted) setState(() { try { _items = jsonDecode(r.body); } catch(_) { _items = []; } _ld = false; });
+      final res = await ApiService.adminKnowledgeFeedback();
+      if(mounted) setState(() { _items = res.data is List ? res.data : []; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   Future<void> _review(String id, String decision) async {
-    await http.post(Uri.parse('$_api/admin/knowledge-feedback/$id/review'),
-      headers: {'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
-      body: jsonEncode({'decision': decision}));
+    await ApiService.adminReviewFeedback(id, {'decision': decision});
     _load();
   }
   List get _filtered => _filter == 'all' ? _items : _items.where((i) => i['status'] == _filter).toList();
@@ -122,12 +112,12 @@ class _PVS extends State<ProviderVerificationScreen> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/admin/providers'), headers: S.h());
-      if(mounted) setState(() { try { _provs = jsonDecode(r.body); } catch(_) { _provs = []; } _ld = false; });
+      final res = await ApiService.adminProviders();
+      if(mounted) setState(() { _provs = res.data is List ? res.data : []; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   Future<void> _action(String id, String action) async {
-    await http.post(Uri.parse('$_api/admin/providers/$id/$action'), headers: S.h());
+    await ApiService.adminProviderAction(id, action);
     _load();
   }
   @override Widget build(BuildContext c) => Scaffold(
@@ -157,7 +147,7 @@ class _PVS extends State<ProviderVerificationScreen> {
                 const SizedBox(height: 8),
                 Wrap(spacing: 6, runSpacing: 4, children: (p['service_scopes'] as List).map((s) =>
                   Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: AC.cyan.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                     child: Text(s['name_ar']??s['code']??'', style: const TextStyle(color: AC.cyan, fontSize: 10)))).toList())],
               if(p['required_documents']!=null) ...[
                 const SizedBox(height: 6),
@@ -191,8 +181,8 @@ class _PMS extends State<PolicyManagementScreen> {
   @override void initState() { super.initState(); _load(); }
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/legal/policies'), headers: S.h());
-      if(mounted) setState(() { try { _policies = jsonDecode(r.body); } catch(_) { _policies = []; } _ld = false; });
+      final res = await ApiService.getLegalPolicies();
+      if(mounted) setState(() { _policies = res.data is List ? res.data : []; _ld = false; });
     } catch(_) { if(mounted) setState(()=> _ld=false); }
   }
   @override Widget build(BuildContext c) => Scaffold(
@@ -258,15 +248,9 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
     if (!_allAccepted) return;
     setState(() => _loading = true);
     try {
-      await http.post(Uri.parse('$_api/legal/accept'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'document_type': 'terms', 'version': '1.0'}));
-      await http.post(Uri.parse('$_api/legal/accept'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'document_type': 'privacy', 'version': '1.0'}));
-      await http.post(Uri.parse('$_api/legal/accept'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'document_type': 'acceptable_use', 'version': '1.0'}));
+      await ApiService.acceptLegal(documentType: 'terms', version: '1.0');
+      await ApiService.acceptLegal(documentType: 'privacy', version: '1.0');
+      await ApiService.acceptLegal(documentType: 'acceptable_use', version: '1.0');
       widget.onAccepted();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e')));
@@ -330,7 +314,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
       decoration: BoxDecoration(
         color: Colors.white, borderRadius: BorderRadius.circular(12),
         border: Border.all(color: value ? AC.gold : const Color(0xFFE0E0E0), width: value ? 2 : 1),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -413,7 +397,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: CircleAvatar(
-                    backgroundColor: selected ? AC.gold.withOpacity(0.15) : const Color(0xFFF5F5F5),
+                    backgroundColor: selected ? AC.gold.withValues(alpha: 0.15) : const Color(0xFFF5F5F5),
                     child: Icon(t['icon'] as IconData, color: selected ? AC.gold : AC.navy, size: 24),
                   ),
                   title: Text(t['name'] as String, style: TextStyle(
@@ -774,7 +758,7 @@ class ActivityHistoryScreen extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
             child: Row(children: [
               CircleAvatar(
-                backgroundColor: (a['color'] as Color).withOpacity(0.1),
+                backgroundColor: (a['color'] as Color).withValues(alpha: 0.1),
                 radius: 20,
                 child: Icon(a['icon'] as IconData, color: a['color'] as Color, size: 20),
               ),
@@ -812,11 +796,9 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
   
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/results/${widget.analysisId}/details'),
-        headers: S.h());
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        final details = data['details'] as List? ?? [];
+      final res = await ApiService.getResultDetails(widget.analysisId);
+      if (res.success) {
+        final details = res.data['details'] as List? ?? [];
         for (var d in details) {
           if (d['result_key'] == widget.resultKey) {
             setState(() { _detail = d; _loading = false; });
@@ -876,7 +858,7 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
   
   Widget _chip(String t, Color c) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(color: c.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+    decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
     child: Text(t, style: TextStyle(color: c, fontSize: 11)));
 }
 
@@ -913,13 +895,12 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
     setState(() => _loading = true);
     try {
       // Load task type requirements
-      final r1 = await http.get(Uri.parse('$_api/task-types/${widget.taskTypeCode}'));
-      if (r1.statusCode == 200) _taskType = jsonDecode(r1.body);
-      
+      final r1 = await ApiService.getTaskType(widget.taskTypeCode);
+      if (r1.success) _taskType = r1.data is Map ? r1.data : null;
+
       // Load existing submissions
-      final r2 = await http.get(Uri.parse('$_api/task-submissions/${widget.taskId}'),
-        headers: S.h());
-      if (r2.statusCode == 200) _submissions = jsonDecode(r2.body);
+      final r2 = await ApiService.getTaskSubmission(widget.taskId);
+      if (r2.success) _submissions = r2.data is List ? r2.data : [];
     } catch (e) { /* handle */ }
     setState(() => _loading = false);
   }
@@ -929,14 +910,12 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
   Future<void> _upload(String reqId, String docName) async {
     // Simulate upload — in production, use file picker
     try {
-      final r = await http.post(Uri.parse('$_api/task-submissions'),
-        headers: {...S.h(), 'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'service_task_id': widget.taskId,
-          'requirement_id': reqId,
-          'file_name': '$docName.pdf',
-        }));
-      if (r.statusCode == 200) {
+      final res = await ApiService.createTaskSubmission({
+        'service_task_id': widget.taskId,
+        'requirement_id': reqId,
+        'file_name': '$docName.pdf',
+      });
+      if (res.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('\u062a\u0645 \u0631\u0641\u0639 $docName'), backgroundColor: const Color(0xFF2ECC8A)));
         _load();
@@ -1054,9 +1033,9 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
   
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/task-types'));
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
+      final res = await ApiService.getTaskTypes();
+      if (res.success) {
+        final data = res.data;
         if (data is List) { _types = data; }
         else if (data is Map && data['task_types'] != null) { _types = data['task_types']; }
         else { _types = []; }
@@ -1134,12 +1113,10 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
   
   Future<void> _load() async {
     try {
-      String url = '$_api/knowledge-feedback/review-queue?status=$_filter';
-      if (_filter == 'all') url = '$_api/knowledge-feedback/review-queue';
-      final r = await http.get(Uri.parse(url), headers: S.h());
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        _feedbacks = data is List ? data : (data['items'] ?? []);
+      final res = await ApiService.getReviewQueue(status: _filter == 'all' ? 'submitted' : _filter);
+      if (res.success) {
+        final data = res.data;
+        _feedbacks = data is List ? data : (data is Map ? (data['items'] ?? []) : []);
       }
     } catch (e) { /* handle */ }
     setState(() => _loading = false);
@@ -1194,7 +1171,7 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
                     Expanded(child: Text(fb['feedback_type'] ?? '\u0645\u0644\u0627\u062d\u0638\u0629',
                       style: const TextStyle(color: AC.tp, fontWeight: FontWeight.bold))),
                     Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                       child: Text(status, style: TextStyle(color: statusColor, fontSize: 11))),
                   ]),
                   const SizedBox(height: 8),
@@ -1224,8 +1201,8 @@ class _AuditLogS extends State<AuditLogScreen> {
   
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/audit/events?limit=100'), headers: S.h());
-      if (r.statusCode == 200) _events = jsonDecode(r.body);
+      final res = await ApiService.adminAuditEvents();
+      if (res.success) _events = res.data is List ? res.data : [];
     } catch (e) { /* handle */ }
     setState(() => _loading = false);
   }

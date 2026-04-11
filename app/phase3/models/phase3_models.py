@@ -15,17 +15,24 @@ Rules:
 
 import enum
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index, UniqueConstraint,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
 )
 from sqlalchemy.orm import relationship
 
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
-
 # ═══════════════════════════════════════════════════════════════
 # Enums
 # ═══════════════════════════════════════════════════════════════
+
 
 class FeedbackType(str, enum.Enum):
     classification_correction = "classification_correction"
@@ -74,11 +81,13 @@ class ApplicabilityScope(str, enum.Enum):
 # Migration 08: Knowledge Feedback Events
 # ═══════════════════════════════════════════════════════════════
 
+
 class KnowledgeFeedbackEvent(Base):
     """
     Structured feedback from eligible users.
     Never mutates production results directly.
     """
+
     __tablename__ = "knowledge_feedback_events"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -125,10 +134,13 @@ class KnowledgeFeedbackEvent(Base):
 
 class FeedbackAttachment(Base):
     """Files attached to feedback (screenshots, documents)."""
+
     __tablename__ = "feedback_attachments"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    feedback_id = Column(String(36), ForeignKey("knowledge_feedback_events.id", ondelete="CASCADE"), nullable=False, index=True)
+    feedback_id = Column(
+        String(36), ForeignKey("knowledge_feedback_events.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     filename = Column(String(300), nullable=False)
     file_type = Column(String(20), nullable=True)
     file_size_bytes = Column(Integer, nullable=True)
@@ -142,12 +154,16 @@ class FeedbackAttachment(Base):
 # Migration 09: Knowledge Governance
 # ═══════════════════════════════════════════════════════════════
 
+
 class KnowledgeFeedbackReview(Base):
     """Review decisions on feedback items."""
+
     __tablename__ = "knowledge_feedback_reviews"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    feedback_id = Column(String(36), ForeignKey("knowledge_feedback_events.id", ondelete="CASCADE"), nullable=False, index=True)
+    feedback_id = Column(
+        String(36), ForeignKey("knowledge_feedback_events.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     reviewer_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
     decision = Column(String(30), nullable=False)  # accepted, rejected, needs_refinement, queued_for_rule_design
     reviewer_notes = Column(Text, nullable=True)
@@ -156,13 +172,12 @@ class KnowledgeFeedbackReview(Base):
 
     feedback = relationship("KnowledgeFeedbackEvent", back_populates="reviews")
 
-    __table_args__ = (
-        Index("ix_review_feedback_reviewer", "feedback_id", "reviewer_id"),
-    )
+    __table_args__ = (Index("ix_review_feedback_reviewer", "feedback_id", "reviewer_id"),)
 
 
 class KnowledgeCandidateRule(Base):
     """Rules promoted from accepted feedback — awaiting activation."""
+
     __tablename__ = "knowledge_candidate_rules"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -192,13 +207,12 @@ class KnowledgeCandidateRule(Base):
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_candidate_rule_status", "status", "rule_type"),
-    )
+    __table_args__ = (Index("ix_candidate_rule_status", "status", "rule_type"),)
 
 
 class ActiveKnowledgeRule(Base):
     """Production-active rules promoted from candidates."""
+
     __tablename__ = "active_knowledge_rules"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)

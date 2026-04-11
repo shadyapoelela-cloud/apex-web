@@ -43,5 +43,5 @@ Widget apexKV(String key, String value, {Color? valueColor}) => Padding(
 
 Widget apexBadge(String text, Color color) => Container(
   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-  decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+  decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
   child: Text(text, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)));

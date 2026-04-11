@@ -5,8 +5,15 @@ Extension over phase2_models.py - per Architecture Doc v5 Section 29
 """
 
 from sqlalchemy import (
-    Column, String, Boolean, Integer,
-    DateTime, Text, ForeignKey, JSON, Index,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
 )
 from sqlalchemy.orm import relationship
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
@@ -87,9 +94,7 @@ class ClientRequiredDocument(Base):
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_client_doc_status", "client_id", "status"),
-    )
+    __table_args__ = (Index("ix_client_doc_status", "client_id", "status"),)
 
 
 # 5. Client Onboarding Draft (saves wizard progress)
@@ -128,6 +133,4 @@ class StageNote(Base):
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
-    __table_args__ = (
-        Index("ix_stage_note_lookup", "service_key", "stage_key", "role_scope"),
-    )
+    __table_args__ = (Index("ix_stage_note_lookup", "service_key", "stage_key", "role_scope"),)

@@ -218,11 +218,14 @@ LEGAL_FORCE = {
 def get_authority(code: str) -> dict:
     return AUTHORITIES.get(code, {})
 
+
 def get_authorities_by_domain(domain: str) -> list:
     return [k for k, v in AUTHORITIES.items() if domain in v.get("domain_scope", [])]
 
+
 def get_all_authorities() -> dict:
     return AUTHORITIES
+
 
 def get_legal_force_hierarchy() -> list:
     return sorted(LEGAL_FORCE.items(), key=lambda x: x[1]["priority"])

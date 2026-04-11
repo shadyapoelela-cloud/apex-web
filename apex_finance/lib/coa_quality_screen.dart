@@ -1,9 +1,9 @@
 ﻿import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'shared_widgets.dart';
-import 'coa_review_screen.dart';
 
 class CoaQualityScreen extends StatefulWidget {
   final String uploadId, clientId, clientName;
@@ -59,7 +59,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
           const SizedBox(height: 16),
           // ── درجة كاملة ──
           Container(padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(18), border: Border.all(color: _gold.withOpacity(0.35))),
+            decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(18), border: Border.all(color: _gold.withValues(alpha: 0.35))),
             child: Row(children: [
               AnimatedBuilder(animation: _progress, builder: (_, __) => SizedBox(width: 86, height: 86,
                 child: CustomPaint(painter: _RingPainter(_progress.value, _scoreColor(_overall)),
@@ -71,7 +71,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
                 Text('${(_overall * 100).toInt()} / 100', style: TextStyle(fontSize:28, fontWeight:FontWeight.w900, color:_scoreColor(_overall), fontFamily:'Tajawal')),
                 const SizedBox(height:6),
                 Container(padding: const EdgeInsets.symmetric(horizontal:10, vertical:3),
-                  decoration: BoxDecoration(color: _scoreColor(_overall).withOpacity(0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: _scoreColor(_overall).withOpacity(0.3))),
+                  decoration: BoxDecoration(color: _scoreColor(_overall).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: _scoreColor(_overall).withValues(alpha: 0.3))),
                   child: Text(_overall >= 0.75 ? 'جودة مرتفعة — جاهز للتحليل' : _overall >= 0.50 ? 'جودة متوسطة — يُنصح بالمراجعة' : 'جودة منخفضة — مراجعة مطلوبة',
                     style: TextStyle(fontSize:11, color:_scoreColor(_overall), fontFamily:'Tajawal'))),
                 const SizedBox(height:4),
@@ -109,7 +109,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
                 final ready = readiness[item.$1] == true;
                 final color = ready ? _success : _danger;
                 return Expanded(child: Container(margin: const EdgeInsets.only(left:6), padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: color.withOpacity(0.07), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.07), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
                   child: Column(children: [
                     Icon(item.$3, color:color, size:18),
                     const SizedBox(height:4),
@@ -122,7 +122,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
           if (recs.isNotEmpty) ...[
             const SizedBox(height:12),
             Container(padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: _warning.withOpacity(0.05), borderRadius: BorderRadius.circular(14), border: Border.all(color: _warning.withOpacity(0.25))),
+              decoration: BoxDecoration(color: _warning.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(14), border: Border.all(color: _warning.withValues(alpha: 0.25))),
               child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 const Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Text('توصيات التحسين', textDirection: TextDirection.rtl, style: TextStyle(fontSize:13, fontWeight:FontWeight.w700, color:Color(0xFFE8A838), fontFamily:'Tajawal')),
@@ -152,15 +152,15 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             if (_overall < 0.5) Padding(padding: const EdgeInsets.only(bottom:10),
               child: Container(padding: const EdgeInsets.symmetric(horizontal:12, vertical:8),
-                decoration: BoxDecoration(color: _warning.withOpacity(0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: _warning.withOpacity(0.3))),
+                decoration: BoxDecoration(color: _warning.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: _warning.withValues(alpha: 0.3))),
                 child: const Row(children: [
                   Icon(Icons.info_outline_rounded, color:Color(0xFFE8A838), size:14), SizedBox(width:6),
                   Expanded(child: Text('درجة الجودة منخفضة — يُنصح بمراجعة شجرة الحسابات', textDirection: TextDirection.rtl, style: TextStyle(fontSize:11, color:Color(0xFFE8A838), fontFamily:'Tajawal'))),
                 ]))),
             GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => CoaReviewScreen(uploadId: widget.uploadId, clientId: widget.clientId, clientName: widget.clientName))),
+              onTap: () => context.push('/coa/review', extra: {'uploadId': widget.uploadId, 'clientId': widget.clientId, 'clientName': widget.clientName}),
               child: Container(width: double.infinity, height:54,
-                decoration: BoxDecoration(gradient: const LinearGradient(colors:[Color(0xFF2ECC8A),Color(0xFF1A8C5C)]), borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: _success.withOpacity(0.3), blurRadius:12, offset: const Offset(0,4))]),
+                decoration: BoxDecoration(gradient: const LinearGradient(colors:[Color(0xFF2ECC8A),Color(0xFF1A8C5C)]), borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: _success.withValues(alpha: 0.3), blurRadius:12, offset: const Offset(0,4))]),
                 child: const Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Icon(Icons.arrow_forward_rounded, color:Colors.white, size:20), SizedBox(width:8),
                   Text('متابعة لمراجعة التبويب', style: TextStyle(color:Colors.white, fontSize:15, fontWeight:FontWeight.w700, fontFamily:'Tajawal')),
@@ -174,7 +174,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
     final val = ((widget.assessData[s.$1] ?? 0.0) as num).toDouble();
     final color = _scoreColor(val);
     return Expanded(child: Container(margin: const EdgeInsets.only(left:8), padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withOpacity(0.25))),
+      decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withValues(alpha: 0.25))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('${(val*100).toInt()}%', style: TextStyle(fontSize:15, fontWeight:FontWeight.w800, color:color, fontFamily:'Tajawal')),
@@ -188,7 +188,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
   }).toList());
 
   Widget _buildIssueList(String title, IconData icon, Color color, List<String> items) => Container(padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withOpacity(0.2))),
+    decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withValues(alpha: 0.2))),
     child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
       Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         Text(title, textDirection: TextDirection.rtl, style: TextStyle(fontSize:12, fontWeight:FontWeight.w700, color:color, fontFamily:'Tajawal')),
@@ -208,7 +208,7 @@ class _RingPainter extends CustomPainter {
   const _RingPainter(this.value, this.color);
   @override void paint(Canvas canvas, Size size) {
     final center = Offset(size.width/2, size.height/2); final r = size.width/2-6;
-    canvas.drawCircle(center, r, Paint()..color=color.withOpacity(0.1)..strokeWidth=8..style=PaintingStyle.stroke);
+    canvas.drawCircle(center, r, Paint()..color=color.withValues(alpha: 0.1)..strokeWidth=8..style=PaintingStyle.stroke);
     canvas.drawArc(Rect.fromCircle(center:center,radius:r), -math.pi/2, 2*math.pi*value.clamp(0.0,1.0), false, Paint()..color=color..strokeWidth=8..style=PaintingStyle.stroke..strokeCap=StrokeCap.round);
   }
   @override bool shouldRepaint(_RingPainter old) => old.value != value;

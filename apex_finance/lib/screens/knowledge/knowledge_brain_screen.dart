@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
-import '../copilot/copilot_screen.dart';
 
 class KnowledgeBrainScreen extends StatefulWidget {
   const KnowledgeBrainScreen({super.key});
@@ -94,14 +94,14 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
         title: Row(children: [
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: const Color(0xFFE91E63).withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: const Color(0xFFE91E63).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
             child: const Icon(Icons.psychology, color: Color(0xFFE91E63), size: 20),
           ),
           const SizedBox(width: 10),
           const Text('\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
         ]),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CopilotScreen()))),
+          IconButton(icon: const Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -132,17 +132,17 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
         final color = Color(a['color'] as int);
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withOpacity(0.3))),
+          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withValues(alpha: 0.3))),
           child: ExpansionTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
               child: Icon(a['icon'] as IconData, color: color, size: 22),
             ),
             title: Row(children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                 child: Text(a['code'] as String, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
               ),
               const SizedBox(width: 8),
@@ -154,7 +154,7 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
               Padding(padding: const EdgeInsets.all(14), child: Column(children: [
                 Wrap(spacing: 6, runSpacing: 6, children: (a['tags'] as List).map<Widget>((t) => Chip(
                   label: Text(t, style: const TextStyle(color: AC.tp, fontSize: 10)),
-                  backgroundColor: AC.navy4, side: BorderSide(color: color.withOpacity(0.3)),
+                  backgroundColor: AC.navy4, side: BorderSide(color: color.withValues(alpha: 0.3)),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, visualDensity: VisualDensity.compact,
                 )).toList()),
                 const SizedBox(height: 10),
@@ -199,7 +199,7 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
                   child: Text('', style: const TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
               ]),

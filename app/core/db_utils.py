@@ -12,6 +12,7 @@ from sqlalchemy import text as _t
 def get_db_session():
     """Create a new database session. Caller MUST close it in finally block."""
     from app.phase1.models.platform_models import SessionLocal
+
     return SessionLocal()
 
 

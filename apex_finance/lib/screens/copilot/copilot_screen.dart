@@ -91,7 +91,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
         title: Row(children: [
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
             child: const Icon(Icons.smart_toy, color: AC.gold, size: 20),
           ),
           const SizedBox(width: 10),
@@ -99,7 +99,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(color: AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
             child: const Text('AI', style: TextStyle(color: AC.gold, fontSize: 10, fontWeight: FontWeight.w700)),
           ),
         ]),
@@ -110,7 +110,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
               child: Chip(
                 label: Text(_lastIntent!['intent'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 10)),
                 backgroundColor: AC.navy3,
-                side: BorderSide(color: AC.gold.withOpacity(0.3)),
+                side: BorderSide(color: AC.gold.withValues(alpha: 0.3)),
               ),
             ),
           IconButton(icon: const Icon(Icons.refresh, color: AC.ts), onPressed: () {
@@ -148,9 +148,9 @@ class _CopilotScreenState extends State<CopilotScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AC.gold.withOpacity(0.1),
+              color: AC.gold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AC.gold.withOpacity(0.3)),
+              border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
             ),
             child: const Icon(Icons.smart_toy, color: AC.gold, size: 48),
           ),
@@ -194,9 +194,9 @@ class _CopilotScreenState extends State<CopilotScreen> {
         padding: const EdgeInsets.all(14),
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
         decoration: BoxDecoration(
-          color: isUser ? AC.gold.withOpacity(0.15) : AC.navy3,
+          color: isUser ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: isUser ? AC.gold.withOpacity(0.3) : AC.bdr),
+          border: Border.all(color: isUser ? AC.gold.withValues(alpha: 0.3) : AC.bdr),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(msg['content'] ?? '', style: TextStyle(color: AC.tp, fontSize: 14, height: 1.5), textDirection: TextDirection.rtl),
@@ -220,7 +220,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
             const SizedBox(height: 8),
             Wrap(spacing: 4, children: (msg['references'] as List).map<Widget>((r) =>
               Chip(label: Text('', style: const TextStyle(color: AC.tp, fontSize: 9)),
-                backgroundColor: AC.navy4, side: BorderSide(color: AC.cyan.withOpacity(0.3)),
+                backgroundColor: AC.navy4, side: BorderSide(color: AC.cyan.withValues(alpha: 0.3)),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
               ),
@@ -230,7 +230,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: AC.warn.withOpacity(0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: AC.warn.withOpacity(0.3))),
+              decoration: BoxDecoration(color: AC.warn.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: AC.warn.withValues(alpha: 0.3))),
               child: Row(children: [
                 const Icon(Icons.warning_amber, color: AC.warn, size: 16),
                 const SizedBox(width: 6),
@@ -245,7 +245,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
 
   Widget _metaBadge(String text, Color color) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-    decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+    decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
     child: Text(text, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w600)),
   );
 
@@ -272,7 +272,7 @@ class _CopilotScreenState extends State<CopilotScreen> {
         child: ActionChip(
           avatar: Icon(_getIcon(a['icon'] ?? ''), color: AC.gold, size: 15),
           label: Text(a['label'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 11)),
-          backgroundColor: AC.navy3, side: BorderSide(color: AC.gold.withOpacity(0.3)),
+          backgroundColor: AC.navy3, side: BorderSide(color: AC.gold.withValues(alpha: 0.3)),
           onPressed: () { _controller.text = a['label'] ?? ''; _sendMessage(); },
         ),
       )).toList()),

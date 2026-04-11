@@ -54,9 +54,9 @@ class EscalationBanner extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AC.warn.withOpacity(0.08),
+        color: AC.warn.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AC.warn.withOpacity(0.4)),
+        border: Border.all(color: AC.warn.withValues(alpha: 0.4)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [

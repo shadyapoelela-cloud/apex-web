@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
+import 'package:go_router/go_router.dart';
+import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/shared_constants.dart';
-import '../../client_create.dart';
-import 'coa_screens.dart';
-import '../clients/client_detail_screen.dart';
-
-final _api = apiBase;
 
 // ── 1. Client List Screen ──
 class ClientListScreen extends StatefulWidget {
@@ -23,9 +17,9 @@ class _ClientListS extends State<ClientListScreen> {
 
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/clients'), headers: S.h());
-      if (r.statusCode == 200) {
-        final d = jsonDecode(r.body);
+      final res = await ApiService.listClients();
+      if (res.success) {
+        final d = res.data;
         setState(() {
           _clients = d is List ? d : (d['clients'] ?? []);
           _ld = false;
@@ -40,7 +34,7 @@ class _ClientListS extends State<ClientListScreen> {
     appBar: AppBar(title: const Text('العملاء', style: TextStyle(color: AC.gold)),
       actions: [IconButton(icon: const Icon(Icons.add_circle, color: AC.gold),
         onPressed: () async {
-          final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen2()));
+          final created = await context.push('/clients/create');
           if (created == true) _load();
         })]),
     body: _ld ? const Center(child: CircularProgressIndicator(color: AC.gold))
@@ -54,7 +48,7 @@ class _ClientListS extends State<ClientListScreen> {
               icon: const Icon(Icons.add),
               label: const Text('إنشاء عميل جديد'),
               onPressed: () async {
-                final created = await Navigator.push(c, MaterialPageRoute(builder: (_) => const ClientCreateScreen2()));
+                final created = await context.push('/clients/create');
                 if (created == true) _load();
               }),
           ]))
@@ -66,8 +60,7 @@ class _ClientListS extends State<ClientListScreen> {
               final cl = _clients[i];
               final km = cl['knowledge_mode'] == true;
               return InkWell(
-              onTap: () => Navigator.push(c, MaterialPageRoute(
-                builder: (_) => ClientDetailScreen(clientId: cl['id'], clientName: cl['name_ar'] ?? cl['name'] ?? ''))),
+              onTap: () => context.push('/client-detail', extra: {'id': cl['id'], 'name': cl['name_ar'] ?? cl['name'] ?? ''}),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 padding: const EdgeInsets.all(16),
@@ -77,7 +70,7 @@ class _ClientListS extends State<ClientListScreen> {
                   border: Border.all(color: Colors.white12),
                 ),
                 child: Row(children: [
-                  CircleAvatar(backgroundColor: AC.gold.withOpacity(0.2),
+                  CircleAvatar(backgroundColor: AC.gold.withValues(alpha: 0.2),
                     child: Text((cl['name_ar'] ?? cl['name'] ?? '?')[0], style: TextStyle(color: AC.gold))),
                   const SizedBox(width: 16),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -114,14 +107,16 @@ class _ClientCreateS extends State<ClientCreateScreen> {
     }
     setState(() { _ld = true; _err = null; });
     try {
-      final r = await http.post(Uri.parse('$_api/clients'),
-        headers: {...S.h(), 'Content-Type': 'application/json'},
-        body: jsonEncode({'name_ar': _nameC.text.trim(), 'client_type_code': _selectedType}));
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
+      final res = await ApiService.createClient(
+        clientCode: _nameC.text.trim().replaceAll(' ', '_'),
+        name: _nameC.text.trim(),
+        clientType: _selectedType!,
+        nameAr: _nameC.text.trim(),
+      );
+      if (res.success) {
         if (mounted) Navigator.pop(context, true);
       } else {
-        setState(() { _err = d['detail'] ?? 'فشل'; _ld = false; });
+        setState(() { _err = res.error ?? 'فشل'; _ld = false; });
       }
     } catch (e) { setState(() { _err = e.toString(); _ld = false; }); }
   }
@@ -218,7 +213,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: sel ? AC.gold.withOpacity(0.15) : AC.navy3,
+          color: sel ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
           border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -238,7 +233,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
             if (isKm)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                 child: Text('معرفي', style: TextStyle(color: AC.gold, fontSize: 10)),
               ),
           ],

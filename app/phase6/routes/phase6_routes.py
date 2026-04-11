@@ -26,11 +26,13 @@ def require_admin(user: dict = Depends(get_current_user)):
 class UpdateUserStatusReq(BaseModel):
     new_status: str
 
+
 class AssignRoleReq(BaseModel):
     role_code: str
 
 
 # ─── Dashboard ───────────────────────────────────────────────
+
 
 @router.get("/stats")
 async def platform_stats(user: dict = Depends(require_admin)):
@@ -41,9 +43,14 @@ async def platform_stats(user: dict = Depends(require_admin)):
 
 # ─── User Management ─────────────────────────────────────────
 
+
 @router.get("/users")
-async def list_users(status: Optional[str] = None, search: Optional[str] = None,
-                     limit: int = Query(50, le=200), user: dict = Depends(require_admin)):
+async def list_users(
+    status: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = Query(50, le=200),
+    user: dict = Depends(require_admin),
+):
     result = admin.list_users(status=status, search=search, limit=limit)
     return {"success": True, "data": result}
 
@@ -51,29 +58,37 @@ async def list_users(status: Optional[str] = None, search: Optional[str] = None,
 @router.post("/users/{uid}/status")
 async def update_user_status(uid: str, req: UpdateUserStatusReq, user: dict = Depends(require_admin)):
     result = admin.update_user_status(uid, req.new_status, user["sub"])
-    if not result["success"]: raise HTTPException(400, result["error"])
+    if not result["success"]:
+        raise HTTPException(400, result["error"])
     return result
 
 
 @router.post("/users/{uid}/roles/assign")
 async def assign_role(uid: str, req: AssignRoleReq, user: dict = Depends(require_admin)):
     result = admin.assign_role(uid, req.role_code, user["sub"])
-    if not result["success"]: raise HTTPException(400, result["error"])
+    if not result["success"]:
+        raise HTTPException(400, result["error"])
     return result
 
 
 @router.post("/users/{uid}/roles/remove")
 async def remove_role(uid: str, req: AssignRoleReq, user: dict = Depends(require_admin)):
     result = admin.remove_role(uid, req.role_code, user["sub"])
-    if not result["success"]: raise HTTPException(400, result["error"])
+    if not result["success"]:
+        raise HTTPException(400, result["error"])
     return result
 
 
 # ─── Audit Log ───────────────────────────────────────────────
 
+
 @router.get("/audit-log")
-async def get_audit_log(user_id: Optional[str] = None, action: Optional[str] = None,
-                        limit: int = Query(100, le=500), user: dict = Depends(require_admin)):
+async def get_audit_log(
+    user_id: Optional[str] = None,
+    action: Optional[str] = None,
+    limit: int = Query(100, le=500),
+    user: dict = Depends(require_admin),
+):
     result = admin.get_audit_log(user_id=user_id, action=action, limit=limit)
     return {"success": True, "data": result}
 

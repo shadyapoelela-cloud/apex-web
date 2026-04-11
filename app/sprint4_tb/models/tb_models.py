@@ -13,13 +13,23 @@ Per Apex_Coa_First_Workflow_Execution_Document §6.5, §6.6, §8.6, §8.7
 
 import enum
 from sqlalchemy import (
-    Column, String, Boolean, Integer, Float,
-    DateTime, Text, ForeignKey, JSON, Index, UniqueConstraint, BigInteger,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    Float,
+    DateTime,
+    Text,
+    ForeignKey,
+    JSON,
+    Index,
+    UniqueConstraint,
+    BigInteger,
 )
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
-
 # ─── Enums ───
+
 
 class TbUploadStatus(str, enum.Enum):
     uploaded = "uploaded"
@@ -49,8 +59,10 @@ class TbMatchType(str, enum.Enum):
 # Table: trial_balance_uploads
 # ═══════════════════════════════════════════════════════════
 
+
 class TrialBalanceUpload(Base):
     """TB upload record — tracks file, period, and linked approved COA."""
+
     __tablename__ = "trial_balance_uploads"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
@@ -99,12 +111,16 @@ class TrialBalanceUpload(Base):
 # Table: tb_parsed_rows
 # ═══════════════════════════════════════════════════════════
 
+
 class TbParsedRow(Base):
     """Individual parsed row from a trial balance file."""
+
     __tablename__ = "tb_parsed_rows"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    tb_upload_id = Column(String(36), ForeignKey("trial_balance_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
+    tb_upload_id = Column(
+        String(36), ForeignKey("trial_balance_uploads.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     source_row_number = Column(Integer, nullable=False)
 
     # Raw fields from file
@@ -140,12 +156,16 @@ class TbParsedRow(Base):
 # Table: tb_binding_results
 # ═══════════════════════════════════════════════════════════
 
+
 class TbBindingResult(Base):
     """Result of binding a TB row to an approved COA account."""
+
     __tablename__ = "tb_binding_results"
 
     id = Column(String(36), primary_key=True, default=gen_uuid)
-    tb_upload_id = Column(String(36), ForeignKey("trial_balance_uploads.id", ondelete="CASCADE"), nullable=False, index=True)
+    tb_upload_id = Column(
+        String(36), ForeignKey("trial_balance_uploads.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     tb_row_id = Column(String(36), ForeignKey("tb_parsed_rows.id"), nullable=False)
     coa_account_id = Column(String(36), ForeignKey("client_chart_of_accounts.id"), nullable=True)
 
@@ -187,6 +207,7 @@ class TbBindingResult(Base):
 def init_sprint4_tb_db():
     """Create Sprint 4 TB tables."""
     from app.phase1.models.platform_models import engine
+
     TrialBalanceUpload.__table__.create(bind=engine, checkfirst=True)
     TbParsedRow.__table__.create(bind=engine, checkfirst=True)
     TbBindingResult.__table__.create(bind=engine, checkfirst=True)

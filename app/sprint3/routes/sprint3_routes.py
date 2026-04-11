@@ -13,7 +13,8 @@ APIs:
   DELETE /coa/rules/{rule_id}              — Deactivate rule
 """
 
-import json, logging
+import json
+import logging
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -21,8 +22,8 @@ from datetime import datetime, timezone
 from sqlalchemy import text as _t
 from app.core.db_utils import get_db_session
 
-
 # ── Request Models ──────────────────────────────────────────
+
 
 class ApproveCoaBody(BaseModel):
     approved_by: Optional[str] = None
@@ -50,12 +51,14 @@ class CreateClientRuleBody(BaseModel):
     rule_type: str = Field(default="alias")
     created_by: Optional[str] = None
 
+
 router = APIRouter(tags=["Sprint 3 — COA Quality & Review"])
 
 
 # ═══════════════════════════════════════════════════════════
 # POST /coa/uploads/{upload_id}/assess
 # ═══════════════════════════════════════════════════════════
+
 
 @router.post("/coa/uploads/{upload_id}/assess")
 def assess_coa_quality(upload_id: str, activity: str = Query("general")):
@@ -66,9 +69,9 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
     db = get_db_session()
     try:
         # Verify upload exists and is classified
-        upload_row = db.execute(_t(
-            "SELECT id, client_id, upload_status FROM client_coa_uploads WHERE id = :uid"
-        ), {"uid": upload_id}).fetchone()
+        upload_row = db.execute(
+            _t("SELECT id, client_id, upload_status FROM client_coa_uploads WHERE id = :uid"), {"uid": upload_id}
+        ).fetchone()
 
         if not upload_row:
             raise HTTPException(404, "Upload not found")
@@ -76,8 +79,8 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
         client_id = upload_row[1]
 
         # Get classified accounts
-        rows = db.execute(_t(
-            """SELECT id, account_code, account_name_raw, account_name_normalized,
+        rows = db.execute(
+            _t("""SELECT id, account_code, account_name_raw, account_name_normalized,
                       parent_code, parent_name, account_level, account_type_raw,
                       normal_balance, normalized_class, statement_section, subcategory,
                       current_noncurrent, cashflow_role, sign_rule,
@@ -85,25 +88,37 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
                       issues_json, classification_issues_json
                FROM client_chart_of_accounts
                WHERE coa_upload_id = :uid AND record_status != 'rejected'
-               ORDER BY source_row_number"""
-        ), {"uid": upload_id}).fetchall()
+               ORDER BY source_row_number"""),
+            {"uid": upload_id},
+        ).fetchall()
 
         if not rows:
             raise HTTPException(400, "No accounts found. Parse and classify first.")
 
         accounts = []
         for r in rows:
-            accounts.append({
-                "id": r[0], "account_code": r[1],
-                "account_name_raw": r[2], "account_name_normalized": r[3],
-                "parent_code": r[4], "parent_name": r[5],
-                "account_level": r[6], "account_type_raw": r[7],
-                "normal_balance": r[8], "normalized_class": r[9],
-                "statement_section": r[10], "subcategory": r[11],
-                "current_noncurrent": r[12], "cashflow_role": r[13],
-                "sign_rule": r[14], "mapping_confidence": r[15] or 0,
-                "mapping_source": r[16], "record_status": r[17],
-            })
+            accounts.append(
+                {
+                    "id": r[0],
+                    "account_code": r[1],
+                    "account_name_raw": r[2],
+                    "account_name_normalized": r[3],
+                    "parent_code": r[4],
+                    "parent_name": r[5],
+                    "account_level": r[6],
+                    "account_type_raw": r[7],
+                    "normal_balance": r[8],
+                    "normalized_class": r[9],
+                    "statement_section": r[10],
+                    "subcategory": r[11],
+                    "current_noncurrent": r[12],
+                    "cashflow_role": r[13],
+                    "sign_rule": r[14],
+                    "mapping_confidence": r[15] or 0,
+                    "mapping_source": r[16],
+                    "record_status": r[17],
+                }
+            )
 
         # Run assessment
         result = run_full_assessment(accounts, activity)
@@ -115,13 +130,13 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
 
         # Upsert assessment record
         now = datetime.now(timezone.utc).isoformat()
-        existing = db.execute(_t(
-            "SELECT id FROM client_coa_assessments WHERE coa_upload_id = :uid"
-        ), {"uid": upload_id}).fetchone()
+        existing = db.execute(
+            _t("SELECT id FROM client_coa_assessments WHERE coa_upload_id = :uid"), {"uid": upload_id}
+        ).fetchone()
 
         if existing:
-            db.execute(_t(
-                """UPDATE client_coa_assessments SET
+            db.execute(
+                _t("""UPDATE client_coa_assessments SET
                     overall_score = :os, completeness_score = :cs, consistency_score = :cons,
                     naming_clarity_score = :ns, duplication_risk_score = :ds,
                     reporting_readiness_score = :rs,
@@ -131,23 +146,30 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
                     issues_json = :ij, recommendations_json = :rj,
                     missing_categories_json = :mcj, ambiguous_accounts_json = :aaj,
                     duplicate_suspects_json = :dsj
-                WHERE coa_upload_id = :uid"""
-            ), {
-                "os": result["overall_score"], "cs": result["completeness_score"],
-                "cons": result["consistency_score"], "ns": result["naming_clarity_score"],
-                "ds": result["duplication_risk_score"], "rs": result["reporting_readiness_score"],
-                "ta": len(accounts), "ca": high_conf + low_conf,
-                "hc": high_conf, "lc": low_conf, "uc": unclassified,
-                "ij": json.dumps(result["issues"]),
-                "rj": json.dumps(result["recommendations"]),
-                "mcj": json.dumps(result["completeness"]["missing_categories"]),
-                "aaj": json.dumps(result["naming_clarity"]["ambiguous_accounts"][:20]),
-                "dsj": json.dumps(result["duplication_risk"]["duplicate_suspects"][:20]),
-                "uid": upload_id,
-            })
+                WHERE coa_upload_id = :uid"""),
+                {
+                    "os": result["overall_score"],
+                    "cs": result["completeness_score"],
+                    "cons": result["consistency_score"],
+                    "ns": result["naming_clarity_score"],
+                    "ds": result["duplication_risk_score"],
+                    "rs": result["reporting_readiness_score"],
+                    "ta": len(accounts),
+                    "ca": high_conf + low_conf,
+                    "hc": high_conf,
+                    "lc": low_conf,
+                    "uc": unclassified,
+                    "ij": json.dumps(result["issues"]),
+                    "rj": json.dumps(result["recommendations"]),
+                    "mcj": json.dumps(result["completeness"]["missing_categories"]),
+                    "aaj": json.dumps(result["naming_clarity"]["ambiguous_accounts"][:20]),
+                    "dsj": json.dumps(result["duplication_risk"]["duplicate_suspects"][:20]),
+                    "uid": upload_id,
+                },
+            )
         else:
-            db.execute(_t(
-                """INSERT INTO client_coa_assessments
+            db.execute(
+                _t("""INSERT INTO client_coa_assessments
                    (id, client_id, coa_upload_id,
                     overall_score, completeness_score, consistency_score,
                     naming_clarity_score, duplication_risk_score, reporting_readiness_score,
@@ -156,44 +178,56 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
                     issues_json, recommendations_json, missing_categories_json,
                     ambiguous_accounts_json, duplicate_suspects_json, created_at)
                    VALUES (:id, :cid, :uid, :os, :cs, :cons, :ns, :ds, :rs,
-                           :ta, :ca, :hc, :lc, :uc, :ij, :rj, :mcj, :aaj, :dsj, :now)"""
-            ), {
-                "id": gen_uuid(), "cid": client_id, "uid": upload_id,
-                "os": result["overall_score"], "cs": result["completeness_score"],
-                "cons": result["consistency_score"], "ns": result["naming_clarity_score"],
-                "ds": result["duplication_risk_score"], "rs": result["reporting_readiness_score"],
-                "ta": len(accounts), "ca": high_conf + low_conf,
-                "hc": high_conf, "lc": low_conf, "uc": unclassified,
-                "ij": json.dumps(result["issues"]),
-                "rj": json.dumps(result["recommendations"]),
-                "mcj": json.dumps(result["completeness"]["missing_categories"]),
-                "aaj": json.dumps(result["naming_clarity"]["ambiguous_accounts"][:20]),
-                "dsj": json.dumps(result["duplication_risk"]["duplicate_suspects"][:20]),
-                "now": now,
-            })
+                           :ta, :ca, :hc, :lc, :uc, :ij, :rj, :mcj, :aaj, :dsj, :now)"""),
+                {
+                    "id": gen_uuid(),
+                    "cid": client_id,
+                    "uid": upload_id,
+                    "os": result["overall_score"],
+                    "cs": result["completeness_score"],
+                    "cons": result["consistency_score"],
+                    "ns": result["naming_clarity_score"],
+                    "ds": result["duplication_risk_score"],
+                    "rs": result["reporting_readiness_score"],
+                    "ta": len(accounts),
+                    "ca": high_conf + low_conf,
+                    "hc": high_conf,
+                    "lc": low_conf,
+                    "uc": unclassified,
+                    "ij": json.dumps(result["issues"]),
+                    "rj": json.dumps(result["recommendations"]),
+                    "mcj": json.dumps(result["completeness"]["missing_categories"]),
+                    "aaj": json.dumps(result["naming_clarity"]["ambiguous_accounts"][:20]),
+                    "dsj": json.dumps(result["duplication_risk"]["duplicate_suspects"][:20]),
+                    "now": now,
+                },
+            )
 
         db.commit()
 
-        return {"success": True, "data": {
-            "upload_id": upload_id,
-            "overall_score": result["overall_score"],
-            "completeness_score": result["completeness_score"],
-            "consistency_score": result["consistency_score"],
-            "naming_clarity_score": result["naming_clarity_score"],
-            "duplication_risk_score": result["duplication_risk_score"],
-            "reporting_readiness_score": result["reporting_readiness_score"],
-            "total_accounts": len(accounts),
-            "high_confidence": high_conf,
-            "low_confidence": low_conf,
-            "unclassified": unclassified,
-            "missing_categories": result["completeness"]["missing_categories"],
-            "recommendations": result["recommendations"],
-            "reporting_readiness": result["reporting_readiness"]["readiness"],
-            "issues_count": len(result["issues"]),
-        }}
+        return {
+            "success": True,
+            "data": {
+                "upload_id": upload_id,
+                "overall_score": result["overall_score"],
+                "completeness_score": result["completeness_score"],
+                "consistency_score": result["consistency_score"],
+                "naming_clarity_score": result["naming_clarity_score"],
+                "duplication_risk_score": result["duplication_risk_score"],
+                "reporting_readiness_score": result["reporting_readiness_score"],
+                "total_accounts": len(accounts),
+                "high_confidence": high_conf,
+                "low_confidence": low_conf,
+                "unclassified": unclassified,
+                "missing_categories": result["completeness"]["missing_categories"],
+                "recommendations": result["recommendations"],
+                "reporting_readiness": result["reporting_readiness"]["readiness"],
+                "issues_count": len(result["issues"]),
+            },
+        }
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("COA assessment error", exc_info=True)
         raise HTTPException(500, "COA quality assessment failed")
     finally:
@@ -204,20 +238,22 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
 # GET /coa/uploads/{upload_id}/assessment
 # ═══════════════════════════════════════════════════════════
 
+
 @router.get("/coa/uploads/{upload_id}/assessment")
 def get_assessment(upload_id: str):
     """Get stored quality assessment for a COA upload."""
     db = get_db_session()
     try:
-        row = db.execute(_t(
-            """SELECT overall_score, completeness_score, consistency_score,
+        row = db.execute(
+            _t("""SELECT overall_score, completeness_score, consistency_score,
                       naming_clarity_score, duplication_risk_score, reporting_readiness_score,
                       total_accounts, classified_accounts,
                       high_confidence_count, low_confidence_count, unclassified_count,
                       issues_json, recommendations_json, missing_categories_json,
                       ambiguous_accounts_json, duplicate_suspects_json, created_at
-               FROM client_coa_assessments WHERE coa_upload_id = :uid"""
-        ), {"uid": upload_id}).fetchone()
+               FROM client_coa_assessments WHERE coa_upload_id = :uid"""),
+            {"uid": upload_id},
+        ).fetchone()
 
         if not row:
             raise HTTPException(404, "Assessment not found. Run POST /coa/uploads/{upload_id}/assess first.")
@@ -227,26 +263,29 @@ def get_assessment(upload_id: str):
                 return json.loads(val)
             return val or []
 
-        return {"success": True, "data": {
-            "upload_id": upload_id,
-            "overall_score": row[0],
-            "completeness_score": row[1],
-            "consistency_score": row[2],
-            "naming_clarity_score": row[3],
-            "duplication_risk_score": row[4],
-            "reporting_readiness_score": row[5],
-            "total_accounts": row[6],
-            "classified_accounts": row[7],
-            "high_confidence_count": row[8],
-            "low_confidence_count": row[9],
-            "unclassified_count": row[10],
-            "issues": _parse(row[11]),
-            "recommendations": _parse(row[12]),
-            "missing_categories": _parse(row[13]),
-            "ambiguous_accounts": _parse(row[14]),
-            "duplicate_suspects": _parse(row[15]),
-            "assessed_at": str(row[16]) if row[16] else None,
-        }}
+        return {
+            "success": True,
+            "data": {
+                "upload_id": upload_id,
+                "overall_score": row[0],
+                "completeness_score": row[1],
+                "consistency_score": row[2],
+                "naming_clarity_score": row[3],
+                "duplication_risk_score": row[4],
+                "reporting_readiness_score": row[5],
+                "total_accounts": row[6],
+                "classified_accounts": row[7],
+                "high_confidence_count": row[8],
+                "low_confidence_count": row[9],
+                "unclassified_count": row[10],
+                "issues": _parse(row[11]),
+                "recommendations": _parse(row[12]),
+                "missing_categories": _parse(row[13]),
+                "ambiguous_accounts": _parse(row[14]),
+                "duplicate_suspects": _parse(row[15]),
+                "assessed_at": str(row[16]) if row[16] else None,
+            },
+        }
     finally:
         db.close()
 
@@ -255,6 +294,7 @@ def get_assessment(upload_id: str):
 # POST /coa/uploads/{upload_id}/approve-coa
 # ═══════════════════════════════════════════════════════════
 
+
 @router.get("/coa/uploads/{upload_id}/approval-check", tags=["Phase1-Gates"])
 def check_coa_approval_readiness(upload_id: str):
     """Check all approval gates before allowing final COA approve."""
@@ -262,19 +302,30 @@ def check_coa_approval_readiness(upload_id: str):
 
     db = get_db_session()
     try:
-        scores_row = db.execute(_t(
-            "SELECT overall_score, completeness_score, reporting_readiness_score "
-            "FROM client_coa_assessments WHERE coa_upload_id = :uid"
-        ), {"uid": upload_id}).fetchone()
+        scores_row = db.execute(
+            _t(
+                "SELECT overall_score, completeness_score, reporting_readiness_score "
+                "FROM client_coa_assessments WHERE coa_upload_id = :uid"
+            ),
+            {"uid": upload_id},
+        ).fetchone()
 
         if not scores_row:
-            return {"success": True, "data": {"can_approve": False, "blockers": ["Run quality assessment first"], "quality_overall": 0}}
+            return {
+                "success": True,
+                "data": {"can_approve": False, "blockers": ["Run quality assessment first"], "quality_overall": 0},
+            }
 
-        quality_scores = {"overall": scores_row[0] or 0, "completeness": scores_row[1] or 0, "reporting": scores_row[2] or 0}
+        quality_scores = {
+            "overall": scores_row[0] or 0,
+            "completeness": scores_row[1] or 0,
+            "reporting": scores_row[2] or 0,
+        }
 
-        rows = db.execute(_t(
-            "SELECT record_status, normalized_class FROM client_chart_of_accounts WHERE coa_upload_id = :uid"
-        ), {"uid": upload_id}).fetchall()
+        rows = db.execute(
+            _t("SELECT record_status, normalized_class FROM client_chart_of_accounts WHERE coa_upload_id = :uid"),
+            {"uid": upload_id},
+        ).fetchall()
         accounts = [{"status": r[0], "normalized_class": r[1]} for r in rows]
 
         result = check_approval_gates(accounts, quality_scores)
@@ -290,9 +341,9 @@ def approve_coa(upload_id: str, body: ApproveCoaBody = ApproveCoaBody()):
 
     db = get_db_session()
     try:
-        upload_row = db.execute(_t(
-            "SELECT client_id FROM client_coa_uploads WHERE id = :uid"
-        ), {"uid": upload_id}).fetchone()
+        upload_row = db.execute(
+            _t("SELECT client_id FROM client_coa_uploads WHERE id = :uid"), {"uid": upload_id}
+        ).fetchone()
         if not upload_row:
             raise HTTPException(404, "Upload not found")
     finally:
@@ -315,6 +366,7 @@ def approve_coa(upload_id: str, body: ApproveCoaBody = ApproveCoaBody()):
 # POST /coa/uploads/{upload_id}/reject-coa
 # ═══════════════════════════════════════════════════════════
 
+
 @router.post("/coa/uploads/{upload_id}/reject-coa")
 def reject_coa(upload_id: str, body: RejectCoaBody = RejectCoaBody()):
     """Return COA upload for review/revision."""
@@ -322,9 +374,9 @@ def reject_coa(upload_id: str, body: RejectCoaBody = RejectCoaBody()):
 
     db = get_db_session()
     try:
-        upload_row = db.execute(_t(
-            "SELECT client_id FROM client_coa_uploads WHERE id = :uid"
-        ), {"uid": upload_id}).fetchone()
+        upload_row = db.execute(
+            _t("SELECT client_id FROM client_coa_uploads WHERE id = :uid"), {"uid": upload_id}
+        ).fetchone()
         if not upload_row:
             raise HTTPException(404, "Upload not found")
     finally:
@@ -345,16 +397,19 @@ def reject_coa(upload_id: str, body: RejectCoaBody = RejectCoaBody()):
 # GET /coa/uploads/{upload_id}/approval-history
 # ═══════════════════════════════════════════════════════════
 
+
 @router.get("/coa/uploads/{upload_id}/approval-history")
 def approval_history(upload_id: str):
     """Get approval/rejection history for a COA upload."""
     from app.sprint3.services.coa_review_service import get_approval_history
+
     return get_approval_history(upload_id)
 
 
 # ═══════════════════════════════════════════════════════════
 # Client Rules
 # ═══════════════════════════════════════════════════════════
+
 
 @router.post("/coa/accounts/{account_id}/create-rule")
 def create_rule_from_account(account_id: str, body: CreateRuleFromAccountBody = CreateRuleFromAccountBody()):
@@ -363,11 +418,12 @@ def create_rule_from_account(account_id: str, body: CreateRuleFromAccountBody = 
 
     db = get_db_session()
     try:
-        row = db.execute(_t(
-            """SELECT client_id, coa_upload_id, account_name_raw, normalized_class,
+        row = db.execute(
+            _t("""SELECT client_id, coa_upload_id, account_name_raw, normalized_class,
                       statement_section, subcategory
-               FROM client_chart_of_accounts WHERE id = :aid"""
-        ), {"aid": account_id}).fetchone()
+               FROM client_chart_of_accounts WHERE id = :aid"""),
+            {"aid": account_id},
+        ).fetchone()
         if not row:
             raise HTTPException(404, "Account not found")
 
@@ -375,15 +431,23 @@ def create_rule_from_account(account_id: str, body: CreateRuleFromAccountBody = 
         rule_name = body.rule_name if body.rule_name is not None else f"قاعدة مخصصة: {(row[2] or '')[:40]}"
         rule_type = body.rule_type if body.rule_type is not None else "classification_override"
 
-        condition = body.condition if body.condition is not None else {
-            "field": "account_name_raw",
-            "contains": row[2],
-        }
-        action = body.action if body.action is not None else {
-            "set_class": row[3],
-            "set_section": row[4],
-            "set_subcategory": row[5],
-        }
+        condition = (
+            body.condition
+            if body.condition is not None
+            else {
+                "field": "account_name_raw",
+                "contains": row[2],
+            }
+        )
+        action = (
+            body.action
+            if body.action is not None
+            else {
+                "set_class": row[3],
+                "set_section": row[4],
+                "set_subcategory": row[5],
+            }
+        )
     finally:
         db.close()
 
@@ -407,6 +471,7 @@ def create_rule_from_account(account_id: str, body: CreateRuleFromAccountBody = 
 def get_client_rules(client_id: str, active_only: bool = Query(True)):
     """List classification rules for a client."""
     from app.sprint3.services.coa_review_service import list_client_rules
+
     return list_client_rules(client_id, active_only)
 
 

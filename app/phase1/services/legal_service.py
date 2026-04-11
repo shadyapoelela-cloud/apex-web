@@ -8,8 +8,11 @@ Per execution document section 15.
 import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
-    PolicyDocument, PolicyAcceptanceLog, PolicyType,
-    SessionLocal, gen_uuid, utcnow,
+    PolicyDocument,
+    PolicyAcceptanceLog,
+    PolicyType,
+    SessionLocal,
+    gen_uuid,
 )
 
 
@@ -19,18 +22,24 @@ class LegalService:
         """Get all current (latest version) policies."""
         db = SessionLocal()
         try:
-            policies = db.query(PolicyDocument).filter(
-                PolicyDocument.is_current == True
-            ).order_by(PolicyDocument.policy_type).all()
-            return [{
-                "id": p.id,
-                "type": p.policy_type,
-                "version": p.version,
-                "title_ar": p.title_ar,
-                "title_en": p.title_en,
-                "content_ar": p.content_ar,
-                "effective_from": p.effective_from.isoformat() if p.effective_from else None,
-            } for p in policies]
+            policies = (
+                db.query(PolicyDocument)
+                .filter(PolicyDocument.is_current == True)
+                .order_by(PolicyDocument.policy_type)
+                .all()
+            )
+            return [
+                {
+                    "id": p.id,
+                    "type": p.policy_type,
+                    "version": p.version,
+                    "title_ar": p.title_ar,
+                    "title_en": p.title_en,
+                    "content_ar": p.content_ar,
+                    "effective_from": p.effective_from.isoformat() if p.effective_from else None,
+                }
+                for p in policies
+            ]
         finally:
             db.close()
 
@@ -63,8 +72,11 @@ class LegalService:
             db.close()
 
     def accept_policy(
-        self, user_id: str, policy_document_id: str,
-        ip_address: Optional[str] = None, user_agent: Optional[str] = None,
+        self,
+        user_id: str,
+        policy_document_id: str,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
     ) -> dict:
         """Log user accepting a specific policy version."""
         db = SessionLocal()
@@ -74,24 +86,35 @@ class LegalService:
                 return {"success": False, "error": "السياسة غير موجودة"}
 
             # Check if already accepted this version
-            existing = db.query(PolicyAcceptanceLog).filter(
-                PolicyAcceptanceLog.user_id == user_id,
-                PolicyAcceptanceLog.policy_document_id == policy_document_id,
-            ).first()
+            existing = (
+                db.query(PolicyAcceptanceLog)
+                .filter(
+                    PolicyAcceptanceLog.user_id == user_id,
+                    PolicyAcceptanceLog.policy_document_id == policy_document_id,
+                )
+                .first()
+            )
             if existing:
                 return {"success": True, "message": "تم قبول هذه السياسة مسبقاً", "already_accepted": True}
 
-            db.add(PolicyAcceptanceLog(
-                id=gen_uuid(),
-                user_id=user_id,
-                policy_document_id=policy_document_id,
-                accepted_ip=ip_address,
-                accepted_user_agent=user_agent,
-            ))
+            db.add(
+                PolicyAcceptanceLog(
+                    id=gen_uuid(),
+                    user_id=user_id,
+                    policy_document_id=policy_document_id,
+                    accepted_ip=ip_address,
+                    accepted_user_agent=user_agent,
+                )
+            )
             db.commit()
 
-            return {"success": True, "message": "تم تسجيل القبول", "policy_type": policy.policy_type, "version": policy.version}
-        except Exception as e:
+            return {
+                "success": True,
+                "message": "تم تسجيل القبول",
+                "policy_type": policy.policy_type,
+                "version": policy.version,
+            }
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -114,25 +137,35 @@ class LegalService:
         try:
             missing = []
             for ptype in required_types:
-                current = db.query(PolicyDocument).filter(
-                    PolicyDocument.policy_type == ptype,
-                    PolicyDocument.is_current == True,
-                ).first()
+                current = (
+                    db.query(PolicyDocument)
+                    .filter(
+                        PolicyDocument.policy_type == ptype,
+                        PolicyDocument.is_current == True,
+                    )
+                    .first()
+                )
                 if not current:
                     continue
 
-                accepted = db.query(PolicyAcceptanceLog).filter(
-                    PolicyAcceptanceLog.user_id == user_id,
-                    PolicyAcceptanceLog.policy_document_id == current.id,
-                ).first()
+                accepted = (
+                    db.query(PolicyAcceptanceLog)
+                    .filter(
+                        PolicyAcceptanceLog.user_id == user_id,
+                        PolicyAcceptanceLog.policy_document_id == current.id,
+                    )
+                    .first()
+                )
 
                 if not accepted:
-                    missing.append({
-                        "policy_type": ptype,
-                        "policy_id": current.id,
-                        "title_ar": current.title_ar,
-                        "version": current.version,
-                    })
+                    missing.append(
+                        {
+                            "policy_type": ptype,
+                            "policy_id": current.id,
+                            "title_ar": current.title_ar,
+                            "version": current.version,
+                        }
+                    )
 
             return {
                 "all_accepted": len(missing) == 0,
@@ -145,19 +178,24 @@ class LegalService:
         """Get all policy acceptances for a user."""
         db = SessionLocal()
         try:
-            logs = db.query(PolicyAcceptanceLog).filter(
-                PolicyAcceptanceLog.user_id == user_id
-            ).order_by(PolicyAcceptanceLog.accepted_at.desc()).all()
+            logs = (
+                db.query(PolicyAcceptanceLog)
+                .filter(PolicyAcceptanceLog.user_id == user_id)
+                .order_by(PolicyAcceptanceLog.accepted_at.desc())
+                .all()
+            )
             result = []
             for log in logs:
                 policy = db.query(PolicyDocument).filter(PolicyDocument.id == log.policy_document_id).first()
-                result.append({
-                    "policy_type": policy.policy_type if policy else "unknown",
-                    "version": policy.version if policy else "unknown",
-                    "title_ar": policy.title_ar if policy else "",
-                    "accepted_at": log.accepted_at.isoformat(),
-                    "accepted_ip": log.accepted_ip,
-                })
+                result.append(
+                    {
+                        "policy_type": policy.policy_type if policy else "unknown",
+                        "version": policy.version if policy else "unknown",
+                        "title_ar": policy.title_ar if policy else "",
+                        "accepted_at": log.accepted_at.isoformat(),
+                        "accepted_ip": log.accepted_ip,
+                    }
+                )
             return result
         finally:
             db.close()

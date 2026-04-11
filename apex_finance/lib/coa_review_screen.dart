@@ -114,7 +114,7 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
               for (final f in [('all','الكل'),('low','ثقة متوسطة'),('unclassified','غير مصنف'),('manual','معدّل')]) Padding(padding: const EdgeInsets.only(left:8),
                 child: GestureDetector(onTap: () { setState(() => _filter = f.$1); _loadAccounts(reset: true); },
                   child: AnimatedContainer(duration: const Duration(milliseconds:150), padding: const EdgeInsets.symmetric(horizontal:10, vertical:4),
-                    decoration: BoxDecoration(color: _filter==f.$1?_gold.withOpacity(0.1):Colors.transparent, borderRadius: BorderRadius.circular(6), border: Border.all(color: _filter==f.$1?_gold:_border)),
+                    decoration: BoxDecoration(color: _filter==f.$1?_gold.withValues(alpha: 0.1):Colors.transparent, borderRadius: BorderRadius.circular(6), border: Border.all(color: _filter==f.$1?_gold:_border)),
                     child: Text(f.$2, style: TextStyle(fontSize:11, color:_filter==f.$1?_gold:_textSec, fontFamily:'Tajawal'))))),
             ])),
           // ── قائمة ──
@@ -131,14 +131,14 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
                   final color = conf>=0.75?_success:conf>=0.40?_warning:_danger;
                   final approved = acc['record_status']=='approved';
                   return Container(margin: const EdgeInsets.only(bottom:8), padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color: approved?_success.withOpacity(0.2):color.withOpacity(0.2))),
+                    decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color: approved?_success.withValues(alpha: 0.2):color.withValues(alpha: 0.2))),
                     child: Column(children: [
                       Row(children: [
                         approved ? const Icon(Icons.check_circle_rounded, color:Color(0xFF2ECC8A), size:22)
                           : GestureDetector(onTap: () async {
                               await ApiService.approveAccount(acc['id']);
                               _loadAccounts(reset: true);
-                            }, child: Container(width:28,height:28, decoration: BoxDecoration(shape:BoxShape.circle, border:Border.all(color:_success.withOpacity(0.4))), child: const Icon(Icons.check_rounded, color:Color(0xFF2ECC8A), size:16))),
+                            }, child: Container(width:28,height:28, decoration: BoxDecoration(shape:BoxShape.circle, border:Border.all(color:_success.withValues(alpha: 0.4))), child: const Icon(Icons.check_rounded, color:Color(0xFF2ECC8A), size:16))),
                         const SizedBox(width:10),
                         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('${(conf*100).toInt()}%', style: TextStyle(fontSize:12, fontWeight:FontWeight.w700, color:color, fontFamily:'Tajawal')),
@@ -153,8 +153,8 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
                       if (nc != '—' || ss.isNotEmpty) ...[
                         const SizedBox(height:6),
                         Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                          if (ss.isNotEmpty) Container(margin: const EdgeInsets.only(right:6), padding: const EdgeInsets.symmetric(horizontal:7,vertical:2), decoration: BoxDecoration(color:_gold.withOpacity(0.06), borderRadius:BorderRadius.circular(4), border:Border.all(color:_gold.withOpacity(0.15))), child: Text(ss, style: const TextStyle(fontSize:10, color:Color(0xFFC9A84C), fontFamily:'Tajawal'))),
-                          Container(padding: const EdgeInsets.symmetric(horizontal:7,vertical:2), decoration: BoxDecoration(color:color.withOpacity(0.08), borderRadius:BorderRadius.circular(4), border:Border.all(color:color.withOpacity(0.2))), child: Text(nc, style: TextStyle(fontSize:10, color:color, fontFamily:'Tajawal', fontWeight:FontWeight.w600))),
+                          if (ss.isNotEmpty) Container(margin: const EdgeInsets.only(right:6), padding: const EdgeInsets.symmetric(horizontal:7,vertical:2), decoration: BoxDecoration(color:_gold.withValues(alpha: 0.06), borderRadius:BorderRadius.circular(4), border:Border.all(color:_gold.withValues(alpha: 0.15))), child: Text(ss, style: const TextStyle(fontSize:10, color:Color(0xFFC9A84C), fontFamily:'Tajawal'))),
+                          Container(padding: const EdgeInsets.symmetric(horizontal:7,vertical:2), decoration: BoxDecoration(color:color.withValues(alpha: 0.08), borderRadius:BorderRadius.circular(4), border:Border.all(color:color.withValues(alpha: 0.2))), child: Text(nc, style: TextStyle(fontSize:10, color:color, fontFamily:'Tajawal', fontWeight:FontWeight.w600))),
                         ]),
                       ],
                     ]));
@@ -168,7 +168,7 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
             const SizedBox(height:10),
             GestureDetector(onTap: _approving ? null : _approveAll,
               child: Container(width:double.infinity, height:54,
-                decoration: BoxDecoration(gradient: const LinearGradient(colors:[Color(0xFF2ECC8A),Color(0xFF1A8C5C)]), borderRadius:BorderRadius.circular(14), boxShadow:[BoxShadow(color:_success.withOpacity(0.3), blurRadius:12, offset:const Offset(0,4))]),
+                decoration: BoxDecoration(gradient: const LinearGradient(colors:[Color(0xFF2ECC8A),Color(0xFF1A8C5C)]), borderRadius:BorderRadius.circular(14), boxShadow:[BoxShadow(color:_success.withValues(alpha: 0.3), blurRadius:12, offset:const Offset(0,4))]),
                 child: Center(child: _approving ? const SizedBox(width:22,height:22,child:CircularProgressIndicator(color:Colors.white,strokeWidth:2.5))
                   : const Row(mainAxisAlignment:MainAxisAlignment.center, children:[Icon(Icons.verified_rounded,color:Colors.white,size:20),SizedBox(width:8),Text('اعتماد شجرة الحسابات',style:TextStyle(color:Colors.white,fontSize:15,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
           ])),
@@ -176,6 +176,6 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
     );
   }
 
-  Widget _chip(String label, String value, Color color) => Container(padding: const EdgeInsets.symmetric(horizontal:8,vertical:4), decoration: BoxDecoration(color:color.withOpacity(0.08), borderRadius:BorderRadius.circular(6), border:Border.all(color:color.withOpacity(0.2))), child: Row(mainAxisSize:MainAxisSize.min, children:[Text(value,style:TextStyle(fontSize:13,fontWeight:FontWeight.w700,color:color,fontFamily:'Tajawal')),const SizedBox(width:4),Text(label,style:const TextStyle(fontSize:9,color:Color(0xFF8A8880),fontFamily:'Tajawal'))]));
+  Widget _chip(String label, String value, Color color) => Container(padding: const EdgeInsets.symmetric(horizontal:8,vertical:4), decoration: BoxDecoration(color:color.withValues(alpha: 0.08), borderRadius:BorderRadius.circular(6), border:Border.all(color:color.withValues(alpha: 0.2))), child: Row(mainAxisSize:MainAxisSize.min, children:[Text(value,style:TextStyle(fontSize:13,fontWeight:FontWeight.w700,color:color,fontFamily:'Tajawal')),const SizedBox(width:4),Text(label,style:const TextStyle(fontSize:9,color:Color(0xFF8A8880),fontFamily:'Tajawal'))]));
 }
 

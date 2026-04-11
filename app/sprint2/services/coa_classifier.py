@@ -18,8 +18,7 @@ Classification priority:
 5. Keyword/pattern matching
 """
 
-import re, json
-from typing import Optional
+import re
 from app.core.text_utils import remove_diacritics
 
 # ── Normalized Classes ──
@@ -48,7 +47,6 @@ ARABIC_RULES = [
     (r"ضريب.*مدفوع.*مقدم|ضريب.*مسترد", "asset", "current_assets", "prepaid_tax", 0.82),
     (r"عهد|سلف|أمانات.*مدين", "asset", "current_assets", "advances", 0.78),
     (r"استثمار.*قصير|ودائع.*قصير", "asset", "current_assets", "short_term_investments", 0.80),
-
     # Assets - Non-current
     (r"أص.*ثابت|ممتلكات|عقار|أراضي|أرض", "asset", "noncurrent_assets", "fixed_assets", 0.90),
     (r"مبان|مبنى|إنشاءات", "asset", "noncurrent_assets", "buildings", 0.90),
@@ -60,7 +58,6 @@ ARABIC_RULES = [
     (r"شهر.*تجاري|جودويل|goodwill", "asset", "noncurrent_assets", "goodwill", 0.85),
     (r"غير.*ملموس|برمجيات|براء", "asset", "noncurrent_assets", "intangible_assets", 0.82),
     (r"مشروع.*تحت.*التنفيذ|أعمال.*تحت", "asset", "noncurrent_assets", "work_in_progress", 0.80),
-
     # Liabilities - Current
     (r"ذمم.*دائن|موردي|دائنون", "liability", "current_liabilities", "accounts_payable", 0.90),
     (r"أوراق.*دفع", "liability", "current_liabilities", "notes_payable", 0.88),
@@ -70,12 +67,10 @@ ARABIC_RULES = [
     (r"إيراد.*مقدم|دفع.*مقدم.*عميل", "liability", "current_liabilities", "unearned_revenue", 0.82),
     (r"قرض.*قصير|تسهيل.*بنك", "liability", "current_liabilities", "short_term_loans", 0.82),
     (r"جزء.*متداول.*قرض", "liability", "current_liabilities", "current_portion_ltl", 0.80),
-
     # Liabilities - Non-current
     (r"قرض.*طويل|تمويل.*طويل", "liability", "noncurrent_liabilities", "long_term_loans", 0.85),
     (r"مكافأ.*نهاي|تعويض.*نهاي|مكاف.*خدم", "liability", "noncurrent_liabilities", "end_of_service", 0.90),
     (r"سند|صكوك", "liability", "noncurrent_liabilities", "bonds_payable", 0.78),
-
     # Equity
     (r"رأس.*مال|رأس مال", "equity", "equity", "share_capital", 0.95),
     (r"احتياطي|احتياط", "equity", "equity", "reserves", 0.88),
@@ -84,16 +79,13 @@ ARABIC_RULES = [
     (r"جاري.*شريك|جاري.*مالك|حساب.*شخصي", "equity", "equity", "owner_drawings", 0.82),
     (r"توزيع.*أرباح", "equity", "equity", "dividends", 0.85),
     (r"عالوة.*إصدار|عالو.*أسهم", "equity", "equity", "share_premium", 0.80),
-
     # Revenue
     (r"إيراد.*تشغيل|إيراد.*رئيسي|مبيعات", "revenue", "operating_revenue", "operating_revenue", 0.92),
     (r"إيراد.*خدم", "revenue", "operating_revenue", "service_revenue", 0.90),
     (r"إيراد.*أخر|إيراد.*متنوع|إيراد.*استثمار", "revenue", "other_revenue", "other_revenue", 0.78),
     (r"خصم.*مسموح|مردود.*مبيع|خصم.*تجاري", "contra", "contra_revenue", "sales_returns_discounts", 0.85),
-
     # Expenses - COGS
     (r"تكلف.*مبيع|تكلف.*بضاع|كلف.*إيراد", "expense", "cost_of_revenue", "cost_of_revenue", 0.92),
-
     # Expenses - Operating
     (r"رواتب|أجور|مكافآت.*موظف|رواتب.*أجور", "expense", "operating_expense", "salaries_wages", 0.90),
     (r"إيجار", "expense", "operating_expense", "rent", 0.88),
@@ -109,10 +101,8 @@ ARABIC_RULES = [
     (r"ضيافة|بدل.*طعام", "expense", "operating_expense", "hospitality", 0.75),
     (r"تدريب|تطوير.*موظف", "expense", "operating_expense", "training", 0.78),
     (r"اشتراك|عضوي|رسوم.*حكوم", "expense", "operating_expense", "subscriptions_fees", 0.75),
-
     # Expenses - Finance
     (r"فائد|عمول.*بنك|مصروف.*تمويل|رسوم.*بنك", "expense", "finance_cost", "finance_cost", 0.85),
-
     # Expenses - Other
     (r"خسائر|خسار|مصروف.*أخر|متنوع", "expense", "other_expense", "other_expense", 0.65),
     (r"غرام|جزاء|مخالف", "expense", "other_expense", "penalties", 0.75),
@@ -177,6 +167,7 @@ CODE_PREFIX_RULES = [
     ("52", "expense", 0.65),
 ]
 
+
 def _normalize_for_match(text: str) -> str:
     """Normalize text for classification matching."""
     if not text:
@@ -187,6 +178,7 @@ def _normalize_for_match(text: str) -> str:
     t = t.replace("ى", "ي").replace("ة", "ه")
     t = re.sub(r"\s+", " ", t)
     return t
+
 
 def classify_account(
     account_name_raw: str,
@@ -206,7 +198,7 @@ def classify_account(
     mapping_source, classification_issues
     """
     name = _normalize_for_match(account_name_raw or "")
-    norm_name = _normalize_for_match(account_name_normalized or account_name_raw or "")
+    _normalize_for_match(account_name_normalized or account_name_raw or "")
     code = (account_code or "").strip()
     issues = []
 

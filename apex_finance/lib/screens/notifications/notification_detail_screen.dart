@@ -15,7 +15,7 @@ class NotificationDetailScreen extends StatelessWidget {
         Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AC.cyan.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: const Icon(Icons.notifications, color: AC.cyan, size: 22)),
               const SizedBox(width: 12),
               Expanded(child: Text(notification['title'] ?? notification['message'] ?? '', style: const TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
@@ -25,7 +25,7 @@ class NotificationDetailScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(notification['created_at'] ?? '', style: const TextStyle(color: AC.ts, fontSize: 11)),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: notification['is_read'] == true ? AC.ok.withOpacity(0.12) : AC.warn.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: notification['is_read'] == true ? AC.ok.withValues(alpha: 0.12) : AC.warn.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Text(notification['is_read'] == true ? '\u0645\u0642\u0631\u0648\u0621' : '\u062c\u062f\u064a\u062f', style: TextStyle(color: notification['is_read'] == true ? AC.ok : AC.warn, fontSize: 10))),
             ]),
           ])),

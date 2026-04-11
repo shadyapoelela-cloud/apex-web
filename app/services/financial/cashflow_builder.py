@@ -47,11 +47,13 @@ class CashFlowBuilder:
         has_prior = balance_prior is not None
 
         if not has_prior:
-            warnings.append({
-                "code": "NO_PRIOR_PERIOD",
-                "severity": "WARNING",
-                "message": "لا تتوفر بيانات الفترة السابقة — التدفقات النقدية مشتقة جزئياً من الأرصدة الحالية فقط",
-            })
+            warnings.append(
+                {
+                    "code": "NO_PRIOR_PERIOD",
+                    "severity": "WARNING",
+                    "message": "لا تتوفر بيانات الفترة السابقة — التدفقات النقدية مشتقة جزئياً من الأرصدة الحالية فقط",
+                }
+            )
 
         # ═══ Operating Activities ═══
         net_profit = income.get("net_profit", 0)
@@ -84,11 +86,13 @@ class CashFlowBuilder:
             # We estimate from current balances only with low confidence
             wc_changes = self._estimate_wc_from_current(balance_current)
             wc_total = 0  # Don't include estimated WC in totals
-            warnings.append({
-                "code": "WC_ESTIMATED",
-                "severity": "WARNING",
-                "message": "تغيرات رأس المال العامل غير متاحة — تحتاج بيانات فترتين للحساب الدقيق",
-            })
+            warnings.append(
+                {
+                    "code": "WC_ESTIMATED",
+                    "severity": "WARNING",
+                    "message": "تغيرات رأس المال العامل غير متاحة — تحتاج بيانات فترتين للحساب الدقيق",
+                }
+            )
 
         operating_cash_flow = net_profit + non_cash_total + wc_total
 
@@ -105,11 +109,13 @@ class CashFlowBuilder:
             estimated_capex = -(ppe_current) if ppe_current > 0 else 0
             if estimated_capex != 0:
                 investing["estimated_capex"] = round(estimated_capex, 2)
-                warnings.append({
-                    "code": "INVESTING_ESTIMATED",
-                    "severity": "WARNING",
-                    "message": "الأنشطة الاستثمارية تقديرية — تحتاج بيانات فترتين",
-                })
+                warnings.append(
+                    {
+                        "code": "INVESTING_ESTIMATED",
+                        "severity": "WARNING",
+                        "message": "الأنشطة الاستثمارية تقديرية — تحتاج بيانات فترتين",
+                    }
+                )
 
         # ═══ Financing Activities ═══
         financing = {}
@@ -119,11 +125,13 @@ class CashFlowBuilder:
             financing = self._calculate_financing(balance_current, balance_prior)
             financing_total = sum(financing.values())
         else:
-            warnings.append({
-                "code": "FINANCING_ESTIMATED",
-                "severity": "WARNING",
-                "message": "الأنشطة التمويلية غير متاحة — تحتاج بيانات فترتين",
-            })
+            warnings.append(
+                {
+                    "code": "FINANCING_ESTIMATED",
+                    "severity": "WARNING",
+                    "message": "الأنشطة التمويلية غير متاحة — تحتاج بيانات فترتين",
+                }
+            )
 
         # ═══ Net Change ═══
         net_change = operating_cash_flow + investing_total + financing_total
@@ -221,10 +229,19 @@ class CashFlowBuilder:
         nca_prior = prior.get("non_current_assets", {}).get("detail", {})
 
         # PPE changes (gross, before depreciation)
-        ppe_classes = {"land", "buildings", "machinery", "vehicles", "furniture",
-                       "computers", "leasehold_improvements", "rou_assets",
-                       "intangible_assets", "projects_under_construction"}
-        depr_classes = {k for k in ACCOUNT_TAXONOMY if k.startswith("accum_depr")}
+        ppe_classes = {
+            "land",
+            "buildings",
+            "machinery",
+            "vehicles",
+            "furniture",
+            "computers",
+            "leasehold_improvements",
+            "rou_assets",
+            "intangible_assets",
+            "projects_under_construction",
+        }
+        {k for k in ACCOUNT_TAXONOMY if k.startswith("accum_depr")}
 
         for cls in ppe_classes:
             curr_val = nca_curr.get(cls, 0)
@@ -237,8 +254,16 @@ class CashFlowBuilder:
 
         # Investment changes
         for cls in ("long_term_investments", "short_term_investments"):
-            curr_val = nca_curr.get(cls, 0) if cls in nca_curr else current.get("current_assets", {}).get("detail", {}).get(cls, 0)
-            prior_val = nca_prior.get(cls, 0) if cls in nca_prior else prior.get("current_assets", {}).get("detail", {}).get(cls, 0)
+            curr_val = (
+                nca_curr.get(cls, 0)
+                if cls in nca_curr
+                else current.get("current_assets", {}).get("detail", {}).get(cls, 0)
+            )
+            prior_val = (
+                nca_prior.get(cls, 0)
+                if cls in nca_prior
+                else prior.get("current_assets", {}).get("detail", {}).get(cls, 0)
+            )
             delta = curr_val - prior_val
             if delta != 0:
                 investing[f"تغير استثمارات"] = -delta
@@ -290,8 +315,7 @@ class CashFlowBuilder:
     def _sum_ppe(self, balance: dict) -> float:
         """Sum all PPE gross values."""
         nca = balance.get("non_current_assets", {}).get("detail", {})
-        ppe_classes = {"land", "buildings", "machinery", "vehicles", "furniture",
-                       "computers", "leasehold_improvements"}
+        ppe_classes = {"land", "buildings", "machinery", "vehicles", "furniture", "computers", "leasehold_improvements"}
         return sum(nca.get(cls, 0) for cls in ppe_classes)
 
     def _get_from_balance(self, balance: dict, cls: str) -> float:

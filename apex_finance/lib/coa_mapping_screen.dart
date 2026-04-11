@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 import 'api_service.dart';
 import 'shared_widgets.dart';
-import 'coa_quality_screen.dart';
 
 class CoaMappingScreen extends StatefulWidget {
   final Map<String,dynamic> uploadData;
@@ -50,7 +50,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
         final assessResult = await ApiService.assessCoa(uploadId);
         final ad = assessResult.success ? assessResult.data as Map<String,dynamic> : <String,dynamic>{};
         if (!mounted) return;
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => CoaQualityScreen(uploadId: uploadId, clientId: widget.clientId, clientName: widget.clientName, assessData: ad)));
+        context.pushReplacement('/coa/quality', extra: {'uploadId': uploadId, 'clientId': widget.clientId, 'clientName': widget.clientName, 'assessData': ad});
       } else {
         setState(() => _errorMsg = parseResult.error ?? 'فشل الـ Parse');
       }
@@ -121,7 +121,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
                 final code = cc != null ? (row[cc] ?? '').toString() : '';
                 return Column(children: [
                   Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:8), child: Row(children: [
-                    if (code.isNotEmpty) Container(padding: const EdgeInsets.symmetric(horizontal:7, vertical:2), decoration: BoxDecoration(color:_gold.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(code, style: const TextStyle(fontSize:10, color:_gold, fontFamily:'Tajawal'))),
+                    if (code.isNotEmpty) Container(padding: const EdgeInsets.symmetric(horizontal:7, vertical:2), decoration: BoxDecoration(color:_gold.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(4)), child: Text(code, style: const TextStyle(fontSize:10, color:_gold, fontFamily:'Tajawal'))),
                     const Spacer(),
                     Expanded(flex:3, child: Text(name, textDirection: TextDirection.rtl, style: const TextStyle(fontSize:12, color:_textPri, fontFamily:'Tajawal'), overflow: TextOverflow.ellipsis)),
                   ])),
@@ -131,7 +131,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
           ],
           if (_errorMsg.isNotEmpty) ...[
             const SizedBox(height:12),
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color:_danger.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color:_danger.withOpacity(0.3))),
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color:_danger.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color:_danger.withValues(alpha: 0.3))),
               child: Row(children: [const Icon(Icons.error_outline_rounded, color:_danger, size:16), const SizedBox(width:8), Expanded(child: Text(_errorMsg, textDirection: TextDirection.rtl, style: const TextStyle(fontSize:12, color:_danger, fontFamily:'Tajawal')))])),
           ],
           const SizedBox(height: 80),
@@ -142,9 +142,9 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
             child: Container(height: 54,
               decoration: BoxDecoration(
                 gradient: (_canParse && !_parsing) ? const LinearGradient(colors:[Color(0xFFC9A84C), Color(0xFF8B6F35)]) : null,
-                color: (!_canParse || _parsing) ? Colors.white.withOpacity(0.05) : null,
+                color: (!_canParse || _parsing) ? Colors.white.withValues(alpha: 0.05) : null,
                 borderRadius: BorderRadius.circular(14),
-                border: (!_canParse || _parsing) ? Border.all(color: Colors.white.withOpacity(0.1)) : null),
+                border: (!_canParse || _parsing) ? Border.all(color: Colors.white.withValues(alpha: 0.1)) : null),
               child: Center(child: _parsing
                 ? const SizedBox(width:22, height:22, child: CircularProgressIndicator(color: Color(0xFF050D1A), strokeWidth:2.5))
                 : Row(mainAxisAlignment: MainAxisAlignment.center, children: [

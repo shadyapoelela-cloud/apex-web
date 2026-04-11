@@ -11,15 +11,26 @@ knowledge_review_queue, knowledge_audit_log, knowledge_authorities, knowledge_pl
 
 import os
 import uuid
-from datetime import datetime, date, timezone
+from datetime import datetime, timezone
 from sqlalchemy import (
-    create_engine, Column, String, Text, Float, Integer, Boolean,
-    DateTime, Date, ForeignKey, JSON, Index, event
+    create_engine,
+    Column,
+    String,
+    Text,
+    Float,
+    Integer,
+    Boolean,
+    DateTime,
+    Date,
+    ForeignKey,
+    JSON,
+    Index,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 # ─── Database Setup ───
 import logging as _logging
+
 _kb_logger = _logging.getLogger(__name__)
 
 DB_PATH = os.environ.get("KB_DATABASE_URL", "sqlite:///knowledge_brain.db")
@@ -34,12 +45,14 @@ else:
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 Base = declarative_base()
 
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 def gen_id():
     return str(uuid.uuid4())[:12]
@@ -49,17 +62,18 @@ def gen_id():
 #  1. knowledge_authorities — الجهات المرجعية
 # ═══════════════════════════════════════════
 
+
 class Authority(Base):
     __tablename__ = "knowledge_authorities"
     id = Column(String(12), primary_key=True, default=gen_id)
-    code = Column(String(20), unique=True, nullable=False, index=True)     # ZATCA, SOCPA, MOC
+    code = Column(String(20), unique=True, nullable=False, index=True)  # ZATCA, SOCPA, MOC
     name_ar = Column(String(200), nullable=False)
     name_en = Column(String(200))
-    jurisdiction = Column(String(10), default="sa")                        # sa, international
-    domain_scope = Column(JSON)                                             # ["tax", "customs"]
+    jurisdiction = Column(String(10), default="sa")  # sa, international
+    domain_scope = Column(JSON)  # ["tax", "customs"]
     official_urls = Column(JSON)
-    source_priority = Column(Integer, default=5)                           # 1=highest
-    update_frequency = Column(String(20))                                   # monthly, quarterly, annual
+    source_priority = Column(Integer, default=5)  # 1=highest
+    update_frequency = Column(String(20))  # monthly, quarterly, annual
     notes = Column(Text)
     active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
@@ -69,10 +83,11 @@ class Authority(Base):
 #  2. knowledge_domains — المجالات المعرفية
 # ═══════════════════════════════════════════
 
+
 class Domain(Base):
     __tablename__ = "knowledge_domains"
     id = Column(String(12), primary_key=True, default=gen_id)
-    code = Column(String(30), unique=True, nullable=False, index=True)     # tax, accounting, governance
+    code = Column(String(30), unique=True, nullable=False, index=True)  # tax, accounting, governance
     name_ar = Column(String(100), nullable=False)
     name_en = Column(String(100))
     description = Column(Text)
@@ -84,10 +99,11 @@ class Domain(Base):
 #  3. knowledge_sectors — القطاعات
 # ═══════════════════════════════════════════
 
+
 class Sector(Base):
     __tablename__ = "knowledge_sectors"
     id = Column(String(12), primary_key=True, default=gen_id)
-    code = Column(String(30), unique=True, nullable=False, index=True)     # retail, manufacturing
+    code = Column(String(30), unique=True, nullable=False, index=True)  # retail, manufacturing
     name_ar = Column(String(100), nullable=False)
     name_en = Column(String(100))
     description = Column(Text)
@@ -99,6 +115,7 @@ class Sector(Base):
 #  4. knowledge_sources — المصادر الرسمية
 # ═══════════════════════════════════════════
 
+
 class Source(Base):
     __tablename__ = "knowledge_sources"
     id = Column(String(12), primary_key=True, default=gen_id)
@@ -106,9 +123,9 @@ class Source(Base):
     subdomain = Column(String(50))
     title = Column(String(300), nullable=False)
     authority_code = Column(String(20), ForeignKey("knowledge_authorities.code"), index=True)
-    source_type = Column(String(30), index=True)        # law, regulation, standard, guide, bulletin, best_practice
-    legal_force = Column(String(30))                      # binding_law, implementing_regulation, professional_standard...
-    official_reference = Column(String(200))              # رقم النظام/المعيار
+    source_type = Column(String(30), index=True)  # law, regulation, standard, guide, bulletin, best_practice
+    legal_force = Column(String(30))  # binding_law, implementing_regulation, professional_standard...
+    official_reference = Column(String(200))  # رقم النظام/المعيار
     source_url = Column(String(500))
     country = Column(String(10), default="sa")
     language = Column(String(5), default="ar")
@@ -121,58 +138,60 @@ class Source(Base):
     raw_text = Column(Text)
     checksum = Column(String(64))
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
+    )
 
     # Relationships
     entries = relationship("Entry", back_populates="source")
 
-    __table_args__ = (
-        Index("idx_source_domain_status", "domain", "status"),
-    )
+    __table_args__ = (Index("idx_source_domain_status", "domain", "status"),)
 
 
 # ═══════════════════════════════════════════
 #  5. knowledge_entries — المعرفة المنظمة
 # ═══════════════════════════════════════════
 
+
 class Entry(Base):
     __tablename__ = "knowledge_entries"
     id = Column(String(12), primary_key=True, default=gen_id)
     source_id = Column(String(12), ForeignKey("knowledge_sources.id"), index=True)
-    entry_code = Column(String(50), index=True)          # IAS_2_PERIODIC_COGS
+    entry_code = Column(String(50), index=True)  # IAS_2_PERIODIC_COGS
     domain = Column(String(30), index=True)
     subdomain = Column(String(50))
     title = Column(String(300), nullable=False)
     summary = Column(Text)
-    structured_json = Column(JSON)                        # key_points, obligations, exceptions
-    applicability_json = Column(JSON)                     # entity_types, sectors, thresholds
+    structured_json = Column(JSON)  # key_points, obligations, exceptions
+    applicability_json = Column(JSON)  # entity_types, sectors, thresholds
     obligations_json = Column(JSON)
     exceptions_json = Column(JSON)
-    impacts_json = Column(JSON)                           # financial, tax, governance, operational
-    linked_rules = Column(JSON)                           # [rule_ids]
-    linked_cases = Column(JSON)                           # [case_ids]
+    impacts_json = Column(JSON)  # financial, tax, governance, operational
+    linked_rules = Column(JSON)  # [rule_ids]
+    linked_cases = Column(JSON)  # [case_ids]
     confidence_level = Column(Float, default=0.95)
     obligation_level = Column(String(20), default="mandatory")  # mandatory, recommended, optional
     review_frequency = Column(String(20), default="annual")
-    status = Column(String(20), default="approved", index=True)   # draft, under_review, approved, archived, superseded
+    status = Column(String(20), default="approved", index=True)  # draft, under_review, approved, archived, superseded
     review_status = Column(String(20), default="approved")
     owner_user = Column(String(50))
     reviewer_user = Column(String(50))
     approver_user = Column(String(50))
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
+    )
 
     # Relationships
     source = relationship("Source", back_populates="entries")
 
-    __table_args__ = (
-        Index("idx_entry_domain_status", "domain", "status"),
-    )
+    __table_args__ = (Index("idx_entry_domain_status", "domain", "status"),)
 
 
 # ═══════════════════════════════════════════
 #  6. knowledge_rules — القواعد التنفيذية
 # ═══════════════════════════════════════════
+
 
 class Rule(Base):
     __tablename__ = "knowledge_rules"
@@ -182,11 +201,11 @@ class Rule(Base):
     subdomain = Column(String(50))
     rule_name_ar = Column(String(200), nullable=False)
     rule_name_en = Column(String(200))
-    rule_type = Column(String(30))                        # compliance, warning, recommendation, info
-    scope = Column(String(50))                            # all, sector_specific, entity_specific
+    rule_type = Column(String(30))  # compliance, warning, recommendation, info
+    scope = Column(String(50))  # all, sector_specific, entity_specific
     priority = Column(Integer, default=5)
-    condition_json = Column(JSON)                         # {"field": "revenue", "op": ">", "value": 375000}
-    action_json = Column(JSON)                            # {"type": "flag", "severity": "warning", "message": "..."}
+    condition_json = Column(JSON)  # {"field": "revenue", "op": ">", "value": 375000}
+    action_json = Column(JSON)  # {"type": "flag", "severity": "warning", "message": "..."}
     exception_json = Column(JSON)
     source_entry_id = Column(String(12), ForeignKey("knowledge_entries.id"), index=True)
     authority_code = Column(String(20))
@@ -197,7 +216,9 @@ class Rule(Base):
     version = Column(Integer, default=1)
     review_status = Column(String(20), default="approved")
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
+    )
 
     versions = relationship("RuleVersion", back_populates="rule")
 
@@ -205,6 +226,7 @@ class Rule(Base):
 # ═══════════════════════════════════════════
 #  7. knowledge_rule_versions
 # ═══════════════════════════════════════════
+
 
 class RuleVersion(Base):
     __tablename__ = "knowledge_rule_versions"
@@ -223,11 +245,12 @@ class RuleVersion(Base):
 #  8. knowledge_sector_mappings
 # ═══════════════════════════════════════════
 
+
 class SectorMapping(Base):
     __tablename__ = "knowledge_sector_mappings"
     id = Column(String(12), primary_key=True, default=gen_id)
     sector_code = Column(String(30), ForeignKey("knowledge_sectors.code"), index=True)
-    entity_type = Column(String(20))                      # source, entry, rule, playbook
+    entity_type = Column(String(20))  # source, entry, rule, playbook
     entity_id = Column(String(12), index=True)
     notes = Column(Text)
 
@@ -235,6 +258,7 @@ class SectorMapping(Base):
 # ═══════════════════════════════════════════
 #  9. knowledge_cases — السوابق والحالات
 # ═══════════════════════════════════════════
+
 
 class Case(Base):
     __tablename__ = "knowledge_cases"
@@ -259,12 +283,13 @@ class Case(Base):
 #  10. knowledge_patterns — الأنماط
 # ═══════════════════════════════════════════
 
+
 class Pattern(Base):
     __tablename__ = "knowledge_patterns"
     id = Column(String(12), primary_key=True, default=gen_id)
     domain = Column(String(30), index=True)
     sector = Column(String(30))
-    pattern_type = Column(String(30))                     # risk, behavior, seasonal, macro
+    pattern_type = Column(String(30))  # risk, behavior, seasonal, macro
     title = Column(String(200))
     description = Column(Text)
     data_json = Column(JSON)
@@ -277,10 +302,11 @@ class Pattern(Base):
 #  11. knowledge_updates — التحديثات
 # ═══════════════════════════════════════════
 
+
 class Update(Base):
     __tablename__ = "knowledge_updates"
     id = Column(String(12), primary_key=True, default=gen_id)
-    update_type = Column(String(30), index=True)          # regulatory, standard, tax, market
+    update_type = Column(String(30), index=True)  # regulatory, standard, tax, market
     title = Column(String(300), nullable=False)
     authority_code = Column(String(20))
     change_summary = Column(Text)
@@ -290,7 +316,7 @@ class Update(Base):
     impacted_entries = Column(JSON)
     impacted_playbooks = Column(JSON)
     source_url = Column(String(500))
-    status = Column(String(20), default="detected", index=True)   # detected, under_review, approved, applied, archived
+    status = Column(String(20), default="detected", index=True)  # detected, under_review, approved, applied, archived
     review_deadline = Column(Date)
     applied_at = Column(DateTime)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
@@ -299,6 +325,7 @@ class Update(Base):
 # ═══════════════════════════════════════════
 #  12. knowledge_playbooks — الأدلة التشغيلية
 # ═══════════════════════════════════════════
+
 
 class Playbook(Base):
     __tablename__ = "knowledge_playbooks"
@@ -316,19 +343,22 @@ class Playbook(Base):
     risk_flags = Column(JSON)
     status = Column(String(20), default="approved")
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
+    )
 
 
 # ═══════════════════════════════════════════
 #  13. knowledge_review_queue — طابور المراجعة
 # ═══════════════════════════════════════════
 
+
 class ReviewQueueItem(Base):
     __tablename__ = "knowledge_review_queue"
     id = Column(String(12), primary_key=True, default=gen_id)
-    entity_type = Column(String(20), nullable=False)      # source, entry, rule, playbook, update
+    entity_type = Column(String(20), nullable=False)  # source, entry, rule, playbook, update
     entity_id = Column(String(12), nullable=False, index=True)
-    action = Column(String(20))                            # create, update, activate, deactivate, archive
+    action = Column(String(20))  # create, update, activate, deactivate, archive
     requested_by = Column(String(50))
     assigned_to = Column(String(50))
     status = Column(String(20), default="pending", index=True)  # pending, approved, rejected
@@ -341,12 +371,13 @@ class ReviewQueueItem(Base):
 #  14. knowledge_audit_log — سجل التعديلات
 # ═══════════════════════════════════════════
 
+
 class AuditLog(Base):
     __tablename__ = "knowledge_audit_log"
     id = Column(String(12), primary_key=True, default=gen_id)
     entity_type = Column(String(20), nullable=False, index=True)
     entity_id = Column(String(12), nullable=False, index=True)
-    action = Column(String(20), nullable=False)            # create, update, delete, approve, reject, archive
+    action = Column(String(20), nullable=False)  # create, update, delete, approve, reject, archive
     field_changed = Column(String(100))
     old_value = Column(Text)
     new_value = Column(Text)
@@ -359,10 +390,12 @@ class AuditLog(Base):
 #  Create All Tables
 # ═══════════════════════════════════════════
 
+
 def init_db():
     """Create all tables if they don't exist."""
     Base.metadata.create_all(bind=engine)
     return True
+
 
 def get_table_stats(db):
     """Get count of records in each table."""

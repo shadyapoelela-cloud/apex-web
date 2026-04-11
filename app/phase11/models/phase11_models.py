@@ -2,7 +2,8 @@
 APEX Phase 11 — Legal Acceptance Models
 Tables: legal_documents_v2, acceptance_logs_v2
 """
-from sqlalchemy import Column, String, DateTime, Boolean, Text, Integer, Float
+
+from sqlalchemy import Column, String, DateTime, Boolean, Text
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 LEGAL_DOC_TYPES = [
@@ -13,8 +14,10 @@ LEGAL_DOC_TYPES = [
     "document_upload_policy",
 ]
 
+
 class LegalDocumentV2(Base):
     """Versioned legal/policy documents."""
+
     __tablename__ = "legal_documents_v2"
     __table_args__ = {"extend_existing": True}
     id = Column(String, primary_key=True, default=gen_uuid)
@@ -29,8 +32,10 @@ class LegalDocumentV2(Base):
     effective_date = Column(DateTime, default=utcnow)
     created_at = Column(DateTime, default=utcnow)
 
+
 class AcceptanceLogV2(Base):
     """Track user acceptance of legal documents."""
+
     __tablename__ = "acceptance_logs_v2"
     __table_args__ = {"extend_existing": True}
     id = Column(String, primary_key=True, default=gen_uuid)
@@ -42,7 +47,9 @@ class AcceptanceLogV2(Base):
     ip_address = Column(String(45), nullable=True)
     user_agent = Column(String(500), nullable=True)
 
+
 def init_phase11_db():
     from app.phase1.models.platform_models import engine
+
     Base.metadata.create_all(bind=engine)
     return ["legal_documents_v2", "acceptance_logs_v2"]
