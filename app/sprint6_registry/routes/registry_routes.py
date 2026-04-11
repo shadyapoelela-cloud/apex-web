@@ -3,10 +3,10 @@ APEX Sprint 6 — Official Source Registry + Eligibility Engines Routes
 15 APIs: Reference management, Regulatory monitoring, Funding/Support/License eligibility.
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
 from typing import Optional
-import json, uuid
+import uuid
 from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now_iso as _now
 
 

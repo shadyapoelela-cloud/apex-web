@@ -4,9 +4,10 @@ Uses Phase 1 PasswordReset + UserSession models
 """
 
 import logging
-import secrets, hashlib
+import secrets
+import hashlib
 from datetime import datetime, timedelta, timezone
-from app.phase1.models.platform_models import SessionLocal, User, gen_uuid, utcnow, PasswordReset, UserSession
+from app.phase1.models.platform_models import SessionLocal, User, gen_uuid, PasswordReset, UserSession
 from app.phase9.models.phase9_models import AccountAction
 
 
@@ -55,7 +56,7 @@ def create_password_reset(email: str):
             "reset_token": raw_token,
             "expires_in_minutes": 60,
         }
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -116,7 +117,7 @@ def execute_password_reset(raw_token: str, new_password: str):
             "success": True,
             "message": "\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0628\u0646\u062c\u0627\u062d",
         }
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -141,7 +142,7 @@ def create_session(user_id, device_info=None, ip_address=None):
         db.add(session)
         db.commit()
         return {"session_id": session.id, "session_token": raw_token}
-    except Exception as e:
+    except Exception:
         db.rollback()
         return None
     finally:
@@ -200,7 +201,7 @@ def logout_all_sessions(user_id, except_current=None):
         db.add(action)
         db.commit()
         return {"success": True, "terminated": count}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -231,7 +232,7 @@ def logout_session(user_id, session_id):
             "success": True,
             "message": "\u062a\u0645 \u0625\u0646\u0647\u0627\u0621 \u0627\u0644\u062c\u0644\u0633\u0629",
         }
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -275,7 +276,7 @@ def update_profile(user_id, display_name=None, email=None, mobile=None):
 
         db.commit()
         return {"success": True, "changes": changes}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -319,7 +320,7 @@ def request_account_closure(user_id, closure_type="temporary", reason=""):
         db.add(action)
         db.commit()
         return {"success": True, "closure_type": closure_type, "message": msg}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}

@@ -75,7 +75,7 @@ class IncomeStatementBuilder:
         purchases = sum_class("purchases")
         purchases_returns = sum_class("purchases_returns")
         freight_in = sum_class("freight_in")
-        direct_labor = sum_class("direct_labor")
+        sum_class("direct_labor")
 
         # Closing inventory: use override if provided (periodic system)
         if closing_inventory_override is not None:

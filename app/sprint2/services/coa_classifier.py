@@ -18,8 +18,7 @@ Classification priority:
 5. Keyword/pattern matching
 """
 
-import re, json
-from typing import Optional
+import re
 from app.core.text_utils import remove_diacritics
 
 # ── Normalized Classes ──
@@ -199,7 +198,7 @@ def classify_account(
     mapping_source, classification_issues
     """
     name = _normalize_for_match(account_name_raw or "")
-    norm_name = _normalize_for_match(account_name_normalized or account_name_raw or "")
+    _normalize_for_match(account_name_normalized or account_name_raw or "")
     code = (account_code or "").strip()
     issues = []
 

@@ -3,7 +3,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, List
-import json, uuid, logging
+import json
+import logging
 from datetime import datetime, timezone
 from app.core.db_utils import exec_sql as _exec
 
@@ -407,7 +408,7 @@ def bulk_approve(upload_id: str, body: BulkApproveBody = BulkApproveBody()):
                 "approval_percentage": round(count / total * 100, 1) if total > 0 else 0,
             },
         }
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Batch approve error", exc_info=True)
         raise HTTPException(500, "Batch approval failed")
@@ -531,6 +532,6 @@ def debug_classify(upload_id: str):
             "sample_account": sample[2],
             "classification": cls_result,
         }
-    except Exception as e:
+    except Exception:
         logging.error("Debug classification error", exc_info=True)
         return {"success": False, "error": "Classification debug failed"}

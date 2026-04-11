@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
-import '../../core/session.dart';
+import '../../api_service.dart';
 import '../../core/shared_constants.dart';
-
-final _api = apiBase;
 
 // Phase 10 Notification System §13
 // ═══════════════════════════════════════════════════════════
@@ -24,34 +19,25 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final h = {'Authorization': 'Bearer ${S.token}'};
-      final r = await http.get(Uri.parse('$_api/notifications?page_size=50'), headers: h);
-      final c = await http.get(Uri.parse('$_api/notifications/count'), headers: h);
-      if (r.statusCode == 200) {
-        setState(() => _notifs = jsonDecode(r.body)['notifications'] ?? []);
+      final r = await ApiService.getNotificationsPaged(pageSize: 50);
+      final c = await ApiService.getNotificationCount();
+      if (r.success) {
+        setState(() => _notifs = r.data['notifications'] ?? []);
       }
-      if (c.statusCode == 200) {
-        setState(() => _unread = jsonDecode(c.body)['unread'] ?? 0);
+      if (c.success) {
+        setState(() => _unread = c.data['unread'] ?? 0);
       }
     } catch (_) {}
     setState(() => _loading = false);
   }
 
   Future<void> _markAllRead() async {
-    await http.post(
-      Uri.parse('$_api/notifications/mark-read'),
-      headers: {'Authorization': 'Bearer ${S.token}', 'Content-Type': 'application/json'},
-      body: jsonEncode({}),
-    );
+    await ApiService.markNotificationsRead();
     _load();
   }
 
   Future<void> _markOneRead(String id) async {
-    await http.post(
-      Uri.parse('$_api/notifications/mark-read'),
-      headers: {'Authorization': 'Bearer ${S.token}', 'Content-Type': 'application/json'},
-      body: jsonEncode({'notification_id': id}),
-    );
+    await ApiService.markNotificationRead(id);
     _load();
   }
 
@@ -188,12 +174,9 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final r = await http.get(
-        Uri.parse('$_api/notifications/preferences'),
-        headers: {'Authorization': 'Bearer ${S.token}'},
-      );
-      if (r.statusCode == 200) {
-        setState(() => _prefs = jsonDecode(r.body)['preferences'] ?? []);
+      final r = await ApiService.getNotificationPreferences();
+      if (r.success) {
+        setState(() => _prefs = r.data['preferences'] ?? []);
       }
     } catch (_) {}
     setState(() => _loading = false);
@@ -202,15 +185,11 @@ class _NotifPrefsState extends State<NotificationPrefsScreen> {
   Future<void> _toggle(String type, String channel, bool val) async {
     final pref = _prefs.firstWhere((p) => p['type'] == type, orElse: () => null);
     if (pref == null) return;
-    await http.put(
-      Uri.parse('$_api/notifications/preferences'),
-      headers: {'Authorization': 'Bearer ${S.token}', 'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'notification_type': type,
-        'in_app': channel == 'in_app' ? val : pref['in_app'],
-        'email': channel == 'email' ? val : pref['email'],
-        'sms': channel == 'sms' ? val : pref['sms'],
-      }),
+    await ApiService.updateNotificationPreferences(
+      notificationType: type,
+      inApp: channel == 'in_app' ? val : (pref['in_app'] == true),
+      email: channel == 'email' ? val : (pref['email'] == true),
+      sms: channel == 'sms' ? val : (pref['sms'] == true),
     );
     _load();
   }

@@ -3,7 +3,7 @@ APEX — Copilot database models (sessions, messages, escalations)
 نماذج قاعدة بيانات المساعد الذكي (الجلسات، الرسائل، التصعيدات)
 """
 
-from sqlalchemy import Column, String, Text, JSON, DateTime, ForeignKey, Float, Index
+from sqlalchemy import Column, String, Text, JSON, DateTime, ForeignKey, Float
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 

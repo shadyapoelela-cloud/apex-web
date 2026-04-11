@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:html' as html;
-import '../../core/api_config.dart';
+import '../../api_service.dart';
 import '../clients/client_detail_screen.dart';
 import '../extracted/coa_screens.dart';
 
 // ════════════════════════════════════════
-// ENHANCED DASHBOARD v5.3b — Live API (localStorage token)
+// ENHANCED DASHBOARD v5.3b — Live API (ApiService)
 // ════════════════════════════════════════
-// يستخدم نفس طريقة ClientsTab لجلب العملاء
-// localStorage['apex_token'] + http.get مباشرة
-
-const String _api = apiBase;
 
 class EnhancedDashboard extends StatefulWidget {
   final VoidCallback? onSwitchToClients;
@@ -52,46 +45,19 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   }
 
   Future<void> _loadClients() async {
-    final token = html.window.localStorage['apex_token'] ?? '';
-    if (token.isEmpty) {
-      if (mounted) setState(() { _loading = false; });
-      return;
-    }
-
-    // Retry logic for Render cold starts (up to 3 attempts)
-    for (int attempt = 1; attempt <= 3; attempt++) {
-      try {
-        final resp = await http.get(
-          Uri.parse('$_api/clients'),
-          headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
-        ).timeout(Duration(seconds: attempt == 1 ? 10 : 20));
-
-        if (resp.statusCode == 200) {
-          final data = jsonDecode(resp.body);
-          final list = data is List ? data : (data['clients'] ?? data['data'] ?? []);
-          if (mounted) {
-            setState(() {
-              _clients = List<Map<String, dynamic>>.from(list);
-              _loading = false;
-            });
-          }
-          return; // Success — exit retry loop
-        } else if (resp.statusCode == 401) {
-          // Token expired — clear and stop
-          html.window.localStorage.remove('apex_token');
-          if (mounted) setState(() { _loading = false; });
-          return;
-        }
-      } catch (e) {
-        if (attempt < 3) {
-          // Wait before retry (Render cold start)
-          await Future.delayed(Duration(seconds: attempt * 3));
-          continue;
-        }
+    final res = await ApiService.listClients();
+    if (mounted) {
+      if (res.success) {
+        final data = res.data;
+        final list = data is List ? data : (data['clients'] ?? data['data'] ?? []);
+        setState(() {
+          _clients = List<Map<String, dynamic>>.from(list);
+          _loading = false;
+        });
+      } else {
+        setState(() { _loading = false; });
       }
     }
-    // All retries failed
-    if (mounted) setState(() { _loading = false; });
   }
 
   @override

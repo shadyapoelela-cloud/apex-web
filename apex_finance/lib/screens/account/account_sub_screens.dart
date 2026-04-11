@@ -1,20 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
+import '../../api_service.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
-
-const _api = apiBase;
-
-class LoginScreen extends StatelessWidget { const LoginScreen({super.key}); @override Widget build(BuildContext c) => const Scaffold(); }
-
-class S {
-  static String? token, uid, uname, dname, plan, email;
-  static List<String> roles = [];
-  static void clear() { token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[]; }
-  static Map<String,String> h() => {'Authorization': 'Bearer ${token ?? ""}'};
-}
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
@@ -41,11 +29,9 @@ class _EditPS extends State<EditProfileScreen> {
   Future<void> _save() async {
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.put(Uri.parse('$_api/users/me'),
-        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
-        body: jsonEncode({'display_name':_dn.text.trim(),'organization_name':_org.text.trim(),'job_title':_job.text.trim(),'city':_city.text.trim()}));
-      if(r.statusCode==200) { S.dname=_dn.text.trim(); setState(()=> _done=true); }
-      else { setState(()=> _e=jsonDecode(r.body)['detail']); }
+      final res = await ApiService.updateUser({'display_name':_dn.text.trim(),'organization_name':_org.text.trim(),'job_title':_job.text.trim(),'city':_city.text.trim()});
+      if(res.success) { setState(()=> _done=true); }
+      else { setState(()=> _e=res.error); }
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -85,11 +71,9 @@ class _ChPwS extends State<ChangePasswordScreen> {
     if(_new1.text!=_new2.text) { setState(()=> _e='\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646'); return; }
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/users/me/security/password'),
-        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
-        body: jsonEncode({'current_password':_cur.text,'new_password':_new1.text,'confirm_password':_new2.text}));
-      if(r.statusCode==200) setState(()=> _done=true);
-      else setState(()=> _e=jsonDecode(r.body)['detail']);
+      final res = await ApiService.changePassword(current: _cur.text, newPw: _new1.text, confirm: _new2.text);
+      if(res.success) setState(()=> _done=true);
+      else setState(()=> _e=res.error);
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -124,11 +108,9 @@ class _CloseAS extends State<CloseAccountScreen> {
   Future<void> _go() async {
     setState((){ _l=true; _e=null; });
     try {
-      final r = await http.post(Uri.parse('$_api/account/closure'),
-        headers:{'Authorization':'Bearer ${S.token}','Content-Type':'application/json'},
-        body: jsonEncode({'closure_type':_type}));
-      if(r.statusCode==200) setState(()=> _done=true);
-      else setState(()=> _e=jsonDecode(r.body)['detail']??'\u062e\u0637\u0623');
+      final res = await ApiService.requestClosure(type: _type);
+      if(res.success) setState(()=> _done=true);
+      else setState(()=> _e=res.error??'\u062e\u0637\u0623');
     } catch(e){ setState(()=> _e='$e'); }
     finally { if(mounted) setState(()=> _l=false); }
   }
@@ -192,24 +174,17 @@ class _SessionsScreenState extends State<SessionsScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final r = await http.get(
-        Uri.parse('$_api/account/sessions'),
-        headers: {'Authorization': 'Bearer ${S.token}'},
-      );
-      if (r.statusCode == 200) {
-        final data = jsonDecode(r.body);
-        setState(() => _sessions = data['sessions'] ?? []);
+      final res = await ApiService.getSessions();
+      if (res.success) {
+        setState(() => _sessions = res.data['sessions'] ?? []);
       }
     } catch (_) {}
     setState(() => _loading = false);
   }
 
   Future<void> _logoutAll() async {
-    final r = await http.post(
-      Uri.parse('$_api/account/sessions/logout-all'),
-      headers: {'Authorization': 'Bearer ${S.token}'},
-    );
-    if (r.statusCode == 200) {
+    final res = await ApiService.logoutAllSessions();
+    if (res.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم إنهاء جميع الجلسات'), backgroundColor: Colors.green));
       _load();
@@ -217,11 +192,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
   }
 
   Future<void> _logoutOne(String id) async {
-    final r = await http.post(
-      Uri.parse('$_api/account/sessions/$id/logout'),
-      headers: {'Authorization': 'Bearer ${S.token}'},
-    );
-    if (r.statusCode == 200) {
+    final res = await ApiService.logoutSession(id);
+    if (res.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم إنهاء الجلسة'), backgroundColor: Colors.green));
       _load();

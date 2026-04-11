@@ -34,7 +34,7 @@ async def create_session(req: SessionRequest, user: dict = Depends(get_current_u
             user_id=user["sub"], client_id=req.client_id, session_type=req.session_type
         )
         return {"success": True, "data": session}
-    except Exception as e:
+    except Exception:
         logging.error("Copilot create_session route error", exc_info=True)
         raise HTTPException(status_code=500, detail="فشل إنشاء الجلسة")
 
@@ -74,7 +74,7 @@ async def chat(req: ChatRequest, user: dict = Depends(get_current_user)):
         return {"success": True, "data": result}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("Copilot chat error", exc_info=True)
         raise HTTPException(status_code=500, detail="فشل معالجة الرسالة")
 
@@ -148,7 +148,6 @@ async def get_session_escalations(
 @router.get("/escalations")
 async def list_all_escalations(status: str = "pending", user: dict = Depends(get_current_user)):
     """List all escalations (admin/reviewer only)."""
-    import os
 
     # RBAC: Only admins can see all escalations
     user_roles = user.get("roles", [])

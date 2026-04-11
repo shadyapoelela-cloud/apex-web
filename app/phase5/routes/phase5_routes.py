@@ -4,7 +4,7 @@ APEX Platform — Phase 5 API Routes
 Marketplace, Task Compliance, Suspension Engine.
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import Optional
 

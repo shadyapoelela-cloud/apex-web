@@ -83,7 +83,7 @@ def _eval_eos_provision(ctx):
     """نظام العمل: مكافأة نهاية الخدمة"""
     inc = ctx["income"]
     bs = ctx["balance"]
-    has_payroll = any(k for k in ["payroll", "selling_expenses"] if inc.get(k, 0) > 0)
+    any(k for k in ["payroll", "selling_expenses"] if inc.get(k, 0) > 0)
     # rough check: admin + selling expenses as proxy for payroll
     total_expenses = inc.get("admin_expenses", 0) + inc.get("selling_expenses", 0)
 

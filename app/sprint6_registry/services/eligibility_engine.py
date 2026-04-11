@@ -5,7 +5,7 @@ Uses approved financial data from analysis runs + client profile.
 """
 
 import json
-from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now as _now
+from app.core.db_utils import exec_sql as _exec, utc_now as _now
 
 
 def get_client_financial_snapshot(db, client_id: str) -> dict | None:
@@ -71,7 +71,6 @@ def assess_funding_eligibility(db, client_id: str, program_id: str | None = None
     Assess client eligibility for funding programs.
     If program_id is None, checks all active programs.
     """
-    import uuid
 
     client = get_client_profile(db, client_id)
     if not client:
@@ -158,7 +157,7 @@ def _evaluate_single_program(client: dict, financials: dict | None, program_row,
     # (SQLite returns tuples, not dicts)
     prog_id = program_row[0]
     prog_name_ar = program_row[1]
-    prog_name_en = program_row[2] if len(program_row) > 2 else ""
+    program_row[2] if len(program_row) > 2 else ""
 
     met = []
     gaps = []
@@ -181,7 +180,7 @@ def _evaluate_single_program(client: dict, financials: dict | None, program_row,
     if has_financials:
         ratios = financials.get("ratios", {})
         income = financials.get("income", {})
-        balance = financials.get("balance", {})
+        financials.get("balance", {})
 
         # Current ratio
         cr = ratios.get("current_ratio", 0) or 0

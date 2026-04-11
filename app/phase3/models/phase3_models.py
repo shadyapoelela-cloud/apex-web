@@ -19,13 +19,11 @@ from sqlalchemy import (
     String,
     Boolean,
     Integer,
-    Float,
     DateTime,
     Text,
     ForeignKey,
     JSON,
     Index,
-    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 

@@ -38,7 +38,7 @@ def validate_analysis(client_id: str, tb_upload_id: str):
         return {"success": True, "data": result}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("Analysis validation failed", exc_info=True)
         raise HTTPException(500, "Analysis validation failed")
     finally:

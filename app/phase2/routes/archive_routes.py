@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 import logging
 
 from app.phase1.routes.phase1_routes import get_current_user
-from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
+from app.phase1.models.platform_models import SessionLocal
 from app.phase2.models.archive_models import (
     ArchiveItem,
     ArchiveLink,
@@ -167,7 +167,7 @@ async def upload_to_archive(req: ArchiveUploadRequest, user: dict = Depends(get_
         db.commit()
         db.refresh(item)
         return {"success": True, "archive_item_id": item.id, "expires_at": str(item.expires_at)}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Failed to upload to archive", exc_info=True)
         raise HTTPException(status_code=500, detail="Archive upload failed")
@@ -203,7 +203,7 @@ async def attach_from_archive(
         return {"success": True, "link_id": link.id}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Failed to attach archive item", exc_info=True)
         raise HTTPException(status_code=500, detail="Archive attach failed")
@@ -246,7 +246,7 @@ async def delete_archive_item(archive_item_id: str, user: dict = Depends(get_cur
         return {"success": True, "message": "Item marked as deleted"}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Failed to delete archive item", exc_info=True)
         raise HTTPException(status_code=500, detail="Archive deletion failed")

@@ -11,7 +11,7 @@ knowledge_review_queue, knowledge_audit_log, knowledge_authorities, knowledge_pl
 
 import os
 import uuid
-from datetime import datetime, date, timezone
+from datetime import datetime, timezone
 from sqlalchemy import (
     create_engine,
     Column,
@@ -25,7 +25,6 @@ from sqlalchemy import (
     ForeignKey,
     JSON,
     Index,
-    event,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 

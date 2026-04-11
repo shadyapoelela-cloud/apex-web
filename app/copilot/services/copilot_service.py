@@ -53,7 +53,7 @@ class CopilotService:
             db.add(session)
             db.commit()
             return cls._session_to_dict(session)
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Copilot create_session error", exc_info=True)
             raise
@@ -189,7 +189,7 @@ class CopilotService:
                 "context": ctx,
                 "needs_escalation": needs_escalation,
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Copilot process_message error", exc_info=True)
             raise
@@ -263,7 +263,7 @@ class CopilotService:
             session.updated_at = datetime.now(timezone.utc)
             db.commit()
             return True
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Copilot close_session error", exc_info=True)
             return False

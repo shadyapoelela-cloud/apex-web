@@ -4,7 +4,7 @@ Per Execution Master §8, §6 + Zero-Ambiguity §9, §7, §14
 """
 
 from fastapi import APIRouter, HTTPException, Depends
-from typing import Optional, List
+from typing import Optional
 from pydantic import BaseModel
 import logging
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
@@ -194,7 +194,7 @@ async def submit_task_document(req: SubmitDocRequest, user=Depends(get_current_u
         )
         db.commit()
         return {"success": True, "data": {"submission_id": sub.id, "status": "uploaded"}}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Task submission error", exc_info=True)
         raise HTTPException(500, "Task submission failed")
@@ -256,7 +256,7 @@ async def flag_provider_compliance(req: ComplianceFlagRequest, user=Depends(get_
         )
         db.commit()
         return {"success": True, "data": {"flag_id": flag.id}}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Compliance flag error", exc_info=True)
         raise HTTPException(500, "Failed to flag provider")
@@ -342,7 +342,7 @@ async def suspend_provider(req: SuspendRequest, user=Depends(get_current_user)):
         )
         db.commit()
         return {"success": True, "data": {"suspension_id": suspension.id}}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Suspension error", exc_info=True)
         raise HTTPException(500, "Failed to suspend provider")
@@ -380,7 +380,7 @@ async def unsuspend_provider(provider_id: str, user=Depends(get_current_user)):
         return {"success": True, "data": {"message": "Suspension lifted"}}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Unsuspend error", exc_info=True)
         raise HTTPException(500, "Failed to lift suspension")
@@ -475,7 +475,7 @@ async def generate_result_explanation(analysis_id: str, user=Depends(get_current
 
         db.commit()
         return {"success": True, "data": {"generated": count, "analysis_id": analysis_id}}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Explanation generation error", exc_info=True)
         raise HTTPException(500, "Failed to generate explanations")
@@ -491,7 +491,7 @@ async def resolve_entitlements(feature: str, user=Depends(get_current_user)):
     """Check if the current user has access to a specific feature based on plan + role"""
     db = SessionLocal()
     try:
-        from app.phase1.models.platform_models import User, UserSubscription, Plan, PlanFeature
+        from app.phase1.models.platform_models import User, UserSubscription, Plan
 
         u = db.query(User).filter(User.id == user["sub"]).first()
         if not u:

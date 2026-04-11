@@ -17,7 +17,6 @@ from sqlalchemy import (
     String,
     Boolean,
     Integer,
-    Float,
     DateTime,
     Text,
     ForeignKey,
@@ -219,7 +218,7 @@ class CoaKnowledgeFeedback(Base):
 
 def init_sprint1_db():
     """Create Sprint 1 tables."""
-    from app.phase1.models.platform_models import engine, Base
+    from app.phase1.models.platform_models import engine
 
     # Import to register models
     ClientCoaUpload.__table__.create(bind=engine, checkfirst=True)

@@ -5,11 +5,12 @@ Usage: python -m app.seed_runner
 """
 
 import logging
-import sys, os
+import sys
+import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.phase1.models.platform_models import Base, engine, SessionLocal, gen_uuid, utcnow
+from app.phase1.models.platform_models import Base, engine, SessionLocal, gen_uuid
 from app.phase2.models.onboarding_models import LegalEntityType, SectorMain, SectorSub, StageNote
 from app.phase2.models.archive_models import ArchivePolicy
 from app.phase2.models.service_catalog_models import ServiceCatalog, ServiceWorkflowStage, AuditProgramTemplate
@@ -272,7 +273,7 @@ def seed_all():
 
         logging.info("Seed completed successfully!")
 
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Seed runner failed", exc_info=True)
         logging.error("ERROR: Seed runner failed. Check logs for details.")

@@ -4,10 +4,9 @@ Google Sign-In + Apple Sign-In + Mobile with Country Code
 Per Architecture Doc v5 Section 5
 """
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime, timezone
 import json
 import logging
 
@@ -17,7 +16,6 @@ from app.phase1.models.platform_models import (
     UserSecurityEvent,
     SessionLocal,
     gen_uuid,
-    utcnow,
 )
 
 router = APIRouter()
@@ -132,7 +130,7 @@ async def google_sign_in(req: GoogleSignInRequest):
             }
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Google sign-in failed", exc_info=True)
         raise HTTPException(status_code=500, detail="Social authentication failed")
@@ -209,7 +207,7 @@ async def apple_sign_in(req: AppleSignInRequest):
             }
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Apple sign-in failed", exc_info=True)
         raise HTTPException(status_code=500, detail="Social authentication failed")

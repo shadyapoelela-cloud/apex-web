@@ -13,7 +13,6 @@ from app.phase1.models.platform_models import (
     PolicyType,
     SessionLocal,
     gen_uuid,
-    utcnow,
 )
 
 
@@ -115,7 +114,7 @@ class LegalService:
                 "policy_type": policy.policy_type,
                 "version": policy.version,
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}

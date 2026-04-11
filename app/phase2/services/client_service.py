@@ -10,12 +10,10 @@ Per execution document sections 5, 7.
 import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
-    User,
     AuditEvent,
     Notification,
     SessionLocal,
     gen_uuid,
-    utcnow,
 )
 from app.phase2.models.phase2_models import (
     Client,
@@ -135,7 +133,7 @@ class ClientService:
                 },
             }
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -255,7 +253,7 @@ class ClientService:
             )
             db.commit()
             return {"success": True, "message": "تمت إضافة العضو"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -295,7 +293,7 @@ class ClientService:
 
             db.commit()
             return {"success": True, "message": "تم تحديث بيانات العميل"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}

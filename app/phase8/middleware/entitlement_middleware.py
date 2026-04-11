@@ -10,8 +10,7 @@ Usage:
         ...
 """
 
-from fastapi import Depends, HTTPException, Request
-from functools import wraps
+from fastapi import HTTPException, Request
 from app.phase1.models.platform_models import SessionLocal
 
 

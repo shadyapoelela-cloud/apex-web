@@ -13,8 +13,6 @@ from app.phase1.models.platform_models import (
     Role,
     AuditEvent,
     Notification,
-    PolicyDocument,
-    PolicyAcceptanceLog,
     SessionLocal,
     gen_uuid,
     utcnow,
@@ -24,7 +22,6 @@ from app.phase4.models.phase4_models import (
     ProviderDocument,
     ServiceProviderScope,
     VerificationStatus,
-    DocumentStatus,
     ProviderCategory,
 )
 
@@ -162,7 +159,7 @@ class ProviderService:
                 "message": "تم التسجيل — يرجى رفع المستندات المطلوبة للتحقق",
             }
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -205,7 +202,7 @@ class ProviderService:
                 "all_required_uploaded": all_uploaded,
                 "verification_status": provider.verification_status,
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -267,7 +264,7 @@ class ProviderService:
             db.commit()
             return {"success": True, "provider_id": provider_id, "status": decision}
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}

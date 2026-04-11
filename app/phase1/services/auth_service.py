@@ -29,7 +29,6 @@ from app.phase1.models.platform_models import (
     Plan,
     PlanFeature,
     SecurityEventType,
-    UserStatus,
     RoleCode,
     PlanCode,
     SessionLocal,
@@ -238,7 +237,7 @@ class AuthService:
                     "refresh_token": create_refresh_token(user.id),
                 },
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -353,7 +352,7 @@ class AuthService:
                 },
                 "session_id": session.id,
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -376,7 +375,7 @@ class AuthService:
             )
             db.commit()
             return {"success": True, "message": "طھظ… طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -406,7 +405,7 @@ class AuthService:
             )
             db.commit()
             return {"success": True, "message": "طھظ… طھط؛ظٹظٹط± ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -444,7 +443,7 @@ class AuthService:
                 "message": "ط¥ط°ط§ ظƒط§ظ† ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ط§ظ‹ ط³طھطµظ„ظƒ ط±ط³ط§ظ„ط©",
                 "reset_token": reset_token,
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -476,7 +475,7 @@ class AuthService:
             reset.is_used = True
             db.commit()
             return {"success": True, "message": "طھظ… ط¥ط¹ط§ط¯ط© طھط¹ظٹظٹظ† ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}

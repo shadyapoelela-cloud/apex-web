@@ -116,7 +116,7 @@ class AccountService:
             db.commit()
             return {"success": True, "message": "تم تحديث الملف الشخصي"}
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -289,7 +289,7 @@ class AccountService:
                 "status": req.status,
             }
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -320,7 +320,7 @@ class AccountService:
             db.commit()
             return {"success": True, "message": "تم إعادة تفعيل الحساب"}
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}

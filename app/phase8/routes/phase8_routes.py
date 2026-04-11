@@ -12,14 +12,13 @@ APIs:
 - GET /plans/compare — compare all plans side by side
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Header
+from fastapi import APIRouter, HTTPException, Query, Header
 import logging
 from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
 from app.phase8.middleware.entitlement_middleware import (
     get_user_subscription,
     get_all_user_entitlements,
     check_entitlement,
-    check_usage_count,
 )
 from app.phase8.services.seed_phase8 import (
     PLAN_LIMITS,
@@ -69,7 +68,6 @@ def get_current_user_id(authorization: str = None):
 @router.get("/subscriptions/me")
 def get_my_subscription(authorization: str = None, x_token: str = Header(None, alias="Authorization")):
     """Get current subscription for logged-in user"""
-    from fastapi import Header
 
     # Simple auth extraction
     user_id = get_current_user_id(authorization or x_token)
@@ -79,7 +77,7 @@ def get_my_subscription(authorization: str = None, x_token: str = Header(None, a
     sub = get_user_subscription(user_id)
     if not sub:
         # Auto-create Free subscription
-        result = create_user_subscription(user_id, "Free")
+        create_user_subscription(user_id, "Free")
         sub = get_user_subscription(user_id)
 
     entitlements = get_all_user_entitlements(user_id)

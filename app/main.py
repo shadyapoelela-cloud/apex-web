@@ -21,8 +21,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import Optional
-import os, logging
+import os
+import logging
 from app.services.orchestrator import AnalysisOrchestrator
 
 logging.basicConfig(
@@ -64,8 +64,6 @@ def _verify_admin(secret: str = None, x_admin_secret: str = Header(None, alias="
         raise HTTPException(403, "Invalid admin secret")
     return token
 
-
-from fastapi.responses import Response as PDFResponse
 
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
@@ -124,7 +122,7 @@ except Exception as e:
     logging.warning(f"Phase 6 disabled: {e}")
 # Phase 7 â€" Task Documents + Suspension + Result Details + Audit
 try:
-    from app.phase7.models.phase7_models import init_phase7_db, P7ResultExplanation
+    from app.phase7.models.phase7_models import init_phase7_db
     from app.phase7.routes.phase7_routes import router as p7r
     from app.phase7.services.seed_phase7 import seed_task_types
 
@@ -136,7 +134,7 @@ except Exception as e:
 try:
     from app.phase8.models.phase8_models import init_phase8_db
     from app.phase8.routes.phase8_routes import router as p8r
-    from app.phase8.services.seed_phase8 import seed_plan_limits, create_user_subscription
+    from app.phase8.services.seed_phase8 import seed_plan_limits
 
     HAS_P8 = True
 except Exception as e:
@@ -235,69 +233,69 @@ def _run_startup():
     if KB:
         try:
             init_kb()
-        except Exception as e:
+        except Exception:
             logging.error("Knowledge Brain init error", exc_info=True)
     if P1:
         try:
             t = init_platform_db()
             logging.info(f"APEX: {len(t)} tables")
             seed1()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 1 startup error", exc_info=True)
     if P2:
         try:
             seed_client_types()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 2 startup error", exc_info=True)
     if P4:
         try:
             init_phase4_db()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 4 init error", exc_info=True)
     if P5:
         try:
             init_phase5_db()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 5 init error", exc_info=True)
     if HAS_P7:
         try:
             init_phase7_db()
             seed_task_types()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 7 init error", exc_info=True)
     if HAS_P8:
         try:
             init_phase8_db()
             seed_plan_limits()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 8 init error", exc_info=True)
     if HAS_P9:
         try:
             init_phase9_db()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 9 init error", exc_info=True)
     if HAS_P10:
         try:
             init_phase10_db()
             seed_welcome_notification()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 10 init error", exc_info=True)
     if HAS_P11:
         try:
             init_phase11_db()
             seed_legal_documents()
-        except Exception as e:
+        except Exception:
             logging.error("Phase 11 init error", exc_info=True)
     if HAS_S1:
         try:
             init_sprint1_db()
-        except Exception as e:
+        except Exception:
             logging.error("Sprint 1 init error", exc_info=True)
     try:
         from app.copilot.models.copilot_models import init_copilot_db
 
         init_copilot_db()
-    except Exception as e:
+    except Exception:
         logging.error("Copilot init error", exc_info=True)
 
 
@@ -527,7 +525,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
 
         Base.metadata.create_all(bind=engine, checkfirst=True)
         results["phase1"] = "OK"
-    except Exception as e:
+    except Exception:
         results["phase1"] = "error"
 
     # Seed data
@@ -535,7 +533,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
         from app.phase1.services.seed_data import seed_all
 
         results["seed1"] = seed_all()
-    except Exception as e:
+    except Exception:
         results["seed1"] = "error"
 
     # Phase 7 seed
@@ -544,7 +542,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
             from app.phase7.services.seed_phase7 import seed_task_types
 
             results["phase7_seed"] = seed_task_types()
-        except Exception as e:
+        except Exception:
             results["phase7"] = "error"
 
     # Phase 9-11 init
@@ -552,13 +550,13 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
         if HAS_P9:
             init_phase9_db()
             results["phase9"] = "OK"
-    except Exception as e:
+    except Exception:
         results["phase9"] = "error"
     try:
         if HAS_P10:
             init_phase10_db()
             results["phase10"] = "OK"
-    except Exception as e:
+    except Exception:
         results["phase10"] = "error"
     try:
         if HAS_P11:
@@ -567,7 +565,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
 
             seed_result = seed_legal_documents()
             results["phase11"] = f"OK - {seed_result}"
-    except Exception as e:
+    except Exception:
         results["phase11"] = "error"
 
     # Sprint 2 classification columns
@@ -615,7 +613,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
         from app.sprint3.models.sprint3_models import init_sprint3_db
 
         results["sprint3"] = init_sprint3_db()
-    except Exception as e:
+    except Exception:
         results["sprint3"] = "error"
 
     # Sprint 4 TB tables
@@ -623,7 +621,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
         from app.sprint4_tb.models.tb_models import init_sprint4_tb_db
 
         results["sprint4_tb"] = init_sprint4_tb_db()
-    except Exception as e:
+    except Exception:
         results["sprint4_tb"] = "error"
 
     # Sprint 5 Analysis tables
@@ -631,7 +629,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
         from app.sprint5_analysis.models.analysis_models import init_sprint5_analysis_db
 
         results["sprint5_analysis"] = init_sprint5_analysis_db()
-    except Exception as e:
+    except Exception:
         results["sprint5_analysis"] = "error"
 
     # Sprint 6 Registry + Eligibility tables
@@ -639,7 +637,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
         from app.sprint6_registry.models.registry_models import init_sprint6_db
 
         results["sprint6_registry"] = init_sprint6_db()
-    except Exception as e:
+    except Exception:
         results["sprint6_registry"] = "error"
 
     # Sprint 4 â€" Knowledge Brain tables (PostgreSQL compatible)
@@ -787,7 +785,7 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
 def admin_stats(secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
     """Platform statistics for admin dashboard."""
     _verify_admin(secret, x_admin_secret)
-    from app.phase1.models.platform_models import SessionLocal, User, UserSubscription, UserRole, Role
+    from app.phase1.models.platform_models import SessionLocal, User, UserSubscription
     from datetime import datetime, timezone, timedelta
 
     stats = {}
@@ -931,7 +929,7 @@ def admin_users(
                 "total_pages": (total + page_size - 1) // page_size,
             },
         }
-    except Exception as e:
+    except Exception:
         logging.error("admin_users failed", exc_info=True)
         raise HTTPException(500, "Failed to fetch users")
     finally:
@@ -1022,7 +1020,7 @@ def reset_postgres(secret: str = Query(None), x_admin_secret: str = Header(None,
         # Recreate all tables
         Base.metadata.create_all(bind=engine)
         return {"success": True, "data": {"message": "All tables dropped and recreated on PostgreSQL"}}
-    except Exception as e:
+    except Exception:
         logging.error("Database reset failed", exc_info=True)
         return {"success": False, "error": "Database reset failed"}
 
@@ -1095,7 +1093,7 @@ async def promote_to_admin(
             db.close()
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("Promote user failed", exc_info=True)
         return {"success": False, "error": "Promotion failed"}
 
@@ -1116,7 +1114,7 @@ async def analyze(
         return orch.analyze_bytes(
             file_bytes=c, filename=file.filename, industry=industry, closing_inventory=closing_inventory
         )
-    except Exception as e:
+    except Exception:
         logging.error("Analysis error", exc_info=True)
         raise HTTPException(500, "Analysis failed")
 
@@ -1149,7 +1147,7 @@ async def analyze_full(
             logging.warning("Failed to get knowledge brain context for narrative", exc_info=True)
         r["narrative"] = await n.generate(r, language=language, brain_context=bc)
         return r
-    except Exception as e:
+    except Exception:
         logging.error("Full analysis error", exc_info=True)
         raise HTTPException(500, "Analysis failed")
 
@@ -1184,7 +1182,7 @@ async def analyze_report(
                 "Access-Control-Expose-Headers": "Content-Disposition",
             },
         )
-    except Exception as e:
+    except Exception:
         logging.error("Report generation error", exc_info=True)
         raise HTTPException(500, "Report generation failed")
 
@@ -1226,7 +1224,7 @@ async def classify(file: UploadFile = File(...)):
                 for r in cl
             ],
         }
-    except Exception as e:
+    except Exception:
         logging.error("Classification error", exc_info=True)
         raise HTTPException(500, "Classification failed")
 
@@ -1427,7 +1425,6 @@ async def accept_legal(body: AcceptLegalRequest, authorization: str = Header(Non
 @app.post("/account/closure", tags=["Account"])
 async def request_closure(body: AccountClosureRequest):
     closure_type = body.type
-    reason = body.reason
     return {
         "success": True,
         "data": {

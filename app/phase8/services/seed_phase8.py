@@ -7,8 +7,7 @@ Feature Keys per plan with limits
 """
 
 import logging
-from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow, UserSubscription, SubscriptionEntitlement
-from app.phase8.models.phase8_models import P8PlanLimit, P8EntitlementAuditLog
+from app.phase1.models.platform_models import SessionLocal, gen_uuid, SubscriptionEntitlement
 
 # ─── Plan Limits Matrix (Execution Master §4 + Zero Ambiguity §10) ─────
 PLAN_LIMITS = {
@@ -170,7 +169,7 @@ def create_user_subscription(user_id, plan_name="Free"):
 
         db.commit()
         return {"success": True, "plan": plan_name, "entitlements": len(limits)}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -223,7 +222,7 @@ def upgrade_user_plan(user_id, new_plan_name):
 
         db.commit()
         return {"success": True, "old_plan": old_plan_name, "new_plan": new_plan_name}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}

@@ -31,11 +31,17 @@ class ApiService {
   static Future<ApiResult> getCurrentPlan() => _get('/subscriptions/me');
   static Future<ApiResult> getEntitlements() => _get('/entitlements/me');
   static Future<ApiResult> upgradePlan(String planId) => _post('/subscriptions/upgrade', {'plan_id':planId});
+  static Future<ApiResult> upgradePlanByName(String planName) => _post('/subscriptions/upgrade?plan_name=$planName', {});
+  static Future<ApiResult> comparePlans() => _get('/plans/compare');
 
   // ── Legal ──
   static Future<ApiResult> getTerms() => _get('/legal/terms');
   static Future<ApiResult> getPrivacyPolicy() => _get('/legal/privacy');
   static Future<ApiResult> acceptLegal({required String documentType, required String version}) => _post('/legal/accept', {'document_type':documentType,'version':version});
+  static Future<ApiResult> getLegalDocuments() => _get('/legal/documents');
+  static Future<ApiResult> getLegalPending() => _get('/legal/pending');
+  static Future<ApiResult> acceptLegalDoc(String docId) => _post('/legal/accept/$docId', {});
+  static Future<ApiResult> acceptAllLegal() => _post('/legal/accept-all', {});
 
   // ── Clients ──
   static Future<ApiResult> getClientTypes() => _get('/client-types');
@@ -51,6 +57,7 @@ class ApiService {
   static Future<ApiResult> getSubSectors(String mainCode) => _get('/sectors/$mainCode/sub');
   static Future<ApiResult> getOnboardingDraft() => _get('/onboarding/draft');
   static Future<ApiResult> saveOnboardingDraft({required int step, required Map data}) => _post('/onboarding/draft', {'step_completed':step,'draft_data':data});
+  static Future<ApiResult> createClientFromOnboarding(Map body) => _post('/clients', body);
   static Future<ApiResult> getClientRequiredDocs(String clientId) => _get('/clients/$clientId/required-documents');
   static Future<ApiResult> getStageNotes(String service, String stage, {String role='all'}) => _get('/stage-notes/$service/$stage?role=$role');
 
@@ -58,6 +65,7 @@ class ApiService {
   static Future<ApiResult> getUserArchive({int page=1}) => _get('/account/archive?page=$page');
   static Future<ApiResult> getClientArchive(String clientId, {int page=1}) => _get('/clients/$clientId/archive?page=$page');
   static Future<ApiResult> attachFromArchive(String itemId, {required String processType, required String processId}) => _post('/archive/items/$itemId/attach', {'target_process_type':processType,'target_process_id':processId});
+  static Future<ApiResult> deleteArchiveItem(String id) => _delete('/archive/items/$id');
 
   // ── Service Catalog (New) ──
   static Future<ApiResult> getServiceCatalog({String? category}) => _get('/services/catalog${category!=null?"?category=$category":""}');
@@ -214,6 +222,9 @@ class ApiService {
   static Future<ApiResult> _put(String path, Map body) async {
     try { final res=await http.put(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
   }
+  static Future<ApiResult> _delete(String path) async {
+    try { final res=await http.delete(Uri.parse('$_base$path'),headers:_h); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+  }
   static Future<ApiResult> _patch(String path, Map body) async {
     try { final res=await http.patch(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('???: $e');}
   }
@@ -256,6 +267,12 @@ class ApiService {
 
   // ── Notifications Extended ──
   static Future<ApiResult> markNotificationsReadAll() => _post('/notifications/read-all', {});
+  static Future<ApiResult> getNotificationCount() => _get('/notifications/count');
+  static Future<ApiResult> getNotificationsPaged({int pageSize = 50}) => _get('/notifications?page_size=$pageSize');
+  static Future<ApiResult> markNotificationRead(String notificationId) => _post('/notifications/mark-read', {'notification_id': notificationId});
+  static Future<ApiResult> markNotificationsRead() => _post('/notifications/mark-read', {});
+  static Future<ApiResult> getNotificationPreferences() => _get('/notifications/preferences');
+  static Future<ApiResult> updateNotificationPreferences({required String notificationType, required bool inApp, required bool email, required bool sms}) => _put('/notifications/preferences', {'notification_type': notificationType, 'in_app': inApp, 'email': email, 'sms': sms});
 
   // ── Results & Tasks ──
   static Future<ApiResult> getResultDetails(String analysisId) => _get('/results/$analysisId/details');

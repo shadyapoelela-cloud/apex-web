@@ -8,21 +8,17 @@ Per execution document section 10.
 import logging
 from typing import Optional
 from app.phase1.models.platform_models import (
-    User,
     AuditEvent,
     Notification,
     SessionLocal,
     gen_uuid,
-    utcnow,
 )
-from app.phase2.models.phase2_models import Client, ClientMembership, KNOWLEDGE_MODE_ELIGIBLE_TYPES
+from app.phase2.models.phase2_models import Client
 from app.phase3.models.phase3_models import (
     KnowledgeFeedbackEvent,
     KnowledgeFeedbackReview,
     KnowledgeCandidateRule,
-    ActiveKnowledgeRule,
     FeedbackStatus,
-    RuleStatus,
 )
 
 
@@ -89,7 +85,7 @@ class KnowledgeFeedbackService:
                 "message": "تم تقديم الملاحظة المعرفية وستخضع للمراجعة",
             }
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -232,7 +228,7 @@ class KnowledgeFeedbackService:
             db.commit()
             return {"success": True, "feedback_id": feedback_id, "new_status": decision}
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -287,7 +283,7 @@ class KnowledgeFeedbackService:
 
             return {"success": True, "rule_id": rule.id, "rule_code": rule_code, "status": "candidate"}
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}

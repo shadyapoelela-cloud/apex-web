@@ -9,7 +9,6 @@ import logging
 from typing import Optional
 from datetime import datetime, timedelta, timezone
 from app.phase1.models.platform_models import (
-    User,
     AuditEvent,
     Notification,
     SessionLocal,
@@ -26,8 +25,6 @@ from app.phase5.models.phase5_models import (
     SuspensionAppeal,
     RequestStatus,
     TaskComplianceStatus,
-    SuspensionReason,
-    AppealStatus,
 )
 
 
@@ -82,7 +79,7 @@ class MarketplaceService:
                 "status": req.status,
                 "deadline": deadline.isoformat() if deadline else None,
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -144,7 +141,7 @@ class MarketplaceService:
                 "commission": commission,
                 "payout": agreed_price - commission,
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -198,7 +195,7 @@ class MarketplaceService:
             )
             db.commit()
             return {"success": True, "request_id": request_id, "old_status": old_status, "new_status": new_status}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -228,7 +225,7 @@ class MarketplaceService:
                 req.provider_review = review
             db.commit()
             return {"success": True, "rating": rating}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -352,7 +349,7 @@ class MarketplaceService:
 
             db.commit()
             return {"success": True, "status": status, "days_overdue": days_overdue}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -410,7 +407,7 @@ class MarketplaceService:
                 "suspension_id": event.id,
                 "expires": expires.isoformat() if expires else "permanent",
             }
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -435,7 +432,7 @@ class MarketplaceService:
 
             db.commit()
             return {"success": True, "message": "تم رفع الإيقاف"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -459,7 +456,7 @@ class MarketplaceService:
             db.add(appeal)
             db.commit()
             return {"success": True, "appeal_id": appeal.id, "status": "submitted"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}

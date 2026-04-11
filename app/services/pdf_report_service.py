@@ -12,7 +12,7 @@ from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.units import mm, cm
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab.pdfbase import pdfmetrics
@@ -118,8 +118,8 @@ def generate_pdf_report(analysis_result: dict, client_name: str = "", user_name:
     body_style = ParagraphStyle(
         "BodyAR", parent=styles["Normal"], fontName=font_name, fontSize=10, alignment=TA_RIGHT, leading=16
     )
-    cell_style_r = ParagraphStyle("CellR", parent=styles["Normal"], fontName=font_name, fontSize=9, alignment=TA_RIGHT)
-    cell_style_l = ParagraphStyle("CellL", parent=styles["Normal"], fontName=font_name, fontSize=9, alignment=TA_LEFT)
+    ParagraphStyle("CellR", parent=styles["Normal"], fontName=font_name, fontSize=9, alignment=TA_RIGHT)
+    ParagraphStyle("CellL", parent=styles["Normal"], fontName=font_name, fontSize=9, alignment=TA_LEFT)
 
     elements = []
 
@@ -138,7 +138,6 @@ def generate_pdf_report(analysis_result: dict, client_name: str = "", user_name:
     info_data.append([now, _ar("التاريخ")])
 
     confidence = analysis_result.get("confidence", 0)
-    conf_color = GREEN if confidence >= 70 else (GOLD if confidence >= 50 else RED)
     info_data.append([f"{confidence:.1f}%", _ar("مستوى الثقة")])
 
     if info_data:

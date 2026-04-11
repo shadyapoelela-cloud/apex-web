@@ -8,7 +8,7 @@ Per execution document sections 5, 6, 12.
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Query
 from pydantic import BaseModel, Field
 from typing import Optional
-import os, logging
+import logging
 
 from app.phase1.routes.phase1_routes import get_current_user
 from app.phase2.services.client_service import ClientService
@@ -211,7 +211,7 @@ async def upload_and_analyze(
         engine_result["result_id"] = result_id
         return {"success": True, "data": engine_result}
 
-    except Exception as e:
+    except Exception:
         logging.error("Analysis error", exc_info=True)
         raise HTTPException(status_code=500, detail="Analysis failed")
 
@@ -304,7 +304,7 @@ async def get_client_readiness(client_id: str, user: dict = Depends(get_current_
         }
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("Readiness check failed", exc_info=True)
         raise HTTPException(500, "Readiness check failed")
     finally:
@@ -377,7 +377,7 @@ async def update_document_status(
         }
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("Document update failed", exc_info=True)
         raise HTTPException(500, "Document update failed")
     finally:

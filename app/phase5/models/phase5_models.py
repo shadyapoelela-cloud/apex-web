@@ -19,7 +19,6 @@ from sqlalchemy import (
     DateTime,
     Text,
     ForeignKey,
-    JSON,
     Index,
 )
 from sqlalchemy.orm import relationship

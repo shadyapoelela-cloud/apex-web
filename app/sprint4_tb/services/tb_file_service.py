@@ -7,8 +7,9 @@ and saves to tb_parsed_rows table.
 Reuses: app.services.ingestion.trial_balance_reader.TrialBalanceReader
 """
 
-import os, re, json
-from typing import Dict, List, Any, Optional
+import re
+import json
+from typing import Dict
 
 
 def _norm_name(text: str) -> str:

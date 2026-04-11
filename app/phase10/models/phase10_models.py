@@ -4,7 +4,7 @@ Tables: notifications_v2, notification_preferences, notification_delivery_logs
 13 notification types per Zero Ambiguity §13
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, Text, Integer
+from sqlalchemy import Column, String, DateTime, Boolean, Text
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 # 13 notification types from Zero Ambiguity §13

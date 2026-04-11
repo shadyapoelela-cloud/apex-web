@@ -16,7 +16,6 @@ from app.phase1.models.platform_models import (
     PolicyType,
     SessionLocal,
     gen_uuid,
-    utcnow,
 )
 
 
@@ -33,7 +32,7 @@ def seed_all():
         created["policies"] = _seed_policies(db)
         db.commit()
         return {"success": True, "created": created}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}

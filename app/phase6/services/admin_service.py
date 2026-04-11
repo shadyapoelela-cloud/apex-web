@@ -13,19 +13,15 @@ from app.phase1.models.platform_models import (
     Role,
     UserSubscription,
     Plan,
-    UserSession,
-    UserSecurityEvent,
     AuditEvent,
     Notification,
-    PolicyAcceptanceLog,
     SessionLocal,
     gen_uuid,
-    utcnow,
 )
 from app.phase2.models.phase2_models import Client, COAUpload, AnalysisResult
 from app.phase3.models.phase3_models import KnowledgeFeedbackEvent, KnowledgeCandidateRule
-from app.phase4.models.phase4_models import ServiceProvider, ProviderDocument
-from app.phase5.models.phase5_models import ServiceRequest, SuspensionEvent, TaskComplianceEvent
+from app.phase4.models.phase4_models import ServiceProvider
+from app.phase5.models.phase5_models import ServiceRequest, SuspensionEvent
 from sqlalchemy import func
 
 
@@ -192,7 +188,7 @@ class AdminService:
             )
             db.commit()
             return {"success": True, "user_id": user_id, "old_status": old, "new_status": new_status}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -222,7 +218,7 @@ class AdminService:
             )
             db.commit()
             return {"success": True, "message": f"تم تعيين الدور: {role_code}"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
@@ -251,7 +247,7 @@ class AdminService:
             )
             db.commit()
             return {"success": True, "message": f"تم إزالة الدور: {role_code}"}
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}

@@ -1,11 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../copilot/copilot_screen.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
 import '../../core/theme.dart';
-
-const _api = apiBase;
+import '../../api_service.dart';
 
 Widget _card(String t, List<Widget> c, {Color? accent}) => Container(
   margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
@@ -38,8 +34,6 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
   bool _loading = true;
   List<dynamic> _templates = [], _samples = [], _workpapers = [], _findings = [];
 
-  Map<String, String> get _h => {'Authorization': 'Bearer ${widget.token ?? ""}'};
-
   static const _stages = [
     {'key': 'coa_setup', 'label': 'ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ', 'icon': Icons.account_tree},
     {'key': 'tb_upload', 'label': 'ظ…ظٹط²ط§ظ† ط§ظ„ظ…ط±ط§ط¬ط¹ط©', 'icon': Icons.balance},
@@ -59,16 +53,14 @@ class _AuditServiceS extends State<AuditServiceScreen> with SingleTickerProvider
 
   Future<void> _loadAll() async {
     setState(() => _loading = true);
-    try {
-      final tR = await http.get(Uri.parse('$_api/audit/templates'), headers: _h);
-      if (tR.statusCode == 200) _templates = jsonDecode(tR.body)['data'] ?? [];
-      final sR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/samples'), headers: _h);
-      if (sR.statusCode == 200) _samples = jsonDecode(sR.body)['data'] ?? [];
-      final wR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/workpapers'), headers: _h);
-      if (wR.statusCode == 200) _workpapers = jsonDecode(wR.body)['data'] ?? [];
-      final fR = await http.get(Uri.parse('$_api/audit/cases/${widget.caseId}/findings'), headers: _h);
-      if (fR.statusCode == 200) _findings = jsonDecode(fR.body)['data'] ?? [];
-    } catch (_) {}
+    final tR = await ApiService.getAuditTemplates();
+    if (tR.success) _templates = tR.data['data'] ?? [];
+    final sR = await ApiService.getAuditSamples(widget.caseId);
+    if (sR.success) _samples = sR.data['data'] ?? [];
+    final wR = await ApiService.getWorkpapers(widget.caseId);
+    if (wR.success) _workpapers = wR.data['data'] ?? [];
+    final fR = await ApiService.getFindings(widget.caseId);
+    if (fR.success) _findings = fR.data['data'] ?? [];
     if (mounted) setState(() => _loading = false);
   }
 

@@ -70,7 +70,7 @@ def _eval_inventory_method(ctx):
     if inv_system == "periodic":
         inc = ctx["income"]
         cogs = inc.get("cogs", 0)
-        cogs_method = inc.get("cogs_method", "")
+        inc.get("cogs_method", "")
         if cogs == 0 and inc.get("net_revenue", 0) > 0:
             return {
                 "type": "compliance",
@@ -147,7 +147,7 @@ def _eval_comparative_info(ctx):
 def _eval_materiality_checks(ctx):
     """فحوصات الأهمية النسبية"""
     total_assets = ctx["balance"].get("total_assets", 0)
-    rev = ctx["income"].get("net_revenue", 0)
+    ctx["income"].get("net_revenue", 0)
     if total_assets == 0:
         return None
 

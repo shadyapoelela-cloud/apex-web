@@ -21,7 +21,7 @@ APEX Account Classifier — محرك التبويب المحاسبي
 """
 
 import re
-from typing import Optional, Tuple
+from typing import Optional
 from app.core.constants import ACCOUNT_TAXONOMY
 
 # ═══════════════════════════════════════════════════════════════════════════════

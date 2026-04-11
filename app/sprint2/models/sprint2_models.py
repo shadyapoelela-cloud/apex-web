@@ -4,8 +4,6 @@ APEX — Sprint 2 models for COA account classification and review workflow
 """
 
 import enum
-from sqlalchemy import Column, String, Float, Text, DateTime, Boolean, Integer, Enum as SAEnum, func
-from sqlalchemy.ext.declarative import declarative_base
 
 # We'll add classification columns to the existing ClientChartOfAccount
 # via ALTER TABLE in init_sprint2_db()
@@ -59,7 +57,6 @@ def init_sprint2_db(engine=None):
             db = SessionLocal()
             engine = db.bind
             db.close()
-    import sqlite3
 
     conn = engine.raw_connection()
     cursor = conn.cursor()

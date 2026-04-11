@@ -11,7 +11,8 @@ APIs:
   GET  /tb/uploads/{tb_upload_id}/binding-summary  — Binding stats
 """
 
-import os, logging, json
+import os
+import logging
 from fastapi import APIRouter, File, UploadFile, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -141,7 +142,7 @@ async def upload_tb(
 
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("TB upload error", exc_info=True)
         raise HTTPException(500, "TB upload failed")
 
@@ -238,7 +239,7 @@ def bind_tb(tb_upload_id: str, body: BindTBRequest = BindTBRequest()):
         return result
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("TB binding error", exc_info=True)
         raise HTTPException(500, "TB binding failed")
 

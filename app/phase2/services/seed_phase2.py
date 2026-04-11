@@ -97,7 +97,7 @@ def seed_client_types():
                 count += 1
         db.commit()
         return count
-    except Exception as e:
+    except Exception:
         db.rollback()
         return 0
     finally:

@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
+import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/shared_constants.dart';
-
-final _api = apiBase;
 
 // ── 1. Client List Screen ──
 class ClientListScreen extends StatefulWidget {
@@ -21,9 +17,9 @@ class _ClientListS extends State<ClientListScreen> {
 
   Future<void> _load() async {
     try {
-      final r = await http.get(Uri.parse('$_api/clients'), headers: S.h());
-      if (r.statusCode == 200) {
-        final d = jsonDecode(r.body);
+      final res = await ApiService.listClients();
+      if (res.success) {
+        final d = res.data;
         setState(() {
           _clients = d is List ? d : (d['clients'] ?? []);
           _ld = false;
@@ -111,14 +107,16 @@ class _ClientCreateS extends State<ClientCreateScreen> {
     }
     setState(() { _ld = true; _err = null; });
     try {
-      final r = await http.post(Uri.parse('$_api/clients'),
-        headers: {...S.h(), 'Content-Type': 'application/json'},
-        body: jsonEncode({'name_ar': _nameC.text.trim(), 'client_type_code': _selectedType}));
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
+      final res = await ApiService.createClient(
+        clientCode: _nameC.text.trim().replaceAll(' ', '_'),
+        name: _nameC.text.trim(),
+        clientType: _selectedType!,
+        nameAr: _nameC.text.trim(),
+      );
+      if (res.success) {
         if (mounted) Navigator.pop(context, true);
       } else {
-        setState(() { _err = d['detail'] ?? 'فشل'; _ld = false; });
+        setState(() { _err = res.error ?? 'فشل'; _ld = false; });
       }
     } catch (e) { setState(() { _err = e.toString(); _ld = false; }); }
   }

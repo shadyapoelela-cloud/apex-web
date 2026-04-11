@@ -5,7 +5,7 @@ Key rule: Analysis only runs if TB binding is approved and COA is approved.
 """
 
 import json
-from app.core.db_utils import get_db_session as _db, exec_sql as _exec, utc_now as _now
+from app.core.db_utils import exec_sql as _exec, utc_now as _now
 
 
 def get_approved_coa_for_client(db, client_id: str) -> dict | None:
@@ -162,7 +162,6 @@ def run_coa_aware_analysis(
     """
     Main entry point: run financial analysis using approved COA + TB binding.
     """
-    from app.sprint5_analysis.models.analysis_models import AnalysisRun
     import uuid
 
     # Step 1: Validate preconditions

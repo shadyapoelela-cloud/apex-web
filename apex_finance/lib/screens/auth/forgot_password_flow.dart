@@ -1,11 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
+import '../../api_service.dart';
 import '../../core/theme.dart';
-
-const _api = apiBase;
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
@@ -31,16 +27,13 @@ class _ForgotPwS extends State<ForgotPasswordScreen> {
     }
     setState(() { _ld = true; _err = null; _ok = null; });
     try {
-      final r = await http.post(Uri.parse('$_api/account/forgot-password'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': _eC.text.trim()}));
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
+      final res = await ApiService.forgotPassword(_eC.text.trim());
+      if (res.success) {
         if (!mounted) return;
         Navigator.push(context, MaterialPageRoute(
-          builder: (_) => VerifyResetCodeScreen(email: _eC.text.trim(), token: d['reset_token'] ?? '')));
+          builder: (_) => VerifyResetCodeScreen(email: _eC.text.trim(), token: res.data['reset_token'] ?? '')));
       } else {
-        setState(() { _err = d['error'] ?? d['detail'] ?? d['message'] ?? 'حدث خطأ'; });
+        setState(() { _err = res.error ?? 'حدث خطأ'; });
       }
     } catch (e) {
       setState(() { _err = 'خطأ في الاتصال'; });
@@ -165,16 +158,12 @@ class _NewPwS extends State<NewPasswordScreen> {
       return;
     }
     setState(() { _ld = true; _err = null; });
-    // Token debug removed for security
     try {
-      final r = await http.post(Uri.parse('$_api/account/reset-password'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'token': widget.token, 'new_password': _pw1.text}));
-      final d = jsonDecode(r.body);
-      if (r.statusCode == 200 && d['success'] == true) {
+      final res = await ApiService.resetPassword(token: widget.token, newPassword: _pw1.text);
+      if (res.success) {
         setState(() { _done = true; });
       } else {
-        setState(() { _err = d['error'] ?? d['detail'] ?? 'فشلت إعادة التعيين'; });
+        setState(() { _err = res.error ?? 'فشلت إعادة التعيين'; });
       }
     } catch (e) {
       setState(() { _err = 'خطأ في الاتصال'; });

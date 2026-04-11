@@ -12,7 +12,7 @@ Per Apex_Coa_First_Workflow_Execution_Document §14
 """
 
 import re
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict
 from difflib import SequenceMatcher
 from app.core.text_utils import normalize_arabic
 

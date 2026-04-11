@@ -4,7 +4,7 @@ Uses UserSubscription and SubscriptionEntitlement from Phase 1.
 Only adds: P8PlanLimit, P8EntitlementAuditLog (new tables)
 """
 
-from sqlalchemy import Column, String, Integer, Float, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, String, Float, DateTime, JSON, ForeignKey
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 

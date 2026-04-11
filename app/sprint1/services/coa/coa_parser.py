@@ -5,7 +5,7 @@ Converts raw rows into normalized structured records.
 Per Sprint 1 Build Spec §17.2.
 """
 
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional
 from app.sprint1.services.coa.coa_normalizer import (
     normalize_text,
     normalize_account_code,

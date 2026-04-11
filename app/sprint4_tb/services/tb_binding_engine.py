@@ -16,9 +16,9 @@ Outputs per row:
 If unmatched accounts exceed 15%, analysis is blocked.
 """
 
-import re, json
+import json
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 from difflib import SequenceMatcher
 from app.core.text_utils import normalize_arabic
 
@@ -335,7 +335,7 @@ def manually_match_tb_row(binding_id: str, coa_account_id: str, matched_by: str 
         )
         db.commit()
         return {"success": True, "binding_id": binding_id, "status": "manually_matched"}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -380,7 +380,7 @@ def approve_binding(tb_upload_id: str, approved_by: str = None) -> Dict:
             "ready_for_analysis": True,
             "warning": f"لا يزال هناك {unmatched} حساب غير مطابق ({unmatched_pct}%)" if unmatched > 0 else None,
         }
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}

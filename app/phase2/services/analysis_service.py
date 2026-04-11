@@ -12,17 +12,14 @@ from app.phase1.models.platform_models import (
     Notification,
     SessionLocal,
     gen_uuid,
-    utcnow,
 )
 from app.phase2.models.phase2_models import (
     COAUpload,
-    COAAccount,
     AnalysisResult,
     ResultExplanation,
     ResultWarning,
     UploadStatus,
     AnalysisStatus,
-    ExplanationSeverity,
 )
 
 

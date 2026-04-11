@@ -4,18 +4,16 @@ APEX Sprint 1 — COA Upload Service
 Manages upload records, file storage, status transitions.
 """
 
-import os
 import logging
 from typing import Optional, Dict, Any
-from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
+from app.phase1.models.platform_models import SessionLocal, gen_uuid
 from app.sprint1.models.sprint1_models import (
     ClientCoaUpload,
     ClientChartOfAccount,
     RejectedCoaRow,
     CoaUploadStatus,
-    CoaRecordStatus,
 )
-from app.core.storage_service import upload_file, download_file
+from app.core.storage_service import upload_file
 
 logger = logging.getLogger(__name__)
 

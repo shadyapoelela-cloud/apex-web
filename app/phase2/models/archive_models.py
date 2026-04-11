@@ -13,7 +13,6 @@ from sqlalchemy import (
     DateTime,
     Text,
     ForeignKey,
-    JSON,
     Index,
 )
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow

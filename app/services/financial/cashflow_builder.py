@@ -241,7 +241,7 @@ class CashFlowBuilder:
             "intangible_assets",
             "projects_under_construction",
         }
-        depr_classes = {k for k in ACCOUNT_TAXONOMY if k.startswith("accum_depr")}
+        {k for k in ACCOUNT_TAXONOMY if k.startswith("accum_depr")}
 
         for cls in ppe_classes:
             curr_val = nca_curr.get(cls, 0)

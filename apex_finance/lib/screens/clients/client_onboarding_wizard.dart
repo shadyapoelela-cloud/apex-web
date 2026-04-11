@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
+import '../../api_service.dart';
 import '../../core/theme.dart';
-
-const _api = apiBase;
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
@@ -50,11 +46,6 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
   Map<String, dynamic>? _stageNote;
 
-  Map<String, String> get _h => {
-    'Authorization': 'Bearer ${widget.token ?? ""}',
-    'Content-Type': 'application/json',
-  };
-
   @override
   void initState() {
     super.initState();
@@ -65,32 +56,30 @@ class _WizardState extends State<ClientOnboardingWizard> {
     setState(() => _loading = true);
     try {
       // Load draft
-      final dr = await http.get(Uri.parse('$_api/onboarding/draft'), headers: _h);
-      if (dr.statusCode == 200) {
-        final d = jsonDecode(utf8.decode(dr.bodyBytes));
-        if (d['success'] == true && d['data'] != null) {
-          final data = d['data']['draft_data'] ?? {};
-          _step = d['data']['step_completed'] ?? 0;
-          _nameArC.text = data['name_ar'] ?? '';
-          _nameEnC.text = data['name_en'] ?? '';
-          _crC.text = data['cr_number'] ?? '';
-          _taxC.text = data['tax_number'] ?? '';
-          _addressC.text = data['national_address'] ?? '';
-          _cityC.text = data['city'] ?? '';
-          _selectedEntityType = data['legal_entity_type'];
-          _selectedSector = data['sector_main_code'];
-          _selectedSubSector = data['sector_sub_code'];
-          _clientType = data['client_type'] ?? 'standard_business';
-        }
+      final dr = await ApiService.getOnboardingDraft();
+      if (dr.success && dr.data != null) {
+        final draft = dr.data['data'] ?? dr.data;
+        final data = draft['draft_data'] ?? {};
+        _step = draft['step_completed'] ?? 0;
+        _nameArC.text = data['name_ar'] ?? '';
+        _nameEnC.text = data['name_en'] ?? '';
+        _crC.text = data['cr_number'] ?? '';
+        _taxC.text = data['tax_number'] ?? '';
+        _addressC.text = data['national_address'] ?? '';
+        _cityC.text = data['city'] ?? '';
+        _selectedEntityType = data['legal_entity_type'];
+        _selectedSector = data['sector_main_code'];
+        _selectedSubSector = data['sector_sub_code'];
+        _clientType = data['client_type'] ?? 'standard_business';
       }
 
       // Load entity types
-      final et = await http.get(Uri.parse('$_api/legal-entity-types'));
-      if (et.statusCode == 200) _entityTypes = jsonDecode(utf8.decode(et.bodyBytes))['data'] ?? [];
+      final et = await ApiService.getLegalEntityTypes();
+      if (et.success) _entityTypes = et.data is List ? et.data : (et.data['data'] ?? []);
 
       // Load sectors
-      final sc = await http.get(Uri.parse('$_api/sectors'));
-      if (sc.statusCode == 200) _sectors = jsonDecode(utf8.decode(sc.bodyBytes))['data'] ?? [];
+      final sc = await ApiService.getSectors();
+      if (sc.success) _sectors = sc.data is List ? sc.data : (sc.data['data'] ?? []);
 
       // Load sub sectors if sector selected
       if (_selectedSector != null) await _loadSubSectors(_selectedSector!);
@@ -103,8 +92,8 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
   Future<void> _loadSubSectors(String mainCode) async {
     try {
-      final r = await http.get(Uri.parse('$_api/sectors/$mainCode/sub'));
-      if (r.statusCode == 200) _subSectors = jsonDecode(utf8.decode(r.bodyBytes))['data'] ?? [];
+      final r = await ApiService.getSubSectors(mainCode);
+      if (r.success) _subSectors = r.data is List ? r.data : (r.data['data'] ?? []);
     } catch (_) {}
   }
 
@@ -112,30 +101,23 @@ class _WizardState extends State<ClientOnboardingWizard> {
     const stages = ['entity_info', 'legal_entity', 'sector', 'sector', 'client_type', 'documents', 'review'];
     if (_step < stages.length) {
       try {
-        final r = await http.get(Uri.parse('$_api/stage-notes/client_onboarding/${stages[_step]}'));
-        if (r.statusCode == 200) {
-          final d = jsonDecode(utf8.decode(r.bodyBytes));
-          if (d['success'] == true) _stageNote = d['data'];
-        }
+        final r = await ApiService.getStageNotes('client_onboarding', stages[_step]);
+        if (r.success) _stageNote = r.data is Map ? (r.data['data'] ?? r.data) : null;
       } catch (_) {}
     }
   }
 
   Future<void> _saveDraft() async {
     try {
-      await http.post(Uri.parse('$_api/onboarding/draft'), headers: _h,
-        body: jsonEncode({
-          'step_completed': _step,
-          'draft_data': {
-            'name_ar': _nameArC.text, 'name_en': _nameEnC.text,
-            'cr_number': _crC.text, 'tax_number': _taxC.text,
-            'national_address': _addressC.text, 'city': _cityC.text,
-            'legal_entity_type': _selectedEntityType,
-            'sector_main_code': _selectedSector,
-            'sector_sub_code': _selectedSubSector,
-            'client_type': _clientType,
-          }
-        }));
+      await ApiService.saveOnboardingDraft(step: _step, data: {
+        'name_ar': _nameArC.text, 'name_en': _nameEnC.text,
+        'cr_number': _crC.text, 'tax_number': _taxC.text,
+        'national_address': _addressC.text, 'city': _cityC.text,
+        'legal_entity_type': _selectedEntityType,
+        'sector_main_code': _selectedSector,
+        'sector_sub_code': _selectedSubSector,
+        'client_type': _clientType,
+      });
     } catch (_) {}
   }
 
@@ -166,23 +148,21 @@ class _WizardState extends State<ClientOnboardingWizard> {
   Future<void> _submit() async {
     setState(() => _loading = true);
     try {
-      final r = await http.post(Uri.parse('$_api/clients'), headers: _h,
-        body: jsonEncode({
-          'name_ar': _nameArC.text.trim(),
-          'client_type_code': _clientType,
-          'name_en': _nameEnC.text.trim(),
-          'cr_number': _crC.text.trim(),
-          'tax_number': _taxC.text.trim(),
-          'city': _cityC.text.trim(),
-        }));
-      final d = jsonDecode(utf8.decode(r.bodyBytes));
+      final r = await ApiService.createClientFromOnboarding({
+        'name_ar': _nameArC.text.trim(),
+        'client_type_code': _clientType,
+        'name_en': _nameEnC.text.trim(),
+        'cr_number': _crC.text.trim(),
+        'tax_number': _taxC.text.trim(),
+        'city': _cityC.text.trim(),
+      });
       if (mounted) {
-        if (r.statusCode == 200 && d['success'] == true) {
+        if (r.success) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('تم إنشاء العميل بنجاح'), backgroundColor: Colors.green));
           Navigator.pop(context, true);
         } else {
-          setState(() { _error = d['detail'] ?? d['error'] ?? 'فشل الإنشاء'; _loading = false; });
+          setState(() { _error = r.error ?? 'فشل الإنشاء'; _loading = false; });
         }
       }
     } catch (e) {

@@ -3,14 +3,14 @@ APEX Platform - Service Catalog + Audit Service APIs
 Per Architecture Doc v5 Sections 7, 8, 15
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime, timezone
 import logging
 
 from app.phase1.routes.phase1_routes import get_current_user
-from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
+from app.phase1.models.platform_models import SessionLocal, gen_uuid
 from app.phase2.models.service_catalog_models import (
     ServiceCatalog,
     ServiceWorkflowStage,
@@ -174,7 +174,7 @@ async def create_service_case(req: CreateServiceCaseRequest, user: dict = Depend
         return {"success": True, "case_id": case.id, "current_stage": case.current_stage}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Failed to create service case", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to create service case")
@@ -283,7 +283,7 @@ async def create_sample(case_id: str, req: CreateSampleRequest, user: dict = Dep
         db.commit()
         db.refresh(sample)
         return {"success": True, "sample_id": sample.id}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Failed to create audit sample", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to create audit sample")
@@ -337,7 +337,7 @@ async def create_workpaper(case_id: str, req: CreateWorkpaperRequest, user: dict
         db.commit()
         db.refresh(wp)
         return {"success": True, "workpaper_id": wp.id}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Failed to create workpaper", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to create workpaper")
@@ -386,7 +386,7 @@ async def review_workpaper(wp_id: str, req: ReviewWorkpaperRequest, user: dict =
         return {"success": True, "status": wp.reviewer_status}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Failed to review workpaper", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to review workpaper")
@@ -416,7 +416,7 @@ async def create_finding(case_id: str, req: CreateFindingRequest, user: dict = D
         db.commit()
         db.refresh(finding)
         return {"success": True, "finding_id": finding.id, "finding_code": finding.finding_code}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Failed to create audit finding", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to create audit finding")

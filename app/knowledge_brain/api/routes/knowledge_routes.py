@@ -16,7 +16,7 @@ Endpoints per implementation plan:
 
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime, timezone
 from app.knowledge_brain.models.db_models import (
     get_db,

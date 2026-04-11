@@ -1,11 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../copilot/copilot_screen.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../core/api_config.dart';
 import '../../core/theme.dart';
-
-const _api = apiBase;
+import '../../api_service.dart';
 
 class ServiceCatalogScreen extends StatefulWidget {
   final String? clientId;
@@ -24,21 +20,14 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
     'compliance': 'ط§ظ…طھط«ط§ظ„', 'readiness': 'ط¬ط§ظ‡ط²ظٹط©', 'advisory': 'ط§ط³طھط´ط§ط±ظٹط©',
   };
 
-  Map<String, String> get _h => {'Authorization': 'Bearer ${widget.token ?? ""}', 'Content-Type': 'application/json'};
-
   @override void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    try {
-      String url = '$_api/services/catalog';
-      if (_selectedCategory != null) url += '?category=$_selectedCategory';
-      final r = await http.get(Uri.parse(url));
-      if (r.statusCode == 200) {
-        final d = jsonDecode(utf8.decode(r.bodyBytes));
-        setState(() { _services = d['data'] ?? []; _loading = false; });
-      } else { setState(() => _loading = false); }
-    } catch (_) { setState(() => _loading = false); }
+    final res = await ApiService.getServiceCatalog(category: _selectedCategory);
+    if (res.success) {
+      setState(() { _services = res.data['data'] ?? []; _loading = false; });
+    } else { setState(() => _loading = false); }
   }
 
   @override
@@ -113,17 +102,11 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
         backgroundColor: Colors.orange));
       return;
     }
-    try {
-      final r = await http.post(Uri.parse('$_api/services/cases'), headers: _h,
-        body: jsonEncode({'client_id': widget.clientId ?? '', 'service_code': code}));
-      if (r.statusCode == 200) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('طھظ… ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط© ط¨ظ†ط¬ط§ط­'), backgroundColor: Colors.green));
-      } else {
-        final d = jsonDecode(utf8.decode(r.bodyBytes));
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(d['detail'] ?? 'ظپط´ظ„'), backgroundColor: Colors.red));
-      }
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('ط®ط·ط£: $e'), backgroundColor: Colors.red));
+    final res = await ApiService.createServiceCase(clientId: widget.clientId!, serviceCode: code);
+    if (res.success) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('طھظ… ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط© ط¨ظ†ط¬ط§ط­'), backgroundColor: Colors.green));
+    } else {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? 'ظپط´ظ„'), backgroundColor: Colors.red));
     }
   }
 }

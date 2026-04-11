@@ -3,7 +3,7 @@ APEX Phase 7 — Seed Data for Task Types & Document Requirements
 Per Execution Master §8
 """
 
-from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
+from app.phase1.models.platform_models import SessionLocal, gen_uuid
 
 TASK_TYPES_DATA = [
     {

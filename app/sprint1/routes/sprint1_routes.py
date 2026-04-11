@@ -12,7 +12,7 @@ APIs per Sprint 1 Build Spec §15:
 
 import os
 import logging
-from fastapi import APIRouter, File, UploadFile, HTTPException, Query, Depends
+from fastapi import APIRouter, File, UploadFile, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Any, Dict, Optional
 
@@ -155,7 +155,7 @@ async def upload_coa(
 
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("COA upload failed", exc_info=True)
         raise HTTPException(500, "Upload processing failed")
 
@@ -279,7 +279,7 @@ async def parse_coa(upload_id: str, body: ParseCoaRequest = None):
 
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("COA parse error", exc_info=True)
         raise HTTPException(500, "COA file parsing failed")
 
@@ -334,7 +334,7 @@ async def create_knowledge_feedback(body: KnowledgeFeedbackRequest):
         db.add(fb)
         db.commit()
         return {"success": True, "data": {"id": fb.id, "status": "submitted", "message": "تم حفظ الملاحظة بنجاح"}}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Knowledge feedback submission failed", exc_info=True)
         raise HTTPException(500, "Failed to submit feedback")

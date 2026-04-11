@@ -4,7 +4,7 @@ APEX Platform — Phase 4 API Routes
 Provider Registration, Documents, Verification, Marketplace.
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import Optional
 

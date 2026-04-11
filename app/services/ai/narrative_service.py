@@ -10,7 +10,6 @@ APEX AI Narrative Service — طبقة الذكاء الاصطناعي
 
 import os
 import json
-from typing import Optional
 
 
 class NarrativeService:
@@ -50,21 +49,21 @@ class NarrativeService:
             try:
                 narrative = await self._call_openai(prompt)
                 platform = "gpt4"
-            except Exception as e:
+            except Exception:
                 narrative = {"error": "AI narrative generation failed (GPT-4)"}
 
         if not narrative.get("executive_summary") and self.google_key:
             try:
                 narrative = await self._call_gemini(prompt)
                 platform = "gemini"
-            except Exception as e:
+            except Exception:
                 narrative = {"error": "AI narrative generation failed (Gemini)"}
 
         if not narrative.get("executive_summary") and self.anthropic_key:
             try:
                 narrative = await self._call_claude(prompt)
                 platform = "claude"
-            except Exception as e:
+            except Exception:
                 narrative = {"error": "AI narrative generation failed (Claude)"}
 
         narrative["platform"] = platform

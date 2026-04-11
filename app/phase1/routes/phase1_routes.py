@@ -6,9 +6,9 @@ Per execution document section 12 + Zero-Ambiguity Pack section 14.
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Header, Request
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import Optional
-import logging, os
+import logging
 
 from app.phase1.services.auth_service import AuthService, decode_token
 from app.phase1.services.account_service import AccountService
@@ -288,7 +288,7 @@ async def reactivate(user: dict = Depends(get_current_user)):
 @router.post("/auth/change-password", tags=["Auth"])
 async def api_change_password(request: Request):
     from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
-    import jwt, traceback
+    import jwt
 
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
@@ -297,7 +297,7 @@ async def api_change_password(request: Request):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload.get("user_id") or payload.get("sub")
-    except Exception as e:
+    except Exception:
         raise HTTPException(401, "Invalid or expired token")
     body = await request.json()
     current_pw = body.get("current_password", "")
@@ -319,7 +319,7 @@ async def api_change_password(request: Request):
         return {"success": True, "data": {"message": "Password changed successfully"}}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Password change error", exc_info=True)
         raise HTTPException(500, "Failed to change password")

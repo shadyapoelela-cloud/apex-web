@@ -5,7 +5,7 @@ Handles: emit, list, mark-read, count, preferences
 
 import logging
 from datetime import datetime, timezone
-from app.phase1.models.platform_models import SessionLocal, gen_uuid, utcnow
+from app.phase1.models.platform_models import SessionLocal, gen_uuid
 from app.phase10.models.phase10_models import (
     NotificationV2,
     NotificationPreference,
@@ -117,7 +117,7 @@ def emit_notification(
             logging.error("Email delivery failed for notification %s: %s", notif.id, email_err)
 
         return {"success": True, "notification_id": notif.id}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -209,7 +209,7 @@ def mark_as_read(user_id, notification_id=None):
             )
             db.commit()
             return {"success": True, "marked": count}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}
@@ -287,7 +287,7 @@ def update_preference(user_id, notification_type, in_app=True, email=True, sms=F
 
         db.commit()
         return {"success": True}
-    except Exception as e:
+    except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
         return {"success": False, "error": "Internal server error"}

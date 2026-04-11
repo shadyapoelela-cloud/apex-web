@@ -13,7 +13,8 @@ APIs:
   DELETE /coa/rules/{rule_id}              — Deactivate rule
 """
 
-import json, logging
+import json
+import logging
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -226,7 +227,7 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
         }
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logging.error("COA assessment error", exc_info=True)
         raise HTTPException(500, "COA quality assessment failed")
     finally:

@@ -8,7 +8,7 @@
 ╚════════════════════════════════════════════════════════════════╝
 """
 
-from typing import List, Dict, Optional
+from typing import List, Dict
 from app.knowledge_brain.rulebooks.tax_rulebook import TAX_RULES
 from app.knowledge_brain.rulebooks.accounting_rulebook import ACCOUNTING_RULES
 from app.knowledge_brain.rulebooks.governance_rulebook import GOVERNANCE_RULES

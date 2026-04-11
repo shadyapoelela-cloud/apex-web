@@ -2,9 +2,8 @@
 APEX Sprint 1 — Pydantic Schemas for COA Workflow
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
-from datetime import datetime
 
 # ── Upload & Detection ──
 

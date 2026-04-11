@@ -3,7 +3,7 @@ APEX Phase 11 — Legal Acceptance Models
 Tables: legal_documents_v2, acceptance_logs_v2
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, Text, Integer, Float
+from sqlalchemy import Column, String, DateTime, Boolean, Text
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 LEGAL_DOC_TYPES = [

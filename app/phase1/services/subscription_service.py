@@ -8,18 +8,13 @@ Resolution chain (per execution document):
 """
 
 import logging
-from typing import Optional
 from app.phase1.models.platform_models import (
-    User,
     Plan,
     PlanFeature,
     UserSubscription,
     SubscriptionEntitlement,
-    UserRole,
-    Role,
     Notification,
     AuditEvent,
-    PlanCode,
     SubscriptionStatus,
     SessionLocal,
     gen_uuid,
@@ -166,7 +161,7 @@ class SubscriptionService:
                 "plan": new_plan_code,
             }
 
-        except Exception as e:
+        except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
             return {"success": False, "error": "Internal server error"}
