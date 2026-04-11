@@ -13,15 +13,42 @@ env:
   ANTHROPIC_API_KEY: sk-ant-fake-key-for-ci
 
 jobs:
-  build-and-test:
+  lint:
+    name: Lint & Security
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install lint tools
+        run: pip install black bandit ruff
+
+      - name: Black format check
+        run: black --check --diff --line-length 120 app/ tests/ || echo "::warning::Black formatting issues found (non-blocking)"
+
+      - name: Ruff lint check
+        run: ruff check app/ --select E9,F63,F7,F82 --no-fix || echo "::warning::Ruff found issues (non-blocking)"
+
+      - name: Bandit security scan
+        run: bandit -r app/ -ll -q --skip B101,B311 -f txt || echo "::warning::Bandit found issues (non-blocking)"
+
+      - name: Syntax check all Python files
+        run: |
+          echo "Running py_compile on all .py files under app/..."
+          find app/ -name "*.py" -print0 | xargs -0 -n1 python -m py_compile
+          echo "All files compiled successfully."
+
+  test:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
@@ -30,18 +57,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest httpx
+          pip install pytest httpx pytest-cov
 
-      - name: Syntax check all Python files
+      - name: Run tests with coverage
         run: |
-          echo "Running py_compile on all .py files under app/..."
-          find app/ -name "*.py" -print0 | xargs -0 -n1 python -m py_compile
-          echo "All files compiled successfully."
+          pytest tests/ -v \
+            --cov=app \
+            --cov-report=term-missing \
+            --cov-report=html:coverage_html \
+            --cov-fail-under=10 \
+            --tb=short
 
-      - name: Run tests
-        run: |
-          cd $GITHUB_WORKSPACE
-          pytest tests/ -v
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage_html/
+          retention-days: 14
 
       - name: Verify major module imports
         run: |
@@ -57,7 +90,11 @@ jobs:
               ('app.phase2.models.archive_models', 'Archive models'),
               ('app.phase2.models.service_catalog_models', 'Service catalog models'),
               ('app.phase3.models.phase3_models', 'Phase 3 models'),
+              ('app.phase4.models.phase4_models', 'Phase 4 models'),
+              ('app.phase4.services.provider_service', 'Provider service'),
               ('app.core', 'Core module'),
+              ('app.core.auth_utils', 'Auth utils'),
+              ('app.core.email_service', 'Email service'),
           ]
 
           for mod, desc in modules:
@@ -77,7 +114,8 @@ jobs:
           "
 
   deploy:
-    needs: build-and-test
+    name: Deploy to Render
+    needs: [lint, test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
