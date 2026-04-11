@@ -1,6 +1,8 @@
 """
 APEX — Copilot service layer for session management and AI-powered chat
 خدمة المساعد الذكي لإدارة الجلسات والمحادثة المدعومة بالذكاء الاصطناعي
+
+Powered by Claude (Anthropic) — configured as APEX's intelligent financial assistant
 """
 
 import os
@@ -11,29 +13,200 @@ from app.copilot.models.copilot_models import CopilotSession, CopilotMessage, Co
 from app.copilot.services.intent_router import detect_intent, build_context, suggest_next_actions
 
 # Maximum recent messages to include as conversation memory
-MAX_MEMORY_MESSAGES = 10
+MAX_MEMORY_MESSAGES = 20
 
 # AI API key for real responses
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
-# System prompt for the Copilot AI assistant
-COPILOT_SYSTEM_PROMPT = """أنت مساعد APEX الذكي — منصة مالية سعودية متقدمة للمحاسبين والمراجعين والشركات.
+# ═══════════════════════════════════════════════════════════════
+# APEX COPILOT — SYSTEM PROMPT (Claude Identity as APEX Assistant)
+# ═══════════════════════════════════════════════════════════════
 
-دورك:
-- مساعدة المستخدمين في التحليل المالي، شجرة الحسابات (COA)، النسب المالية، والقوائم المالية
-- الإجابة عن أسئلة الامتثال (ضريبة القيمة المضافة VAT، الزكاة ZATCA، نظام الشركات)
-- شرح معايير المحاسبة (SOCPA، IFRS) ومعايير المراجعة (ISA)
-- المساعدة في تقييم الجاهزية التمويلية وتحليل المخاطر
-- توجيه المستخدمين لخدمات سوق الخدمات المهنية (Marketplace)
-- إدارة الاشتراكات والحسابات
+COPILOT_SYSTEM_PROMPT = """أنت "Apex Copilot" — المساعد الذكي المدمج في منصة APEX، وهي منصة سعودية متقدمة للتحليل المالي والحوكمة المعرفية مصممة خصيصاً للسوق السعودي.
 
-قواعد صارمة:
-- أجب بالعربية دائماً إلا إذا طلب المستخدم الإنجليزية
-- لا تختلق أرقاماً مالية أو بيانات غير موجودة
-- إذا لم تكن متأكداً، اذكر ذلك بوضوح واقترح التصعيد لمختص
-- كن موجزاً ومهنياً — الردود لا تزيد عن 300 كلمة
-- استخدم التنسيق المناسب (نقاط، أرقام) لتسهيل القراءة
-- عند ذكر أنظمة أو معايير، اذكر المرجع الرسمي"""
+═══════════════════════════════════════
+🏢 هوية المنصة
+═══════════════════════════════════════
+
+APEX هي منصة مالية سعودية شاملة تخدم:
+- المحاسبين القانونيين والمالكين
+- مكاتب المراجعة والتدقيق
+- المنشآت الصغيرة والمتوسطة (SMEs)
+- المستشارين الماليين والضريبيين
+- الشركات التي تسعى للتمويل البنكي أو الاستثماري
+
+═══════════════════════════════════════
+🎯 خدمات المنصة التي تدعمها
+═══════════════════════════════════════
+
+1. **شجرة الحسابات (COA)**
+   - رفع ملفات CSV/Excel تحتوي على دليل الحسابات
+   - تصنيف تلقائي ذكي (أصول، خصوم، حقوق ملكية، إيرادات، مصروفات)
+   - 70+ قاعدة تصنيف عربية و33+ إنجليزية و16 قاعدة لرموز الحسابات
+   - تقييم جودة بخمسة أبعاد: التغطية، الاتساق، العمق، التوازن، الاكتمال
+   - مراجعة واعتماد مع بوابات ثقة (85% للاعتماد التلقائي)
+
+2. **ميزان المراجعة (Trial Balance)**
+   - رفع الميزان بصيغة Excel
+   - ربط تلقائي بشجرة الحسابات المعتمدة
+   - كشف المطابقات الدقيقة والتقريبية
+   - تقرير نسب الربط والحسابات غير المطابقة
+
+3. **التحليل المالي**
+   - حساب 20+ نسبة مالية (ربحية، سيولة، كفاءة، رفع مالي)
+   - مقارنة بمعايير القطاع (Benchmarking)
+   - إنشاء القوائم المالية: الدخل، المركز المالي، التدفقات النقدية
+   - توليد تقارير PDF وExcel
+
+4. **الجاهزية التمويلية**
+   - تقييم شامل لجاهزية المنشأة للحصول على تمويل
+   - تحديد الفجوات والمتطلبات المفقودة
+   - درجة جاهزية من 0 إلى 100
+
+5. **الامتثال والحوكمة**
+   - فحص التزام بمتطلبات ZATCA (هيئة الزكاة والضريبة والجمارك)
+   - ضريبة القيمة المضافة (VAT 15%)
+   - الفوترة الإلكترونية (FATOORAH)
+   - نظام الشركات السعودي الجديد (2023)
+
+6. **المراجعة والتدقيق**
+   - 7 مراحل: من تعريف الشجرة حتى المخرجات النهائية
+   - برامج مراجعة ذكية
+   - اختيار عينات وتنفيذ إجراءات
+   - أوراق عمل وملاحظات
+
+7. **سوق الخدمات المهنية (Marketplace)**
+   - طلب خدمات: مسك دفاتر، إعداد قوائم، مراجعة ضريبية
+   - ربط بمكاتب محاسبة ومراجعة معتمدة
+   - تتبع الطلبات والتقييمات
+
+8. **قاعدة المعرفة المهنية (Knowledge Brain)**
+   - معايير SOCPA (الهيئة السعودية للمراجعين والمحاسبين)
+   - معايير IFRS الدولية
+   - معايير المراجعة ISA
+   - أنظمة ولوائح ZATCA
+   - نظام الشركات ولوائحه التنفيذية
+
+═══════════════════════════════════════
+🎨 شخصيتك وأسلوبك
+═══════════════════════════════════════
+
+- أنت مساعد مهني ذكي، ودود لكن محترف — لست روبوت خدمة عملاء عادي
+- تتحدث بالعربية الفصحى البسيطة (لا عامية ولا تعقيد لغوي)
+- أجب بالإنجليزية فقط إذا طلب المستخدم ذلك صراحة
+- استخدم الأرقام والنقاط والتنسيق لتسهيل القراءة
+- كن مباشراً — لا تكرر الترحيب في كل رد، ركز على الإجابة
+- إذا كان السؤال خارج نطاق المنصة، وجّه المستخدم بلطف
+- لا تقل "أنا مجرد ذكاء اصطناعي" — أنت Apex Copilot وهذه هويتك
+
+═══════════════════════════════════════
+⚠️ قواعد حتمية
+═══════════════════════════════════════
+
+1. **لا تختلق بيانات مالية**: إذا لم تكن لديك أرقام فعلية، قل ذلك بوضوح
+2. **الامتثال والضرائب**: دائماً أضف تحذير "النتائج استرشادية وتحتاج مراجعة مختص معتمد"
+3. **التصعيد**: إذا كان الموضوع يحتاج خبير بشري (مثل فتوى ضريبية أو رأي قانوني)، اقترح التصعيد
+4. **الخصوصية**: لا تطلب من المستخدم مشاركة بيانات حساسة (كلمات مرور، أرقام حسابات بنكية)
+5. **المعايير والأنظمة**: عند الاستشهاد بنظام أو معيار، اذكر المصدر والرقم إن أمكن
+6. **الردود المختصرة**: لا تزيد عن 400 كلمة إلا إذا طلب المستخدم تفصيلاً
+7. **التوجيه العملي**: دائماً قدم الخطوة التالية — لا تترك المستخدم بدون إجراء واضح
+8. **السياق**: استخدم بيانات العميل المرفقة في السياق لتخصيص إجاباتك"""
+
+# ═══════════════════════════════════════════════════════════════
+# Dynamic context builder — pulls real client data for Claude
+# ═══════════════════════════════════════════════════════════════
+
+
+def _fetch_client_context(db, client_id: str) -> str:
+    """Fetch real client data to enrich Claude's context."""
+    if not client_id:
+        return ""
+
+    context_parts = []
+
+    try:
+        from app.phase2.models.phase2_models import Client
+
+        client = db.query(Client).filter(Client.id == client_id).first()
+        if client:
+            context_parts.append(f"اسم العميل: {client.name_ar or client.name or '—'}")
+            if hasattr(client, "sector") and client.sector:
+                context_parts.append(f"القطاع: {client.sector}")
+            if hasattr(client, "legal_entity_type") and client.legal_entity_type:
+                context_parts.append(f"الكيان القانوني: {client.legal_entity_type}")
+            if hasattr(client, "coa_status") and client.coa_status:
+                context_parts.append(f"حالة شجرة الحسابات: {client.coa_status}")
+            if hasattr(client, "tb_status") and client.tb_status:
+                context_parts.append(f"حالة ميزان المراجعة: {client.tb_status}")
+    except Exception:
+        logging.debug("Could not fetch client data for copilot context", exc_info=True)
+
+    # Try to get latest COA upload info
+    try:
+        from app.sprint1.models.sprint1_models import CoaUpload
+
+        coa = (
+            db.query(CoaUpload)
+            .filter(CoaUpload.client_id == client_id)
+            .order_by(CoaUpload.created_at.desc())
+            .first()
+        )
+        if coa:
+            context_parts.append(f"آخر رفع COA: {coa.status or '—'}")
+            if hasattr(coa, "total_accounts"):
+                context_parts.append(f"عدد الحسابات: {coa.total_accounts or 0}")
+            if hasattr(coa, "classification_confidence"):
+                conf = coa.classification_confidence
+                if conf:
+                    context_parts.append(f"ثقة التصنيف: {conf}%")
+    except Exception:
+        pass
+
+    # Try to get latest analysis
+    try:
+        from app.phase3.models.phase3_models import AnalysisResult
+
+        analysis = (
+            db.query(AnalysisResult)
+            .filter(AnalysisResult.client_id == client_id)
+            .order_by(AnalysisResult.created_at.desc())
+            .first()
+        )
+        if analysis:
+            context_parts.append(f"آخر تحليل مالي: متوفر")
+            if hasattr(analysis, "readiness_score") and analysis.readiness_score:
+                context_parts.append(f"درجة الجاهزية: {analysis.readiness_score}/100")
+    except Exception:
+        pass
+
+    if context_parts:
+        return "\n\n📋 بيانات العميل الحالي:\n" + "\n".join(f"- {p}" for p in context_parts)
+    return ""
+
+
+def _fetch_user_context(db, user_id: str) -> str:
+    """Fetch user profile info for personalization."""
+    try:
+        from app.phase1.models.platform_models import User
+
+        user = db.query(User).filter(User.id == user_id).first()
+        if user:
+            parts = []
+            if user.display_name:
+                parts.append(f"اسم المستخدم: {user.display_name}")
+            if hasattr(user, "plan") and user.plan:
+                plan_labels = {
+                    "free": "مجاني",
+                    "starter": "أساسي",
+                    "professional": "احترافي",
+                    "enterprise": "مؤسسي",
+                }
+                parts.append(f"الخطة: {plan_labels.get(user.plan, user.plan)}")
+            if parts:
+                return "\n👤 " + " | ".join(parts)
+    except Exception:
+        pass
+    return ""
 
 
 class CopilotService:
@@ -110,7 +283,6 @@ class CopilotService:
 
             # Continuity boost: if user seems to continue same topic
             if last_intent and intent == "general" and confidence < 0.5 and conversation_history:
-                # User likely continuing previous topic — inherit last intent with lower confidence
                 intent = last_intent
                 confidence = 0.5
                 intent_result = {
@@ -129,7 +301,16 @@ class CopilotService:
                 risk_level = "medium"
 
             needs_escalation = confidence < 0.45 or (risk_level == "high" and confidence < 0.7)
-            response_text = cls._generate_response(intent, confidence, ctx, user_message, conversation_history)
+
+            # Fetch real client + user context for AI enrichment
+            effective_client_id = client_id or session.client_id
+            client_context = _fetch_client_context(db, effective_client_id) if effective_client_id else ""
+            user_context = _fetch_user_context(db, session.user_id)
+
+            response_text = cls._generate_response(
+                intent, confidence, ctx, user_message, conversation_history,
+                client_context=client_context, user_context=user_context,
+            )
             next_actions = suggest_next_actions(intent, ctx)
             references = cls._get_references(intent)
 
@@ -176,7 +357,7 @@ class CopilotService:
                 **ctx,
                 "last_intent": intent,
                 "intent_history": intent_history,
-                "message_count": len(conversation_history) + 2,  # +2 for new user+assistant
+                "message_count": len(conversation_history) + 2,
                 "last_confidence": confidence,
             }
             session.updated_at = datetime.now(timezone.utc)
@@ -246,13 +427,11 @@ class CopilotService:
             )
             escalations = db.query(CopilotEscalation).filter(CopilotEscalation.session_id == session_id).all()
 
-            # Topic distribution
             intents = [m.intent for m in messages if m.intent and m.role == "assistant"]
             topic_counts = {}
             for i in intents:
                 topic_counts[i] = topic_counts.get(i, 0) + 1
 
-            # Average confidence
             confidences = [m.confidence for m in messages if m.confidence is not None]
             avg_confidence = round(sum(confidences) / len(confidences), 2) if confidences else 0
 
@@ -290,8 +469,13 @@ class CopilotService:
         finally:
             db.close()
 
+    # ═══════════════════════════════════════════════════════════════
+    # AI Response Generation (Claude API + Fallback)
+    # ═══════════════════════════════════════════════════════════════
+
     @classmethod
-    def _generate_response(cls, intent, confidence, ctx, user_message, conversation_history=None):
+    def _generate_response(cls, intent, confidence, ctx, user_message, conversation_history=None,
+                           client_context="", user_context=""):
         """Generate AI response using Claude API, with fallback to hardcoded responses."""
         if not ANTHROPIC_API_KEY:
             return cls._generate_fallback_response(intent, confidence, ctx, user_message, conversation_history)
@@ -315,7 +499,7 @@ class CopilotService:
             # Add the current user message
             messages.append({"role": "user", "content": user_message})
 
-            # Build an enhanced system prompt with intent context
+            # Build the full system prompt with dynamic context
             intent_labels = {
                 "financial_analysis": "التحليل المالي",
                 "coa_workflow": "شجرة الحسابات",
@@ -331,30 +515,41 @@ class CopilotService:
             }
             intent_label = intent_labels.get(intent, intent)
 
-            system_prompt = (
-                COPILOT_SYSTEM_PROMPT
-                + f"\n\nالسياق الحالي:\n- نية المستخدم المكتشفة: {intent_label} (ثقة: {confidence})"
-            )
+            # Build dynamic context section
+            dynamic_context = f"\n\n═══ السياق الحالي ═══\n- نية المستخدم: {intent_label} (ثقة: {confidence})"
+
+            if user_context:
+                dynamic_context += user_context
+            if client_context:
+                dynamic_context += client_context
+
             if ctx.get("requires_client") and not ctx.get("client_id"):
-                system_prompt += "\n- لم يتم اختيار عميل بعد — ذكّر المستخدم باختيار العميل إذا لزم الأمر"
+                dynamic_context += "\n⚠️ لم يتم اختيار عميل — ذكّر المستخدم باختيار العميل"
             if ctx.get("requires_file"):
-                system_prompt += "\n- هذه العملية تتطلب رفع ملف — وجّه المستخدم لذلك إذا لم يرفع بعد"
+                dynamic_context += "\n📎 هذه العملية تتطلب رفع ملف — وجّه المستخدم لذلك"
             if ctx.get("may_escalate"):
-                system_prompt += "\n- هذا الموضوع حساس وقد يحتاج تصعيد لمختص — نبّه المستخدم عند الحاجة"
+                dynamic_context += "\n🔴 موضوع حساس — قد يحتاج تصعيد لمختص"
+
+            # Conversation summary for long conversations
+            msg_count = len(conversation_history) if conversation_history else 0
+            if msg_count > 6:
+                dynamic_context += f"\n💬 عدد الرسائل السابقة: {msg_count} — ركز على آخر التطورات"
+
+            system_prompt = COPILOT_SYSTEM_PROMPT + dynamic_context
 
             response = client.messages.create(
                 model="claude-sonnet-4-20250514",
-                max_tokens=1024,
-                temperature=0.7,
+                max_tokens=1500,
+                temperature=0.6,
                 system=system_prompt,
                 messages=messages,
             )
 
             ai_text = response.content[0].text.strip()
 
-            # Append low-confidence warning if needed
-            if confidence < 0.5:
-                ai_text += "\n\n⚠️ لم أتمكن من فهم طلبك بدقة. يرجى توضيح ما تحتاجه."
+            # Append low-confidence warning only for very low confidence
+            if confidence < 0.4:
+                ai_text += "\n\n⚠️ لم أتمكن من فهم طلبك بدقة. يرجى إعادة صياغة سؤالك."
 
             return ai_text
 
@@ -365,14 +560,13 @@ class CopilotService:
     @classmethod
     def _generate_fallback_response(cls, intent, confidence, ctx, user_message, conversation_history=None):
         """Fallback hardcoded responses when AI API is unavailable."""
-        # Primary responses per intent
         responses = {
             "financial_analysis": {
                 "first": "يمكنني مساعدتك في التحليل المالي. الخطوات:\n1. رفع ميزان المراجعة (Excel)\n2. تحديد القطاع والفترة\n3. استعراض النسب والقوائم المالية\n\nهل تريد رفع ميزان المراجعة الآن؟",
                 "follow_up": "نكمل التحليل المالي. هل تريد عرض النسب المالية أم القوائم؟",
             },
             "coa_workflow": {
-                "first": "لنبدأ بشجرة الحسابات:\n1. ارفع الملف (CSV أو Excel)\n2. سأقوم بتحليل وتصنيف الحسابات تلقائيا\n3. راجع التصنيف واعتمده\n\nالملفات المدعومة: CSV, XLSX, XLS",
+                "first": "لنبدأ بشجرة الحسابات:\n1. ارفع الملف (CSV أو Excel)\n2. سأقوم بتحليل وتصنيف الحسابات تلقائياً\n3. راجع التصنيف واعتمده\n\nالملفات المدعومة: CSV, XLSX, XLS",
                 "follow_up": "نكمل العمل على شجرة الحسابات. هل تريد رفع ملف جديد أم مراجعة التصنيف؟",
             },
             "tb_binding": {
@@ -380,7 +574,7 @@ class CopilotService:
                 "follow_up": "نكمل ربط الميزان. هل تريد عرض نتائج الربط أم تعديل المطابقة؟",
             },
             "funding_readiness": {
-                "first": "سأقيّم جاهزية المنشأة للتمويل:\n- تحليل القوائم المالية\n- فحص النسب المطلوبة من جهات التمويل\n- تحديد الفجوات والتوصيات\n\n⚠️ النتائج استرشادية وليست ضمانا للحصول على تمويل.",
+                "first": "سأقيّم جاهزية المنشأة للتمويل:\n- تحليل القوائم المالية\n- فحص النسب المطلوبة من جهات التمويل\n- تحديد الفجوات والتوصيات\n\n⚠️ النتائج استرشادية وليست ضماناً للحصول على تمويل.",
                 "follow_up": "نكمل تقييم الجاهزية التمويلية. هل تريد عرض الفجوات أم تجهيز المستندات؟",
             },
             "compliance": {
@@ -408,12 +602,11 @@ class CopilotService:
                 "follow_up": "هل تحتاج مساعدة أخرى في حسابك؟",
             },
             "general": {
-                "first": "مرحبا! أنا مساعد Apex الذكي. يمكنني مساعدتك في:\n\n📊 التحليل المالي والنسب\n📋 شجرة الحسابات والتصنيف\n⚖️ الامتثال والزكاة والضريبة\n🔍 المراجعة والتدقيق\n💰 الجاهزية التمويلية\n📚 البحث في المعايير والأنظمة\n🛒 طلب خدمات مهنية\n\nكيف أساعدك؟",
+                "first": "مرحباً! أنا Apex Copilot — مساعدك الذكي في المنصة.\n\nيمكنني مساعدتك في:\n📊 التحليل المالي والنسب\n📋 شجرة الحسابات والتصنيف\n⚖️ الامتثال والزكاة والضريبة\n🔍 المراجعة والتدقيق\n💰 الجاهزية التمويلية\n📚 البحث في المعايير والأنظمة\n🛒 طلب خدمات مهنية\n\nكيف أساعدك اليوم؟",
                 "follow_up": "هل تحتاج مساعدة في شيء آخر؟",
             },
         }
 
-        # Determine if this is a follow-up or first message for this intent
         is_follow_up = False
         if conversation_history:
             for msg in conversation_history:
@@ -427,7 +620,7 @@ class CopilotService:
         if confidence < 0.5:
             base += "\n\n⚠️ لم أتمكن من فهم طلبك بدقة. يرجى توضيح ما تحتاجه."
         if ctx.get("requires_client") and not ctx.get("client_id"):
-            base += "\n\n📋 لإكمال هذه العملية، يرجى اختيار العميل أولا من قائمة العملاء."
+            base += "\n\n📋 لإكمال هذه العملية، يرجى اختيار العميل أولاً من قائمة العملاء."
         if ctx.get("requires_file"):
             base += "\n\n📎 ستحتاج لرفع ملف لإكمال هذه العملية."
         return base
@@ -436,20 +629,24 @@ class CopilotService:
     def _get_references(cls, intent):
         ref_map = {
             "compliance": [
-                {"source": "ZATCA", "type": "regulatory", "note": "هيئة الزكاة"},
-                {"source": "VAT", "type": "law", "note": "ضريبة القيمة المضافة"},
+                {"source": "ZATCA", "type": "regulatory", "note": "هيئة الزكاة والضريبة والجمارك"},
+                {"source": "VAT", "type": "law", "note": "نظام ضريبة القيمة المضافة"},
             ],
             "audit_review": [
-                {"source": "ISA", "type": "standard", "note": "معايير المراجعة"},
-                {"source": "SOCPA", "type": "standard", "note": "المعايير السعودية"},
+                {"source": "ISA", "type": "standard", "note": "معايير المراجعة الدولية"},
+                {"source": "SOCPA", "type": "standard", "note": "الهيئة السعودية للمراجعين والمحاسبين"},
             ],
             "financial_analysis": [
-                {"source": "SOCPA", "type": "standard", "note": "معايير المحاسبة"},
-                {"source": "IFRS", "type": "standard", "note": "المعايير الدولية"},
+                {"source": "SOCPA", "type": "standard", "note": "معايير المحاسبة السعودية"},
+                {"source": "IFRS", "type": "standard", "note": "المعايير الدولية لإعداد التقارير المالية"},
             ],
             "knowledge_lookup": [
-                {"source": "MoC", "type": "regulatory", "note": "نظام الشركات"},
-                {"source": "SOCPA", "type": "standard", "note": "الهيئة السعودية"},
+                {"source": "MoC", "type": "regulatory", "note": "نظام الشركات - وزارة التجارة"},
+                {"source": "SOCPA", "type": "standard", "note": "الهيئة السعودية للمراجعين والمحاسبين"},
+            ],
+            "funding_readiness": [
+                {"source": "SAMA", "type": "regulatory", "note": "البنك المركزي السعودي"},
+                {"source": "IFRS", "type": "standard", "note": "معايير العرض والإفصاح"},
             ],
         }
         return ref_map.get(intent, [])
