@@ -44,6 +44,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditPS extends State<EditProfileScreen> {
   late TextEditingController _dn, _org, _job, _city;
   bool _l=false; String? _e; bool _done=false;
+  @override void dispose() { _dn.dispose(); _org.dispose(); _job.dispose(); _city.dispose(); super.dispose(); }
   @override void initState() { super.initState();
     _dn=TextEditingController(text: widget.profile?['user']?['display_name']??'');
     _org=TextEditingController(text: widget.profile?['profile']?['organization_name']??'');
@@ -92,6 +93,7 @@ class ChangePasswordScreen extends StatefulWidget {
 class _ChPwS extends State<ChangePasswordScreen> {
   final _cur=TextEditingController(), _new1=TextEditingController(), _new2=TextEditingController();
   bool _l=false; String? _e; bool _done=false;
+  @override void dispose() { _cur.dispose(); _new1.dispose(); _new2.dispose(); super.dispose(); }
   Future<void> _go() async {
     if(_new1.text!=_new2.text) { setState(()=> _e='\u0643\u0644\u0645\u062a\u0627 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0645\u062a\u0637\u0627\u0628\u0642\u062a\u064a\u0646'); return; }
     setState((){ _l=true; _e=null; });

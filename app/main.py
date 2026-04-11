@@ -231,13 +231,39 @@ def _run_startup():
     except Exception as e: logging.error("Copilot init error", exc_info=True)
 
 
+def _validate_env():
+    """Validate critical environment variables at startup."""
+    env = os.environ.get("ENVIRONMENT", "development")
+    jwt = os.environ.get("JWT_SECRET", "")
+    admin = os.environ.get("ADMIN_SECRET", "")
+    db_url = os.environ.get("DATABASE_URL", "")
+
+    if env == "production":
+        missing = []
+        if not jwt or jwt == "apex-dev-secret-CHANGE-IN-PRODUCTION":
+            missing.append("JWT_SECRET")
+        if not admin or admin == "apex-admin-2026":
+            missing.append("ADMIN_SECRET")
+        if not db_url:
+            missing.append("DATABASE_URL")
+        if missing:
+            raise RuntimeError(f"PRODUCTION: Missing/default env vars: {', '.join(missing)}")
+    else:
+        if not jwt or jwt == "apex-dev-secret-CHANGE-IN-PRODUCTION":
+            logging.warning("⚠ JWT_SECRET using default — set in production!")
+        if not admin or admin == "apex-admin-2026":
+            logging.warning("⚠ ADMIN_SECRET using default — set in production!")
+
+_validate_env()
+
+
 @asynccontextmanager
 async def lifespan(app):
     _run_startup()
     yield
 
 
-app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="11.3.0", lifespan=lifespan)
+app = FastAPI(title="APEX Financial Platform API", description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints", version="11.4.0", lifespan=lifespan)
 _cors_env = os.environ.get("CORS_ORIGINS", "")
 _cors_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else ["*"]
 _allow_creds = "*" not in _cors_origins  # credentials forbidden with wildcard
@@ -725,18 +751,24 @@ def admin_users(
             .all()
         )
 
+        # Pre-fetch all roles in ONE query (fixes N+1)
+        user_ids = [u.id for u in users_q]
+        role_map = {}  # user_id -> [role_codes]
+        if user_ids:
+            try:
+                role_rows = (
+                    db.query(UserRole.user_id, Role.code)
+                    .join(Role, Role.id == UserRole.role_id)
+                    .filter(UserRole.user_id.in_(user_ids))
+                    .all()
+                )
+                for uid, code in role_rows:
+                    role_map.setdefault(uid, []).append(code)
+            except Exception:
+                logging.warning("Failed to batch-fetch roles", exc_info=True)
+
         users_list = []
         for u in users_q:
-            # Fetch roles
-            role_names = []
-            try:
-                for ur in db.query(UserRole).filter(UserRole.user_id == u.id).all():
-                    role = db.query(Role).filter(Role.id == ur.role_id).first()
-                    if role:
-                        role_names.append(role.code)
-            except Exception:
-                pass
-
             users_list.append({
                 "id": u.id,
                 "username": u.username,
@@ -744,7 +776,7 @@ def admin_users(
                 "display_name": u.display_name,
                 "status": u.status,
                 "created_at": u.created_at.isoformat() if u.created_at else None,
-                "roles": role_names,
+                "roles": role_map.get(u.id, []),
             })
 
         return {

@@ -3439,7 +3439,7 @@ class _NewPwS extends State<NewPasswordScreen> {
       return;
     }
     setState(() { _ld = true; _err = null; });
-    print('TOKEN: [${widget.token}] LEN: ${widget.token.length}');
+    // Token debug removed for security
     try {
       final r = await http.post(Uri.parse('$_api/account/reset-password'),
         headers: {'Content-Type': 'application/json'},

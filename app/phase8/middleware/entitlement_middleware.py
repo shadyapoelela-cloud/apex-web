@@ -123,9 +123,9 @@ def require_entitlement(feature_key: str, required_value=None):
             if auth.startswith("Bearer "):
                 try:
                     import jwt
+                    from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
                     token = auth.split(" ")[1]
-                    # Use same secret as auth module
-                    payload = jwt.decode(token, options={"verify_signature": False})
+                    payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
                     user_id = payload.get("sub") or payload.get("user_id")
                 except Exception:
                     pass
