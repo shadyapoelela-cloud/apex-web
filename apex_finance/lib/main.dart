@@ -6,16 +6,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'core/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'core/router.dart';
+import 'core/session.dart';
+import 'core/api_retry.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
 
-
-
-// auth_widgets imported via router.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/app_providers.dart';
 import 'screens/extracted/subscription_screens.dart';
@@ -23,48 +21,6 @@ import 'screens/extracted/notification_screens_v2.dart';
 import 'screens/extracted/legal_screens_v2.dart';
 import 'screens/extracted/client_screens.dart';
 import 'screens/extracted/coa_screens.dart';
-// Note: Most screen navigation uses GoRouter (context.push) — no direct imports needed
-
-// === v7.5 ApiRetry helper (cold-start tolerance for Render free tier) ===
-class ApiRetry {
-  static Future<http.Response> _attempt(
-    Future<http.Response> Function() call,
-    String method,
-    String url,
-  ) async {
-    Object? lastErr;
-    for (int attempt = 1; attempt <= 3; attempt++) {
-      try {
-        final timeout = Duration(seconds: attempt == 1 ? 10 : 20);
-        final r = await call().timeout(timeout);
-        // Treat 502/503/504 as retriable (cold start gateway errors)
-        if (attempt < 3 && (r.statusCode == 502 || r.statusCode == 503 || r.statusCode == 504)) {
-          await Future.delayed(Duration(seconds: attempt * 3));
-          continue;
-        }
-        return r;
-      } catch (e) {
-        lastErr = e;
-        if (attempt < 3) {
-          await Future.delayed(Duration(seconds: attempt * 3));
-        }
-      }
-    }
-    throw Exception('ApiRetry $method $url failed after 3 attempts: $lastErr');
-  }
-
-  static Future<http.Response> get(Uri url, {Map<String, String>? headers}) =>
-    _attempt(() => http.get(url, headers: headers), 'GET', url.toString());
-
-  static Future<http.Response> post(Uri url,
-    {Map<String, String>? headers, Object? body}) =>
-    _attempt(() => http.post(url, headers: headers, body: body), 'POST', url.toString());
-
-  static Future<http.Response> put(Uri url,
-    {Map<String, String>? headers, Object? body}) =>
-    _attempt(() => http.put(url, headers: headers, body: body), 'PUT', url.toString());
-}
-// === end ApiRetry ===
 
 const _api = apiBase;
 
@@ -79,79 +35,8 @@ void main() {
   runApp(const ProviderScope(child: ApexApp()));
 }
 
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-// Design System
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-class AC {
-  static const gold = Color(0xFFC9A84C);
-  static const navy = Color(0xFF050D1A);
-  static const navy2 = Color(0xFF080F1F);
-  static const navy3 = Color(0xFF0D1829);
-  static const navy4 = Color(0xFF0F2040);
-  static const cyan = Color(0xFF00C2E0);
-  static const tp = Color(0xFFF0EDE6);
-  static const ts = Color(0xFF8A8880);
-  static const ok = Color(0xFF2ECC8A);
-  static const warn = Color(0xFFF0A500);
-  static const err = Color(0xFFE05050);
-  static const bdr = Color(0x26C9A84C);
-}
-
-class S {
-  static String? _token, uid, uname, dname, plan, email;
-  static String? get token {
-    _token ??= html.window.localStorage['apex_token'];
-    return (_token != null && _token!.isNotEmpty) ? _token : null;
-  }
-  static set token(String? v) {
-    _token = v;
-    if (v != null && v.isNotEmpty) {
-      html.window.localStorage['apex_token'] = v;
-    } else {
-      html.window.localStorage.remove('apex_token');
-    }
-  }
-  static List<String> roles = [];
-  static String get liveToken => html.window.localStorage['apex_token'] ?? '';
-  static Map<String,String> lh() => {'Authorization':'Bearer ${liveToken}','Content-Type':'application/json'};
-  static Map<String,String> h() => {'Authorization':'Bearer ${liveToken}'};
-  static Map<String,String> hj() => {'Authorization':'Bearer ${liveToken}','Content-Type':'application/json'};
-  static void clear() {
-    token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[];
-    final st = html.window.localStorage;
-    st.remove('apex_token'); st.remove('apex_uid'); st.remove('apex_uname');
-    st.remove('apex_dname'); st.remove('apex_plan'); st.remove('apex_email');
-    st.remove('apex_roles');
-  }
-  static String planAr() {
-    const m = {'free':'\u0645\u062c\u0627\u0646\u064a','pro':'\u0627\u062d\u062a\u0631\u0627\u0641\u064a','business':'\u0623\u0639\u0645\u0627\u0644','expert':'\u062e\u0628\u064a\u0631','enterprise':'\u0645\u0624\u0633\u0633\u064a'};
-    return m[plan] ?? plan ?? '\u0645\u062c\u0627\u0646\u064a';
-  }
-
-  static void save() {
-    final st = html.window.localStorage;
-    if (token != null) st['apex_token'] = token!;
-    if (uid != null) st['apex_uid'] = uid!;
-    if (uname != null) st['apex_uname'] = uname!;
-    if (dname != null) st['apex_dname'] = dname!;
-    if (plan != null) st['apex_plan'] = plan!;
-    if (email != null) st['apex_email'] = email!;
-    st['apex_roles'] = roles.join(',');
-  }
-  static bool restore() {
-    final st = html.window.localStorage;
-    if (st['apex_token'] == null || st['apex_token']!.isEmpty) return false;
-    token = st['apex_token']; uid = st['apex_uid'];
-    uname = st['apex_uname']; dname = st['apex_dname'];
-    plan = st['apex_plan']; email = st['apex_email'];
-    final r = st['apex_roles'];
-    if (r != null && r.isNotEmpty) {
-        try { roles = List<String>.from(jsonDecode(r)); }
-        catch(_) { roles = r.split(','); }
-      }
-    return true;
-  }
-}
+// AC imported from core/theme.dart
+// S imported from core/session.dart
 
 
   Widget _quickServiceBtn(BuildContext c, String label, IconData icon, int tabIdx) => Padding(
