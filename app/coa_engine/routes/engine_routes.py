@@ -490,3 +490,154 @@ async def get_ontology():
             "sections": {k: v for k, v in SECTION_MEMBERSHIP.items()},
         },
     }
+
+
+# ══════════════════════════════════════════════════════════════
+# POST /api/coa-engine/simulate — Financial statement simulation
+# ══════════════════════════════════════════════════════════════
+
+
+@router.post("/simulate")
+async def simulate_statements(
+    payload: dict,
+    user_id: str = Depends(_require_auth),
+):
+    """Simulate financial statement structure from classified accounts.
+
+    Expects JSON body with: accounts: [{code, name, main_class, sub_class, nature, concept_id, ...}]
+    Returns balance sheet, income statement, completeness score, and issues.
+    """
+    from app.coa_engine.services.simulator import simulate_financial_statements
+
+    accounts = payload.get("accounts", [])
+    if not accounts:
+        return {"success": False, "error": "No accounts provided"}
+
+    result = simulate_financial_statements(accounts)
+
+    return {
+        "success": True,
+        "data": result,
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# POST /api/coa-engine/compliance — IFRS/SOCPA/ZATCA compliance check
+# ══════════════════════════════════════════════════════════════
+
+
+@router.post("/compliance")
+async def check_coa_compliance(
+    payload: dict,
+    user_id: str = Depends(_require_auth),
+):
+    """Check COA compliance against IFRS/SOCPA/ZATCA requirements.
+
+    Expects JSON body with:
+      accounts: [{code, name, concept_id, main_class, ...}]
+      sector_code: (optional) sector code for sector-specific checks
+    """
+    from app.coa_engine.services.simulator import check_compliance
+
+    accounts = payload.get("accounts", [])
+    if not accounts:
+        return {"success": False, "error": "No accounts provided"}
+
+    sector_code = payload.get("sector_code")
+    result = check_compliance(accounts, sector_code)
+
+    return {
+        "success": True,
+        "data": result,
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# GET /api/coa-engine/compliance-rules — List compliance rules
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/compliance-rules")
+async def list_compliance_rules():
+    """Return the 9 IFRS/SOCPA/ZATCA compliance rules."""
+    from app.coa_engine.services.simulator import COMPLIANCE_RULES
+
+    return {
+        "success": True,
+        "data": {
+            "count": len(COMPLIANCE_RULES),
+            "rules": COMPLIANCE_RULES,
+        },
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# POST /api/coa-engine/fraud-scan — Detect fraud patterns
+# ══════════════════════════════════════════════════════════════
+
+
+@router.post("/fraud-scan")
+async def scan_fraud_patterns(
+    payload: dict,
+    user_id: str = Depends(_require_auth),
+):
+    """Scan COA for 8 fraud patterns (FP01-FP08).
+
+    Expects JSON body with:
+      accounts: [{code, name, main_class, nature, concept_id, ...}]
+      sector_code: (optional) detected sector for FP05
+    """
+    from app.coa_engine.services.fraud_detector import detect_fraud_patterns
+
+    accounts = payload.get("accounts", [])
+    if not accounts:
+        return {"success": False, "error": "No accounts provided"}
+
+    sector_code = payload.get("sector_code")
+    result = detect_fraud_patterns(accounts, sector_code)
+
+    return {
+        "success": True,
+        "data": result,
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# GET /api/coa-engine/fraud-patterns — List fraud pattern definitions
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/fraud-patterns")
+async def list_fraud_patterns():
+    """Return the 8 fraud pattern definitions (FP01-FP08)."""
+    from app.coa_engine.services.fraud_detector import FRAUD_PATTERNS
+
+    return {
+        "success": True,
+        "data": {
+            "count": len(FRAUD_PATTERNS),
+            "patterns": FRAUD_PATTERNS,
+        },
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# GET /api/coa-engine/engine-rules — Engine rule governance
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/engine-rules")
+async def list_engine_rules():
+    """Return all 12 engine rules with governance metadata and statistics."""
+    from app.coa_engine.services.fraud_detector import get_engine_rules, get_rule_stats
+
+    rules = get_engine_rules()
+    stats = get_rule_stats()
+
+    return {
+        "success": True,
+        "data": {
+            "rules": rules,
+            "stats": stats,
+        },
+    }

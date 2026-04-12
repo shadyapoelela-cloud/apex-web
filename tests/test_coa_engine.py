@@ -981,3 +981,339 @@ class TestOntologyRoute:
         assert data["success"] is True
         assert data["data"]["rules_count"] >= 15
         assert "sections" in data["data"]
+
+
+# ══════════════════════════════════════════════════════════════
+# Wave 6: Financial Statement Simulator + Compliance
+# ══════════════════════════════════════════════════════════════
+
+
+class TestSimulator:
+    """Tests for simulate_financial_statements()."""
+
+    def _make_accounts(self):
+        return [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "sub_class": "current_asset", "nature": "debit", "concept_id": "CASH"},
+            {"code": "1101", "name": "ذمم مدينة", "main_class": "asset", "sub_class": "current_asset", "nature": "debit", "concept_id": "ACC_RECEIVABLE"},
+            {"code": "1501", "name": "أصول ثابتة", "main_class": "asset", "sub_class": "non_current_asset", "nature": "debit", "concept_id": "PPE"},
+            {"code": "2001", "name": "ذمم دائنة", "main_class": "liability", "sub_class": "current_liability", "nature": "credit", "concept_id": "ACC_PAYABLE"},
+            {"code": "3001", "name": "رأس المال", "main_class": "equity", "sub_class": "equity", "nature": "credit", "concept_id": "SHARE_CAPITAL"},
+            {"code": "3101", "name": "أرباح مبقاة", "main_class": "equity", "sub_class": "equity", "nature": "credit", "concept_id": "RETAINED_EARNINGS"},
+            {"code": "4001", "name": "إيرادات", "main_class": "revenue", "nature": "credit", "concept_id": "SALES_REVENUE"},
+            {"code": "5001", "name": "تكلفة مبيعات", "main_class": "cogs", "nature": "debit", "concept_id": "COGS"},
+            {"code": "6001", "name": "مصروفات عمومية", "main_class": "expense", "nature": "debit", "concept_id": "GENERAL_EXPENSE"},
+        ]
+
+    def test_simulate_complete_coa(self):
+        from app.coa_engine.services.simulator import simulate_financial_statements
+
+        result = simulate_financial_statements(self._make_accounts())
+        assert result["completeness_score"] > 50
+        assert result["bs_sections_filled"] >= 3
+        assert result["is_sections_filled"] >= 3
+        assert "balance_sheet" in result
+        assert "income_statement" in result
+        assert result["balance_sheet"]["current_assets"]["count"] == 2
+
+    def test_simulate_missing_sections(self):
+        from app.coa_engine.services.simulator import simulate_financial_statements
+
+        # Only assets — missing liabilities, equity, revenue
+        accounts = [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "sub_class": "current_asset", "nature": "debit"},
+        ]
+        result = simulate_financial_statements(accounts)
+        assert result["completeness_score"] < 50
+        assert len(result["issues"]) >= 2  # missing liabilities, revenue
+
+    def test_simulate_issues_detection(self):
+        from app.coa_engine.services.simulator import simulate_financial_statements
+
+        # Revenue without COGS
+        accounts = [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit"},
+            {"code": "2001", "name": "خصوم", "main_class": "liability", "nature": "credit"},
+            {"code": "3001", "name": "ملكية", "main_class": "equity", "nature": "credit"},
+            {"code": "4001", "name": "إيرادات", "main_class": "revenue", "nature": "credit"},
+        ]
+        result = simulate_financial_statements(accounts)
+        issue_types = [i["issue"] for i in result["issues"]]
+        assert "MISSING_COGS" in issue_types
+
+    def test_simulate_empty(self):
+        from app.coa_engine.services.simulator import simulate_financial_statements
+
+        result = simulate_financial_statements([])
+        assert result["total_accounts"] == 0
+        assert result["completeness_score"] == 0
+
+
+class TestCompliance:
+    """Tests for check_compliance()."""
+
+    def test_compliance_all_pass(self):
+        from app.coa_engine.services.simulator import check_compliance
+
+        accounts = [
+            {"concept_id": "VAT"},
+            {"concept_id": "INCOME_TAX"},
+            {"concept_id": "ECL_PROVISION"},
+            {"concept_id": "ACC_RECEIVABLE"},
+            {"concept_id": "LEASE_LIABILITY"},
+            {"concept_id": "RENT_EXPENSE"},
+            {"concept_id": "ACCUM_DEPRECIATION"},
+            {"concept_id": "DEPRECIATION_EXP"},
+            {"concept_id": "PPE"},
+            {"concept_id": "END_OF_SERVICE"},
+            {"concept_id": "SALARIES_EXPENSE"},
+            {"concept_id": "COGS"},
+            {"concept_id": "SALES_REVENUE"},
+            {"concept_id": "RETAINED_EARNINGS"},
+            {"concept_id": "SHARE_CAPITAL"},
+        ]
+        result = check_compliance(accounts)
+        assert result["compliance_score"] == 100.0
+        assert result["failed"] == 0
+
+    def test_compliance_trigger_not_applicable(self):
+        from app.coa_engine.services.simulator import check_compliance
+
+        # No trigger concepts — conditional rules should be not_applicable
+        accounts = [
+            {"concept_id": "VAT"},
+            {"concept_id": "INCOME_TAX"},
+            {"concept_id": "RETAINED_EARNINGS"},
+            {"concept_id": "SHARE_CAPITAL"},
+        ]
+        result = check_compliance(accounts)
+        not_applicable = [d for d in result["details"] if d["status"] == "not_applicable"]
+        assert len(not_applicable) >= 3  # IFRS9, IFRS16, IAS16, EOS, accounting cycle triggers missing
+
+    def test_compliance_failure(self):
+        from app.coa_engine.services.simulator import check_compliance
+
+        # Has receivables but no ECL — IFRS9 should fail
+        accounts = [
+            {"concept_id": "ACC_RECEIVABLE"},
+            {"concept_id": "VAT"},
+            {"concept_id": "INCOME_TAX"},
+        ]
+        result = check_compliance(accounts)
+        failed_rules = [d for d in result["details"] if d["status"] == "failed"]
+        failed_ids = [d["rule_id"] for d in failed_rules]
+        assert "IFRS9_ECL" in failed_ids
+
+    def test_compliance_empty(self):
+        from app.coa_engine.services.simulator import check_compliance
+
+        result = check_compliance([])
+        # Rules without triggers (VAT, ZAKAT, RETAINED_EARNINGS, SHARE_CAPITAL) still apply and fail
+        assert result["rules_checked"] > 0
+        assert result["failed"] >= 1
+
+
+class TestSimulatorRoutes:
+    @pytest.fixture
+    def client(self):
+        from fastapi.testclient import TestClient
+        from app.main import app
+
+        return TestClient(app)
+
+    @pytest.fixture
+    def auth_header(self):
+        import jwt as pyjwt
+        from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
+
+        token = pyjwt.encode({"sub": "test-user"}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+        return {"Authorization": f"Bearer {token}"}
+
+    def test_simulate_endpoint(self, client, auth_header):
+        payload = {
+            "accounts": [
+                {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit"},
+                {"code": "4001", "name": "إيرادات", "main_class": "revenue", "nature": "credit"},
+            ]
+        }
+        resp = client.post("/api/coa-engine/simulate", json=payload, headers=auth_header)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert "balance_sheet" in data["data"]
+        assert "income_statement" in data["data"]
+
+    def test_compliance_endpoint(self, client, auth_header):
+        payload = {
+            "accounts": [
+                {"concept_id": "VAT"},
+                {"concept_id": "INCOME_TAX"},
+            ]
+        }
+        resp = client.post("/api/coa-engine/compliance", json=payload, headers=auth_header)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert "compliance_score" in data["data"]
+
+    def test_compliance_rules_endpoint(self, client):
+        resp = client.get("/api/coa-engine/compliance-rules")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["count"] == 9
+
+
+# ══════════════════════════════════════════════════════════════
+# Wave 7: Fraud Pattern Detector + Rule Governance
+# ══════════════════════════════════════════════════════════════
+
+
+class TestFraudDetector:
+    """Tests for detect_fraud_patterns()."""
+
+    def test_fp01_hidden_revenue(self):
+        from app.coa_engine.services.fraud_detector import detect_fraud_patterns
+
+        accounts = [
+            {"code": "5001", "name": "إيراد مخفي", "main_class": "expense", "nature": "credit", "concept_id": "MISC"},
+        ]
+        result = detect_fraud_patterns(accounts)
+        alerts = result["alerts"]
+        assert any(a["pattern_id"] == "FP01" for a in alerts)
+
+    def test_fp02_hidden_expense(self):
+        from app.coa_engine.services.fraud_detector import detect_fraud_patterns
+
+        accounts = [
+            {"code": "1501", "name": "مصروفات صيانة", "main_class": "asset", "nature": "debit", "concept_id": "OTHER"},
+        ]
+        result = detect_fraud_patterns(accounts)
+        alerts = result["alerts"]
+        assert any(a["pattern_id"] == "FP02" for a in alerts)
+
+    def test_fp06_asset_inflation(self):
+        from app.coa_engine.services.fraud_detector import detect_fraud_patterns
+
+        accounts = [
+            {"code": "1001", "name": "أصل غريب", "main_class": "asset", "nature": "credit", "concept_id": "OTHER"},
+        ]
+        result = detect_fraud_patterns(accounts)
+        alerts = result["alerts"]
+        assert any(a["pattern_id"] == "FP06" for a in alerts)
+
+    def test_fp06_excludes_contra(self):
+        from app.coa_engine.services.fraud_detector import detect_fraud_patterns
+
+        # Accumulated depreciation is contra — should NOT trigger FP06
+        accounts = [
+            {"code": "1599", "name": "مجمع الإهلاك", "main_class": "asset", "nature": "credit", "concept_id": "ACCUM_DEPRECIATION"},
+        ]
+        result = detect_fraud_patterns(accounts)
+        alerts = result["alerts"]
+        assert not any(a["pattern_id"] == "FP06" for a in alerts)
+
+    def test_fp07_hidden_receivables(self):
+        from app.coa_engine.services.fraud_detector import detect_fraud_patterns
+
+        accounts = [
+            {"code": "1101", "name": "ذمم مدينة", "main_class": "asset", "nature": "debit", "concept_id": "ACC_RECEIVABLE"},
+        ]
+        result = detect_fraud_patterns(accounts)
+        alerts = result["alerts"]
+        assert any(a["pattern_id"] == "FP07" for a in alerts)
+
+    def test_no_fraud_clean_coa(self):
+        from app.coa_engine.services.fraud_detector import detect_fraud_patterns
+
+        accounts = [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit", "concept_id": "CASH"},
+            {"code": "2001", "name": "دائنون", "main_class": "liability", "nature": "credit", "concept_id": "ACC_PAYABLE"},
+            {"code": "4001", "name": "مبيعات", "main_class": "revenue", "nature": "credit", "concept_id": "SALES_REVENUE"},
+        ]
+        result = detect_fraud_patterns(accounts)
+        assert result["risk_level"] == "None"
+        assert result["alerts_count"] == 0
+
+    def test_fraud_summary_structure(self):
+        from app.coa_engine.services.fraud_detector import detect_fraud_patterns
+
+        result = detect_fraud_patterns([])
+        assert "patterns_checked" in result
+        assert result["patterns_checked"] == 8
+        assert "risk_summary" in result
+
+
+class TestRuleGovernance:
+    """Tests for engine rule governance."""
+
+    def test_get_engine_rules(self):
+        from app.coa_engine.services.fraud_detector import get_engine_rules
+
+        rules = get_engine_rules()
+        assert len(rules) == 12
+        assert all("rule_code" in r for r in rules)
+        assert all("precision_score" in r for r in rules)
+
+    def test_get_rule_stats(self):
+        from app.coa_engine.services.fraud_detector import get_rule_stats
+
+        stats = get_rule_stats()
+        assert stats["total_rules"] == 12
+        assert stats["active"] == 12
+        assert stats["avg_precision"] > 0.5
+        assert "rule_types" in stats
+        assert "classification" in stats["rule_types"]
+
+    def test_fraud_patterns_loaded(self):
+        from app.coa_engine.services.fraud_detector import FRAUD_PATTERNS, FRAUD_PATTERN_INDEX
+
+        assert len(FRAUD_PATTERNS) == 8
+        assert "FP01" in FRAUD_PATTERN_INDEX
+        assert "FP08" in FRAUD_PATTERN_INDEX
+        assert FRAUD_PATTERN_INDEX["FP01"]["risk"] == "Critical"
+
+
+class TestFraudRoutes:
+    @pytest.fixture
+    def client(self):
+        from fastapi.testclient import TestClient
+        from app.main import app
+
+        return TestClient(app)
+
+    @pytest.fixture
+    def auth_header(self):
+        import jwt as pyjwt
+        from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
+
+        token = pyjwt.encode({"sub": "test-user"}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+        return {"Authorization": f"Bearer {token}"}
+
+    def test_fraud_scan_endpoint(self, client, auth_header):
+        payload = {
+            "accounts": [
+                {"code": "5001", "name": "إيراد مخفي", "main_class": "expense", "nature": "credit", "concept_id": "MISC"},
+            ]
+        }
+        resp = client.post("/api/coa-engine/fraud-scan", json=payload, headers=auth_header)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["patterns_checked"] == 8
+        assert data["data"]["alerts_count"] >= 1
+
+    def test_fraud_patterns_endpoint(self, client):
+        resp = client.get("/api/coa-engine/fraud-patterns")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["count"] == 8
+
+    def test_engine_rules_endpoint(self, client):
+        resp = client.get("/api/coa-engine/engine-rules")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert len(data["data"]["rules"]) == 12
+        assert "stats" in data["data"]
+        assert data["data"]["stats"]["total_rules"] == 12
