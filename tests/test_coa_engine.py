@@ -759,3 +759,122 @@ class TestSectorRoutes:
     def test_sector_detail_not_found(self, client):
         resp = client.get("/api/coa-engine/sectors/NONEXISTENT")
         assert resp.status_code == 404
+
+
+# ── Wave 4: Version Manager ──
+class TestVersionManager:
+    def test_version_snapshot(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot
+
+        accounts = [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit"},
+            {"code": "2001", "name": "موردين", "main_class": "liability", "nature": "credit"},
+        ]
+        snap = VersionSnapshot(1, accounts, quality_score=80.0)
+        assert snap.total_accounts == 2
+        assert snap.get_account("1001") is not None
+        assert "1001" in snap.account_codes
+
+    def test_compare_added_accounts(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot, compare_versions
+
+        old = VersionSnapshot(1, [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit"},
+        ], quality_score=70.0)
+        new = VersionSnapshot(2, [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit"},
+            {"code": "1002", "name": "بنوك", "main_class": "asset", "nature": "debit"},
+        ], quality_score=75.0)
+        result = compare_versions(old, new)
+        assert result["total_changes"] >= 1
+        assert "added" in result["change_summary"]
+        assert result["quality_trend"]["trend"] == "stable" or result["quality_trend"]["delta"] > 0
+
+    def test_compare_deleted_accounts(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot, compare_versions
+
+        old = VersionSnapshot(1, [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit"},
+            {"code": "1002", "name": "بنوك", "main_class": "asset", "nature": "debit"},
+        ], quality_score=80.0)
+        new = VersionSnapshot(2, [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit"},
+        ], quality_score=75.0)
+        result = compare_versions(old, new)
+        assert "deleted" in result["change_summary"]
+        assert result["risk_summary"]["Critical"] > 0
+
+    def test_compare_renamed(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot, compare_versions
+
+        old = VersionSnapshot(1, [{"code": "1001", "name": "نقدية", "main_class": "asset"}])
+        new = VersionSnapshot(2, [{"code": "1001", "name": "الصندوق النقدي", "main_class": "asset"}])
+        result = compare_versions(old, new)
+        assert "renamed" in result["change_summary"]
+
+    def test_compare_reclassified(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot, compare_versions
+
+        old = VersionSnapshot(1, [{"code": "1001", "name": "حساب", "main_class": "asset", "nature": "debit"}])
+        new = VersionSnapshot(2, [{"code": "1001", "name": "حساب", "main_class": "liability", "nature": "credit"}])
+        result = compare_versions(old, new)
+        types = result["change_summary"]
+        assert "reclassified" in types or "rebalanced" in types
+        assert result["overall_risk"] == "Critical"
+
+    def test_compare_no_changes(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot, compare_versions
+
+        accts = [{"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit"}]
+        old = VersionSnapshot(1, accts, quality_score=80)
+        new = VersionSnapshot(2, accts, quality_score=80)
+        result = compare_versions(old, new)
+        assert result["total_changes"] == 0
+        assert result["overall_risk"] == "None"
+
+
+class TestMigrationMap:
+    def test_migration_same(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot, build_migration_map
+
+        accts = [{"code": "1001", "name": "نقدية", "main_class": "asset"}]
+        old = VersionSnapshot(1, accts)
+        new = VersionSnapshot(2, accts)
+        mmap = build_migration_map(old, new)
+        assert len(mmap) == 1
+        assert mmap[0]["map_type"] == "SAME"
+
+    def test_migration_deleted_and_added(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot, build_migration_map
+
+        old = VersionSnapshot(1, [{"code": "1001", "name": "نقدية", "main_class": "asset"}])
+        new = VersionSnapshot(2, [{"code": "1002", "name": "بنوك", "main_class": "asset"}])
+        mmap = build_migration_map(old, new)
+        types = {m["map_type"] for m in mmap}
+        assert "DELETED" in types or "RECODED" in types
+        assert "ADDED" in types or "RECODED" in types
+
+    def test_migration_recoded_by_name(self):
+        from app.coa_engine.services.version_manager import VersionSnapshot, build_migration_map
+
+        old = VersionSnapshot(1, [{"code": "100", "name": "نقدية", "main_class": "asset"}])
+        new = VersionSnapshot(2, [{"code": "1001", "name": "نقدية", "main_class": "asset"}])
+        mmap = build_migration_map(old, new)
+        recoded = [m for m in mmap if m["map_type"] == "RECODED"]
+        assert len(recoded) == 1
+        assert recoded[0]["old_code"] == "100"
+        assert recoded[0]["new_code"] == "1001"
+
+    def test_summarize_migration(self):
+        from app.coa_engine.services.version_manager import summarize_migration
+
+        mmap = [
+            {"map_type": "SAME", "auto_matched": True},
+            {"map_type": "SAME", "auto_matched": True},
+            {"map_type": "RENAMED", "auto_matched": True},
+            {"map_type": "DELETED", "auto_matched": True},
+        ]
+        summary = summarize_migration(mmap)
+        assert summary["total_entries"] == 4
+        assert summary["stability_pct"] == 50.0
+        assert summary["needs_review"] == 1

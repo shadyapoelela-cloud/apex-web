@@ -379,3 +379,56 @@ async def get_sector_detail(sector_code: str):
         "success": True,
         "data": sector,
     }
+
+
+# ══════════════════════════════════════════════════════════════
+# POST /api/coa-engine/compare-versions — Compare two COA versions
+# ══════════════════════════════════════════════════════════════
+
+
+@router.post("/compare-versions")
+async def compare_coa_versions(
+    payload: dict,
+    user_id: str = Depends(_require_auth),
+):
+    """Compare two COA versions and return evolution log + migration map.
+
+    Expects JSON body with:
+      old_version: {accounts: [...], version_number: int, quality_score: float}
+      new_version: {accounts: [...], version_number: int, quality_score: float}
+    """
+    from app.coa_engine.services.version_manager import (
+        VersionSnapshot, compare_versions, build_migration_map, summarize_migration,
+    )
+
+    old_data = payload.get("old_version", {})
+    new_data = payload.get("new_version", {})
+
+    if not old_data.get("accounts") or not new_data.get("accounts"):
+        return {"success": False, "error": "Both old_version and new_version must contain accounts"}
+
+    old_snap = VersionSnapshot(
+        version_number=old_data.get("version_number", 1),
+        accounts=old_data["accounts"],
+        quality_score=old_data.get("quality_score", 0),
+        label=old_data.get("label", ""),
+    )
+    new_snap = VersionSnapshot(
+        version_number=new_data.get("version_number", 2),
+        accounts=new_data["accounts"],
+        quality_score=new_data.get("quality_score", 0),
+        label=new_data.get("label", ""),
+    )
+
+    evolution = compare_versions(old_snap, new_snap)
+    migration = build_migration_map(old_snap, new_snap)
+    migration_summary = summarize_migration(migration)
+
+    return {
+        "success": True,
+        "data": {
+            "evolution": evolution,
+            "migration_map": migration,
+            "migration_summary": migration_summary,
+        },
+    }
