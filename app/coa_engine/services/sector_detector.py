@@ -176,7 +176,7 @@ def calculate_similarity(
     if sector:
         mandatory = sector.get("mandatory_accounts", [])
         mandatory_present = sum(1 for m in mandatory if m in concept_set)
-        mandatory_coverage = (mandatory_present / len(mandatory) * 100) if mandatory else 100.0
+        mandatory_coverage = (mandatory_present / len(mandatory) * 100) if mandatory else 50.0  # Unknown mandatory = neutral
     else:
         mandatory_coverage = 50.0  # Unknown sector — neutral score
 

@@ -35,7 +35,10 @@ _EXPECTED_NATURE = {
 # Contra accounts (exceptions to expected nature)
 _CONTRA_CONCEPTS = {
     "ACCUM_DEPRECIATION",  # asset but credit
+    "ALLOWANCE_DOUBTFUL",  # asset (receivable) but credit
+    "ECL_PROVISION",  # asset (receivable) but credit
     "SALES_RETURNS",  # revenue but debit
+    "SALES_DISCOUNTS",  # revenue but debit
     "PURCHASE_RETURNS",  # cogs but credit
     "ACCUMULATED_LOSSES",  # equity but debit
     "OWNER_DRAWINGS",  # equity but debit
@@ -420,22 +423,23 @@ def _check_cross_validation(
             trigger_accounts = [
                 a for a in accounts if a.get("concept_id") == trigger
             ]
-            for acct in trigger_accounts[:3]:  # Limit to first 3 to avoid spam
-                code = str(acct.get(code_key, acct.get("code", ""))).strip()
-                name = str(acct.get(name_key, acct.get("name", ""))).strip()
+            # Report once per rule (not per trigger account) to avoid spam
+            first_acct = trigger_accounts[0] if trigger_accounts else None
+            if first_acct:
+                code = str(first_acct.get(code_key, first_acct.get("code", ""))).strip()
+                name = str(first_acct.get(name_key, first_acct.get("name", ""))).strip()
                 errors.append(AccountError(
                     error_code, code, name,
                     description_ar=message_ar,
-                    cause_ar=f"يوجد {trigger} لكن لا يوجد {required}",
+                    cause_ar=f"يوجد {trigger} ({len(trigger_accounts)} حساب) لكن لا يوجد {required}",
                     suggestion_ar=f"أضف حساب {required}",
                     severity=severity,
                     category="balance",
                 ))
-                # Also inject into the account
-                if "errors" not in acct:
-                    acct["errors"] = []
-                if error_code not in acct["errors"]:
-                    acct["errors"].append(error_code)
+                # Inject error code into trigger accounts
+                for acct in trigger_accounts:
+                    if isinstance(acct.get("errors"), list) and error_code not in acct["errors"]:
+                        acct["errors"].append(error_code)
 
     return errors
 

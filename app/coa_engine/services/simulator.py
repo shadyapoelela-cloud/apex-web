@@ -177,25 +177,29 @@ def simulate_financial_statements(accounts: List[Dict]) -> Dict:
 
     # Check for missing main sections
     has_assets = any(a.get("main_class") == "asset" for a in accounts)
-    has_liabilities = any(a.get("main_class") in ("liability", "equity") for a in accounts)
+    has_liabilities = any(a.get("main_class") == "liability" for a in accounts)
+    has_equity = any(a.get("main_class") == "equity" for a in accounts)
     has_revenue = any(a.get("main_class") == "revenue" for a in accounts)
 
     if not has_assets:
         issues.append({"issue": "MISSING_ASSETS", "severity": "Critical",
                         "description_ar": "لا توجد حسابات أصول في الشجرة"})
-    if not has_liabilities:
+    if not has_liabilities and not has_equity:
         issues.append({"issue": "MISSING_LIABILITIES", "severity": "Critical",
                         "description_ar": "لا توجد حسابات خصوم أو ملكية"})
+    elif not has_liabilities:
+        issues.append({"issue": "MISSING_LIABILITIES_ONLY", "severity": "High",
+                        "description_ar": "لا توجد حسابات خصوم (التزامات) — ملكية موجودة فقط"})
     if not has_revenue:
         issues.append({"issue": "MISSING_REVENUE", "severity": "Critical",
                         "description_ar": "لا توجد حسابات إيرادات"})
     if has_revenue and not any(a.get("main_class") == "cogs" for a in accounts):
         issues.append({"issue": "MISSING_COGS", "severity": "High",
                         "description_ar": "إيرادات موجودة بدون تكلفة مبيعات — E50"})
-    if not any(a.get("main_class") == "equity" for a in accounts):
+    if not has_equity:
         issues.append({"issue": "MISSING_EQUITY", "severity": "High",
                         "description_ar": "لا توجد حسابات حقوق ملكية"})
-    if "SHARE_CAPITAL" not in concept_set and has_liabilities:
+    if "SHARE_CAPITAL" not in concept_set and (has_liabilities or has_equity):
         issues.append({"issue": "MISSING_CAPITAL", "severity": "High",
                         "description_ar": "لا يوجد حساب رأس مال في حقوق الملكية"})
 

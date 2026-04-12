@@ -209,6 +209,9 @@ class KnowledgeGraph:
 
         Returns a list of impacted nodes with severity and description.
         """
+        if node_id not in self._nodes:
+            return []
+
         impacts: List[Dict] = []
 
         # Check what requires this node

@@ -220,7 +220,7 @@ def detect_fraud_patterns(
 
     # FP04: Revenue Scatter — too many similar revenue accounts
     revenue_accounts = [a for a in accounts if a.get("main_class") == "revenue"]
-    if len(revenue_accounts) > 10:
+    if len(revenue_accounts) >= 10:
         # Check for similar names
         rev_names = [str(a.get("name", "")).strip()[:20] for a in revenue_accounts]
         name_prefixes = Counter(rev_names)
@@ -248,11 +248,14 @@ def detect_fraud_patterns(
     # FP07: Hidden Bad Receivables — has receivables but no ECL
     if "ACC_RECEIVABLE" in concept_set and "ECL_PROVISION" not in concept_set:
         rec_accounts = [a for a in accounts if a.get("concept_id") == "ACC_RECEIVABLE"]
-        for acct in rec_accounts[:1]:
+        rec_count = len(rec_accounts)
+        first = rec_accounts[0] if rec_accounts else None
+        if first:
             alerts.append(FraudAlert(
-                "FP07", str(acct.get("code", "")), str(acct.get("name", "")),
-                description_ar="ذمم مدينة بدون مخصص خسائر ائتمان — إخفاء ديون معدومة محتمل",
-                indicator="receivables without ECL provision",
+                "FP07", str(first.get("code", "")),
+                f"{rec_count} receivable account(s) without ECL",
+                description_ar=f"ذمم مدينة ({rec_count} حساب) بدون مخصص خسائر ائتمان — إخفاء ديون معدومة محتمل",
+                indicator=f"{rec_count} receivable accounts without ECL provision",
                 risk="High", confidence=0.7,
             ))
 

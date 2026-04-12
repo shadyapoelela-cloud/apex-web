@@ -476,11 +476,15 @@ def _step3_normalize(df: pd.DataFrame, result: PipelineResult) -> pd.DataFrame:
 
     normalized_df = normalize_dataframe(df, result.column_mapping)
 
+    if normalized_df is None:
+        logger.warning("Step 3: normalize_dataframe returned None — using original DataFrame")
+        normalized_df = df
+
     # encoding may already be set from CSV detection in step 0
     if not result.encoding:
         result.encoding = "utf-8"  # Default for Excel files
 
-    row_diff = len(df) - len(normalized_df) if normalized_df is not None else 0
+    row_diff = len(df) - len(normalized_df)
     if row_diff > 0:
         result.warnings.append(f"Normalization removed {row_diff} invalid row(s)")
         result.row_count = len(normalized_df)
@@ -648,14 +652,8 @@ def _step5c_detect_sector(result: PipelineResult) -> None:
     similarity = calculate_similarity(result.accounts, result.sector_detected)
     result.sector_similarity = similarity.get("overall_score", 0.0)
 
-    # Build enhanced report card
-    result.report_card = build_sector_report(
-        result.accounts,
-        sector_result,
-        similarity,
-        result.quality_score,
-        result.errors_summary,
-    )
+    # Store sector data for report_card (built later in Step 6 with final quality_score)
+    result._sector_similarity_data = similarity
 
     logger.info(
         "Step 5c: Sector=%s confidence=%.2f similarity=%.2f",
@@ -756,6 +754,17 @@ def _step6_assess_quality(result: PipelineResult) -> None:
     # --- Report card ---
     result.report_card = _build_report_card(result.quality_score, result)
 
+    # Enhance report_card with sector intelligence if available (from Step 5c)
+    if result.sector_result and hasattr(result, '_sector_similarity_data'):
+        sector_report = build_sector_report(
+            result.accounts,
+            result.sector_result,
+            result._sector_similarity_data,
+            result.quality_score,
+            result.errors_summary,
+        )
+        result.report_card.update(sector_report)
+
     logger.info(
         "Step 6: Quality score=%.2f grade=%s dimensions=%s",
         result.quality_score,
@@ -828,15 +837,15 @@ def _step7_determine_status(result: PipelineResult) -> None:
     """
     logger.info("Step 7: Determining review status...")
 
-    has_critical = result.errors_summary.get("critical", 0) > 0
+    critical_count = result.errors_summary.get("critical", 0)
     pending_accounts = sum(1 for a in result.accounts if a.get("review_status") == "pending")
+    total_accounts = max(len(result.accounts), 1)
 
-    if has_critical and result.errors_summary["critical"] > (len(result.accounts) * 0.2):
-        # More than 20% of accounts have critical errors
+    if critical_count >= 3 or (critical_count > 0 and critical_count > total_accounts * 0.10):
+        # Block if 3+ critical errors OR critical errors exceed 10% of accounts
         result.review_status = "blocked"
         result.warnings.append(
-            f"Review blocked: {result.errors_summary['critical']} account(s) with critical errors "
-            f"(>{int(len(result.accounts) * 0.2)} threshold)"
+            f"Review blocked: {critical_count} critical error(s) detected — requires auditor review"
         )
     elif result.quality_score >= MIN_QUALITY_SCORE and pending_accounts == 0:
         result.review_status = "auto_approved"

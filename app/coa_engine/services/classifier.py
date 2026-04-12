@@ -513,13 +513,13 @@ def _layer5_claude_api(account: Dict, column_mapping: Dict, context: Optional[Di
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         logger.debug("Layer 5 skipped — no ANTHROPIC_API_KEY")
-        return None
+        return _layer5_fallback()
 
     code = _extract_code(account, column_mapping)
     name = _extract_name(account, column_mapping)
 
     if not code and not name:
-        return None
+        return _layer5_fallback()
 
     ctx = context or {}
 
@@ -549,7 +549,7 @@ def _layer5_claude_api(account: Dict, column_mapping: Dict, context: Optional[Di
         f"Detected sector: {ctx.get('sector', 'unspecified')}\n"
         f"ERP system: {ctx.get('erp_system', 'unspecified')}\n\n"
         "Respond with JSON format:\n"
-        "{\"main_class\",\"sub_class\",\"normal_balance\",\"confidence\",\"reason\"}"
+        "{\"main_class\": \"...\", \"sub_class\": \"...\", \"normal_balance\": \"debit|credit\", \"confidence\": 0.00, \"reason\": \"...\"}"
     )
 
     import json
