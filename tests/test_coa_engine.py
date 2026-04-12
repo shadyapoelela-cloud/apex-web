@@ -360,3 +360,266 @@ class TestEngineRoutes:
     def test_analyze_requires_auth(self, client):
         resp = client.post("/api/coa-engine/analyze")
         assert resp.status_code in (401, 403, 422)
+
+
+# ── Wave 2: Error Catalog ──
+class TestErrorCatalog:
+    def test_error_count(self):
+        from app.coa_engine.data.error_catalog import ERROR_CATALOG
+
+        assert len(ERROR_CATALOG) == 58
+
+    def test_error_index(self):
+        from app.coa_engine.data.error_catalog import ERROR_INDEX
+
+        assert "E01" in ERROR_INDEX
+        assert "E50" in ERROR_INDEX
+        assert "EP1" in ERROR_INDEX
+        assert "EC5" in ERROR_INDEX
+
+    def test_error_structure(self):
+        from app.coa_engine.data.error_catalog import ERROR_INDEX
+
+        e01 = ERROR_INDEX["E01"]
+        assert e01["severity"] == "Critical"
+        assert e01["category"] == "structural"
+        assert e01["auto_fixable"] is True
+        assert "name_ar" in e01
+        assert "name_en" in e01
+
+    def test_category_index(self):
+        from app.coa_engine.data.error_catalog import CATEGORY_INDEX
+
+        assert "structural" in CATEGORY_INDEX
+        assert "classification" in CATEGORY_INDEX
+        assert len(CATEGORY_INDEX["structural"]) == 8  # E01-E08
+
+    def test_score_impact(self):
+        from app.coa_engine.data.error_catalog import SCORE_IMPACT
+
+        assert SCORE_IMPACT["Critical"] == -15
+        assert SCORE_IMPACT["High"] == -8
+        assert SCORE_IMPACT["Medium"] == -3
+        assert SCORE_IMPACT["Low"] == -1
+
+    def test_get_error(self):
+        from app.coa_engine.data.error_catalog import get_error
+
+        e28 = get_error("E28")
+        assert e28["name_en"] == "Missing ECL Provision"
+        assert e28["category"] == "ifrs"
+        assert "IFRS 9" in str(e28["references"])
+
+    def test_get_nonexistent_error(self):
+        from app.coa_engine.data.error_catalog import get_error
+
+        assert get_error("E99") == {}
+
+
+# ── Wave 2: Error Detector ──
+class TestErrorDetector:
+    def test_duplicate_code_detection(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit", "confidence": 0.85},
+            {"code": "1001", "name": "نقدية أخرى", "main_class": "asset", "nature": "debit", "confidence": 0.85},
+        ]
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        error_codes = [e["error_code"] for e in errors]
+        assert "E01" in error_codes
+
+    def test_missing_code_detection(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "", "name": "حساب بدون كود", "main_class": "asset", "nature": "debit", "confidence": 0.5},
+        ]
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        error_codes = [e["error_code"] for e in errors]
+        assert "E02" in error_codes
+
+    def test_no_classification_detection(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "9999", "name": "حساب غامض", "main_class": None, "nature": None, "confidence": 0.0},
+        ]
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        error_codes = [e["error_code"] for e in errors]
+        assert "E04" in error_codes
+
+    def test_ambiguous_name_detection(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "5999", "name": "أخرى", "main_class": "expense", "nature": "debit", "confidence": 0.7},
+        ]
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        error_codes = [e["error_code"] for e in errors]
+        assert "E21" in error_codes
+
+    def test_duplicate_name_detection(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit", "confidence": 0.85},
+            {"code": "1002", "name": "نقدية", "main_class": "asset", "nature": "debit", "confidence": 0.85},
+        ]
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        error_codes = [e["error_code"] for e in errors]
+        assert "E22" in error_codes
+
+    def test_nature_mismatch_detection(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "4001", "name": "مبيعات", "main_class": "revenue", "nature": "debit",
+             "concept_id": "SALES_REVENUE", "confidence": 0.85},
+        ]
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        error_codes = [e["error_code"] for e in errors]
+        assert "E19" in error_codes
+
+    def test_cross_validation_missing_cogs(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "4001", "name": "مبيعات", "main_class": "revenue", "nature": "credit",
+             "concept_id": "SALES_REVENUE", "confidence": 0.85},
+        ]
+        # Has revenue but no COGS → E50
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        error_codes = [e["error_code"] for e in errors]
+        assert "E50" in error_codes
+
+    def test_broken_hierarchy_detection(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "1101", "name": "نقدية", "main_class": "asset", "nature": "debit",
+             "parent_code": "NONEXISTENT", "confidence": 0.85},
+        ]
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        error_codes = [e["error_code"] for e in errors]
+        assert "E08" in error_codes
+
+    def test_error_injected_into_account(self):
+        from app.coa_engine.services.error_detector import detect_errors
+
+        accounts = [
+            {"code": "1001", "name": "نقدية", "main_class": "asset", "nature": "debit", "confidence": 0.85},
+            {"code": "1001", "name": "نقدية ثانية", "main_class": "asset", "nature": "debit", "confidence": 0.85},
+        ]
+        updated, errors = detect_errors(accounts, {"code": "code", "name": "name"}, "GENERIC_FLAT")
+        assert "E01" in updated[0].get("errors", [])
+
+    def test_summarize_errors(self):
+        from app.coa_engine.services.error_detector import summarize_errors
+
+        error_dicts = [
+            {"severity": "Critical"}, {"severity": "Critical"},
+            {"severity": "High"}, {"severity": "Medium"},
+        ]
+        summary = summarize_errors(error_dicts)
+        assert summary["critical"] == 2
+        assert summary["high"] == 1
+        assert summary["medium"] == 1
+        assert summary["total"] == 4
+
+
+# ── Wave 2: Pipeline with Errors ──
+class TestPipelineWithErrors:
+    def test_pipeline_detects_errors(self):
+        from app.coa_engine.services.pipeline import process_dataframe
+
+        df = pd.DataFrame(
+            {
+                "كود الحساب": ["1", "11", "1101", "1101", "2", "21", "2101", "3", "31", "4", "41", "5", "51"],
+                "اسم الحساب": [
+                    "أصول",
+                    "أصول متداولة",
+                    "نقدية",
+                    "نقدية مكررة",
+                    "التزامات",
+                    "التزامات متداولة",
+                    "موردين",
+                    "حقوق ملكية",
+                    "رأس المال",
+                    "إيرادات",
+                    "مبيعات",
+                    "مصروفات",
+                    "رواتب",
+                ],
+            }
+        )
+        result = process_dataframe(df, filename="test_errors.xlsx")
+        assert result.status == "completed"
+        assert result.errors_summary["total"] > 0  # Should detect duplicate E01
+
+    def test_pipeline_result_includes_errors(self):
+        from app.coa_engine.services.pipeline import process_dataframe
+
+        df = pd.DataFrame(
+            {
+                "كود الحساب": ["1", "11", "1101", "2", "21", "2101"],
+                "اسم الحساب": ["أصول", "أصول متداولة", "نقدية", "التزامات", "التزامات متداولة", "موردين"],
+            }
+        )
+        result = process_dataframe(df, filename="test.xlsx")
+        d = result.to_dict()
+        assert "errors" in d
+        assert "errors_summary" in d
+        assert isinstance(d["errors"], list)
+
+
+# ── Wave 2: Error API Routes ──
+class TestErrorRoutes:
+    @pytest.fixture
+    def client(self):
+        from fastapi.testclient import TestClient
+        from app.main import app
+
+        return TestClient(app)
+
+    def test_errors_endpoint(self, client):
+        resp = client.get("/api/coa-engine/errors")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["count"] == 58
+
+    def test_errors_filter_by_category(self, client):
+        resp = client.get("/api/coa-engine/errors?category=structural")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["count"] == 8
+        for err in data["data"]["errors"]:
+            assert err["category"] == "structural"
+
+    def test_errors_filter_by_severity(self, client):
+        resp = client.get("/api/coa-engine/errors?severity=Critical")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert all(e["severity"] == "Critical" for e in data["data"]["errors"])
+
+    def test_error_detail_endpoint(self, client):
+        resp = client.get("/api/coa-engine/errors/E01")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["error_code"] == "E01"
+        assert data["data"]["severity"] == "Critical"
+
+    def test_error_detail_not_found(self, client):
+        resp = client.get("/api/coa-engine/errors/E99")
+        assert resp.status_code == 404
+
+    def test_error_categories_endpoint(self, client):
+        resp = client.get("/api/coa-engine/error-categories")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["count"] >= 10

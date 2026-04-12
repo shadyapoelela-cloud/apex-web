@@ -13,6 +13,7 @@ from app.coa_engine.services.pipeline import process_file, PipelineError
 from app.coa_engine.services.pattern_detector import PATTERNS
 from app.coa_engine.data.canonical_accounts import CANONICAL_ACCOUNTS
 from app.coa_engine.data.sectors import SECTORS
+from app.coa_engine.data.error_catalog import ERROR_CATALOG, ERROR_INDEX, CATEGORY_INDEX, get_error, get_errors_by_category
 
 logger = logging.getLogger(__name__)
 
@@ -274,7 +275,87 @@ async def engine_health():
             "data": {
                 "canonical_accounts": len(CANONICAL_ACCOUNTS),
                 "sectors": len(SECTORS),
+                "error_types": len(ERROR_CATALOG),
                 "patterns": len(PATTERNS),
             },
+        },
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# GET /api/coa-engine/errors — List all 58 error types
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/errors")
+async def list_errors(
+    category: Optional[str] = Query(None, description="Filter by category (structural, classification, nature, naming, ifrs, tax_saudi, etc.)"),
+    severity: Optional[str] = Query(None, description="Filter by severity (Critical, High, Medium, Low)"),
+):
+    """Return the 58 error type definitions from the error catalog.
+
+    Optionally filter by category or severity.
+    """
+    errors = ERROR_CATALOG
+    if category:
+        errors = [e for e in errors if e["category"] == category]
+    if severity:
+        errors = [e for e in errors if e["severity"] == severity]
+
+    return {
+        "success": True,
+        "data": {
+            "count": len(errors),
+            "category_filter": category,
+            "severity_filter": severity,
+            "errors": errors,
+        },
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# GET /api/coa-engine/errors/{error_code} — Get error definition
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/errors/{error_code}")
+async def get_error_detail(error_code: str):
+    """Return the full definition for a specific error code (e.g. E01, EP1, EC5)."""
+    error = get_error(error_code.upper())
+    if not error:
+        raise HTTPException(status_code=404, detail=f"Error code '{error_code}' not found")
+
+    return {
+        "success": True,
+        "data": error,
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# GET /api/coa-engine/error-categories — List error categories
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/error-categories")
+async def list_error_categories():
+    """Return error categories with counts and severity distribution."""
+    categories = []
+    for cat_name, cat_errors in CATEGORY_INDEX.items():
+        severity_dist = {}
+        for e in cat_errors:
+            sev = e["severity"]
+            severity_dist[sev] = severity_dist.get(sev, 0) + 1
+        categories.append({
+            "category": cat_name,
+            "count": len(cat_errors),
+            "severity_distribution": severity_dist,
+            "error_codes": [e["error_code"] for e in cat_errors],
+        })
+
+    return {
+        "success": True,
+        "data": {
+            "count": len(categories),
+            "categories": categories,
         },
     }

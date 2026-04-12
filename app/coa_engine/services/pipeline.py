@@ -23,6 +23,7 @@ from app.coa_engine.services.column_mapper import auto_detect_and_map, validate_
 from app.coa_engine.services.normalizer import normalize_dataframe, detect_encoding
 from app.coa_engine.services.hierarchy_builder import build_hierarchy, validate_hierarchy
 from app.coa_engine.services.classifier import classify_accounts
+from app.coa_engine.services.error_detector import detect_errors, summarize_errors
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,7 @@ class PipelineResult:
         self.hierarchy_stats: Dict = {}
         self.quality_score: float = 0.0
         self.quality_dimensions: Dict = {}
+        self.errors: List[Dict] = []  # All detected errors (Wave 2)
         self.errors_summary: Dict = {"critical": 0, "high": 0, "medium": 0, "low": 0, "total": 0}
         self.confidence_avg: float = 0.0
         self.warnings: List[str] = []
@@ -105,6 +107,7 @@ class PipelineResult:
             "row_count": self.row_count,
             "quality_score": round(self.quality_score, 2),
             "confidence_avg": round(self.confidence_avg, 4),
+            "errors": self.errors,
             "errors_summary": self.errors_summary,
             "quality_dimensions": self.quality_dimensions,
             "report_card": self.report_card,
@@ -164,6 +167,9 @@ def process_file(file_bytes: bytes, filename: str, client_id: int = None) -> Pip
 
         # Step 5: Classify
         _step5_classify(result)
+
+        # Step 5b: Detect errors (Wave 2)
+        _step5b_detect_errors(result)
 
         # Step 6: Quality assessment
         _step6_assess_quality(result)
@@ -237,6 +243,9 @@ def process_dataframe(df: pd.DataFrame, filename: str = "uploaded.xlsx", client_
 
         # Step 5: Classify
         _step5_classify(result)
+
+        # Step 5b: Detect errors (Wave 2)
+        _step5b_detect_errors(result)
 
         # Step 6: Quality assessment
         _step6_assess_quality(result)
@@ -565,6 +574,43 @@ def _step5_classify(result: PipelineResult) -> None:
 
 
 # =========================================================================
+# Step 5b: Error detection (Wave 2)
+# =========================================================================
+
+
+def _step5b_detect_errors(result: PipelineResult) -> None:
+    """Run 58-type error detection on classified accounts.
+
+    Populates result.errors and result.errors_summary.
+    Also injects per-account error codes into each account's 'errors' field.
+    """
+    logger.info("Step 5b: Detecting errors on %d accounts...", len(result.accounts))
+
+    if not result.accounts:
+        logger.warning("Step 5b: No accounts to check for errors")
+        return
+
+    result.accounts, error_dicts = detect_errors(
+        result.accounts,
+        result.column_mapping,
+        result.pattern,
+        result.erp_system,
+    )
+
+    result.errors = error_dicts
+    result.errors_summary = summarize_errors(error_dicts)
+
+    logger.info(
+        "Step 5b: Error detection complete — %d errors (Critical=%d, High=%d, Medium=%d, Low=%d)",
+        result.errors_summary["total"],
+        result.errors_summary["critical"],
+        result.errors_summary["high"],
+        result.errors_summary["medium"],
+        result.errors_summary["low"],
+    )
+
+
+# =========================================================================
 # Step 6: Quality assessment
 # =========================================================================
 
@@ -595,21 +641,15 @@ def _step6_assess_quality(result: PipelineResult) -> None:
     )
     classification_accuracy = (high_conf_count / total) * 100
 
-    # --- error_severity: start at 100, deduct for low-confidence accounts ---
-    low_conf_accounts = [a for a in result.accounts if a.get("confidence", 0) < 0.50]
-    medium_conf_accounts = [
-        a for a in result.accounts
-        if 0.50 <= a.get("confidence", 0) < 0.70
-    ]
-    # Critical: confidence < 0.50 => 3 points each; medium: < 0.70 => 1 point each
-    critical_deduction = len(low_conf_accounts) * 3
-    medium_deduction = len(medium_conf_accounts) * 1
-    error_severity = max(0, 100 - critical_deduction - medium_deduction)
-
-    # Update errors_summary
-    result.errors_summary["critical"] = len(low_conf_accounts)
-    result.errors_summary["medium"] = len(medium_conf_accounts)
-    result.errors_summary["total"] = len(low_conf_accounts) + len(medium_conf_accounts)
+    # --- error_severity: start at 100, deduct based on detected errors ---
+    # Use real error counts from Step 5b (Wave 2) instead of confidence-only heuristic
+    critical_count = result.errors_summary.get("critical", 0)
+    high_count = result.errors_summary.get("high", 0)
+    medium_count = result.errors_summary.get("medium", 0)
+    low_count = result.errors_summary.get("low", 0)
+    # Score impact: Critical=-15, High=-8, Medium=-3, Low=-1
+    error_deduction = (critical_count * 15) + (high_count * 8) + (medium_count * 3) + (low_count * 1)
+    error_severity = max(0, 100 - error_deduction)
 
     # --- completeness: % of accounts that got classified ---
     classified_count = sum(

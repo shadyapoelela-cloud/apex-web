@@ -495,26 +495,167 @@ def _layer4_conflict_detection(layer_results: List[Dict]) -> Dict:
 # ---------------------------------------------------------------------------
 
 def _layer5_claude_api(account: Dict, column_mapping: Dict, context: Optional[Dict] = None) -> Optional[Dict]:
-    """Stub for Claude API classification fallback (TABLE 80).
+    """Layer 5: Claude API classification (TABLE 78-80).
 
-    In Wave 2 this will call Anthropic's API with a structured prompt:
-        Classify this account:
-        Code: {code}
-        Name: {name}
-        Parent: {parent_name} (code: {parent_code})
-        Siblings: {siblings}
-        Sector: {sector}
-        ERP: {erp_system}
+    Calls Anthropic's Claude API to classify unresolved accounts.
+    Only called when layers 1-4 fail to classify.
 
-    Returns None for now — the account will be left as pending_review.
+    Settings (TABLE 78):
+        model: claude-sonnet-4-20250514
+        max_tokens: 200
+        temperature: 0.1
+        timeout: 15s
+        retries: 2 with 2s delay
+        fallback: confidence=0.50, pending_review
     """
-    # TODO(wave2): implement Claude API call with retry and rate limiting
-    logger.debug(
-        "Layer 5 (Claude API) stub called for account code=%s name=%s — skipping",
-        _extract_code(account, column_mapping),
-        _extract_name(account, column_mapping),
+    import os
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        logger.debug("Layer 5 skipped — no ANTHROPIC_API_KEY")
+        return None
+
+    code = _extract_code(account, column_mapping)
+    name = _extract_name(account, column_mapping)
+
+    if not code and not name:
+        return None
+
+    ctx = context or {}
+
+    system_prompt = (
+        "You are an expert chartered accountant in IFRS and Saudi standards SOCPA.\n"
+        "Your task is to classify chart of accounts for companies operating in Saudi Arabia.\n\n"
+        "Strict response rules:\n"
+        "1. Respond with JSON only — no text before or after\n"
+        "2. Use only these canonical identifiers:\n"
+        "   Main sections: asset|liability|equity|revenue|cogs|expense|finance_cost|closing\n"
+        "   Sub-sections: current_asset|non_current_asset|current_liability|\n"
+        "                 non_current_liability|equity|operating_revenue|other_revenue|\n"
+        "                 cogs|operating_expense|selling_expense|admin_expense|tax_expense|\n"
+        "                 finance_cost|closing\n"
+        "3. Nature: debit|credit\n"
+        "4. Level: header|sub|detail\n"
+        "5. Confidence: number 0.00-1.00\n\n"
+        "Do not add additional explanations — JSON only."
     )
-    return None
+
+    user_prompt = (
+        f"Classify this account:\n\n"
+        f"Code: {code}\n"
+        f"Name: {name}\n"
+        f"Parent: {ctx.get('parent_name', 'N/A')} (code: {ctx.get('parent_code', '--')})\n"
+        f"Siblings: {', '.join(ctx.get('siblings', [])[:4])}\n"
+        f"Detected sector: {ctx.get('sector', 'unspecified')}\n"
+        f"ERP system: {ctx.get('erp_system', 'unspecified')}\n\n"
+        "Respond with JSON format:\n"
+        "{\"main_class\",\"sub_class\",\"normal_balance\",\"confidence\",\"reason\"}"
+    )
+
+    import json
+    import time
+
+    max_retries = 2
+    timeout_seconds = 15
+
+    for attempt in range(max_retries + 1):
+        try:
+            import httpx
+
+            response = httpx.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json={
+                    "model": "claude-sonnet-4-20250514",
+                    "max_tokens": 200,
+                    "temperature": 0.1,
+                    "system": system_prompt,
+                    "messages": [{"role": "user", "content": user_prompt}],
+                },
+                timeout=timeout_seconds,
+            )
+
+            if response.status_code != 200:
+                logger.warning(
+                    "Layer 5 API error (attempt %d): status=%d",
+                    attempt + 1, response.status_code,
+                )
+                if attempt < max_retries:
+                    time.sleep(2)
+                    continue
+                return _layer5_fallback()
+
+            data = response.json()
+            text = data.get("content", [{}])[0].get("text", "")
+
+            # Parse JSON from response
+            # Strip markdown code fences if present
+            text = text.strip()
+            if text.startswith("```"):
+                text = re.sub(r"^```(?:json)?\s*", "", text)
+                text = re.sub(r"\s*```$", "", text)
+
+            result = json.loads(text)
+
+            main_class = result.get("main_class", "").lower()
+            sub_class = result.get("sub_class", "").lower()
+            nature = result.get("normal_balance", "").lower()
+            llm_confidence = float(result.get("confidence", 0.75))
+
+            # Validate response
+            if main_class not in VALID_MAIN_CLASSES:
+                logger.warning("Layer 5: invalid main_class '%s' — falling back", main_class)
+                return _layer5_fallback()
+
+            if nature not in VALID_NATURES:
+                nature = "debit" if main_class in ("asset", "expense", "cogs", "finance_cost") else "credit"
+
+            final_confidence = min(BASE_CONFIDENCE["llm"], llm_confidence)
+
+            logger.info(
+                "Layer 5 classified: code=%s → %s/%s (confidence=%.2f)",
+                code, main_class, sub_class, final_confidence,
+            )
+
+            return {
+                "concept_id": None,
+                "main_class": main_class,
+                "sub_class": sub_class if sub_class in VALID_SUB_CLASSES else None,
+                "nature": nature,
+                "confidence": final_confidence,
+                "classification_method": "llm",
+            }
+
+        except json.JSONDecodeError:
+            logger.warning("Layer 5: failed to parse JSON (attempt %d)", attempt + 1)
+            if attempt < max_retries:
+                time.sleep(2)
+                continue
+            return _layer5_fallback()
+        except Exception as e:
+            logger.warning("Layer 5 error (attempt %d): %s", attempt + 1, e)
+            if attempt < max_retries:
+                time.sleep(2)
+                continue
+            return _layer5_fallback()
+
+    return _layer5_fallback()
+
+
+def _layer5_fallback() -> Dict:
+    """Fallback when Claude API fails — low confidence triggers human review."""
+    return {
+        "concept_id": None,
+        "main_class": None,
+        "sub_class": None,
+        "nature": None,
+        "confidence": 0.50,
+        "classification_method": "llm_fallback",
+    }
 
 
 # ---------------------------------------------------------------------------
