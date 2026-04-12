@@ -359,3 +359,23 @@ async def list_error_categories():
             "categories": categories,
         },
     }
+
+
+# ══════════════════════════════════════════════════════════════
+# GET /api/coa-engine/sectors/{sector_code} — Get sector detail
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/sectors/{sector_code}")
+async def get_sector_detail(sector_code: str):
+    """Return details for a specific sector including mandatory accounts."""
+    from app.coa_engine.data.sectors import get_sector
+
+    sector = get_sector(sector_code.upper())
+    if not sector:
+        raise HTTPException(status_code=404, detail=f"Sector '{sector_code}' not found")
+
+    return {
+        "success": True,
+        "data": sector,
+    }

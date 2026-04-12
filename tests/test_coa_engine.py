@@ -623,3 +623,139 @@ class TestErrorRoutes:
         data = resp.json()
         assert data["success"] is True
         assert data["data"]["count"] >= 10
+
+
+# ── Wave 3: Sector Detector ──
+class TestSectorDetector:
+    def test_detect_retail_sector(self):
+        from app.coa_engine.services.sector_detector import detect_sector
+
+        accounts = [
+            {"concept_id": "INVENTORY"},
+            {"concept_id": "COGS"},
+            {"concept_id": "SALES_RETURNS"},
+            {"concept_id": "PURCHASE_RETURNS"},
+            {"concept_id": "CASH"},
+        ]
+        result = detect_sector(accounts)
+        assert result["sector_code"] == "RETAIL"
+        assert result["confidence"] > 0.5
+
+    def test_detect_unknown_sector(self):
+        from app.coa_engine.services.sector_detector import detect_sector
+
+        accounts = [{"concept_id": "CASH"}, {"concept_id": "BANK"}]
+        result = detect_sector(accounts)
+        # Common accounts only — no sector-specific match
+        assert result["sector_code"] in ("UNKNOWN", "RETAIL", "ECOMMERCE")
+
+    def test_detect_empty_accounts(self):
+        from app.coa_engine.services.sector_detector import detect_sector
+
+        result = detect_sector([])
+        assert result["sector_code"] == "UNKNOWN"
+        assert result["confidence"] == 0.0
+
+    def test_missing_accounts_identified(self):
+        from app.coa_engine.services.sector_detector import detect_sector
+
+        # Only partial retail accounts
+        accounts = [{"concept_id": "INVENTORY"}, {"concept_id": "COGS"}]
+        result = detect_sector(accounts)
+        if result["sector_code"] == "RETAIL":
+            assert len(result["missing_accounts"]) > 0
+
+
+class TestSimilarityEngine:
+    def test_similarity_score(self):
+        from app.coa_engine.services.sector_detector import calculate_similarity
+
+        accounts = [
+            {"concept_id": "CASH", "main_class": "asset", "parent_code": None, "name": "نقدية"},
+            {"concept_id": "BANK", "main_class": "asset", "parent_code": None, "name": "بنوك"},
+            {"concept_id": "INVENTORY", "main_class": "asset", "parent_code": None, "name": "مخزون"},
+            {"concept_id": "COGS", "main_class": "cogs", "parent_code": None, "name": "تكلفة"},
+        ]
+        result = calculate_similarity(accounts, "RETAIL")
+        assert result["overall_score"] > 0
+        assert result["grade"] in ("A", "B", "C", "D", "F")
+        assert "mandatory_coverage" in result["dimensions"]
+
+    def test_similarity_empty(self):
+        from app.coa_engine.services.sector_detector import calculate_similarity
+
+        result = calculate_similarity([], "RETAIL")
+        assert result["overall_score"] == 0.0
+        assert result["grade"] == "F"
+
+
+class TestSectorReport:
+    def test_report_card_structure(self):
+        from app.coa_engine.services.sector_detector import build_sector_report
+
+        accounts = [{"main_class": "asset", "review_status": "auto_approved"}]
+        sector = {"sector_code": "RETAIL", "sector_name_ar": "تجارة", "sector_name_en": "Retail", "confidence": 0.8, "missing_accounts": ["INVENTORY"]}
+        similarity = {"overall_score": 75.0, "dimensions": {"mandatory_coverage": 50}}
+        report = build_sector_report(accounts, sector, similarity, 75.0, {"critical": 0, "high": 1, "medium": 0, "low": 0})
+        assert "grade" in report
+        assert "sector" in report
+        assert "top_actions" in report
+        assert "executive_summary_ar" in report
+        assert "benchmark" in report
+
+    def test_report_with_critical_errors(self):
+        from app.coa_engine.services.sector_detector import build_sector_report
+
+        accounts = [{"main_class": "asset", "review_status": "pending"}]
+        sector = {"sector_code": "RETAIL", "sector_name_ar": "تجارة", "sector_name_en": "Retail", "confidence": 0.5, "missing_accounts": []}
+        similarity = {"overall_score": 40.0, "dimensions": {}}
+        report = build_sector_report(accounts, sector, similarity, 40.0, {"critical": 3, "high": 2, "medium": 0, "low": 0})
+        assert report["grade"] == "F"
+        assert len(report["top_actions"]) > 0
+        assert report["top_actions"][0]["severity"] == "Critical"
+
+
+class TestPipelineWithSector:
+    def test_pipeline_detects_sector(self):
+        from app.coa_engine.services.pipeline import process_dataframe
+
+        df = pd.DataFrame(
+            {
+                "كود الحساب": ["1", "11", "1101", "1102", "2", "21", "2101", "3", "31", "4", "41", "5", "51"],
+                "اسم الحساب": [
+                    "أصول", "أصول متداولة", "نقدية", "بنوك",
+                    "التزامات", "التزامات متداولة", "موردين",
+                    "حقوق ملكية", "رأس المال",
+                    "إيرادات", "مبيعات",
+                    "مصروفات", "رواتب",
+                ],
+            }
+        )
+        result = process_dataframe(df, filename="test_sector.xlsx")
+        assert result.status == "completed"
+        assert result.sector_detected is not None
+        d = result.to_dict()
+        assert "sector_detected" in d
+        assert "sector_similarity" in d
+        assert "report_card" in d
+
+
+class TestSectorRoutes:
+    @pytest.fixture
+    def client(self):
+        from fastapi.testclient import TestClient
+        from app.main import app
+
+        return TestClient(app)
+
+    def test_sector_detail_endpoint(self, client):
+        resp = client.get("/api/coa-engine/sectors/RETAIL")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["code"] == "RETAIL"
+        assert "mandatory_accounts" in data["data"]
+
+    def test_sector_detail_not_found(self, client):
+        resp = client.get("/api/coa-engine/sectors/NONEXISTENT")
+        assert resp.status_code == 404

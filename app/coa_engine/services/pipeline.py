@@ -24,6 +24,7 @@ from app.coa_engine.services.normalizer import normalize_dataframe, detect_encod
 from app.coa_engine.services.hierarchy_builder import build_hierarchy, validate_hierarchy
 from app.coa_engine.services.classifier import classify_accounts
 from app.coa_engine.services.error_detector import detect_errors, summarize_errors
+from app.coa_engine.services.sector_detector import detect_sector, calculate_similarity, build_sector_report
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +94,9 @@ class PipelineResult:
         self.processing_ms: int = 0
         self.row_count: int = 0
         self.report_card: Dict = {}
+        self.sector_detected: Optional[str] = None
+        self.sector_result: Dict = {}
+        self.sector_similarity: float = 0.0
         self.review_status: str = "pending"  # auto_approved | pending_review | rejected | blocked
 
     def to_dict(self) -> Dict:
@@ -107,6 +111,8 @@ class PipelineResult:
             "row_count": self.row_count,
             "quality_score": round(self.quality_score, 2),
             "confidence_avg": round(self.confidence_avg, 4),
+            "sector_detected": self.sector_detected,
+            "sector_similarity": round(self.sector_similarity, 2),
             "errors": self.errors,
             "errors_summary": self.errors_summary,
             "quality_dimensions": self.quality_dimensions,
@@ -170,6 +176,9 @@ def process_file(file_bytes: bytes, filename: str, client_id: int = None) -> Pip
 
         # Step 5b: Detect errors (Wave 2)
         _step5b_detect_errors(result)
+
+        # Step 5c: Sector detection (Wave 3)
+        _step5c_detect_sector(result)
 
         # Step 6: Quality assessment
         _step6_assess_quality(result)
@@ -246,6 +255,9 @@ def process_dataframe(df: pd.DataFrame, filename: str = "uploaded.xlsx", client_
 
         # Step 5b: Detect errors (Wave 2)
         _step5b_detect_errors(result)
+
+        # Step 5c: Sector detection (Wave 3)
+        _step5c_detect_sector(result)
 
         # Step 6: Quality assessment
         _step6_assess_quality(result)
@@ -607,6 +619,49 @@ def _step5b_detect_errors(result: PipelineResult) -> None:
         result.errors_summary["high"],
         result.errors_summary["medium"],
         result.errors_summary["low"],
+    )
+
+
+# =========================================================================
+# Step 5c: Sector detection (Wave 3)
+# =========================================================================
+
+
+def _step5c_detect_sector(result: PipelineResult) -> None:
+    """Auto-detect company sector and calculate similarity score.
+
+    Populates result.sector_detected, result.sector_result, result.sector_similarity.
+    Also enhances result.report_card with sector intelligence.
+    """
+    logger.info("Step 5c: Detecting sector from %d accounts...", len(result.accounts))
+
+    if not result.accounts:
+        logger.warning("Step 5c: No accounts for sector detection")
+        return
+
+    # Detect sector
+    sector_result = detect_sector(result.accounts)
+    result.sector_detected = sector_result.get("sector_code", "UNKNOWN")
+    result.sector_result = sector_result
+
+    # Calculate similarity
+    similarity = calculate_similarity(result.accounts, result.sector_detected)
+    result.sector_similarity = similarity.get("overall_score", 0.0)
+
+    # Build enhanced report card
+    result.report_card = build_sector_report(
+        result.accounts,
+        sector_result,
+        similarity,
+        result.quality_score,
+        result.errors_summary,
+    )
+
+    logger.info(
+        "Step 5c: Sector=%s confidence=%.2f similarity=%.2f",
+        result.sector_detected,
+        sector_result.get("confidence", 0),
+        result.sector_similarity,
     )
 
 
