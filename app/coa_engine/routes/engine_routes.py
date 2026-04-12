@@ -432,3 +432,61 @@ async def compare_coa_versions(
             "migration_summary": migration_summary,
         },
     }
+
+
+# ══════════════════════════════════════════════════════════════
+# POST /api/coa-engine/knowledge-graph — Build graph from accounts
+# ══════════════════════════════════════════════════════════════
+
+
+@router.post("/knowledge-graph")
+async def build_knowledge_graph(
+    payload: dict,
+    user_id: str = Depends(_require_auth),
+):
+    """Build a knowledge graph from classified accounts.
+
+    Expects JSON body with: accounts: [{code, name, concept_id, main_class, ...}]
+    Returns graph nodes, edges, and statistics.
+    """
+    from app.coa_engine.services.knowledge_graph import build_graph_from_accounts
+
+    accounts = payload.get("accounts", [])
+    if not accounts:
+        return {"success": False, "error": "No accounts provided"}
+
+    graph = build_graph_from_accounts(accounts)
+
+    return {
+        "success": True,
+        "data": graph.to_dict(),
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# GET /api/coa-engine/ontology — Get built-in ontology rules
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/ontology")
+async def get_ontology():
+    """Return the built-in accounting ontology rules and section membership."""
+    from app.coa_engine.services.knowledge_graph import ONTOLOGY_RULES, SECTION_MEMBERSHIP
+
+    rules = []
+    for source, rel, target, meta in ONTOLOGY_RULES:
+        rules.append({
+            "source": source,
+            "relationship": rel,
+            "target": target,
+            **meta,
+        })
+
+    return {
+        "success": True,
+        "data": {
+            "rules_count": len(rules),
+            "rules": rules,
+            "sections": {k: v for k, v in SECTION_MEMBERSHIP.items()},
+        },
+    }

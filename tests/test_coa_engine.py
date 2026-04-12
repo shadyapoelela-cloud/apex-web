@@ -878,3 +878,106 @@ class TestMigrationMap:
         assert summary["total_entries"] == 4
         assert summary["stability_pct"] == 50.0
         assert summary["needs_review"] == 1
+
+
+# ── Wave 5: Knowledge Graph ──
+class TestKnowledgeGraph:
+    def test_graph_construction(self):
+        from app.coa_engine.services.knowledge_graph import KnowledgeGraph
+
+        g = KnowledgeGraph()
+        g.add_node("1001", {"name": "نقدية"})
+        g.add_node("1002", {"name": "بنوك"})
+        g.add_edge("1001", "1002", "PARENT_OF")
+        assert g.node_count == 2
+        assert g.edge_count == 1
+
+    def test_bfs_traversal(self):
+        from app.coa_engine.services.knowledge_graph import KnowledgeGraph
+
+        g = KnowledgeGraph()
+        g.add_node("A", {})
+        g.add_node("B", {})
+        g.add_node("C", {})
+        g.add_edge("A", "B", "PARENT_OF")
+        g.add_edge("B", "C", "PARENT_OF")
+        results = g.bfs("A")
+        assert len(results) == 3
+        assert results[0]["node_id"] == "A"
+        assert results[0]["depth"] == 0
+        assert results[2]["depth"] == 2
+
+    def test_find_dependencies(self):
+        from app.coa_engine.services.knowledge_graph import KnowledgeGraph
+
+        g = KnowledgeGraph()
+        g.add_node("PPE", {})
+        g.add_node("DEPR", {})
+        g.add_edge("PPE", "DEPR", "REQUIRES", {"error_code": "E48"})
+        deps = g.find_dependencies("PPE")
+        assert len(deps["requires"]) == 1
+        assert deps["requires"][0]["target"] == "DEPR"
+
+    def test_impact_analysis(self):
+        from app.coa_engine.services.knowledge_graph import KnowledgeGraph
+
+        g = KnowledgeGraph()
+        g.add_node("REC", {})
+        g.add_node("ECL", {})
+        g.add_edge("REC", "ECL", "REQUIRES", {"error_code": "E28"})
+        impacts = g.impact_analysis("ECL")
+        assert len(impacts) >= 1
+        assert impacts[0]["impacted_node"] == "REC"
+
+    def test_build_from_accounts(self):
+        from app.coa_engine.services.knowledge_graph import build_graph_from_accounts
+
+        accounts = [
+            {"code": "1", "name": "أصول", "concept_id": None, "main_class": "asset", "parent_code": None},
+            {"code": "11", "name": "متداولة", "concept_id": None, "main_class": "asset", "parent_code": "1"},
+            {"code": "1101", "name": "نقدية", "concept_id": "CASH", "main_class": "asset", "parent_code": "11", "nature": "debit"},
+            {"code": "1111", "name": "ذمم مدينة", "concept_id": "ACC_RECEIVABLE", "main_class": "asset", "parent_code": "11", "nature": "debit"},
+        ]
+        graph = build_graph_from_accounts(accounts)
+        assert graph.node_count > 4  # accounts + section nodes
+        assert graph.edge_count >= 2  # at least PARENT_OF edges
+        # Check PARENT_OF edge
+        neighbors = graph.get_neighbors("1", "PARENT_OF")
+        assert any(t == "11" for t, _, _ in neighbors)
+
+    def test_graph_serialization(self):
+        from app.coa_engine.services.knowledge_graph import KnowledgeGraph
+
+        g = KnowledgeGraph()
+        g.add_node("A", {"name": "test"})
+        g.add_node("B", {"name": "test2"})
+        g.add_edge("A", "B", "REQUIRES")
+        d = g.to_dict()
+        assert d["node_count"] == 2
+        assert d["edge_count"] == 1
+        assert len(d["nodes"]) == 2
+        assert len(d["edges"]) == 1
+
+    def test_ontology_rules_loaded(self):
+        from app.coa_engine.services.knowledge_graph import ONTOLOGY_RULES, SECTION_MEMBERSHIP
+
+        assert len(ONTOLOGY_RULES) >= 15
+        assert "current_asset" in SECTION_MEMBERSHIP
+        assert "CASH" in SECTION_MEMBERSHIP["current_asset"]
+
+
+class TestOntologyRoute:
+    @pytest.fixture
+    def client(self):
+        from fastapi.testclient import TestClient
+        from app.main import app
+
+        return TestClient(app)
+
+    def test_ontology_endpoint(self, client):
+        resp = client.get("/api/coa-engine/ontology")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["data"]["rules_count"] >= 15
+        assert "sections" in data["data"]
