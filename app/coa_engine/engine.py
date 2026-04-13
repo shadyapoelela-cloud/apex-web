@@ -386,8 +386,6 @@ def normalize_code(raw: Any) -> Optional[str]:
     s = str(raw).strip().translate(_ARABIC_DIGITS)
     if not s or s.lower() in {"nan","none","null",""}: return None
     s = re.sub(r"(\d),(\d)", r"\1\2", s)  # فاصلة آلاف
-    s = s.replace(" ", "")                 # مسافات داخلية: "1 1 01" → "1101"
-    s = s.replace("-", "")                 # شرطات: "1-101" → "1101"
     if re.fullmatch(r"\d+\.0+", s): return str(int(float(s)))  # float trailing zeros
     if re.fullmatch(r"\d+(\.\d+)+", s): return s  # نقطة هيكلية
     try:
@@ -636,9 +634,18 @@ async def _layer5(acc: Dict, tree: Dict) -> Tuple[Optional[str],Optional[str],Op
     )
     system_prompt = (
         "أنت محاسب قانوني خبير في IFRS والمعايير السعودية SOCPA. "
-        "مهمتك تصنيف حسابات شجرة الحسابات للشركات العاملة في المملكة العربية السعودية. "
-        "قواعد الإجابة الصارمة: 1. أجِب بـ JSON فقط — لا نص قبله ولا بعده. "
-        "2. الثقة: رقم 0.00-1.00. لا تضف تفسيرات إضافية — JSON فقط."
+        "مهمتك تصنيف حسابات شجرة الحسابات للشركات العاملة في المملكة العربية السعودية.\n\n"
+        "قواعد الإجابة الصارمة:\n"
+        "1. أجِب بـ JSON فقط — لا نص قبله ولا بعده\n"
+        "2. استخدم المعرّفات الثابتة التالية فقط:\n"
+        "   الأقسام الرئيسية: asset|liability|equity|revenue|cogs|expense|finance_cost|closing\n"
+        "   الأقسام الفرعية: current_asset|non_current_asset|current_liability|"
+        "non_current_liability|operating_revenue|other_revenue|"
+        "operating_expense|selling_expense|admin_expense|tax_expense\n"
+        "3. الطبيعة: debit|credit\n"
+        "4. المستوى: header|sub|detail\n"
+        "5. الثقة: رقم 0.00-1.00\n\n"
+        "لا تضف تفسيرات إضافية — JSON فقط."
     )
 
     VALID_MAIN = ["asset","liability","equity","revenue","cogs","expense","finance_cost","closing"]
@@ -677,7 +684,7 @@ async def _layer5(acc: Dict, tree: Dict) -> Tuple[Optional[str],Optional[str],Op
             if result.get("normal_balance") not in VALID_NATURE:
                 result["normal_balance"] = "debit"
 
-            conf = min(max(float(result["confidence"]), 0.0), 0.75)
+            conf = min(max(float(result["confidence"]), 0.0), 0.73)
             return (
                 result["main_class"],
                 result.get("sub_class", result["main_class"]),
@@ -806,7 +813,7 @@ def compute_quality_score(accounts: List[ProcessedAccount], errors: List[COAErro
     }
     score = sum(QUALITY_WEIGHTS[k] * dims[k] * 100 for k in QUALITY_WEIGHTS)
     score = round(max(0.0, min(100.0, score)), 2)
-    grade = "A" if score>=90 else "B" if score>=80 else "C" if score>=70 else "D" if score>=65 else "F"
+    grade = "A" if score>=90 else "B" if score>=80 else "C" if score>=70 else "D" if score>=60 else "F"
     return score, grade, {k: round(v*100,1) for k,v in dims.items()}
 
 
@@ -1125,7 +1132,7 @@ class COAEngine:
                 if e.severity == "Critical": crit_codes.add(e.account_code)
         for pa in processed:
             pa.errors = err_by_code.get(pa.code,[])
-            if pa.code in crit_codes: pa.review_status = "pending"
+            if pa.code in crit_codes: pa.review_status = "blocked"
 
         # 6. التقرير
         quality_score, quality_grade, quality_dims = compute_quality_score(processed, errors)

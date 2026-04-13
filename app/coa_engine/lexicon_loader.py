@@ -17,7 +17,7 @@ from typing import Dict, List, Optional, Set, Tuple
 _ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 _NORM_MAP = str.maketrans({
     "أ":"ا","إ":"ا","آ":"ا","ٱ":"ا",
-    "ة":"ه","ى":"ي","ؤ":"و","ئ":"ي","ء":"","ـ":"",
+    "ه":"ة","ى":"ي","ؤ":"و","ئ":"ي","ء":"","ـ":"",
 })
 _TASHKEEL = re.compile(
     r"[\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED]"

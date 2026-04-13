@@ -320,7 +320,7 @@ def _detect_revenue_fragmentation(accounts: List[Dict], threshold: int = 8) -> L
     words = [w for a in revenue_accounts for w in str(a.get("name_raw","") or "").split() if len(w) > 3]
     if not words:
         return []
-    common = [w for w, c in Counter(words).most_common(3) if c > threshold * 0.6]
+    common = [w for w, c in Counter(words).most_common(3) if c > threshold * 0.8]
     return revenue_accounts if common else []
 
 

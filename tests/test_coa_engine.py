@@ -310,7 +310,7 @@ class TestPipeline:
             assert a.code
             assert a.name_raw
             assert 0 <= a.confidence <= 1, f"confidence out of range: {a.confidence}"
-            assert a.review_status in ("auto_approved", "auto_classified", "pending", "pending_review", "rejected_pending", "rejected", "resolved")
+            assert a.review_status in ("auto_approved", "auto_classified", "pending", "pending_review", "rejected_pending", "rejected", "resolved", "blocked")
 
     def test_pipeline_result_to_api_response(self, engine):
         r = self._run(engine, "01_ODOO_FLAT.xlsx")
