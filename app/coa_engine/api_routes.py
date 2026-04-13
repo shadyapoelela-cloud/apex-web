@@ -756,6 +756,24 @@ async def get_health_trend(client_id: str) -> Dict[str, Any]:
 
 
 # ─────────────────────────────────────────────────────────────
+# Endpoint 12: Health check (MUST be before /{upload_id})
+# ─────────────────────────────────────────────────────────────
+@router.get("/health", summary="حالة محرك COA", tags=["Health"])
+async def coa_health() -> Dict[str, Any]:
+    db = get_db()
+    db_ok = db is not None and db.is_connected
+    return {
+        "status": "healthy" if db_ok else "degraded",
+        "version": "4.3.0",
+        "components": {
+            "engine": "ready",
+            "database": "connected" if db_ok else "not_connected",
+            "lexicon": "loaded",
+        },
+    }
+
+
+# ─────────────────────────────────────────────────────────────
 # Endpoint 2: Get analysis result
 # ─────────────────────────────────────────────────────────────
 @router.get(
@@ -1325,19 +1343,3 @@ async def trial_balance_check(upload_id: str, body: Dict[str, Any] = {}) -> Dict
     }
 
 
-# ─────────────────────────────────────────────────────────────
-# Endpoint 12: Health check
-# ─────────────────────────────────────────────────────────────
-@router.get("/health", summary="حالة محرك COA", tags=["Health"])
-async def coa_health() -> Dict[str, Any]:
-    db = get_db()
-    db_ok = db is not None and db.is_connected
-    return {
-        "status": "healthy" if db_ok else "degraded",
-        "version": "4.3.0",
-        "components": {
-            "engine": "ready",
-            "database": "connected" if db_ok else "not_connected",
-            "lexicon": "loaded",
-        },
-    }
