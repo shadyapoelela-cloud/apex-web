@@ -67,7 +67,7 @@ def check_E22_duplicate_name(accounts: List[Dict]) -> List[COAError]:
                 description_ar=f"الاسم '{acc.get('name_raw','')}' مكرر في الأكواد: {', '.join(name_count[name])}",
                 cause_ar="التكرار يُربك الربط مع ميزان المراجعة",
                 suggestion_ar="ميِّز كل حساب بوصف إضافي أو ادمج المتطابقة",
-                auto_fixable=True, references=["IASC Framework"],
+                auto_fixable=False, references=["IASC Framework"],
             ))
     return errors
 
@@ -589,20 +589,27 @@ def check_E44_large_code_gaps(accounts: List[Dict]) -> List[COAError]:
 
 
 def check_E45_wrong_sector_account(accounts: List[Dict]) -> List[COAError]:
-    """E45 — حساب من قطاع آخر | High | 🔧 يدوي"""
+    """E45 — حساب من قطاع آخر | High | 🔧 يدوي
+    استثناء: أكواد Odoo للتسوية (999901/999902) لا تُنتج E45 — تسوية مقصودة.
+    """
     errors = []
-    # حسابات Odoo تسوية التي تُدرَج خطأً في COA حقيقي
-    odoo_settlement = {"999901", "999902", "999999"}
+    # أكواد Odoo تسوية مقصودة — لا تُعد أخطاء (الوثيقة: القسم 2.2)
+    odoo_settlement_exempt = {"999901", "999902"}
     for acc in accounts:
         code = str(acc.get("code","") or "").strip()
-        if code in odoo_settlement:
+        name = str(acc.get("name_raw","") or "")
+        # استثناء Odoo — تسوية مقصودة
+        if code in odoo_settlement_exempt:
+            continue
+        # كشف حسابات قطاع آخر (مثل 9901 في نهاية الشجرة)
+        if code.startswith("99") and not re.search(r"ختامي|إقفال|closing", name, re.I):
             errors.append(COAError(
                 error_code="E45", severity="High", category="sector",
-                account_code=code, account_name=acc.get("name_raw",""),
-                description_ar=f"الكود {code} حساب تسوية Odoo — ليس حساباً محاسبياً حقيقياً",
-                cause_ar="حسابات التسوية الداخلية لـ Odoo تُربك التحليل إذا ظهرت في COA",
-                suggestion_ar="احذف هذا الحساب من الشجرة أو ضعه في قسم 'حسابات ختامية' 8XXX",
-                auto_fixable=False, references=["Odoo Chart of Accounts Documentation"],
+                account_code=code, account_name=name,
+                description_ar=f"الكود {code} يبدو من قطاع آخر أو حساب تسوية غير معروف",
+                cause_ar="حسابات خارج نطاق الشجرة الأساسية تُربك التحليل",
+                suggestion_ar="إذا نشاط مختلف: أنشئ شجرة مستقلة. إذا خطأ: احذفه",
+                auto_fixable=False, references=["أفضل الممارسات: هيكل الشجرة"],
             ))
     return errors
 
@@ -805,7 +812,7 @@ def check_EP2_coding_pattern_mismatch(accounts: List[Dict], erp_system: Optional
                 description_ar=f"معظم الأكواد أقصر من المعتاد لـ Odoo ({len(short_codes)} كود قصير)",
                 cause_ar="Odoo يستخدم أكواداً من 4-6 أرقام عادةً — الأكواد القصيرة قد تُربك الاستيراد",
                 suggestion_ar="وسِّع الأكواد لتتوافق مع نمط Odoo: 4+ أرقام",
-                auto_fixable=True, references=["Odoo Chart of Accounts Best Practices"],
+                auto_fixable=False, references=["Odoo Chart of Accounts Best Practices"],
             ))
     return errors
 
@@ -851,7 +858,7 @@ def check_EC1_negative_cash(accounts: List[Dict]) -> List[COAError]:
                         description_ar=f"صندوق '{name}' برصيد سالب: {balance}",
                         cause_ar="الصندوق النقدي لا يمكن أن يكون سالباً — يشير لخطأ في التسجيل",
                         suggestion_ar="إما خطأ في القيود أو تحويل من حساب الصندوق لم يُسجَّل",
-                        auto_fixable=True, references=["IASC Framework: خصائص الأصول"],
+                        auto_fixable=False, references=["IASC Framework: خصائص الأصول"],
                     ))
             except (ValueError, TypeError):
                 pass
@@ -874,8 +881,8 @@ def check_EC2_accum_depr_as_liability(accounts: List[Dict]) -> List[COAError]:
                 account_code=acc.get("code"), account_name=name,
                 description_ar=f"'{name}' مُصنَّف كالتزام — خطأ Odoo الكلاسيكي",
                 cause_ar="مجمع الإهلاك حساب مقابل للأصول (contra-asset)، ليس التزاماً",
-                suggestion_ar="انقل لقسم الأصول الثابتة مع الحفاظ على طبيعته الدائنة",
-                auto_fixable=True, references=["IAS 16 §73", "IASC Framework: الأصول المقابلة"],
+                suggestion_ar="انقل لقسم الأصول الثابتة كـ Contra Asset مع الحفاظ على طبيعته الدائنة",
+                auto_fixable=False, references=["IAS 16 §73", "IASC Framework: الأصول المقابلة"],
             ))
     return errors
 
@@ -916,7 +923,7 @@ def check_EC4_journals_mixed(accounts: List[Dict]) -> List[COAError]:
                 description_ar=f"الكود '{code}' يبدو قيد يوميات مُدرَج في شجرة الحسابات",
                 cause_ar="اختلاط السجلات المحاسبية مع الشجرة يُفسد التحليل",
                 suggestion_ar="احذف هذا السجل من شجرة الحسابات — اليوميات تُعالَج منفصلاً",
-                auto_fixable=True, references=[],
+                auto_fixable=False, references=[],
             ))
     return errors
 
@@ -939,8 +946,8 @@ def check_EC5_operational_data_mixed(accounts: List[Dict]) -> List[COAError]:
             error_code="EC5", severity="Critical", category="real_file",
             description_ar="الملف يخلط بيانات COA مع بيانات عملاء/موردين/أصناف",
             cause_ar="الملفات المختلطة لا تُمثِّل شجرة حسابات — تحتاج فصلاً قبل المعالجة",
-            suggestion_ar="ارفع ملف COA منفصلاً يحتوي الحسابات فقط",
-            auto_fixable=True, references=[],
+            suggestion_ar="ارفع ملف COA منفصلاً يحتوي الحسابات فقط — الملف مرفوض",
+            auto_fixable=False, references=[],
         ))
     return errors
 

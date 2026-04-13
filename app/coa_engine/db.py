@@ -198,6 +198,35 @@ CREATE TABLE IF NOT EXISTS coa_migration_map (
 CREATE INDEX IF NOT EXISTS idx_migration_client_ver
     ON coa_migration_map(client_id, from_version, to_version);
 
+CREATE TABLE IF NOT EXISTS canonical_accounts (
+    concept_id          TEXT PRIMARY KEY,
+    code_pattern        TEXT NOT NULL,
+    name_ar             TEXT NOT NULL,
+    name_en             TEXT,
+    section             TEXT NOT NULL,
+    nature              TEXT NOT NULL DEFAULT 'debit',
+    level               TEXT NOT NULL DEFAULT 'detail',
+    definition_ar       TEXT,
+    mandatory_sectors   TEXT DEFAULT '[]',
+    created_at          TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS coa_evolution_log (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id           TEXT NOT NULL,
+    from_version        INTEGER NOT NULL,
+    to_version          INTEGER NOT NULL,
+    change_type         TEXT NOT NULL,
+    account_code        TEXT,
+    old_value           TEXT,
+    new_value           TEXT,
+    risk_level          TEXT DEFAULT 'low',
+    created_at          TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_evolution_client
+    ON coa_evolution_log(client_id, from_version, to_version);
+
 CREATE TABLE IF NOT EXISTS engine_rules (
     rule_id             TEXT PRIMARY KEY,
     rule_name           TEXT NOT NULL,

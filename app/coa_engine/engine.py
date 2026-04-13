@@ -424,11 +424,34 @@ def find_parent_by_prefix(code: str, code_index: Dict) -> Optional[str]:
     return None
 
 
+def _resolve_zoho_parents(accounts: List[Dict], code_index: Dict) -> None:
+    """Zoho: parent بالاسم — قد يكون AMBIGUOUS (القسم 2.2 + 3.1)."""
+    name_to_codes: Dict[str, List[str]] = {}
+    for acc in accounts:
+        name = str(acc.get("name_raw","") or "").strip()
+        code = str(acc.get("code","") or "").strip()
+        if name and code:
+            name_to_codes.setdefault(name, []).append(code)
+
+    for acc in accounts:
+        pname = str(acc.get("_parent_name","") or "").strip()
+        if not pname or acc.get("parent_code"):
+            continue
+        matches = name_to_codes.get(pname, [])
+        if len(matches) == 1:
+            acc["parent_code"] = matches[0]
+        elif len(matches) > 1:
+            acc["parent_code"] = "AMBIGUOUS"  # → مراجعة بشرية
+
+
 def build_hierarchy(accounts: List[Dict]) -> Dict[str, Dict]:
     code_index: Dict[str, Dict] = {}
     for acc in accounts:
         if acc.get("code"):
             code_index[str(acc["code"])] = acc
+
+    # المرحلة 0: حل أبوّة Zoho بالاسم (AMBIGUOUS عند التكرار)
+    _resolve_zoho_parents(accounts, code_index)
 
     # المرحلة 1: البحث عن أب صريح موجود
     for acc in accounts:
@@ -494,7 +517,7 @@ _CODE_MAP = {
     "4":("revenue","إيرادات","credit"),
     "5":("cogs","تكلفة المبيعات","debit"),
     "6":("expense","مصروفات","debit"),
-    "7":("finance_cost","تكاليف تمويل","debit"),
+    "7":("other_income_expense","إيرادات ومصروفات أخرى","variable"),
     "8":("closing","حسابات ختامية","variable"),
 }
 _SUBCODE_MAP = {
@@ -506,26 +529,26 @@ _SUBCODE_MAP = {
     ("2","24"):"non_current_liability",
 }
 _USER_TYPE_MAP = {
-    "بنك والنقد":         ("BANK","current_asset","debit",0.85),
-    "bank and cash":      ("BANK","current_asset","debit",0.85),
-    "الأصول المتداولة":   ("current_asset","current_asset","debit",0.80),
-    "current assets":     ("current_asset","current_asset","debit",0.80),
-    "أصول ثابتة":         ("non_current_asset","non_current_asset","debit",0.85),
-    "fixed assets":       ("non_current_asset","non_current_asset","debit",0.85),
-    "المدين":             ("ACC_RECEIVABLE","current_asset","debit",0.82),
-    "receivable":         ("ACC_RECEIVABLE","current_asset","debit",0.82),
-    "الدائن":             ("ACC_PAYABLE","current_liability","credit",0.82),
-    "payable":            ("ACC_PAYABLE","current_liability","credit",0.82),
-    "الالتزامات الحالية": ("current_liability","current_liability","credit",0.80),
-    "current liabilities":("current_liability","current_liability","credit",0.80),
-    "الالتزامات غير":     ("non_current_liability","non_current_liability","credit",0.80),
-    "رأس المال":          ("equity","equity","credit",0.85),
-    "equity":             ("equity","equity","credit",0.85),
-    "الدخل":              ("revenue","revenue","credit",0.85),
-    "income":             ("revenue","revenue","credit",0.85),
-    "مصاريف":             ("expense","expense","debit",0.82),
-    "expense":            ("expense","expense","debit",0.82),
-    "cost of revenue":    ("cogs","cogs","debit",0.85),
+    "بنك والنقد":         ("BANK","current_asset","debit",0.88),
+    "bank and cash":      ("BANK","current_asset","debit",0.88),
+    "الأصول المتداولة":   ("current_asset","current_asset","debit",0.88),
+    "current assets":     ("current_asset","current_asset","debit",0.88),
+    "أصول ثابتة":         ("non_current_asset","non_current_asset","debit",0.88),
+    "fixed assets":       ("non_current_asset","non_current_asset","debit",0.88),
+    "المدين":             ("ACC_RECEIVABLE","current_asset","debit",0.88),
+    "receivable":         ("ACC_RECEIVABLE","current_asset","debit",0.88),
+    "الدائن":             ("ACC_PAYABLE","current_liability","credit",0.88),
+    "payable":            ("ACC_PAYABLE","current_liability","credit",0.88),
+    "الالتزامات الحالية": ("current_liability","current_liability","credit",0.88),
+    "current liabilities":("current_liability","current_liability","credit",0.88),
+    "الالتزامات غير":     ("non_current_liability","non_current_liability","credit",0.88),
+    "رأس المال":          ("equity","equity","credit",0.88),
+    "equity":             ("equity","equity","credit",0.88),
+    "الدخل":              ("revenue","revenue","credit",0.88),
+    "income":             ("revenue","revenue","credit",0.88),
+    "مصاريف":             ("expense","expense","debit",0.88),
+    "expense":            ("expense","expense","debit",0.88),
+    "cost of revenue":    ("cogs","cogs","debit",0.88),
 }
 
 def _layer1(code: str) -> Tuple[Optional[str], Optional[str], Optional[str], float]:

@@ -980,7 +980,7 @@ def check_E20_expense_credit(accounts: List[Dict]) -> List[COAError]:
         if is_expense and nature == "credit":
             errors.append(COAError(
                 error_code="E20",
-                severity="High",
+                severity="Critical",
                 category="nature",
                 account_code=code,
                 account_name=name,

@@ -1,3 +1,3 @@
-"""APEX COA Engine v4.2 — Chart of Accounts classification and analysis engine."""
+"""APEX COA Engine v4.3 — Chart of Accounts classification and analysis engine."""
 
-__version__ = "4.2.0"
+__version__ = "4.3.0"
