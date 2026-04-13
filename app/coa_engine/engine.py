@@ -536,8 +536,8 @@ def _layer1(code: str) -> Tuple[Optional[str], Optional[str], Optional[str], flo
     if first not in _CODE_MAP: return None, None, None, 0.0
     section, section_ar, nature = _CODE_MAP[first]
     sub = _SUBCODE_MAP.get((first, s[:2]), section)
-    if first == "8": return "closing","حسابات ختامية","variable",0.80
-    return sub, section_ar, nature, 0.80
+    if first == "8": return "closing","حسابات ختامية","variable",0.85
+    return sub, section_ar, nature, 0.85
 
 def _layer2(acc: Dict) -> Tuple[Optional[str],Optional[str],Optional[str],float]:
     """الطبقة 2: user_type_id."""
@@ -638,7 +638,7 @@ async def _layer5(acc: Dict, tree: Dict) -> Tuple[Optional[str],Optional[str],Op
             if result.get("normal_balance") not in VALID_NATURE:
                 result["normal_balance"] = "debit"
 
-            conf = min(max(float(result["confidence"]), 0.0), 0.73)
+            conf = min(max(float(result["confidence"]), 0.0), 0.75)
             return (
                 result["main_class"],
                 result.get("sub_class", result["main_class"]),
