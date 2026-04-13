@@ -532,6 +532,22 @@ void _storeErpKnowledge(String erpName, int accountCount, List<String> headers) 
 }
 
 
+String _detectFilePattern(List<String> headers) {
+  final hLower = headers.map((h) => h.replaceAll(RegExp(r'[\u00A0\s]+'), ' ').trim().toLowerCase()).toSet();
+  // ODOO patterns
+  if (hLower.any((h) => h.contains('user_type_id') || h.contains('user type') || h.contains('internal type'))) return 'ODOO_FLAT';
+  if (hLower.any((h) => h.contains('__export__'))) return 'ODOO_WITH_ID';
+  if (hLower.any((h) => h == 'النوع' || h == 'نوع' || h == 'نوع الحساب' || h == 'تصنيف الحساب')) return 'ODOO_FLAT';
+  // Zoho
+  if (hLower.any((h) => h.contains('zoho'))) return 'ZOHO_BOOKS';
+  // Hierarchical
+  if (hLower.any((h) => h.contains('parent') || h.contains('الأب') || h.contains('الحساب الرئيسي'))) return 'HIERARCHICAL';
+  // English with class
+  if (hLower.any((h) => h.contains('class'))) return 'ENGLISH_WITH_CLASS';
+  return 'GENERIC_FLAT';
+}
+
+
 // ═══════════════════════════════════════════════════════════════
 // Main COA Journey Screen
 // ═══════════════════════════════════════════════════════════════
@@ -576,6 +592,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   String _filterStatus = 'all'; // all, approved, review, flagged
   String _searchQuery = '';
   String _detectedErp = '';
+  String _filePattern = '';
 
   // Tree state
   Map<String, bool> _treeExpanded = {};
@@ -681,8 +698,9 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     // Auto-detect columns
     _autoDetectColumns();
 
-    // Detect ERP silently
+    // Detect ERP and file pattern silently
     _detectedErp = _detectErpSilently(_headers);
+    _filePattern = _detectFilePattern(_headers);
     _storeErpKnowledge(_detectedErp, _rawRows.length, _headers);
 
     // Show column confirmation dialog
@@ -1304,7 +1322,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                 children: [
                   Icon(Icons.check_circle, color: AppColors.greenC, size: 16),
                   const SizedBox(width: 6),
-                  Text('${_accounts.length} حساب',
+                  Text([
+                    if (_detectedErp.isNotEmpty && _detectedErp != 'غير معروف') _detectedErp,
+                    if (_filePattern.isNotEmpty && _filePattern != 'GENERIC_FLAT') _filePattern,
+                    '${_accounts.length} حساب',
+                  ].join(' • '),
                       style: TextStyle(color: AppColors.greenC, fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
@@ -2142,8 +2164,18 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         a.code.isNotEmpty && a.name.trim().length >= 3 && a.rootClass != 'غير محدد').length;
     final completeness = (complete / total * 100).round();
 
-    // Consistency: accounts where level matches code pattern
-    final consistent = _accounts.where((a) => a.parentCode.isNotEmpty || a.level <= 1).length;
+    // Consistency: accounts with parent OR inferable hierarchy from code prefix
+    final consistent = _accounts.where((a) {
+      if (a.parentCode.isNotEmpty || a.level <= 1) return true;
+      // Infer hierarchy: if other accounts share a common prefix, the code is consistent
+      final cleaned = a.code.replaceAll(RegExp(r'[^0-9]'), '');
+      if (cleaned.length >= 2) {
+        final prefix = cleaned.substring(0, (cleaned.length / 2).ceil().clamp(1, cleaned.length - 1));
+        final siblings = _accounts.where((o) => o.code != a.code && o.code.replaceAll(RegExp(r'[^0-9]'), '').startsWith(prefix)).length;
+        if (siblings > 0) return true;
+      }
+      return false;
+    }).length;
     final consistency = (consistent / total * 100).round();
 
     // Naming clarity: accounts with name length > 5

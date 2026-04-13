@@ -226,6 +226,14 @@ try:
 except Exception as e:
     HAS_P11 = False
     logging.warning(f"Phase 11 disabled: {e}")
+# --- COA Engine v4.3 ---
+HAS_COA_ENGINE = False
+try:
+    from app.coa_engine.api_routes import router as coa_engine_router, init_coa_engine
+
+    HAS_COA_ENGINE = True
+except Exception as e:
+    logging.warning(f"COA Engine v4.3 disabled: {e}")
 
 
 def _run_startup():
@@ -297,11 +305,6 @@ def _run_startup():
         init_copilot_db()
     except Exception:
         logging.error("Copilot init error", exc_info=True)
-    if HAS_COA_ENGINE:
-        try:
-            init_coa_engine_db()
-        except Exception:
-            logging.error("COA Engine v4.2 init error", exc_info=True)
 
 
 def _validate_env():
@@ -334,6 +337,11 @@ _validate_env()
 @asynccontextmanager
 async def lifespan(app):
     _run_startup()
+    if HAS_COA_ENGINE:
+        try:
+            await init_coa_engine()
+        except Exception:
+            logging.error("COA Engine init error", exc_info=True)
     yield
 
 
@@ -469,19 +477,8 @@ if HAS_S5:
     app.include_router(s5r, tags=["Sprint 5 Analysis Trigger"])
 if HAS_S6:
     app.include_router(s6r, tags=["Sprint 6 Registry + Eligibility"])
-
-# ── COA Engine v4.2 ──
-HAS_COA_ENGINE = False
-try:
-    from app.coa_engine.routes.engine_routes import router as coa_engine_r
-    from app.coa_engine.models.engine_models import init_coa_engine_db
-
-    HAS_COA_ENGINE = True
-except Exception as e:
-    logging.warning(f"COA Engine v4.2 disabled: {e}")
-
 if HAS_COA_ENGINE:
-    app.include_router(coa_engine_r, tags=["COA Engine v4.2"])
+    app.include_router(coa_engine_router, tags=["COA Engine v4.3"])
 
 # ── New Routes (P0-P4) ──
 from app.phase2.routes.onboarding_routes import router as onboarding_r
@@ -1005,9 +1002,7 @@ def health():
             "s5": HAS_S5,
             "s6": HAS_S6,
         },
-        "engines": {
-            "coa_engine_v4": HAS_COA_ENGINE,
-        },
+        "engines": {"coa_engine_v4.3": HAS_COA_ENGINE},
         "all_phases_active": all([P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8]),
     }
 

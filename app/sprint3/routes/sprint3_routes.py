@@ -70,13 +70,36 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
     try:
         # Verify upload exists and is classified
         upload_row = db.execute(
-            _t("SELECT id, client_id, upload_status FROM client_coa_uploads WHERE id = :uid"), {"uid": upload_id}
+            _t("SELECT id, client_id, upload_status, detected_columns_json, column_mapping_json FROM client_coa_uploads WHERE id = :uid"), {"uid": upload_id}
         ).fetchone()
 
         if not upload_row:
             raise HTTPException(404, "Upload not found")
 
         client_id = upload_row[1]
+
+        # Detect file_pattern and erp_system from columns
+        _det_cols = upload_row[3] or "[]"
+        if isinstance(_det_cols, str):
+            try:
+                _det_cols = json.loads(_det_cols)
+            except Exception:
+                _det_cols = []
+        _det_lower = {str(c).lower().strip() for c in _det_cols} if _det_cols else set()
+        _erp_system = None
+        _file_pattern = "GENERIC_FLAT"
+        odoo_kw = {"user_type_id", "reconcile", "account_type", "النوع", "نوع", "نوع الحساب"}
+        if any(k in _det_lower for k in odoo_kw):
+            _file_pattern = "ODOO_FLAT"
+            _erp_system = "Odoo"
+        elif any("__export__" in str(c) for c in (_det_cols or [])):
+            _file_pattern = "ODOO_WITH_ID"
+            _erp_system = "Odoo"
+        elif any("zoho" in str(c).lower() for c in (_det_cols or [])):
+            _file_pattern = "ZOHO_BOOKS"
+            _erp_system = "Zoho Books"
+        elif any("class" in str(c).lower() for c in (_det_cols or [])):
+            _file_pattern = "ENGLISH_WITH_CLASS"
 
         # Get classified accounts
         rows = db.execute(
@@ -223,6 +246,10 @@ def assess_coa_quality(upload_id: str, activity: str = Query("general")):
                 "recommendations": result["recommendations"],
                 "reporting_readiness": result["reporting_readiness"]["readiness"],
                 "issues_count": len(result["issues"]),
+                "file_pattern": _file_pattern,
+                "erp_system": _erp_system,
+                "naming_clarity": result.get("naming_clarity", {}),
+                "duplication_risk": result.get("duplication_risk", {}),
             },
         }
     except HTTPException:

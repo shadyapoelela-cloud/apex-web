@@ -74,7 +74,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
                   child: Text(_overall >= 0.75 ? 'جودة مرتفعة — جاهز للتحليل' : _overall >= 0.50 ? 'جودة متوسطة — يُنصح بالمراجعة' : 'جودة منخفضة — مراجعة مطلوبة',
                     style: TextStyle(fontSize:11, color:_scoreColor(_overall), fontFamily:'Tajawal'))),
                 SizedBox(height:4),
-                Text('${widget.assessData['total_accounts'] ?? 0} حساب', style: TextStyle(fontSize:11, color:AC.ts, fontFamily:'Tajawal')),
+                _buildFileInfoChip(),
               ])),
             ])),
           const SizedBox(height:14),
@@ -166,6 +166,29 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
                 ])))),
           ])),
       ]),
+    );
+  }
+
+  Widget _buildFileInfoChip() {
+    final erp = widget.assessData['erp_system'] as String?;
+    final pattern = widget.assessData['file_pattern'] as String? ?? '';
+    final total = widget.assessData['total_accounts'] ?? 0;
+    final parts = <String>[];
+    if (erp != null && erp.isNotEmpty) parts.add(erp);
+    if (pattern.isNotEmpty && pattern != 'UNKNOWN') parts.add(pattern);
+    parts.add('$total حساب');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AC.gold.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AC.gold.withValues(alpha: 0.2)),
+      ),
+      child: Text(
+        parts.join(' • '),
+        textDirection: TextDirection.rtl,
+        style: TextStyle(fontSize: 11, color: AC.gold, fontFamily: 'Tajawal', fontWeight: FontWeight.w600),
+      ),
     );
   }
 
