@@ -386,6 +386,8 @@ def normalize_code(raw: Any) -> Optional[str]:
     s = str(raw).strip().translate(_ARABIC_DIGITS)
     if not s or s.lower() in {"nan","none","null",""}: return None
     s = re.sub(r"(\d),(\d)", r"\1\2", s)  # فاصلة آلاف
+    s = s.replace(" ", "")                 # مسافات داخلية: "1 1 01" → "1101"
+    s = s.replace("-", "")                 # شرطات: "1-101" → "1101"
     if re.fullmatch(r"\d+\.0+", s): return str(int(float(s)))  # float trailing zeros
     if re.fullmatch(r"\d+(\.\d+)+", s): return s  # نقطة هيكلية
     try:
@@ -517,38 +519,45 @@ _CODE_MAP = {
     "4":("revenue","إيرادات","credit"),
     "5":("cogs","تكلفة المبيعات","debit"),
     "6":("expense","مصروفات","debit"),
-    "7":("other_income_expense","إيرادات ومصروفات أخرى","variable"),
+    "7":("finance_cost","تكاليف تمويلية","debit"),
     "8":("closing","حسابات ختامية","variable"),
+    "9":("verification","حسابات تحقق","variable"),
 }
 _SUBCODE_MAP = {
     ("1","10"):"current_asset",   ("1","11"):"current_asset",
     ("1","12"):"non_current_asset",("1","13"):"non_current_asset",
     ("1","14"):"non_current_asset",("1","15"):"non_current_asset",
+    ("1","16"):"non_current_asset",("1","17"):"non_current_asset",
+    ("1","18"):"non_current_asset",("1","19"):"non_current_asset",
     ("2","20"):"current_liability",("2","21"):"current_liability",
     ("2","22"):"non_current_liability",("2","23"):"non_current_liability",
-    ("2","24"):"non_current_liability",
+    ("2","24"):"non_current_liability",("2","25"):"non_current_liability",
+    ("2","26"):"non_current_liability",("2","27"):"non_current_liability",
+    ("2","28"):"non_current_liability",("2","29"):"non_current_liability",
 }
 _USER_TYPE_MAP = {
-    "بنك والنقد":         ("BANK","current_asset","debit",0.88),
-    "bank and cash":      ("BANK","current_asset","debit",0.88),
-    "الأصول المتداولة":   ("current_asset","current_asset","debit",0.88),
-    "current assets":     ("current_asset","current_asset","debit",0.88),
-    "أصول ثابتة":         ("non_current_asset","non_current_asset","debit",0.88),
-    "fixed assets":       ("non_current_asset","non_current_asset","debit",0.88),
-    "المدين":             ("ACC_RECEIVABLE","current_asset","debit",0.88),
-    "receivable":         ("ACC_RECEIVABLE","current_asset","debit",0.88),
-    "الدائن":             ("ACC_PAYABLE","current_liability","credit",0.88),
-    "payable":            ("ACC_PAYABLE","current_liability","credit",0.88),
-    "الالتزامات الحالية": ("current_liability","current_liability","credit",0.88),
-    "current liabilities":("current_liability","current_liability","credit",0.88),
-    "الالتزامات غير":     ("non_current_liability","non_current_liability","credit",0.88),
-    "رأس المال":          ("equity","equity","credit",0.88),
-    "equity":             ("equity","equity","credit",0.88),
-    "الدخل":              ("revenue","revenue","credit",0.88),
-    "income":             ("revenue","revenue","credit",0.88),
-    "مصاريف":             ("expense","expense","debit",0.88),
-    "expense":            ("expense","expense","debit",0.88),
-    "cost of revenue":    ("cogs","cogs","debit",0.88),
+    "بنك والنقد":         ("BANK","current_asset","debit",0.80),
+    "bank and cash":      ("BANK","current_asset","debit",0.80),
+    "الأصول المتداولة":   ("current_asset","current_asset","debit",0.80),
+    "current assets":     ("current_asset","current_asset","debit",0.80),
+    "أصول ثابتة":         ("non_current_asset","non_current_asset","debit",0.80),
+    "fixed assets":       ("non_current_asset","non_current_asset","debit",0.80),
+    "المدين":             ("ACC_RECEIVABLE","current_asset","debit",0.80),
+    "receivable":         ("ACC_RECEIVABLE","current_asset","debit",0.80),
+    "الدائن":             ("ACC_PAYABLE","current_liability","credit",0.80),
+    "payable":            ("ACC_PAYABLE","current_liability","credit",0.80),
+    "الالتزامات الحالية": ("current_liability","current_liability","credit",0.80),
+    "current liabilities":("current_liability","current_liability","credit",0.80),
+    "الالتزامات غير":     ("non_current_liability","non_current_liability","credit",0.80),
+    "رأس المال":          ("equity","equity","credit",0.80),
+    "equity":             ("equity","equity","credit",0.80),
+    "الدخل":              ("revenue","revenue","credit",0.80),
+    "income":             ("revenue","revenue","credit",0.80),
+    "مصاريف":             ("expense","expense","debit",0.80),
+    "expense":            ("expense","expense","debit",0.80),
+    "cost of revenue":    ("cogs","cogs","debit",0.80),
+    "أرباح السنة الجارية":("RETAINED_EARNINGS","equity","credit",0.80),
+    "current year earnings":("RETAINED_EARNINGS","equity","credit",0.80),
 }
 
 def _layer1(code: str) -> Tuple[Optional[str], Optional[str], Optional[str], float]:
@@ -579,16 +588,23 @@ def _layer3(name: str, lexicon) -> Tuple[Optional[str],Optional[str],float]:
     return m.concept_id, (c.section if c else None), m.confidence
 
 def _layer4(acc: Dict, tree: Dict) -> Tuple[Optional[str], float]:
-    """الطبقة 4: كشف التعارضات."""
+    """الطبقة 4: كشف التعارضات — 4 أنواع (T1-T4)."""
     code = str(acc.get("code",""))
-    sect = acc.get("section","")
-    name = acc.get("name_raw","")
-    if code.startswith("1") and "liability" in str(sect).lower():
+    sect = str(acc.get("section","") or "").lower()
+    name = str(acc.get("name_raw","") or "")
+    # T1: تعارض كود/تصنيف
+    if code.startswith("1") and "liability" in sect:
         return "CODE_TYPE_CONFLICT", -0.20
-    if code.startswith("2") and "asset" in str(sect).lower():
+    if code.startswith("2") and "asset" in sect:
         return "CODE_TYPE_CONFLICT", -0.20
-    if re.search(r"مجمع.*(إهلاك|اهلاك)", name, re.I) and "liability" in str(sect).lower():
-        return "ACCUM_DEP_MISCLASS", -0.30
+    # T2: تعارض اسم/تصنيف — اسم إيراد في قسم مصروفات أو العكس
+    if re.search(r"إيراد|revenue|income", name, re.I) and ("expense" in sect or "cogs" in sect):
+        return "NAME_CLASS_CONFLICT", -0.20
+    if re.search(r"مصروف|expense|cost", name, re.I) and "revenue" in sect:
+        return "NAME_CLASS_CONFLICT", -0.20
+    # T3: مجمع إهلاك مصنف كالتزام
+    if re.search(r"مجمع.*(إهلاك|اهلاك)", name, re.I) and "liability" in sect:
+        return "ACCUM_DEP_MISCLASS", -0.20
     return None, 0.0
 
 async def _layer5(acc: Dict, tree: Dict) -> Tuple[Optional[str],Optional[str],Optional[str],float,Optional[str]]:
@@ -703,6 +719,16 @@ async def classify_account(acc: Dict, tree: Dict, lexicon) -> ProcessedAccount:
     if c3 > 0 and (not concept_id or c3 > conf + 0.05):
         concept_id, conf, method = cid3, c3, "lexicon"
         if s3: section = s3
+
+    # Confidence bonuses — القسم 8.1
+    # +0.10 إذا اتفق الكود مع user_type، +0.10 إذا اتفق الاسم مع الكود
+    if c1 > 0 and c2 > 0 and s1 == s2:
+        conf = min(1.0, conf + 0.10)
+    if c1 > 0 and c3 > 0 and cid3:
+        # name agrees with code section
+        concept = lexicon.get_concept(cid3) if cid3 else None
+        if concept and concept.section and concept.section.lower() == str(s1 or "").lower():
+            conf = min(1.0, conf + 0.10)
 
     # Layer 4 — تعارضات
     conflict, penalty = _layer4(acc, tree)

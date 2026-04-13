@@ -264,20 +264,20 @@ class LexiconIndex:
         name_str = str(name).strip()
         norm_ar  = normalize_ar(name_str)
         norm_en  = normalize_en(name_str)
-        # 1. Exact Arabic
+        # 1. Exact Arabic — القسم 8.1: exact_match = 0.92
         if norm_ar in self._exact_ar:
-            return ConceptMatch(self._exact_ar[norm_ar], 0.97, "exact_ar", norm_ar)
-        # 2. Exact English
+            return ConceptMatch(self._exact_ar[norm_ar], 0.92, "exact_ar", norm_ar)
+        # 2. Exact English — القسم 8.1: exact_match = 0.92
         if norm_en in self._exact_en:
-            return ConceptMatch(self._exact_en[norm_en], 0.95, "exact_en", norm_en)
-        # 3. Regex Arabic
+            return ConceptMatch(self._exact_en[norm_en], 0.92, "exact_en", norm_en)
+        # 3. Regex Arabic — القسم 8.1: regex_match = 0.75
         for pattern, cid in ARABIC_PATTERNS:
             if pattern.search(name_str):
-                return ConceptMatch(cid, 0.85, "regex_ar", pattern.pattern[:40])
-        # 4. Regex English
+                return ConceptMatch(cid, 0.75, "regex_ar", pattern.pattern[:40])
+        # 4. Regex English — القسم 8.1: regex_match = 0.75
         for pattern, cid in ENGLISH_PATTERNS:
             if pattern.search(name_str):
-                return ConceptMatch(cid, 0.82, "regex_en", pattern.pattern[:40])
+                return ConceptMatch(cid, 0.75, "regex_en", pattern.pattern[:40])
         return ConceptMatch("UNKNOWN", 0.0, "no_match", name_str)
 
     def get_concept(self, cid: str) -> Optional[ConceptEntry]:

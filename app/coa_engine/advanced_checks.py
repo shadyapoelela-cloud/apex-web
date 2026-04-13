@@ -390,7 +390,7 @@ def run_fraud_detection(accounts: List[Dict]) -> List[FraudAlert]:
                  any(re.search(r"إيراد|مبيعات|revenue", n, re.I) for n in names))
     if not has_basic and len(accounts) > 10:
         alerts.append(FraudAlert(
-            pattern_id="FP05", risk="Medium",
+            pattern_id="FP05", risk="High",
             account_code=None, account_name=None,
             message="الشجرة تفتقر لحسابات أساسية (نقدية + إيرادات) — تحقق من صحة الملف",
         ))
@@ -402,7 +402,7 @@ def run_fraud_detection(accounts: List[Dict]) -> List[FraudAlert]:
             and not re.search(r"مجمع|مخصص|ECL|contra", str(a.get("name_raw","") or ""), re.I)]
     for a in fp06:
         alerts.append(FraudAlert(
-            pattern_id="FP06", risk="High",
+            pattern_id="FP06", risk="Critical",
             account_code=a.get("code"), account_name=a.get("name_raw"),
             message=f"'{a.get('name_raw','')}' — أصل برصيد دائن بدون مبرر واضح (ليس مجمع إهلاك)",
         ))
@@ -469,13 +469,13 @@ def detect_fp08_partner_drawings(accounts: List[Dict], trial_balance: Optional[D
             bal = trial_balance.get(c_acc["code"], {})
             total_capital += abs(float(bal.get("credit", 0) or 0) - float(bal.get("debit", 0) or 0))
 
-        if total_capital > 0 and total_drawings > (total_capital * 0.5):
+        if total_capital > 0 and total_drawings > (total_capital * 0.3):
             ratio = round(total_drawings / total_capital * 100, 1)
             return FraudAlert(
                 pattern_id="FP08", risk="Critical",
                 account_code=drawings_accounts[0]["code"],
                 account_name=drawings_accounts[0]["name"],
-                message=f"سحوبات الشركاء ({ratio}% من رأس المال) تتجاوز الحد الآمن 50% — خطر تآكل حقوق الملكية",
+                message=f"سحوبات الشركاء ({ratio}% من رأس المال) تتجاوز الحد الآمن 30% — خطر تآكل حقوق الملكية",
             )
         return None
 

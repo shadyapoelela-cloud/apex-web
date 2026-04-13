@@ -12,7 +12,7 @@ def _headline(score: float) -> str:
         return "شجرتك جيدة وتحتاج تعديلات بسيطة"
     if score >= 70:
         return "شجرتك مقبولة وتحتاج مراجعة قبل الاعتماد"
-    if score >= 65:
+    if score >= 60:
         return "شجرتك تحتاج إصلاحات جوهرية قبل الاستخدام"
     return "شجرتك تحتاج إعادة هيكلة شاملة"
 
@@ -24,7 +24,7 @@ def _grade(score: float) -> str:
         return "B"
     if score >= 70:
         return "C"
-    if score >= 65:
+    if score >= 60:
         return "D"
     return "F"
 
