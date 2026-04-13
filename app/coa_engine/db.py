@@ -603,8 +603,8 @@ class Database:
         await self._conn.execute(
             """INSERT INTO coa_approval_records
                (id,upload_id,action,approved_by,override_reason,override_error_code)
-               VALUES (?,'override_critical',?,?,?)""",
-            (self._uid(), upload_id, approved_by, override_reason, error_code),
+               VALUES (?,?,?,?,?,?)""",
+            (self._uid(), upload_id, "override_critical", approved_by, override_reason, error_code),
         )
         await self._conn.execute(
             """UPDATE coa_account_errors SET resolved=1,resolved_at=datetime('now'),resolved_by=?

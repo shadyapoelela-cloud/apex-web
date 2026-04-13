@@ -297,7 +297,8 @@ async def upload_coa(
     summary="اقتراح قاعدة جديدة",
     tags=["Governance"],
 )
-async def propose_rule_endpoint(body: Dict[str, Any] = {}) -> Dict[str, Any]:
+async def propose_rule_endpoint(body: Dict[str, Any] = None) -> Dict[str, Any]:
+    body = body or {}
     from .governance import propose_rule
     rule_name = body.get("rule_name")
     if not rule_name:
@@ -335,7 +336,8 @@ async def list_rules_endpoint(status: Optional[str] = None) -> Dict[str, Any]:
     summary="اعتماد قاعدة",
     tags=["Governance"],
 )
-async def approve_rule_endpoint(rule_id: str, body: Dict[str, Any] = {}) -> Dict[str, Any]:
+async def approve_rule_endpoint(rule_id: str, body: Dict[str, Any] = None) -> Dict[str, Any]:
+    body = body or {}
     from .governance import approve_rule
     db = get_db()
     if not db or not db.is_connected:
@@ -355,7 +357,8 @@ async def approve_rule_endpoint(rule_id: str, body: Dict[str, Any] = {}) -> Dict
     summary="إيقاف قاعدة",
     tags=["Governance"],
 )
-async def deprecate_rule_endpoint(rule_id: str, body: Dict[str, Any] = {}) -> Dict[str, Any]:
+async def deprecate_rule_endpoint(rule_id: str, body: Dict[str, Any] = None) -> Dict[str, Any]:
+    body = body or {}
     from .governance import deprecate_rule
     db = get_db()
     if not db or not db.is_connected:
@@ -394,7 +397,8 @@ async def governance_stats_endpoint() -> Dict[str, Any]:
     summary="اختبار A/B بين قاعدتين",
     tags=["Governance"],
 )
-async def ab_test_endpoint(body: Dict[str, Any] = {}) -> Dict[str, Any]:
+async def ab_test_endpoint(body: Dict[str, Any] = None) -> Dict[str, Any]:
+    body = body or {}
     from .governance import run_ab_test
     db = get_db()
     if not db or not db.is_connected:
@@ -419,7 +423,8 @@ async def ab_test_endpoint(body: Dict[str, Any] = {}) -> Dict[str, Any]:
     summary="فحص التراجع التلقائي",
     tags=["Governance"],
 )
-async def auto_rollback_endpoint(body: Dict[str, Any] = {}) -> Dict[str, Any]:
+async def auto_rollback_endpoint(body: Dict[str, Any] = None) -> Dict[str, Any]:
+    body = body or {}
     from .governance import check_auto_rollback, notify_governance_alert
     db = get_db()
     if not db or not db.is_connected:
@@ -794,18 +799,18 @@ async def get_analysis(upload_id: str) -> COAAnalysisResponse:
     accounts = await db.get_accounts(upload_id)
     errors = await db.get_errors(upload_id)
 
-    dims = assessment.get("quality_dimensions_json") or "{}"
-    if isinstance(dims, str):
-        dims = json.loads(dims)
-    err_sum = assessment.get("errors_summary_json") or "{}"
-    if isinstance(err_sum, str):
-        err_sum = json.loads(err_sum)
-    recs = assessment.get("recommendations_json") or "[]"
-    if isinstance(recs, str):
-        recs = json.loads(recs)
-    sh = upload.get("session_health_json") or "{}"
-    if isinstance(sh, str):
-        sh = json.loads(sh)
+    def _safe_json(val, default):
+        if not isinstance(val, str):
+            return val if val is not None else default
+        try:
+            return json.loads(val)
+        except (json.JSONDecodeError, TypeError):
+            return default
+
+    dims = _safe_json(assessment.get("quality_dimensions_json"), {})
+    err_sum = _safe_json(assessment.get("errors_summary_json"), {})
+    recs = _safe_json(assessment.get("recommendations_json"), [])
+    sh = _safe_json(upload.get("session_health_json"), {})
 
     return COAAnalysisResponse(
         upload_id=upload_id,
@@ -1038,6 +1043,8 @@ async def get_kpis() -> Dict[str, Any]:
 
     try:
         conn = db._conn
+        if not conn:
+            raise HTTPException(503, "اتصال قاعدة البيانات غير متوفر")
 
         # 1. نسبة الاعتماد الآلي
         row = await conn.execute_fetchall(
@@ -1306,7 +1313,8 @@ async def get_roadmap(upload_id: str) -> Dict[str, Any]:
     summary="فحص توازن ميزان المراجعة + كشف سحوبات الشركاء",
     tags=["Trial Balance"],
 )
-async def trial_balance_check(upload_id: str, body: Dict[str, Any] = {}) -> Dict[str, Any]:
+async def trial_balance_check(upload_id: str, body: Dict[str, Any] = None) -> Dict[str, Any]:
+    body = body or {}
     from .advanced_checks import check_trial_balance, detect_fp08_partner_drawings
 
     db = get_db()
