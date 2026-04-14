@@ -45,7 +45,7 @@ def check_E21_ambiguous_name(accounts: List[Dict]) -> List[COAError]:
 
 def check_E22_duplicate_name(accounts: List[Dict]) -> List[COAError]:
     """
-    E22 — اسم مكرر بنفس الكلمات | Medium | ✅ إصلاح تلقائي
+    E22 — اسم مكرر بنفس الكلمات | Medium | 🔧 يدوي
     """
     errors = []
     name_count: Dict[str, List[str]] = {}
@@ -798,7 +798,7 @@ def check_EP1_erp_structure_mismatch(accounts: List[Dict], erp_system: Optional[
 
 
 def check_EP2_coding_pattern_mismatch(accounts: List[Dict], erp_system: Optional[str] = None) -> List[COAError]:
-    """EP2 — ترميز لا يتبع نمط ERP | Medium | ✅ إصلاح تلقائي"""
+    """EP2 — ترميز لا يتبع نمط ERP | Medium | 🔧 يدوي"""
     if not erp_system: return []
     errors = []
     # نتحقق: Odoo يستخدم 6 أرقام عادةً
@@ -843,7 +843,7 @@ def check_EP3_code_too_long(accounts: List[Dict], erp_system: Optional[str] = No
 # ─────────────────────────────────────────────────────────────
 
 def check_EC1_negative_cash(accounts: List[Dict]) -> List[COAError]:
-    """EC1 — رصيد سالب في صندوق نقدي | Critical | ✅ إصلاح تلقائي"""
+    """EC1 — رصيد سالب في صندوق نقدي | Critical | 🔧 يدوي"""
     errors = []
     for acc in accounts:
         name    = str(acc.get("name_raw","") or "")
@@ -866,7 +866,7 @@ def check_EC1_negative_cash(accounts: List[Dict]) -> List[COAError]:
 
 
 def check_EC2_accum_depr_as_liability(accounts: List[Dict]) -> List[COAError]:
-    """EC2 — مجمع إهلاك كـ التزام (خطأ Odoo) | Critical | ✅ إصلاح تلقائي"""
+    """EC2 — مجمع إهلاك كـ التزام (خطأ Odoo) | Critical | 🔧 يدوي"""
     errors = []
     for acc in accounts:
         name    = str(acc.get("name_raw","") or "")
@@ -911,7 +911,7 @@ def check_EC3_employee_code_duplicate(accounts: List[Dict]) -> List[COAError]:
 
 
 def check_EC4_journals_mixed(accounts: List[Dict]) -> List[COAError]:
-    """EC4 — يوميات مخلوطة مع COA | High | ✅ إصلاح تلقائي"""
+    """EC4 — يوميات مخلوطة مع COA | High | 🔧 يدوي"""
     errors = []
     journal_codes = {"TA","INV","BILL","MISC","JNL","PO","SO","BANK"}
     for acc in accounts:
@@ -929,7 +929,7 @@ def check_EC4_journals_mixed(accounts: List[Dict]) -> List[COAError]:
 
 
 def check_EC5_operational_data_mixed(accounts: List[Dict]) -> List[COAError]:
-    """EC5 — ملف بيانات مختلطة | Critical | ✅ إصلاح تلقائي (رفض)"""
+    """EC5 — ملف بيانات مختلطة | Critical | 🔧 يدوي (رفض)"""
     errors = []
     mixed_indicators = 0
     all_names = " ".join(str(a.get("name_raw","") or "") for a in accounts)
