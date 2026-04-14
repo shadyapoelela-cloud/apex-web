@@ -460,39 +460,17 @@ def build_hierarchy(accounts: List[Dict]) -> Dict[str, Dict]:
             acc["parent_code"] = find_parent_by_prefix(code, code_index)
 
     # المرحلة 2: بناء هرمية مُستنتجة من prefix الكود
-    # ذكي: يكتشف المستويات ذات المعنى فقط بدلاً من إنشاء عقدة لكل حرف
+    # إذا لم يُوجد أب صريح: 101000 → أب 10100 → أب 1010 → أب 101 → أب 10 → أب 1
     orphans = [a for a in accounts if not a.get("parent_code") and len(str(a.get("code",""))) > 1]
     if orphans:
+        # اجمع كل prefixes الممكنة من كل الأكواد
         all_codes = {str(a.get("code","")).strip() for a in accounts if a.get("code")}
-        numeric_codes = [c for c in all_codes if c and c[0].isdigit()]
-
-        # اكتشاف المستويات ذات المعنى:
-        # مستوى "ذو معنى" = طول prefix يُنتج تفرعات جديدة مقارنة بالمستوى السابق
-        # مثال: 110001,110002,110101,120001 →
-        #   طول 1: {1} = 1 مجموعة
-        #   طول 2: {11,12} = 2 مجموعة → معنوي (تفرع جديد)
-        #   طول 3: {110,120} = 2 → ليس معنوياً (نفس العدد)
-        #   طول 4: {1100,1101,1200} = 3 → معنوي (تفرع جديد)
-        #   طول 5: {11000,11010,12000} = 3 → ليس معنوياً
-        if numeric_codes:
-            max_len = max(len(c.replace(".0","")) for c in numeric_codes)
-            significant_levels: set = {1}  # المستوى 1 (القسم الرئيسي) دائماً معنوي
-            prev_group_count = 0
-            for length in range(1, max_len):
-                groups = {c[:length] for c in numeric_codes if len(c) >= length}
-                if len(groups) > prev_group_count:
-                    significant_levels.add(length)
-                    prev_group_count = len(groups)
-
-            # أنشئ عقد وسيطة فقط عند المستويات المعنوية
-            prefix_set: set = set()
-            for code in numeric_codes:
-                clean = code.replace(".0","").strip()
-                for length in significant_levels:
-                    if length < len(clean):
-                        prefix_set.add(clean[:length])
-        else:
-            prefix_set = set()
+        prefix_set: set = set()
+        for code in all_codes:
+            clean = code.replace(".0","").strip()
+            if clean and clean[0].isdigit():
+                for length in range(1, len(clean)):
+                    prefix_set.add(clean[:length])
 
         # أنشئ عقد وسيطة اصطناعية في code_index فقط (لا تُضاف للحسابات)
         for prefix in sorted(prefix_set):
