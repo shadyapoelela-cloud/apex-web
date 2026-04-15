@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 class KnowledgeBrainScreen extends StatefulWidget {
   const KnowledgeBrainScreen({super.key});
@@ -100,7 +101,7 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
           Text('\u0627\u0644\u0639\u0642\u0644 \u0627\u0644\u0645\u0639\u0631\u0641\u064a', style: TextStyle(color: AC.tp, fontSize: 17, fontWeight: FontWeight.bold)),
         ]),
         actions: [
-          IconButton(icon: Icon(Icons.smart_toy, color: AC.gold), onPressed: () => context.push('/copilot')),
+          ApexIconButton(icon: Icons.smart_toy, color: AC.gold, tooltip: 'Apex Copilot', onPressed: () => context.push('/copilot')),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -114,10 +115,20 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
           ],
         ),
       ),
-      body: TabBarView(controller: _tabController, children: [
-        _buildAuthoritiesTab(),
-        _buildDomainsTab(),
-        _buildSearchTab(),
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+          child: ApexHeroSection(
+            title: '\u0627\u0644\u0642\u0627\u0639\u062f\u0629 \u0627\u0644\u0645\u0639\u0631\u0641\u064a\u0629',
+            description: '\u0627\u0644\u0645\u0639\u0627\u064a\u064a\u0631 \u0648\u0627\u0644\u0623\u0646\u0638\u0645\u0629 \u0648\u0627\u0644\u0645\u0631\u0627\u062c\u0639 \u0627\u0644\u0645\u0647\u0646\u064a\u0629 \u0641\u064a \u0645\u0643\u0627\u0646 \u0648\u0627\u062d\u062f',
+            icon: Icons.psychology_rounded,
+          ),
+        ),
+        Expanded(child: TabBarView(controller: _tabController, children: [
+          _buildAuthoritiesTab(),
+          _buildDomainsTab(),
+          _buildSearchTab(),
+        ])),
       ]),
     );
   }
@@ -131,7 +142,7 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
         final color = Color(a['color'] as int);
         return Container(
           margin: EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withValues(alpha: 0.3))),
+          decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
           child: ExpansionTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
@@ -188,10 +199,10 @@ class _KBState extends State<KnowledgeBrainScreen> with SingleTickerProviderStat
       itemBuilder: (ctx, i) {
         final d = _domains[i];
         return Container(
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
+          decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
           child: InkWell(
             onTap: () {},
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(18),
             child: Padding(padding: EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Icon(d['icon'] as IconData, color: AC.gold, size: 24),

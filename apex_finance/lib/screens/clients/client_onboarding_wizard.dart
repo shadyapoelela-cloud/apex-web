@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
@@ -159,7 +160,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
       if (mounted) {
         if (r.success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم إنشاء العميل بنجاح'), backgroundColor: Colors.green));
+            SnackBar(content: Text('تم إنشاء العميل بنجاح'), backgroundColor: AC.ok));
           Navigator.pop(context, true);
         } else {
           setState(() { _error = r.error ?? 'فشل الإنشاء'; _loading = false; });
@@ -183,8 +184,9 @@ class _WizardState extends State<ClientOnboardingWizard> {
         title: Text('تسجيل عميل جديد', style: TextStyle(color: AC.gold)),
         leading: _step > 0 ? IconButton(icon: Icon(Icons.arrow_back, color: AC.gold), onPressed: _back) : null,
         actions: [
-          if (_stageNote != null) IconButton(
-            icon: Icon(Icons.help_outline, color: AC.gold),
+          if (_stageNote != null) ApexIconButton(
+            icon: Icons.help_outline,
+            color: AC.gold,
             tooltip: 'لماذا هذه الخطوة؟',
             onPressed: () => _showStageNote(context)),
         ],
@@ -201,18 +203,9 @@ class _WizardState extends State<ClientOnboardingWizard> {
           ])),
         Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: _buildStep())),
         Padding(padding: EdgeInsets.all(16), child: Row(children: [
-          if (_step > 0) Expanded(child: OutlinedButton(
-            onPressed: _back,
-            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold), padding: EdgeInsets.symmetric(vertical: 14)),
-            child: Text('السابق', style: TextStyle(color: AC.gold)))),
+          if (_step > 0) Expanded(child: apexSecondaryButton('السابق', _back)),
           if (_step > 0) const SizedBox(width: 12),
-          Expanded(child: ElevatedButton(
-            onPressed: _step == 6 ? _submit : _next,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _step == 6 ? Colors.green.shade700 : AC.gold,
-              padding: EdgeInsets.symmetric(vertical: 14)),
-            child: Text(_step == 6 ? 'إنشاء العميل' : 'التالي',
-              style: TextStyle(color: _step == 6 ? Colors.white : AC.navy, fontWeight: FontWeight.bold)))),
+          Expanded(child: apexPrimaryButton(_step == 6 ? 'إنشاء العميل' : 'التالي', _step == 6 ? _submit : _next)),
         ])),
       ]),
     );
@@ -266,7 +259,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
 
   Widget _field(String label, TextEditingController c, IconData icon) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
-    child: TextField(controller: c, style: const TextStyle(color: Colors.white), decoration: _inp(label, ic: icon)));
+    child: TextField(controller: c, style: TextStyle(color: AC.tp), decoration: _inp(label, ic: icon)));
 
   Widget _stepLegalEntity() => Column(children: _entityTypes.map((e) =>
     _radioTile(e['code'], e['name_ar'], e['description_ar'] ?? '', _selectedEntityType,
@@ -308,7 +301,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
       textAlign: TextAlign.center, style: TextStyle(color: AC.ts, fontSize: 14)),
     SizedBox(height: 12),
     Container(padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('المستندات الأساسية:', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
@@ -360,10 +353,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
       child: Container(
         margin: EdgeInsets.only(bottom: 8),
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: sel ? AC.gold.withValues(alpha: 0.12) : AC.navy3,
-          border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1),
-          borderRadius: BorderRadius.circular(10)),
+        decoration: apexSelectableDecoration(isSelected: sel, activeColor: AC.gold),
         child: Row(children: [
           Icon(sel ? Icons.radio_button_checked : Icons.radio_button_off, color: sel ? AC.gold : AC.ts, size: 20),
           SizedBox(width: 12),

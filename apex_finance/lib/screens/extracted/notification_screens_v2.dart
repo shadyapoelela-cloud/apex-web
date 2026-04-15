@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/shared_constants.dart';
+import '../../core/ui_components.dart';
 
 // Phase 10 Notification System §13
 // ═══════════════════════════════════════════════════════════
@@ -92,9 +93,11 @@ class _NotifCenterV2State extends State<NotificationCenterScreenV2> {
               onPressed: _markAllRead,
               child: Text('قراءة الكل', style: TextStyle(color: AC.gold, fontSize: 12)),
             ),
-          IconButton(
+          ApexIconButton(
+            icon: Icons.settings,
+            color: AC.ts,
+            size: 20,
             onPressed: () => context.push('/notifications/prefs'),
-            icon: Icon(Icons.settings, color: AC.ts, size: 20),
           ),
         ],
       ),

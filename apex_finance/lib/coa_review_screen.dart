@@ -19,9 +19,9 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
   static Color get _bg => AC.navy;
   static Color get _surface => AC.navy2;
   static Color get _gold => AC.gold;
-  static Color _success = Color(0xFF2ECC8A);
-  static Color _danger = Color(0xFFE05050);
-  static Color _warning = Color(0xFFE8A838);
+  static Color get _success => AC.ok;
+  static Color get _danger => AC.err;
+  static Color get _warning => AC.warn;
   static Color get _border => AC.bdr;
   static Color get _textPri => AC.tp;
   static Color get _textSec => AC.ts;
@@ -60,12 +60,12 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
 
   Future<void> _approveAll() async {
     final confirmed = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
-      backgroundColor: Color(0xFF0D1829),
+      backgroundColor: AC.navy3,
       title: Text('اعتماد شجرة الحسابات', textDirection: TextDirection.rtl, style: TextStyle(fontFamily:'Tajawal', color:AC.tp, fontSize:15)),
       content: Text('سيتم اعتماد شجرة الحسابات كمرجع للتحليل. هل أنت متأكد؟', textDirection: TextDirection.rtl, style: TextStyle(fontFamily:'Tajawal', color:AC.ts, fontSize:13)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context, false), child: Text('إلغاء', style: TextStyle(color:AC.ts, fontFamily:'Tajawal'))),
-        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('اعتماد', style: TextStyle(color:Color(0xFF2ECC8A), fontFamily:'Tajawal', fontWeight:FontWeight.w700))),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('اعتماد', style: TextStyle(color:AC.ok, fontFamily:'Tajawal', fontWeight:FontWeight.w700))),
       ]));
     if (confirmed != true) return;
     setState(() => _approving = true);
@@ -73,7 +73,7 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
       final r = await ApiService.approveCoa(widget.uploadId);
       if (r.success) {
         setState(() => _approved = true);
-        if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ تم اعتماد شجرة الحسابات — جاهزة للتحليل', style: TextStyle(fontFamily:'Tajawal')), backgroundColor: Color(0xFF2ECC8A))); Navigator.of(context).pop({'approved': true, 'upload_id': widget.uploadId}); }
+        if (mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('✅ تم اعتماد شجرة الحسابات — جاهزة للتحليل', style: TextStyle(fontFamily:'Tajawal')), backgroundColor: AC.ok)); Navigator.of(context).pop({'approved': true, 'upload_id': widget.uploadId}); }
       } else { setState(() => _errorMsg = 'فشل الاعتماد'); }
     } catch (e) { setState(() => _errorMsg = 'خطأ: $e'); } finally { setState(() => _approving = false); }
   }
@@ -132,14 +132,14 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
                   final color = conf>=0.75?_success:conf>=0.40?_warning:_danger;
                   final approved = acc['record_status']=='approved';
                   return Container(margin: const EdgeInsets.only(bottom:8), padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: const Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color: approved?_success.withValues(alpha: 0.2):color.withValues(alpha: 0.2))),
+                    decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: approved?_success.withValues(alpha: 0.2):color.withValues(alpha: 0.2))),
                     child: Column(children: [
                       Row(children: [
-                        approved ? const Icon(Icons.check_circle_rounded, color:Color(0xFF2ECC8A), size:22)
+                        approved ? Icon(Icons.check_circle_rounded, color:_success, size:22)
                           : GestureDetector(onTap: () async {
                               await ApiService.approveAccount(acc['id']);
                               _loadAccounts(reset: true);
-                            }, child: Container(width:28,height:28, decoration: BoxDecoration(shape:BoxShape.circle, border:Border.all(color:_success.withValues(alpha: 0.4))), child: const Icon(Icons.check_rounded, color:Color(0xFF2ECC8A), size:16))),
+                            }, child: Container(width:28,height:28, decoration: BoxDecoration(shape:BoxShape.circle, border:Border.all(color:_success.withValues(alpha: 0.4))), child: Icon(Icons.check_rounded, color:_success, size:16))),
                         SizedBox(width:10),
                         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('${(conf*100).toInt()}%', style: TextStyle(fontSize:12, fontWeight:FontWeight.w700, color:color, fontFamily:'Tajawal')),
@@ -164,14 +164,14 @@ class _CoaReviewScreenState extends State<CoaReviewScreen> {
         if (!_approved) Container(padding: EdgeInsets.all(16),
           decoration: BoxDecoration(color:AC.navy2, border: Border(top: BorderSide(color:AC.bdr))),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            if (_errorMsg != null) Padding(padding: EdgeInsets.only(bottom:8), child: Text(_errorMsg!, style: TextStyle(color:Color(0xFFE05050), fontSize:12, fontFamily:'Tajawal'))),
+            if (_errorMsg != null) Padding(padding: EdgeInsets.only(bottom:8), child: Text(_errorMsg!, style: TextStyle(color:_danger, fontSize:12, fontFamily:'Tajawal'))),
             Text('${((((_summary['high_confidence']??0) as num)/(((_summary['total_accounts']??1) as num)))*100).toStringAsFixed(0)}% من الحسابات بثقة عالية ≥ 75%', style: TextStyle(fontSize:11, color:AC.ts, fontFamily:'Tajawal')),
             const SizedBox(height:10),
             GestureDetector(onTap: _approving ? null : _approveAll,
               child: Container(width:double.infinity, height:54,
-                decoration: BoxDecoration(gradient: const LinearGradient(colors:[Color(0xFF2ECC8A),Color(0xFF1A8C5C)]), borderRadius:BorderRadius.circular(14), boxShadow:[BoxShadow(color:_success.withValues(alpha: 0.3), blurRadius:12, offset:const Offset(0,4))]),
-                child: Center(child: _approving ? const SizedBox(width:22,height:22,child:CircularProgressIndicator(color:Colors.white,strokeWidth:2.5))
-                  : const Row(mainAxisAlignment:MainAxisAlignment.center, children:[Icon(Icons.verified_rounded,color:Colors.white,size:20),SizedBox(width:8),Text('اعتماد شجرة الحسابات',style:TextStyle(color:Colors.white,fontSize:15,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
+                decoration: BoxDecoration(gradient: LinearGradient(colors:[_success,_success.withValues(alpha: 0.7)]), borderRadius:BorderRadius.circular(14), boxShadow:[BoxShadow(color:_success.withValues(alpha: 0.3), blurRadius:12, offset:const Offset(0,4))]),
+                child: Center(child: _approving ? SizedBox(width:22,height:22,child:CircularProgressIndicator(color:AC.btnFg,strokeWidth:2.5))
+                  : Row(mainAxisAlignment:MainAxisAlignment.center, children:[Icon(Icons.verified_rounded,color:AC.btnFg,size:20),SizedBox(width:8),Text('اعتماد شجرة الحسابات',style:TextStyle(color:AC.btnFg,fontSize:15,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
           ])),
       ]),
     );

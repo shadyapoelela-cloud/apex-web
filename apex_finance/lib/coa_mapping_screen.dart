@@ -19,7 +19,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
   static Color get _bg => AC.navy;
   static Color get _surface => AC.navy2;
   static Color get _gold => AC.gold;
-  static Color _danger = Color(0xFFE05050);
+  static Color get _danger => AC.err;
   static Color get _border => AC.bdr;
   static Color get _textPri => AC.tp;
   static Color get _textSec => AC.ts;
@@ -76,7 +76,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
           HelpCard(icon: Icons.swap_horiz_rounded, title: 'ماذا يعني ربط الأعمدة؟', body: 'النظام اقترح ربط أعمدة ملفك بالحقول القياسية. راجع وعدّل أي ربط غير صحيح قبل المتابعة.'),
           SizedBox(height: 14),
           Container(padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color:_border)),
+            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color:_border)),
             child: Row(children: [
               SizedBox(width:8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -87,7 +87,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
               Icon(Icons.table_chart_rounded, color:_gold, size:22),
             ])),
           SizedBox(height: 14),
-          Container(decoration: BoxDecoration(color: Color(0xFF0D1829), borderRadius: BorderRadius.circular(14), border: Border.all(color:_border)),
+          Container(decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color:_border)),
             child: Column(children: _fields.asMap().entries.map((e) {
               final idx = e.key; final field = e.value;
               final label = (_labels as Map)[field] ?? field;
@@ -97,7 +97,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
               return Column(children: [
                 Padding(padding: EdgeInsets.symmetric(horizontal:12, vertical:8), child: Row(children: [
                   Expanded(child: DropdownButtonHideUnderline(child: DropdownButton<String?>(
-                    value: cur, dropdownColor: Color(0xFF0D1829),
+                    value: cur, dropdownColor: AC.navy3,
                     style: TextStyle(color:_textPri, fontFamily:'Tajawal', fontSize:12),
                     hint: Text('— لا يوجد —', style: TextStyle(color:AC.ts, fontFamily:'Tajawal', fontSize:12)),
                     isExpanded: true,
@@ -105,7 +105,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
                     onChanged: (v) => setState(() => _mapping[field] = v)))),
                   SizedBox(width:10),
                   Row(mainAxisSize: MainAxisSize.min, children: [
-                    if (cur != null) Container(width:7, height:7, margin: EdgeInsets.only(left:5), decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF2ECC8A))),
+                    if (cur != null) Container(width:7, height:7, margin: EdgeInsets.only(left:5), decoration: BoxDecoration(shape: BoxShape.circle, color: AC.ok)),
                     Text(label, textDirection: TextDirection.rtl, style: TextStyle(fontSize:12, color: isReq ? _gold : _textPri, fontWeight: isReq ? FontWeight.w700 : FontWeight.w400, fontFamily:'Tajawal')),
                   ]),
                 ])),
@@ -114,7 +114,7 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
             }).toList())),
           if (_samples.isNotEmpty) ...[
             SizedBox(height: 14),
-            Container(decoration: BoxDecoration(color: Color(0xFF0D1829), borderRadius: BorderRadius.circular(12), border: Border.all(color:_border)),
+            Container(decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color:_border)),
               child: Column(children: _samples.take(5).toList().asMap().entries.map((e) {
                 final row = e.value; final isLast = e.key == (_samples.length > 5 ? 4 : _samples.length - 1);
                 final nc = _mapping['account_name']; final cc = _mapping['account_code'];
@@ -142,16 +142,16 @@ class _CoaMappingScreenState extends State<CoaMappingScreen> {
           child: GestureDetector(onTap: (_canParse && !_parsing) ? _runParse : null,
             child: Container(height: 54,
               decoration: BoxDecoration(
-                gradient: (_canParse && !_parsing) ? LinearGradient(colors:[AC.gold, Color(0xFF8B6F35)]) : null,
-                color: (!_canParse || _parsing) ? Colors.white.withValues(alpha: 0.05) : null,
+                gradient: (_canParse && !_parsing) ? LinearGradient(colors:[AC.gold, AC.gold.withValues(alpha: 0.7)]) : null,
+                color: (!_canParse || _parsing) ? AC.tp.withValues(alpha: 0.05) : null,
                 borderRadius: BorderRadius.circular(14),
-                border: (!_canParse || _parsing) ? Border.all(color: Colors.white.withValues(alpha: 0.1)) : null),
+                border: (!_canParse || _parsing) ? Border.all(color: AC.tp.withValues(alpha: 0.1)) : null),
               child: Center(child: _parsing
                 ? SizedBox(width:22, height:22, child: CircularProgressIndicator(color: AC.navy, strokeWidth:2.5))
                 : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Icon(Icons.play_arrow_rounded, color: _canParse ? AC.navy : Colors.white24, size:20),
+                    Icon(Icons.play_arrow_rounded, color: _canParse ? AC.navy : AC.td, size:20),
                     SizedBox(width:8),
-                    Text('تأكيد وتحليل الأعمدة', style: TextStyle(color: _canParse ? AC.navy : Colors.white24, fontSize:15, fontWeight:FontWeight.w700, fontFamily:'Tajawal')),
+                    Text('تأكيد وتحليل الأعمدة', style: TextStyle(color: _canParse ? AC.navy : AC.td, fontSize:15, fontWeight:FontWeight.w700, fontFamily:'Tajawal')),
                   ])))),
         ),
       ]),

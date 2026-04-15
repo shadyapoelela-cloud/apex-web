@@ -17,7 +17,7 @@ class _PasswordFieldState extends State<PasswordField> {
   Widget build(BuildContext context) => TextField(
     controller: widget.controller,
     obscureText: _obscure,
-    style: const TextStyle(color: Colors.white),
+    style: TextStyle(color: AC.tp),
     onSubmitted: widget.onSubmitted,
     decoration: InputDecoration(
       labelText: widget.label,
@@ -63,9 +63,9 @@ class PasswordStrengthBar extends StatelessWidget {
     if (_strength <= 0) return Colors.transparent;
     if (_strength == 1) return AC.err;
     if (_strength == 2) return AC.warn;
-    if (_strength == 3) return Colors.orange;
+    if (_strength == 3) return AC.warn;
     if (_strength == 4) return AC.ok;
-    return Colors.green;
+    return AC.ok;
   }
 
   @override
@@ -128,7 +128,7 @@ class _PhoneFieldState extends State<PhoneFieldWithCountryCode> {
     Expanded(child: TextField(
       controller: widget.phoneController,
       keyboardType: TextInputType.phone,
-      style: TextStyle(color: Colors.white),
+      style: TextStyle(color: AC.tp),
       decoration: InputDecoration(
         labelText: 'رقم الجوال',
         prefixIcon: Icon(Icons.phone, color: AC.gold, size: 20),

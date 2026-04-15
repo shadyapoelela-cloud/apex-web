@@ -1,8 +1,10 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'screens/dashboard/enhanced_dashboard.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme.dart';
+import 'core/ui_components.dart';
 import 'package:go_router/go_router.dart';
 import 'core/router.dart';
 import 'core/session.dart';
@@ -30,7 +32,7 @@ void main() {
   Widget _quickServiceBtn(BuildContext c, String label, IconData icon, int tabIdx) => Padding(
     padding: EdgeInsets.only(left: 8),
     child: ActionChip(
-      avatar: Icon(icon, color: AC.gold, size: 16),
+      avatar: Icon(icon, color: AC.goldText, size: 16),
       label: Text(label, style: TextStyle(color: AC.tp, fontSize: 11)),
       backgroundColor: AC.navy3,
       side: BorderSide(color: AC.bdr),
@@ -59,10 +61,10 @@ Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetri
   child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
-  labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
+  labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.goldText, size: 20) : null,
   filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)));
+  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.goldText)));
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // App Root
@@ -71,31 +73,283 @@ class ApexApp extends ConsumerWidget {
   const ApexApp({super.key});
   @override Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
-    final isDark = settings.isDarkMode;
     final isAr = settings.language == 'ar';
 
-    // Update AC colors globally based on theme
-    AC.setLight(!isDark);
+    // Apply selected theme globally
+    AC.setTheme(settings.themeId);
+    final isDark = AC.current.isDark;
 
-    final darkTheme = ThemeData.dark().copyWith(scaffoldBackgroundColor: AC.navy,
-      textTheme: GoogleFonts.tajawalTextTheme(ThemeData.dark().textTheme),
-      appBarTheme: AppBarTheme(backgroundColor: AC.navy2, elevation: 0, centerTitle: true),
-      elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
-        backgroundColor: AC.gold, foregroundColor: AC.navy,
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))));
-
-    final lightTheme = ThemeData.light().copyWith(
-      scaffoldBackgroundColor: Color(0xFFF5F5F0),
-      textTheme: GoogleFonts.tajawalTextTheme(ThemeData.light().textTheme),
-      appBarTheme: AppBarTheme(backgroundColor: Color(0xFFFFFFFF), elevation: 1, centerTitle: true,
-        foregroundColor: Color(0xFF1A1A2E), iconTheme: IconThemeData(color: AC.gold)),
-      elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
-        backgroundColor: AC.gold, foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
-      cardColor: Colors.white,
-      dividerColor: const Color(0xFFE0E0E0),
+    final baseTheme = isDark ? ThemeData.dark() : ThemeData.light();
+    final textTheme = GoogleFonts.tajawalTextTheme(baseTheme.textTheme).copyWith(
+      displayLarge: GoogleFonts.tajawal(fontSize: 34, fontWeight: FontWeight.w800, color: AC.tp, letterSpacing: -0.5),
+      displayMedium: GoogleFonts.tajawal(fontSize: 28, fontWeight: FontWeight.w700, color: AC.tp),
+      displaySmall: GoogleFonts.tajawal(fontSize: 22, fontWeight: FontWeight.w700, color: AC.tp),
+      headlineLarge: GoogleFonts.tajawal(fontSize: 20, fontWeight: FontWeight.w700, color: AC.tp),
+      headlineMedium: GoogleFonts.tajawal(fontSize: 18, fontWeight: FontWeight.w600, color: AC.tp),
+      headlineSmall: GoogleFonts.tajawal(fontSize: 16, fontWeight: FontWeight.w600, color: AC.tp),
+      titleLarge: GoogleFonts.tajawal(fontSize: 15, fontWeight: FontWeight.w600, color: AC.tp),
+      titleMedium: GoogleFonts.tajawal(fontSize: 14, fontWeight: FontWeight.w500, color: AC.tp),
+      titleSmall: GoogleFonts.tajawal(fontSize: 13, fontWeight: FontWeight.w500, color: AC.ts),
+      bodyLarge: GoogleFonts.tajawal(fontSize: 14, fontWeight: FontWeight.w400, color: AC.tp, height: 1.6),
+      bodyMedium: GoogleFonts.tajawal(fontSize: 13, fontWeight: FontWeight.w400, color: AC.tp, height: 1.5),
+      bodySmall: GoogleFonts.tajawal(fontSize: 12, fontWeight: FontWeight.w400, color: AC.ts, height: 1.4),
+      labelLarge: GoogleFonts.tajawal(fontSize: 14, fontWeight: FontWeight.w600, color: AC.tp),
+      labelMedium: GoogleFonts.tajawal(fontSize: 12, fontWeight: FontWeight.w500, color: AC.ts),
+      labelSmall: GoogleFonts.tajawal(fontSize: 11, fontWeight: FontWeight.w400, color: AC.td),
+    );
+    final colorScheme = (isDark ? ColorScheme.dark() : ColorScheme.light()).copyWith(
+      primary: AC.gold, onPrimary: AC.btnFg,
+      secondary: AC.goldLight, onSecondary: AC.btnFg,
+      surface: AC.navy2, onSurface: AC.tp,
+      error: AC.err, onError: Colors.white,
+      outline: AC.bdr,
+    );
+    final theme = baseTheme.copyWith(
+      colorScheme: colorScheme,
+      splashFactory: InkSparkle.splashFactory,
+      splashColor: AC.gold.withValues(alpha: 0.10),
+      highlightColor: AC.gold.withValues(alpha: 0.05),
+      hoverColor: AC.gold.withValues(alpha: 0.04),
+      focusColor: AC.gold.withValues(alpha: 0.08),
+      scaffoldBackgroundColor: AC.navy,
+      textTheme: textTheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: AC.navy2, elevation: 0, scrolledUnderElevation: 2, centerTitle: true,
+        foregroundColor: AC.tp, iconTheme: IconThemeData(color: AC.gold),
+        surfaceTintColor: Colors.transparent,
+        shadowColor: AC.bdr.withValues(alpha: 0.3),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.disabled)) return AC.gold.withValues(alpha: 0.4);
+          if (s.contains(WidgetState.pressed)) return AC.goldLight;
+          if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.88);
+          return AC.gold;
+        }),
+        foregroundColor: WidgetStateProperty.all(AC.btnFg),
+        elevation: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.hovered) ? 4 : 0),
+        shadowColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.3)),
+        overlayColor: WidgetStateProperty.all(AC.goldLight.withValues(alpha: 0.2)),
+        padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
+        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+        textStyle: WidgetStateProperty.all(GoogleFonts.tajawal(fontSize: 14, fontWeight: FontWeight.w600)),
+        animationDuration: const Duration(milliseconds: 200),
+      )),
+      outlinedButtonTheme: OutlinedButtonThemeData(style: ButtonStyle(
+        foregroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.hovered)) return AC.goldLight;
+          return AC.gold;
+        }),
+        side: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.hovered)) return BorderSide(color: AC.gold.withValues(alpha: 0.7), width: 1.5);
+          return BorderSide(color: AC.gold.withValues(alpha: 0.35));
+        }),
+        backgroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.06);
+          return Colors.transparent;
+        }),
+        overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.1)),
+        padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
+        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+        textStyle: WidgetStateProperty.all(GoogleFonts.tajawal(fontSize: 14, fontWeight: FontWeight.w600)),
+        animationDuration: const Duration(milliseconds: 200),
+      )),
+      textButtonTheme: TextButtonThemeData(style: ButtonStyle(
+        foregroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.hovered)) return AC.goldLight;
+          return AC.gold;
+        }),
+        overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.08)),
+        textStyle: WidgetStateProperty.all(GoogleFonts.tajawal(fontSize: 13, fontWeight: FontWeight.w500)),
+        animationDuration: const Duration(milliseconds: 150),
+      )),
+      iconButtonTheme: IconButtonThemeData(style: ButtonStyle(
+        iconColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return AC.gold;
+          if (s.contains(WidgetState.hovered)) return AC.goldLight;
+          return AC.ts;
+        }),
+        backgroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return AC.gold.withValues(alpha: 0.15);
+          if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.08);
+          return Colors.transparent;
+        }),
+        overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.12)),
+        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+        animationDuration: const Duration(milliseconds: 180),
+      )),
+      iconTheme: IconThemeData(color: AC.ts, size: 22),
+      cardTheme: CardThemeData(
+        color: AC.navy2, elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shadowColor: AC.bdr.withValues(alpha: 0.2),
+      ),
+      dividerColor: AC.bdr,
+      dividerTheme: DividerThemeData(color: AC.bdr, thickness: 0.8, space: 20),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AC.navy2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 8,
+        shadowColor: Colors.black26,
+        titleTextStyle: GoogleFonts.tajawal(fontSize: 18, fontWeight: FontWeight.w700, color: AC.tp),
+        contentTextStyle: GoogleFonts.tajawal(fontSize: 14, color: AC.ts),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: AC.navy2, elevation: 8, shadowColor: Colors.black26,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        textStyle: GoogleFonts.tajawal(fontSize: 13, color: AC.tp),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AC.navy2, elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        behavior: SnackBarBehavior.floating,
+        contentTextStyle: GoogleFonts.tajawal(fontSize: 13, color: AC.tp),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true, fillColor: AC.navy3,
+        labelStyle: TextStyle(color: AC.ts),
+        hintStyle: TextStyle(color: AC.td),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.gold, width: 1.5)),
+        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.err)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AC.navy3,
+        labelStyle: TextStyle(color: AC.tp, fontSize: 12),
+        side: BorderSide(color: AC.bdr),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        selectedColor: AC.gold.withValues(alpha: 0.15),
+        secondarySelectedColor: AC.goldLight.withValues(alpha: 0.12),
+        checkmarkColor: AC.gold,
+        deleteIconColor: AC.err,
+        selectedShadowColor: AC.gold.withValues(alpha: 0.2),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: AC.gold, unselectedLabelColor: AC.ts, indicatorColor: AC.gold,
+        indicatorSize: TabBarIndicatorSize.label,
+        labelStyle: GoogleFonts.tajawal(fontSize: 14, fontWeight: FontWeight.w700),
+        unselectedLabelStyle: GoogleFonts.tajawal(fontSize: 14, fontWeight: FontWeight.w400),
+        overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.08)),
+        splashFactory: InkSparkle.splashFactory,
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(color: AC.navy4, borderRadius: BorderRadius.circular(8),
+          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8)]),
+        textStyle: GoogleFonts.tajawal(fontSize: 12, color: AC.tp),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected) && s.contains(WidgetState.hovered)) return AC.goldLight;
+          if (s.contains(WidgetState.selected)) return AC.gold;
+          if (s.contains(WidgetState.hovered)) return AC.tp.withValues(alpha: 0.7);
+          return AC.ts;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected)) return AC.gold.withValues(alpha: 0.35);
+          return AC.navy4;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.3);
+          return Colors.transparent;
+        }),
+        overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.1)),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected) && s.contains(WidgetState.hovered)) return AC.goldLight;
+          if (s.contains(WidgetState.selected)) return AC.gold;
+          if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.08);
+          return Colors.transparent;
+        }),
+        checkColor: WidgetStateProperty.all(AC.btnFg),
+        side: BorderSide(color: AC.ts, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.1)),
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected) && s.contains(WidgetState.hovered)) return AC.goldLight;
+          if (s.contains(WidgetState.selected)) return AC.gold;
+          if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.6);
+          return AC.ts;
+        }),
+        overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.1)),
+      ),
+      listTileTheme: ListTileThemeData(
+        textColor: AC.tp, iconColor: AC.gold,
+        titleTextStyle: GoogleFonts.tajawal(fontSize: 14, fontWeight: FontWeight.w500, color: AC.tp),
+        subtitleTextStyle: GoogleFonts.tajawal(fontSize: 12, color: AC.ts),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        selectedTileColor: AC.gold.withValues(alpha: 0.06),
+        selectedColor: AC.gold,
+      ),
+      dataTableTheme: DataTableThemeData(
+        headingRowColor: WidgetStateProperty.all(AC.navy3),
+        dataRowColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.hovered) ? AC.navy4 : AC.navy2),
+        headingTextStyle: GoogleFonts.tajawal(fontSize: 13, fontWeight: FontWeight.w600, color: AC.gold),
+        dataTextStyle: GoogleFonts.tajawal(fontSize: 12, color: AC.tp),
+        dividerThickness: 0.5,
+      ),
+      scrollbarTheme: ScrollbarThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.dragged)) return AC.gold.withValues(alpha: 0.6);
+          if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.45);
+          return AC.gold.withValues(alpha: 0.18);
+        }),
+        trackColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.hovered)) return AC.navy3.withValues(alpha: 0.5);
+          return Colors.transparent;
+        }),
+        radius: const Radius.circular(10),
+        thickness: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.hovered) ? 8.0 : 4.0),
+        thumbVisibility: WidgetStateProperty.all(false),
+        interactive: true,
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: AC.gold, linearTrackColor: AC.navy3),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AC.gold, foregroundColor: AC.btnFg,
+        elevation: 4, highlightElevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        splashColor: AC.goldLight.withValues(alpha: 0.3),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: AC.navy2, elevation: 12,
+        shadowColor: Colors.black38,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        dragHandleColor: AC.gold.withValues(alpha: 0.4),
+        dragHandleSize: const Size(40, 4),
+      ),
+      // ── Cursor ──
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AC.gold,
+        selectionColor: AC.gold.withValues(alpha: 0.25),
+        selectionHandleColor: AC.gold,
+      ),
+      // ── Badge ──
+      badgeTheme: BadgeThemeData(
+        backgroundColor: AC.err,
+        textColor: Colors.white,
+        textStyle: GoogleFonts.tajawal(fontSize: 10, fontWeight: FontWeight.w600),
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+      ),
+      // ── Drawer ──
+      drawerTheme: DrawerThemeData(
+        backgroundColor: AC.navy2,
+        elevation: 8,
+        shadowColor: Colors.black26,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(20))),
+      ),
+      // ── Navigation Rail ──
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: AC.navy2,
+        selectedIconTheme: IconThemeData(color: AC.gold, size: 24),
+        unselectedIconTheme: IconThemeData(color: AC.ts, size: 22),
+        indicatorColor: AC.gold.withValues(alpha: 0.12),
+      ),
     );
 
     return Directionality(
@@ -103,7 +357,7 @@ class ApexApp extends ConsumerWidget {
       child: MaterialApp.router(
         title: 'APEX', debugShowCheckedModeBanner: false,
         routerConfig: appRouter,
-        theme: isDark ? darkTheme : lightTheme,
+        theme: theme,
         locale: isAr ? const Locale('ar') : const Locale('en'),
       ),
     );
@@ -162,38 +416,66 @@ class _LoginS extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext c) => Scaffold(
-    backgroundColor: AC.navy,
-    body: Center(child: SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        // Logo
-        Container(
-          padding: EdgeInsets.all(20),
+    body: AnimatedContainer(
+      duration: const Duration(seconds: 2),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter, end: Alignment.bottomCenter,
+          colors: [AC.navy, AC.navy2, AC.navy],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+      ),
+      child: Center(child: SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
           decoration: BoxDecoration(
-            color: AC.gold.withValues(alpha: 0.08),
+            color: AC.navy2,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AC.gold.withValues(alpha: 0.2)),
+            border: Border.all(color: AC.gold.withValues(alpha: 0.1)),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 40, spreadRadius: -8),
+              BoxShadow(color: AC.gold.withValues(alpha: 0.06), blurRadius: 60, spreadRadius: -4),
+            ],
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+        // Logo with glow
+        Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: AC.gold.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: AC.gold.withValues(alpha: 0.15)),
+            boxShadow: [
+              BoxShadow(color: AC.gold.withValues(alpha: 0.08), blurRadius: 32, spreadRadius: 2),
+              BoxShadow(color: AC.gold.withValues(alpha: 0.04), blurRadius: 60, spreadRadius: 8),
+            ],
           ),
           child: Column(children: [
-            Icon(Icons.account_balance, color: AC.gold, size: 48),
-            SizedBox(height: 8),
-            Text('APEX', style: TextStyle(color: AC.gold, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 4)),
-            SizedBox(height: 4),
+            Icon(Icons.account_balance, color: AC.goldText, size: 56),
+            const SizedBox(height: 10),
+            Text('APEX', style: TextStyle(color: AC.goldText, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: 6)),
+            const SizedBox(height: 6),
             Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0648\u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0647\u0646\u064a\u0629',
               style: TextStyle(color: AC.ts, fontSize: 11)),
+            const SizedBox(height: 4),
+            Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0645\u0627\u0644\u064a',
+              style: TextStyle(color: AC.goldText.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1)),
           ]),
         ),
-        SizedBox(height: 32),
+        const SizedBox(height: 32),
         // Title
         Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.tp, fontSize: 22, fontWeight: FontWeight.bold)),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Text('\u0623\u062f\u062e\u0644 \u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u0644\u0644\u0645\u062a\u0627\u0628\u0639\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
         const SizedBox(height: 24),
         // Error
         if (_e != null) Container(
-          width: double.infinity, margin: EdgeInsets.only(bottom: 14), padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10), border: Border.all(color: AC.err.withValues(alpha: 0.3))),
-          child: Row(children: [Icon(Icons.error_outline, color: AC.err, size: 18), SizedBox(width: 8),
+          width: double.infinity, margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.err.withValues(alpha: 0.3))),
+          child: Row(children: [Icon(Icons.error_outline, color: AC.err, size: 18), const SizedBox(width: 8),
             Expanded(child: Text(_e!, style: TextStyle(color: AC.err, fontSize: 12)))]),
         ),
         // Email field
@@ -201,61 +483,90 @@ class _LoginS extends State<LoginScreen> {
           textDirection: TextDirection.ltr,
           decoration: InputDecoration(
             labelText: '\u0627\u0644\u0628\u0631\u064a\u062f \u0623\u0648 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
-            prefixIcon: Icon(Icons.email_outlined, color: AC.gold, size: 20),
-            filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)),
+            prefixIcon: Icon(Icons.email_outlined, color: AC.goldText, size: 20),
+            filled: true, fillColor: AC.navy3.withValues(alpha: 0.5), labelStyle: TextStyle(color: AC.ts),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.goldText, width: 1.5)),
           )),
-        SizedBox(height: 14),
+        const SizedBox(height: 16),
         // Password field
         TextField(controller: _p, obscureText: _obscure, style: TextStyle(color: AC.tp),
           decoration: InputDecoration(
             labelText: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-            prefixIcon: Icon(Icons.lock_outlined, color: AC.gold, size: 20),
+            prefixIcon: Icon(Icons.lock_outlined, color: AC.goldText, size: 20),
             suffixIcon: IconButton(icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20),
               onPressed: () => setState(() => _obscure = !_obscure)),
-            filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold)),
+            filled: true, fillColor: AC.navy3.withValues(alpha: 0.5), labelStyle: TextStyle(color: AC.ts),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.goldText, width: 1.5)),
           ),
           onSubmitted: (_) => _go()),
         // Forgot password
         Align(alignment: Alignment.centerLeft, child: TextButton(
           onPressed: () => context.go('/forgot-password'),
-          child: Text('\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f', style: TextStyle(color: AC.gold, fontSize: 12)))),
+          child: Text('\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f', style: TextStyle(color: AC.goldText, fontSize: 12)))),
         const SizedBox(height: 8),
-        // Login button
-        SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
-          onPressed: _l ? null : _go,
-          style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            disabledBackgroundColor: AC.gold.withValues(alpha: 0.5)),
-          child: _l ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
-            : Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.navy, fontSize: 16, fontWeight: FontWeight.bold)),
+        // Login button with gradient
+        SizedBox(width: double.infinity, height: 50, child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: _l ? null : LinearGradient(colors: [AC.gold, AC.goldLight]),
+            color: _l ? AC.gold.withValues(alpha: 0.5) : null,
+            boxShadow: _l ? null : [BoxShadow(color: AC.gold.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
+          ),
+          child: ElevatedButton(
+            onPressed: _l ? null : _go,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent, shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              disabledBackgroundColor: AC.gold.withValues(alpha: 0.5),
+            ),
+            child: _l ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
+              : Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.navy, fontSize: 16, fontWeight: FontWeight.bold)),
+          ),
         )),
-        SizedBox(height: 20),
-        // Divider
-        Row(children: [Expanded(child: Divider(color: AC.bdr)), Padding(padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text('\u0623\u0648 \u0633\u062c\u0651\u0644 \u0628\u0648\u0627\u0633\u0637\u0629', style: TextStyle(color: AC.ts, fontSize: 11))), Expanded(child: Divider(color: AC.bdr))]),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
+        // Divider with "or" pill
+        Row(children: [
+          Expanded(child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, AC.bdr])))),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(color: AC.navy3.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AC.bdr.withValues(alpha: 0.3))),
+              child: Text('\u0623\u0648', style: TextStyle(color: AC.ts, fontSize: 12, fontWeight: FontWeight.w500)),
+            )),
+          Expanded(child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.bdr, Colors.transparent])))),
+        ]),
+        const SizedBox(height: 20),
         // Social Login Buttons (UI only - not functional yet)
         Row(children: [
           Expanded(child: OutlinedButton.icon(
             onPressed: () => ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Google Sign-In'), backgroundColor: AC.navy3)),
-            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            icon: Icon(Icons.g_mobiledata, color: Colors.red, size: 24),
+            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr.withValues(alpha: 0.4)), padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+            icon: Icon(Icons.g_mobiledata, color: AC.err, size: 24),
             label: Text('Google', style: TextStyle(color: AC.tp, fontSize: 12)),
           )),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(child: OutlinedButton.icon(
             onPressed: () => ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Apple Sign-In'), backgroundColor: AC.navy3)),
-            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr.withValues(alpha: 0.4)), padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
             icon: Icon(Icons.apple, color: AC.tp, size: 22),
             label: Text('Apple', style: TextStyle(color: AC.tp, fontSize: 12)),
           )),
         ]),
-        SizedBox(height: 20),
+        const SizedBox(height: 24),
+        // Subtle divider before register
+        Row(children: [
+          Expanded(child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, AC.bdr.withValues(alpha: 0.3)])))),
+          const SizedBox(width: 8),
+          Expanded(child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.bdr.withValues(alpha: 0.3), Colors.transparent])))),
+        ]),
+        const SizedBox(height: 8),
         // Register link
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f', style: TextStyle(color: AC.ts, fontSize: 13)),
@@ -263,7 +574,10 @@ class _LoginS extends State<LoginScreen> {
             child: Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.bold))),
         ]),
       ]),
+    ),
+  ),
     )),
+    ),
   );
 }
 
@@ -351,11 +665,11 @@ class ApexSearch extends SearchDelegate<String> {
   }
 }
 
-class MainNav extends StatefulWidget {
+class MainNav extends ConsumerStatefulWidget {
   const MainNav({super.key});
-  @override State<MainNav> createState() => _MainNavS();
+  @override ConsumerState<MainNav> createState() => _MainNavS();
 }
-class _MainNavS extends State<MainNav> {
+class _MainNavS extends ConsumerState<MainNav> {
   int _i = 0;
   bool _dr = false;
   List _cl = [];
@@ -367,6 +681,7 @@ class _MainNavS extends State<MainNav> {
   double _fabY = 100;
   String _userName = S.dname ?? 'User';
   String _clientLabel = '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644';
+  int _hoveredDrawerIndex = -1;
   @override
   void initState() {
     super.initState();
@@ -380,6 +695,7 @@ class _MainNavS extends State<MainNav> {
 
 
   @override Widget build(BuildContext c) {
+    _drawerItemCounter = 0;
     final tabs = [EnhancedDashboard(
           onSwitchToClients: () => setState(() => _i = 1),
           onCreateClient: () {
@@ -393,16 +709,17 @@ class _MainNavS extends State<MainNav> {
       body: Column(children: [
         Container(padding: EdgeInsets.only(top: 36, left: 12, right: 12, bottom: 8), decoration: BoxDecoration(color: AC.navy2, border: Border(bottom: BorderSide(color: AC.bdr, width: 0.5))),
           child: Row(children: [
-            GestureDetector(onTap: () => setState(() => _i = 0), child: Text('APEX', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2))),
+            GestureDetector(onTap: () => setState(() => _i = 0), child: Text('APEX', style: TextStyle(color: AC.goldText, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2))),
             SizedBox(width: 8),
-            IconButton(icon: Icon(Icons.search, color: AC.gold, size: 20), onPressed: () {
+            // Separator between logo and nav icons
+            Container(width: 1, height: 24, margin: EdgeInsets.symmetric(horizontal: 6), color: AC.bdr),
+            ApexIconButton(icon: Icons.search, tooltip: 'البحث في المنصة', onPressed: () {
               showSearch(context: context, delegate: ApexSearch());
             }),
-            IconButton(
-              key: _bizKey,
-              icon: Icon(Icons.business, color: AC.gold, size: 20),
+            Builder(key: _bizKey, builder: (btnCtx) => ApexIconButton(icon: Icons.business, tooltip: 'تبديل العميل النشط',
+              showBadge: _activeClients.isNotEmpty, badgeColor: AC.ok,
               onPressed: () {
-                final RenderBox btn = _bizKey.currentContext!.findRenderObject() as RenderBox;
+                final RenderBox btn = btnCtx.findRenderObject() as RenderBox;
                 final Offset pos = btn.localToGlobal(Offset.zero);
                 final Size sz = btn.size;
                 showMenu<String>(
@@ -427,16 +744,15 @@ class _MainNavS extends State<MainNav> {
                       }).toList(),
                 ).then((v) { if (v != null && v.isNotEmpty) setState(() { if (_activeClients.contains(v)) _activeClients.remove(v); else _activeClients.add(v); }); });
               },
-            ),
+            )),
 
-            IconButton(
-              key: _notifKey,
-              icon: Stack(children: [
-                Icon(Icons.notifications_outlined, color: AC.gold, size: 20),
-                if (_notifs.any((n) => n['is_read'] != true)) Positioned(right: 0, top: 0, child: Container(width: 8, height: 8, decoration: BoxDecoration(color: AC.gold, shape: BoxShape.circle))),
-              ]),
+            Builder(key: _notifKey, builder: (notifCtx) => ApexIconButton(
+              icon: Icons.notifications_outlined,
+              tooltip: 'الإشعارات والتنبيهات',
+              showBadge: _notifs.any((n) => n['is_read'] != true),
+              badgeColor: AC.gold,
               onPressed: () {
-                final RenderBox btn = _notifKey.currentContext!.findRenderObject() as RenderBox;
+                final RenderBox btn = notifCtx.findRenderObject() as RenderBox;
                 final Offset pos = btn.localToGlobal(Offset.zero);
                 final Size sz = btn.size;
                 showMenu<String>(
@@ -464,25 +780,39 @@ class _MainNavS extends State<MainNav> {
                     ],
                 ).then((v) { if (v == 'all') context.go('/notifications'); });
               },
-            ),
+            )),
+            // ── Divider before settings section ──
+            Container(width: 1, height: 24, margin: EdgeInsets.symmetric(horizontal: 6), color: AC.bdr),
+            // ── Theme Picker ──
+            _buildThemePicker(),
+            // ── Language Toggle ──
+            _buildLangToggle(),
             Spacer(),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'), style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
-              Text(_activeClients.isEmpty ? _clientLabel : _activeClients.join(' , '), style: TextStyle(color: AC.ts, fontSize: 10)),
+              Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'), style: TextStyle(color: AC.tp.withValues(alpha: 0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.2)),
+              SizedBox(height: 2),
+              Text(_activeClients.isEmpty ? _clientLabel : _activeClients.join(' , '), style: TextStyle(color: AC.ts.withValues(alpha: 0.7), fontSize: 10)),
             ]),
             SizedBox(width: 6),
-            GestureDetector(
-              onTap: () => {},
-              child: Icon(Icons.account_circle, color: AC.gold, size: 22),
-            ),
+            ApexIconButton(icon: Icons.account_circle, size: 22, tooltip: 'الملف الشخصي والإعدادات',
+              onPressed: () => context.push('/settings')),
           ]),
         ),
         Expanded(child: Stack(children: [
           Row(children: [
             Expanded(child: tabs[_i]),
             if (_dr) MouseRegion(onExit: (_) => setState(() => _dr = false),
-              child: SizedBox(width: 250,
-                child: Material(color: AC.navy2,
+              child: SizedBox(width: 260,
+                child: ClipRRect(
+                  child: Container(
+                  decoration: BoxDecoration(
+                    color: AC.navy2.withValues(alpha: 0.92),
+                    border: Border(left: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 30, offset: Offset(-4, 0))],
+                  ),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                  child: Material(color: Colors.transparent,
                 child: Column(children: [
 
                   Expanded(child: ListView(padding: EdgeInsets.zero, children: [
@@ -492,9 +822,9 @@ class _MainNavS extends State<MainNav> {
           title: Text('الأساسي', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
           initiallyExpanded: true,
           children: [
-          _drawerItem(Icons.dashboard_rounded, 'الرئيسية', () { setState(() { _i = 0; _dr = false; }); }),
+          _drawerItem(Icons.dashboard_rounded, 'الرئيسية', () { setState(() { _i = 0; _dr = false; }); }, isActive: _i == 0),
           _drawerItem(Icons.smart_toy, 'Apex Copilot', () { context.push('/copilot'); setState(() => _dr = false); }, isGold: true),
-          _drawerItem(Icons.business_rounded, 'العملاء', () { setState(() { _i = 1; _dr = false; }); }),
+          _drawerItem(Icons.business_rounded, 'العملاء', () { setState(() { _i = 1; _dr = false; }); }, isActive: _i == 1),
           ],
         ),
         ExpansionTile(
@@ -506,7 +836,7 @@ class _MainNavS extends State<MainNav> {
           _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () => _goToCoa(), isGold: true),
           _drawerItem(Icons.table_chart, 'ميزان المراجعة TB', () { context.push('/financial-ops'); setState(() => _dr = false); }),
           _drawerItem(Icons.receipt_long, 'القوائم المالية', () { context.push('/financial-ops'); setState(() => _dr = false); }),
-          _drawerItem(Icons.analytics_rounded, 'التحليل المالي', () { setState(() { _i = 2; _dr = false; }); }),
+          _drawerItem(Icons.analytics_rounded, 'التحليل المالي', () { setState(() { _i = 2; _dr = false; }); }, isActive: _i == 2),
           ],
         ),
         ExpansionTile(
@@ -526,7 +856,7 @@ class _MainNavS extends State<MainNav> {
           tilePadding: EdgeInsets.symmetric(horizontal: 16),
           title: Text('السوق', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
           children: [
-          _drawerItem(Icons.store_rounded, 'سوق الخدمات', () { setState(() { _i = 3; _dr = false; }); }),
+          _drawerItem(Icons.store_rounded, 'سوق الخدمات', () { setState(() { _i = 3; _dr = false; }); }, isActive: _i == 3),
           _drawerItem(Icons.work_rounded, 'مقدمو الخدمات', () { context.push('/provider-kanban'); setState(() => _dr = false); }),
           _drawerItem(Icons.menu_book, 'Bookkeeping', () { _comingSoon(); }),
           ],
@@ -548,22 +878,27 @@ class _MainNavS extends State<MainNav> {
           title: Text('الإدارة', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
           children: [
           _drawerItem(Icons.settings, 'الإدارة والإعدادات', () { context.push('/settings'); setState(() => _dr = false); }),
-          _drawerItem(Icons.diamond_outlined, 'الحساب والاشتراكات', () { setState(() { _i = 5; _dr = false; }); }),
+          _drawerItem(Icons.diamond_outlined, 'الحساب والاشتراكات', () { setState(() { _i = 5; _dr = false; }); }, isActive: _i == 5),
           ],
         ),
                   ])),
                 ]),
               ),
             )),
+          ))),
             if (!_dr) MouseRegion(onEnter: (_) => setState(() => _dr = true),
               child: Container(width: 8, color: Colors.transparent)),
           ]),
-          if (_dr) Positioned(left: 0, top: 0, bottom: 0, right: 250,
+          if (_dr) Positioned(left: 0, top: 0, bottom: 0, right: 260,
             child: GestureDetector(onTap: () => setState(() => _dr = false), behavior: HitTestBehavior.translucent, child: const SizedBox.expand())),
           Positioned(right: _fabX, bottom: _fabY,
             child: GestureDetector(
               onPanUpdate: (d) => setState(() { _fabX = (_fabX - d.delta.dx).clamp(0, 300); _fabY = (_fabY - d.delta.dy).clamp(0, 600); }),
-              child: FloatingActionButton(backgroundColor: AC.gold, onPressed: () => context.go('/copilot'), child: Icon(Icons.smart_toy, color: AC.navy)),
+              child: ApexGlowFAB(
+                icon: Icons.smart_toy,
+                tooltip: 'Apex Copilot — المساعد الذكي',
+                onPressed: () => context.go('/copilot'),
+              ),
             ),
           ),
         ])),
@@ -635,7 +970,7 @@ class _MainNavS extends State<MainNav> {
             SizedBox(height: 16),
             Text(title, style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFE8E0D0), fontSize: 14, height: 1.5)),
+            Text(message, textAlign: TextAlign.center, style: TextStyle(color: AC.tp, fontSize: 14, height: 1.5)),
             SizedBox(height: 24),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -657,17 +992,289 @@ class _MainNavS extends State<MainNav> {
   void _comingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('قريبًا — هذه الخدمة قيد التطوير'),
-        backgroundColor: Color(0xFF1A2536), duration: Duration(seconds: 2)));
+        backgroundColor: AC.navy2, duration: Duration(seconds: 2)));
     setState(() => _dr = false);
   }
 
-  Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false}) => ListTile(
-    trailing: Icon(icon, color: isGold ? AC.gold : AC.ts, size: 20),
-    title: Text(label, textAlign: TextAlign.right, style: TextStyle(color: isGold ? AC.gold : AC.tp, fontSize: 13, fontWeight: isGold ? FontWeight.bold : FontWeight.normal)),
-    onTap: onTap,
-    dense: true,
-    visualDensity: VisualDensity.compact,
-  );
+  int _drawerItemCounter = 0;
+  Widget _drawerItem(IconData icon, String label, VoidCallback onTap, {bool isGold = false, bool isActive = false}) {
+    final idx = _drawerItemCounter++;
+    final hovered = _hoveredDrawerIndex == idx;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: MouseRegion(
+        onEnter: (_) { setState(() => _hoveredDrawerIndex = idx); },
+        onExit: (_) { setState(() => _hoveredDrawerIndex = -1); },
+        child: GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            transform: hovered ? (Matrix4.identity()..translate(-2.0, 0.0)) : Matrix4.identity(),
+            decoration: BoxDecoration(
+              color: isActive
+                  ? AC.gold.withValues(alpha: 0.10)
+                  : hovered
+                      ? AC.gold.withValues(alpha: 0.06)
+                      : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isActive
+                    ? AC.gold.withValues(alpha: 0.25)
+                    : hovered
+                        ? AC.gold.withValues(alpha: 0.12)
+                        : Colors.transparent,
+              ),
+              boxShadow: hovered ? [
+                BoxShadow(color: AC.gold.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(-2, 0)),
+              ] : null,
+            ),
+            child: Row(children: [
+              // Active indicator bar
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 3, height: 20,
+                decoration: BoxDecoration(
+                  color: isActive ? AC.gold : (hovered ? AC.gold.withValues(alpha: 0.4) : Colors.transparent),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(child: Text(label, textAlign: TextAlign.right, style: TextStyle(
+                color: isGold || isActive ? AC.gold : (hovered ? AC.goldLight : AC.tp),
+                fontSize: 13,
+                fontWeight: isGold || isActive || hovered ? FontWeight.w600 : FontWeight.normal,
+              ))),
+              const SizedBox(width: 10),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 30, height: 30,
+                decoration: BoxDecoration(
+                  color: (isGold || isActive || hovered) ? AC.gold.withValues(alpha: 0.12) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: isGold || isActive ? AC.gold : (hovered ? AC.goldLight : AC.ts), size: 18),
+              ),
+              // Arrow appears on hover
+              AnimatedOpacity(
+                opacity: hovered ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 180),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Icon(Icons.chevron_right, color: AC.gold.withValues(alpha: 0.5), size: 14),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Theme Picker ──
+  final _themeKey = GlobalKey();
+  String? _previewThemeId; // for hover preview — null means no preview active
+  String? _savedThemeId;   // original theme to restore on hover exit
+
+  Widget _buildThemePicker() {
+    final currentId = ref.watch(appSettingsProvider).themeId;
+    final isDark = currentId.endsWith('_dark');
+    final currentFamily = themeFamilyOf(currentId);
+    final isAr = ref.watch(appSettingsProvider).language == 'ar';
+    return ApexIconButton(
+      key: _themeKey,
+      icon: Icons.palette_outlined,
+      size: 20,
+      tooltip: isAr ? 'تغيير السمة' : 'Change Theme',
+      onPressed: () {
+        final RenderBox btn = _themeKey.currentContext!.findRenderObject() as RenderBox;
+        final Offset pos = btn.localToGlobal(Offset.zero);
+        final Size sz = btn.size;
+        _savedThemeId = currentId;
+
+        showDialog(
+          context: context,
+          barrierColor: Colors.transparent,
+          builder: (ctx) => Stack(children: [
+            // Dismiss layer
+            Positioned.fill(child: GestureDetector(onTap: () {
+              // Restore original theme on dismiss
+              if (_savedThemeId != null) {
+                ref.read(appSettingsProvider.notifier).setTheme(_savedThemeId!);
+              }
+              _previewThemeId = null;
+              _savedThemeId = null;
+              Navigator.of(ctx).pop();
+            })),
+            // Picker overlay
+            Positioned(
+              left: pos.dx - 100,
+              top: pos.dy + sz.height + 6,
+              child: Material(
+                color: Colors.transparent,
+                child: StatefulBuilder(builder: (ctx2, setLocal) {
+                  return MouseRegion(
+                    onExit: (_) {
+                      // Restore when leaving the entire picker
+                      if (_savedThemeId != null && _previewThemeId != null) {
+                        ref.read(appSettingsProvider.notifier).setTheme(_savedThemeId!);
+                        _previewThemeId = null;
+                        if (mounted) setState(() {});
+                      }
+                    },
+                    child: Container(
+                      width: 240,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AC.navy2,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: AC.gold.withValues(alpha: 0.25)),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0, 8)),
+                          BoxShadow(color: AC.gold.withValues(alpha: 0.06), blurRadius: 40),
+                        ],
+                      ),
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        // ── Dark / Light Toggle ──
+                        GestureDetector(
+                          onTap: () {
+                            ref.read(appSettingsProvider.notifier).toggleDarkMode(!isDark);
+                            _savedThemeId = ref.read(appSettingsProvider).themeId;
+                            Navigator.of(ctx).pop();
+                            _previewThemeId = null;
+                            _savedThemeId = null;
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AC.navy3,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                              Icon(Icons.light_mode_rounded, color: !isDark ? AC.gold : AC.td, size: 18),
+                              const SizedBox(width: 8),
+                              Text(isAr ? 'فاتح' : 'Light',
+                                style: TextStyle(color: !isDark ? AC.gold : AC.td, fontSize: 12, fontWeight: !isDark ? FontWeight.bold : FontWeight.normal)),
+                              const SizedBox(width: 12),
+                              Container(
+                                width: 40, height: 22,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: isDark ? AC.gold.withValues(alpha: 0.25) : AC.navy4,
+                                ),
+                                child: AnimatedAlign(
+                                  duration: const Duration(milliseconds: 200),
+                                  alignment: isDark ? Alignment.centerLeft : Alignment.centerRight,
+                                  child: Container(
+                                    width: 18, height: 18, margin: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isDark ? AC.gold : AC.ts,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Icon(Icons.dark_mode_rounded, color: isDark ? AC.gold : AC.td, size: 18),
+                              const SizedBox(width: 8),
+                              Text(isAr ? 'داكن' : 'Dark',
+                                style: TextStyle(color: isDark ? AC.gold : AC.td, fontSize: 12, fontWeight: isDark ? FontWeight.bold : FontWeight.normal)),
+                            ]),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Divider(color: AC.bdr, height: 1),
+                        const SizedBox(height: 6),
+                        // ── 4 Theme Families with hover preview ──
+                        ...apexThemeFamilies.map((f) {
+                          final isSelected = currentFamily == f.id && _previewThemeId == null;
+                          final isPreviewing = _previewThemeId != null && themeFamilyOf(_previewThemeId!) == f.id;
+                          return MouseRegion(
+                            onEnter: (_) {
+                              // Live preview: apply this family's theme temporarily
+                              final previewId = themeIdFor(f.id, isDark);
+                              _previewThemeId = previewId;
+                              ref.read(appSettingsProvider.notifier).setTheme(previewId);
+                              setLocal(() {});
+                              if (mounted) setState(() {});
+                            },
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () {
+                                // Confirm this theme
+                                ref.read(appSettingsProvider.notifier).setThemeFamily(f.id);
+                                _previewThemeId = null;
+                                _savedThemeId = null;
+                                Navigator.of(ctx).pop();
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 180),
+                                margin: const EdgeInsets.symmetric(vertical: 3),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: (isSelected || isPreviewing) ? f.preview.withValues(alpha: 0.12) : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: (isSelected || isPreviewing) ? f.preview.withValues(alpha: 0.5) : Colors.transparent,
+                                    width: 1.2,
+                                  ),
+                                ),
+                                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                                  if (isSelected) Icon(Icons.check_circle_rounded, color: f.preview, size: 16),
+                                  if (isSelected) const SizedBox(width: 8),
+                                  Expanded(child: Text(isAr ? f.nameAr : f.nameEn,
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                      color: (isSelected || isPreviewing) ? f.preview : AC.tp, fontSize: 13,
+                                      fontWeight: (isSelected || isPreviewing) ? FontWeight.bold : FontWeight.w500))),
+                                  const SizedBox(width: 10),
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    width: isPreviewing ? 26 : 22, height: isPreviewing ? 26 : 22,
+                                    decoration: BoxDecoration(
+                                      color: f.preview, shape: BoxShape.circle,
+                                      border: Border.all(color: (isSelected || isPreviewing) ? f.preview : AC.ts.withValues(alpha: 0.5), width: (isSelected || isPreviewing) ? 2.5 : 1.5),
+                                      boxShadow: (isSelected || isPreviewing) ? [BoxShadow(color: f.preview.withValues(alpha: 0.5), blurRadius: 12)] : null,
+                                    ),
+                                  ),
+                                ]),
+                              ),
+                            ),
+                          );
+                        }),
+                      ]),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ]),
+        );
+      },
+    );
+  }
+
+  // ── Language Toggle ──
+  Widget _buildLangToggle() {
+    final isAr = ref.watch(appSettingsProvider).language == 'ar';
+    return GestureDetector(
+      onTap: () {
+        ref.read(appSettingsProvider.notifier).setLanguage(isAr ? 'en' : 'ar');
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: AC.gold.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
+        ),
+        child: Text(isAr ? 'EN' : 'ع', style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
 }
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
@@ -697,11 +1304,11 @@ class _DashS extends ConsumerState<DashTab> {
       title: Text('\u0645\u0631\u062d\u0628\u0627\u064b ${(S.dname != null && S.dname!.contains('?') ? S.uname : S.dname)??""} \u{1F44B}', style: TextStyle(color: AC.gold, fontSize: 18)),
       actions: [
         Stack(children: [
-          IconButton(icon: Icon(Icons.notifications_outlined, color: AC.tp),
+          ApexIconButton(icon: Icons.notifications_outlined, color: AC.tp,
             onPressed: ()=>context.go('/notifications')),
           if(_notifCount>0) Positioned(right:8,top:8, child: Container(padding: EdgeInsets.all(4),
             decoration: BoxDecoration(color: AC.err, shape: BoxShape.circle),
-            child: Text('$_notifCount', style: TextStyle(color: Colors.white, fontSize: 10))))]),
+            child: Text('$_notifCount', style: TextStyle(color: AC.btnFg, fontSize: 10))))]),
       ]),
     body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
@@ -935,10 +1542,10 @@ class _ClientsS extends ConsumerState<ClientsTab> {
     final type = typeMap[_cType] ?? 'standard_business';
     final res = await ApiService.createClient(clientCode: code, name: _cName.text.isNotEmpty ? _cName.text : name, nameAr: _cNameAr.text.isNotEmpty ? _cNameAr.text : name, clientType: type, industry: _cSector.isNotEmpty ? _cSector : null);
     if (res.success) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644'), backgroundColor: Color(0xFF2E7D32)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644'), backgroundColor: AC.ok));
       _load();
     } else {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? '\u062e\u0637\u0623'), backgroundColor: const Color(0xFFC62828)));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? '\u062e\u0637\u0623'), backgroundColor: AC.err));
     }
     _cName.clear(); _cNameAr.clear(); _cEmail.clear(); _cPhone.clear(); _cCR.clear(); _cVAT.clear(); _cAddress.clear(); _cType = ''; _cSector = '';
   }
@@ -1095,7 +1702,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
             Row(children: [
               Text('\u062a\u0633\u062c\u064a\u0644 \u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
               Spacer(),
-              IconButton(icon: Icon(Icons.close, color: AC.ts, size: 20), onPressed: () => Navigator.pop(dc)),
+              ApexIconButton(icon: Icons.close, color: AC.ts, size: 20, onPressed: () => Navigator.pop(dc)),
             ]),
             const SizedBox(height: 16),
             SizedBox(height: 50, child: Row(children: List.generate(7, (idx) =>
@@ -1146,8 +1753,8 @@ class _ClientsS extends ConsumerState<ClientsTab> {
     }).toList();
     return Scaffold(
       backgroundColor: AC.navy,
-      floatingActionButton: FloatingActionButton(backgroundColor: AC.gold, child: Icon(Icons.add, color: AC.navy),
-        onPressed: () => _showNewClientWizard(c)),
+      floatingActionButton: ApexGlowFAB(icon: Icons.add, color: AC.gold,
+        onPressed: () => _showNewClientWizard(c), tooltip: 'عميل جديد'),
       body: Column(children: [
         // Header with title + search
         Container(padding: EdgeInsets.fromLTRB(16, 16, 16, 12),
@@ -1375,14 +1982,14 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
             try {
               final result = await ApiService.analyzeReport(bytes: _fb!, fileName: 'tb.xlsx');
               if (result.success) {
-                ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('طھظ… طھط­ظ…ظٹظ„ ط§ظ„طھظ‚ط±ظٹط± ط¨ظ†ط¬ط§ط­'), backgroundColor: Color(0xFF2ECC8A)));
+                ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u062a\u0645 \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u062a\u0642\u0631\u064a\u0631 \u0628\u0646\u062c\u0627\u062d'), backgroundColor: AC.ok));
               }
             } catch (e) {
               ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u062e\u0637\u0623: $e'), backgroundColor: AC.navy3));
             }
           },
-          icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
-          label: const Text('\u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u062a\u0642\u0631\u064a\u0631 PDF', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
+          icon: Icon(Icons.picture_as_pdf, color: AC.btnFg),
+          label: Text('\u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u062a\u0642\u0631\u064a\u0631 PDF', style: TextStyle(color: AC.btnFg, fontWeight: FontWeight.bold)))),
       ]])));
 
   Color _getConfidenceColor(dynamic v) {
@@ -1653,7 +2260,7 @@ class _AccS extends ConsumerState<AccountTab> {
     ApiService.clearToken(); context.go('/login'); }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: Text('\u062d\u0633\u0627\u0628\u064a', style: TextStyle(color: AC.gold)),
-      actions: [IconButton(onPressed: _logout, icon: Icon(Icons.logout, color: AC.err))]),
+      actions: [ApexIconButton(onPressed: _logout, icon: Icons.logout, color: AC.err)]),
     body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
         // Profile Card
@@ -1691,13 +2298,13 @@ class _AccS extends ConsumerState<AccountTab> {
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
           ()=>context.go('/account/close')),
           _mi(Icons.archive, 'ط§ظ„ط£ط±ط´ظٹظپ', AC.cyan, () => context.push('/archive')),
-            _mi(Icons.history, 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·', Color(0xFF9C27B0),
+            _mi(Icons.history, 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·', AC.purple,
             ()=>context.go('/account/activity')),
           _mi(Icons.compare_arrows, 'ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·', AC.cyan,
             ()=>context.go('/plans/compare')),
           _mi(Icons.assignment, 'ط£ظ†ظˆط§ط¹ ط§ظ„ظ…ظ‡ط§ظ…', AC.cyan,
             ()=>context.go('/tasks/types')),
-          _mi(Icons.description, 'ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…', Color(0xFF607D8B),
+          _mi(Icons.description, 'ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…', AC.ts,
             ()=>context.go('/legal')),
           _mi(Icons.devices, 'ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©', AC.cyan,
             ()=>context.go('/account/sessions')),
@@ -1730,17 +2337,17 @@ class _AdminS extends ConsumerState<AdminTab> {
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: Text('\u0644\u0648\u062d\u0629 \u0627\u0644\u0625\u062f\u0627\u0631\u0629', style: TextStyle(color: AC.gold)),
       actions: [
-        IconButton(icon: Icon(Icons.rate_review, color: AC.cyan),
+        ApexIconButton(icon: Icons.rate_review, color: AC.cyan,
           onPressed: ()=>context.go('/admin/reviewer')),
-        IconButton(icon: Icon(Icons.verified_user, color: AC.ok),
+        ApexIconButton(icon: Icons.verified_user, color: AC.ok,
           onPressed: ()=>context.go('/admin/providers/verify')),
-        IconButton(icon: Icon(Icons.upload_file, color: AC.gold),
+        ApexIconButton(icon: Icons.upload_file, color: AC.gold,
           onPressed: ()=>context.go('/admin/providers/documents')),
-        IconButton(icon: Icon(Icons.shield, color: AC.gold),
+        ApexIconButton(icon: Icons.shield, color: AC.gold,
           onPressed: ()=>context.go('/admin/providers/compliance')),
-        IconButton(icon: Icon(Icons.psychology, color: AC.gold),
+        ApexIconButton(icon: Icons.psychology, color: AC.gold,
           onPressed: ()=>context.go('/knowledge/console')),
-        IconButton(icon: Icon(Icons.security, color: AC.gold),
+        ApexIconButton(icon: Icons.security, color: AC.gold,
           onPressed: ()=>context.go('/admin/audit')),
       ]),
     body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
@@ -1753,8 +2360,8 @@ class _AdminS extends ConsumerState<AdminTab> {
             _statCard('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', '${_stats['total_clients']??0}', Icons.business, AC.cyan),
             _statCard('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', '${_stats['total_providers']??0}', Icons.work, AC.ok),
             _statCard('\u0627\u0644\u0637\u0644\u0628\u0627\u062a', '${_stats['total_requests']??0}', Icons.assignment, AC.warn),
-            _statCard('\u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a', '${_stats['total_feedback']??0}', Icons.feedback, Colors.purple),
-            _statCard('\u0627\u0644\u062a\u062d\u0644\u064a\u0644\u0627\u062a', '${_stats['total_analyses']??0}', Icons.analytics, Colors.teal),
+            _statCard('\u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a', '${_stats['total_feedback']??0}', Icons.feedback, AC.purple),
+            _statCard('\u0627\u0644\u062a\u062d\u0644\u064a\u0644\u0627\u062a', '${_stats['total_analyses']??0}', Icons.analytics, AC.info),
           ]),
         SizedBox(height: 16),
         // Quick Actions

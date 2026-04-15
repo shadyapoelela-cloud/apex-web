@@ -6,6 +6,7 @@ import 'package:csv/csv.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'dart:html' as html;
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // APEX Phase 1 — COA Qualification v5.0
@@ -17,18 +18,18 @@ class AppColors {
   static Color get navyLight => AC.navy3;
   static Color get navyMid => AC.navy4;
   static Color get gold => AC.gold;
-  static Color get goldLight => const Color(0xFFD4B96A);
+  static Color get goldLight => AC.goldLight;
   static Color get textColor => AC.tp;
   static Color get textMid => AC.ts;
-  static Color get textDim => AC.isLight ? const Color(0xFF9A917F) : const Color(0xFF6B6355);
+  static Color get textDim => AC.td;
   static Color get cardBg => AC.navy3;
   static Color get borderColor => AC.bdr;
-  static const greenC = Color(0xFF34D399);
-  static const cyanC = Color(0xFF34D399);
-  static const redC = Color(0xFFF87171);
-  static const blueC = Color(0xFF60A5FA);
-  static const orangeC = Color(0xFFFBBF24);
-  static const purpleC = Color(0xFFA78BFA);
+  static Color get greenC => AC.ok;
+  static Color get cyanC => AC.info;
+  static Color get redC => AC.err;
+  static Color get blueC => AC.info;
+  static Color get orangeC => AC.warn;
+  static Color get purpleC => AC.purple;
 }
 
 // ─── Data Models ──────────────────────────────────────────────
@@ -1255,6 +1256,12 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
   Future<void> _advanceStage() async {
     if (_accounts.isEmpty) return;
     if (_currentStage == 5) { await _submitCoa(); return; }
+
+    // After code editing stage (1→2): rebuild hierarchy with corrected codes
+    if (_currentStage == 1) {
+      _rebuildHierarchy();
+    }
+
     setState(() {
       _currentStage = _currentStage + 1;
       if (_currentStage <= 5) {
@@ -1264,6 +1271,54 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
         }
       }
     });
+  }
+
+  /// Rebuild hierarchy after code corrections: recalculate levels, parentCode,
+  /// account types, flags, and acceptance scores based on current codes.
+  void _rebuildHierarchy() {
+    // 1. Recalculate levels from codes
+    for (final acc in _accounts) {
+      acc.level = _detectLevelFromCode(acc.code, _accounts);
+    }
+
+    // 2. Recalculate parent codes
+    for (final acc in _accounts) {
+      acc.parentCode = _findParentCode(acc.code, _accounts);
+      if (acc.parentCode.isNotEmpty) {
+        final potentialParents = _accounts.where((a) => a.code == acc.parentCode).toList();
+        if (potentialParents.length == 1) {
+          acc.parentUniqueId = potentialParents.first.uniqueId;
+        } else if (potentialParents.length > 1) {
+          final myCategory = _classifyByName(acc.name);
+          CoaAccount? bestParent;
+          for (final p in potentialParents) {
+            if (myCategory.isNotEmpty && _classifyByName(p.name) == myCategory) {
+              bestParent = p;
+              break;
+            }
+          }
+          acc.parentUniqueId = (bestParent ?? potentialParents.first).uniqueId;
+        }
+      } else {
+        acc.parentUniqueId = '';
+      }
+    }
+
+    // 3. Recalculate account types
+    for (final acc in _accounts) {
+      if (acc.level <= 2) {
+        acc.accountType = 'حساب رئيسي';
+      } else if (acc.level == 3) {
+        acc.accountType = 'حساب فرعي';
+      } else {
+        acc.accountType = 'حساب تفصيلي';
+      }
+    }
+
+    // 4. Recalculate acceptance scores
+    for (final acc in _accounts) {
+      acc.acceptanceScore = _calculateAcceptanceScore(acc, _accounts);
+    }
   }
 
   IconData _stageButtonIcon() {
@@ -1381,7 +1436,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
             final isCurrent = si == _currentStage;
             final isTbReady = si == 6 && _currentStage >= 6;
             final bgColor = isTbReady ? AppColors.greenC : (isComplete ? AppColors.greenC : (isCurrent ? AppColors.gold : AppColors.navyMid));
-            final textCol = isTbReady ? AppColors.navy : (isComplete || isCurrent ? (isComplete ? Colors.white : AppColors.navy) : AppColors.textDim);
+            final textCol = isTbReady ? AppColors.navy : (isComplete || isCurrent ? (isComplete ? AC.btnFg : AppColors.navy) : AppColors.textDim);
 
             return Column(
               children: [
@@ -2640,7 +2695,7 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
                             const SizedBox(height: 2),
                             Text('${acc.code}  —  ${acc.name}', style: TextStyle(color: AppColors.textDim, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
                           ])),
-                          IconButton(icon: Icon(Icons.close, color: AppColors.textMid), onPressed: () => Navigator.pop(ctx)),
+                          ApexIconButton(icon: Icons.close, color: AppColors.textMid, onPressed: () => Navigator.pop(ctx)),
                         ]),
                       ),
                       Container(
@@ -3459,36 +3514,199 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
     return widgets;
   }
 
+    // ─── Smart Hierarchy Naming Helpers ─────────────────────────
+
+    /// Level 1: Main section name by first digit
+    String _mainSectionName(String digit) {
+      switch (digit) {
+        case '1': return 'الأصول';
+        case '2': return 'الالتزامات';
+        case '3': return 'حقوق الملكية';
+        case '4': return 'الإيرادات';
+        case '5': return 'تكلفة المبيعات';
+        case '6': return 'المصروفات التشغيلية';
+        case '7': return 'المصروفات التمويلية';
+        case '8': return 'حسابات ختامية';
+        case '9': return 'حسابات نظامية';
+        default: return 'مجموعة $digit';
+      }
+    }
+
+    /// Level 2: Sub-section name by first 2 digits (Saudi COA standard)
+    String _subSectionName(String prefix2) {
+      if (prefix2.isEmpty) return '';
+      final d1 = prefix2[0];
+      final d2 = prefix2.length > 1 ? prefix2[1] : '0';
+      switch (d1) {
+        case '1':
+          return (d2 == '0' || d2 == '1') ? 'أصول متداولة' : 'أصول غير متداولة';
+        case '2':
+          return (d2 == '0' || d2 == '1') ? 'التزامات متداولة' : 'التزامات غير متداولة';
+        case '3':
+          if (d2 == '0') return 'رأس المال';
+          if (d2 == '1') return 'الاحتياطيات';
+          if (d2 == '2') return 'الأرباح المبقاة';
+          return 'حقوق ملكية أخرى';
+        case '4':
+          return (d2 == '0' || d2 == '1') ? 'إيرادات تشغيلية' : 'إيرادات أخرى';
+        case '5':
+          return 'تكلفة المبيعات';
+        case '6':
+          if (d2 == '0') return 'مصروفات بيعية وتسويقية';
+          if (d2 == '1') return 'مصروفات إدارية وعمومية';
+          return 'مصروفات أخرى';
+        case '7':
+          return 'تكاليف تمويلية';
+        default:
+          return 'مجموعة $prefix2';
+      }
+    }
+
+    /// Level 3: Category name derived from child account names
+    String _categoryName(String prefix3) {
+      final children = _accounts.where((a) {
+        final cleaned = a.code.replaceAll(RegExp(r'[^0-9]'), '');
+        return cleaned.startsWith(prefix3);
+      }).toList();
+      if (children.isEmpty) return 'مجموعة $prefix3';
+
+      // Find most common classification from child names
+      final cats = <String, int>{};
+      for (final c in children) {
+        final cat = _classifyByName(c.name);
+        if (cat.isNotEmpty) cats[cat] = (cats[cat] ?? 0) + 1;
+      }
+      if (cats.isNotEmpty) {
+        final sorted = cats.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+        return sorted.first.key;
+      }
+      return 'مجموعة $prefix3';
+    }
+
+    // ─── Smart Tree Structure Builder ────────────────────────────
+
     List<CoaAccount> _buildTreeStructure() {
-    // Create a map using uniqueId for duplicate-safe lookup
+    final existingCodes = _accounts.map((a) => a.code).toSet();
+
+    // Detect flat structure: most accounts have no shorter prefix code as parent
+    int noParentCount = 0;
+    for (final acc in _accounts) {
+      final cleaned = acc.code.replaceAll(RegExp(r'[^0-9]'), '');
+      if (cleaned.length <= 1) continue;
+      bool hasRealParent = false;
+      for (int len = cleaned.length - 1; len >= 1; len--) {
+        if (existingCodes.contains(cleaned.substring(0, len))) {
+          hasRealParent = true;
+          break;
+        }
+      }
+      if (!hasRealParent) noParentCount++;
+    }
+    final needsSynthetic = noParentCount > _accounts.length * 0.5 && _accounts.length > 5;
+
+    final syntheticAccounts = <CoaAccount>[];
+
+    if (needsSynthetic) {
+      // Find minimum code length to determine what levels are missing
+      int minCodeLen = 999;
+      for (final acc in _accounts) {
+        final len = acc.code.replaceAll(RegExp(r'[^0-9]'), '').length;
+        if (len > 0 && len < minCodeLen) minCodeLen = len;
+      }
+      if (minCodeLen == 999) minCodeLen = 1;
+
+      // Smart: only create meaningful accounting levels (max 3 synthetic levels)
+      // Level 1 (1-digit): Main sections — أصول, التزامات, حقوق ملكية...
+      // Level 2 (2-digit): Sub-sections — أصول متداولة, أصول غير متداولة...
+      // Level 3 (3-digit): Categories — نقدية وبنوك, ذمم مدينة, مخزون...
+      // NO levels 4, 5 (1010, 10100) — accounts attach directly to level 3
+
+      final neededPrefixes = <String, int>{}; // prefix → level
+
+      for (final acc in _accounts) {
+        final cleaned = acc.code.replaceAll(RegExp(r'[^0-9]'), '');
+        if (cleaned.isEmpty) continue;
+
+        // Level 1: first digit
+        if (cleaned.length >= 1 && minCodeLen > 1 && !existingCodes.contains(cleaned[0])) {
+          neededPrefixes[cleaned[0]] = 1;
+        }
+        // Level 2: first 2 digits
+        if (cleaned.length >= 2 && minCodeLen > 2 && !existingCodes.contains(cleaned.substring(0, 2))) {
+          neededPrefixes[cleaned.substring(0, 2)] = 2;
+        }
+        // Level 3: first 3 digits
+        if (cleaned.length >= 3 && minCodeLen > 3 && !existingCodes.contains(cleaned.substring(0, 3))) {
+          neededPrefixes[cleaned.substring(0, 3)] = 3;
+        }
+      }
+
+      // Create synthetic nodes with smart accounting names
+      for (final entry in neededPrefixes.entries) {
+        final prefix = entry.key;
+        final level = entry.value;
+
+        String name;
+        switch (level) {
+          case 1: name = _mainSectionName(prefix); break;
+          case 2: name = _subSectionName(prefix); break;
+          case 3: name = _categoryName(prefix); break;
+          default: name = 'مجموعة $prefix';
+        }
+
+        syntheticAccounts.add(CoaAccount(
+          code: prefix,
+          name: name,
+          level: level,
+          rowIndex: -1,
+        )..uniqueId = 'synthetic_$prefix'
+         ..rootClass = _classifyRoot(prefix)
+         ..accountType = 'حساب رئيسي');
+      }
+    }
+
+    // Build working list (real + synthetic)
+    final workingAccounts = [..._accounts, ...syntheticAccounts];
+
+    // Create maps — compute parent locally (don't modify _accounts)
     final uidMap = <String, CoaAccount>{};
     final codeMap = <String, List<CoaAccount>>{};
-    for (final acc in _accounts) {
+    final localParent = <String, String>{};
+    final localParentUid = <String, String>{};
+
+    for (final acc in workingAccounts) {
       acc.children = [];
       uidMap[acc.uniqueId] = acc;
       codeMap.putIfAbsent(acc.code, () => []);
       codeMap[acc.code]!.add(acc);
+
+      final parentCode = _findParentCode(acc.code, workingAccounts);
+      localParent[acc.uniqueId] = parentCode;
+      if (parentCode.isNotEmpty) {
+        final parents = workingAccounts.where((a) => a.code == parentCode).toList();
+        if (parents.length == 1) {
+          localParentUid[acc.uniqueId] = parents.first.uniqueId;
+        }
+      }
     }
 
-    // Build parent-child relationships using uniqueId when available
+    // Build parent-child relationships
     final roots = <CoaAccount>[];
-    for (final acc in _accounts) {
+    for (final acc in workingAccounts) {
       bool attached = false;
+      final pUid = localParentUid[acc.uniqueId] ?? '';
+      final pCode = localParent[acc.uniqueId] ?? '';
 
-      // Try uniqueId-based parent first (duplicate-aware)
-      if (acc.parentUniqueId.isNotEmpty && uidMap.containsKey(acc.parentUniqueId)) {
-        final parent = uidMap[acc.parentUniqueId]!;
+      if (pUid.isNotEmpty && uidMap.containsKey(pUid)) {
+        final parent = uidMap[pUid]!;
         parent.children = [...parent.children, acc];
         attached = true;
-      }
-      // Fallback to code-based parent (non-duplicate case)
-      else if (acc.parentCode.isNotEmpty && codeMap.containsKey(acc.parentCode)) {
-        final candidates = codeMap[acc.parentCode]!;
+      } else if (pCode.isNotEmpty && codeMap.containsKey(pCode)) {
+        final candidates = codeMap[pCode]!;
         if (candidates.length == 1) {
           candidates.first.children = [...candidates.first.children, acc];
           attached = true;
         } else {
-          // Multiple parents with same code — use name classification
           final myCategory = _classifyByName(acc.name);
           CoaAccount? bestParent;
           for (final p in candidates) {

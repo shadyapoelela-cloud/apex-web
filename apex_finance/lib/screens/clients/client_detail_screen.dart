@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 // ════════════════════════════════════════
 // APEX Client Detail Screen v5.2 — Visual Alignment
@@ -14,17 +15,17 @@ Color get navy => AC.navy;
 Color get navyLight => AC.navy3;
 Color get navyMid => AC.navy4;
 Color get gold => AC.gold;
-Color get goldLight => Color(0xFFD4B96A);
+Color get goldLight => AC.goldLight;
 Color get textColor => AC.tp;
 Color get textMid => AC.ts;
-Color get textDim => AC.isLight ? Color(0xFF9A917F) : Color(0xFF6B6355);
+Color get textDim => AC.td;
 Color get cardBg => AC.navy3;
 Color get borderColor => AC.bdr;
-const Color greenC = Color(0xFF34D399);
-const Color blueC = Color(0xFF60A5FA);
-const Color orangeC = Color(0xFFFBBF24);
-const Color redC = Color(0xFFF87171);
-const Color purpleC = Color(0xFFA78BFA);
+Color get greenC => AC.ok;
+Color get blueC => AC.info;
+Color get orangeC => AC.warn;
+Color get redC => AC.err;
+Color get purpleC => AC.purple;
 
 class ClientDetailScreen extends StatefulWidget {
   final String clientId;
@@ -121,6 +122,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           child: Column(
             children: [
               _buildHeader(),
+              _buildClientJourneyFlow(),
               _buildInfoCards(),
               _buildServiceStatusGrid(),
               _buildNextStepCard(),
@@ -137,52 +139,47 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   // HEADER — matching reference model
   // ════════════════════════════════════════
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-      child: Row(
-        children: [
-          // Avatar
-          Container(
-            width: 56, height: 56,
-            decoration: BoxDecoration(
-              color: gold.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(Icons.business, color: gold, size: 28),
-          ),
-          const SizedBox(width: 16),
-          // Name + badges
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.clientName,
-                    style: TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 6,
-                  children: [
-                    _badge('نشط', greenC),
-                    _badge(readinessData['sector'] ?? 'التجزئة', blueC),
-                    _badge(readinessData['type'] ?? 'شركة', textMid),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          // Edit button
-          OutlinedButton.icon(
-            onPressed: () => _showEditClientDialog(),
-            icon: Icon(Icons.edit, size: 14, color: textMid),
-            label: Text('تعديل', style: TextStyle(color: textMid, fontSize: 12)),
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: borderColor),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            ),
-          ),
+    final statusLine = [
+      'نشط',
+      readinessData['sector'] ?? 'التجزئة',
+      readinessData['type'] ?? 'شركة',
+    ].join(' · ');
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: ApexHeroSection(
+        title: widget.clientName,
+        description: statusLine,
+        icon: Icons.business_rounded,
+        actions: [
+          apexPill('نشط', color: greenC, filled: true),
+          apexPill(readinessData['sector'] ?? 'التجزئة', color: blueC),
+          apexPill(readinessData['type'] ?? 'شركة', color: textMid),
+          apexSecondaryButton('تعديل', () => _showEditClientDialog(), icon: Icons.edit),
         ],
+      ),
+    );
+  }
+
+  // ════════════════════════════════════════
+  // CLIENT JOURNEY — step flow at top
+  // ════════════════════════════════════════
+  Widget _buildClientJourneyFlow() {
+    final coaStatus = readinessData['coa_status'] ?? '';
+    int currentStep = 0;
+    if (coaStatus == 'معتمد') {
+      currentStep = 3;
+    } else if (coaStatus == 'قيد المراجعة') {
+      currentStep = 2;
+    } else if (coaStatus.isNotEmpty && coaStatus != 'pending' && coaStatus != 'لم يبدأ') {
+      currentStep = 1;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+      child: apexStepFlow(
+        steps: ['إنشاء عميل', 'رفع COA', 'مراجعة', 'ميزان المراجعة', 'القوائم المالية'],
+        currentStep: currentStep,
       ),
     );
   }
@@ -191,43 +188,76 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   // 3 INFO CARDS — matching reference model
   // ════════════════════════════════════════
   Widget _buildInfoCards() {
-    final cards = [
-      _InfoItem('السجل التجاري', readinessData['cr_number'] ?? 'N/A', Icons.description, gold),
-      _InfoItem('تاريخ الإنشاء', readinessData['created_date'] ?? 'N/A', Icons.calendar_today, blueC),
-      _InfoItem('حالة COA', readinessData['coa_status'] ?? 'لم يبدأ', Icons.account_tree, orangeC),
-    ];
+    final coaStatus = readinessData['coa_status'] ?? 'لم يبدأ';
+    final coaTint = coaStatus == 'معتمد' ? ApexTint.green : (coaStatus == 'قيد المراجعة' ? ApexTint.amber : ApexTint.red);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
-        children: cards.map((c) => Expanded(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: cardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderColor),
-            ),
-            child: Row(
+        children: [
+          Expanded(
+            child: apexTintedCard(
+              tint: ApexTint.amber,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               children: [
-                Icon(c.icon, color: c.color, size: 18),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(c.label, style: TextStyle(color: textDim, fontSize: 11)),
-                      const SizedBox(height: 4),
-                      Text(c.value,
-                          style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w600),
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ],
-                  ),
-                ),
+                Row(children: [
+                  Icon(Icons.description, color: gold, size: 18),
+                  const SizedBox(width: 12),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('السجل التجاري', style: TextStyle(color: textDim, fontSize: 11)),
+                    const SizedBox(height: 4),
+                    Text(readinessData['cr_number'] ?? 'N/A',
+                        style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w600),
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ])),
+                ]),
               ],
             ),
           ),
-        )).toList(),
+          Expanded(
+            child: apexTintedCard(
+              tint: ApexTint.blue,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              children: [
+                Row(children: [
+                  Icon(Icons.calendar_today, color: blueC, size: 18),
+                  const SizedBox(width: 12),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('تاريخ الإنشاء', style: TextStyle(color: textDim, fontSize: 11)),
+                    const SizedBox(height: 4),
+                    Text(readinessData['created_date'] ?? 'N/A',
+                        style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w600),
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ])),
+                ]),
+              ],
+            ),
+          ),
+          Expanded(
+            child: apexTintedCard(
+              tint: coaTint,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              children: [
+                Row(children: [
+                  Icon(Icons.account_tree, color: orangeC, size: 18),
+                  const SizedBox(width: 12),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('حالة COA', style: TextStyle(color: textDim, fontSize: 11)),
+                    const SizedBox(height: 4),
+                    Row(children: [
+                      Text(coaStatus,
+                          style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w600),
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      const SizedBox(width: 6),
+                      apexPill(coaStatus == 'معتمد' ? 'تم' : (coaStatus == 'قيد المراجعة' ? 'جارٍ' : 'بانتظار'),
+                          color: coaStatus == 'معتمد' ? greenC : (coaStatus == 'قيد المراجعة' ? orangeC : textDim)),
+                    ]),
+                  ])),
+                ]),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -250,9 +280,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: borderColor),
+          color: AC.navy2,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: const Offset(0, 3))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,10 +305,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: navyMid,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: borderColor),
+                      decoration: apexSelectableDecoration(
+                        isSelected: s.clickable,
+                        activeColor: sColor,
                       ),
                       child: Column(
                         children: [
@@ -286,16 +315,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                               textAlign: TextAlign.center,
                               style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w600)),
                           const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: sColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(99),
-                              border: Border.all(color: sColor.withValues(alpha: 0.2)),
-                            ),
-                            child: Text(sLabel,
-                                style: TextStyle(color: sColor, fontSize: 10, fontWeight: FontWeight.w600)),
-                          ),
+                          apexPill(sLabel, color: sColor),
                         ],
                       ),
                     ),
@@ -336,55 +356,26 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [gold.withValues(alpha: 0.12), Colors.transparent],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
+      child: Column(
+        children: [
+          if (!hasCoA)
+            apexNoticeBanner(
+              title: 'خطوة مطلوبة',
+              text: 'لم يتم رفع شجرة الحسابات بعد — يرجى رفع الملف لبدء المسار المالي للعميل.',
+              tint: ApexTint.amber,
+            ),
+          ApexNextStepCard(
+            description: hasCoA ? 'متابعة رحلة شجرة الحسابات' : 'رفع شجرة الحسابات لبدء المسار المالي',
+            buttonLabel: hasCoA ? 'متابعة COA' : 'رفع COA',
+            icon: Icons.auto_awesome,
+            onPressed: () {
+              context.push('/coa/journey', extra: {
+                'clientId': '${widget.clientId}',
+                'clientName': widget.clientName,
+              });
+            },
           ),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: gold.withValues(alpha: 0.25)),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.auto_awesome, color: gold, size: 22),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('الخطوة التالية',
-                      style: TextStyle(color: gold, fontSize: 14, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 3),
-                  Text(
-                    hasCoA ? 'متابعة رحلة شجرة الحسابات' : 'رفع شجرة الحسابات لبدء المسار المالي',
-                    style: TextStyle(color: textMid, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            ElevatedButton.icon(
-              onPressed: () {
-                context.push('/coa/journey', extra: {
-                  'clientId': '${widget.clientId}',
-                  'clientName': widget.clientName,
-                });
-              },
-              icon: Icon(Icons.arrow_back, size: 14),
-              label: Text(hasCoA ? 'متابعة COA' : 'رفع COA'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: gold,
-                foregroundColor: navy,
-                textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -452,21 +443,29 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _infoCard('المعلومات الأساسية', [
-                  ('النوع', readinessData['type'] ?? 'شركة'),
-                  ('القطاع', readinessData['sector'] ?? 'التجزئة'),
-                  ('الحالة', 'نشط'),
-                  ('الموقع', 'الرياض'),
-                ]),
+                child: apexTintedCard(
+                  tint: ApexTint.blue,
+                  title: 'المعلومات الأساسية',
+                  children: [
+                    _infoRow('النوع', readinessData['type'] ?? 'شركة'),
+                    _infoRow('القطاع', readinessData['sector'] ?? 'التجزئة'),
+                    _infoRowWithPill('الحالة', 'نشط', greenC),
+                    _infoRow('الموقع', 'الرياض'),
+                  ],
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _infoCard('الاتصال والموقع', [
-                  ('البريد الإلكتروني', 'info@company.com'),
-                  ('الهاتف', '+966 11 123 4567'),
-                  ('العنوان', 'الرياض، المملكة العربية السعودية'),
-                  ('الموقع الجغرافي', '24.7136° N, 46.6753° E'),
-                ]),
+                child: apexTintedCard(
+                  tint: ApexTint.green,
+                  title: 'الاتصال والموقع',
+                  children: [
+                    _infoRow('البريد الإلكتروني', 'info@company.com'),
+                    _infoRow('الهاتف', '+966 11 123 4567'),
+                    _infoRow('العنوان', 'الرياض، المملكة العربية السعودية'),
+                    _infoRow('الموقع الجغرافي', '24.7136° N, 46.6753° E'),
+                  ],
+                ),
               ),
             ],
           ),
@@ -477,47 +476,39 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     );
   }
 
-  Widget _infoCard(String title, List<(String, String)> items) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style: TextStyle(color: goldLight, fontSize: 14, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 14),
-          ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(item.$1, style: TextStyle(color: textMid, fontSize: 12)),
-                Text(item.$2, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w500)),
-              ],
-            ),
-          )),
+          Text(label, style: TextStyle(color: textMid, fontSize: 12)),
+          Text(value, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRowWithPill(String label, String value, Color pillColor) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: textMid, fontSize: 12)),
+          apexPill(value, color: pillColor, filled: true),
         ],
       ),
     );
   }
 
   Widget _buildReadinessFlow() {
-    final steps = [
-      ('تهيئة', 0), ('المستندات', 1), ('جاهز لـ COA', 2), ('COA جارية', 3), ('جاهز لـ TB', 4),
-    ];
-    final currentIdx = 1; // documents_pending
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
+        color: AC.navy2,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: const Offset(0, 3))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -525,47 +516,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           Text('مسار الجاهزية',
               style: TextStyle(color: goldLight, fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
-          Row(
-            children: steps.asMap().entries.map((entry) {
-              final idx = entry.key;
-              final step = entry.value;
-              final isCompleted = idx < currentIdx;
-              final isCurrent = idx == currentIdx;
-              final color = isCompleted ? greenC : (isCurrent ? gold : textDim);
-
-              return Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 36, height: 36,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isCompleted ? greenC : (isCurrent ? gold : navyMid),
-                              border: Border.all(color: color, width: 2),
-                            ),
-                            child: Center(
-                              child: isCompleted
-                                  ? Icon(Icons.check, color: Colors.white, size: 16)
-                                  : Text('${idx + 1}',
-                                      style: TextStyle(color: isCurrent ? navy : textDim, fontSize: 12, fontWeight: FontWeight.w700)),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(step.$1,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: color, fontSize: 10, fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w400)),
-                        ],
-                      ),
-                    ),
-                    if (idx < steps.length - 1)
-                      Container(width: 20, height: 2, color: isCompleted ? greenC : borderColor),
-                  ],
-                ),
-              );
-            }).toList(),
+          apexStepFlow(
+            steps: ['تهيئة', 'المستندات', 'جاهز لـ COA', 'COA جارية', 'جاهز لـ TB'],
+            currentStep: 1,
           ),
         ],
       ),
@@ -615,17 +568,21 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
             ],
           ),
           const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: pct,
-              backgroundColor: navyMid,
-              valueColor: AlwaysStoppedAnimation<Color>(pct >= 1.0 ? greenC : gold),
-              minHeight: 6,
-            ),
+          apexGradientProgress(
+            value: pct,
+            label: 'نسبة الاكتمال',
+            startColor: pct >= 1.0 ? greenC : null,
+            endColor: pct >= 1.0 ? greenC : null,
           ),
           const SizedBox(height: 20),
           ...documentsData.map((doc) => _documentCard(doc)),
+          ApexTableLegend(items: [
+            MapEntry('مقبول', greenC),
+            MapEntry('مرفوع', blueC),
+            MapEntry('مرفوض', redC),
+            MapEntry('منتهي', orangeC),
+            MapEntry('مفقود', textDim),
+          ]),
         ],
       ),
     );
@@ -642,9 +599,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isMissing ? gold.withValues(alpha: 0.3) : borderColor),
+        color: AC.navy2,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: const Offset(0, 3))],
+        border: isMissing ? Border.all(color: gold.withValues(alpha: 0.3)) : null,
       ),
       child: Row(
         children: [
@@ -692,32 +650,13 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           ),
           const SizedBox(width: 8),
           // Per-document action button
-          SizedBox(
-            height: 32,
-            child: isMissing
-              ? ElevatedButton.icon(
-                  onPressed: () => _uploadDocForType(doc['name']),
-                  icon: const Icon(Icons.upload_file, size: 14),
-                  label: Text('\u0631\u0641\u0639', style: const TextStyle(fontSize: 11)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: gold,
-                    foregroundColor: navy,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                )
-              : OutlinedButton.icon(
-                  onPressed: () => _viewDoc(doc['name']),
-                  icon: Icon(isUploaded ? Icons.visibility : Icons.refresh, size: 14, color: gold),
-                  label: Text(isUploaded ? '\u0639\u0631\u0636' : '\u0625\u0639\u0627\u062f\u0629',
-                    style: TextStyle(fontSize: 11, color: gold)),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: gold.withValues(alpha: 0.4)),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-          ),
+          isMissing
+            ? apexPrimaryButton('رفع', () => _uploadDocForType(doc['name']), icon: Icons.upload_file)
+            : apexSecondaryButton(
+                isUploaded ? 'عرض' : 'إعادة',
+                () => _viewDoc(doc['name']),
+                icon: isUploaded ? Icons.visibility : Icons.refresh,
+              ),
         ],
       ),
     );
@@ -737,9 +676,9 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('جاري رفع ${file.name}...'),
-            backgroundColor: const Color(0xFF1A2536)));
+            backgroundColor: navy));
       }
-      
+
       // Upload to API
       final res = await ApiService.uploadDocument(widget.clientId, docName, file.bytes!, file.name);
       if (res.success) {
@@ -747,7 +686,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('تم رفع ${file.name} بنجاح'),
-              backgroundColor: const Color(0xFF1A2536)));
+              backgroundColor: navy));
         }
       } else {
         throw Exception(res.error ?? 'خطأ في الرفع');
@@ -756,7 +695,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('خطأ في الرفع: $e'),
-            backgroundColor: const Color(0xFF1A2536)));
+            backgroundColor: navy));
       }
     }
   }
@@ -767,7 +706,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
         Navigator.pop(ctx);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('جاري رفع $docName ($format)...'),
-          backgroundColor: const Color(0xFF1A2536),
+          backgroundColor: navy,
         ));
       },
       borderRadius: BorderRadius.circular(12),
@@ -790,7 +729,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   void _viewDoc(String docName) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('عرض $docName — قريباً'),
-      backgroundColor: const Color(0xFF1A2536),
+      backgroundColor: navy,
     ));
   }
 
@@ -816,24 +755,20 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
                 filled: true, fillColor: navyMid, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none))),
             const SizedBox(height: 20),
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: Text('إلغاء', style: TextStyle(color: textMid))),
+              apexSecondaryButton('إلغاء', () => Navigator.pop(ctx)),
               const SizedBox(width: 12),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: gold, foregroundColor: navy),
-                onPressed: () async {
+              apexPrimaryButton('حفظ', () async {
                   Navigator.pop(ctx);
                   try {
                     await ApiService.updateClient(widget.clientId, {'name_ar': nameCtrl.text, 'sector': sectorCtrl.text});
                     _loadReadiness();
                     if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('تم التحديث بنجاح'), backgroundColor: Color(0xFF1A2536)));
+                      SnackBar(content: Text('تم التحديث بنجاح'), backgroundColor: navy));
                   } catch (_) {
                     if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('خطأ في التحديث'), backgroundColor: Color(0xFF1A2536)));
+                      SnackBar(content: Text('خطأ في التحديث'), backgroundColor: navy));
                   }
-                },
-                child: const Text('حفظ', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
+                }),
             ]),
           ]),
         ),
@@ -887,54 +822,49 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          ...services.map((s) => Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: cardBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderColor),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48, height: 48,
-                  decoration: BoxDecoration(
-                    color: s.color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(s.icon, color: s.color, size: 22),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          ...services.map((s) {
+            final tint = s.color == greenC ? ApexTint.green
+                : s.color == blueC ? ApexTint.blue
+                : s.color == orangeC ? ApexTint.amber
+                : s.color == purpleC ? ApexTint.violet
+                : ApexTint.amber;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: apexTintedCard(
+                tint: tint,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Text(s.label, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
-                          const SizedBox(width: 8),
-                          Text(s.labelEn, style: TextStyle(color: textDim, fontSize: 11)),
-                        ],
+                      Container(
+                        width: 48, height: 48,
+                        decoration: BoxDecoration(
+                          color: s.color.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(s.icon, color: s.color, size: 22),
                       ),
-                      const SizedBox(height: 4),
-                      Text(s.desc, style: TextStyle(color: textDim, fontSize: 11)),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Text(s.label, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
+                              const SizedBox(width: 8),
+                              Text(s.labelEn, style: TextStyle(color: textDim, fontSize: 11)),
+                            ]),
+                            const SizedBox(height: 4),
+                            Text(s.desc, style: TextStyle(color: textDim, fontSize: 11)),
+                          ],
+                        ),
+                      ),
+                      apexPill(s.status, color: s.color),
                     ],
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: s.color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(99),
-                    border: Border.all(color: s.color.withValues(alpha: 0.2)),
-                  ),
-                  child: Text(s.status,
-                      style: TextStyle(color: s.color, fontSize: 10, fontWeight: FontWeight.w600)),
-                ),
-              ],
-            ),
-          )),
+                ],
+              ),
+            );
+          }),
 
           const SizedBox(height: 16),
           // Financial pathway
@@ -945,68 +875,19 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   }
 
   Widget _buildFinancialPathway() {
-    final steps = [
-      ('جمع الوثائق', 'تم', greenC),
-      ('المراجعة المالية', 'جارية', gold),
-      ('إعداد الميزانية', 'قيد الانتظار', textDim),
-      ('الإقفال النهائي', 'قيد الانتظار', textDim),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('مسار السنة المالية',
-              style: TextStyle(color: goldLight, fontSize: 14, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 16),
-          ...steps.map((step) {
-            final isCompleted = step.$2 == 'تم';
-            final isActive = step.$2 == 'جارية';
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: Row(
-                children: [
-                  Container(
-                    width: 28, height: 28,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: step.$3.withValues(alpha: isCompleted ? 1.0 : 0.15),
-                      border: Border.all(color: step.$3, width: 2),
-                    ),
-                    child: Center(
-                      child: isCompleted
-                          ? Icon(Icons.check, color: Colors.white, size: 14)
-                          : (isActive
-                              ? Icon(Icons.play_arrow, color: gold, size: 14)
-                              : null),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(step.$1,
-                        style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w600)),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: step.$3.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                    child: Text(step.$2,
-                        style: TextStyle(color: step.$3, fontSize: 10, fontWeight: FontWeight.w600)),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('مسار السنة المالية',
+            style: TextStyle(color: goldLight, fontSize: 14, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 12),
+        ApexChecklist(items: [
+          ApexCheckItem('جمع الوثائق', CheckStatus.done),
+          ApexCheckItem('المراجعة المالية', CheckStatus.pending),
+          ApexCheckItem('إعداد الميزانية', CheckStatus.blocked),
+          ApexCheckItem('الإقفال النهائي', CheckStatus.blocked),
+        ]),
+      ],
     );
   }
 
@@ -1025,54 +906,13 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
-        children: activities.asMap().entries.map((entry) {
-          final idx = entry.key;
-          final a = entry.value;
-          final isLast = idx == activities.length - 1;
-
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                children: [
-                  Container(
-                    width: 38, height: 38,
-                    decoration: BoxDecoration(
-                      color: a.$5.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(a.$4, color: a.$5, size: 16),
-                  ),
-                  if (!isLast)
-                    Container(width: 2, height: 40, color: borderColor),
-                ],
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 4, bottom: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(a.$1,
-                                style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
-                          ),
-                          Text(a.$3, style: TextStyle(color: textDim, fontSize: 11)),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(a.$2, style: TextStyle(color: textDim, fontSize: 11)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        }).toList(),
+        children: activities.map((a) => apexFeedItem(
+          title: a.$1,
+          subtitle: a.$2,
+          time: a.$3,
+          icon: a.$4,
+          accentColor: a.$5,
+        )).toList(),
       ),
     );
   }

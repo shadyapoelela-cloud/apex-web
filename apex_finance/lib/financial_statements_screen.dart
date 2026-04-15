@@ -27,9 +27,9 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
   static Color get _border => AC.bdr;
   static Color get _textPrimary => AC.tp;
   static Color get _textSecondary => AC.ts;
-  static const _success = Color(0xFF2ECC8A);
-  static const _cyan = Color(0xFF00C2E0);
-  static const _danger = Color(0xFFE05050);
+  static Color get _success => AC.ok;
+  static Color get _cyan => AC.cyan;
+  static Color get _danger => AC.err;
 
   Map<String, dynamic> get _data => widget.apiData?['data'] ?? {};
 
@@ -110,7 +110,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
     } catch (e) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('خطأ: $e'), backgroundColor: Colors.red));
+        content: Text('خطأ: $e'), backgroundColor: _danger));
     } finally {
       setState(() { _loadingPdf = false; _loadingExcel = false; });
     }
@@ -262,7 +262,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: _cyan.withValues(alpha: 0.3))),
           child: Row(children: [
-            const Icon(Icons.info_outline, color: _cyan, size: 18),
+            Icon(Icons.info_outline, color: _cyan, size: 18),
             const SizedBox(width: 10),
             Expanded(child: Text(
               'التدفقات النقدية محسوبة بطريقة غير المباشرة بناءً على بيانات ميزان المراجعة',
@@ -306,19 +306,19 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
           child: Container(
             width: double.infinity, height: 54,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2ECC8A), Color(0xFF1A8C5C)]),
+              gradient: LinearGradient(
+                colors: [_success, _success.withValues(alpha: 0.7)]),
               borderRadius: BorderRadius.circular(14),
               boxShadow: [BoxShadow(
                 color: _success.withValues(alpha: 0.3),
                 blurRadius: 16, offset: const Offset(0, 4))]),
-            child: const Center(child: Row(
+            child: Center(child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.analytics_rounded, color: Colors.white, size: 20),
-                SizedBox(width: 8),
+                Icon(Icons.analytics_rounded, color: AC.btnFg, size: 20),
+                const SizedBox(width: 8),
                 Text('التحليل المالي الكامل',
-                  style: TextStyle(color: Colors.white, fontSize: 16,
+                  style: TextStyle(color: AC.btnFg, fontSize: 16,
                     fontWeight: FontWeight.w700, fontFamily: 'Tajawal')),
               ])))),
       ]));

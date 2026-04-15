@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../core/session.dart';
+import '../../core/ui_components.dart';
 import '../../api_service.dart';
 import '../../providers/app_providers.dart';
 
@@ -95,7 +96,7 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
   Widget _sectionCard(String title, IconData icon, List<Widget> children) => Container(
     margin: EdgeInsets.only(bottom: 14),
     padding: EdgeInsets.all(16),
-    decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.bdr)),
+    decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         Icon(icon, color: AC.gold, size: 20),
@@ -140,10 +141,6 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
 
   Widget _editButton(String text, {VoidCallback? onTap}) => Padding(
     padding: EdgeInsets.only(top: 6),
-    child: SizedBox(width: double.infinity, child: OutlinedButton(
-      onPressed: onTap ?? () {},
-      style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),
-      child: Text(text, style: TextStyle(color: AC.gold, fontSize: 12)),
-    )),
+    child: SizedBox(width: double.infinity, child: apexSecondaryButton(text, onTap ?? () {})),
   );
 }

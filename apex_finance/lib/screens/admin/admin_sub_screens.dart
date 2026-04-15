@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
@@ -10,7 +11,7 @@ InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
 
 Widget _card(String t, List<Widget> c, {Color? accent}) => Container(
   margin: EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(16),
-  decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14), border: Border.all(color: accent ?? AC.bdr)),
+  decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     Text(t, style: TextStyle(color: accent ?? AC.gold, fontWeight: FontWeight.bold, fontSize: 15)),
     Divider(color: AC.bdr, height: 18), ...c]));
@@ -54,7 +55,7 @@ class _RevCS extends State<ReviewerConsoleScreen> {
               selected: _filter == f, onSelected: (_) => setState(()=> _filter = f),
               label: Text(f == 'all' ? '\u0627\u0644\u0643\u0644' : f == 'submitted' ? '\u0645\u0642\u062f\u0645\u0629' : f == 'under_review' ? '\u0642\u064a\u062f \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629' : f == 'accepted' ? '\u0645\u0642\u0628\u0648\u0644\u0629' : '\u0645\u0631\u0641\u0648\u0636\u0629',
                 style: TextStyle(color: _filter == f ? AC.navy : AC.tp, fontSize: 12)),
-              selectedColor: AC.gold, backgroundColor: AC.navy3,
+              selectedColor: AC.gold, backgroundColor: AC.navy2,
               side: BorderSide(color: _filter == f ? AC.gold : AC.bdr)))).toList())),
         // Items list
         Expanded(child: _filtered.isEmpty ?
@@ -67,7 +68,7 @@ class _RevCS extends State<ReviewerConsoleScreen> {
               final item = _filtered[i];
               final status = item['status'] ?? 'submitted';
               return Container(margin: EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+                decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Expanded(child: Text(item['title']??'', style: TextStyle(color: AC.tp, fontWeight: FontWeight.bold, fontSize: 14))),
@@ -129,7 +130,7 @@ class _PVS extends State<ProviderVerificationScreen> {
           final p = _provs[i];
           final vStatus = p['verification_status'] ?? 'pending';
           return Container(margin: EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+            decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 CircleAvatar(backgroundColor: AC.navy4, radius: 20,
@@ -192,7 +193,7 @@ class _PMS extends State<PolicyManagementScreen> {
         itemBuilder: (_, i) {
           final p = _policies[i];
           return Container(margin: EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+            decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Icon(_policyIcon(p['policy_type']??''), color: AC.gold, size: 24),
@@ -259,7 +260,7 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),
-      appBar: AppBar(title: Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('الشروط والأحكام'), backgroundColor: AC.navy, foregroundColor: AC.tp),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -291,13 +292,13 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
           ElevatedButton(
             onPressed: _allAccepted && !_loading ? _submit : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _allAccepted ? AC.gold : Colors.grey,
+              backgroundColor: _allAccepted ? AC.gold : AC.ts,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: _loading
-              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('أوافق وأتابع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AC.btnFg))
+              : Text('أوافق وأتابع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AC.btnFg)),
           ),
         ]),
       ),
@@ -309,9 +310,9 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white, borderRadius: BorderRadius.circular(12),
+        color: AC.navy2, borderRadius: BorderRadius.circular(18),
         border: Border.all(color: value ? AC.gold : Color(0xFFE0E0E0), width: value ? 2 : 1),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: const Offset(0, 3))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -319,11 +320,11 @@ class _LegalAcceptanceScreenState extends State<LegalAcceptanceScreen> {
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1B2A4A))),
-            Text(version, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+            Text(version, style: TextStyle(color: AC.td, fontSize: 12)),
           ])),
         ]),
         const SizedBox(height: 8),
-        Text(desc, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+        Text(desc, style: TextStyle(color: AC.ts, fontSize: 13)),
         SizedBox(height: 12),
         Row(children: [
           Checkbox(value: value, onChanged: onChanged, activeColor: AC.gold),
@@ -371,7 +372,7 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),
-      appBar: AppBar(title: Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('اختيار نوع العميل'), backgroundColor: AC.navy, foregroundColor: AC.tp),
       body: Column(children: [
         Container(
           width: double.infinity, padding: const EdgeInsets.all(16), color: const Color(0xFFF0F4FF),
@@ -388,8 +389,9 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
               return Container(
                 margin: EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(12),
+                  color: AC.navy2, borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: selected ? AC.gold : Color(0xFFE0E0E0), width: selected ? 2 : 1),
+                  boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))],
                 ),
                 child: ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -398,10 +400,10 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
                     child: Icon(t['icon'] as IconData, color: selected ? AC.gold : AC.navy, size: 24),
                   ),
                   title: Text(t['name'] as String, style: TextStyle(
-                    fontWeight: FontWeight.bold, color: selected ? AC.navy : Colors.black87)),
+                    fontWeight: FontWeight.bold, color: selected ? AC.navy : AC.tp)),
                   subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const SizedBox(height: 4),
-                    Text(t['desc'] as String, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    Text(t['desc'] as String, style: TextStyle(fontSize: 12, color: AC.ts)),
                     if (t['km'] == true) ...[
                       const SizedBox(height: 4),
                       Container(
@@ -425,11 +427,11 @@ class _ClientTypeSelectionScreenState extends State<ClientTypeSelectionScreen> {
           child: ElevatedButton(
             onPressed: _selected != null ? () => widget.onSelected(_selected!) : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _selected != null ? AC.gold : Colors.grey,
+              backgroundColor: _selected != null ? AC.gold : AC.ts,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('تأكيد واستمرار', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            child: Text('تأكيد واستمرار', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AC.btnFg)),
           ),
         ),
       ]),
@@ -461,7 +463,7 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
 
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),
-      appBar: AppBar(title: Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('مستندات التحقق'), backgroundColor: AC.navy, foregroundColor: AC.tp),
       body: Column(children: [
         Container(
           width: double.infinity, padding: const EdgeInsets.all(16),
@@ -487,8 +489,9 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : const Color(0xFFE0E0E0)),
+                  color: AC.navy2, borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: doc['uploaded'] == true ? AC.ok : const Color(0xFFE0E0E0)),
+                  boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))],
                 ),
                 child: Row(children: [
                   CircleAvatar(
@@ -500,18 +503,18 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
                       Text(doc['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      if (doc['required'] == true) const Text(' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      if (doc['required'] == true) Text(' *', style: TextStyle(color: AC.err, fontWeight: FontWeight.bold)),
                     ]),
                     Text(doc['uploaded'] == true ? 'تم الرفع — قيد المراجعة' : 'لم يتم الرفع',
-                      style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : Colors.grey)),
+                      style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? AC.ok : AC.ts)),
                   ])),
                   ElevatedButton.icon(
                     onPressed: () => setState(() => _docs[i] = {...doc, 'uploaded': true}),
                     icon: Icon(doc['uploaded'] == true ? Icons.refresh : Icons.upload_file, size: 16),
                     label: Text(doc['uploaded'] == true ? 'تحديث' : 'رفع', style: TextStyle(fontSize: 12)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: doc['uploaded'] == true ? Colors.grey[200] : AC.navy,
-                      foregroundColor: doc['uploaded'] == true ? Colors.black87 : Colors.white,
+                      backgroundColor: doc['uploaded'] == true ? AC.navy4 : AC.navy,
+                      foregroundColor: doc['uploaded'] == true ? AC.tp : AC.tp,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                   ),
@@ -521,16 +524,24 @@ class _ProviderDocumentUploadScreenState extends State<ProviderDocumentUploadScr
           ),
         ),
         Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ApexTableLegend(items: [
+            MapEntry('تم الرفع', AC.ok),
+            MapEntry('لم يتم الرفع', AC.ts),
+            MapEntry('إلزامي', AC.err),
+          ]),
+        ),
+        Padding(
           padding: const EdgeInsets.all(16),
           child: ElevatedButton(
             onPressed: uploadedRequired == requiredCount ? () => Navigator.pop(context) : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: uploadedRequired == requiredCount ? AC.gold : Colors.grey,
+              backgroundColor: uploadedRequired == requiredCount ? AC.gold : AC.ts,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(uploadedRequired == requiredCount ? 'إرسال للمراجعة' : 'أكمل رفع المستندات الإلزامية',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AC.btnFg)),
           ),
         ),
       ]),
@@ -575,8 +586,8 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
       backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text('مستندات المهمة'),
-        backgroundColor: AC.navy, foregroundColor: Colors.white,
-        bottom: TabBar(controller: _tabs, indicatorColor: AC.gold, labelColor: Colors.white, tabs: [
+        backgroundColor: AC.navy, foregroundColor: AC.tp,
+        bottom: TabBar(controller: _tabs, indicatorColor: AC.gold, labelColor: AC.tp, tabs: [
           Tab(text: 'المدخلات ($inputsDone/${_inputs.length})'),
           Tab(text: 'المخرجات ($outputsDone/${_outputs.length})'),
         ]),
@@ -594,11 +605,18 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: inputsDone == _inputs.length ? const Color(0xFF2ECC8A) : const Color(0xFFFF9800),
+                color: inputsDone == _inputs.length ? AC.ok : const Color(0xFFFF9800),
                 borderRadius: BorderRadius.circular(8)),
               child: Text(inputsDone == _inputs.length ? 'مكتمل' : 'ناقص',
-                style: const TextStyle(color: Colors.white, fontSize: 11)),
+                style: TextStyle(color: AC.tp, fontSize: 11)),
             ),
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ApexTableLegend(items: [
+            MapEntry('تم الرفع', AC.ok),
+            MapEntry('مطلوب', AC.err),
           ]),
         ),
         Expanded(
@@ -621,24 +639,25 @@ class _TaskDocumentScreenState extends State<TaskDocumentScreen> with SingleTick
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : const Color(0xFFFFCDD2)),
+            color: AC.navy2, borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: doc['uploaded'] == true ? AC.ok : const Color(0xFFFFCDD2)),
+            boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.15), blurRadius: 10, offset: Offset(0, 2))],
           ),
           child: Row(children: [
             Icon(doc['uploaded'] == true ? Icons.check_circle : Icons.error_outline,
-              color: doc['uploaded'] == true ? const Color(0xFF2ECC8A) : const Color(0xFFD32F2F)),
+              color: doc['uploaded'] == true ? AC.ok : const Color(0xFFD32F2F)),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(doc['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
               Text(doc['uploaded'] == true ? 'تم الرفع: ${doc['date']}' : 'مطلوب — لم يتم الرفع',
-                style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? Colors.green : Colors.red)),
+                style: TextStyle(fontSize: 12, color: doc['uploaded'] == true ? AC.ok : AC.err)),
             ])),
             if (doc['uploaded'] != true)
               ElevatedButton.icon(
                 onPressed: () => setState(() => docs[i] = {...doc, 'uploaded': true, 'date': '2026-03-30'}),
                 icon: Icon(Icons.upload_file, size: 16),
                 label: Text('رفع'),
-                style: ElevatedButton.styleFrom(backgroundColor: AC.navy, foregroundColor: Colors.white),
+                style: ElevatedButton.styleFrom(backgroundColor: AC.navy, foregroundColor: AC.tp),
               ),
           ]),
         );
@@ -657,7 +676,7 @@ class ProviderComplianceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),
-      appBar: AppBar(title: Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('حالة الامتثال'), backgroundColor: AC.navy, foregroundColor: AC.tp),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -671,12 +690,12 @@ class ProviderComplianceScreen extends StatelessWidget {
             child: Column(children: [
               const Icon(Icons.verified, color: Color(0xFF2ECC8A), size: 48),
               const SizedBox(height: 12),
-              const Text('حالة الحساب: نشط', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('حالة الحساب: نشط', style: TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                decoration: BoxDecoration(color: const Color(0xFF2ECC8A), borderRadius: BorderRadius.circular(20)),
-                child: const Text('لا توجد مخالفات', style: TextStyle(color: Colors.white, fontSize: 13)),
+                decoration: BoxDecoration(color: AC.ok, borderRadius: BorderRadius.circular(20)),
+                child: Text('لا توجد مخالفات', style: TextStyle(color: AC.tp, fontSize: 13)),
               ),
             ]),
           ),
@@ -685,10 +704,10 @@ class ProviderComplianceScreen extends StatelessWidget {
           // Compliance Metrics
           const Text('مؤشرات الامتثال', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
-          _metricCard('المهام المكتملة', '12', Icons.task_alt, const Color(0xFF2ECC8A)),
-          _metricCard('المستندات المرفوعة', '8/8', Icons.description, const Color(0xFF2ECC8A)),
-          _metricCard('المخالفات', '0', Icons.warning, const Color(0xFF2ECC8A)),
-          _metricCard('التعليقات السابقة', '0', Icons.block, const Color(0xFF2ECC8A)),
+          _metricCard('المهام المكتملة', '12', Icons.task_alt, AC.ok),
+          _metricCard('المستندات المرفوعة', '8/8', Icons.description, AC.ok),
+          _metricCard('المخالفات', '0', Icons.warning, AC.ok),
+          _metricCard('التعليقات السابقة', '0', Icons.block, AC.ok),
           _metricCard('تقييم الأداء', '4.8/5', Icons.star, const Color(0xFFD4A843)),
 
           const SizedBox(height: 20),
@@ -696,12 +715,12 @@ class ProviderComplianceScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: AC.tp, borderRadius: BorderRadius.circular(12)),
             child: Column(children: [
               const Icon(Icons.check_circle, color: Color(0xFF2ECC8A), size: 40),
               const SizedBox(height: 8),
-              const Text('سجل نظيف', style: TextStyle(fontSize: 14, color: Colors.grey)),
-              const Text('لا توجد مخالفات أو تعليقات سابقة', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('سجل نظيف', style: TextStyle(fontSize: 14, color: AC.ts)),
+              Text('لا توجد مخالفات أو تعليقات سابقة', style: TextStyle(fontSize: 12, color: AC.ts)),
             ]),
           ),
         ]),
@@ -713,7 +732,7 @@ class ProviderComplianceScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.15), blurRadius: 10, offset: Offset(0, 2))]),
       child: Row(children: [
         Icon(icon, color: color, size: 20),
         const SizedBox(width: 12),
@@ -735,7 +754,7 @@ class ActivityHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final activities = [
       {'action': 'تحليل مالي', 'detail': 'رفع ميزان مراجعة - retail', 'time': 'اليوم 11:30', 'icon': Icons.analytics, 'color': const Color(0xFF1B2A4A)},
-      {'action': 'تحميل تقرير PDF', 'detail': 'تقرير التحليل المالي', 'time': 'اليوم 11:45', 'icon': Icons.picture_as_pdf, 'color': const Color(0xFF2ECC8A)},
+      {'action': 'تحميل تقرير PDF', 'detail': 'تقرير التحليل المالي', 'time': 'اليوم 11:45', 'icon': Icons.picture_as_pdf, 'color': AC.ok},
       {'action': 'إنشاء عميل', 'detail': 'شركة التقنية المتقدمة', 'time': 'أمس 14:00', 'icon': Icons.person_add, 'color': const Color(0xFFD4A843)},
       {'action': 'طلب خدمة', 'detail': 'مسك دفاتر - شهري', 'time': 'أمس 15:30', 'icon': Icons.shopping_cart, 'color': const Color(0xFF9C27B0)},
       {'action': 'ملاحظة معرفية', 'detail': 'تحسين تبويب الإيرادات', 'time': '28 مارس', 'icon': Icons.lightbulb, 'color': const Color(0xFFFF9800)},
@@ -743,7 +762,7 @@ class ActivityHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),
-      appBar: AppBar(title: Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: Colors.white),
+      appBar: AppBar(title: Text('سجل النشاط'), backgroundColor: AC.navy, foregroundColor: AC.tp),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: activities.length,
@@ -752,7 +771,7 @@ class ActivityHistoryScreen extends StatelessWidget {
           return Container(
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.15), blurRadius: 10, offset: Offset(0, 2))]),
             child: Row(children: [
               CircleAvatar(
                 backgroundColor: (a['color'] as Color).withValues(alpha: 0.1),
@@ -762,9 +781,9 @@ class ActivityHistoryScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(a['action'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                Text(a['detail'] as String, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text(a['detail'] as String, style: TextStyle(fontSize: 12, color: AC.ts)),
               ])),
-              Text(a['time'] as String, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+              Text(a['time'] as String, style: TextStyle(fontSize: 11, color: AC.td)),
             ]),
           );
         },
@@ -809,7 +828,7 @@ class _ResultDetailPanelS extends State<ResultDetailPanel> {
   
   @override Widget build(BuildContext c) => Container(
     padding: EdgeInsets.all(16),
-    decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12)),
+    decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
     child: _loading 
       ? Center(child: CircularProgressIndicator(color: AC.gold))
       : _detail == null 
@@ -914,7 +933,7 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
       });
       if (res.success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('\u062a\u0645 \u0631\u0641\u0639 $docName'), backgroundColor: const Color(0xFF2ECC8A)));
+          SnackBar(content: Text('\u062a\u0645 \u0631\u0641\u0639 $docName'), backgroundColor: AC.ok));
         _load();
       }
     } catch (e) { /* handle */ }
@@ -931,7 +950,7 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
         : ListView(padding: EdgeInsets.all(16), children: [
             // Task type header
             Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(
-              color: AC.navy2, borderRadius: BorderRadius.circular(12)),
+              color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(_taskType!['name_ar'] ?? '', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
@@ -965,8 +984,9 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
       margin: EdgeInsets.only(bottom: 8),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AC.navy3, borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: uploaded ? Color(0xFF2ECC8A) : (mandatory ? Color(0x33F39C12) : AC.navy4))),
+        color: AC.navy2, borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: uploaded ? Color(0xFF2ECC8A) : (mandatory ? Color(0x33F39C12) : AC.navy4)),
+        boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.12), blurRadius: 8, offset: Offset(0, 2))]),
       child: Row(children: [
         Icon(uploaded ? Icons.check_circle : (isInput ? Icons.upload_file : Icons.download),
           color: uploaded ? Color(0xFF2ECC8A) : AC.gold, size: 24),
@@ -996,7 +1016,7 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
     final progress = total > 0 ? done / total : 0.0;
     
     return Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(
-      color: AC.navy2, borderRadius: BorderRadius.circular(12)),
+      color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
       child: Column(children: [
         Text('\u0627\u0644\u062a\u0642\u062f\u0645: $done / $total \u0645\u0633\u062a\u0646\u062f \u0625\u0644\u0632\u0627\u0645\u064a',
           style: TextStyle(color: AC.tp, fontSize: 14)),
@@ -1009,7 +1029,7 @@ class _TaskDocMgmtS extends State<TaskDocumentManagementScreen> {
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.check, size: 18),
             label: const Text('\u062c\u0645\u064a\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a \u0645\u0643\u062a\u0645\u0644\u0629'),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2ECC8A), foregroundColor: Colors.white)),
+            style: ElevatedButton.styleFrom(backgroundColor: AC.ok, foregroundColor: AC.tp)),
       ]));
   }
 }
@@ -1056,7 +1076,7 @@ class _TaskTypesBrowserS extends State<TaskTypesBrowserScreen> {
             final outputs = tt['output_requirements'] ?? tt['output_documents'] ?? [] as List? ?? [];
             return Container(
               margin: EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.15), blurRadius: 10, offset: Offset(0, 2))]),
               child: ExpansionTile(
                 tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 iconColor: AC.gold, collapsedIconColor: AC.ts,
@@ -1159,8 +1179,9 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
               return Container(
                 margin: EdgeInsets.only(bottom: 10),
                 padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(12),
-                  border: Border(right: BorderSide(color: statusColor, width: 3))),
+                decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18),
+                  border: Border(right: BorderSide(color: statusColor, width: 3)),
+                  boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.15), blurRadius: 10, offset: Offset(0, 2))]),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Icon(Icons.lightbulb_outline, color: statusColor, size: 20),
@@ -1229,7 +1250,7 @@ class _AuditLogS extends State<AuditLogScreen> {
               return Container(
                 margin: EdgeInsets.only(bottom: 8),
                 padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.15), blurRadius: 10, offset: Offset(0, 2))]),
                 child: Row(children: [
                   Icon(_actionIcon(e['action'] ?? ''), color: AC.cyan, size: 20),
                   SizedBox(width: 12),

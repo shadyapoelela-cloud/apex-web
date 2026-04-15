@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 class ArchiveScreen extends StatefulWidget {
   final String? clientId;
@@ -70,10 +71,10 @@ class _ArchiveS extends State<ArchiveScreen> {
                 ]));
             })),
           Padding(padding: EdgeInsets.all(12), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            IconButton(icon: Icon(Icons.chevron_right, color: AC.ts),
+            ApexIconButton(icon: Icons.chevron_right, color: AC.ts,
               onPressed: _page > 1 ? () { setState(() => _page--); _load(); } : null),
             Text('صفحة ' + _page.toString(), style: TextStyle(color: AC.ts)),
-            IconButton(icon: Icon(Icons.chevron_left, color: AC.ts),
+            ApexIconButton(icon: Icons.chevron_left, color: AC.ts,
               onPressed: _total > _page * 20 ? () { setState(() => _page++); _load(); } : null),
           ])),
         ]),

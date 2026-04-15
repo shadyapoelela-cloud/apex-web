@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 class CopilotScreen extends StatefulWidget {
   final String? clientId;
@@ -188,8 +189,10 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
       appBar: AppBar(
         backgroundColor: AC.navy2,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: AC.ts, size: 18),
+        leading: ApexIconButton(
+          icon: Icons.arrow_back_ios_new,
+          color: AC.ts,
+          size: 18,
           onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
         ),
         title: Row(children: [
@@ -364,8 +367,8 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
       child: Container(
         width: 155, padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AC.navy3, borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AC.bdr),
+          color: AC.navy2, borderRadius: BorderRadius.circular(18),
+          boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(emoji, style: TextStyle(fontSize: 24)),
@@ -393,13 +396,13 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
         padding: EdgeInsets.all(16),
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
         decoration: BoxDecoration(
-          color: isUser ? AC.gold.withValues(alpha: 0.12) : AC.navy3,
+          color: isUser ? AC.gold.withValues(alpha: 0.12) : AC.navy2,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16), topRight: Radius.circular(16),
-            bottomLeft: Radius.circular(isUser ? 16 : 4),
-            bottomRight: Radius.circular(isUser ? 4 : 16),
+            topLeft: Radius.circular(18), topRight: Radius.circular(18),
+            bottomLeft: Radius.circular(isUser ? 18 : 4),
+            bottomRight: Radius.circular(isUser ? 4 : 18),
           ),
-          border: Border.all(color: isUser ? AC.gold.withValues(alpha: 0.25) : AC.bdr),
+          boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.12), blurRadius: 10, offset: Offset(0, 2))],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // Header for assistant messages
@@ -695,8 +698,8 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AC.navy.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AC.bdr),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.10), blurRadius: 6, offset: Offset(0, 1))],
       ),
       child: Stack(children: [
         SingleChildScrollView(
@@ -733,8 +736,8 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
     child: Container(
       margin: EdgeInsets.only(bottom: 12), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AC.navy3, borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AC.bdr),
+        color: AC.navy2, borderRadius: BorderRadius.circular(18),
+        boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.12), blurRadius: 10, offset: Offset(0, 2))],
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(Icons.smart_toy, color: AC.gold, size: 14),
@@ -801,9 +804,9 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
               decoration: InputDecoration(
                 hintText: 'اسأل Apex Copilot أي شيء...',
                 hintStyle: TextStyle(color: AC.ts, fontSize: 13),
-                filled: true, fillColor: AC.navy3,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(color: AC.gold.withValues(alpha: 0.5))),
+                filled: true, fillColor: AC.navy2,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: AC.gold.withValues(alpha: 0.5))),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
               ),
               onSubmitted: (_) => _sendMessage(),
@@ -818,8 +821,10 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
               borderRadius: BorderRadius.circular(18),
               boxShadow: [BoxShadow(color: AC.gold.withValues(alpha: 0.3), blurRadius: 8, offset: Offset(0, 2))],
             ),
-            child: IconButton(
-              icon: Icon(_loading ? Icons.hourglass_top : Icons.send_rounded, color: AC.navy, size: 20),
+            child: ApexIconButton(
+              icon: _loading ? Icons.hourglass_top : Icons.send_rounded,
+              color: AC.navy,
+              size: 20,
               onPressed: _loading ? null : () => _sendMessage(),
             ),
           ),

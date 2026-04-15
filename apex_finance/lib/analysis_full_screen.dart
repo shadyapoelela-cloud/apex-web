@@ -22,10 +22,10 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
   static Color get _border => AC.bdr;
   static Color get _textPrimary => AC.tp;
   static Color get _textSecondary => AC.ts;
-  static const _success = Color(0xFF2ECC8A);
-  static const _warning = Color(0xFFF0A500);
-  static const _danger = Color(0xFFE05050);
-  static const _cyan = Color(0xFF00C2E0);
+  static Color get _success => AC.ok;
+  static Color get _warning => AC.warn;
+  static Color get _danger => AC.err;
+  static Color get _cyan => AC.cyan;
 
   final _tabs = ['الربحية', 'السيولة', 'الكفاءة', 'الرفع المالي', 'التدفقات'];
 
@@ -203,7 +203,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: _success.withValues(alpha: 0.3))),
               child: Text(_label,
-                style: const TextStyle(fontSize: 12, color: _success, fontFamily: 'Tajawal'))),
+                style: TextStyle(fontSize: 12, color: _success, fontFamily: 'Tajawal'))),
           ])),
         ]),
         SizedBox(height: 16),
@@ -342,7 +342,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
                 borderRadius: BorderRadius.circular(2),
                 child: LinearProgressIndicator(
                   value: score / 100, minHeight: 6,
-                  backgroundColor: Colors.white.withValues(alpha: 0.06),
+                  backgroundColor: AC.tp.withValues(alpha: 0.06),
                   valueColor: AlwaysStoppedAnimation(color)))),
             ]),
             const SizedBox(height: 8),
@@ -357,7 +357,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.03),
+                  color: AC.tp.withValues(alpha: 0.03),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: _border)),
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -366,7 +366,7 @@ class _AnalysisFullScreenState extends State<AnalysisFullScreen>
                     style: TextStyle(fontSize: 11, color: _textSecondary,
                       fontFamily: 'Tajawal', height: 1.5))),
                   const SizedBox(width: 6),
-                  const Icon(Icons.info_outline, color: _cyan, size: 14),
+                  Icon(Icons.info_outline, color: _cyan, size: 14),
                 ])),
             ],
           ]));
@@ -383,11 +383,11 @@ class _RingPainter extends CustomPainter {
     final center = Offset(s.width / 2, s.height / 2);
     final r = s.width / 2 - 6;
     c.drawCircle(center, r,
-      Paint()..color = const Color(0xFFC9A84C).withValues(alpha: 0.1)
+      Paint()..color = AC.gold.withValues(alpha: 0.1)
         ..strokeWidth = 8..style = PaintingStyle.stroke);
     c.drawArc(Rect.fromCircle(center: center, radius: r),
       -1.5707963, 2 * 3.14159 * v, false,
-      Paint()..color = const Color(0xFFC9A84C)..strokeWidth = 8
+      Paint()..color = AC.gold..strokeWidth = 8
         ..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
   }
   @override

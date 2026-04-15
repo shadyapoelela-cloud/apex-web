@@ -1,6 +1,7 @@
 ﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api_service.dart';
 import '../core/session.dart';
+import '../core/theme.dart';
 
 // ── Auth State ──
 class AuthState {
@@ -69,16 +70,31 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) => Aut
 // ── Theme & Language State ──
 class AppSettingsState {
   final bool isDarkMode;
+  final String themeId;
   final String language; // 'ar' or 'en'
-  const AppSettingsState({this.isDarkMode = true, this.language = 'ar'});
-  AppSettingsState copyWith({bool? isDarkMode, String? language}) =>
-    AppSettingsState(isDarkMode: isDarkMode ?? this.isDarkMode, language: language ?? this.language);
+  const AppSettingsState({this.isDarkMode = false, this.themeId = 'original_light', this.language = 'ar'});
+  AppSettingsState copyWith({bool? isDarkMode, String? themeId, String? language}) =>
+    AppSettingsState(isDarkMode: isDarkMode ?? this.isDarkMode, themeId: themeId ?? this.themeId, language: language ?? this.language);
 }
 
 class AppSettingsNotifier extends StateNotifier<AppSettingsState> {
   AppSettingsNotifier() : super(const AppSettingsState());
 
-  void toggleDarkMode(bool v) => state = state.copyWith(isDarkMode: v);
+  void toggleDarkMode(bool v) {
+    // Switch to same family but opposite mode
+    final family = themeFamilyOf(state.themeId);
+    final newId = themeIdFor(family, v);
+    state = state.copyWith(isDarkMode: v, themeId: newId);
+  }
+
+  void setTheme(String id) => state = state.copyWith(themeId: id);
+
+  /// Set theme by family — picks light or dark variant based on current mode
+  void setThemeFamily(String familyId) {
+    final isDark = state.themeId.endsWith('_dark');
+    state = state.copyWith(themeId: themeIdFor(familyId, isDark));
+  }
+
   void setLanguage(String lang) => state = state.copyWith(language: lang);
 }
 

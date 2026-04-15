@@ -37,11 +37,34 @@ import '../coa_upload_screen.dart';
 import '../coa_mapping_screen.dart';
 import '../coa_quality_screen.dart';
 import '../coa_review_screen.dart';
+import '../screens/simulation/financial_simulation_screen.dart';
+import '../screens/simulation/compliance_check_screen.dart';
+import '../screens/simulation/roadmap_screen.dart';
+import '../screens/simulation/trial_balance_screen.dart';
 import '../tb_binding_screen.dart';
 import '../financial_statements_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
+
+/// Smooth page transition — fade + subtle slide
+CustomTransitionPage<void> _apexPage(Widget child, GoRouterState state) =>
+    CustomTransitionPage(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 280),
+      reverseTransitionDuration: const Duration(milliseconds: 220),
+      transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        return FadeTransition(
+          opacity: curved,
+          child: SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0.0, 0.02), end: Offset.zero).animate(curved),
+            child: child,
+          ),
+        );
+      },
+    );
 
 final appRouter = GoRouter(
   refreshListenable: authRefresh,
@@ -49,165 +72,183 @@ final appRouter = GoRouter(
   // redirect: disabled for now - auth handled in login screen,
     routes: [
     // Auth
-    GoRoute(path: '/login', builder: (c, s) => const SlideAuthScreen()),
+    GoRoute(path: '/login', pageBuilder: (c, s) => _apexPage(const SlideAuthScreen(), s)),
     // GoRoute(path: '/login-old', builder: (c, s) => const LoginScreen()),
-    GoRoute(path: '/register', builder: (c, s) => const RegScreen()),
-    GoRoute(path: '/forgot-password', builder: (c, s) => const ForgotPasswordScreen()),
+    GoRoute(path: '/register', pageBuilder: (c, s) => _apexPage(const RegScreen(), s)),
+    GoRoute(path: '/forgot-password', pageBuilder: (c, s) => _apexPage(const ForgotPasswordScreen(), s)),
 
     // Main app (with bottom nav)
-    GoRoute(path: '/home', builder: (c, s) => const MainNav()),
+    GoRoute(path: '/home', pageBuilder: (c, s) => _apexPage(const MainNav(), s)),
 
     // Account
-    GoRoute(path: '/profile/edit', builder: (c, s) => EditProfileScreen(profile: s.extra as Map<String, dynamic>? ?? {})),
-    GoRoute(path: '/password/change', builder: (c, s) => const ChangePasswordScreen()),
-    GoRoute(path: '/account/close', builder: (c, s) => const CloseAccountScreen()),
-    GoRoute(path: '/account/sessions', builder: (c, s) => const SessionsScreen()),
-    GoRoute(path: '/account/activity', builder: (c, s) => const ActivityHistoryScreen()),
+    GoRoute(path: '/profile/edit', pageBuilder: (c, s) => _apexPage(EditProfileScreen(profile: s.extra as Map<String, dynamic>? ?? {}), s)),
+    GoRoute(path: '/password/change', pageBuilder: (c, s) => _apexPage(const ChangePasswordScreen(), s)),
+    GoRoute(path: '/account/close', pageBuilder: (c, s) => _apexPage(const CloseAccountScreen(), s)),
+    GoRoute(path: '/account/sessions', pageBuilder: (c, s) => _apexPage(const SessionsScreen(), s)),
+    GoRoute(path: '/account/activity', pageBuilder: (c, s) => _apexPage(const ActivityHistoryScreen(), s)),
 
     // Subscription
-    GoRoute(path: '/subscription', builder: (c, s) => const SubscriptionScreen()),
-    GoRoute(path: '/plans/compare', builder: (c, s) => const PlanComparisonScreen()),
+    GoRoute(path: '/subscription', pageBuilder: (c, s) => _apexPage(const SubscriptionScreen(), s)),
+    GoRoute(path: '/plans/compare', pageBuilder: (c, s) => _apexPage(const PlanComparisonScreen(), s)),
 
     // Notifications
-    GoRoute(path: '/notifications', builder: (c, s) => const NotificationCenterScreenV2()),
-    GoRoute(path: '/notifications/prefs', builder: (c, s) => const NotificationPrefsScreen()),
+    GoRoute(path: '/notifications', pageBuilder: (c, s) => _apexPage(const NotificationCenterScreenV2(), s)),
+    GoRoute(path: '/notifications/prefs', pageBuilder: (c, s) => _apexPage(const NotificationPrefsScreen(), s)),
 
     // Legal
-    GoRoute(path: '/legal', builder: (c, s) => LegalDocumentsScreenV2()),
+    GoRoute(path: '/legal', pageBuilder: (c, s) => _apexPage(LegalDocumentsScreenV2(), s)),
 
     // Clients
-    GoRoute(path: '/clients', builder: (c, s) => const ClientListScreen()),
+    GoRoute(path: '/clients', pageBuilder: (c, s) => _apexPage(const ClientListScreen(), s)),
 
     // Archive
-    GoRoute(path: '/archive', builder: (c, s) => archive.ArchiveScreen(token: S.token ?? '')),
+    GoRoute(path: '/archive', pageBuilder: (c, s) => _apexPage(archive.ArchiveScreen(token: S.token ?? ''), s)),
 
     // Knowledge
-    GoRoute(path: '/knowledge/feedback', builder: (c, s) => const KnowledgeFeedbackScreen()),
-    GoRoute(path: '/knowledge/console', builder: (c, s) => const KnowledgeDeveloperConsole()),
+    GoRoute(path: '/knowledge/feedback', pageBuilder: (c, s) => _apexPage(const KnowledgeFeedbackScreen(), s)),
+    GoRoute(path: '/knowledge/console', pageBuilder: (c, s) => _apexPage(const KnowledgeDeveloperConsole(), s)),
 
     // Tasks
-    GoRoute(path: '/tasks/types', builder: (c, s) => const TaskTypesBrowserScreen()),
+    GoRoute(path: '/tasks/types', pageBuilder: (c, s) => _apexPage(const TaskTypesBrowserScreen(), s)),
 
     // Admin
-    GoRoute(path: '/admin/reviewer', builder: (c, s) => const ReviewerConsoleScreen()),
-    GoRoute(path: '/admin/providers/verify', builder: (c, s) => const ProviderVerificationScreen()),
-    GoRoute(path: '/admin/providers/documents', builder: (c, s) => const ProviderDocumentUploadScreen()),
-    GoRoute(path: '/admin/providers/compliance', builder: (c, s) => const ProviderComplianceScreen()),
-    GoRoute(path: '/admin/policies', builder: (c, s) => const PolicyManagementScreen()),
-    GoRoute(path: '/provider-kanban', builder: (c, s) => const ProviderKanbanScreen()),
-    GoRoute(path: '/client-detail', builder: (c, s) { final args = s.extra as Map<String,dynamic>? ?? {}; return ClientDetailScreen(clientId: args['id'] ?? '', clientName: args['name'] ?? ''); }),
-    GoRoute(path: '/legal-acceptance', builder: (c, s) => const LegalAcceptanceLogger()),
-    GoRoute(path: '/compliance-detail', builder: (c, s) => const ProviderComplianceDetailScreen()),
-    GoRoute(path: '/coa-tree', builder: (c, s) => const CoaTreeScreen()),
-    GoRoute(path: '/settings', builder: (c, s) => const EnhancedSettingsScreen()),
-    GoRoute(path: '/dashboard', builder: (c, s) => const EnhancedDashboard()),
-    GoRoute(path: '/audit-workflow', builder: (c, s) => const AuditWorkflowScreen()),
-    GoRoute(path: '/knowledge-brain', builder: (c, s) => const KnowledgeBrainScreen()),
-    GoRoute(path: '/financial-ops', builder: (c, s) => const FinancialOpsScreen()),
-    GoRoute(path: '/copilot', builder: (c, s) => const CopilotScreen()),
-    GoRoute(path: '/admin/audit', builder: (c, s) => const AuditLogScreen()),
+    GoRoute(path: '/admin/reviewer', pageBuilder: (c, s) => _apexPage(const ReviewerConsoleScreen(), s)),
+    GoRoute(path: '/admin/providers/verify', pageBuilder: (c, s) => _apexPage(const ProviderVerificationScreen(), s)),
+    GoRoute(path: '/admin/providers/documents', pageBuilder: (c, s) => _apexPage(const ProviderDocumentUploadScreen(), s)),
+    GoRoute(path: '/admin/providers/compliance', pageBuilder: (c, s) => _apexPage(const ProviderComplianceScreen(), s)),
+    GoRoute(path: '/admin/policies', pageBuilder: (c, s) => _apexPage(const PolicyManagementScreen(), s)),
+    GoRoute(path: '/provider-kanban', pageBuilder: (c, s) => _apexPage(const ProviderKanbanScreen(), s)),
+    GoRoute(path: '/client-detail', pageBuilder: (c, s) { final args = s.extra as Map<String,dynamic>? ?? {}; return _apexPage(ClientDetailScreen(clientId: args['id'] ?? '', clientName: args['name'] ?? ''), s); }),
+    GoRoute(path: '/legal-acceptance', pageBuilder: (c, s) => _apexPage(const LegalAcceptanceLogger(), s)),
+    GoRoute(path: '/compliance-detail', pageBuilder: (c, s) => _apexPage(const ProviderComplianceDetailScreen(), s)),
+    GoRoute(path: '/coa-tree', pageBuilder: (c, s) => _apexPage(const CoaTreeScreen(), s)),
+    GoRoute(path: '/settings', pageBuilder: (c, s) => _apexPage(const EnhancedSettingsScreen(), s)),
+    GoRoute(path: '/dashboard', pageBuilder: (c, s) => _apexPage(const EnhancedDashboard(), s)),
+    GoRoute(path: '/audit-workflow', pageBuilder: (c, s) => _apexPage(const AuditWorkflowScreen(), s)),
+    GoRoute(path: '/knowledge-brain', pageBuilder: (c, s) => _apexPage(const KnowledgeBrainScreen(), s)),
+    GoRoute(path: '/financial-ops', pageBuilder: (c, s) => _apexPage(const FinancialOpsScreen(), s)),
+    GoRoute(path: '/copilot', pageBuilder: (c, s) => _apexPage(const CopilotScreen(), s)),
+    GoRoute(path: '/admin/audit', pageBuilder: (c, s) => _apexPage(const AuditLogScreen(), s)),
 
     // ─── COA Workflow ───
-    GoRoute(path: '/upload', builder: (c, s) => const UploadScreen()),
-    GoRoute(path: '/coa/upload', builder: (c, s) {
+    GoRoute(path: '/upload', pageBuilder: (c, s) => _apexPage(const UploadScreen(), s)),
+    GoRoute(path: '/coa/upload', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return CoaUploadScreen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? '');
+      return _apexPage(CoaUploadScreen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
     }),
-    GoRoute(path: '/coa/mapping', builder: (c, s) {
+    GoRoute(path: '/coa/mapping', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return CoaMappingScreen(
+      return _apexPage(CoaMappingScreen(
         uploadData: args['uploadData'] as Map<String, dynamic>? ?? {},
         clientId: args['clientId'] ?? '',
         clientName: args['clientName'] ?? '',
         pickedFile: args['pickedFile'] as PlatformFile,
-      );
+      ), s);
     }),
-    GoRoute(path: '/coa/quality', builder: (c, s) {
+    GoRoute(path: '/coa/quality', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return CoaQualityScreen(
+      return _apexPage(CoaQualityScreen(
         uploadId: args['uploadId'] ?? '',
         clientId: args['clientId'] ?? '',
         clientName: args['clientName'] ?? '',
         assessData: args['assessData'] as Map<String, dynamic>? ?? {},
-      );
+      ), s);
     }),
-    GoRoute(path: '/coa/review', builder: (c, s) {
+    GoRoute(path: '/coa/review', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return CoaReviewScreen(
+      return _apexPage(CoaReviewScreen(
         uploadId: args['uploadId'] ?? '',
         clientId: args['clientId'] ?? '',
         clientName: args['clientName'] ?? '',
-      );
+      ), s);
+    }),
+
+    // ─── Simulation ───
+    GoRoute(path: '/coa/financial-simulation', pageBuilder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return _apexPage(FinancialSimulationScreen(uploadId: args['uploadId'] ?? '', clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
+    }),
+    GoRoute(path: '/coa/compliance-check', pageBuilder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return _apexPage(ComplianceCheckScreen(uploadId: args['uploadId'] ?? '', clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
+    }),
+    GoRoute(path: '/coa/roadmap', pageBuilder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return _apexPage(RoadmapScreen(uploadId: args['uploadId'] ?? '', clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
+    }),
+    GoRoute(path: '/coa/trial-balance-check', pageBuilder: (c, s) {
+      final args = s.extra as Map<String, dynamic>? ?? {};
+      return _apexPage(TrialBalanceCheckScreen(uploadId: args['uploadId'] ?? '', clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
     }),
 
     // ─── TB Binding ───
-    GoRoute(path: '/tb/binding', builder: (c, s) {
+    GoRoute(path: '/tb/binding', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return TbBindingScreen(tbUploadId: args['tbUploadId'] ?? '', coaUploadId: args['coaUploadId']);
+      return _apexPage(TbBindingScreen(tbUploadId: args['tbUploadId'] ?? '', coaUploadId: args['coaUploadId']), s);
     }),
 
     // ─── Analysis & Statements ───
-    GoRoute(path: '/analysis/full', builder: (c, s) {
+    GoRoute(path: '/analysis/full', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>?;
-      return AnalysisFullScreen(
+      return _apexPage(AnalysisFullScreen(
         apiData: args?['apiData'] as Map<String, dynamic>?,
         pickedFile: args?['pickedFile'] as PlatformFile?,
-      );
+      ), s);
     }),
-    GoRoute(path: '/analysis/result', builder: (c, s) {
+    GoRoute(path: '/analysis/result', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>?;
-      return AnalysisResultScreen(
+      return _apexPage(AnalysisResultScreen(
         apiData: args?['apiData'] as Map<String, dynamic>?,
         pickedFile: args?['pickedFile'],
-      );
+      ), s);
     }),
-    GoRoute(path: '/financial-statements', builder: (c, s) {
+    GoRoute(path: '/financial-statements', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>?;
-      return FinancialStatementsScreen(
+      return _apexPage(FinancialStatementsScreen(
         apiData: args?['apiData'] as Map<String, dynamic>?,
         pickedFile: args?['pickedFile'] as PlatformFile?,
-      );
+      ), s);
     }),
 
     // ─── Detail Screens ───
-    GoRoute(path: '/service-request/detail', builder: (c, s) {
-      return ServiceRequestDetail(request: s.extra as Map<String, dynamic>? ?? {});
+    GoRoute(path: '/service-request/detail', pageBuilder: (c, s) {
+      return _apexPage(ServiceRequestDetail(request: s.extra as Map<String, dynamic>? ?? {}), s);
     }),
-    GoRoute(path: '/notification/detail', builder: (c, s) {
-      return NotificationDetailScreen(notification: s.extra as Map<String, dynamic>? ?? {});
+    GoRoute(path: '/notification/detail', pageBuilder: (c, s) {
+      return _apexPage(NotificationDetailScreen(notification: s.extra as Map<String, dynamic>? ?? {}), s);
     }),
-    GoRoute(path: '/provider/profile', builder: (c, s) {
-      return ProviderProfileScreen(provider: s.extra as Map<String, dynamic>? ?? {});
+    GoRoute(path: '/provider/profile', pageBuilder: (c, s) {
+      return _apexPage(ProviderProfileScreen(provider: s.extra as Map<String, dynamic>? ?? {}), s);
     }),
-    GoRoute(path: '/onboarding/wizard', builder: (c, s) {
+    GoRoute(path: '/onboarding/wizard', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>?;
-      return wizard.ClientOnboardingWizard(token: args?['token'] as String?);
+      return _apexPage(wizard.ClientOnboardingWizard(token: args?['token'] as String?), s);
     }),
-    GoRoute(path: '/coa/journey', builder: (c, s) {
+    GoRoute(path: '/coa/journey', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return CoaJourneyScreen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? '');
+      return _apexPage(CoaJourneyScreen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
     }),
-    GoRoute(path: '/service-catalog', builder: (c, s) {
+    GoRoute(path: '/service-catalog', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>?;
-      return catalog.ServiceCatalogScreen(clientId: args?['clientId'] as String?, token: args?['token'] as String?);
+      return _apexPage(catalog.ServiceCatalogScreen(clientId: args?['clientId'] as String?, token: args?['token'] as String?), s);
     }),
-    GoRoute(path: '/upgrade-plan', builder: (c, s) {
+    GoRoute(path: '/upgrade-plan', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return UpgradePlanScreen(plans: args['plans'] as List? ?? [], currentPlan: args['currentPlan'] as String?);
+      return _apexPage(UpgradePlanScreen(plans: args['plans'] as List? ?? [], currentPlan: args['currentPlan'] as String?), s);
     }),
-    GoRoute(path: '/knowledge/feedback-form', builder: (c, s) {
+    GoRoute(path: '/knowledge/feedback-form', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>?;
-      return KnowledgeFeedbackScreen(resultId: args?['resultId'] as String?);
+      return _apexPage(KnowledgeFeedbackScreen(resultId: args?['resultId'] as String?), s);
     }),
-    GoRoute(path: '/marketplace/new-request', builder: (c, s) => const NewServiceRequestScreen()),
-    GoRoute(path: '/clients/create', builder: (c, s) => const ClientCreateScreen2()),
-    GoRoute(path: '/audit/service', builder: (c, s) {
+    GoRoute(path: '/marketplace/new-request', pageBuilder: (c, s) => _apexPage(const NewServiceRequestScreen(), s)),
+    GoRoute(path: '/clients/create', pageBuilder: (c, s) => _apexPage(const ClientCreateScreen2(), s)),
+    GoRoute(path: '/audit/service', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return audit.AuditServiceScreen(
+      return _apexPage(audit.AuditServiceScreen(
         caseId: args['caseId'] ?? '',
         clientName: args['clientName'] ?? '',
         token: args['token'] as String?,
-      );
+      ), s);
     }),
   ],
 );

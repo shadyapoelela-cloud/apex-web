@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 import 'package:go_router/go_router.dart';
 
 class FinancialOpsScreen extends StatefulWidget {
@@ -71,14 +72,24 @@ class _FinOpsState extends State<FinancialOpsScreen> {
             Text(widget.clientName!, style: TextStyle(color: AC.ts, fontSize: 12)),
         ]),
         actions: [
-          IconButton(
-            icon: Icon(Icons.smart_toy, color: AC.gold),
+          ApexIconButton(
+            icon: Icons.smart_toy,
+            color: AC.gold,
             tooltip: 'Apex Copilot',
             onPressed: () => context.push('/copilot'),
           ),
         ],
       ),
       body: Column(children: [
+        // Hero Section
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+          child: ApexHeroSection(
+            title: '\u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0645\u0627\u0644\u064a\u0629',
+            description: '\u0625\u062f\u0627\u0631\u0629 \u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a \u0648\u0627\u0644\u0645\u064a\u0632\u0627\u0646 \u0648\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0648\u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0645\u0627\u0644\u064a\u0629',
+            icon: Icons.account_balance_rounded,
+          ),
+        ),
         // Section Tabs
         Container(
           height: 100,
@@ -106,11 +117,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       child: Container(
         width: 90,
         margin: EdgeInsets.only(left: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.15) : AC.navy3,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: isSelected ? color : AC.bdr, width: isSelected ? 1.5 : 1),
-        ),
+        decoration: apexSelectableDecoration(isSelected: isSelected, activeColor: color),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(section['icon'] as IconData, color: isSelected ? color : AC.ts, size: 26),
           SizedBox(height: 6),
@@ -170,6 +177,11 @@ class _FinOpsState extends State<FinancialOpsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('\u064a\u0631\u062c\u0649 \u0631\u0641\u0639 \u0645\u064a\u0632\u0627\u0646 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0623\u0648\u0644\u0627\u064b', style: TextStyle(fontFamily: 'Tajawal')), backgroundColor: Color(0xFFF0A500)));
       }),
       _stepCard(3, '\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0631\u0628\u0637', '\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0645\u0637\u0627\u0628\u0642\u0629 \u0648\u062d\u0644 \u0627\u0644\u062a\u0639\u0627\u0631\u0636\u0627\u062a', Icons.checklist, AC.ok, () {}),
+      ApexNextStepCard(
+        description: '\u0627\u0631\u0641\u0639 \u0645\u064a\u0632\u0627\u0646 \u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0644\u0631\u0628\u0637\u0647 \u0628\u0634\u062c\u0631\u0629 \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a',
+        buttonLabel: '\u0631\u0641\u0639 \u0627\u0644\u0645\u064a\u0632\u0627\u0646',
+        icon: Icons.balance_rounded,
+      ),
     ]);
   }
 
@@ -186,6 +198,12 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       }),
       _actionCard('\u0627\u0644\u0646\u0633\u0628 \u0627\u0644\u0645\u0627\u0644\u064a\u0629', '\u0633\u064a\u0648\u0644\u0629\u060c \u0631\u0628\u062d\u064a\u0629\u060c \u0643\u0641\u0627\u0621\u0629\u060c \u0631\u0627\u0641\u0639\u0629', Icons.pie_chart, AC.cyan, () {}),
       _actionCard('\u0627\u0644\u0645\u0642\u0627\u0631\u0646\u0629 \u0627\u0644\u062f\u0648\u0631\u064a\u0629', '\u0645\u0642\u0627\u0631\u0646\u0629 \u0628\u064a\u0646 \u0627\u0644\u0641\u062a\u0631\u0627\u062a', Icons.compare_arrows, AC.warn, () {}),
+      ApexNextStepCard(
+        description: '\u0627\u0628\u062f\u0623 \u0628\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0633\u0631\u064a\u0639 \u0644\u0644\u062d\u0635\u0648\u0644 \u0639\u0644\u0649 \u0646\u062a\u0627\u0626\u062c \u0641\u0648\u0631\u064a\u0629',
+        buttonLabel: '\u062a\u062d\u0644\u064a\u0644 \u0633\u0631\u064a\u0639',
+        icon: Icons.flash_on_rounded,
+        onPressed: () => context.push('/analysis/full'),
+      ),
     ]);
   }
 
@@ -207,6 +225,12 @@ class _FinOpsState extends State<FinancialOpsScreen> {
         context.push('/financial-statements');
       }),
       _actionCard('\u062a\u0635\u062f\u064a\u0631 PDF', '\u062a\u0635\u062f\u064a\u0631 \u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0643\u0645\u0644\u0641 PDF', Icons.picture_as_pdf, AC.err, () {}),
+      ApexNextStepCard(
+        description: '\u0627\u0639\u0631\u0636 \u0627\u0644\u0642\u0648\u0627\u0626\u0645 \u0627\u0644\u0645\u0627\u0644\u064a\u0629 \u0627\u0644\u0645\u0641\u0635\u0644\u0629 \u0644\u0644\u0639\u0645\u064a\u0644',
+        buttonLabel: '\u0639\u0631\u0636 \u0627\u0644\u0642\u0648\u0627\u0626\u0645',
+        icon: Icons.receipt_long_rounded,
+        onPressed: () => context.push('/financial-statements'),
+      ),
     ]);
   }
 
@@ -234,7 +258,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: EdgeInsets.all(14),
-        decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+        decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
         child: Row(children: [
           Container(
             width: 36, height: 36,
@@ -259,7 +283,7 @@ class _FinOpsState extends State<FinancialOpsScreen> {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: EdgeInsets.all(14),
-        decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+        decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
         child: Row(children: [
           Container(
             padding: const EdgeInsets.all(10),

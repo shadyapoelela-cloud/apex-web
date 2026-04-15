@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 class CoaTreeScreen extends StatefulWidget {
   final String? uploadId;
@@ -53,7 +54,7 @@ class _CoaTreeState extends State<CoaTreeScreen> {
           if (widget.clientName != null) Text(widget.clientName!, style: TextStyle(color: AC.ts, fontSize: 11)),
         ]),
         actions: [
-          IconButton(icon: Icon(_expanded.isEmpty ? Icons.unfold_more : Icons.unfold_less, color: AC.ts), onPressed: () {
+          ApexIconButton(icon: _expanded.isEmpty ? Icons.unfold_more : Icons.unfold_less, color: AC.ts, tooltip: 'توسيع/طي الشجرة', onPressed: () {
             setState(() { if (_expanded.isEmpty) { _expanded = _accounts.map((a) => a['account_code']?.toString() ?? '').toSet(); } else { _expanded.clear(); } });
           }),
         ],

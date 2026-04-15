@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 import '../../api_service.dart';
 
 class ServiceCatalogScreen extends StatefulWidget {
@@ -43,8 +44,8 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
             selected: _selectedCategory == e.key,
             selectedColor: AC.gold.withValues(alpha: 0.2),
             labelStyle: TextStyle(color: _selectedCategory == e.key ? AC.gold : AC.ts),
-            backgroundColor: AC.navy3,
-            side: BorderSide(color: _selectedCategory == e.key ? AC.gold : Colors.white12),
+            backgroundColor: AC.navy2,
+            side: BorderSide(color: _selectedCategory == e.key ? AC.gold : AC.bdr.withValues(alpha: 0.5)),
             onSelected: (_) { setState(() => _selectedCategory = e.key); _load(); },
           ))).toList())),
       Expanded(child: _loading
@@ -61,7 +62,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
                 return Container(
                   margin: EdgeInsets.only(bottom: 10),
                   padding: EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.bdr)),
+                  decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(18), boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))]),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
                       Expanded(child: Text(s['title_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
@@ -78,10 +79,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
                       _tag('ط§ظ„ط­ط¯ ط§ظ„ط£ط¯ظ†ظ‰: ' + minPlan, AC.ts),
                     ]),
                     SizedBox(height: 10),
-                    SizedBox(width: double.infinity, child: ElevatedButton(
-                      onPressed: () => _startService(s['service_code']),
-                      style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy),
-                      child: const Text('ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط©'))),
+                    SizedBox(width: double.infinity, child: apexPrimaryButton('ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط©', () => _startService(s['service_code']))),
                   ]),
                 );
               })),
@@ -96,16 +94,16 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
 
   Future<void> _startService(String code) async {
     if (widget.clientId == null || widget.clientId!.isEmpty) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('ظٹط±ط¬ظ‰ ط§ط®طھظٹط§ط± ط¹ظ…ظٹظ„ ط£ظˆظ„ط§ظ‹ ظ…ظ† طھط¨ظˆظٹط¨ ط§ظ„ط¹ظ…ظ„ط§ط،'),
-        backgroundColor: Colors.orange));
+        backgroundColor: AC.warn));
       return;
     }
     final res = await ApiService.createServiceCase(clientId: widget.clientId!, serviceCode: code);
     if (res.success) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('طھظ… ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط© ط¨ظ†ط¬ط§ط­'), backgroundColor: Colors.green));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('طھظ… ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط© ط¨ظ†ط¬ط§ط­'), backgroundColor: AC.ok));
     } else {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? 'ظپط´ظ„'), backgroundColor: Colors.red));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? 'ظپط´ظ„'), backgroundColor: AC.err));
     }
   }
 }

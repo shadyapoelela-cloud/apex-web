@@ -110,6 +110,12 @@ class ApiService {
   static Future<ApiResult> approveAccount(String accountId) => _post('/coa/approve/$accountId', {});
   static Future<ApiResult> getClassificationSummary(String uploadId) => _get('/coa/classification-summary/$uploadId');
 
+  // ── Simulation ──
+  static Future<ApiResult> getFinancialSimulation(String uploadId) => _get('/coa/uploads/$uploadId/financial-simulation');
+  static Future<ApiResult> getComplianceCheck(String uploadId) => _get('/coa/uploads/$uploadId/compliance-check');
+  static Future<ApiResult> getRoadmap(String uploadId) => _get('/coa/uploads/$uploadId/roadmap');
+  static Future<ApiResult> postTrialBalanceCheck(String uploadId, Map<String, dynamic> tb) => _post('/coa/uploads/$uploadId/trial-balance-check', tb);
+
   // ── TB ──
   static Future<ApiResult> uploadTb({required String clientId, required List<int> bytes, required String fileName, String? coaUploadId, String? periodLabel}) async {
     try {

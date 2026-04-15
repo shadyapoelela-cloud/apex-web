@@ -20,10 +20,10 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
   static Color get _surface => AC.navy2;
   static Color get _card    => AC.navy3;
   static Color get _gold    => AC.gold;
-  static const Color _cyan    = Color(0xFF00C2E0);
-  static Color _success = Color(0xFF2ECC8A);
-  static Color _danger  = Color(0xFFE05050);
-  static Color _warning = Color(0xFFE8A838);
+  static Color get _cyan    => AC.cyan;
+  static Color get _success => AC.ok;
+  static Color get _danger  => AC.err;
+  static Color get _warning => AC.warn;
   static Color get _border  => AC.bdr;
   static Color get _textPri => AC.tp;
   static Color get _textSec => AC.ts;
@@ -71,9 +71,9 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
       final r = await ApiService.approveBinding(widget.tbUploadId);
       if (r.success) {
         setState(() => _approved = true);
-        if (mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('✅ تم اعتماد الربط — جاهز للتحليل', style: TextStyle(fontFamily:'Tajawal')), backgroundColor: _success)); Navigator.of(context).pop({'approved': true}); }
-      } else { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('فشل الاعتماد'), backgroundColor: _danger)); }
-    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e'), backgroundColor: _danger)); }
+        if (mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('✅ تم اعتماد الربط — جاهز للتحليل', style: TextStyle(fontFamily:'Tajawal')), backgroundColor: _success, )); Navigator.of(context).pop({'approved': true}); }
+      } else { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('فشل الاعتماد'), backgroundColor: _danger,)); }
+    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: $e'), backgroundColor: _danger,)); }
     finally { setState(() => _approving = false); }
   }
 
@@ -97,11 +97,11 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
     Text('ربط ميزان المراجعة بشجرة الحسابات', textDirection:TextDirection.rtl, textAlign:TextAlign.center, style:TextStyle(fontSize:17, fontWeight:FontWeight.w700, color:AC.tp, fontFamily:'Tajawal')),
     SizedBox(height:10),
     Text('سيتم مطابقة كل حساب في الميزان بالحسابات المعتمدة في شجرة الحسابات تلقائياً', textDirection:TextDirection.rtl, textAlign:TextAlign.center, style:TextStyle(fontSize:13, color:AC.ts, fontFamily:'Tajawal', height:1.6)),
-    if (_errorMsg != null) ...[SizedBox(height:16), Container(padding:const EdgeInsets.all(12), decoration:BoxDecoration(color:_danger.withValues(alpha: 0.08), borderRadius:BorderRadius.circular(10), border:Border.all(color:_danger.withValues(alpha: 0.3))), child:Row(children:[const Icon(Icons.error_outline_rounded,color:Color(0xFFE05050),size:16),const SizedBox(width:8),Expanded(child:Text(_errorMsg!,textDirection:TextDirection.rtl,style:const TextStyle(fontSize:12,color:Color(0xFFE05050),fontFamily:'Tajawal')))]))],
+    if (_errorMsg != null) ...[SizedBox(height:16), Container(padding:const EdgeInsets.all(12), decoration:BoxDecoration(color:_danger.withValues(alpha: 0.08), borderRadius:BorderRadius.circular(10), border:Border.all(color:_danger.withValues(alpha: 0.3))), child:Row(children:[Icon(Icons.error_outline_rounded,color:_danger,size:16),const SizedBox(width:8),Expanded(child:Text(_errorMsg!,textDirection:TextDirection.rtl,style:TextStyle(fontSize:12,color:_danger,fontFamily:'Tajawal')))]))],
     SizedBox(height:28),
     GestureDetector(onTap: _loadingBind ? null : _runBinding,
       child: Container(width:double.infinity, height:54,
-        decoration: BoxDecoration(gradient:LinearGradient(colors:[AC.gold,Color(0xFF8B6F35)]), borderRadius:BorderRadius.circular(14), boxShadow:[BoxShadow(color:_gold.withValues(alpha: 0.3),blurRadius:16,offset:Offset(0,4))]),
+        decoration: BoxDecoration(gradient:LinearGradient(colors:[AC.gold,AC.gold.withValues(alpha: 0.7)]), borderRadius:BorderRadius.circular(14), boxShadow:[BoxShadow(color:_gold.withValues(alpha: 0.3),blurRadius:16,offset:Offset(0,4))]),
         child: Center(child: _loadingBind ? SizedBox(width:22,height:22,child:CircularProgressIndicator(color:AC.navy,strokeWidth:2.5))
           : Row(mainAxisAlignment:MainAxisAlignment.center, children:[Icon(Icons.link_rounded,color:AC.navy,size:20),SizedBox(width:8),Text('تشغيل الربط الآن',style:TextStyle(color:AC.navy,fontSize:15,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
   ])));
@@ -157,7 +157,7 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
                 child:Column(children:[
                   Row(children:[
                     Container(padding:EdgeInsets.symmetric(horizontal:7,vertical:2),decoration:BoxDecoration(color:color.withValues(alpha: 0.1),borderRadius:BorderRadius.circular(4),border:Border.all(color:color.withValues(alpha: 0.3))),child:Text(label,style:TextStyle(fontSize:10,color:color,fontFamily:'Tajawal',fontWeight:FontWeight.w600))),
-                    if(review)...[SizedBox(width:6),Container(padding:EdgeInsets.symmetric(horizontal:6,vertical:2),decoration:BoxDecoration(color:_warning.withValues(alpha: 0.08),borderRadius:BorderRadius.circular(4)),child:const Text('يحتاج مراجعة',style:TextStyle(fontSize:9,color:Color(0xFFE8A838),fontFamily:'Tajawal')))],
+                    if(review)...[SizedBox(width:6),Container(padding:EdgeInsets.symmetric(horizontal:6,vertical:2),decoration:BoxDecoration(color:_warning.withValues(alpha: 0.08),borderRadius:BorderRadius.circular(4)),child:Text('يحتاج مراجعة',style:TextStyle(fontSize:9,color:_warning,fontFamily:'Tajawal')))],
                     Spacer(),
                     Expanded(flex:3,child:Text(r['tb_account_name']??'—',textDirection:TextDirection.rtl,textAlign:TextAlign.end,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:13,fontWeight:FontWeight.w600,color:AC.tp,fontFamily:'Tajawal'))),
                   ]),
@@ -179,15 +179,15 @@ class _TbBindingScreenState extends State<TbBindingScreen> {
     final canApprove = pct >= 70;
     return Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(color:AC.navy2, border:Border(top:BorderSide(color:AC.bdr))),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        if (!canApprove) Padding(padding: const EdgeInsets.only(bottom:10), child: Row(children: [const Icon(Icons.info_outline_rounded,color:Color(0xFFE8A838),size:14),const SizedBox(width:6),const Expanded(child:Text('نسبة الربط أقل من 70% — يُنصح بمراجعة الحسابات غير المطابقة',textDirection:TextDirection.rtl,style:TextStyle(fontSize:11,color:Color(0xFFE8A838),fontFamily:'Tajawal')))])),
+        if (!canApprove) Padding(padding: const EdgeInsets.only(bottom:10), child: Row(children: [Icon(Icons.info_outline_rounded,color:_warning,size:14),const SizedBox(width:6),Expanded(child:Text('نسبة الربط أقل من 70% — يُنصح بمراجعة الحسابات غير المطابقة',textDirection:TextDirection.rtl,style:TextStyle(fontSize:11,color:_warning,fontFamily:'Tajawal')))])),
         GestureDetector(onTap: _approving ? null : _approveBinding,
           child: Container(width:double.infinity, height:52,
             decoration: BoxDecoration(
-              gradient: canApprove ? const LinearGradient(colors:[Color(0xFF2ECC8A),Color(0xFF1A8C5C)]) : const LinearGradient(colors:[Color(0xFF444444),Color(0xFF333333)]),
+              gradient: canApprove ? LinearGradient(colors:[_success,_success.withValues(alpha: 0.7)]) : LinearGradient(colors:[_border,_border.withValues(alpha: 0.7)]),
               borderRadius: BorderRadius.circular(14),
-              boxShadow: canApprove ? [BoxShadow(color:const Color(0xFF2ECC8A).withValues(alpha: 0.3),blurRadius:12,offset:const Offset(0,4))] : []),
-            child: Center(child: _approving ? SizedBox(width:22,height:22,child:CircularProgressIndicator(color:Colors.white,strokeWidth:2.5))
-              : Row(mainAxisAlignment:MainAxisAlignment.center, children:[Icon(Icons.check_circle_rounded,color:canApprove?Colors.white:Colors.white38,size:20),SizedBox(width:8),Text('اعتماد الربط والمتابعة للتحليل',style:TextStyle(color:canApprove?Colors.white:Colors.white38,fontSize:15,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
+              boxShadow: canApprove ? [BoxShadow(color:_success.withValues(alpha: 0.3),blurRadius:12,offset:const Offset(0,4))] : []),
+            child: Center(child: _approving ? SizedBox(width:22,height:22,child:CircularProgressIndicator(color:AC.btnFg,strokeWidth:2.5))
+              : Row(mainAxisAlignment:MainAxisAlignment.center, children:[Icon(Icons.check_circle_rounded,color:canApprove?AC.btnFg:AC.td,size:20),SizedBox(width:8),Text('اعتماد الربط والمتابعة للتحليل',style:TextStyle(color:canApprove?AC.btnFg:AC.td,fontSize:15,fontWeight:FontWeight.w700,fontFamily:'Tajawal'))])))),
       ]));
   }
 

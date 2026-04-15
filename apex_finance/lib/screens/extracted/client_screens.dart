@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/shared_constants.dart';
+import '../../core/ui_components.dart';
 
 // ── 1. Client List Screen ──
 class ClientListScreen extends StatefulWidget {
@@ -31,7 +32,7 @@ class _ClientListS extends State<ClientListScreen> {
   Widget build(BuildContext c) => Scaffold(
     backgroundColor: AC.navy,
     appBar: AppBar(title: Text('العملاء', style: TextStyle(color: AC.gold)),
-      actions: [IconButton(icon: Icon(Icons.add_circle, color: AC.gold),
+      actions: [ApexIconButton(icon: Icons.add_circle, color: AC.gold,
         onPressed: () async {
           final created = await context.push('/clients/create');
           if (created == true) _load();
@@ -64,9 +65,9 @@ class _ClientListS extends State<ClientListScreen> {
                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AC.navy3,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white12),
+                  color: AC.navy2,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))],
                 ),
                 child: Row(children: [
                   CircleAvatar(backgroundColor: AC.gold.withValues(alpha: 0.2),
@@ -136,14 +137,14 @@ class _ClientCreateS extends State<ClientCreateScreen> {
               height: 56,
               child: TextField(
                 controller: _nameC,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: AC.tp),
                 decoration: InputDecoration(
                   labelText: 'اسم الشركة *',
-                  labelStyle: TextStyle(color: Colors.white54),
+                  labelStyle: TextStyle(color: AC.td),
                   prefixIcon: Icon(Icons.business, color: AC.gold),
                   contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(8)),
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.bdr), borderRadius: BorderRadius.circular(8)),
                   focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(8)),
                 ),
               ),
@@ -186,16 +187,9 @@ class _ClientCreateS extends State<ClientCreateScreen> {
             child: SizedBox(
               height: 52,
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _ld ? null : _create,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AC.gold,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: _ld
-                    ? SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : Text('انشاء العميل', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
+              child: _ld
+                  ? Center(child: SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.gold)))
+                  : apexPrimaryButton('انشاء العميل', _ld ? null : _create),
             ),
           ),
         ],
@@ -211,11 +205,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
         height: 52,
         margin: EdgeInsets.only(bottom: 6),
         padding: EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: sel ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
-          border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1),
-          borderRadius: BorderRadius.circular(10),
-        ),
+        decoration: apexSelectableDecoration(isSelected: sel, activeColor: AC.gold),
         child: Row(
           children: [
             Icon(sel ? Icons.radio_button_checked : Icons.radio_button_off, color: sel ? AC.gold : AC.ts, size: 20),

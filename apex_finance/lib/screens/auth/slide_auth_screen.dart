@@ -75,7 +75,7 @@ class _SAS extends State<SlideAuthScreen> {
       body: SafeArea(child: Center(child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(vertical: 30, horizontal: 16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('APEX', style: TextStyle(color: AC.gold, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: 6)),
+          Text('APEX', style: TextStyle(color: AC.goldText, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: 6)),
           SizedBox(height: 4),
           Text('منصة التحليل المالي والحوكمة المعرفية — السوق السعودي', style: TextStyle(color: AC.ts, fontSize: 11)),
           SizedBox(height: 24),
@@ -102,7 +102,7 @@ class _SAS extends State<SlideAuthScreen> {
     child: AnimatedContainer(duration: Duration(milliseconds: 250),
       padding: EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(color: _pg == i ? AC.gold : Colors.transparent, borderRadius: BorderRadius.circular(10)),
-      child: Center(child: Text(l, style: TextStyle(color: _pg == i ? AC.navy : AC.ts, fontSize: 13, fontWeight: FontWeight.bold)))),
+      child: Center(child: Text(l, style: TextStyle(color: _pg == i ? AC.btnFg : AC.goldText, fontSize: 13, fontWeight: FontWeight.bold)))),
   ));
 
   Widget _loginForm() => Column(children: [
@@ -113,7 +113,7 @@ class _SAS extends State<SlideAuthScreen> {
     _pf(_lp, 'كلمة المرور', _lo, () => setState(() => _lo = !_lo), sub: _login),
     Align(alignment: Alignment.centerLeft, child: TextButton(
       onPressed: () => context.go('/forgot-password'),
-      child: Text('نسيت كلمة المرور؟', style: TextStyle(color: AC.gold, fontSize: 12)))),
+      child: Text('نسيت كلمة المرور؟', style: TextStyle(color: AC.goldText, fontSize: 12)))),
     const SizedBox(height: 6),
     _btn('تسجيل الدخول', _ll, _login),
     const SizedBox(height: 14), _orW(), const SizedBox(height: 10), _socW(),
@@ -152,20 +152,20 @@ class _SAS extends State<SlideAuthScreen> {
 
   Widget _tf(TextEditingController c, String l, IconData ic, {bool ltr = false}) => TextField(
     controller: c, style: TextStyle(color: AC.tp), textDirection: ltr ? TextDirection.ltr : null,
-    decoration: InputDecoration(labelText: l, prefixIcon: Icon(ic, color: AC.gold, size: 20),
+    decoration: InputDecoration(labelText: l, prefixIcon: Icon(ic, color: AC.goldText, size: 20),
       filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
       isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold))));
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.goldText))));
 
   Widget _pf(TextEditingController c, String l, bool o, VoidCallback t, {VoidCallback? sub}) => TextField(
     controller: c, obscureText: o, style: TextStyle(color: AC.tp),
-    decoration: InputDecoration(labelText: l, prefixIcon: Icon(Icons.lock_outlined, color: AC.gold, size: 20),
+    decoration: InputDecoration(labelText: l, prefixIcon: Icon(Icons.lock_outlined, color: AC.goldText, size: 20),
       suffixIcon: IconButton(icon: Icon(o ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20), onPressed: t),
       filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
       isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.gold))),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.goldText))),
     onSubmitted: sub != null ? (_) => sub() : null);
 
   Widget _btn(String l, bool ld, VoidCallback fn) => SizedBox(width: double.infinity, height: 46,
@@ -187,8 +187,8 @@ class _SAS extends State<SlideAuthScreen> {
 
   void _comingSoon(String provider) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('تسجيل الدخول عبر $provider سيكون متاحاً قريباً', style: const TextStyle(color: Colors.white)),
-      backgroundColor: const Color(0xFF2A2A3E),
+      content: Text('تسجيل الدخول عبر $provider سيكون متاحاً قريباً', style: TextStyle(color: AC.tp)),
+      backgroundColor: AC.navy3,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       duration: const Duration(seconds: 2),
@@ -199,7 +199,7 @@ class _SAS extends State<SlideAuthScreen> {
     Expanded(child: OutlinedButton.icon(onPressed: () => _comingSoon('Google'),
       style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-      icon: Icon(Icons.g_mobiledata, color: Colors.red, size: 22),
+      icon: Icon(Icons.g_mobiledata, color: AC.err, size: 22),
       label: Text('Google', style: TextStyle(color: AC.tp, fontSize: 11)))),
     SizedBox(width: 8),
     Expanded(child: OutlinedButton.icon(onPressed: () => _comingSoon('Apple'),

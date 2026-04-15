@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
   labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.gold, size: 20) : null,
@@ -52,8 +53,9 @@ class _EditPS extends State<EditProfileScreen> {
       TextField(controller: _city, decoration: _inp('\u0627\u0644\u0645\u062f\u064a\u0646\u0629', ic: Icons.location_city)),
       if(_e!=null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_e!, style: TextStyle(color: AC.err))),
       const SizedBox(height: 22),
-      SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_save,
-        child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062d\u0641\u0638 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a')))])));
+      SizedBox(width: double.infinity, child: _l
+        ? Center(child: CircularProgressIndicator(strokeWidth: 2, color: AC.gold))
+        : apexPrimaryButton('\u062d\u0641\u0638 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a', _l?null:_save))])));
 }
 
 // ═══════════════════════════════════════════════════
@@ -92,8 +94,9 @@ class _ChPwS extends State<ChangePasswordScreen> {
       TextField(controller: _new2, obscureText: true, decoration: _inp('\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', ic: Icons.lock_outline)),
       if(_e!=null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_e!, style: TextStyle(color: AC.err))),
       const SizedBox(height: 22),
-      SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_go,
-        child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u062a\u063a\u064a\u064a\u0631')))])));
+      SizedBox(width: double.infinity, child: _l
+        ? Center(child: CircularProgressIndicator(strokeWidth: 2, color: AC.gold))
+        : apexPrimaryButton('\u062a\u063a\u064a\u064a\u0631', _l?null:_go))])));
 }
 
 // ═══════════════════════════════════════════════════
@@ -131,8 +134,7 @@ class _CloseAS extends State<CloseAccountScreen> {
       SizedBox(height: 10),
       GestureDetector(onTap: ()=>setState(()=>_type='temporary'),
         child: Container(padding: EdgeInsets.all(14), margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(color: _type=='temporary'?AC.warn.withValues(alpha: 0.1):AC.navy3,
-            borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='temporary'?AC.warn:AC.bdr)),
+          decoration: apexSelectableDecoration(isSelected: _type=='temporary', activeColor: AC.warn),
           child: Row(children: [Icon(_type=='temporary'?Icons.radio_button_checked:Icons.radio_button_off,
             color: _type=='temporary'?AC.warn:AC.ts, size: 18), SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -140,8 +142,7 @@ class _CloseAS extends State<CloseAccountScreen> {
               Text('\u064a\u0645\u0643\u0646\u0643 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0641\u0639\u064a\u0644 \u0644\u0627\u062d\u0642\u0627\u064b', style: TextStyle(color: AC.ts, fontSize: 11))]))]))),
       GestureDetector(onTap: ()=>setState(()=>_type='permanent'),
         child: Container(padding: EdgeInsets.all(14),
-          decoration: BoxDecoration(color: _type=='permanent'?AC.err.withValues(alpha: 0.1):AC.navy3,
-            borderRadius: BorderRadius.circular(10), border: Border.all(color: _type=='permanent'?AC.err:AC.bdr)),
+          decoration: apexSelectableDecoration(isSelected: _type=='permanent', activeColor: AC.err),
           child: Row(children: [Icon(_type=='permanent'?Icons.radio_button_checked:Icons.radio_button_off,
             color: _type=='permanent'?AC.err:AC.ts, size: 18), SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -152,8 +153,8 @@ class _CloseAS extends State<CloseAccountScreen> {
       SizedBox(width: double.infinity, child: ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: AC.err),
         onPressed: _l?null:_go,
-        child: _l ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white) :
-          const Text('\u062a\u0623\u0643\u064a\u062f \u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', style: TextStyle(color: Colors.white))))])));
+        child: _l ? CircularProgressIndicator(strokeWidth: 2, color: AC.btnFg) :
+          Text('\u062a\u0623\u0643\u064a\u062f \u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', style: TextStyle(color: AC.btnFg))))])));
 }
 
 
@@ -186,7 +187,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
     final res = await ApiService.logoutAllSessions();
     if (res.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إنهاء جميع الجلسات'), backgroundColor: Colors.green));
+        SnackBar(content: Text('تم إنهاء جميع الجلسات'), backgroundColor: AC.ok));
       _load();
     }
   }
@@ -195,7 +196,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
     final res = await ApiService.logoutSession(id);
     if (res.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إنهاء الجلسة'), backgroundColor: Colors.green));
+        SnackBar(content: Text('تم إنهاء الجلسة'), backgroundColor: AC.ok));
       _load();
     }
   }
@@ -227,8 +228,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
                   margin: EdgeInsets.only(bottom: 12),
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AC.navy3, borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AC.bdr),
+                    color: AC.navy2, borderRadius: BorderRadius.circular(18),
+                    boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.18), blurRadius: 14, offset: Offset(0, 3))],
                   ),
                   child: Row(children: [
                     Icon(Icons.devices, color: AC.cyan, size: 32),
@@ -245,9 +246,10 @@ class _SessionsScreenState extends State<SessionsScreen> {
                           style: TextStyle(color: AC.ts, fontSize: 12)),
                       ],
                     )),
-                    IconButton(
+                    ApexIconButton(
+                      icon: Icons.close,
+                      color: AC.err,
                       onPressed: () => _logoutOne(s['id']),
-                      icon: Icon(Icons.close, color: AC.err),
                       tooltip: 'إنهاء الجلسة',
                     ),
                   ]),

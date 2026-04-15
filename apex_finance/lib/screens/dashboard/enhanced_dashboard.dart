@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 // ════════════════════════════════════════
 // ENHANCED DASHBOARD v5.3b — Live API (ApiService)
@@ -21,17 +22,18 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   static Color get navy => AC.navy;
   static Color get navyMid => AC.navy4;
   static Color get gold => AC.gold;
-  static Color get goldLight => Color(0xFFD4B96A);
+  static Color get goldLight => AC.goldLight;
+  static Color get iconGold => AC.iconAccent;
   static Color get textColor => AC.tp;
   static Color get textMid => AC.ts;
-  static Color get textDim => AC.isLight ? Color(0xFF9A917F) : Color(0xFF6B6355);
+  static Color get textDim => AC.td;
   static Color get cardBg => AC.navy3;
   static Color get borderColor => AC.bdr;
-  static const greenC = Color(0xFF34D399);
-  static const redC = Color(0xFFF87171);
-  static const blueC = Color(0xFF60A5FA);
-  static const orangeC = Color(0xFFFBBF24);
-  static const purpleC = Color(0xFFA78BFA);
+  static Color get greenC => AC.ok;
+  static Color get redC => AC.err;
+  static Color get blueC => AC.info;
+  static Color get orangeC => AC.warn;
+  static Color get purpleC => AC.purple;
 
   List<dynamic> _clients = [];
   bool _loading = true;
@@ -83,11 +85,16 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('مرحبًا بك في Apex',
-                          style: TextStyle(color: textColor, fontSize: 22, fontWeight: FontWeight.w800)),
-                      SizedBox(height: 4),
-                      Text('لوحة القيادة الرئيسية — نظرة سريعة على حالة العمليات',
-                          style: TextStyle(color: textMid, fontSize: 13)),
+                      apexContextBar(
+                        pills: ['العميل الحالي', 'المرحلة 1', 'الجاهزية: ${_clients.isEmpty ? 0 : ((_clients.where((c) => (c['coa_status'] ?? '').toString().toLowerCase() == 'approved' || (c['coa_status'] ?? '').toString().toLowerCase() == 'معتمد').length / _clients.length) * 100).toInt()}%'],
+                      ),
+                      ApexHeroSection(
+                        title: 'مرحبًا بك في Apex',
+                        description: 'لوحة القيادة الرئيسية — نظرة سريعة على حالة العمليات',
+                        icon: Icons.dashboard_rounded,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildNoticeBanners(),
                       const SizedBox(height: 24),
                       _buildKPIRow(),
                       const SizedBox(height: 24),
@@ -105,6 +112,12 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                       _buildNextStepCard(),
                       const SizedBox(height: 24),
                       _buildServiceStatusRow(),
+                      ApexTableLegend(items: [
+                        MapEntry('نشط', greenC),
+                        MapEntry('قيد المراجعة', orangeC),
+                        MapEntry('جاهز', blueC),
+                        MapEntry('قريبًا', textDim),
+                      ]),
                     ],
                   ),
                 ),
@@ -125,38 +138,24 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
       else if (s == 'review' || s == 'مراجعة' || s == 'in_progress') coaReview++;
       else if (s == 'ready' || s == 'جاهز') coaReady++;
     }
-    final kpis = [
-      _KPI('العملاء النشطون', '$total', total > 0 ? 'مسجلون في النظام' : 'لا يوجد عملاء', Icons.people_outline, blueC),
-      _KPI('شجرة معتمدة', '$coaApproved', 'من أصل $total', Icons.check_circle_outline, greenC),
-      _KPI('قيد المراجعة', '$coaReview', coaReview > 0 ? 'بانتظار قرار' : 'لا يوجد', Icons.schedule, orangeC),
-      _KPI('جاهز لـ TB', '$coaReady', coaReady > 0 ? '$coaReady عملاء' : 'بعد COA', Icons.track_changes, gold),
-    ];
-    return Row(
-      children: kpis.map((k) => Expanded(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 6),
-          child: Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 48, height: 48,
-                  decoration: BoxDecoration(color: k.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
-                  child: Icon(k.icon, color: k.color, size: 22),
-                ),
-                SizedBox(height: 14),
-                Text(k.value, style: TextStyle(color: k.color, fontSize: 32, fontWeight: FontWeight.w800)),
-                SizedBox(height: 4),
-                Text(k.label, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
-                SizedBox(height: 4),
-                Text(k.subtitle, style: TextStyle(color: textDim, fontSize: 11)),
-              ],
-            ),
-          ),
-        ),
-      )).toList(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossCount = constraints.maxWidth > 900 ? 4 : (constraints.maxWidth > 500 ? 2 : 1);
+        return GridView.count(
+          crossAxisCount: crossCount,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+          childAspectRatio: 1.7,
+          children: [
+            apexScoreCard(label: 'العملاء النشطون', value: '$total', subtitle: total > 0 ? 'مسجلون في النظام' : 'لا يوجد عملاء', tintColor: blueC, infoTip: 'عدد العملاء المسجلين والنشطين في المنصة حالياً'),
+            apexScoreCard(label: 'شجرة معتمدة', value: '$coaApproved', subtitle: 'من أصل $total', tintColor: greenC, valueColor: greenC, infoTip: 'عدد العملاء الذين تم اعتماد شجرة حساباتهم بنجاح'),
+            apexScoreCard(label: 'قيد المراجعة', value: '$coaReview', subtitle: coaReview > 0 ? 'بانتظار قرار' : 'لا يوجد', tintColor: orangeC, valueColor: orangeC, infoTip: 'شجرات حسابات بانتظار مراجعة واعتماد المراجع'),
+            apexScoreCard(label: 'جاهز لـ TB', value: '$coaReady', subtitle: coaReady > 0 ? '$coaReady عملاء' : 'بعد COA', tintColor: iconGold, valueColor: gold, infoTip: 'عملاء جاهزون لرفع ميزان المراجعة بعد اعتماد الشجرة'),
+          ],
+        );
+      },
     );
   }
 
@@ -164,62 +163,62 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   // QUICK ACTIONS
   // ════════════════════════════════════════
   Widget _buildQuickActions() {
-    final actions = [
-      _QAction('إنشاء عميل جديد', 'بدء معالج الإنشاء', Icons.add, gold, () {
-        if (widget.onCreateClient != null) widget.onCreateClient!();
-        else if (widget.onSwitchToClients != null) widget.onSwitchToClients!();
-      }),
-      _QAction('رفع شجرة حسابات', 'COA Upload', Icons.upload_file, blueC, () {
-        // v6.6: Use parent callback (checks top-bar client selection)
-        if (widget.onNavigateToCoa != null) {
-          widget.onNavigateToCoa!();
-        } else if (_clients.isNotEmpty) {
-          _navigateToCoa(_clients.first);
-        } else if (widget.onSwitchToClients != null) {
-          widget.onSwitchToClients!();
-        }
-      }),
-      _QAction('عرض العملاء', 'قائمة العملاء', Icons.visibility, greenC, () {
-        if (widget.onSwitchToClients != null) widget.onSwitchToClients!();
-      }),
-      _QAction('تحديث البيانات', 'إعادة تحميل', Icons.refresh, orangeC, _loadClients),
-    ];
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            Icon(Icons.flash_on, color: gold, size: 18),
-            SizedBox(width: 8),
-            Text('إجراءات سريعة', style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w700)),
-          ]),
+          apexSectionTitle('إجراءات سريعة', icon: Icons.flash_on, infoTip: 'اختصارات سريعة للعمليات الأكثر استخداماً'),
           const SizedBox(height: 16),
           GridView.count(
             crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 2.6,
-            children: actions.map((a) => GestureDetector(
-              onTap: a.onTap,
-              child: Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(color: navyMid, borderRadius: BorderRadius.circular(10), border: Border.all(color: borderColor)),
-                child: Row(children: [
-                  Container(
-                    width: 40, height: 40,
-                    decoration: BoxDecoration(color: a.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
-                    child: Icon(a.icon, color: a.color, size: 18),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(a.label, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w600)),
-                      SizedBox(height: 2),
-                      Text(a.desc, style: TextStyle(color: textDim, fontSize: 10)),
-                    ],
-                  )),
-                ]),
+            children: [
+              ApexActionCard(
+                label: 'إنشاء عميل جديد',
+                description: 'بدء معالج الإنشاء',
+                icon: Icons.person_add_rounded,
+                color: iconGold,
+                tooltip: 'فتح معالج إنشاء عميل جديد وإضافته للنظام',
+                onTap: () {
+                  if (widget.onCreateClient != null) widget.onCreateClient!();
+                  else if (widget.onSwitchToClients != null) widget.onSwitchToClients!();
+                },
               ),
-            )).toList(),
+              ApexActionCard(
+                label: 'رفع شجرة حسابات',
+                description: 'تحميل ملف COA',
+                icon: Icons.upload_file_rounded,
+                color: blueC,
+                tooltip: 'رفع ملف شجرة الحسابات (CSV أو Excel) لعميل محدد',
+                onTap: () {
+                  if (widget.onNavigateToCoa != null) {
+                    widget.onNavigateToCoa!();
+                  } else if (_clients.isNotEmpty) {
+                    _navigateToCoa(_clients.first);
+                  } else if (widget.onSwitchToClients != null) {
+                    widget.onSwitchToClients!();
+                  }
+                },
+              ),
+              ApexActionCard(
+                label: 'عرض العملاء',
+                description: 'قائمة العملاء المسجلين',
+                icon: Icons.people_rounded,
+                color: greenC,
+                tooltip: 'الانتقال لصفحة العملاء لعرض وإدارة جميع العملاء',
+                onTap: () {
+                  if (widget.onSwitchToClients != null) widget.onSwitchToClients!();
+                },
+              ),
+              ApexActionCard(
+                label: 'سوق الخدمات',
+                description: 'تصفح مقدمي الخدمات',
+                icon: Icons.store_rounded,
+                color: purpleC,
+                tooltip: 'استعراض وطلب خدمات من مقدمي الخدمات المعتمدين',
+                onTap: () => context.push('/provider-kanban'),
+              ),
+            ],
           ),
         ],
       ),
@@ -234,23 +233,19 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(children: [
-                Icon(Icons.timeline, color: gold, size: 18),
-                SizedBox(width: 8),
-                Text('حالة العملاء', style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w700)),
-              ]),
-              Row(children: [
-                _badge('${_clients.length} عملاء', textDim),
-                SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _loadClients,
-                  child: Icon(Icons.refresh, color: textDim, size: 16),
-                ),
-              ]),
-            ],
+          apexSectionTitle('حالة العملاء',
+            icon: Icons.timeline,
+            infoTip: 'ملخص حالة شجرة الحسابات لكل عميل — اضغط على عميل لعرض التفاصيل',
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              _badge('${_clients.length} عملاء', textDim),
+              const SizedBox(width: 6),
+              ApexIconButton(
+                icon: Icons.refresh_rounded,
+                onPressed: _loadClients,
+                tooltip: 'تحديث البيانات',
+                size: 16,
+              ),
+            ]),
           ),
           const SizedBox(height: 16),
 
@@ -269,7 +264,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                     Text('اضغط تحديث أو أعد تسجيل الدخول', style: TextStyle(color: textDim, fontSize: 11)),
                   ],
                 )),
-                TextButton(onPressed: _loadClients, child: Text('تحديث', style: TextStyle(color: gold, fontSize: 12))),
+                TextButton(onPressed: _loadClients, child: Text('تحديث', style: TextStyle(color: AC.goldText, fontSize: 12))),
               ]),
             ),
           ]
@@ -281,13 +276,8 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 Icon(Icons.people_outline, color: textDim, size: 40),
                 SizedBox(height: 12),
                 Text('لا يوجد عملاء بعد', style: TextStyle(color: textMid, fontSize: 13)),
-                const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: widget.onCreateClient ?? widget.onSwitchToClients,
-                  icon: Icon(Icons.add, size: 16),
-                  label: Text('إنشاء عميل جديد'),
-                  style: ElevatedButton.styleFrom(backgroundColor: gold, foregroundColor: navy, textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                ),
+                const SizedBox(height: 4),
+                Text('أنشئ عميلك الأول من "إجراءات سريعة"', style: TextStyle(color: textDim, fontSize: 11)),
               ]),
             ),
           ]
@@ -295,7 +285,6 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
           else ...[
             ...(_clients.length > 5 ? _clients.sublist(0, 5) : _clients).asMap().entries.map((e) {
               final c = e.value;
-              final isLast = e.key == (_clients.length > 5 ? 4 : _clients.length - 1);
               final clientName = c['name_ar'] ?? c['name'] ?? 'عميل';
               final sector = c['industry'] ?? c['sector'] ?? '';
               final status = c['status'] ?? 'active';
@@ -310,41 +299,24 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
               else if (coaStatus == 'review' || coaStatus == 'مراجعة' || coaStatus == 'in_progress') { coaColor = orangeC; coaLabel = 'COA مراجعة'; }
               else if (coaStatus == 'ready') { coaColor = blueC; coaLabel = 'جاهز لـ TB'; }
 
-              return GestureDetector(
+              return _ClientRow(
+                clientName: clientName,
+                sector: sector,
+                statusLabel: statusLabel,
+                statusColor: statusColor,
+                coaLabel: coaLabel,
+                coaColor: coaColor,
                 onTap: () async {
                   await context.push('/client-detail', extra: {'id': clientId.toString(), 'name': clientName});
                   if (mounted) _loadClients();
                 },
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                  decoration: BoxDecoration(border: isLast ? null : Border(bottom: BorderSide(color: borderColor))),
-                  child: Row(children: [
-                    Container(
-                      width: 40, height: 40,
-                      decoration: BoxDecoration(color: gold.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
-                      child: Center(child: Text(clientName.isNotEmpty ? clientName[0] : '?',
-                          style: TextStyle(color: gold, fontSize: 14, fontWeight: FontWeight.w800))),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(clientName, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
-                        if (sector.isNotEmpty) Text(sector, style: TextStyle(color: textDim, fontSize: 11)),
-                      ],
-                    )),
-                    _badge(statusLabel, statusColor),
-                    const SizedBox(width: 6),
-                    _badge(coaLabel, coaColor),
-                  ]),
-                ),
               );
             }),
             if (_clients.length > 5) ...[
               SizedBox(height: 8),
               Center(child: TextButton(
                 onPressed: widget.onSwitchToClients,
-                child: Text('عرض جميع العملاء (${_clients.length})', style: TextStyle(color: gold, fontSize: 12)),
+                child: Text('عرض جميع العملاء (${_clients.length})', style: TextStyle(color: AC.goldText, fontSize: 12)),
               )),
             ],
           ],
@@ -377,40 +349,21 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
       }
     }
     if (activities.isEmpty) {
-      activities.add(_Activity('مرحبًا بك في APEX', 'ابدأ بإنشاء عميلك الأول', 'الآن', Icons.waving_hand, gold));
+      activities.add(_Activity('مرحبًا بك في APEX', 'ابدأ بإنشاء عميلك الأول', 'الآن', Icons.waving_hand, iconGold));
     }
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            Icon(Icons.description, color: gold, size: 18),
-            SizedBox(width: 8),
-            Text('النشاط الأخير', style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w700)),
-          ]),
+          apexSectionTitle('النشاط الأخير', icon: Icons.description, infoTip: 'آخر التحديثات والإجراءات على العملاء والمستندات'),
           const SizedBox(height: 12),
-          ...activities.asMap().entries.map((e) {
-            final a = e.value;
-            final isLast = e.key == activities.length - 1;
-            return Container(
-              padding: EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(border: isLast ? null : Border(bottom: BorderSide(color: borderColor))),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(color: a.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
-                  child: Icon(a.icon, color: a.color, size: 16),
-                ),
-                SizedBox(width: 14),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(a.title, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
-                  SizedBox(height: 3),
-                  Text(a.detail, style: TextStyle(color: textDim, fontSize: 11)),
-                ])),
-                Text(a.time, style: TextStyle(color: textDim, fontSize: 11)),
-              ]),
-            );
-          }),
+          ...activities.map((a) => apexFeedItem(
+            title: a.title,
+            subtitle: a.detail,
+            icon: a.icon,
+            accentColor: a.color,
+            time: a.time,
+          )),
         ],
       ),
     );
@@ -443,38 +396,12 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
       }
     }
 
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [gold.withValues(alpha: 0.12), Colors.transparent], begin: Alignment.topRight, end: Alignment.bottomLeft),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: gold.withValues(alpha: 0.25)),
-      ),
-      child: Row(children: [
-        Container(
-          width: 48, height: 48,
-          decoration: BoxDecoration(color: gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
-          child: Icon(Icons.auto_awesome, color: gold, size: 22),
-        ),
-        SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: TextStyle(color: gold, fontSize: 15, fontWeight: FontWeight.w700)),
-          SizedBox(height: 3),
-          Text(desc, style: TextStyle(color: textMid, fontSize: 12)),
-        ])),
-        const SizedBox(width: 12),
-        ElevatedButton.icon(
-          onPressed: action,
-          icon: Icon(Icons.arrow_back, size: 14),
-          label: Text(btn),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: gold, foregroundColor: navy,
-            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          ),
-        ),
-      ]),
+    return ApexNextStepCard(
+      title: title,
+      description: desc,
+      buttonLabel: btn,
+      onPressed: action,
+      icon: Icons.auto_awesome,
     );
   }
 
@@ -487,42 +414,86 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
       final s = (c['coa_status'] ?? '').toString().toLowerCase();
       if (s == 'approved' || s == 'معتمد') coaApproved++;
     }
-    final services = [
-      _Service('شجرة الحسابات', 'COA', _clients.isNotEmpty ? 'نشط' : 'قريبًا', _clients.isNotEmpty ? greenC : textDim, '$coaApproved/${_clients.length}'),
-      _Service('ميزان المراجعة', 'TB', coaApproved > 0 ? 'جاهز' : 'قريبًا', coaApproved > 0 ? blueC : textDim, 'بعد COA'),
-      _Service('القوائم المالية', 'FS', 'قريبًا', textDim, 'بعد TB'),
-      _Service('التحليل المالي', 'FA', 'قريبًا', textDim, 'بعد FS'),
-      _Service('الامتثال', 'Comp', 'قريبًا', textDim, 'متوازي'),
-    ];
-    return Row(
-      children: services.map((s) => Expanded(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
-          child: Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor)),
-            child: Column(children: [
-              Container(height: 3, color: s.color, margin: EdgeInsets.only(bottom: 12)),
-              Text(s.label, textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w700)),
-              SizedBox(height: 2),
-              Text(s.labelEn, style: TextStyle(color: textDim, fontSize: 10)),
-              SizedBox(height: 10),
-              _badge(s.status, s.color),
-              SizedBox(height: 6),
-              Text(s.detail, style: TextStyle(color: textDim, fontSize: 10)),
-            ]),
-          ),
-        ),
-      )).toList(),
+    // Determine current step based on pipeline progress
+    int currentStep = 0;
+    if (_clients.isNotEmpty) currentStep = 1; // COA active
+    if (coaApproved > 0) currentStep = 2; // TB ready
+    return apexStepFlow(
+      steps: ['شجرة الحسابات', 'ميزان المراجعة', 'القوائم المالية', 'التحليل المالي', 'الامتثال'],
+      currentStep: currentStep,
     );
+  }
+
+  // ════════════════════════════════════════
+  // NOTICE BANNERS
+  // ════════════════════════════════════════
+  Widget _buildNoticeBanners() {
+    final banners = <Widget>[];
+    if (_clients.isEmpty) {
+      banners.add(apexNoticeBanner(
+        title: 'لا يوجد عملاء',
+        text: 'ابدأ بإنشاء عميلك الأول لتفعيل المسار المالي الكامل.',
+        tint: ApexTint.blue,
+        icon: Icons.info_rounded,
+        actionLabel: 'إنشاء عميل',
+        onAction: widget.onCreateClient ?? widget.onSwitchToClients,
+      ));
+    } else {
+      int reviewCount = 0;
+      for (final c in _clients) {
+        final s = (c['coa_status'] ?? '').toString().toLowerCase();
+        if (s == 'review' || s == 'مراجعة' || s == 'in_progress') reviewCount++;
+      }
+      if (reviewCount > 0) {
+        banners.add(apexNoticeBanner(
+          title: '$reviewCount شجرة حسابات بانتظار المراجعة',
+          text: 'يرجى مراجعة واعتماد شجرة الحسابات المعلقة للمتابعة.',
+          tint: ApexTint.amber,
+          actionLabel: 'انتقل للمراجعة',
+          onAction: widget.onNavigateToCoa,
+        ));
+      }
+      // Show readiness progress
+      final total = _clients.length;
+      int approved = 0;
+      for (final c in _clients) {
+        final s = (c['coa_status'] ?? '').toString().toLowerCase();
+        if (s == 'approved' || s == 'معتمد') approved++;
+      }
+      final readiness = total > 0 ? approved / total : 0.0;
+      banners.add(Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: apexGradientProgress(
+          value: readiness,
+          label: 'جاهزية الشجرة المحاسبية',
+          startColor: greenC,
+          endColor: greenC,
+        ),
+      ));
+    }
+    if (_error != null) {
+      banners.add(apexNoticeBanner(
+        title: 'خطأ في الاتصال',
+        text: _error!,
+        tint: ApexTint.red,
+        actionLabel: 'تحديث',
+        onAction: _loadClients,
+      ));
+    }
+    return Column(children: banners);
   }
 
   // ════════════════════════════════════════
   // HELPERS
   // ════════════════════════════════════════
   Widget _card({required Widget child}) => Container(
-    padding: EdgeInsets.all(20),
-    decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor)),
+    padding: const EdgeInsets.all(22),
+    decoration: BoxDecoration(
+      color: AC.navy2.withValues(alpha: 0.85),
+      borderRadius: BorderRadius.circular(24),
+      border: Border.all(color: AC.bdr.withValues(alpha: 0.06)),
+      boxShadow: [BoxShadow(color: AC.bdr.withValues(alpha: 0.10), blurRadius: 20, offset: Offset(0, 4))],
+    ),
     child: child,
   );
 
@@ -533,7 +504,80 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   );
 }
 
-class _KPI { final String label, value, subtitle; final IconData icon; final Color color; _KPI(this.label, this.value, this.subtitle, this.icon, this.color); }
-class _QAction { final String label, desc; final IconData icon; final Color color; final VoidCallback? onTap; _QAction(this.label, this.desc, this.icon, this.color, this.onTap); }
 class _Activity { final String title, detail, time; final IconData icon; final Color color; _Activity(this.title, this.detail, this.time, this.icon, this.color); }
-class _Service { final String label, labelEn, status, detail; final Color color; _Service(this.label, this.labelEn, this.status, this.color, this.detail); }
+
+/// World-class client row with hover feedback
+class _ClientRow extends StatefulWidget {
+  final String clientName, sector, statusLabel, coaLabel;
+  final Color statusColor, coaColor;
+  final VoidCallback onTap;
+
+  const _ClientRow({
+    required this.clientName, required this.sector,
+    required this.statusLabel, required this.statusColor,
+    required this.coaLabel, required this.coaColor,
+    required this.onTap,
+  });
+
+  @override
+  State<_ClientRow> createState() => _ClientRowState();
+}
+
+class _ClientRowState extends State<_ClientRow> {
+  bool _hov = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hov = true),
+      onExit: (_) => setState(() => _hov = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          margin: const EdgeInsets.symmetric(vertical: 2),
+          decoration: BoxDecoration(
+            color: _hov ? AC.iconAccent.withValues(alpha: 0.06) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: _hov ? AC.iconAccent.withValues(alpha: 0.2) : Colors.transparent),
+          ),
+          child: Row(children: [
+            Container(
+              width: 40, height: 40,
+              decoration: BoxDecoration(color: AC.iconAccent.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
+              child: Center(child: Text(widget.clientName.isNotEmpty ? widget.clientName[0] : '?',
+                  style: TextStyle(color: AC.goldText, fontSize: 14, fontWeight: FontWeight.w800))),
+            ),
+            const SizedBox(width: 14),
+            Expanded(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.clientName, style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
+                if (widget.sector.isNotEmpty) Text(widget.sector, style: TextStyle(color: AC.td, fontSize: 11)),
+              ],
+            )),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              decoration: BoxDecoration(color: widget.statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(99), border: Border.all(color: widget.statusColor.withValues(alpha: 0.2))),
+              child: Text(widget.statusLabel, style: TextStyle(color: widget.statusColor, fontSize: 11, fontWeight: FontWeight.w600)),
+            ),
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              decoration: BoxDecoration(color: widget.coaColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(99), border: Border.all(color: widget.coaColor.withValues(alpha: 0.2))),
+              child: Text(widget.coaLabel, style: TextStyle(color: widget.coaColor, fontSize: 11, fontWeight: FontWeight.w600)),
+            ),
+            const SizedBox(width: 4),
+            AnimatedOpacity(
+              opacity: _hov ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 180),
+              child: Icon(Icons.arrow_forward_ios, color: AC.iconAccent, size: 12),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/shared_constants.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 // Per Execution Master §4, §9 + Zero Ambiguity §5, §6
 // ═══════════════════════════════════════════════════════════
@@ -63,27 +64,37 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         : _error != null
           ? Center(child: Text(_error!, style: TextStyle(color: AC.err)))
           : RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
+              // Hero Section
+              ApexHeroSection(
+                title: '\u062e\u0637\u062a\u064a \u0648\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643',
+                description: '\u0625\u062f\u0627\u0631\u0629 \u062e\u0637\u062a\u0643 \u0627\u0644\u062d\u0627\u0644\u064a\u0629 \u0648\u0627\u0644\u062a\u0631\u0642\u064a\u0629 \u0644\u0644\u062d\u0635\u0648\u0644 \u0639\u0644\u0649 \u0645\u064a\u0632\u0627\u062a \u0623\u0643\u062b\u0631',
+                icon: Icons.workspace_premium_rounded,
+              ),
               // Current Plan Card
               Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Color(0xFF1A1A2E), Color(0xFF16213E)]),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
+                  gradient: LinearGradient(
+                    colors: [AC.gold.withValues(alpha: 0.10), AC.navy2],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [BoxShadow(color: AC.gold.withValues(alpha: 0.08), blurRadius: 20, offset: Offset(0, 4))],
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Icon(Icons.workspace_premium, color: AC.gold, size: 32),
                     SizedBox(width: 12),
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('الخطة الحالية', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text('الخطة الحالية', style: TextStyle(color: AC.ts, fontSize: 12)),
                       Text(currentPlan, style: TextStyle(color: AC.gold, fontSize: 24, fontWeight: FontWeight.bold)),
                     ]),
                   ]),
                   const SizedBox(height: 16),
-                  const Divider(color: Colors.white12),
+                  Divider(color: AC.bdr),
                   const SizedBox(height: 12),
-                  const Text('الميزات المتاحة:', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                  Text('الميزات المتاحة:', style: TextStyle(color: AC.ts, fontSize: 13)),
                   SizedBox(height: 8),
                   ...features.map<Widget>((f) => Padding(
                     padding: EdgeInsets.symmetric(vertical: 3),
@@ -92,9 +103,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         color: f['is_available'] == true ? AC.ok : AC.err, size: 18),
                       SizedBox(width: 8),
                       Expanded(child: Text(f['name_ar'] ?? f['key'],
-                        style: TextStyle(color: Colors.white, fontSize: 13))),
+                        style: TextStyle(color: AC.tp, fontSize: 13))),
                       Text('${f['display_value'] ?? f['value'] ?? ''}',
-                        style: TextStyle(color: f['is_available'] == true ? AC.ok : Colors.grey, fontSize: 12)),
+                        style: TextStyle(color: f['is_available'] == true ? AC.ok : AC.ts, fontSize: 12)),
                     ]),
                   )),
                 ]),
@@ -117,33 +128,29 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 return Container(
                   margin: EdgeInsets.only(bottom: 12),
                   padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isCurrent ? AC.gold.withValues(alpha: 0.1) : AC.navy3,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: isCurrent ? AC.gold : Colors.white12),
-                  ),
+                  decoration: apexSelectableDecoration(isSelected: isCurrent, activeColor: AC.gold),
                   child: Row(children: [
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
                         Text(name, style: TextStyle(
-                          color: isCurrent ? AC.gold : Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                          color: isCurrent ? AC.gold : AC.tp, fontSize: 16, fontWeight: FontWeight.bold)),
                         if (isCurrent) ...[
                           SizedBox(width: 8),
                           Container(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(color: AC.gold, borderRadius: BorderRadius.circular(8)),
-                            child: const Text('الحالية', style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold))),
+                            child: Text('الحالية', style: TextStyle(color: AC.btnFg, fontSize: 10, fontWeight: FontWeight.bold))),
                         ],
                       ]),
                       const SizedBox(height: 4),
                       Text(price is num && price > 0 ? '$price ر.س/شهرياً' : (desc.isNotEmpty ? desc : 'مجاني'),
-                        style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                      Text('$featureCount ميزة متاحة', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                        style: TextStyle(color: AC.ts, fontSize: 12)),
+                      Text('$featureCount ميزة متاحة', style: TextStyle(color: AC.ts, fontSize: 11)),
                     ])),
                     if (!isCurrent)
-                      ElevatedButton(
-                        onPressed: () => _upgrade(code.isNotEmpty ? code : name),
-                        style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: Colors.black),
-                        child: Text(code == 'enterprise' ? 'تواصل معنا' : 'ترقية'),
+                      apexPrimaryButton(
+                        code == 'enterprise' ? '\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627' : '\u062a\u0631\u0642\u064a\u0629',
+                        () => _upgrade(code.isNotEmpty ? code : name),
+                        icon: code == 'enterprise' ? Icons.chat_rounded : Icons.upgrade_rounded,
                       ),
                   ]),
                 );
@@ -203,20 +210,30 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
       body: _loading
         ? Center(child: CircularProgressIndicator(color: AC.gold))
         : SingleChildScrollView(scrollDirection: Axis.horizontal, child: SingleChildScrollView(child:
-            DataTable(
-              headingRowColor: WidgetStateProperty.all(AC.navy3),
-              columns: [
-                DataColumn(label: Text('الميزة', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
-                ..._planNames.map((p) => DataColumn(
-                  label: Text(p, style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)))),
-              ],
-              rows: _comparison.map<DataRow>((row) => DataRow(cells: [
-                DataCell(Text(row['name_ar'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 12))),
-                ..._planNames.map((p) => DataCell(
-                  Text(_formatCellValue(row[p] ?? 'N/A'),
-                    style: TextStyle(color: _cellColor(row[p] ?? ''), fontSize: 11)))),
-              ])).toList(),
-            ),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              DataTable(
+                headingRowColor: WidgetStateProperty.all(AC.navy3),
+                columns: [
+                  DataColumn(label: Text('\u0627\u0644\u0645\u064a\u0632\u0629', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
+                  ..._planNames.map((p) => DataColumn(
+                    label: Text(p, style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold)))),
+                ],
+                rows: _comparison.map<DataRow>((row) => DataRow(cells: [
+                  DataCell(Text(row['name_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 12))),
+                  ..._planNames.map((p) => DataCell(
+                    Text(_formatCellValue(row[p] ?? 'N/A'),
+                      style: TextStyle(color: _cellColor(row[p] ?? ''), fontSize: 11)))),
+                ])).toList(),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ApexTableLegend(items: [
+                  MapEntry('\u0645\u062a\u0627\u062d', AC.ok),
+                  MapEntry('\u063a\u064a\u0631 \u0645\u062a\u0627\u062d', AC.err),
+                  MapEntry('\u063a\u064a\u0631 \u0645\u062d\u062f\u0648\u062f', AC.gold),
+                ]),
+              ),
+            ]),
           )),
     ));
   }
@@ -232,7 +249,7 @@ class _PlanComparisonScreenState extends State<PlanComparisonScreen> {
   Color _cellColor(String v) {
     if (v == 'true' || v == 'unlimited') return AC.ok;
     if (v == 'false' || v == 'none') return AC.err;
-    return Colors.white;
+    return AC.tp;
   }
 }
 

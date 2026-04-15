@@ -40,11 +40,11 @@ class _CCS2 extends State<ClientCreateScreen2> {
       appBar: AppBar(title: Text('عميل جديد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
       body: Column(children: [
         Padding(padding: EdgeInsets.fromLTRB(16, 16, 16, 0), child: SizedBox(height: 56, child: TextField(
-          controller: _nameC, style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(labelText: 'اسم الشركة *', labelStyle: TextStyle(color: Colors.white54),
+          controller: _nameC, style: TextStyle(color: AC.tp),
+          decoration: InputDecoration(labelText: 'اسم الشركة *', labelStyle: TextStyle(color: AC.td),
             prefixIcon: Icon(Icons.business, color: AC.gold),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(8)),
+            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.bdr), borderRadius: BorderRadius.circular(8)),
             focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(8)))))),
         if (_err != null) Padding(padding: EdgeInsets.all(12), child: Text(_err!, style: const TextStyle(color: Colors.redAccent))),
         Padding(padding: EdgeInsets.fromLTRB(16, 12, 16, 8), child: Text('* نوع العميل', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
@@ -61,7 +61,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
         Padding(padding: EdgeInsets.all(16), child: SizedBox(height: 52, width: double.infinity, child: ElevatedButton(
           onPressed: _ld ? null : _create,
           style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-          child: _ld ? SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+          child: _ld ? SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.btnFg))
               : Text('انشاء العميل', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16))))),
       ]),
     );
@@ -72,7 +72,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
     return GestureDetector(onTap: () => setState(() => _sel = code),
       child: Container(height: 52, margin: EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(color: sel ? AC.gold.withValues(alpha: 0.15) : AC.navy3,
-          border: Border.all(color: sel ? AC.gold : Colors.white12, width: sel ? 1.5 : 1), borderRadius: BorderRadius.circular(10)),
+          border: Border.all(color: sel ? AC.gold : AC.bdr, width: sel ? 1.5 : 1), borderRadius: BorderRadius.circular(10)),
         child: Row(children: [
           Icon(sel ? Icons.radio_button_checked : Icons.radio_button_off, color: sel ? AC.gold : AC.ts, size: 20),
           SizedBox(width: 12),

@@ -30,7 +30,7 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
     final r = await ApiService.acceptLegalDoc(docId);
     if (r.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('\u062a\u0645 \u0627\u0644\u0642\u0628\u0648\u0644'), backgroundColor: Colors.green));
+        SnackBar(content: Text('\u062a\u0645 \u0627\u0644\u0642\u0628\u0648\u0644'), backgroundColor: AC.ok));
       _load();
     }
   }
@@ -39,7 +39,7 @@ class _LegalDocsV2State extends State<LegalDocumentsScreenV2> {
     final r = await ApiService.acceptAllLegal();
     if (r.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('\u062a\u0645 \u0642\u0628\u0648\u0644 \u062c\u0645\u064a\u0639 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a'), backgroundColor: Colors.green));
+        SnackBar(content: Text('\u062a\u0645 \u0642\u0628\u0648\u0644 \u062c\u0645\u064a\u0639 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a'), backgroundColor: AC.ok));
       _load();
     }
   }
