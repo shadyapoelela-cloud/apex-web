@@ -13,6 +13,12 @@ __pycache__/
 apex_finance/build/
 apex_finance/.dart_tool/
 apex_finance/web_deploy/
+apex_finance/.packages
+
+# Flutter generated platform files (regenerate on build)
+apex_finance/linux/flutter/generated_*
+apex_finance/macos/Flutter/GeneratedPluginRegistrant.swift
+apex_finance/windows/flutter/generated_*
 
 # Temp / backup files
 _*.py
@@ -22,6 +28,19 @@ _*.py
 *.old
 *.orig
 *.patch
+~*
+*.swp
+*.swo
+*~
+.#*
+
+# Presentations (keep out of repo)
+*.pptx
+
+# Python test/coverage artifacts
+.coverage
+.pytest_cache/
+htmlcov/
 
 # Data dumps (use templates/ for official templates)
 coa_dump.txt
