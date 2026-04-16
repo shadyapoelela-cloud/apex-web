@@ -683,6 +683,15 @@ try:
 except Exception as e:
     logging.error(f"Payroll routes not mounted: {e}", exc_info=True)
 
+# ── Investment appraisal (NPV/IRR) + Budget variance
+try:
+    from app.core.investment_routes import router as investment_router
+
+    app.include_router(investment_router)
+    logging.info("Investment / budget routes mounted")
+except Exception as e:
+    logging.error(f"Investment routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
