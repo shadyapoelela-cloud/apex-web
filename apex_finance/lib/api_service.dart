@@ -350,6 +350,10 @@ class ApiService {
   static Future<ApiResult> payrollCompute(Map body) => _post('/payroll/compute', body);
   static Future<ApiResult> breakevenCompute(Map body) => _post('/breakeven/compute', body);
 
+  // ── Investment appraisal (NPV / IRR / Payback) + Budget variance ──
+  static Future<ApiResult> investmentAnalyze(Map body) => _post('/investment/analyze', body);
+  static Future<ApiResult> budgetVariance(Map body) => _post('/budget/variance', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

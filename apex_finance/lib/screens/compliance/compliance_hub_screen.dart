@@ -152,6 +152,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.gold,
                     onTap: () => context.go('/compliance/breakeven'),
                   ),
+                  _toolCard(
+                    icon: Icons.insights,
+                    title: 'تقييم الاستثمار',
+                    subtitle: 'NPV · IRR · Payback',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/investment'),
+                  ),
+                  _toolCard(
+                    icon: Icons.compare_arrows,
+                    title: 'الميزانية مقابل الفعلي',
+                    subtitle: 'تحليل الانحرافات',
+                    color: AC.warn,
+                    onTap: () => context.go('/compliance/budget-variance'),
+                  ),
                 ],
               );
             }),
