@@ -43,6 +43,10 @@ import '../screens/simulation/roadmap_screen.dart';
 import '../screens/simulation/trial_balance_screen.dart';
 import '../tb_binding_screen.dart';
 import '../financial_statements_screen.dart';
+import '../screens/compliance/journal_entries_screen.dart';
+import '../screens/compliance/audit_trail_screen.dart';
+import '../screens/compliance/zatca_invoice_builder_screen.dart';
+import '../screens/compliance/compliance_hub_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -79,6 +83,24 @@ final appRouter = GoRouter(
 
     // Main app (with bottom nav)
     GoRoute(path: '/home', pageBuilder: (c, s) => _apexPage(const MainNav(), s)),
+
+    // ── Compliance (ZATCA / IFRS / SOCPA) ──
+    GoRoute(
+      path: '/compliance',
+      pageBuilder: (c, s) => _apexPage(const ComplianceHubScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/journal-entries',
+      pageBuilder: (c, s) => _apexPage(const JournalEntriesScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/audit-trail',
+      pageBuilder: (c, s) => _apexPage(const AuditTrailScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/zatca-invoice',
+      pageBuilder: (c, s) => _apexPage(const ZatcaInvoiceBuilderScreen(), s),
+    ),
 
     // Account
     GoRoute(path: '/profile/edit', pageBuilder: (c, s) => _apexPage(EditProfileScreen(profile: s.extra as Map<String, dynamic>? ?? {}), s)),
@@ -221,6 +243,15 @@ final appRouter = GoRouter(
       return _apexPage(ProviderProfileScreen(provider: s.extra as Map<String, dynamic>? ?? {}), s);
     }),
     GoRoute(path: '/onboarding/wizard', pageBuilder: (c, s) {
+      final args = s.extra as Map<String, dynamic>?;
+      return _apexPage(wizard.ClientOnboardingWizard(token: args?['token'] as String?), s);
+    }),
+    // Intuitive alias — many UIs linked to /clients/onboarding
+    GoRoute(path: '/clients/onboarding', pageBuilder: (c, s) {
+      final args = s.extra as Map<String, dynamic>?;
+      return _apexPage(wizard.ClientOnboardingWizard(token: args?['token'] as String?), s);
+    }),
+    GoRoute(path: '/clients/new', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>?;
       return _apexPage(wizard.ClientOnboardingWizard(token: args?['token'] as String?), s);
     }),

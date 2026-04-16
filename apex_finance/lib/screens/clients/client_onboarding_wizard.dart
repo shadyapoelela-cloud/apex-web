@@ -25,12 +25,30 @@ class _WizardState extends State<ClientOnboardingWizard> {
   final _nameEnC = TextEditingController();
   final _crC = TextEditingController();
   final _taxC = TextEditingController();
+  final _vatC = TextEditingController();          // NEW — ZATCA 15-digit VAT
   final _addressC = TextEditingController();
   final _cityC = TextEditingController();
 
+  // NEW — tax jurisdiction + default currency per client
+  String _jurisdiction = 'SA';                    // SA/AE/KW/BH/QA/OM/EG
+  String _currency = 'SAR';                       // ISO 4217
+
+  // Matching pair for the jurisdiction dropdown (name_ar, currency_default)
+  static const List<Map<String, String>> _jurisdictions = [
+    {'code': 'SA', 'name_ar': 'السعودية', 'currency': 'SAR'},
+    {'code': 'AE', 'name_ar': 'الإمارات', 'currency': 'AED'},
+    {'code': 'KW', 'name_ar': 'الكويت',   'currency': 'KWD'},
+    {'code': 'BH', 'name_ar': 'البحرين',  'currency': 'BHD'},
+    {'code': 'QA', 'name_ar': 'قطر',      'currency': 'QAR'},
+    {'code': 'OM', 'name_ar': 'عُمان',     'currency': 'OMR'},
+    {'code': 'EG', 'name_ar': 'مصر',      'currency': 'EGP'},
+  ];
+  static const List<String> _currencies = ['SAR', 'AED', 'KWD', 'BHD', 'QAR', 'OMR', 'EGP', 'USD', 'EUR'];
+
   @override void dispose() {
     _nameArC.dispose(); _nameEnC.dispose(); _crC.dispose();
-    _taxC.dispose(); _addressC.dispose(); _cityC.dispose();
+    _taxC.dispose(); _vatC.dispose();
+    _addressC.dispose(); _cityC.dispose();
     super.dispose();
   }
 
@@ -66,12 +84,15 @@ class _WizardState extends State<ClientOnboardingWizard> {
         _nameEnC.text = data['name_en'] ?? '';
         _crC.text = data['cr_number'] ?? '';
         _taxC.text = data['tax_number'] ?? '';
+        _vatC.text = data['vat_registration_number'] ?? '';
         _addressC.text = data['national_address'] ?? '';
         _cityC.text = data['city'] ?? '';
         _selectedEntityType = data['legal_entity_type'];
         _selectedSector = data['sector_main_code'];
         _selectedSubSector = data['sector_sub_code'];
         _clientType = data['client_type'] ?? 'standard_business';
+        _jurisdiction = data['tax_jurisdiction'] ?? 'SA';
+        _currency = data['currency'] ?? 'SAR';
       }
 
       // Load entity types
@@ -113,11 +134,14 @@ class _WizardState extends State<ClientOnboardingWizard> {
       await ApiService.saveOnboardingDraft(step: _step, data: {
         'name_ar': _nameArC.text, 'name_en': _nameEnC.text,
         'cr_number': _crC.text, 'tax_number': _taxC.text,
+        'vat_registration_number': _vatC.text,
         'national_address': _addressC.text, 'city': _cityC.text,
         'legal_entity_type': _selectedEntityType,
         'sector_main_code': _selectedSector,
         'sector_sub_code': _selectedSubSector,
         'client_type': _clientType,
+        'tax_jurisdiction': _jurisdiction,
+        'currency': _currency,
       });
     } catch (_) {}
   }
@@ -155,7 +179,10 @@ class _WizardState extends State<ClientOnboardingWizard> {
         'name_en': _nameEnC.text.trim(),
         'cr_number': _crC.text.trim(),
         'tax_number': _taxC.text.trim(),
+        'vat_registration_number': _vatC.text.trim(),
         'city': _cityC.text.trim(),
+        'tax_jurisdiction': _jurisdiction,
+        'currency': _currency,
       });
       if (mounted) {
         if (r.success) {
@@ -253,9 +280,80 @@ class _WizardState extends State<ClientOnboardingWizard> {
     _field('الاسم التجاري (إنجليزي)', _nameEnC, Icons.business),
     _field('السجل التجاري', _crC, Icons.assignment),
     _field('الرقم الضريبي', _taxC, Icons.receipt),
+    // NEW — ZATCA 15-digit VAT registration number
+    Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: _vatC,
+        keyboardType: TextInputType.number,
+        maxLength: 15,
+        style: TextStyle(color: AC.tp),
+        decoration: _inp('رقم التسجيل الضريبي (VAT) — 15 رقم', ic: Icons.qr_code_2).copyWith(
+          counterText: '',
+          helperText: 'مطلوب للفوترة الإلكترونية ZATCA في السعودية',
+          helperStyle: TextStyle(color: AC.ts, fontSize: 11),
+        ),
+      ),
+    ),
+    // NEW — Jurisdiction + Currency (side-by-side on wide screens, stacked on narrow)
+    LayoutBuilder(builder: (ctx, cons) {
+      final wide = cons.maxWidth > 480;
+      final jDropdown = _jurisdictionDropdown();
+      final cDropdown = _currencyDropdown();
+      if (!wide) {
+        return Column(children: [
+          Padding(padding: const EdgeInsets.only(bottom: 12), child: jDropdown),
+          Padding(padding: const EdgeInsets.only(bottom: 12), child: cDropdown),
+        ]);
+      }
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(children: [
+          Expanded(child: jDropdown),
+          const SizedBox(width: 12),
+          Expanded(child: cDropdown),
+        ]),
+      );
+    }),
     _field('العنوان الوطني', _addressC, Icons.location_on),
     _field('المدينة', _cityC, Icons.location_city),
   ]);
+
+  Widget _jurisdictionDropdown() => DropdownButtonFormField<String>(
+    value: _jurisdiction,
+    decoration: _inp('الولاية الضريبية', ic: Icons.public),
+    dropdownColor: AC.navy2,
+    style: TextStyle(color: AC.tp, fontSize: 14),
+    items: _jurisdictions.map((j) => DropdownMenuItem(
+      value: j['code'],
+      child: Text('${j['code']} — ${j['name_ar']}',
+        style: TextStyle(color: AC.tp)),
+    )).toList(),
+    onChanged: (v) {
+      if (v == null) return;
+      setState(() {
+        _jurisdiction = v;
+        // Auto-pick currency matching the jurisdiction (user can override)
+        final match = _jurisdictions.firstWhere(
+          (j) => j['code'] == v,
+          orElse: () => {'currency': _currency},
+        );
+        _currency = match['currency'] ?? _currency;
+      });
+    },
+  );
+
+  Widget _currencyDropdown() => DropdownButtonFormField<String>(
+    value: _currency,
+    decoration: _inp('العملة', ic: Icons.payments),
+    dropdownColor: AC.navy2,
+    style: TextStyle(color: AC.tp, fontSize: 14),
+    items: _currencies.map((c) => DropdownMenuItem(
+      value: c,
+      child: Text(c, style: TextStyle(color: AC.tp)),
+    )).toList(),
+    onChanged: (v) { if (v != null) setState(() => _currency = v); },
+  );
 
   Widget _field(String label, TextEditingController c, IconData icon) => Padding(
     padding: const EdgeInsets.only(bottom: 12),

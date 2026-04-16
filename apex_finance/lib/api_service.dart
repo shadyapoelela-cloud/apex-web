@@ -309,6 +309,27 @@ class ApiService {
   // ── Knowledge Feedback (non-COA) ──
   static Future<ApiResult> submitKnowledgeFeedback(Map body) => _post('/knowledge-feedback', body);
 
+  // ── Compliance (Journal Entry Sequence + Audit Trail) ──
+  static Future<ApiResult> jeReserveNext({required String clientId, required String fiscalYear, String prefix = 'JE'}) =>
+      _post('/compliance/je/next', {'client_id': clientId, 'fiscal_year': fiscalYear, 'prefix': prefix});
+  static Future<ApiResult> jePeek({required String clientId, required String fiscalYear}) =>
+      _get('/compliance/je/peek?client_id=$clientId&fiscal_year=$fiscalYear');
+  static Future<ApiResult> auditLog({required String action, String? entityType, String? entityId, Map? before, Map? after, Map? metadata}) =>
+      _post('/compliance/audit/log', {
+        'action': action,
+        if (entityType != null) 'entity_type': entityType,
+        if (entityId != null) 'entity_id': entityId,
+        if (before != null) 'before': before,
+        if (after != null) 'after': after,
+        if (metadata != null) 'metadata': metadata,
+      });
+  static Future<ApiResult> auditVerify({int limit = 1000}) => _get('/compliance/audit/verify?limit=$limit');
+
+  // ── ZATCA (Fatoora) e-invoice ──
+  static Future<ApiResult> zatcaValidateVat(String vatNumber) =>
+      _post('/zatca/validate-vat', {'vat_number': vatNumber});
+  static Future<ApiResult> zatcaBuildInvoice(Map body) => _post('/zatca/invoice/build', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
