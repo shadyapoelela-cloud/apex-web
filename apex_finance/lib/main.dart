@@ -1330,7 +1330,7 @@ class _DashS extends ConsumerState<DashTab> {
       actions: [
         Stack(children: [
           ApexIconButton(icon: Icons.notifications_outlined, color: AC.tp,
-            onPressed: ()=>context.go('/notifications')),
+            tooltip: 'الإشعارات', onPressed: ()=>context.go('/notifications')),
           if(_notifCount>0) Positioned(right:8,top:8, child: Container(padding: EdgeInsets.all(4),
             decoration: BoxDecoration(color: AC.err, shape: BoxShape.circle),
             child: Text('$_notifCount', style: TextStyle(color: AC.btnFg, fontSize: 10))))]),
@@ -1727,7 +1727,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
             Row(children: [
               Text('\u062a\u0633\u062c\u064a\u0644 \u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
               Spacer(),
-              ApexIconButton(icon: Icons.close, color: AC.ts, size: 20, onPressed: () => Navigator.pop(dc)),
+              ApexIconButton(icon: Icons.close, color: AC.ts, size: 20, tooltip: 'إغلاق', onPressed: () => Navigator.pop(dc)),
             ]),
             const SizedBox(height: 16),
             SizedBox(height: 50, child: Row(children: List.generate(7, (idx) =>
@@ -2285,7 +2285,7 @@ class _AccS extends ConsumerState<AccountTab> {
     ApiService.clearToken(); context.go('/login'); }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: Text('\u062d\u0633\u0627\u0628\u064a', style: TextStyle(color: AC.gold)),
-      actions: [ApexIconButton(onPressed: _logout, icon: Icons.logout, color: AC.err)]),
+      actions: [ApexIconButton(onPressed: _logout, icon: Icons.logout, color: AC.err, tooltip: 'تسجيل الخروج')]),
     body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
         // Profile Card
@@ -2361,17 +2361,17 @@ class _AdminS extends ConsumerState<AdminTab> {
     appBar: AppBar(title: Text('\u0644\u0648\u062d\u0629 \u0627\u0644\u0625\u062f\u0627\u0631\u0629', style: TextStyle(color: AC.gold)),
       actions: [
         ApexIconButton(icon: Icons.rate_review, color: AC.cyan,
-          onPressed: ()=>context.go('/admin/reviewer')),
+          tooltip: 'المراجع', onPressed: ()=>context.go('/admin/reviewer')),
         ApexIconButton(icon: Icons.verified_user, color: AC.ok,
-          onPressed: ()=>context.go('/admin/providers/verify')),
+          tooltip: 'التحقق من مقدمي الخدمات', onPressed: ()=>context.go('/admin/providers/verify')),
         ApexIconButton(icon: Icons.upload_file, color: AC.gold,
-          onPressed: ()=>context.go('/admin/providers/documents')),
+          tooltip: 'مستندات مقدمي الخدمات', onPressed: ()=>context.go('/admin/providers/documents')),
         ApexIconButton(icon: Icons.shield, color: AC.gold,
-          onPressed: ()=>context.go('/admin/providers/compliance')),
+          tooltip: 'الامتثال', onPressed: ()=>context.go('/admin/providers/compliance')),
         ApexIconButton(icon: Icons.psychology, color: AC.gold,
-          onPressed: ()=>context.go('/knowledge/console')),
+          tooltip: 'قاعدة المعرفة', onPressed: ()=>context.go('/knowledge/console')),
         ApexIconButton(icon: Icons.security, color: AC.gold,
-          onPressed: ()=>context.go('/admin/audit')),
+          tooltip: 'سجل التدقيق', onPressed: ()=>context.go('/admin/audit')),
       ]),
     body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(14), children: [

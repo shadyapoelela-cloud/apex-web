@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../core/ui_components.dart';
 
 class SlideAuthScreen extends StatefulWidget {
   const SlideAuthScreen({super.key});
@@ -27,6 +28,10 @@ class _SAS extends State<SlideAuthScreen> {
   final _codes = const ['+966','+20','+971','+973','+965','+974','+968'];
 
   Future<void> _login() async {
+    if (_lu.text.trim().isEmpty || _lp.text.isEmpty) {
+      setState(() => _le = 'يرجى ملء جميع الحقول');
+      return;
+    }
     setState(() { _ll = true; _le = null; });
     final res = await ApiService.login(_lu.text.trim(), _lp.text);
     if (res.success) {
@@ -46,6 +51,14 @@ class _SAS extends State<SlideAuthScreen> {
   }
 
   Future<void> _register() async {
+    if (_rn.text.trim().isEmpty || _ru.text.trim().isEmpty || _rem.text.trim().isEmpty || _rp.text.isEmpty) {
+      setState(() => _re = 'يرجى ملء جميع الحقول المطلوبة');
+      return;
+    }
+    if (_rp.text.length < 6) {
+      setState(() => _re = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      return;
+    }
     if (_rp.text != _rp2.text) {
       setState(() => _re = 'كلمة المرور غير متطابقة');
       return;
@@ -133,6 +146,7 @@ class _SAS extends State<SlideAuthScreen> {
     _tf(_rem, 'البريد الإلكتروني', Icons.email_outlined, ltr: true),
     const SizedBox(height: 10),
     _pf(_rp, 'كلمة المرور', _ro, () => setState(() => _ro = !_ro)),
+    ApexPasswordStrength(password: _rp.text),
     const SizedBox(height: 10),
     _pf(_rp2, 'تأكيد كلمة المرور', _ro, () => setState(() => _ro = !_ro)),
     SizedBox(height: 10),
@@ -164,6 +178,7 @@ class _SAS extends State<SlideAuthScreen> {
 
   Widget _pf(TextEditingController c, String l, bool o, VoidCallback t, {VoidCallback? sub}) => TextField(
     controller: c, obscureText: o, style: TextStyle(color: AC.tp),
+    onChanged: (_) => setState(() {}),
     decoration: InputDecoration(labelText: l, prefixIcon: Icon(Icons.lock_outlined, color: AC.goldText, size: 20),
       suffixIcon: IconButton(icon: Icon(o ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20), onPressed: t),
       filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),

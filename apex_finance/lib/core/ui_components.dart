@@ -2277,3 +2277,108 @@ class _ApexActionTileState extends State<ApexActionTile> with SingleTickerProvid
     );
   }
 }
+
+// ── 37. Workflow Stepper — step progress indicator for multi-step flows ──
+
+class ApexWorkflowStepper extends StatelessWidget {
+  final List<String> steps;
+  final int currentStep;
+  final Color? activeColor;
+
+  const ApexWorkflowStepper({
+    super.key,
+    required this.steps,
+    required this.currentStep,
+    this.activeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = activeColor ?? AC.gold;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: AC.navy2,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AC.bdr.withValues(alpha: 0.15)),
+      ),
+      child: Row(children: List.generate(steps.length * 2 - 1, (i) {
+        if (i.isOdd) {
+          final done = (i ~/ 2) < currentStep;
+          return Expanded(child: Container(
+            height: 2,
+            color: done ? c : AC.bdr.withValues(alpha: 0.3),
+          ));
+        }
+        final idx = i ~/ 2;
+        final isDone = idx < currentStep;
+        final isActive = idx == currentStep;
+        return Column(mainAxisSize: MainAxisSize.min, children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            width: 28, height: 28,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isDone ? c : isActive ? c.withValues(alpha: 0.15) : AC.navy3,
+              border: Border.all(color: isDone || isActive ? c : AC.bdr, width: isActive ? 2 : 1.5),
+            ),
+            child: Center(child: isDone
+              ? Icon(Icons.check, color: AC.btnFg, size: 14)
+              : Text('${idx + 1}', style: TextStyle(
+                  color: isActive ? c : AC.ts,
+                  fontSize: 11, fontWeight: FontWeight.bold))),
+          ),
+          const SizedBox(height: 4),
+          Text(steps[idx], style: TextStyle(
+            color: isActive ? c : isDone ? AC.tp : AC.td,
+            fontSize: 9, fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ]);
+      })),
+    );
+  }
+}
+
+// ── 38. Password Strength Indicator ──
+
+class ApexPasswordStrength extends StatelessWidget {
+  final String password;
+  const ApexPasswordStrength({super.key, required this.password});
+
+  int get _strength {
+    if (password.isEmpty) return 0;
+    int s = 0;
+    if (password.length >= 6) s++;
+    if (password.length >= 10) s++;
+    if (RegExp(r'[A-Z]').hasMatch(password)) s++;
+    if (RegExp(r'[0-9]').hasMatch(password)) s++;
+    if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) s++;
+    return s;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (password.isEmpty) return const SizedBox.shrink();
+    final s = _strength;
+    final labels = ['', 'ضعيفة جداً', 'ضعيفة', 'متوسطة', 'قوية', 'ممتازة'];
+    final colors = [AC.bdr, AC.err, AC.err, AC.warn, AC.ok, AC.ok];
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: List.generate(5, (i) => Expanded(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            height: 3,
+            margin: EdgeInsets.only(left: i > 0 ? 4 : 0),
+            decoration: BoxDecoration(
+              color: i < s ? colors[s] : AC.bdr.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ))),
+        const SizedBox(height: 4),
+        Text(labels[s], style: TextStyle(color: colors[s], fontSize: 10)),
+      ]),
+    );
+  }
+}
