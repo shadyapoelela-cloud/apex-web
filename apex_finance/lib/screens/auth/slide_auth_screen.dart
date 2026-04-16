@@ -168,16 +168,18 @@ class _SAS extends State<SlideAuthScreen> {
     const SizedBox(height: 10), _orW(), const SizedBox(height: 8), _socW(),
   ]);
 
-  Widget _tf(TextEditingController c, String l, IconData ic, {bool ltr = false}) => TextField(
+  Widget _tf(TextEditingController c, String l, IconData ic, {bool ltr = false, TextInputAction? action}) => TextField(
     controller: c, style: TextStyle(color: AC.tp), textDirection: ltr ? TextDirection.ltr : null,
+    textInputAction: action ?? TextInputAction.next,
     decoration: InputDecoration(labelText: l, prefixIcon: Icon(ic, color: AC.goldText, size: 20),
       filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
       isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.goldText))));
 
-  Widget _pf(TextEditingController c, String l, bool o, VoidCallback t, {VoidCallback? sub}) => TextField(
+  Widget _pf(TextEditingController c, String l, bool o, VoidCallback t, {VoidCallback? sub, TextInputAction? action}) => TextField(
     controller: c, obscureText: o, style: TextStyle(color: AC.tp),
+    textInputAction: action ?? (sub != null ? TextInputAction.done : TextInputAction.next),
     onChanged: (_) => setState(() {}),
     decoration: InputDecoration(labelText: l, prefixIcon: Icon(Icons.lock_outlined, color: AC.goldText, size: 20),
       suffixIcon: IconButton(icon: Icon(o ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20), onPressed: t),

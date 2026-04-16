@@ -2382,3 +2382,25 @@ class ApexPasswordStrength extends StatelessWidget {
     );
   }
 }
+
+// ── 39. Loading Indicator — spinner with optional message ──
+
+Widget apexLoading({String message = 'جارٍ التحميل...'}) {
+  return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+    CircularProgressIndicator(strokeWidth: 2.5, color: AC.gold),
+    const SizedBox(height: 14),
+    Text(message, style: TextStyle(color: AC.ts, fontSize: 12)),
+  ]));
+}
+
+// ── 41. Consistent SnackBar helper ──
+
+void apexSnack(BuildContext context, String message, {bool isError = false, bool isWarning = false}) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(message, style: TextStyle(color: AC.tp)),
+    backgroundColor: isError ? AC.err : isWarning ? AC.warn : AC.ok,
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    duration: const Duration(seconds: 3),
+  ));
+}
