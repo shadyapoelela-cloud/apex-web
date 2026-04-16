@@ -166,6 +166,27 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.warn,
                     onTap: () => context.go('/compliance/budget-variance'),
                   ),
+                  _toolCard(
+                    icon: Icons.account_balance,
+                    title: 'التسوية البنكية',
+                    subtitle: 'مطابقة الدفاتر بكشف البنك',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/bank-rec'),
+                  ),
+                  _toolCard(
+                    icon: Icons.inventory_2,
+                    title: 'تقييم المخزون',
+                    subtitle: 'FIFO · LIFO · WAC',
+                    color: AC.ok,
+                    onTap: () => context.go('/compliance/inventory'),
+                  ),
+                  _toolCard(
+                    icon: Icons.bar_chart,
+                    title: 'تقرير الأعمار',
+                    subtitle: 'AR/AP + ECL',
+                    color: AC.err,
+                    onTap: () => context.go('/compliance/aging'),
+                  ),
                 ],
               );
             }),
