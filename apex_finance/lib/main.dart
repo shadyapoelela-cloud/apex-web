@@ -802,19 +802,47 @@ class _MainNavS extends ConsumerState<MainNav> {
             _buildThemePicker(),
             _buildLangToggle(),
             Spacer(),
-            Container(
-              padding: const EdgeInsets.only(left: 12),
-              decoration: BoxDecoration(border: Border(left: BorderSide(color: AC.gold.withValues(alpha: 0.15), width: 1.5))),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'), style: TextStyle(color: AC.tp.withValues(alpha: 0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.2)),
-                  SizedBox(height: 2),
-                  Text(_activeClients.isEmpty ? _clientLabel : _activeClients.join(' , '), style: TextStyle(color: AC.ts.withValues(alpha: 0.7), fontSize: 10)),
-                ]),
-                SizedBox(width: 6),
-                ApexIconButton(icon: Icons.account_circle, size: 22, tooltip: 'الملف الشخصي والإعدادات',
-                  onPressed: () => context.push('/settings')),
-              ]),
+            MouseRegion(
+              onEnter: (_) => setState(() => _hovUserSection = 1),
+              onExit: (_) => setState(() => _hovUserSection = 0),
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => context.push('/settings'),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _hovUserSection == 1 ? AC.gold.withValues(alpha: 0.06) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _hovUserSection == 1 ? AC.gold.withValues(alpha: 0.15) : Colors.transparent,
+                    ),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'),
+                        style: TextStyle(color: _hovUserSection == 1 ? AC.gold : AC.tp.withValues(alpha: 0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.2)),
+                      SizedBox(height: 2),
+                      Text(_activeClients.isEmpty ? _clientLabel : _activeClients.join(' , '),
+                        style: TextStyle(color: AC.ts.withValues(alpha: 0.7), fontSize: 10)),
+                    ]),
+                    SizedBox(width: 8),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 32, height: 32,
+                      decoration: BoxDecoration(
+                        color: AC.gold.withValues(alpha: _hovUserSection == 1 ? 0.15 : 0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(child: Text(
+                        (S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'U'))[0].toUpperCase(),
+                        style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold),
+                      )),
+                    ),
+                  ]),
+                ),
+              ),
             ),
           ]),
         ),
@@ -1019,6 +1047,8 @@ class _MainNavS extends ConsumerState<MainNav> {
       ),
     ),
   );
+
+  int _hovUserSection = 0;
 
   void _comingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1306,25 +1336,61 @@ class _MainNavS extends ConsumerState<MainNav> {
   // ── Language Toggle ──
   Widget _buildLangToggle() {
     final isAr = ref.watch(appSettingsProvider).language == 'ar';
-    return GestureDetector(
-      onTap: () {
-        ref.read(appSettingsProvider.notifier).setLanguage(isAr ? 'en' : 'ar');
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          color: AC.gold.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AC.gold.withValues(alpha: 0.3)),
-        ),
-        child: Text(isAr ? 'EN' : 'ع', style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.bold)),
-      ),
+    return _AppBarPill(
+      label: isAr ? 'EN' : 'ع',
+      onTap: () => ref.read(appSettingsProvider.notifier).setLanguage(isAr ? 'en' : 'ar'),
+      tooltip: isAr ? 'Switch to English' : 'التبديل للعربية',
     );
   }
 }
 
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+class _AppBarPill extends StatefulWidget {
+  final String label;
+  final VoidCallback onTap;
+  final String? tooltip;
+  const _AppBarPill({required this.label, required this.onTap, this.tooltip});
+  @override
+  State<_AppBarPill> createState() => _AppBarPillState();
+}
+
+class _AppBarPillState extends State<_AppBarPill> {
+  bool _hov = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final pill = MouseRegion(
+      onEnter: (_) => setState(() => _hov = true),
+      onExit: (_) => setState(() => _hov = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          transform: _hov ? (Matrix4.identity()..scale(1.08)) : Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: _hov ? AC.gold.withValues(alpha: 0.18) : AC.gold.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: _hov ? AC.gold.withValues(alpha: 0.5) : AC.gold.withValues(alpha: 0.25)),
+            boxShadow: _hov ? [BoxShadow(color: AC.gold.withValues(alpha: 0.12), blurRadius: 8)] : null,
+          ),
+          child: Text(widget.label, style: TextStyle(
+            color: AC.gold,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          )),
+        ),
+      ),
+    );
+    if (widget.tooltip != null) return Tooltip(message: widget.tooltip!, preferBelow: false, child: pill);
+    return pill;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
 // DASHBOARD
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 class DashTab extends ConsumerStatefulWidget { const DashTab({super.key}); @override ConsumerState<DashTab> createState()=>_DashS(); }
