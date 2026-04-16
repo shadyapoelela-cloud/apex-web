@@ -692,6 +692,15 @@ try:
 except Exception as e:
     logging.error(f"Investment routes not mounted: {e}", exc_info=True)
 
+# ── Bank Reconciliation + Inventory + Aging
+try:
+    from app.core.accounting_routes import router as acct_router
+
+    app.include_router(acct_router)
+    logging.info("Accounting-ops routes mounted (bank-rec, inventory, aging)")
+except Exception as e:
+    logging.error(f"Accounting routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
