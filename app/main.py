@@ -638,6 +638,15 @@ try:
 except Exception as e:
     logging.error(f"ZATCA routes not mounted: {e}", exc_info=True)
 
+# ── Zakat + VAT calculators (KSA + GCC)
+try:
+    from app.core.tax_routes import router as tax_router
+
+    app.include_router(tax_router)
+    logging.info("Tax routes mounted at /tax/*")
+except Exception as e:
+    logging.error(f"Tax routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
