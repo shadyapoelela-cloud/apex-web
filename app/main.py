@@ -52,18 +52,53 @@ class AccountClosureRequest(BaseModel):
     reason: str = Field(default="")
 
 
-ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "apex-admin-2026")
-if ADMIN_SECRET == "apex-admin-2026":
-    logging.warning("ADMIN_SECRET is using default value! Set ADMIN_SECRET env var in production.")
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development").lower()
+IS_PRODUCTION = ENVIRONMENT in ("production", "prod")
+
+ADMIN_SECRET = os.environ.get("ADMIN_SECRET")
+if not ADMIN_SECRET:
+    if IS_PRODUCTION:
+        raise RuntimeError(
+            "ADMIN_SECRET env var is REQUIRED in production. Refusing to start with insecure default."
+        )
+    ADMIN_SECRET = "apex-admin-dev-only"
+    logging.warning("ADMIN_SECRET not set — using development-only fallback. Set it before production.")
+
+# JWT secret hard-check: refuse to boot in production with a weak/missing secret.
+_jwt_env = os.environ.get("JWT_SECRET")
+if IS_PRODUCTION:
+    if not _jwt_env or len(_jwt_env) < 32:
+        raise RuntimeError(
+            "JWT_SECRET env var is REQUIRED in production and must be >=32 chars. Refusing to start."
+        )
 
 
 def _verify_admin(secret: str = None, x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
-    """Verify admin secret from header (preferred) or query param (legacy, deprecated)."""
+    """Verify admin secret.
+    Header 'X-Admin-Secret' is the preferred and only secure transport.
+    Query-parameter 'secret' is accepted in DEV ONLY for backward compatibility
+    (it leaks into server access logs and is refused in production)."""
+    if IS_PRODUCTION and secret and not x_admin_secret:
+        raise HTTPException(
+            403,
+            "Admin secret via query parameter is forbidden in production — use X-Admin-Secret header.",
+        )
     token = x_admin_secret or secret
     if not token or token != ADMIN_SECRET:
         raise HTTPException(403, "Invalid admin secret")
+    if secret and not x_admin_secret:
+        logging.warning(
+            "DEPRECATED: admin secret via query parameter. Migrate to X-Admin-Secret header."
+        )
     return token
 
+
+# Import compliance models EARLY so their tables register with Base.metadata
+# before any create_all() call (tests in particular rely on this).
+try:
+    from app.core import compliance_models as _compliance_models  # noqa: F401
+except Exception as e:
+    logging.warning(f"Compliance models import failed: {e}")
 
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
@@ -305,6 +340,15 @@ def _run_startup():
         init_copilot_db()
     except Exception:
         logging.error("Copilot init error", exc_info=True)
+    # Compliance core: journal entry sequence + immutable audit trail.
+    # Required by ZATCA Phase 2 (gap-free JE numbers) and IFRS/SOCPA.
+    try:
+        from app.core.compliance_models import init_compliance_db
+
+        tables = init_compliance_db()
+        logging.info(f"Compliance core tables ready: {tables}")
+    except Exception:
+        logging.error("Compliance core init error", exc_info=True)
 
 
 def _validate_env():
@@ -355,14 +399,31 @@ _cors_env = os.environ.get("CORS_ORIGINS", "")
 _cors_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else ["*"]
 _allow_creds = "*" not in _cors_origins  # credentials forbidden with wildcard
 if not _allow_creds:
+    if IS_PRODUCTION:
+        raise RuntimeError("CORS_ORIGINS must be an explicit allowlist in production, not '*'.")
     logging.warning("CORS allows all origins — set CORS_ORIGINS env var in production")
+
+# Explicit method + header allowlists — narrower than "*" per security best practice.
+_ALLOWED_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+_ALLOWED_HEADERS = [
+    "Content-Type",
+    "Authorization",
+    "Accept",
+    "Origin",
+    "X-Requested-With",
+    "X-Admin-Secret",
+    "X-Idempotency-Key",
+    "X-Client-Version",
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
     allow_credentials=_allow_creds,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Content-Disposition"],
+    allow_methods=_ALLOWED_METHODS,
+    allow_headers=_ALLOWED_HEADERS,
+    expose_headers=["Content-Disposition", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
+    max_age=600,
 )
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
@@ -377,12 +438,43 @@ async def global_exception_handler(request, exc):
 
 
 # ======================================================================
-# In-memory rate limiter (per-IP, proxy-aware, resets on restart)
+# In-memory rate limiter — tiered per-path limits, per-IP, proxy-aware.
+# Resets on restart. Replace with Redis-backed slowapi for multi-instance prod.
 # ======================================================================
-_rate_limits = defaultdict(list)  # ip -> [timestamp, ...]
-RATE_LIMIT_WINDOW = 60  # seconds
-RATE_LIMIT_MAX = 60  # max requests per window (per IP)
-_RATE_LIMIT_MAX_IPS = 10000  # prevent memory leak from IP flooding
+_rate_limits = defaultdict(list)  # (ip, bucket) -> [timestamp, ...]
+_RATE_LIMIT_MAX_KEYS = 20000  # prevent memory leak from IP flooding
+
+# Legacy module-level aliases (retained so older tests / external tooling keep working).
+# The active limits are in _RATE_TIERS below — these just mirror the default bucket.
+RATE_LIMIT_WINDOW = 60  # seconds (default bucket window)
+RATE_LIMIT_MAX = 120  # requests per window (default bucket)
+
+# Tiers: (path_prefix, window_seconds, max_requests, bucket_name)
+# More specific prefixes MUST come first (longest prefix wins).
+# Production values are strict (brute-force protection); development values
+# are relaxed so the local workflow doesn't trip every few minutes.
+if IS_PRODUCTION:
+    _RATE_TIERS = [
+        ("/admin/reset-postgres", 3600, 2, "admin_reset"),    # 2/hour — destructive
+        ("/admin/reinit", 3600, 5, "admin_reinit"),
+        ("/admin/", 60, 20, "admin"),                         # 20/min
+        ("/auth/login", 300, 10, "auth_login"),               # 10 per 5min — brute-force guard
+        ("/auth/register", 3600, 5, "auth_register"),         # 5/hour
+        ("/auth/forgot-password", 3600, 3, "auth_forgot"),    # 3/hour
+        ("/auth/", 60, 30, "auth"),
+        ("/", 60, 120, "default"),                            # 120/min global
+    ]
+else:
+    _RATE_TIERS = [
+        ("/admin/reset-postgres", 60, 10, "admin_reset"),
+        ("/admin/reinit", 60, 20, "admin_reinit"),
+        ("/admin/", 60, 120, "admin"),
+        ("/auth/login", 60, 60, "auth_login"),                # 60/min in dev
+        ("/auth/register", 60, 30, "auth_register"),
+        ("/auth/forgot-password", 60, 20, "auth_forgot"),
+        ("/auth/", 60, 120, "auth"),
+        ("/", 60, 600, "default"),                            # very permissive
+    ]
 
 
 def _get_client_ip(request) -> str:
@@ -394,21 +486,55 @@ def _get_client_ip(request) -> str:
     return request.client.host if request.client else "unknown"
 
 
+def _pick_tier(path: str):
+    for prefix, window, limit, bucket in _RATE_TIERS:
+        if path.startswith(prefix):
+            return window, limit, bucket
+    return _RATE_TIERS[-1][1], _RATE_TIERS[-1][2], _RATE_TIERS[-1][3]
+
+
 @app.middleware("http")
 async def rate_limit_middleware(request, call_next):
+    # CORS preflight and health probes MUST bypass rate limiting — they are
+    # not user-initiated traffic and must never be throttled.
+    if request.method == "OPTIONS":
+        return await call_next(request)
+    path_raw = request.url.path or "/"
+    if path_raw in ("/health", "/", "/docs", "/openapi.json", "/redoc"):
+        return await call_next(request)
     client_ip = _get_client_ip(request)
+    path = path_raw
+    window, limit, bucket = _pick_tier(path)
+    key = (client_ip, bucket)
     now = time.time()
-    # Prevent memory leak: evict oldest IPs if too many tracked
-    if len(_rate_limits) > _RATE_LIMIT_MAX_IPS:
-        oldest = sorted(_rate_limits.keys(), key=lambda k: _rate_limits[k][-1] if _rate_limits[k] else 0)
-        for ip in oldest[: _RATE_LIMIT_MAX_IPS // 2]:
-            del _rate_limits[ip]
-    # Clean old entries for this IP
-    _rate_limits[client_ip] = [t for t in _rate_limits[client_ip] if now - t < RATE_LIMIT_WINDOW]
-    if len(_rate_limits[client_ip]) >= RATE_LIMIT_MAX:
-        return JSONResponse(status_code=429, content={"success": False, "error": "طلبات كثيرة جداً. الرجاء الانتظار."})
-    _rate_limits[client_ip].append(now)
+    # Prevent memory leak: evict oldest keys if too many tracked
+    if len(_rate_limits) > _RATE_LIMIT_MAX_KEYS:
+        oldest = sorted(
+            _rate_limits.keys(), key=lambda k: _rate_limits[k][-1] if _rate_limits[k] else 0
+        )
+        for k in oldest[: _RATE_LIMIT_MAX_KEYS // 2]:
+            del _rate_limits[k]
+    # Clean old entries for this bucket
+    _rate_limits[key] = [t for t in _rate_limits[key] if now - t < window]
+    remaining = limit - len(_rate_limits[key])
+    if remaining <= 0:
+        reset_in = int(window - (now - _rate_limits[key][0])) if _rate_limits[key] else window
+        return JSONResponse(
+            status_code=429,
+            headers={
+                "Retry-After": str(reset_in),
+                "X-RateLimit-Limit": str(limit),
+                "X-RateLimit-Remaining": "0",
+                "X-RateLimit-Reset": str(int(now + reset_in)),
+            },
+            content={"success": False, "error": "طلبات كثيرة جداً. الرجاء الانتظار.", "retry_after": reset_in},
+        )
+    _rate_limits[key].append(now)
     response = await call_next(request)
+    # Expose remaining quota to clients
+    response.headers["X-RateLimit-Limit"] = str(limit)
+    response.headers["X-RateLimit-Remaining"] = str(max(0, remaining - 1))
+    response.headers["X-RateLimit-Reset"] = str(int(now + window))
     return response
 
 
@@ -492,6 +618,25 @@ app.include_router(archive_r, tags=["Archive"])
 app.include_router(catalog_r, tags=["Service Catalog"])
 app.include_router(social_auth_r, tags=["Social Auth"])
 app.include_router(copilot_router)
+
+# ── Compliance Core: Journal Entry Sequence + immutable Audit Trail
+# ── (ZATCA Phase 2 / IFRS / SOCPA requirements)
+try:
+    from app.core.compliance_routes import router as compliance_router
+
+    app.include_router(compliance_router)
+    logging.info("Compliance routes mounted at /compliance/*")
+except Exception as e:
+    logging.error(f"Compliance routes not mounted: {e}", exc_info=True)
+
+# ── ZATCA Phase 2 (Fatoora) e-invoice routes
+try:
+    from app.core.zatca_routes import router as zatca_router
+
+    app.include_router(zatca_router)
+    logging.info("ZATCA routes mounted at /zatca/*")
+except Exception as e:
+    logging.error(f"ZATCA routes not mounted: {e}", exc_info=True)
 
 
 @app.get("/")
@@ -1452,16 +1597,37 @@ async def request_closure(body: AccountClosureRequest):
     }
 
 
-# NOTE: Stub endpoints for knowledge-feedback, service-provider docs, task-types,
-# provider compliance, client-types were removed in Phase 7 cleanup (v10.0).
-# These are now served by their proper phase routers:
-#   - /knowledge-feedback/* -> Phase 3 (phase3_routes.py)
-#   - /service-providers/* -> Phase 4 (phase4_routes.py)
-#   - /task-types -> Phase 7 (phase7_routes.py)
-#   - /providers/compliance/* -> Phase 7 (phase7_routes.py)
-#   - /client-types -> Phase 2 (phase2_routes.py)
-#   - /users/me/profile -> Phase 1 (phase1_routes.py PUT /users/me)
-#   - /users/me/activity -> Phase 9 (phase9_routes.py)
+# ═══════════════════════════════════════════════════════════════
+# Route Ownership Registry (single source of truth — do NOT duplicate)
+# ═══════════════════════════════════════════════════════════════
+# Each URL prefix is owned by exactly one phase/sprint router. Any change
+# requires updating this table AND the corresponding router. Duplication
+# causes FastAPI "route shadowing" where behaviour depends on include order.
+#
+# Prefix/Path                         Owner
+# ──────────────────────────────────  ────────────────────────────
+#   /auth/*                           Phase 1 (phase1_routes.py)
+#   /users/me, /users/me/security,    Phase 1
+#     /users/me/sessions
+#   /account/profile, /account/       Phase 9 (phase9_routes.py)
+#     sessions, /account/activity,
+#     /account/closure
+#   /plans, /subscriptions, /legal    Phase 1
+#   /clients, /client-types           Phase 2 (phase2_routes.py)
+#   /coa/*, /coa-uploads              Phase 2 / Sprint 2-3
+#   /knowledge-feedback/*             Phase 3 ONLY
+#   /service-providers/*              Phase 4 ONLY
+#   /services/catalog, /services/     Phase 2 (service_catalog_routes)
+#     cases
+#   /audit/*                          Phase 2 (audit service)
+#   /providers/compliance/*           Phase 7 ONLY
+#   /task-types                       Phase 7 ONLY
+#   /entitlements/*                   Phase 8
+#   /notifications/*                  Phase 10
+#   /admin/*                          main.py + Phase 6
+#   /kb/*                             Knowledge Brain
+#   /copilot/*                        Copilot service
+# ═══════════════════════════════════════════════════════════════
 
 
 if __name__ == "__main__":

@@ -12,11 +12,25 @@ from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
-JWT_SECRET = os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION")
-JWT_ALGORITHM = "HS256"
+_ENVIRONMENT = os.environ.get("ENVIRONMENT", "development").lower()
+_IS_PRODUCTION = _ENVIRONMENT in ("production", "prod")
 
-if JWT_SECRET == "apex-dev-secret-CHANGE-IN-PRODUCTION":
-    logger.warning("⚠ JWT_SECRET is using default value! Set JWT_SECRET env var in production.")
+_jwt_env = os.environ.get("JWT_SECRET")
+if not _jwt_env:
+    if _IS_PRODUCTION:
+        raise RuntimeError(
+            "JWT_SECRET env var is REQUIRED in production. Refusing to start with insecure default."
+        )
+    _jwt_env = "apex-dev-secret-CHANGE-IN-PRODUCTION"
+    logger.warning("⚠ JWT_SECRET not set — using development-only fallback.")
+elif _IS_PRODUCTION and len(_jwt_env) < 32:
+    raise RuntimeError(
+        "JWT_SECRET must be at least 32 characters in production (current length: %d)."
+        % len(_jwt_env)
+    )
+
+JWT_SECRET = _jwt_env
+JWT_ALGORITHM = "HS256"
 
 
 def extract_user_id(authorization: str = None) -> str:
