@@ -1,5 +1,5 @@
 ﻿"""
-APEX Platform â€” Auth Service (Security Patched)
+APEX Platform â€" Auth Service (Security Patched)
 â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 - bcrypt password hashing (replaces SHA-256)
 - JWT_SECRET from environment variable
@@ -37,7 +37,7 @@ from app.phase1.models.platform_models import (
 )
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-# Config â€” from environment variables
+# Config â€" from environment variables
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
@@ -65,7 +65,7 @@ USE_BCRYPT = True
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-# Password Utilities â€” bcrypt with SHA-256 fallback
+# Password Utilities â€" bcrypt with SHA-256 fallback
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 
@@ -255,21 +255,21 @@ class AuthService:
 
             if not user:
                 return {
-                    “success”: False,
-                    “error”: “اسم المستخدم أو كلمة المرور غير صحيحة”,
+                    "success": False,
+                    "error": "اسم المستخدم أو كلمة المرور غير صحيحة",
                 }
 
-            if user.status == “suspended”:
-                return {“success”: False, “error”: “الحساب موقوف — تواصل مع الدعم”}
-            if user.status in (“deactivated_temp”, “deactivated_permanent”):
-                return {“success”: False, “error”: “الحساب معطّل”}
+            if user.status == "suspended":
+                return {"success": False, "error": "الحساب موقوف -- تواصل مع الدعم"}
+            if user.status in ("deactivated_temp", "deactivated_permanent"):
+                return {"success": False, "error": "الحساب معطّل"}
 
             if user.failed_login_count >= MAX_FAILED_LOGINS:
                 if user.locked_until and safe_aware(user.locked_until) > datetime.now(timezone.utc):
                     remaining = (safe_aware(user.locked_until) - datetime.now(timezone.utc)).seconds // 60
                     return {
                         "success": False,
-                        “error”: f”الحساب مقفل — حاول بعد {remaining} دقيقة”,
+                        "error": f"الحساب مقفل -- حاول بعد {remaining} دقيقة",
                     }
                 else:
                     user.failed_login_count = 0
