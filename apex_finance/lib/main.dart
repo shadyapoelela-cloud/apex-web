@@ -137,17 +137,26 @@ class ApexApp extends ConsumerWidget {
       )),
       outlinedButtonTheme: OutlinedButtonThemeData(style: ButtonStyle(
         foregroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return AC.gold;
           if (s.contains(WidgetState.hovered)) return AC.goldLight;
           return AC.gold;
         }),
         side: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return BorderSide(color: AC.gold.withValues(alpha: 0.8), width: 1.5);
           if (s.contains(WidgetState.hovered)) return BorderSide(color: AC.gold.withValues(alpha: 0.7), width: 1.5);
           return BorderSide(color: AC.gold.withValues(alpha: 0.35));
         }),
         backgroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return AC.gold.withValues(alpha: 0.10);
           if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.06);
           return Colors.transparent;
         }),
+        elevation: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return 0;
+          if (s.contains(WidgetState.hovered)) return 3;
+          return 0;
+        }),
+        shadowColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.25)),
         overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.1)),
         padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
         shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
@@ -1054,16 +1063,32 @@ class _MainNavS extends ConsumerState<MainNav> {
                 decoration: BoxDecoration(
                   color: (isGold || isActive || hovered) ? AC.gold.withValues(alpha: 0.12) : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
+                  boxShadow: hovered ? [
+                    BoxShadow(color: AC.gold.withValues(alpha: 0.10), blurRadius: 6),
+                  ] : null,
                 ),
-                child: Icon(icon, color: isGold || isActive ? AC.gold : (hovered ? AC.goldLight : AC.ts), size: 18),
+                child: AnimatedScale(
+                  scale: hovered ? 1.15 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  child: AnimatedRotation(
+                    turns: hovered ? -0.02 : 0.0,
+                    duration: const Duration(milliseconds: 250),
+                    child: Icon(icon, color: isGold || isActive ? AC.gold : (hovered ? AC.goldLight : AC.ts), size: 18),
+                  ),
+                ),
               ),
-              // Arrow appears on hover
-              AnimatedOpacity(
-                opacity: hovered ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 180),
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: Icon(Icons.chevron_right, color: AC.gold.withValues(alpha: 0.5), size: 14),
+              // Arrow slides + fades on hover
+              AnimatedSlide(
+                offset: Offset(0, hovered ? 0.0 : 0.3),
+                duration: const Duration(milliseconds: 200),
+                child: AnimatedOpacity(
+                  opacity: hovered ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 180),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Icon(Icons.chevron_right, color: AC.gold.withValues(alpha: 0.5), size: 14),
+                  ),
                 ),
               ),
             ]),
@@ -1305,7 +1330,7 @@ class _DashS extends ConsumerState<DashTab> {
       actions: [
         Stack(children: [
           ApexIconButton(icon: Icons.notifications_outlined, color: AC.tp,
-            onPressed: ()=>context.go('/notifications')),
+            tooltip: 'الإشعارات', onPressed: ()=>context.go('/notifications')),
           if(_notifCount>0) Positioned(right:8,top:8, child: Container(padding: EdgeInsets.all(4),
             decoration: BoxDecoration(color: AC.err, shape: BoxShape.circle),
             child: Text('$_notifCount', style: TextStyle(color: AC.btnFg, fontSize: 10))))]),
@@ -1702,7 +1727,7 @@ class _ClientsS extends ConsumerState<ClientsTab> {
             Row(children: [
               Text('\u062a\u0633\u062c\u064a\u0644 \u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold, fontSize: 16, fontWeight: FontWeight.bold)),
               Spacer(),
-              ApexIconButton(icon: Icons.close, color: AC.ts, size: 20, onPressed: () => Navigator.pop(dc)),
+              ApexIconButton(icon: Icons.close, color: AC.ts, size: 20, tooltip: 'إغلاق', onPressed: () => Navigator.pop(dc)),
             ]),
             const SizedBox(height: 16),
             SizedBox(height: 50, child: Row(children: List.generate(7, (idx) =>
@@ -2086,7 +2111,7 @@ class _MarketS extends ConsumerState<MarketTab> {
       icon: Icon(Icons.add, color: AC.navy), label: Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629', style: TextStyle(color: AC.navy))),
     body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       ListView(padding: EdgeInsets.all(14), children: [
-        Container(margin: EdgeInsets.only(bottom: 14), padding: EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [Icon(Icons.store_mall_directory, color: AC.gold, size: 36), SizedBox(height: 8), Text("ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ ط§ظ„ظ…ظ‡ظ†ظٹط©", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), SizedBox(height: 4), Text("طھطµظپط­ 6 ط®ط¯ظ…ط§طھ: طھط­ظ„ظٹظ„ ظ…ط§ظ„ظٹطŒ ظ…ط±ط§ط¬ط¹ط©طŒ ط¶ط±ط§ط¦ط¨طŒ طھظ…ظˆظٹظ„طŒ ط¯ط¹ظ…طŒ طھط±ط§ط®ظٹطµ", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => context.push('/service-catalog', extra: {'clientId': '', 'token': S.token}), icon: Icon(Icons.arrow_forward), label: Text("ظپطھط­ ط§ظ„ظƒطھط§ظ„ظˆط¬")))])),
+        Container(margin: EdgeInsets.only(bottom: 14), padding: EdgeInsets.all(14), decoration: BoxDecoration(color: AC.gold.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: AC.gold)), child: Column(children: [Icon(Icons.store_mall_directory, color: AC.gold, size: 36), SizedBox(height: 8), Text("كتالوج الخدمات المهنية", style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold, fontSize: 16)), SizedBox(height: 4), Text("تصفح 6 خدمات: تحليل مالي، مراجعة، ضرائب، تمويل، دعم، تراخيص", style: TextStyle(color: AC.ts, fontSize: 12), textAlign: TextAlign.center), SizedBox(height: 12), SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: () => context.push('/service-catalog', extra: {'clientId': '', 'token': S.token}), icon: Icon(Icons.arrow_forward), label: Text("فتح الكتالوج")))])),
         _card('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0639\u062a\u0645\u062f\u0648\u0646', [
           if(_provs.isEmpty) Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0645\u0642\u062f\u0645\u0648 \u062e\u062f\u0645\u0627\u062a \u0628\u0639\u062f', style: TextStyle(color: AC.ts, fontSize: 13))
           else ..._provs.take(5).map((p) => Padding(padding: EdgeInsets.only(bottom: 8),
@@ -2260,7 +2285,7 @@ class _AccS extends ConsumerState<AccountTab> {
     ApiService.clearToken(); context.go('/login'); }
   @override Widget build(BuildContext c) => Scaffold(
     appBar: AppBar(title: Text('\u062d\u0633\u0627\u0628\u064a', style: TextStyle(color: AC.gold)),
-      actions: [ApexIconButton(onPressed: _logout, icon: Icons.logout, color: AC.err)]),
+      actions: [ApexIconButton(onPressed: _logout, icon: Icons.logout, color: AC.err, tooltip: 'تسجيل الخروج')]),
     body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(16), children: [
         // Profile Card
@@ -2287,7 +2312,7 @@ class _AccS extends ConsumerState<AccountTab> {
           _kv('\u0622\u062e\u0631 \u062f\u062e\u0648\u0644', _s?['last_login']?.toString().substring(0,16)??'-'),
         ]),
         // Menu Items
-                _mi(Icons.account_tree, 'ط´ط¬ط±ط© ط§ظ„ط­ط³ط§ط¨ط§طھ COA', AC.cyan,
+                _mi(Icons.account_tree, 'شجرة الحسابات COA', AC.cyan,
           ()=>context.go('/clients')),
         _mi(Icons.workspace_premium, '\u062e\u0637\u062a\u064a \u0648\u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643', AC.gold,
           ()=>context.go('/subscription')),
@@ -2297,22 +2322,20 @@ class _AccS extends ConsumerState<AccountTab> {
           ()=>context.go('/password/change')),
         _mi(Icons.delete_outline, '\u0625\u063a\u0644\u0627\u0642 \u0627\u0644\u062d\u0633\u0627\u0628', AC.err,
           ()=>context.go('/account/close')),
-          _mi(Icons.archive, 'ط§ظ„ط£ط±ط´ظٹظپ', AC.cyan, () => context.push('/archive')),
-            _mi(Icons.history, 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·', AC.purple,
+          _mi(Icons.archive, 'الأرشيف', AC.cyan, () => context.push('/archive')),
+            _mi(Icons.history, 'سجل النشاط', AC.purple,
             ()=>context.go('/account/activity')),
-          _mi(Icons.compare_arrows, 'ظ…ظ‚ط§ط±ظ†ط© ط§ظ„ط®ط·ط·', AC.cyan,
+          _mi(Icons.compare_arrows, 'مقارنة الخطط', AC.cyan,
             ()=>context.go('/plans/compare')),
-          _mi(Icons.assignment, 'ط£ظ†ظˆط§ط¹ ط§ظ„ظ…ظ‡ط§ظ…', AC.cyan,
+          _mi(Icons.assignment, 'أنواع المهام', AC.cyan,
             ()=>context.go('/tasks/types')),
-          _mi(Icons.description, 'ط§ظ„ط´ط±ظˆط· ظˆط§ظ„ط£ط­ظƒط§ظ…', AC.ts,
+          _mi(Icons.description, 'الشروط والأحكام', AC.ts,
             ()=>context.go('/legal')),
-          _mi(Icons.devices, 'ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©', AC.cyan,
+          _mi(Icons.devices, 'الجلسات النشطة', AC.cyan,
             ()=>context.go('/account/sessions')),
       ])));
-  Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) => GestureDetector(onTap: onTap,
-    child: Container(margin: EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
-      child: ListTile(leading: Icon(i, color: cl), title: Text(l, style: TextStyle(color: AC.tp, fontSize: 14)),
-        trailing: Icon(Icons.chevron_left, color: AC.ts))));
+  Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) =>
+    ApexMenuItem(icon: i, label: l, color: cl, onTap: onTap);
 }
 
 
@@ -2338,17 +2361,17 @@ class _AdminS extends ConsumerState<AdminTab> {
     appBar: AppBar(title: Text('\u0644\u0648\u062d\u0629 \u0627\u0644\u0625\u062f\u0627\u0631\u0629', style: TextStyle(color: AC.gold)),
       actions: [
         ApexIconButton(icon: Icons.rate_review, color: AC.cyan,
-          onPressed: ()=>context.go('/admin/reviewer')),
+          tooltip: 'المراجع', onPressed: ()=>context.go('/admin/reviewer')),
         ApexIconButton(icon: Icons.verified_user, color: AC.ok,
-          onPressed: ()=>context.go('/admin/providers/verify')),
+          tooltip: 'التحقق من مقدمي الخدمات', onPressed: ()=>context.go('/admin/providers/verify')),
         ApexIconButton(icon: Icons.upload_file, color: AC.gold,
-          onPressed: ()=>context.go('/admin/providers/documents')),
+          tooltip: 'مستندات مقدمي الخدمات', onPressed: ()=>context.go('/admin/providers/documents')),
         ApexIconButton(icon: Icons.shield, color: AC.gold,
-          onPressed: ()=>context.go('/admin/providers/compliance')),
+          tooltip: 'الامتثال', onPressed: ()=>context.go('/admin/providers/compliance')),
         ApexIconButton(icon: Icons.psychology, color: AC.gold,
-          onPressed: ()=>context.go('/knowledge/console')),
+          tooltip: 'قاعدة المعرفة', onPressed: ()=>context.go('/knowledge/console')),
         ApexIconButton(icon: Icons.security, color: AC.gold,
-          onPressed: ()=>context.go('/admin/audit')),
+          tooltip: 'سجل التدقيق', onPressed: ()=>context.go('/admin/audit')),
       ]),
     body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
       RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(14), children: [
@@ -2400,12 +2423,6 @@ class _AdminS extends ConsumerState<AdminTab> {
       Text(label, style: TextStyle(color: AC.ts, fontSize: 11))]));
 
   Widget _actionTile(String label, IconData icon, Color color, VoidCallback onTap) =>
-    GestureDetector(onTap: onTap, child: Padding(padding: const EdgeInsets.only(bottom: 8),
-      child: Row(children: [
-        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, color: color, size: 18)),
-        SizedBox(width: 12),
-        Expanded(child: Text(label, style: TextStyle(color: AC.tp, fontSize: 14))),
-        Icon(Icons.chevron_left, color: AC.ts, size: 20)])));
+    ApexActionTile(label: label, icon: icon, color: color, onTap: onTap);
 }
 

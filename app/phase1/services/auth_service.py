@@ -90,12 +90,12 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 def validate_password_strength(password: str):
     if len(password) < PASSWORD_MIN_LENGTH:
-        return False, f"ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ظٹط¬ط¨ ط£ظ† طھظƒظˆظ† {PASSWORD_MIN_LENGTH} ط£ط­ط±ظپ ط¹ظ„ظ‰ ط§ظ„ط£ظ‚ظ„"
+        return False, f"كلمة المرور يجب أن تكون {PASSWORD_MIN_LENGTH} أحرف على الأقل"
     has_upper = any(c.isupper() for c in password)
     has_lower = any(c.islower() for c in password)
     has_digit = any(c.isdigit() for c in password)
     if not (has_upper and has_lower and has_digit):
-        return False, "ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ظٹط¬ط¨ ط£ظ† طھط­طھظˆظٹ ط¹ظ„ظ‰ ط­ط±ظپ ظƒط¨ظٹط± ظˆطµط؛ظٹط± ظˆط±ظ‚ظ…"
+        return False, "كلمة المرور يجب أن تحتوي على حرف كبير وصغير ورقم"
     return True, ""
 
 
@@ -131,9 +131,9 @@ def decode_token(token: str) -> dict:
     try:
         return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     except jwt.ExpiredSignatureError:
-        return {"error": "ط§ظ†طھظ‡طھ طµظ„ط§ط­ظٹط© ط§ظ„ط±ظ…ط²"}
+        return {"error": "انتهت صلاحية الرمز"}
     except jwt.InvalidTokenError:
-        return {"error": "ط±ظ…ط² ط؛ظٹط± طµط§ظ„ط­"}
+        return {"error": "رمز غير صالح"}
 
 
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
@@ -159,7 +159,7 @@ class AuthService:
         db = SessionLocal()
         try:
             if db.query(User).filter((User.username == username.lower()) | (User.email == email.lower())).first():
-                return {"success": False, "error": "ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ط£ظˆ ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ ظ…ط³ط¨ظ‚ط§ظ‹"}
+                return {"success": False, "error": "اسم المستخدم أو البريد مسجل مسبقاً"}
 
             user = User(
                 id=gen_uuid(),
@@ -255,21 +255,21 @@ class AuthService:
 
             if not user:
                 return {
-                    "success": False,
-                    "error": "ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©",
+                    “success”: False,
+                    “error”: “اسم المستخدم أو كلمة المرور غير صحيحة”,
                 }
 
-            if user.status == "suspended":
-                return {"success": False, "error": "ط§ظ„ط­ط³ط§ط¨ ظ…ظˆظ‚ظˆظپ â€” طھظˆط§طµظ„ ظ…ط¹ ط§ظ„ط¯ط¹ظ…"}
-            if user.status in ("deactivated_temp", "deactivated_permanent"):
-                return {"success": False, "error": "ط§ظ„ط­ط³ط§ط¨ ظ…ط¹ط·ظ‘ظ„"}
+            if user.status == “suspended”:
+                return {“success”: False, “error”: “الحساب موقوف — تواصل مع الدعم”}
+            if user.status in (“deactivated_temp”, “deactivated_permanent”):
+                return {“success”: False, “error”: “الحساب معطّل”}
 
             if user.failed_login_count >= MAX_FAILED_LOGINS:
                 if user.locked_until and safe_aware(user.locked_until) > datetime.now(timezone.utc):
                     remaining = (safe_aware(user.locked_until) - datetime.now(timezone.utc)).seconds // 60
                     return {
                         "success": False,
-                        "error": f"ط§ظ„ط­ط³ط§ط¨ ظ…ظ‚ظپظ„ â€” ط­ط§ظˆظ„ ط¨ط¹ط¯ {remaining} ط¯ظ‚ظٹظ‚ط©",
+                        “error”: f”الحساب مقفل — حاول بعد {remaining} دقيقة”,
                     }
                 else:
                     user.failed_login_count = 0
@@ -290,7 +290,7 @@ class AuthService:
                 db.commit()
                 return {
                     "success": False,
-                    "error": "ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©",
+                    "error": "اسم المستخدم أو كلمة المرور غير صحيحة",
                 }
 
             user.failed_login_count = 0
@@ -374,7 +374,7 @@ class AuthService:
                 )
             )
             db.commit()
-            return {"success": True, "message": "طھظ… طھط³ط¬ظٹظ„ ط§ظ„ط®ط±ظˆط¬"}
+            return {"success": True, "message": "تم تسجيل الخروج"}
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
@@ -391,9 +391,9 @@ class AuthService:
         try:
             user = db.query(User).filter(User.id == user_id).first()
             if not user:
-                return {"success": False, "error": "ط§ظ„ظ…ط³طھط®ط¯ظ… ط؛ظٹط± ظ…ظˆط¬ظˆط¯"}
+                return {"success": False, "error": "المستخدم غير موجود"}
             if not verify_password(current_password, user.password_hash):
-                return {"success": False, "error": "ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط§ظ„ط­ط§ظ„ظٹط© ط؛ظٹط± طµط­ظٹط­ط©"}
+                return {"success": False, "error": "كلمة المرور الحالية غير صحيحة"}
 
             user.password_hash = hash_password(new_password)
             db.add(
@@ -404,7 +404,7 @@ class AuthService:
                 )
             )
             db.commit()
-            return {"success": True, "message": "طھظ… طھط؛ظٹظٹط± ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"}
+            return {"success": True, "message": "تم تغيير كلمة المرور"}
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
@@ -417,7 +417,7 @@ class AuthService:
         try:
             user = db.query(User).filter(User.email == email.lower()).first()
             if not user:
-                return {"success": True, "message": "ط¥ط°ط§ ظƒط§ظ† ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ط§ظ‹ ط³طھطµظ„ظƒ ط±ط³ط§ظ„ط©"}
+                return {"success": True, "message": "إذا كان البريد مسجلاً ستصلك رسالة"}
 
             reset_token = secrets.token_urlsafe(32)
             db.add(
@@ -440,7 +440,7 @@ class AuthService:
 
             return {
                 "success": True,
-                "message": "ط¥ط°ط§ ظƒط§ظ† ط§ظ„ط¨ط±ظٹط¯ ظ…ط³ط¬ظ„ط§ظ‹ ط³طھطµظ„ظƒ ط±ط³ط§ظ„ط©",
+                "message": "إذا كان البريد مسجلاً ستصلك رسالة",
                 "reset_token": reset_token,
             }
         except Exception:
@@ -466,15 +466,15 @@ class AuthService:
                 .first()
             )
             if not reset:
-                return {"success": False, "error": "ط±ظ…ط² ط¥ط¹ط§ط¯ط© ط§ظ„طھط¹ظٹظٹظ† ط؛ظٹط± طµط§ظ„ط­"}
+                return {"success": False, "error": "رمز إعادة التعيين غير صالح"}
             if safe_aware(reset.expires_at) < datetime.now(timezone.utc):
-                return {"success": False, "error": "ط§ظ†طھظ‡طھ طµظ„ط§ط­ظٹط© ط§ظ„ط±ظ…ط²"}
+                return {"success": False, "error": "انتهت صلاحية الرمز"}
 
             user = db.query(User).filter(User.id == reset.user_id).first()
             user.password_hash = hash_password(new_password)
             reset.is_used = True
             db.commit()
-            return {"success": True, "message": "طھظ… ط¥ط¹ط§ط¯ط© طھط¹ظٹظٹظ† ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±"}
+            return {"success": True, "message": "تم إعادة تعيين كلمة المرور"}
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)

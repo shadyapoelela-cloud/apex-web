@@ -1279,7 +1279,7 @@ async def list_plans():
             {
                 "id": "free",
                 "name": "Free",
-                "name_ar": "ظ…ط¬ط§ظ†ظٹ",
+                "name_ar": "مجاني",
                 "price": 0,
                 "currency": "SAR",
                 "features": {
@@ -1294,7 +1294,7 @@ async def list_plans():
             {
                 "id": "pro",
                 "name": "Pro",
-                "name_ar": "ط§ط­طھط±ط§ظپظٹ",
+                "name_ar": "احترافي",
                 "price": 99,
                 "currency": "SAR",
                 "features": {
@@ -1309,7 +1309,7 @@ async def list_plans():
             {
                 "id": "business",
                 "name": "Business",
-                "name_ar": "ط£ط¹ظ…ط§ظ„",
+                "name_ar": "أعمال",
                 "price": 299,
                 "currency": "SAR",
                 "features": {
@@ -1325,7 +1325,7 @@ async def list_plans():
             {
                 "id": "expert",
                 "name": "Expert",
-                "name_ar": "ط®ط¨ظٹط±",
+                "name_ar": "خبير",
                 "price": 499,
                 "currency": "SAR",
                 "features": {
@@ -1340,7 +1340,7 @@ async def list_plans():
             {
                 "id": "enterprise",
                 "name": "Enterprise",
-                "name_ar": "ظ…ط¤ط³ط³ظٹ",
+                "name_ar": "مؤسسي",
                 "price": "custom",
                 "currency": "SAR",
                 "features": {
@@ -1366,7 +1366,7 @@ async def get_current_terms():
         "data": {
             "version": "1.0",
             "effective_date": "2026-01-01",
-            "content_ar": "ط´ط±ظˆط· ظˆط£ط­ظƒط§ظ… ظ…ظ†طµط© APEX ظ„ظ„طھط­ظ„ظٹظ„ ط§ظ„ظ…ط§ظ„ظٹ ط§ظ„ظ…ط¹ط±ظپظٹ...",
+            "content_ar": "شروط وأحكام منصة APEX للتحليل المالي المعرفي...",
             "content_en": "APEX Platform Terms and Conditions...",
             "requires_acceptance": True,
         },
@@ -1380,7 +1380,7 @@ async def get_privacy_policy():
         "data": {
             "version": "1.0",
             "effective_date": "2026-01-01",
-            "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط®طµظˆطµظٹط© ظ„ظ…ظ†طµط© APEX...",
+            "content_ar": "سياسة الخصوصية لمنصة APEX...",
             "content_en": "APEX Platform Privacy Policy...",
         },
     }
@@ -1393,19 +1393,19 @@ async def get_provider_policy():
         "data": {
             "version": "1.0",
             "effective_date": "2026-01-01",
-            "content_ar": "ط³ظٹط§ط³ط© ظ…ظ‚ط¯ظ…ظٹ ط§ظ„ط®ط¯ظ…ط§طھ...",
+            "content_ar": "سياسة مقدمي الخدمات...",
             "obligations": [
-                "ط±ظپط¹ ظ…ط³طھظ†ط¯ط§طھ ط§ظ„طھط­ظ‚ظ‚",
-                "ط±ظپط¹ ظ…ط¯ط®ظ„ط§طھ ط§ظ„ظ…ظ‡ظ…ط©",
-                "ط±ظپط¹ ظ…ط®ط±ط¬ط§طھ ط§ظ„ظ…ظ‡ظ…ط©",
-                "ط§ظ„ط¹ظ…ظ„ ط¶ظ…ظ† ط§ظ„ظ†ط·ط§ظ‚ ط§ظ„ظ…ط¹طھظ…ط¯",
-                "ظ‚ط¨ظˆظ„ ط¹ظ…ظˆظ„ط© ط§ظ„ظ…ظ†طµط©",
+                "رفع مستندات التحقق",
+                "رفع مدخلات المهمة",
+                "رفع مخرجات المهمة",
+                "العمل ضمن النطاق المعتمد",
+                "قبول عمولة المنصة",
             ],
             "suspension_triggers": [
-                "ط¹ط¯ظ… ط±ظپط¹ ط§ظ„ظ…ط¯ط®ظ„ط§طھ",
-                "ط¹ط¯ظ… ط±ظپط¹ ط§ظ„ظ…ط®ط±ط¬ط§طھ",
-                "طھط¬ط§ظˆط² ط§ظ„ظ…ظˆط¹ط¯",
-                "ظ…ط®ط§ظ„ظپط© ط¬ظˆط¯ط© ط§ظ„ط¹ظ…ظ„",
+                "عدم رفع المدخلات",
+                "عدم رفع المخرجات",
+                "تجاوز الموعد",
+                "مخالفة جودة العمل",
             ],
         },
     }
@@ -1418,7 +1418,7 @@ async def get_acceptable_use():
         "data": {
             "version": "1.0",
             "effective_date": "2026-01-01",
-            "content_ar": "ط³ظٹط§ط³ط© ط§ظ„ط§ط³طھط®ط¯ط§ظ… ط§ظ„ظ…ظ‚ط¨ظˆظ„ ظ„ظ…ظ†طµط© APEX...",
+            "content_ar": "سياسة الاستخدام المقبول لمنصة APEX...",
         },
     }
 

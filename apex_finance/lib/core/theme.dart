@@ -126,7 +126,7 @@ const List<ApexTheme> apexThemes = [
     bg2: Color(0xFF080F1F),   // original card navy
     bg3: Color(0xFF0D1829),   // original input navy
     bg4: Color(0xFF0F2040),   // original hover
-    textPrimary: Color(0xFFF0EDE6), textSecondary: Color(0xFF8A8880), textDim: Color(0xFF666058),
+    textPrimary: Color(0xFFF0EDE6), textSecondary: Color(0xFF9A9890), textDim: Color(0xFF7A7570),
     border: Color(0x26D4A030), isDark: true, preview: Color(0xFFD4A030),
     success: Color(0xFF2ECC8A),
     error: Color(0xFFE05050),
@@ -168,7 +168,7 @@ const List<ApexTheme> apexThemes = [
     bg2: Color(0xFF1A1220),   // card — dark plum
     bg3: Color(0xFF261A2C),   // input — deep mauve
     bg4: Color(0xFF322438),   // hover — plum
-    textPrimary: Color(0xFFF2ECF0), textSecondary: Color(0xFFB0A0AC), textDim: Color(0xFF786878),
+    textPrimary: Color(0xFFF2ECF0), textSecondary: Color(0xFFB0A0AC), textDim: Color(0xFF8A7E88),
     border: Color(0x30A87C9E), isDark: true, preview: Color(0xFFA87C9E),
     success: Color(0xFF4ADE80),   // mint
     error: Color(0xFFFB7185),     // rose
@@ -206,7 +206,7 @@ const List<ApexTheme> apexThemes = [
     bg2: Color(0xFF16130C),   // card — warm charcoal
     bg3: Color(0xFF201C12),   // input — espresso
     bg4: Color(0xFF2A2418),   // hover — warm brown
-    textPrimary: Color(0xFFF0EADA), textSecondary: Color(0xFFACA28A), textDim: Color(0xFF7A7058),
+    textPrimary: Color(0xFFF0EADA), textSecondary: Color(0xFFACA28A), textDim: Color(0xFF8A8068),
     border: Color(0x28D4AC30), isDark: true, preview: Color(0xFFD4AC30),
     success: Color(0xFF4ADE80), error: Color(0xFFFF6E6A), warning: Color(0xFFFFCC3C),
     info: Color(0xFF22D3EE),    // bright cyan glow
@@ -243,7 +243,7 @@ const List<ApexTheme> apexThemes = [
     bg2: Color(0xFF0C121C),   // card — midnight
     bg3: Color(0xFF161E2C),   // input
     bg4: Color(0xFF1E2838),   // hover
-    textPrimary: Color(0xFFE4EAF2), textSecondary: Color(0xFF8898AC), textDim: Color(0xFF5C6E80),
+    textPrimary: Color(0xFFE4EAF2), textSecondary: Color(0xFF8898AC), textDim: Color(0xFF728494),
     border: Color(0x2850A0E0), isDark: true, preview: Color(0xFF50A0E0),
     success: Color(0xFF4ADE80), error: Color(0xFFFF7474),
     warning: Color(0xFFFFC444),  // golden glow — warm counterpart
@@ -281,7 +281,7 @@ const List<ApexTheme> apexThemes = [
     bg2: Color(0xFF0C1612),   // card
     bg3: Color(0xFF16221C),   // input
     bg4: Color(0xFF1E2E26),   // hover
-    textPrimary: Color(0xFFE2EEE6), textSecondary: Color(0xFF88A294), textDim: Color(0xFF5C7468),
+    textPrimary: Color(0xFFE2EEE6), textSecondary: Color(0xFF88A294), textDim: Color(0xFF728A7C),
     border: Color(0x2840C080), isDark: true, preview: Color(0xFF40C080),
     success: Color(0xFF50E89C), error: Color(0xFFFF7474),
     warning: Color(0xFFFFC840),  // golden glow
@@ -320,7 +320,7 @@ const List<ApexTheme> apexThemes = [
     bg2: Color(0xFF160E10),   // card
     bg3: Color(0xFF22161A),   // input
     bg4: Color(0xFF2E1E22),   // hover
-    textPrimary: Color(0xFFF0E6E8), textSecondary: Color(0xFFA88E90), textDim: Color(0xFF726060),
+    textPrimary: Color(0xFFF0E6E8), textSecondary: Color(0xFFA88E90), textDim: Color(0xFF887474),
     border: Color(0x28DC6064), isDark: true, preview: Color(0xFFDC6064),
     success: Color(0xFF3CD890),
     error: Color(0xFFFF6868),

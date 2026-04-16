@@ -157,32 +157,12 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
     final isDone = s['status'] == 'completed';
     final isProgress = s['status'] == 'in_progress';
     final color = isDone ? AC.ok : isProgress ? AC.gold : AC.ts;
-    return GestureDetector(
+    return _StageChipBtn(
+      isActive: isActive,
+      isDone: isDone,
+      color: color,
+      title: s['title'] as String,
       onTap: () => setState(() => _currentStage = i),
-      child: Container(
-        width: 72,
-        margin: EdgeInsets.only(left: 6),
-        decoration: BoxDecoration(
-          color: isActive ? color.withValues(alpha: 0.15) : AC.navy3,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isActive ? color : AC.bdr, width: isActive ? 2 : 1),
-        ),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Container(
-            width: 30, height: 30,
-            decoration: BoxDecoration(
-              color: isDone ? AC.ok.withValues(alpha: 0.2) : isProgress ? AC.gold.withValues(alpha: 0.2) : Colors.transparent,
-              shape: BoxShape.circle,
-              border: Border.all(color: color, width: 1.5),
-            ),
-            child: Center(child: isDone
-              ? Icon(Icons.check, color: AC.ok, size: 16)
-              : Text('', style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.bold))),
-          ),
-          SizedBox(height: 4),
-          Text(s['title'] as String, style: TextStyle(color: isActive ? color : AC.ts, fontSize: 9, fontWeight: isActive ? FontWeight.bold : FontWeight.normal), textAlign: TextAlign.center, maxLines: 1),
-        ]),
-      ),
     );
   }
 
@@ -283,6 +263,85 @@ class _AuditWFState extends State<AuditWorkflowScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(color: (m['color'] as Color).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
       child: Text(m['text'] as String, style: TextStyle(color: m['color'] as Color, fontSize: 10, fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+class _StageChipBtn extends StatefulWidget {
+  final bool isActive;
+  final bool isDone;
+  final Color color;
+  final String title;
+  final VoidCallback onTap;
+  const _StageChipBtn({required this.isActive, required this.isDone, required this.color, required this.title, required this.onTap});
+  @override
+  State<_StageChipBtn> createState() => _StageChipBtnState();
+}
+
+class _StageChipBtnState extends State<_StageChipBtn> {
+  bool _hov = false;
+  bool _press = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hov = true),
+      onExit: (_) => setState(() { _hov = false; _press = false; }),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _press = true),
+        onTapUp: (_) { setState(() => _press = false); widget.onTap(); },
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          width: 72,
+          margin: const EdgeInsets.only(left: 6),
+          transform: _press
+              ? (Matrix4.identity()..scale(0.93))
+              : _hov
+                  ? (Matrix4.identity()..translate(0.0, -2.0)..scale(1.04))
+                  : Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: widget.isActive || _hov
+                ? widget.color.withValues(alpha: widget.isActive ? 0.15 : 0.10)
+                : AC.navy3,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: widget.isActive || _hov ? widget.color : AC.bdr,
+              width: widget.isActive ? 2 : (_hov ? 1.5 : 1),
+            ),
+            boxShadow: _hov ? [
+              BoxShadow(color: widget.color.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 2)),
+            ] : null,
+          ),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            AnimatedScale(
+              scale: _hov ? 1.12 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: Container(
+                width: 30, height: 30,
+                decoration: BoxDecoration(
+                  color: widget.isDone ? AC.ok.withValues(alpha: 0.2) : widget.color.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: widget.color, width: 1.5),
+                ),
+                child: Center(child: widget.isDone
+                  ? Icon(Icons.check, color: AC.ok, size: 16)
+                  : Text('', style: TextStyle(color: widget.color, fontSize: 13, fontWeight: FontWeight.bold))),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(widget.title, style: TextStyle(
+              color: widget.isActive || _hov ? widget.color : AC.ts,
+              fontSize: 9,
+              fontWeight: widget.isActive || _hov ? FontWeight.bold : FontWeight.normal,
+            ), textAlign: TextAlign.center, maxLines: 1),
+          ]),
+        ),
+      ),
     );
   }
 }
