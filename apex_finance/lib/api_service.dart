@@ -334,6 +334,9 @@ class ApiService {
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);
   static Future<ApiResult> taxVatReturn(Map body) => _post('/tax/vat/return', body);
 
+  // ── Financial ratios (18 ratios across 5 categories) ──
+  static Future<ApiResult> ratiosCompute(Map body) => _post('/ratios/compute', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

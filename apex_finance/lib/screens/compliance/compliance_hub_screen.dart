@@ -110,6 +110,13 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.purple,
                     onTap: () => context.go('/compliance/audit-trail'),
                   ),
+                  _toolCard(
+                    icon: Icons.analytics,
+                    title: 'المؤشرات المالية',
+                    subtitle: '18 مؤشر في 5 فئات',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/ratios'),
+                  ),
                 ],
               );
             }),
