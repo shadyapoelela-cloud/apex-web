@@ -73,13 +73,13 @@ class _SAS extends State<SlideAuthScreen> {
     return Scaffold(
       backgroundColor: AC.navy,
       body: SafeArea(child: Center(child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('APEX', style: TextStyle(color: AC.goldText, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: 6)),
-          SizedBox(height: 4),
+          Text('APEX', style: TextStyle(color: AC.goldText, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 6)),
+          SizedBox(height: 3),
           Text('منصة التحليل المالي والحوكمة المعرفية — السوق السعودي', style: TextStyle(color: AC.ts, fontSize: 11)),
-          SizedBox(height: 24),
-          Container(width: 420, padding: EdgeInsets.all(24),
+          SizedBox(height: 16),
+          Container(width: 420, padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
             decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(24),
               border: Border.all(color: AC.gold.withAlpha(38)),
               boxShadow: [BoxShadow(color: Colors.black.withAlpha(77), blurRadius: 30, offset: Offset(0, 10))]),
@@ -89,7 +89,10 @@ class _SAS extends State<SlideAuthScreen> {
                 child: Row(children: [_tb('تسجيل دخول', 0), _tb('إنشاء حساب', 1)]),
               ),
               const SizedBox(height: 16),
-              IndexedStack(index: _pg, children: [_loginForm(), _regForm()]),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: _pg == 0 ? _loginForm() : _regForm(),
+              ),
             ]),
           ),
         ]),
@@ -105,21 +108,22 @@ class _SAS extends State<SlideAuthScreen> {
       child: Center(child: Text(l, style: TextStyle(color: _pg == i ? AC.btnFg : AC.goldText, fontSize: 13, fontWeight: FontWeight.bold)))),
   ));
 
-  Widget _loginForm() => Column(children: [
-    const SizedBox(height: 12),
+  Widget _loginForm() => Column(key: const ValueKey('login'), children: [
+    const SizedBox(height: 10),
     if (_le != null) _errW(_le!),
     _tf(_lu, 'البريد أو اسم المستخدم', Icons.email_outlined, ltr: true),
-    const SizedBox(height: 12),
+    const SizedBox(height: 10),
     _pf(_lp, 'كلمة المرور', _lo, () => setState(() => _lo = !_lo), sub: _login),
     Align(alignment: Alignment.centerLeft, child: TextButton(
       onPressed: () => context.go('/forgot-password'),
+      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size(0, 30)),
       child: Text('نسيت كلمة المرور؟', style: TextStyle(color: AC.goldText, fontSize: 12)))),
-    const SizedBox(height: 6),
+    const SizedBox(height: 4),
     _btn('تسجيل الدخول', _ll, _login),
-    const SizedBox(height: 14), _orW(), const SizedBox(height: 10), _socW(),
+    const SizedBox(height: 10), _orW(), const SizedBox(height: 8), _socW(),
   ]);
 
-  Widget _regForm() => Column(children: [
+  Widget _regForm() => Column(key: const ValueKey('register'), children: [
     const SizedBox(height: 12),
     if (_re != null) _errW(_re!),
     _tf(_rn, 'الاسم الكامل', Icons.person_outline),
@@ -145,9 +149,9 @@ class _SAS extends State<SlideAuthScreen> {
       const SizedBox(width: 8),
       Expanded(child: _tf(_rph, 'رقم الهاتف', Icons.phone, ltr: true)),
     ]),
-    const SizedBox(height: 14),
+    const SizedBox(height: 10),
     _btn('إنشاء حساب', _rl, _register),
-    const SizedBox(height: 14), _orW(), const SizedBox(height: 10), _socW(),
+    const SizedBox(height: 10), _orW(), const SizedBox(height: 8), _socW(),
   ]);
 
   Widget _tf(TextEditingController c, String l, IconData ic, {bool ltr = false}) => TextField(
@@ -195,18 +199,18 @@ class _SAS extends State<SlideAuthScreen> {
     ));
   }
 
-  Widget _socW() => Row(children: [
-    Expanded(child: OutlinedButton.icon(onPressed: () => _comingSoon('Google'),
+  Widget _socW() => Column(children: [
+    SizedBox(width: double.infinity, child: OutlinedButton.icon(onPressed: () => _comingSoon('Google'),
       style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
       icon: Icon(Icons.g_mobiledata, color: AC.err, size: 22),
-      label: Text('Google', style: TextStyle(color: AC.tp, fontSize: 11)))),
-    SizedBox(width: 8),
-    Expanded(child: OutlinedButton.icon(onPressed: () => _comingSoon('Apple'),
+      label: Text('Google', style: TextStyle(color: AC.tp, fontSize: 12)))),
+    SizedBox(height: 8),
+    SizedBox(width: double.infinity, child: OutlinedButton.icon(onPressed: () => _comingSoon('Apple'),
       style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr), padding: EdgeInsets.symmetric(vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
       icon: Icon(Icons.apple, color: AC.tp, size: 20),
-      label: Text('Apple', style: TextStyle(color: AC.tp, fontSize: 11)))),
+      label: Text('Apple', style: TextStyle(color: AC.tp, fontSize: 12)))),
   ]);
 
   @override

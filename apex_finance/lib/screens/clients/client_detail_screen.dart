@@ -701,7 +701,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   }
 
   Widget _uploadFormatBtn(BuildContext ctx, String docName, String format, IconData icon) {
-    return InkWell(
+    return _UploadFormatBtn(
+      format: format,
+      icon: icon,
+      gold: gold,
       onTap: () {
         Navigator.pop(ctx);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -709,20 +712,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
           backgroundColor: navy,
         ));
       },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 80, height: 80,
-        decoration: BoxDecoration(
-          color: gold.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: gold.withValues(alpha: 0.25)),
-        ),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(icon, color: gold, size: 28),
-          const SizedBox(height: 6),
-          Text(format, style: TextStyle(color: gold, fontSize: 11, fontWeight: FontWeight.w600)),
-        ]),
-      ),
     );
   }
 
@@ -953,4 +942,85 @@ class _DetailedService {
   final Color color;
   final IconData icon;
   _DetailedService(this.label, this.labelEn, this.desc, this.color, this.icon, this.status);
+}
+
+class _UploadFormatBtn extends StatefulWidget {
+  final String format;
+  final IconData icon;
+  final Color gold;
+  final VoidCallback onTap;
+  const _UploadFormatBtn({required this.format, required this.icon, required this.gold, required this.onTap});
+  @override
+  State<_UploadFormatBtn> createState() => _UploadFormatBtnState();
+}
+
+class _UploadFormatBtnState extends State<_UploadFormatBtn> with SingleTickerProviderStateMixin {
+  bool _hov = false;
+  bool _press = false;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack);
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final g = widget.gold;
+    return MouseRegion(
+      onEnter: (_) { setState(() => _hov = true); _ctrl.forward(); },
+      onExit: (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); },
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _press = true),
+        onTapUp: (_) { setState(() => _press = false); widget.onTap(); },
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedBuilder(
+          animation: _anim,
+          builder: (_, __) {
+            final t = _anim.value;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              width: 80, height: 80,
+              transform: _press
+                  ? (Matrix4.identity()..scale(0.92))
+                  : _hov
+                      ? (Matrix4.identity()..scale(1.06))
+                      : Matrix4.identity(),
+              transformAlignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: g.withValues(alpha: _hov ? 0.14 : 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: g.withValues(alpha: _hov ? 0.5 : 0.25),
+                  width: _hov ? 1.3 : 1.0,
+                ),
+                boxShadow: _hov ? [
+                  BoxShadow(color: g.withValues(alpha: 0.15), blurRadius: 12, offset: const Offset(0, 3)),
+                ] : null,
+              ),
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()
+                    ..scale(1.0 + 0.18 * t)
+                    ..rotateZ(-0.1 * t),
+                  child: Icon(widget.icon, color: g, size: 28),
+                ),
+                const SizedBox(height: 6),
+                Text(widget.format, style: TextStyle(color: g, fontSize: 11, fontWeight: FontWeight.w600)),
+              ]),
+            );
+          },
+        ),
+      ),
+    );
+  }
 }

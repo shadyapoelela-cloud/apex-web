@@ -137,17 +137,26 @@ class ApexApp extends ConsumerWidget {
       )),
       outlinedButtonTheme: OutlinedButtonThemeData(style: ButtonStyle(
         foregroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return AC.gold;
           if (s.contains(WidgetState.hovered)) return AC.goldLight;
           return AC.gold;
         }),
         side: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return BorderSide(color: AC.gold.withValues(alpha: 0.8), width: 1.5);
           if (s.contains(WidgetState.hovered)) return BorderSide(color: AC.gold.withValues(alpha: 0.7), width: 1.5);
           return BorderSide(color: AC.gold.withValues(alpha: 0.35));
         }),
         backgroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return AC.gold.withValues(alpha: 0.10);
           if (s.contains(WidgetState.hovered)) return AC.gold.withValues(alpha: 0.06);
           return Colors.transparent;
         }),
+        elevation: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.pressed)) return 0;
+          if (s.contains(WidgetState.hovered)) return 3;
+          return 0;
+        }),
+        shadowColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.25)),
         overlayColor: WidgetStateProperty.all(AC.gold.withValues(alpha: 0.1)),
         padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
         shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
@@ -1054,16 +1063,32 @@ class _MainNavS extends ConsumerState<MainNav> {
                 decoration: BoxDecoration(
                   color: (isGold || isActive || hovered) ? AC.gold.withValues(alpha: 0.12) : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
+                  boxShadow: hovered ? [
+                    BoxShadow(color: AC.gold.withValues(alpha: 0.10), blurRadius: 6),
+                  ] : null,
                 ),
-                child: Icon(icon, color: isGold || isActive ? AC.gold : (hovered ? AC.goldLight : AC.ts), size: 18),
+                child: AnimatedScale(
+                  scale: hovered ? 1.15 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  child: AnimatedRotation(
+                    turns: hovered ? -0.02 : 0.0,
+                    duration: const Duration(milliseconds: 250),
+                    child: Icon(icon, color: isGold || isActive ? AC.gold : (hovered ? AC.goldLight : AC.ts), size: 18),
+                  ),
+                ),
               ),
-              // Arrow appears on hover
-              AnimatedOpacity(
-                opacity: hovered ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 180),
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: Icon(Icons.chevron_right, color: AC.gold.withValues(alpha: 0.5), size: 14),
+              // Arrow slides + fades on hover
+              AnimatedSlide(
+                offset: Offset(0, hovered ? 0.0 : 0.3),
+                duration: const Duration(milliseconds: 200),
+                child: AnimatedOpacity(
+                  opacity: hovered ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 180),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Icon(Icons.chevron_right, color: AC.gold.withValues(alpha: 0.5), size: 14),
+                  ),
                 ),
               ),
             ]),
@@ -2309,10 +2334,8 @@ class _AccS extends ConsumerState<AccountTab> {
           _mi(Icons.devices, 'ط§ظ„ط¬ظ„ط³ط§طھ ط§ظ„ظ†ط´ط·ط©', AC.cyan,
             ()=>context.go('/account/sessions')),
       ])));
-  Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) => GestureDetector(onTap: onTap,
-    child: Container(margin: EdgeInsets.only(bottom: 8), decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),
-      child: ListTile(leading: Icon(i, color: cl), title: Text(l, style: TextStyle(color: AC.tp, fontSize: 14)),
-        trailing: Icon(Icons.chevron_left, color: AC.ts))));
+  Widget _mi(IconData i, String l, Color cl, VoidCallback onTap) =>
+    ApexMenuItem(icon: i, label: l, color: cl, onTap: onTap);
 }
 
 
@@ -2400,12 +2423,6 @@ class _AdminS extends ConsumerState<AdminTab> {
       Text(label, style: TextStyle(color: AC.ts, fontSize: 11))]));
 
   Widget _actionTile(String label, IconData icon, Color color, VoidCallback onTap) =>
-    GestureDetector(onTap: onTap, child: Padding(padding: const EdgeInsets.only(bottom: 8),
-      child: Row(children: [
-        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-          child: Icon(icon, color: color, size: 18)),
-        SizedBox(width: 12),
-        Expanded(child: Text(label, style: TextStyle(color: AC.tp, fontSize: 14))),
-        Icon(Icons.chevron_left, color: AC.ts, size: 20)])));
+    ApexActionTile(label: label, icon: icon, color: color, onTap: onTap);
 }
 

@@ -501,26 +501,14 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
         scrollDirection: Axis.horizontal,
         child: Row(children: List.generate(tabs.length, (i) {
           final on = _tabIndex == i;
-          return GestureDetector(
+          return _AnimTabBtn(
+            label: tabs[i],
+            isActive: on,
+            gold: _gold,
+            textSec: _textSec,
+            badge: i == 3 && errCount > 0 ? errCount : null,
+            badgeColor: _danger,
             onTap: () => setState(() => _tabIndex = i),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-              decoration: BoxDecoration(
-                color: on ? _gold.withValues(alpha: 0.1) : null,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text(tabs[i], style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: on ? _gold : _textSec, fontFamily: 'Tajawal')),
-                if (i == 3 && errCount > 0) ...[
-                  const SizedBox(width: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                    decoration: BoxDecoration(color: _danger, borderRadius: BorderRadius.circular(7)),
-                    child: Text('$errCount', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: AC.btnFg)),
-                  ),
-                ],
-              ]),
-            ),
           );
         })),
       ),
@@ -1186,18 +1174,7 @@ class _CoaQualityScreenState extends State<CoaQualityScreen> with SingleTickerPr
   ]);
 
   Widget _shareBtn(IconData icon, String label) => Expanded(
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: _surface1, borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _border),
-      ),
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _textSec, fontFamily: 'Tajawal')),
-        const SizedBox(width: 6),
-        Icon(icon, color: _textSec, size: 14),
-      ]),
-    ),
+    child: _AnimShareBtn(icon: icon, label: label, surface: _surface1, border: _border, textSec: _textSec, gold: _gold),
   );
 
   // ═══════════════════════════════════════════
@@ -1379,4 +1356,140 @@ class _DonutPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DonutPainter old) => true;
+}
+
+class _AnimTabBtn extends StatefulWidget {
+  final String label;
+  final bool isActive;
+  final Color gold;
+  final Color textSec;
+  final int? badge;
+  final Color? badgeColor;
+  final VoidCallback onTap;
+  const _AnimTabBtn({required this.label, required this.isActive, required this.gold, required this.textSec, this.badge, this.badgeColor, required this.onTap});
+  @override
+  State<_AnimTabBtn> createState() => _AnimTabBtnState();
+}
+
+class _AnimTabBtnState extends State<_AnimTabBtn> {
+  bool _hov = false;
+  bool _press = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final on = widget.isActive;
+    final highlighted = on || _hov;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hov = true),
+      onExit: (_) => setState(() { _hov = false; _press = false; }),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _press = true),
+        onTapUp: (_) { setState(() => _press = false); widget.onTap(); },
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+          transform: _press
+              ? (Matrix4.identity()..scale(0.93))
+              : Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: highlighted ? widget.gold.withValues(alpha: on ? 0.12 : 0.06) : null,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: on ? [
+              BoxShadow(color: widget.gold.withValues(alpha: 0.08), blurRadius: 6),
+            ] : null,
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(widget.label, style: TextStyle(
+              fontSize: 11,
+              fontWeight: highlighted ? FontWeight.w700 : FontWeight.w600,
+              color: highlighted ? widget.gold : widget.textSec,
+              fontFamily: 'Tajawal',
+            )),
+            if (widget.badge != null) ...[
+              const SizedBox(width: 4),
+              AnimatedScale(
+                scale: _hov ? 1.15 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(color: widget.badgeColor, borderRadius: BorderRadius.circular(7)),
+                  child: Text('${widget.badge}', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: AC.btnFg)),
+                ),
+              ),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimShareBtn extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final Color surface;
+  final Color border;
+  final Color textSec;
+  final Color gold;
+  const _AnimShareBtn({required this.icon, required this.label, required this.surface, required this.border, required this.textSec, required this.gold});
+  @override
+  State<_AnimShareBtn> createState() => _AnimShareBtnState();
+}
+
+class _AnimShareBtnState extends State<_AnimShareBtn> {
+  bool _hov = false;
+  bool _press = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hov = true),
+      onExit: (_) => setState(() { _hov = false; _press = false; }),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _press = true),
+        onTapUp: (_) => setState(() => _press = false),
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          transform: _press
+              ? (Matrix4.identity()..scale(0.94))
+              : _hov
+                  ? (Matrix4.identity()..scale(1.03))
+                  : Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: _hov ? widget.gold.withValues(alpha: 0.06) : widget.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _hov ? widget.gold.withValues(alpha: 0.3) : widget.border,
+            ),
+            boxShadow: _hov ? [
+              BoxShadow(color: widget.gold.withValues(alpha: 0.08), blurRadius: 8),
+            ] : null,
+          ),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(widget.label, style: TextStyle(
+              fontSize: 11, fontWeight: FontWeight.w600,
+              color: _hov ? widget.gold : widget.textSec,
+              fontFamily: 'Tajawal',
+            )),
+            const SizedBox(width: 6),
+            AnimatedScale(
+              scale: _hov ? 1.2 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: Icon(widget.icon, color: _hov ? widget.gold : widget.textSec, size: 14),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
 }
