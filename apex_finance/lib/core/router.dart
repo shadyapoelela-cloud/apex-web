@@ -51,6 +51,8 @@ import '../screens/compliance/zakat_calculator_screen.dart';
 import '../screens/compliance/vat_return_screen.dart';
 import '../screens/compliance/financial_ratios_screen.dart';
 import '../screens/compliance/depreciation_screen.dart';
+import '../screens/compliance/cashflow_screen.dart';
+import '../screens/compliance/amortization_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -120,6 +122,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/depreciation',
       pageBuilder: (c, s) => _apexPage(const DepreciationScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/cashflow',
+      pageBuilder: (c, s) => _apexPage(const CashFlowScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/amortization',
+      pageBuilder: (c, s) => _apexPage(const AmortizationScreen(), s),
     ),
 
     // Account

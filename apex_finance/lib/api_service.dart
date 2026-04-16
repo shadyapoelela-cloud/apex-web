@@ -340,6 +340,12 @@ class ApiService {
   // ── Depreciation calculator (SL / DDB / SYD) ──
   static Future<ApiResult> depreciationCompute(Map body) => _post('/depreciation/compute', body);
 
+  // ── Cash Flow statement (indirect method) ──
+  static Future<ApiResult> cashflowCompute(Map body) => _post('/cashflow/compute', body);
+
+  // ── Loan Amortization schedule ──
+  static Future<ApiResult> amortizationCompute(Map body) => _post('/amortization/compute', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

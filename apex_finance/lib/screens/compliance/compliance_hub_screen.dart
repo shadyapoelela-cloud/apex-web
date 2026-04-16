@@ -124,6 +124,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.warn,
                     onTap: () => context.go('/compliance/depreciation'),
                   ),
+                  _toolCard(
+                    icon: Icons.water_drop,
+                    title: 'التدفقات النقدية',
+                    subtitle: 'تشغيلية · استثمارية · تمويلية',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/cashflow'),
+                  ),
+                  _toolCard(
+                    icon: Icons.schedule,
+                    title: 'أقساط القرض',
+                    subtitle: 'جدول السداد الكامل',
+                    color: AC.ok,
+                    onTap: () => context.go('/compliance/amortization'),
+                  ),
                 ],
               );
             }),
