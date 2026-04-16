@@ -2404,3 +2404,94 @@ void apexSnack(BuildContext context, String message, {bool isError = false, bool
     duration: const Duration(seconds: 3),
   ));
 }
+
+// ── 42. APEX Logo — premium gradient text with hover animation ──
+
+class ApexLogo extends StatefulWidget {
+  final double fontSize;
+  final VoidCallback? onTap;
+  final bool showAccentBar;
+
+  const ApexLogo({
+    super.key,
+    this.fontSize = 18,
+    this.onTap,
+    this.showAccentBar = true,
+  });
+
+  @override
+  State<ApexLogo> createState() => _ApexLogoState();
+}
+
+class _ApexLogoState extends State<ApexLogo> {
+  bool _hov = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final fs = widget.fontSize;
+    final baseSpacing = fs < 24 ? 3.0 : 6.0;
+    final hovSpacing = baseSpacing + 1.5;
+    final barW = fs * 0.55;
+    final barHovW = fs * 0.8;
+    final barH = fs < 24 ? 2.0 : 2.5;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hov = true),
+      onExit: (_) => setState(() => _hov = false),
+      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.symmetric(horizontal: fs < 24 ? 6 : 10, vertical: fs < 24 ? 4 : 6),
+          transform: _hov ? (Matrix4.identity()..scale(1.05)) : Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: _hov ? [
+              BoxShadow(color: AC.goldText.withValues(alpha: 0.20), blurRadius: 16, spreadRadius: -2),
+            ] : null,
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            ShaderMask(
+              shaderCallback: (bounds) => LinearGradient(
+                colors: [AC.goldText, AC.gold.withValues(alpha: 0.85), AC.goldText],
+                stops: const [0.0, 0.5, 1.0],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds),
+              child: AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                style: GoogleFonts.poppins(
+                  fontSize: fs,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: _hov ? hovSpacing : baseSpacing,
+                  color: Colors.white,
+                  height: 1.1,
+                ),
+                child: const Text('APEX'),
+              ),
+            ),
+            if (widget.showAccentBar) ...[
+              SizedBox(height: fs < 24 ? 2 : 3),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                width: _hov ? barHovW : barW,
+                height: barH,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AC.gold.withValues(alpha: 0.0), AC.gold, AC.gold.withValues(alpha: 0.0)],
+                  ),
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              ),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+}
