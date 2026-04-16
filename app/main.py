@@ -647,6 +647,15 @@ try:
 except Exception as e:
     logging.error(f"Tax routes not mounted: {e}", exc_info=True)
 
+# ── Financial Ratios (18 ratios across 5 categories)
+try:
+    from app.core.ratios_routes import router as ratios_router
+
+    app.include_router(ratios_router)
+    logging.info("Ratios routes mounted at /ratios/*")
+except Exception as e:
+    logging.error(f"Ratios routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():

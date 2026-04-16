@@ -28,6 +28,11 @@ from app.core.zakat_service import (
     compute_zakat,
     result_to_dict as zakat_to_dict,
 )
+from app.core.ratios_service import (
+    RatiosInput,
+    compute_ratios,
+    result_to_dict as ratios_to_dict,
+)
 
 router = APIRouter(prefix="/tax", tags=["Tax & Zakat"])
 
