@@ -21,7 +21,7 @@ import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
 import '../screens/extracted/client_screens.dart';
-import '../screens/extracted/coa_screens.dart';
+import '../screens/coa_v2/coa_journey_screen.dart';
 import '../screens/auth/forgot_password_flow.dart';
 import '../screens/auth/slide_auth_screen.dart';
 import '../screens/clients/client_onboarding_wizard.dart' as wizard;
@@ -226,7 +226,7 @@ final appRouter = GoRouter(
     }),
     GoRoute(path: '/coa/journey', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
-      return _apexPage(CoaJourneyScreen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
+      return _apexPage(CoaJourneyV2Screen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
     }),
     GoRoute(path: '/service-catalog', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>?;
