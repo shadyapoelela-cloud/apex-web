@@ -1435,7 +1435,8 @@ class _AnimShareBtn extends StatefulWidget {
   final Color border;
   final Color textSec;
   final Color gold;
-  const _AnimShareBtn({required this.icon, required this.label, required this.surface, required this.border, required this.textSec, required this.gold});
+  final VoidCallback? onTap;
+  const _AnimShareBtn({required this.icon, required this.label, required this.surface, required this.border, required this.textSec, required this.gold, this.onTap});
   @override
   State<_AnimShareBtn> createState() => _AnimShareBtnState();
 }
@@ -1452,7 +1453,7 @@ class _AnimShareBtnState extends State<_AnimShareBtn> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTapDown: (_) => setState(() => _press = true),
-        onTapUp: (_) => setState(() => _press = false),
+        onTapUp: (_) { setState(() => _press = false); widget.onTap?.call(); },
         onTapCancel: () => setState(() => _press = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),

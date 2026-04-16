@@ -208,7 +208,9 @@ class _ApexPrimaryBtnState extends State<_ApexPrimaryBtn> with SingleTickerProvi
   @override
   Widget build(BuildContext context) {
     final disabled = widget.onPressed == null;
-    return MouseRegion(
+    return Opacity(
+      opacity: disabled ? 0.5 : 1.0,
+      child: MouseRegion(
       onEnter: disabled ? null : (_) { setState(() => _hov = true); _ctrl.forward(); },
       onExit: (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); },
       cursor: disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
@@ -270,7 +272,7 @@ class _ApexPrimaryBtnState extends State<_ApexPrimaryBtn> with SingleTickerProvi
           },
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -308,7 +310,9 @@ class _ApexSecondaryBtnState extends State<_ApexSecondaryBtn> with SingleTickerP
   Widget build(BuildContext context) {
     final c = widget.color ?? AC.gold;
     final disabled = widget.onPressed == null;
-    return MouseRegion(
+    return Opacity(
+      opacity: disabled ? 0.5 : 1.0,
+      child: MouseRegion(
       onEnter: disabled ? null : (_) { setState(() => _hov = true); _ctrl.forward(); },
       onExit: (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); },
       cursor: disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
@@ -366,7 +370,7 @@ class _ApexSecondaryBtnState extends State<_ApexSecondaryBtn> with SingleTickerP
           },
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -1160,14 +1164,15 @@ class _ApexFeedItemState extends State<_ApexFeedItem> with SingleTickerProviderS
   @override
   Widget build(BuildContext context) {
     final c = widget.accentColor ?? AC.gold;
+    final interactive = widget.onTap != null;
     return MouseRegion(
-      onEnter: (_) { setState(() => _hov = true); _ctrl.forward(); },
-      onExit: (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); },
-      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: interactive ? (_) { setState(() => _hov = true); _ctrl.forward(); } : null,
+      onExit: interactive ? (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); } : null,
+      cursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
       child: GestureDetector(
-        onTapDown: (_) => setState(() => _press = true),
-        onTapUp: (_) { setState(() => _press = false); widget.onTap?.call(); },
-        onTapCancel: () => setState(() => _press = false),
+        onTapDown: interactive ? (_) => setState(() => _press = true) : null,
+        onTapUp: interactive ? (_) { setState(() => _press = false); widget.onTap?.call(); } : null,
+        onTapCancel: interactive ? () => setState(() => _press = false) : null,
         child: AnimatedBuilder(
           animation: _anim,
           builder: (_, __) {
@@ -1566,7 +1571,7 @@ class ApexActionCard extends StatefulWidget {
   State<ApexActionCard> createState() => _ApexActionCardState();
 }
 
-class _ApexActionCardState extends State<ApexActionCard> with TickerProviderStateMixin {
+class _ApexActionCardState extends State<ApexActionCard> with SingleTickerProviderStateMixin {
   bool _hovering = false;
   bool _pressing = false;
   late final AnimationController _iconCtrl;
@@ -1772,14 +1777,15 @@ class _ApexIconButtonState extends State<ApexIconButton> with TickerProviderStat
     final baseColor = widget.color ?? AC.ts;
     final activeColor = widget.hoverColor ?? AC.gold;
 
+    final enabled = widget.onPressed != null;
     final btn = GestureDetector(
-      onTapDown: (_) => setState(() => _pressing = true),
-      onTapUp: (_) { setState(() => _pressing = false); _onTap(); },
-      onTapCancel: () => setState(() => _pressing = false),
+      onTapDown: enabled ? (_) => setState(() => _pressing = true) : null,
+      onTapUp: enabled ? (_) { setState(() => _pressing = false); _onTap(); } : null,
+      onTapCancel: enabled ? () => setState(() => _pressing = false) : null,
       child: MouseRegion(
-        onEnter: (_) { setState(() => _hovering = true); _glowCtrl.forward(); },
-        onExit: (_) { setState(() { _hovering = false; _pressing = false; }); _glowCtrl.reverse(); },
-        cursor: widget.onPressed != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onEnter: enabled ? (_) { setState(() => _hovering = true); _glowCtrl.forward(); } : null,
+        onExit: enabled ? (_) { setState(() { _hovering = false; _pressing = false; }); _glowCtrl.reverse(); } : null,
+        cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
         child: AnimatedBuilder(
           animation: Listenable.merge([_glowAnim, _bounceAnim]),
           builder: (_, __) {
@@ -2037,12 +2043,13 @@ class _ApexAnimatedIconState extends State<ApexAnimatedIcon> with TickerProvider
   Widget build(BuildContext context) {
     final base = widget.color ?? AC.ts;
     final hover = widget.hoverColor ?? AC.gold;
+    final interactive = widget.onTap != null;
     final w = MouseRegion(
-      onEnter: (_) => _ctrl.forward(),
-      onExit: (_) => _ctrl.reverse(),
-      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: interactive ? (_) => _ctrl.forward() : null,
+      onExit: interactive ? (_) => _ctrl.reverse() : null,
+      cursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
       child: GestureDetector(
-        onTap: () { _tapCtrl.forward(from: 0); widget.onTap?.call(); },
+        onTap: interactive ? () { _tapCtrl.forward(from: 0); widget.onTap!(); } : null,
         child: AnimatedBuilder(
           animation: Listenable.merge([_anim, _tapAnim]),
           builder: (_, __) {
