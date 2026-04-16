@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "coa-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "-p", "3456", "-c-1", "--cors"],
+      "port": 3456
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+﻿{
+  "defaultMode": "auto",
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Edit(**)",
+      "Bash(python*)",
+      "Bash(pip*)",
+      "Bash(flutter*)",
+      "Bash(pytest*)",
+      "Bash(alembic*)",
+      "Bash(git status)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git add*)",
+      "Bash(git commit*)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push origin main*)"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /c/apex_app/apex_finance/lib/coa_*)"
+    ]
+  }
+}
