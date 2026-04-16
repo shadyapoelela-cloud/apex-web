@@ -47,6 +47,8 @@ import '../screens/compliance/journal_entries_screen.dart';
 import '../screens/compliance/audit_trail_screen.dart';
 import '../screens/compliance/zatca_invoice_builder_screen.dart';
 import '../screens/compliance/compliance_hub_screen.dart';
+import '../screens/compliance/zakat_calculator_screen.dart';
+import '../screens/compliance/vat_return_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -100,6 +102,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/zatca-invoice',
       pageBuilder: (c, s) => _apexPage(const ZatcaInvoiceBuilderScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/zakat',
+      pageBuilder: (c, s) => _apexPage(const ZakatCalculatorScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/vat-return',
+      pageBuilder: (c, s) => _apexPage(const VatReturnScreen(), s),
     ),
 
     // Account

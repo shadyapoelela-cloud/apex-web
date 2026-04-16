@@ -66,14 +66,14 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
             _sectionTitle('أدوات الامتثال'),
             const SizedBox(height: 8),
             LayoutBuilder(builder: (ctx, cons) {
-              final cols = cons.maxWidth > 700 ? 3 : (cons.maxWidth > 420 ? 2 : 1);
+              final cols = cons.maxWidth > 900 ? 3 : (cons.maxWidth > 540 ? 2 : 1);
               return GridView.count(
                 crossAxisCount: cols,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 1.3,
+                childAspectRatio: 1.35,
                 children: [
                   _toolCard(
                     icon: Icons.receipt_long,
@@ -81,6 +81,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     subtitle: 'ZATCA Phase 2 + QR',
                     color: AC.gold,
                     onTap: () => context.go('/compliance/zatca-invoice'),
+                  ),
+                  _toolCard(
+                    icon: Icons.savings,
+                    title: 'حاسبة الزكاة',
+                    subtitle: 'قاعدة الزكاة × 2.5%',
+                    color: AC.ok,
+                    onTap: () => context.go('/compliance/zakat'),
+                  ),
+                  _toolCard(
+                    icon: Icons.receipt,
+                    title: 'إقرار VAT',
+                    subtitle: 'KSA 15% · UAE 5%',
+                    color: AC.warn,
+                    onTap: () => context.go('/compliance/vat-return'),
                   ),
                   _toolCard(
                     icon: Icons.confirmation_number,
@@ -92,8 +106,8 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                   _toolCard(
                     icon: Icons.lock_outline,
                     title: 'سجل التدقيق',
-                    subtitle: 'hash chain + integrity check',
-                    color: AC.ok,
+                    subtitle: 'hash chain + integrity',
+                    color: AC.purple,
                     onTap: () => context.go('/compliance/audit-trail'),
                   ),
                 ],
