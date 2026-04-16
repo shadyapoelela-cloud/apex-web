@@ -187,6 +187,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.err,
                     onTap: () => context.go('/compliance/aging'),
                   ),
+                  _toolCard(
+                    icon: Icons.sync,
+                    title: 'رأس المال العامل',
+                    subtitle: 'DSO · DIO · DPO · CCC',
+                    color: AC.gold,
+                    onTap: () => context.go('/compliance/working-capital'),
+                  ),
+                  _toolCard(
+                    icon: Icons.speed,
+                    title: 'مؤشر الصحة المالية',
+                    subtitle: 'درجة مركّبة A-F',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/health-score'),
+                  ),
                 ],
               );
             }),

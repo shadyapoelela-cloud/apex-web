@@ -60,6 +60,8 @@ import '../screens/compliance/budget_variance_screen.dart';
 import '../screens/compliance/bank_rec_screen.dart';
 import '../screens/compliance/inventory_screen.dart';
 import '../screens/compliance/aging_screen.dart';
+import '../screens/compliance/working_capital_screen.dart';
+import '../screens/compliance/health_score_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -165,6 +167,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/aging',
       pageBuilder: (c, s) => _apexPage(const AgingScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/working-capital',
+      pageBuilder: (c, s) => _apexPage(const WorkingCapitalScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/health-score',
+      pageBuilder: (c, s) => _apexPage(const HealthScoreScreen(), s),
     ),
 
     // Account

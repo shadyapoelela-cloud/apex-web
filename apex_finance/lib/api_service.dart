@@ -359,6 +359,10 @@ class ApiService {
   static Future<ApiResult> inventoryValuate(Map body) => _post('/inventory/valuate', body);
   static Future<ApiResult> agingReport(Map body) => _post('/aging/report', body);
 
+  // ── Analytics: Working Capital + Health Score ──
+  static Future<ApiResult> workingCapitalAnalyze(Map body) => _post('/working-capital/analyze', body);
+  static Future<ApiResult> healthScoreCompute(Map body) => _post('/health-score/compute', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
