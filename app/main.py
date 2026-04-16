@@ -665,6 +665,15 @@ try:
 except Exception as e:
     logging.error(f"Depreciation routes not mounted: {e}", exc_info=True)
 
+# ── Cash Flow Statement + Loan Amortization
+try:
+    from app.core.cashflow_routes import router as cashflow_router
+
+    app.include_router(cashflow_router)
+    logging.info("Cash flow / amortization routes mounted")
+except Exception as e:
+    logging.error(f"Cash flow routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
