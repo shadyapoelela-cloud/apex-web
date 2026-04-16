@@ -18,6 +18,7 @@ from sqlalchemy import (
     Boolean,
     Integer,
     Float,
+    Numeric,
     DateTime,
     Text,
     ForeignKey,
@@ -130,14 +131,14 @@ class TbParsedRow(Base):
     tab_raw = Column(String(200), nullable=True)
     sub_tab = Column(String(200), nullable=True)
 
-    # Amounts
-    open_debit = Column(Float, default=0.0)
-    open_credit = Column(Float, default=0.0)
-    movement_debit = Column(Float, default=0.0)
-    movement_credit = Column(Float, default=0.0)
-    close_debit = Column(Float, default=0.0)
-    close_credit = Column(Float, default=0.0)
-    net_balance = Column(Float, default=0.0)
+    # Amounts (currency-exact)
+    open_debit = Column(Numeric(18, 2), default=0, nullable=False)
+    open_credit = Column(Numeric(18, 2), default=0, nullable=False)
+    movement_debit = Column(Numeric(18, 2), default=0, nullable=False)
+    movement_credit = Column(Numeric(18, 2), default=0, nullable=False)
+    close_debit = Column(Numeric(18, 2), default=0, nullable=False)
+    close_credit = Column(Numeric(18, 2), default=0, nullable=False)
+    net_balance = Column(Numeric(18, 2), default=0, nullable=False)
 
     # Status
     is_summary_row = Column(Boolean, default=False)
@@ -173,10 +174,10 @@ class TbBindingResult(Base):
     tb_account_code = Column(String(100), nullable=True)
     tb_account_name_raw = Column(String(500), nullable=False)
 
-    # Amounts (copied for quick access)
-    tb_amount_debit = Column(Float, default=0.0)
-    tb_amount_credit = Column(Float, default=0.0)
-    tb_net_balance = Column(Float, default=0.0)
+    # Amounts (copied for quick access, currency-exact)
+    tb_amount_debit = Column(Numeric(18, 2), default=0, nullable=False)
+    tb_amount_credit = Column(Numeric(18, 2), default=0, nullable=False)
+    tb_net_balance = Column(Numeric(18, 2), default=0, nullable=False)
 
     # Binding result
     matched = Column(Boolean, default=False)

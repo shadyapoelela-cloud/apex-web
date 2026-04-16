@@ -19,6 +19,7 @@ from sqlalchemy import (
     Boolean,
     Integer,
     Float,
+    Numeric,
     DateTime,
     Text,
     ForeignKey,
@@ -99,7 +100,7 @@ class ServiceProvider(Base):
     reviewer_notes = Column(Text, nullable=True)
 
     # Commercial
-    commission_rate = Column(Float, default=20.0)  # Platform takes 20%, provider gets 80%
+    commission_rate = Column(Numeric(5, 2), default=20.00, nullable=False)  # Platform takes 20%, provider gets 80%
     is_premium = Column(Boolean, default=False)
     listing_priority = Column(Integer, default=0)  # Higher = shown first
     badge = Column(String(50), nullable=True)  # gold, silver, verified

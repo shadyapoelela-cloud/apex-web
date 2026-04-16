@@ -10,6 +10,7 @@ from sqlalchemy import (
     Boolean,
     Integer,
     Float,
+    Numeric,
     DateTime,
     Text,
     ForeignKey,
@@ -33,7 +34,7 @@ class AnalysisRun(Base):
     run_status = Column(String(30), nullable=False, default="pending")
     # pending -> running -> completed -> failed
     industry = Column(String(100), default="general")
-    closing_inventory = Column(Float, nullable=True)
+    closing_inventory = Column(Numeric(18, 2), nullable=True)
     # Results summary
     overall_confidence = Column(Float, nullable=True)
     total_accounts_analyzed = Column(Integer, default=0)
@@ -72,7 +73,7 @@ class AnalysisResultExplanation(Base):
     result_type = Column(String(50), nullable=False)
     # income_line, balance_line, ratio, validation, readiness
     result_key = Column(String(100), nullable=False)
-    result_value = Column(Float, nullable=True)
+    result_value = Column(Numeric(18, 4), nullable=True)  # 4dp covers amounts + ratios
     explanation_ar = Column(Text, nullable=True)
     explanation_en = Column(Text, nullable=True)
     confidence = Column(Float, default=0.0)

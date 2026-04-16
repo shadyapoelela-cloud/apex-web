@@ -11,6 +11,7 @@ from sqlalchemy import (
     Boolean,
     Integer,
     Float,
+    Numeric,
     DateTime,
     Text,
     ForeignKey,
@@ -150,7 +151,7 @@ class AuditWorkpaper(Base):
     result = Column(String(30), nullable=True)  # satisfactory, exception, not_tested, na
     finding_description = Column(Text, nullable=True)
     severity = Column(String(20), nullable=True)  # low, medium, high, critical
-    materiality_impact = Column(Float, nullable=True)
+    materiality_impact = Column(Numeric(18, 2), nullable=True)
     reviewer_status = Column(String(30), default="pending")  # pending, approved, rejected, needs_revision
     reviewer_id = Column(String(36), nullable=True)
     reviewer_notes = Column(Text, nullable=True)
@@ -173,7 +174,7 @@ class AuditFinding(Base):
     title_en = Column(String(300), nullable=True)
     description_ar = Column(Text, nullable=False)
     severity = Column(String(20), nullable=False)  # low, medium, high, critical
-    materiality = Column(Float, nullable=True)
+    materiality = Column(Numeric(18, 2), nullable=True)
     owner_id = Column(String(36), nullable=True)  # person responsible
     status = Column(String(30), default="open")  # open, resolved, accepted, disputed
     proposed_adjustment = Column(JSON, nullable=True)  # debit/credit entries

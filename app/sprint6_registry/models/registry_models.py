@@ -11,6 +11,7 @@ from sqlalchemy import (
     Boolean,
     Integer,
     Float,
+    Numeric,
     DateTime,
     Text,
     ForeignKey,
@@ -123,8 +124,8 @@ class FundingProgram(Base):
     # loan, credit_line, guarantee, grant, equity
     target_sectors_json = Column(JSON, default=list)
     target_entity_types_json = Column(JSON, default=list)
-    min_revenue = Column(Float, nullable=True)
-    max_revenue = Column(Float, nullable=True)
+    min_revenue = Column(Numeric(18, 2), nullable=True)
+    max_revenue = Column(Numeric(18, 2), nullable=True)
     min_employees = Column(Integer, nullable=True)
     max_employees = Column(Integer, nullable=True)
     min_business_age_months = Column(Integer, nullable=True)

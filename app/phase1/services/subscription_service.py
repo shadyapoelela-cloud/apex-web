@@ -47,8 +47,10 @@ class SubscriptionService:
                         "name_en": p.name_en,
                         "description_ar": p.description_ar,
                         "description_en": p.description_en,
-                        "price_monthly_sar": p.price_monthly_sar,
-                        "price_yearly_sar": p.price_yearly_sar,
+                        # Serialize Numeric -> float for JSON (Decimal is not JSON-native)
+                        "price_monthly_sar": float(p.price_monthly_sar or 0),
+                        "price_yearly_sar": float(p.price_yearly_sar or 0),
+                        "currency": p.currency or "SAR",
                         "target_user_ar": p.target_user_ar,
                         "target_user_en": p.target_user_en,
                         "features": {

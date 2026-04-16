@@ -4,7 +4,7 @@ Uses UserSubscription and SubscriptionEntitlement from Phase 1.
 Only adds: P8PlanLimit, P8EntitlementAuditLog (new tables)
 """
 
-from sqlalchemy import Column, String, Float, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, String, Float, Numeric, DateTime, JSON, ForeignKey, Integer, Boolean
 from app.phase1.models.platform_models import Base, gen_uuid, utcnow
 
 
@@ -39,11 +39,18 @@ class PaymentRecord(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     user_id = Column(String, ForeignKey("users.id"), index=True)
     plan_code = Column(String, nullable=False)
-    amount = Column(Float, nullable=False)
-    currency = Column(String, default="SAR")
+    amount = Column(Numeric(18, 2), nullable=False)  # currency-exact
+    tax_amount = Column(Numeric(18, 2), default=0, nullable=False)  # VAT/tax portion
+    net_amount = Column(Numeric(18, 2), nullable=True)  # amount - tax_amount
+    currency = Column(String(3), default="SAR", nullable=False)
     payment_method = Column(String)  # stripe, mock
     session_id = Column(String, index=True)
+    # Idempotency key to prevent double-charging (required by all serious payment systems)
+    idempotency_key = Column(String(64), unique=True, nullable=True, index=True)
     status = Column(String, default="pending")  # pending, completed, failed, refunded
+    # ZATCA / e-invoice reference
+    einvoice_uuid = Column(String(36), nullable=True, index=True)
+    einvoice_hash = Column(String(64), nullable=True)
     created_at = Column(DateTime, default=utcnow)
     completed_at = Column(DateTime, nullable=True)
 

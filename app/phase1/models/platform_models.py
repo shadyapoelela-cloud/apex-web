@@ -21,6 +21,7 @@ from sqlalchemy import (
     Boolean,
     Integer,
     Float,
+    Numeric,
     DateTime,
     Text,
     ForeignKey,
@@ -348,8 +349,9 @@ class Plan(Base):
     name_en = Column(String(100), nullable=False)
     description_ar = Column(Text, nullable=True)
     description_en = Column(Text, nullable=True)
-    price_monthly_sar = Column(Float, default=0)
-    price_yearly_sar = Column(Float, default=0)
+    price_monthly_sar = Column(Numeric(18, 2), default=0, nullable=False)
+    price_yearly_sar = Column(Numeric(18, 2), default=0, nullable=False)
+    currency = Column(String(3), default="SAR", nullable=False)
     is_active = Column(Boolean, default=True)
     sort_order = Column(Integer, default=0)
     target_user_ar = Column(String(200), nullable=True)

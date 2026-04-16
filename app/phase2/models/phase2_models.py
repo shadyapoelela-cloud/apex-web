@@ -16,6 +16,7 @@ from sqlalchemy import (
     Boolean,
     Integer,
     Float,
+    Numeric,
     DateTime,
     Text,
     ForeignKey,
@@ -111,7 +112,10 @@ class Client(Base):
     name_en = Column(String(200), nullable=True)
     client_type_code = Column(String(50), nullable=False, index=True)
     cr_number = Column(String(30), nullable=True)  # Commercial Registration
-    tax_number = Column(String(30), nullable=True)  # VAT/Tax number
+    tax_number = Column(String(30), nullable=True)  # General tax number (legacy)
+    vat_registration_number = Column(String(15), nullable=True, index=True)  # ZATCA 15-digit VAT
+    tax_jurisdiction = Column(String(2), default="SA", nullable=False)  # SA, AE, KW, BH, QA, OM, EG
+    currency = Column(String(3), default="SAR", nullable=False)  # ISO 4217
     sector = Column(String(50), nullable=True)
     city = Column(String(100), nullable=True)
     country = Column(String(50), default="SA")
@@ -215,7 +219,7 @@ class COAUpload(Base):
     file_format = Column(String(20), nullable=True)  # apex_v1, apex_v2, unknown
     status = Column(String(20), default=UploadStatus.pending.value, nullable=False)
     industry = Column(String(30), default="general")
-    closing_inventory = Column(Float, nullable=True)
+    closing_inventory = Column(Numeric(18, 2), nullable=True)
     inventory_system_override = Column(String(20), nullable=True)
 
     # Parse results summary
@@ -250,13 +254,13 @@ class COAAccount(Base):
     section = Column(String(30), nullable=True)  # income_statement, balance_sheet
     confidence = Column(Float, nullable=True)
     classification_source = Column(String(20), nullable=True)  # exact_tab, alias, regex, name_override
-    net_balance = Column(Float, default=0)
-    open_debit = Column(Float, nullable=True)
-    open_credit = Column(Float, nullable=True)
-    movement_debit = Column(Float, nullable=True)
-    movement_credit = Column(Float, nullable=True)
-    close_debit = Column(Float, nullable=True)
-    close_credit = Column(Float, nullable=True)
+    net_balance = Column(Numeric(18, 2), default=0, nullable=False)
+    open_debit = Column(Numeric(18, 2), nullable=True)
+    open_credit = Column(Numeric(18, 2), nullable=True)
+    movement_debit = Column(Numeric(18, 2), nullable=True)
+    movement_credit = Column(Numeric(18, 2), nullable=True)
+    close_debit = Column(Numeric(18, 2), nullable=True)
+    close_credit = Column(Numeric(18, 2), nullable=True)
     warnings = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
@@ -283,21 +287,27 @@ class AnalysisResult(Base):
     overall_confidence = Column(Float, nullable=True)
     confidence_label = Column(String(20), nullable=True)
 
-    # Income Statement
-    revenue = Column(Float, nullable=True)
-    net_revenue = Column(Float, nullable=True)
-    cogs = Column(Float, nullable=True)
+    # Income Statement (currency-exact)
+    revenue = Column(Numeric(18, 2), nullable=True)
+    net_revenue = Column(Numeric(18, 2), nullable=True)
+    cogs = Column(Numeric(18, 2), nullable=True)
     cogs_method = Column(String(30), nullable=True)
-    gross_profit = Column(Float, nullable=True)
-    operating_profit = Column(Float, nullable=True)
-    net_profit = Column(Float, nullable=True)
+    gross_profit = Column(Numeric(18, 2), nullable=True)
+    operating_profit = Column(Numeric(18, 2), nullable=True)
+    net_profit = Column(Numeric(18, 2), nullable=True)
 
-    # Balance Sheet
-    total_assets = Column(Float, nullable=True)
-    total_liabilities = Column(Float, nullable=True)
-    total_equity = Column(Float, nullable=True)
+    # Balance Sheet (currency-exact)
+    total_assets = Column(Numeric(18, 2), nullable=True)
+    total_liabilities = Column(Numeric(18, 2), nullable=True)
+    total_equity = Column(Numeric(18, 2), nullable=True)
     is_balanced = Column(Boolean, nullable=True)
-    balance_diff = Column(Float, nullable=True)
+    balance_diff = Column(Numeric(18, 2), nullable=True)
+
+    # Period locking + Audit trail (ZATCA / IFRS compliance)
+    period_locked = Column(Boolean, default=False, nullable=False)
+    locked_at = Column(DateTime, nullable=True)
+    locked_by = Column(String(36), ForeignKey("users.id"), nullable=True)
+    audit_trail_json = Column(JSON, nullable=True)  # immutable event log for this result
 
     # Key Ratios (stored as JSON for flexibility)
     ratios = Column(JSON, nullable=True)
@@ -344,7 +354,7 @@ class ResultExplanation(Base):
     metric_key = Column(String(80), nullable=False)  # e.g. "net_revenue", "current_ratio", "cogs"
     metric_label_ar = Column(String(200), nullable=False)
     metric_label_en = Column(String(200), nullable=True)
-    metric_value = Column(Float, nullable=True)
+    metric_value = Column(Numeric(18, 4), nullable=True)  # 4dp to cover ratios + amounts
     metric_formatted = Column(String(50), nullable=True)
 
     # How was this result built?

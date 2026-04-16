@@ -16,6 +16,7 @@ from sqlalchemy import (
     Boolean,
     Integer,
     Float,
+    Numeric,
     DateTime,
     Text,
     ForeignKey,
@@ -93,7 +94,7 @@ class ServiceRequest(Base):
     scope_code = Column(String(80), nullable=True)
     category_required = Column(String(50), nullable=True)
     urgency = Column(String(20), default="normal")  # low, normal, high, urgent
-    budget_sar = Column(Float, nullable=True)
+    budget_sar = Column(Numeric(18, 2), nullable=True)
 
     # Status
     status = Column(String(30), default=RequestStatus.open.value, nullable=False)
@@ -112,11 +113,12 @@ class ServiceRequest(Base):
     provider_rating = Column(Integer, nullable=True)
     provider_review = Column(Text, nullable=True)
 
-    # Payment
-    agreed_price_sar = Column(Float, nullable=True)
-    platform_commission = Column(Float, nullable=True)
-    provider_payout = Column(Float, nullable=True)
+    # Payment (currency-exact)
+    agreed_price_sar = Column(Numeric(18, 2), nullable=True)
+    platform_commission = Column(Numeric(18, 2), nullable=True)
+    provider_payout = Column(Numeric(18, 2), nullable=True)
     payment_status = Column(String(20), default="pending")
+    payment_currency = Column(String(3), default="SAR", nullable=False)
 
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
