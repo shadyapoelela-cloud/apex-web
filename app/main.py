@@ -656,6 +656,15 @@ try:
 except Exception as e:
     logging.error(f"Ratios routes not mounted: {e}", exc_info=True)
 
+# ── Depreciation calculator (SL / DDB / SYD)
+try:
+    from app.core.depreciation_routes import router as depr_router
+
+    app.include_router(depr_router)
+    logging.info("Depreciation routes mounted at /depreciation/*")
+except Exception as e:
+    logging.error(f"Depreciation routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
