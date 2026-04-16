@@ -140,6 +140,8 @@ class _ComplianceHealthWidgetState extends State<ComplianceHealthWidget> {
       ('/compliance/ratios',        Icons.analytics,    'المؤشرات',     AC.info),
       ('/compliance/cashflow',      Icons.water_drop,   'التدفقات',     AC.info),
       ('/compliance/amortization',  Icons.schedule,     'الأقساط',      AC.ok),
+      ('/compliance/payroll',       Icons.badge,        'الرواتب',      AC.purple),
+      ('/compliance/breakeven',     Icons.balance,      'نقطة التعادل', AC.gold),
       ('/compliance/journal-entries', Icons.confirmation_number, 'القيود', AC.purple),
       ('/compliance/depreciation',  Icons.auto_graph,   'الإهلاك',      AC.warn),
       ('/compliance/audit-trail',   Icons.lock_outline, 'سجل التدقيق',  AC.purple),

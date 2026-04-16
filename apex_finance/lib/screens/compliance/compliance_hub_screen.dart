@@ -138,6 +138,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.ok,
                     onTap: () => context.go('/compliance/amortization'),
                   ),
+                  _toolCard(
+                    icon: Icons.badge,
+                    title: 'الرواتب + GOSI',
+                    subtitle: 'حساب الراتب الصافي + التأمينات',
+                    color: AC.purple,
+                    onTap: () => context.go('/compliance/payroll'),
+                  ),
+                  _toolCard(
+                    icon: Icons.balance,
+                    title: 'نقطة التعادل',
+                    subtitle: 'تحليل هامش المساهمة',
+                    color: AC.gold,
+                    onTap: () => context.go('/compliance/breakeven'),
+                  ),
                 ],
               );
             }),

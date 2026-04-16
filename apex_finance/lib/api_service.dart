@@ -346,6 +346,10 @@ class ApiService {
   // ── Loan Amortization schedule ──
   static Future<ApiResult> amortizationCompute(Map body) => _post('/amortization/compute', body);
 
+  // ── Payroll (GOSI + WPS) + Break-even analysis ──
+  static Future<ApiResult> payrollCompute(Map body) => _post('/payroll/compute', body);
+  static Future<ApiResult> breakevenCompute(Map body) => _post('/breakeven/compute', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

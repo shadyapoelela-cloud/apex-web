@@ -53,6 +53,8 @@ import '../screens/compliance/financial_ratios_screen.dart';
 import '../screens/compliance/depreciation_screen.dart';
 import '../screens/compliance/cashflow_screen.dart';
 import '../screens/compliance/amortization_screen.dart';
+import '../screens/compliance/payroll_screen.dart';
+import '../screens/compliance/breakeven_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -130,6 +132,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/amortization',
       pageBuilder: (c, s) => _apexPage(const AmortizationScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/payroll',
+      pageBuilder: (c, s) => _apexPage(const PayrollScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/breakeven',
+      pageBuilder: (c, s) => _apexPage(const BreakevenScreen(), s),
     ),
 
     // Account
