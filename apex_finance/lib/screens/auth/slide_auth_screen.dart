@@ -88,7 +88,7 @@ class _SAS extends State<SlideAuthScreen> {
       body: SafeArea(child: Center(child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('APEX', style: TextStyle(color: AC.goldText, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 6)),
+          ApexLogo(fontSize: 32),
           SizedBox(height: 3),
           Text('منصة التحليل المالي والحوكمة المعرفية — السوق السعودي', style: TextStyle(color: AC.ts, fontSize: 11)),
           SizedBox(height: 16),

@@ -465,7 +465,7 @@ class _LoginS extends State<LoginScreen> {
           child: Column(children: [
             Icon(Icons.account_balance, color: AC.goldText, size: 56),
             const SizedBox(height: 10),
-            Text('APEX', style: TextStyle(color: AC.goldText, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: 6)),
+            ApexLogo(fontSize: 36),
             const SizedBox(height: 6),
             Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0648\u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0647\u0646\u064a\u0629',
               style: TextStyle(color: AC.ts, fontSize: 11)),
@@ -716,12 +716,19 @@ class _MainNavS extends ConsumerState<MainNav> {
     return Scaffold(
       backgroundColor: AC.navy,
       body: Column(children: [
-        Container(padding: EdgeInsets.only(top: 36, left: 12, right: 12, bottom: 8), decoration: BoxDecoration(color: AC.navy2, border: Border(bottom: BorderSide(color: AC.bdr, width: 0.5))),
+        Container(padding: EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [AC.navy2, AC.navy2.withValues(alpha: 0.95)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+            border: Border(bottom: BorderSide(color: AC.gold.withValues(alpha: 0.12), width: 0.5)),
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 8, offset: const Offset(0, 2))],
+          ),
           child: Row(children: [
-            GestureDetector(onTap: () => setState(() => _i = 0), child: Text('APEX', style: TextStyle(color: AC.goldText, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2))),
-            SizedBox(width: 8),
-            // Separator between logo and nav icons
-            Container(width: 1, height: 24, margin: EdgeInsets.symmetric(horizontal: 6), color: AC.bdr),
+            ApexLogo(fontSize: 18, onTap: () => setState(() => _i = 0)),
+            _appBarDivider(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(color: AC.navy3.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
             ApexIconButton(icon: Icons.search, tooltip: 'البحث في المنصة', onPressed: () {
               showSearch(context: context, delegate: ApexSearch());
             }),
@@ -790,21 +797,25 @@ class _MainNavS extends ConsumerState<MainNav> {
                 ).then((v) { if (v == 'all') context.go('/notifications'); });
               },
             )),
-            // ── Divider before settings section ──
-            Container(width: 1, height: 24, margin: EdgeInsets.symmetric(horizontal: 6), color: AC.bdr),
-            // ── Theme Picker ──
+            ])),
+            _appBarDivider(),
             _buildThemePicker(),
-            // ── Language Toggle ──
             _buildLangToggle(),
             Spacer(),
-            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'), style: TextStyle(color: AC.tp.withValues(alpha: 0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.2)),
-              SizedBox(height: 2),
-              Text(_activeClients.isEmpty ? _clientLabel : _activeClients.join(' , '), style: TextStyle(color: AC.ts.withValues(alpha: 0.7), fontSize: 10)),
-            ]),
-            SizedBox(width: 6),
-            ApexIconButton(icon: Icons.account_circle, size: 22, tooltip: 'الملف الشخصي والإعدادات',
-              onPressed: () => context.push('/settings')),
+            Container(
+              padding: const EdgeInsets.only(left: 12),
+              decoration: BoxDecoration(border: Border(left: BorderSide(color: AC.gold.withValues(alpha: 0.15), width: 1.5))),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'), style: TextStyle(color: AC.tp.withValues(alpha: 0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.2)),
+                  SizedBox(height: 2),
+                  Text(_activeClients.isEmpty ? _clientLabel : _activeClients.join(' , '), style: TextStyle(color: AC.ts.withValues(alpha: 0.7), fontSize: 10)),
+                ]),
+                SizedBox(width: 6),
+                ApexIconButton(icon: Icons.account_circle, size: 22, tooltip: 'الملف الشخصي والإعدادات',
+                  onPressed: () => context.push('/settings')),
+              ]),
+            ),
           ]),
         ),
         Expanded(child: Stack(children: [
@@ -997,6 +1008,17 @@ class _MainNavS extends ConsumerState<MainNav> {
     );
   }
 
+
+  Widget _appBarDivider() => Container(
+    width: 1, height: 20,
+    margin: const EdgeInsets.symmetric(horizontal: 10),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [AC.bdr.withValues(alpha: 0.0), AC.bdr.withValues(alpha: 0.4), AC.bdr.withValues(alpha: 0.0)],
+      ),
+    ),
+  );
 
   void _comingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
