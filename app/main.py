@@ -674,6 +674,15 @@ try:
 except Exception as e:
     logging.error(f"Cash flow routes not mounted: {e}", exc_info=True)
 
+# ── Payroll (GOSI + WPS) + Break-even analysis
+try:
+    from app.core.payroll_routes import router as payroll_router
+
+    app.include_router(payroll_router)
+    logging.info("Payroll / break-even routes mounted")
+except Exception as e:
+    logging.error(f"Payroll routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
