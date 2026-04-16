@@ -701,6 +701,15 @@ try:
 except Exception as e:
     logging.error(f"Accounting routes not mounted: {e}", exc_info=True)
 
+# ── Working Capital + Composite Health Score
+try:
+    from app.core.analytics_routes import router as analytics_router
+
+    app.include_router(analytics_router)
+    logging.info("Analytics routes mounted (working-capital, health-score)")
+except Exception as e:
+    logging.error(f"Analytics routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
