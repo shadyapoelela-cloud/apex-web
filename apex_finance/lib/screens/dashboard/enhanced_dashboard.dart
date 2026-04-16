@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
 import '../../core/ui_components.dart';
+import '../compliance/compliance_health_widget.dart';
 
 // ════════════════════════════════════════
 // ENHANCED DASHBOARD v5.3b — Live API (ApiService)
@@ -95,7 +96,10 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                       ),
                       const SizedBox(height: 16),
                       _buildNoticeBanners(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
+                      // Compliance posture + quick links (Sprint 4)
+                      const ComplianceHealthWidget(),
+                      const SizedBox(height: 16),
                       _buildKPIRow(),
                       const SizedBox(height: 24),
                       Row(

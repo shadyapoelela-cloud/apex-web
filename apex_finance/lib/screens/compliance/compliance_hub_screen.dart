@@ -117,6 +117,13 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.info,
                     onTap: () => context.go('/compliance/ratios'),
                   ),
+                  _toolCard(
+                    icon: Icons.auto_graph,
+                    title: 'الإهلاك',
+                    subtitle: 'SL · DDB · SYD',
+                    color: AC.warn,
+                    onTap: () => context.go('/compliance/depreciation'),
+                  ),
                 ],
               );
             }),

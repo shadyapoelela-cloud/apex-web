@@ -337,6 +337,9 @@ class ApiService {
   // ── Financial ratios (18 ratios across 5 categories) ──
   static Future<ApiResult> ratiosCompute(Map body) => _post('/ratios/compute', body);
 
+  // ── Depreciation calculator (SL / DDB / SYD) ──
+  static Future<ApiResult> depreciationCompute(Map body) => _post('/depreciation/compute', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
