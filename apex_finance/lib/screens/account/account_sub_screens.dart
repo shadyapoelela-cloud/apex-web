@@ -87,11 +87,17 @@ class _ChPwS extends State<ChangePasswordScreen> {
       const SizedBox(height: 16),
       ElevatedButton(onPressed: ()=>Navigator.pop(c), child: const Text('\u0631\u062c\u0648\u0639'))])) :
     SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(children: [
-      TextField(controller: _cur, obscureText: true, decoration: _inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062d\u0627\u0644\u064a\u0629', ic: Icons.lock)),
+      TextField(controller: _cur, obscureText: true, textInputAction: TextInputAction.next,
+        decoration: _inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062d\u0627\u0644\u064a\u0629', ic: Icons.lock)),
       const SizedBox(height: 14),
-      TextField(controller: _new1, obscureText: true, decoration: _inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629', ic: Icons.lock_outline)),
+      TextField(controller: _new1, obscureText: true, textInputAction: TextInputAction.next,
+        onChanged: (_) => setState(() {}),
+        decoration: _inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629', ic: Icons.lock_outline)),
+      ApexPasswordStrength(password: _new1.text),
       SizedBox(height: 14),
-      TextField(controller: _new2, obscureText: true, decoration: _inp('\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', ic: Icons.lock_outline)),
+      TextField(controller: _new2, obscureText: true, textInputAction: TextInputAction.done,
+        onSubmitted: (_) => _go(),
+        decoration: _inp('\u062a\u0623\u0643\u064a\u062f \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', ic: Icons.lock_outline)),
       if(_e!=null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_e!, style: TextStyle(color: AC.err))),
       const SizedBox(height: 22),
       SizedBox(width: double.infinity, child: _l
@@ -184,18 +190,36 @@ class _SessionsScreenState extends State<SessionsScreen> {
   }
 
   Future<void> _logoutAll() async {
+    final ok = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
+      backgroundColor: AC.navy2,
+      title: Text('إنهاء جميع الجلسات', style: TextStyle(color: AC.gold)),
+      content: Text('سيتم تسجيل خروجك من جميع الأجهزة. هل تريد المتابعة؟', style: TextStyle(color: AC.tp)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text('إلغاء', style: TextStyle(color: AC.ts))),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('إنهاء الكل', style: TextStyle(color: AC.err))),
+      ]));
+    if (ok != true) return;
     final res = await ApiService.logoutAllSessions();
     if (res.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('تم إنهاء جميع الجلسات'), backgroundColor: AC.ok));
       _load();
     }
   }
 
   Future<void> _logoutOne(String id) async {
+    final ok = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
+      backgroundColor: AC.navy2,
+      title: Text('إنهاء الجلسة', style: TextStyle(color: AC.gold)),
+      content: Text('هل تريد إنهاء هذه الجلسة؟', style: TextStyle(color: AC.tp)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text('إلغاء', style: TextStyle(color: AC.ts))),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('إنهاء', style: TextStyle(color: AC.err))),
+      ]));
+    if (ok != true) return;
     final res = await ApiService.logoutSession(id);
     if (res.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('تم إنهاء الجلسة'), backgroundColor: AC.ok));
       _load();
     }

@@ -16,8 +16,8 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   String? _selectedCategory;
 
   static const _categories = <String?, String>{
-    null: 'ط§ظ„ظƒظ„', 'financial': 'ظ…ط§ظ„ظٹط©', 'audit': 'ط±ظ‚ط§ط¨ظٹط©',
-    'compliance': 'ط§ظ…طھط«ط§ظ„', 'readiness': 'ط¬ط§ظ‡ط²ظٹط©', 'advisory': 'ط§ط³طھط´ط§ط±ظٹط©',
+    null: 'الكل', 'financial': 'مالية', 'audit': 'رقابية',
+    'compliance': 'امتثال', 'readiness': 'جاهزية', 'advisory': 'استشارية',
   };
 
   @override void initState() { super.initState(); _load(); }
@@ -33,7 +33,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('ظƒطھط§ظ„ظˆط¬ ط§ظ„ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy2),
+    appBar: AppBar(title: Text('كتالوج الخدمات', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy2),
     body: Column(children: [
       SingleChildScrollView(scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.all(12),
@@ -51,7 +51,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
       Expanded(child: _loading
         ? Center(child: CircularProgressIndicator(color: AC.gold))
         : _services.isEmpty
-          ? Center(child: Text('ظ„ط§ طھظˆط¬ط¯ ط®ط¯ظ…ط§طھ', style: TextStyle(color: AC.ts)))
+          ? Center(child: Text('لا توجد خدمات', style: TextStyle(color: AC.ts)))
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               itemCount: _services.length,
@@ -68,18 +68,18 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
                       Expanded(child: Text(s['title_ar'] ?? '', style: TextStyle(color: AC.tp, fontSize: 15, fontWeight: FontWeight.bold))),
                       Container(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: AC.cyan.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-                        child: Text(stagesCount + ' ظ…ط±ط§ط­ظ„', style: TextStyle(color: AC.cyan, fontSize: 11))),
+                        child: Text(stagesCount + ' مراحل', style: TextStyle(color: AC.cyan, fontSize: 11))),
                     ]),
                     SizedBox(height: 6),
                     Row(children: [
-                      if (s['requires_coa'] == true) _tag('ظٹطھط·ظ„ط¨ COA', AC.warn),
-                      if (s['requires_tb'] == true) _tag('ظٹطھط·ظ„ط¨ TB', AC.warn),
+                      if (s['requires_coa'] == true) _tag('يتطلب COA', AC.warn),
+                      if (s['requires_tb'] == true) _tag('يتطلب TB', AC.warn),
                       _tag(s['category'] ?? '', AC.gold),
                       Spacer(),
-                      _tag('ط§ظ„ط­ط¯ ط§ظ„ط£ط¯ظ†ظ‰: ' + minPlan, AC.ts),
+                      _tag('الحد الأدنى: ' + minPlan, AC.ts),
                     ]),
                     SizedBox(height: 10),
-                    SizedBox(width: double.infinity, child: apexPrimaryButton('ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط©', () => _startService(s['service_code']))),
+                    SizedBox(width: double.infinity, child: apexPrimaryButton('بدء الخدمة', () => _startService(s['service_code']))),
                   ]),
                 );
               })),
@@ -95,15 +95,15 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   Future<void> _startService(String code) async {
     if (widget.clientId == null || widget.clientId!.isEmpty) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('ظٹط±ط¬ظ‰ ط§ط®طھظٹط§ط± ط¹ظ…ظٹظ„ ط£ظˆظ„ط§ظ‹ ظ…ظ† طھط¨ظˆظٹط¨ ط§ظ„ط¹ظ…ظ„ط§ط،'),
+        content: Text('يرجى اختيار عميل أولاً من تبويب العملاء'),
         backgroundColor: AC.warn));
       return;
     }
     final res = await ApiService.createServiceCase(clientId: widget.clientId!, serviceCode: code);
     if (res.success) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('طھظ… ط¨ط¯ط، ط§ظ„ط®ط¯ظ…ط© ط¨ظ†ط¬ط§ط­'), backgroundColor: AC.ok));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم بدء الخدمة بنجاح'), backgroundColor: AC.ok));
     } else {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? 'ظپط´ظ„'), backgroundColor: AC.err));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? 'فشل'), backgroundColor: AC.err));
     }
   }
 }

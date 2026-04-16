@@ -88,9 +88,18 @@ class _ArchiveS extends State<ArchiveScreen> {
   }
 
   Future<void> _deleteItem(String id) async {
+    final ok = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
+      backgroundColor: AC.navy2,
+      title: Text('حذف الملف', style: TextStyle(color: AC.gold)),
+      content: Text('هل تريد حذف هذا الملف نهائياً؟ لا يمكن التراجع عن هذا الإجراء.', style: TextStyle(color: AC.tp)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text('إلغاء', style: TextStyle(color: AC.ts))),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('حذف', style: TextStyle(color: AC.err))),
+      ]));
+    if (ok != true) return;
     try {
       final r = await ApiService.deleteArchiveItem(id);
-      if (r.success) { _load(); if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم الحذف'))); }
+      if (r.success) { _load(); if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم الحذف'), backgroundColor: AC.ok)); }
     } catch (_) {}
   }
 }

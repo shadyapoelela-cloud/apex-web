@@ -2511,36 +2511,11 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   Widget _filterChip(String label, String status, int? count) {
     final isActive = _filterStatus == status;
-    return GestureDetector(
+    return _AnimFilterChip(
+      label: label,
+      isActive: isActive,
+      count: count,
       onTap: () => setState(() => _filterStatus = status),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isActive ? AppColors.gold.withValues(alpha: 0.2) : AppColors.navy,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isActive ? AppColors.gold : AppColors.borderColor),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label, style: TextStyle(
-              fontSize: 12,
-              color: isActive ? AppColors.gold : AppColors.textMid,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
-            if (count != null) ...[
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: (isActive ? AppColors.gold : AppColors.textDim).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text('$count', style: TextStyle(fontSize: 10, color: isActive ? AppColors.gold : AppColors.textDim)),
-              ),
-            ],
-          ],
-        ),
-      ),
     );
   }
 
@@ -3907,4 +3882,82 @@ class _CoaJourneyScreenState extends State<CoaJourneyScreen>
 
   // ─── Report Tab ────────────────────────────────────────────
 
+}
+
+class _AnimFilterChip extends StatefulWidget {
+  final String label;
+  final bool isActive;
+  final int? count;
+  final VoidCallback onTap;
+  const _AnimFilterChip({required this.label, required this.isActive, this.count, required this.onTap});
+  @override
+  State<_AnimFilterChip> createState() => _AnimFilterChipState();
+}
+
+class _AnimFilterChipState extends State<_AnimFilterChip> {
+  bool _hov = false;
+  bool _press = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final active = widget.isActive;
+    final highlighted = active || _hov;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hov = true),
+      onExit: (_) => setState(() { _hov = false; _press = false; }),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _press = true),
+        onTapUp: (_) { setState(() => _press = false); widget.onTap(); },
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          transform: _press
+              ? (Matrix4.identity()..scale(0.93))
+              : _hov && !active
+                  ? (Matrix4.identity()..scale(1.04))
+                  : Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: highlighted ? AppColors.gold.withValues(alpha: active ? 0.2 : 0.10) : AppColors.navy,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: highlighted ? AppColors.gold : AppColors.borderColor,
+              width: _hov && !active ? 1.3 : 1.0,
+            ),
+            boxShadow: _hov ? [
+              BoxShadow(color: AppColors.gold.withValues(alpha: 0.10), blurRadius: 6),
+            ] : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(widget.label, style: TextStyle(
+                fontSize: 12,
+                color: highlighted ? AppColors.gold : AppColors.textMid,
+                fontWeight: highlighted ? FontWeight.bold : FontWeight.normal,
+              )),
+              if (widget.count != null) ...[
+                const SizedBox(width: 4),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: (highlighted ? AppColors.gold : AppColors.textDim).withValues(alpha: _hov ? 0.3 : 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text('${widget.count}', style: TextStyle(
+                    fontSize: 10,
+                    color: highlighted ? AppColors.gold : AppColors.textDim,
+                  )),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -177,48 +177,206 @@ Widget apexMetricRow(List<ApexMetricCard> cards) => LayoutBuilder(
 // ── 4. Buttons ────────────────────────────────────────────
 
 Widget apexPrimaryButton(String label, VoidCallback? onPressed, {IconData? icon}) {
-  return ElevatedButton(
-    onPressed: onPressed,
-    style: ElevatedButton.styleFrom(
-      backgroundColor: AC.iconAccent,
-      foregroundColor: AC.btnFg,
-      elevation: 0,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    ),
-    child: icon != null
-      ? Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 18),
-          const SizedBox(width: 8),
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-        ])
-      : Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-  );
+  return _ApexPrimaryBtn(label: label, onPressed: onPressed, icon: icon);
+}
+
+class _ApexPrimaryBtn extends StatefulWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  const _ApexPrimaryBtn({required this.label, this.onPressed, this.icon});
+  @override
+  State<_ApexPrimaryBtn> createState() => _ApexPrimaryBtnState();
+}
+
+class _ApexPrimaryBtnState extends State<_ApexPrimaryBtn> with SingleTickerProviderStateMixin {
+  bool _hov = false;
+  bool _press = false;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final disabled = widget.onPressed == null;
+    return Opacity(
+      opacity: disabled ? 0.5 : 1.0,
+      child: MouseRegion(
+      onEnter: disabled ? null : (_) { setState(() => _hov = true); _ctrl.forward(); },
+      onExit: (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); },
+      cursor: disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: disabled ? null : (_) => setState(() => _press = true),
+        onTapUp: disabled ? null : (_) { setState(() => _press = false); widget.onPressed?.call(); },
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedBuilder(
+          animation: _anim,
+          builder: (_, __) {
+            final t = _anim.value;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              transform: _press
+                  ? (Matrix4.identity()..scale(0.95))
+                  : _hov
+                      ? (Matrix4.identity()..scale(1.03))
+                      : Matrix4.identity(),
+              transformAlignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.lerp(AC.iconAccent, AC.gold, t * 0.3)!,
+                    AC.iconAccent,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: AC.iconAccent.withValues(alpha: 0.25 * t),
+                    blurRadius: 14 * t,
+                    offset: Offset(0, 4 * t),
+                  ),
+                ],
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                if (widget.icon != null) ...[
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    transform: _hov
+                        ? (Matrix4.identity()..rotateZ(-0.08))
+                        : Matrix4.identity(),
+                    transformAlignment: Alignment.center,
+                    child: Icon(widget.icon, size: 18, color: AC.btnFg),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Text(widget.label, style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AC.btnFg,
+                  letterSpacing: _hov ? 0.3 : 0.0,
+                )),
+              ]),
+            );
+          },
+        ),
+      ),
+    ));
+  }
 }
 
 Widget apexSecondaryButton(String label, VoidCallback? onPressed, {IconData? icon, Color? color}) {
-  final c = color ?? AC.gold;
-  return OutlinedButton(
-    onPressed: onPressed,
-    style: OutlinedButton.styleFrom(
-      foregroundColor: c,
-      side: BorderSide(color: c.withValues(alpha: 0.45)),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    ),
-    child: icon != null
-      ? Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 18),
-          const SizedBox(width: 8),
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-        ])
-      : Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-  );
+  return _ApexSecondaryBtn(label: label, onPressed: onPressed, icon: icon, color: color);
+}
+
+class _ApexSecondaryBtn extends StatefulWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final Color? color;
+  const _ApexSecondaryBtn({required this.label, this.onPressed, this.icon, this.color});
+  @override
+  State<_ApexSecondaryBtn> createState() => _ApexSecondaryBtnState();
+}
+
+class _ApexSecondaryBtnState extends State<_ApexSecondaryBtn> with SingleTickerProviderStateMixin {
+  bool _hov = false;
+  bool _press = false;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = widget.color ?? AC.gold;
+    final disabled = widget.onPressed == null;
+    return Opacity(
+      opacity: disabled ? 0.5 : 1.0,
+      child: MouseRegion(
+      onEnter: disabled ? null : (_) { setState(() => _hov = true); _ctrl.forward(); },
+      onExit: (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); },
+      cursor: disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: disabled ? null : (_) => setState(() => _press = true),
+        onTapUp: disabled ? null : (_) { setState(() => _press = false); widget.onPressed?.call(); },
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedBuilder(
+          animation: _anim,
+          builder: (_, __) {
+            final t = _anim.value;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              transform: _press
+                  ? (Matrix4.identity()..scale(0.95))
+                  : _hov
+                      ? (Matrix4.identity()..scale(1.02))
+                      : Matrix4.identity(),
+              transformAlignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: c.withValues(alpha: 0.06 * t),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Color.lerp(c.withValues(alpha: 0.45), c, t * 0.5)!,
+                  width: 1.0 + 0.5 * t,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: c.withValues(alpha: 0.15 * t),
+                    blurRadius: 10 * t,
+                    offset: Offset(0, 2 * t),
+                  ),
+                ],
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                if (widget.icon != null) ...[
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    transform: _hov
+                        ? (Matrix4.identity()..translate(2.0, 0.0))
+                        : Matrix4.identity(),
+                    transformAlignment: Alignment.center,
+                    child: Icon(widget.icon, size: 18, color: c),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Text(widget.label, style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: c,
+                )),
+              ]),
+            );
+          },
+        ),
+      ),
+    ));
+  }
 }
 
 // ── 5. Next Step Card ─────────────────────────────────────
 
-class ApexNextStepCard extends StatelessWidget {
+class ApexNextStepCard extends StatefulWidget {
   final String title;
   final String description;
   final String buttonLabel;
@@ -235,39 +393,92 @@ class ApexNextStepCard extends StatelessWidget {
   });
 
   @override
+  State<ApexNextStepCard> createState() => _ApexNextStepCardState();
+}
+
+class _ApexNextStepCardState extends State<ApexNextStepCard> with SingleTickerProviderStateMixin {
+  bool _hov = false;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 350));
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 8, bottom: 14),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        gradient: LinearGradient(
-          colors: [AC.iconAccent.withValues(alpha: 0.10), AC.navy2],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
-        boxShadow: [
-          BoxShadow(color: AC.iconAccent.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 3)),
-        ],
+    return MouseRegion(
+      onEnter: (_) { setState(() => _hov = true); _ctrl.forward(); },
+      onExit: (_) { setState(() => _hov = false); _ctrl.reverse(); },
+      child: AnimatedBuilder(
+        animation: _anim,
+        builder: (_, __) {
+          final t = _anim.value;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            margin: const EdgeInsets.only(top: 8, bottom: 14),
+            padding: const EdgeInsets.all(18),
+            transform: _hov
+                ? (Matrix4.identity()..translate(0.0, -2.0))
+                : Matrix4.identity(),
+            transformAlignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                colors: [
+                  AC.iconAccent.withValues(alpha: 0.10 + 0.06 * t),
+                  _hov ? AC.iconAccent.withValues(alpha: 0.04) : AC.navy2,
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+              border: Border.all(
+                color: AC.iconAccent.withValues(alpha: 0.25 * t),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AC.iconAccent.withValues(alpha: 0.06 + 0.08 * t),
+                  blurRadius: 16 + 10 * t,
+                  offset: Offset(0, 3 + 3 * t),
+                ),
+              ],
+            ),
+            child: Row(children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                width: 40, height: 40,
+                decoration: BoxDecoration(
+                  color: AC.iconAccent.withValues(alpha: _hov ? 0.18 : 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: _hov ? [
+                    BoxShadow(color: AC.gold.withValues(alpha: 0.12), blurRadius: 8),
+                  ] : null,
+                ),
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..scale(1.0 + 0.12 * t),
+                  child: Icon(widget.icon ?? Icons.arrow_forward_rounded, color: AC.gold, size: 20),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(widget.title, style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                Text(widget.description, style: TextStyle(color: AC.ts, fontSize: 12, height: 1.4)),
+              ])),
+              const SizedBox(width: 12),
+              apexPrimaryButton(widget.buttonLabel, widget.onPressed),
+            ]),
+          );
+        },
       ),
-      child: Row(children: [
-        Container(
-          width: 40, height: 40,
-          decoration: BoxDecoration(
-            color: AC.iconAccent.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon ?? Icons.arrow_forward_rounded, color: AC.gold, size: 20),
-        ),
-        const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          Text(description, style: TextStyle(color: AC.ts, fontSize: 12, height: 1.4)),
-        ])),
-        const SizedBox(width: 12),
-        apexPrimaryButton(buttonLabel, onPressed),
-      ]),
     );
   }
 }
@@ -410,47 +621,62 @@ class ApexHoverCard extends StatefulWidget {
 
 class _ApexHoverCardState extends State<ApexHoverCard> {
   bool _hovering = false;
+  bool _pressing = false;
 
   @override
-  Widget build(BuildContext context) => MouseRegion(
-    onEnter: (_) => setState(() => _hovering = true),
-    onExit: (_) => setState(() => _hovering = false),
-    cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
-    child: GestureDetector(
-      onTap: widget.onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        margin: widget.margin ?? const EdgeInsets.only(bottom: 12),
-        padding: widget.padding ?? const EdgeInsets.all(18),
-        transform: _hovering
-            ? (Matrix4.identity()..translate(0.0, -3.0)..scale(1.005))
-            : Matrix4.identity(),
-        decoration: BoxDecoration(
-          color: _hovering ? AC.navy3 : AC.navy2.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: _hovering ? AC.iconAccent.withValues(alpha: 0.35) : AC.bdr.withValues(alpha: 0.15),
-            width: _hovering ? 1.2 : 0.8,
+  Widget build(BuildContext context) {
+    final interactive = widget.onTap != null;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() { _hovering = false; _pressing = false; }),
+      cursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTapDown: interactive ? (_) => setState(() => _pressing = true) : null,
+        onTapUp: interactive ? (_) { setState(() => _pressing = false); widget.onTap?.call(); } : null,
+        onTapCancel: interactive ? () => setState(() => _pressing = false) : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          margin: widget.margin ?? const EdgeInsets.only(bottom: 12),
+          padding: widget.padding ?? const EdgeInsets.all(18),
+          transform: _pressing
+              ? (Matrix4.identity()..scale(0.97))
+              : _hovering
+                  ? (Matrix4.identity()..translate(0.0, -3.0)..scale(1.005))
+                  : Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: _pressing
+                ? AC.iconAccent.withValues(alpha: 0.08)
+                : _hovering ? AC.navy3 : AC.navy2.withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: _pressing
+                  ? AC.iconAccent.withValues(alpha: 0.45)
+                  : _hovering ? AC.iconAccent.withValues(alpha: 0.35) : AC.bdr.withValues(alpha: 0.15),
+              width: _hovering || _pressing ? 1.2 : 0.8,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: _pressing
+                    ? AC.iconAccent.withValues(alpha: 0.15)
+                    : _hovering ? AC.iconAccent.withValues(alpha: 0.10) : AC.bdr.withValues(alpha: 0.10),
+                blurRadius: _pressing ? 6 : (_hovering ? 24 : 8),
+                spreadRadius: _hovering && !_pressing ? 1 : 0,
+                offset: Offset(0, _pressing ? 1 : (_hovering ? 8 : 2)),
+              ),
+              if (_hovering && !_pressing) BoxShadow(
+                color: AC.iconAccent.withValues(alpha: 0.04),
+                blurRadius: 40,
+                offset: const Offset(0, 12),
+              ),
+            ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: _hovering ? AC.iconAccent.withValues(alpha: 0.10) : AC.bdr.withValues(alpha: 0.10),
-              blurRadius: _hovering ? 24 : 8,
-              spreadRadius: _hovering ? 1 : 0,
-              offset: Offset(0, _hovering ? 8 : 2),
-            ),
-            if (_hovering) BoxShadow(
-              color: AC.iconAccent.withValues(alpha: 0.04),
-              blurRadius: 40,
-              offset: const Offset(0, 12),
-            ),
-          ],
+          child: widget.child,
         ),
-        child: widget.child,
       ),
-    ),
-  );
+    );
+  }
 }
 
 // ── 11. Status Indicator Dot ──────────────────────────────
@@ -621,36 +847,95 @@ Widget apexTintedCard({
   EdgeInsets? margin,
   VoidCallback? onTap,
 }) {
-  Color tintColor;
-  switch (tint) {
-    case ApexTint.green: tintColor = AC.ok;
-    case ApexTint.blue: tintColor = AC.info;
-    case ApexTint.amber: tintColor = AC.warn;
-    case ApexTint.red: tintColor = AC.err;
-    case ApexTint.violet: tintColor = AC.purple;
+  return _ApexTintedCard(tint: tint, children: children, title: title, padding: padding, margin: margin, onTap: onTap);
+}
+
+class _ApexTintedCard extends StatefulWidget {
+  final ApexTint tint;
+  final List<Widget> children;
+  final String? title;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final VoidCallback? onTap;
+  const _ApexTintedCard({required this.tint, required this.children, this.title, this.padding, this.margin, this.onTap});
+  @override
+  State<_ApexTintedCard> createState() => _ApexTintedCardState();
+}
+
+class _ApexTintedCardState extends State<_ApexTintedCard> {
+  bool _hov = false;
+  bool _press = false;
+
+  Color get _tintColor {
+    switch (widget.tint) {
+      case ApexTint.green: return AC.ok;
+      case ApexTint.blue: return AC.info;
+      case ApexTint.amber: return AC.warn;
+      case ApexTint.red: return AC.err;
+      case ApexTint.violet: return AC.purple;
+    }
   }
-  final card = Container(
-    margin: margin ?? const EdgeInsets.only(bottom: 12),
-    padding: padding ?? const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(18),
-      gradient: LinearGradient(
-        colors: [tintColor.withValues(alpha: 0.10), AC.navy2],
-        begin: Alignment.topRight, end: Alignment.bottomLeft,
+
+  @override
+  Widget build(BuildContext context) {
+    final c = _tintColor;
+    final interactive = widget.onTap != null;
+    return MouseRegion(
+      onEnter: interactive ? (_) => setState(() => _hov = true) : null,
+      onExit: interactive ? (_) => setState(() { _hov = false; _press = false; }) : null,
+      cursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTapDown: interactive ? (_) => setState(() => _press = true) : null,
+        onTapUp: interactive ? (_) { setState(() => _press = false); widget.onTap?.call(); } : null,
+        onTapCancel: interactive ? () => setState(() => _press = false) : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          margin: widget.margin ?? const EdgeInsets.only(bottom: 12),
+          padding: widget.padding ?? const EdgeInsets.all(16),
+          transform: _press
+              ? (Matrix4.identity()..scale(0.97))
+              : _hov
+                  ? (Matrix4.identity()..translate(0.0, -2.0))
+                  : Matrix4.identity(),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              colors: [
+                c.withValues(alpha: _hov ? 0.16 : 0.10),
+                _hov ? c.withValues(alpha: 0.04) : AC.navy2,
+              ],
+              begin: Alignment.topRight, end: Alignment.bottomLeft,
+            ),
+            border: Border.all(
+              color: c.withValues(alpha: _hov ? 0.35 : 0.18),
+              width: _hov ? 1.2 : 1.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: c.withValues(alpha: _hov ? 0.14 : 0.06),
+                blurRadius: _hov ? 24 : 16,
+                offset: Offset(0, _hov ? 6 : 3),
+              ),
+              if (_hov) BoxShadow(
+                color: c.withValues(alpha: 0.05),
+                blurRadius: 40,
+                spreadRadius: -4,
+              ),
+            ],
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            if (widget.title != null) ...[
+              Text(widget.title!, style: TextStyle(color: c, fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 10),
+            ],
+            ...widget.children,
+          ]),
+        ),
       ),
-      border: Border.all(color: tintColor.withValues(alpha: 0.18)),
-      boxShadow: [BoxShadow(color: tintColor.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 3))],
-    ),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      if (title != null) ...[
-        Text(title, style: TextStyle(color: tintColor, fontWeight: FontWeight.bold, fontSize: 14)),
-        const SizedBox(height: 10),
-      ],
-      ...children,
-    ]),
-  );
-  if (onTap != null) return InkWell(onTap: onTap, borderRadius: BorderRadius.circular(18), child: card);
-  return card;
+    );
+  }
 }
 
 // ── 16. Pill Badge — small colored status indicator ──
@@ -845,42 +1130,116 @@ Widget apexFeedItem({
   String? time,
   VoidCallback? onTap,
 }) {
-  final c = accentColor ?? AC.gold;
-  return InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(14),
-    child: Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [c.withValues(alpha: 0.05), AC.navy2],
-          begin: Alignment.centerRight, end: Alignment.centerLeft,
+  return _ApexFeedItem(title: title, subtitle: subtitle, icon: icon, accentColor: accentColor, time: time, onTap: onTap);
+}
+
+class _ApexFeedItem extends StatefulWidget {
+  final String title;
+  final String? subtitle;
+  final IconData? icon;
+  final Color? accentColor;
+  final String? time;
+  final VoidCallback? onTap;
+  const _ApexFeedItem({required this.title, this.subtitle, this.icon, this.accentColor, this.time, this.onTap});
+  @override
+  State<_ApexFeedItem> createState() => _ApexFeedItemState();
+}
+
+class _ApexFeedItemState extends State<_ApexFeedItem> with SingleTickerProviderStateMixin {
+  bool _hov = false;
+  bool _press = false;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = widget.accentColor ?? AC.gold;
+    final interactive = widget.onTap != null;
+    return MouseRegion(
+      onEnter: interactive ? (_) { setState(() => _hov = true); _ctrl.forward(); } : null,
+      onExit: interactive ? (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); } : null,
+      cursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTapDown: interactive ? (_) => setState(() => _press = true) : null,
+        onTapUp: interactive ? (_) { setState(() => _press = false); widget.onTap?.call(); } : null,
+        onTapCancel: interactive ? () => setState(() => _press = false) : null,
+        child: AnimatedBuilder(
+          animation: _anim,
+          builder: (_, __) {
+            final t = _anim.value;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              transform: _press
+                  ? (Matrix4.identity()..scale(0.97))
+                  : _hov
+                      ? (Matrix4.identity()..translate(0.0, -1.5))
+                      : Matrix4.identity(),
+              transformAlignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    c.withValues(alpha: 0.05 + 0.06 * t),
+                    _hov ? c.withValues(alpha: 0.03) : AC.navy2,
+                  ],
+                  begin: Alignment.centerRight, end: Alignment.centerLeft,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: Color.lerp(AC.bdr.withValues(alpha: 0.2), c.withValues(alpha: 0.35), t)!,
+                ),
+                boxShadow: _hov ? [
+                  BoxShadow(color: c.withValues(alpha: 0.10), blurRadius: 12, offset: const Offset(0, 3)),
+                ] : null,
+              ),
+              child: Row(children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  width: 34, height: 34,
+                  decoration: BoxDecoration(
+                    color: c.withValues(alpha: _hov ? 0.20 : 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: _hov ? [BoxShadow(color: c.withValues(alpha: 0.12), blurRadius: 6)] : null,
+                  ),
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..scale(1.0 + 0.12 * t)
+                      ..rotateZ(-0.08 * t),
+                    child: Icon(widget.icon ?? Icons.circle, color: c, size: 16),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(widget.title, style: TextStyle(
+                    color: _hov ? c : AC.tp,
+                    fontSize: 13, fontWeight: FontWeight.w600,
+                  )),
+                  if (widget.subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(widget.subtitle!, style: TextStyle(color: AC.ts, fontSize: 11)),
+                  ],
+                ])),
+                if (widget.time != null) Text(widget.time!, style: TextStyle(color: AC.td, fontSize: 10)),
+              ]),
+            );
+          },
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AC.bdr.withValues(alpha: 0.2)),
       ),
-      child: Row(children: [
-        Container(
-          width: 34, height: 34,
-          decoration: BoxDecoration(
-            color: c.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon ?? Icons.circle, color: c, size: 16),
-        ),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
-          if (subtitle != null) ...[
-            const SizedBox(height: 2),
-            Text(subtitle, style: TextStyle(color: AC.ts, fontSize: 11)),
-          ],
-        ])),
-        if (time != null) Text(time, style: TextStyle(color: AC.td, fontSize: 10)),
-      ]),
-    ),
-  );
+    );
+  }
 }
 
 // ── 22. Score Card — large number with label and subtitle ──
@@ -1215,6 +1574,18 @@ class ApexActionCard extends StatefulWidget {
 class _ApexActionCardState extends State<ApexActionCard> with SingleTickerProviderStateMixin {
   bool _hovering = false;
   bool _pressing = false;
+  late final AnimationController _iconCtrl;
+  late final Animation<double> _iconAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _iconCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _iconAnim = CurvedAnimation(parent: _iconCtrl, curve: Curves.easeOutBack);
+  }
+
+  @override
+  void dispose() { _iconCtrl.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
@@ -1223,43 +1594,63 @@ class _ApexActionCardState extends State<ApexActionCard> with SingleTickerProvid
       onTapUp: (_) { setState(() => _pressing = false); widget.onTap?.call(); },
       onTapCancel: () => setState(() => _pressing = false),
       child: MouseRegion(
-        onEnter: (_) => setState(() => _hovering = true),
-        onExit: (_) => setState(() { _hovering = false; _pressing = false; }),
+        onEnter: (_) { setState(() => _hovering = true); _iconCtrl.forward(); },
+        onExit: (_) { setState(() { _hovering = false; _pressing = false; }); _iconCtrl.reverse(); },
         cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           transform: _pressing
-              ? (Matrix4.identity()..scale(0.97))
+              ? (Matrix4.identity()..scale(0.96))
               : _hovering
-                  ? (Matrix4.identity()..translate(0.0, -2.0))
+                  ? (Matrix4.identity()..translate(0.0, -3.0)..scale(1.01))
                   : Matrix4.identity(),
           transformAlignment: Alignment.center,
           decoration: BoxDecoration(
             color: _hovering ? widget.color.withValues(alpha: 0.08) : AC.navy2,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: _hovering ? widget.color.withValues(alpha: 0.4) : AC.bdr.withValues(alpha: 0.12),
-              width: _hovering ? 1.2 : 0.8,
+              color: _hovering ? widget.color.withValues(alpha: 0.5) : AC.bdr.withValues(alpha: 0.12),
+              width: _hovering ? 1.3 : 0.8,
             ),
             boxShadow: [
               BoxShadow(
-                color: _hovering ? widget.color.withValues(alpha: 0.12) : AC.bdr.withValues(alpha: 0.08),
-                blurRadius: _hovering ? 16 : 6,
-                offset: Offset(0, _hovering ? 4 : 1),
+                color: _hovering ? widget.color.withValues(alpha: 0.15) : AC.bdr.withValues(alpha: 0.08),
+                blurRadius: _hovering ? 20 : 6,
+                offset: Offset(0, _hovering ? 6 : 1),
+              ),
+              if (_hovering) BoxShadow(
+                color: widget.color.withValues(alpha: 0.06),
+                blurRadius: 40,
+                spreadRadius: -4,
               ),
             ],
           ),
           child: Row(children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 40, height: 40,
-              decoration: BoxDecoration(
-                color: widget.color.withValues(alpha: _hovering ? 0.18 : 0.10),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(widget.icon, color: widget.color, size: 18),
+            AnimatedBuilder(
+              animation: _iconAnim,
+              builder: (_, __) {
+                final t = _iconAnim.value;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 40, height: 40,
+                  decoration: BoxDecoration(
+                    color: widget.color.withValues(alpha: _hovering ? 0.20 : 0.10),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: _hovering ? [
+                      BoxShadow(color: widget.color.withValues(alpha: 0.15), blurRadius: 8),
+                    ] : null,
+                  ),
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..scale(1.0 + 0.15 * t)
+                      ..rotateZ(-0.08 * t),
+                    child: Icon(widget.icon, color: widget.color, size: 18),
+                  ),
+                );
+              },
             ),
             const SizedBox(width: 12),
             Expanded(child: Column(
@@ -1276,10 +1667,15 @@ class _ApexActionCardState extends State<ApexActionCard> with SingleTickerProvid
                 ],
               ],
             )),
-            AnimatedOpacity(
-              opacity: _hovering ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: Icon(Icons.arrow_forward_ios, color: widget.color, size: 12),
+            AnimatedSlide(
+              offset: Offset(_hovering ? 0.0 : 0.5, 0),
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              child: AnimatedOpacity(
+                opacity: _hovering ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: Icon(Icons.arrow_forward_ios, color: widget.color, size: 12),
+              ),
             ),
           ]),
         ),
@@ -1347,48 +1743,60 @@ class ApexIconButton extends StatefulWidget {
   State<ApexIconButton> createState() => _ApexIconButtonState();
 }
 
-class _ApexIconButtonState extends State<ApexIconButton> with SingleTickerProviderStateMixin {
+class _ApexIconButtonState extends State<ApexIconButton> with TickerProviderStateMixin {
   bool _hovering = false;
   bool _pressing = false;
   late final AnimationController _glowCtrl;
   late final Animation<double> _glowAnim;
+  late final AnimationController _bounceCtrl;
+  late final Animation<double> _bounceAnim;
 
   @override
   void initState() {
     super.initState();
     _glowCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
     _glowAnim = CurvedAnimation(parent: _glowCtrl, curve: Curves.easeOutCubic);
+    _bounceCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _bounceAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.82).chain(CurveTween(curve: Curves.easeOut)), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 0.82, end: 1.12).chain(CurveTween(curve: Curves.easeOut)), weight: 35),
+      TweenSequenceItem(tween: Tween(begin: 1.12, end: 1.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 35),
+    ]).animate(_bounceCtrl);
   }
 
   @override
-  void dispose() { _glowCtrl.dispose(); super.dispose(); }
+  void dispose() { _glowCtrl.dispose(); _bounceCtrl.dispose(); super.dispose(); }
+
+  void _onTap() {
+    _bounceCtrl.forward(from: 0);
+    widget.onPressed?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
     final baseColor = widget.color ?? AC.ts;
     final activeColor = widget.hoverColor ?? AC.gold;
 
+    final enabled = widget.onPressed != null;
     final btn = GestureDetector(
-      onTapDown: (_) => setState(() => _pressing = true),
-      onTapUp: (_) { setState(() => _pressing = false); widget.onPressed?.call(); },
-      onTapCancel: () => setState(() => _pressing = false),
+      onTapDown: enabled ? (_) => setState(() => _pressing = true) : null,
+      onTapUp: enabled ? (_) { setState(() => _pressing = false); _onTap(); } : null,
+      onTapCancel: enabled ? () => setState(() => _pressing = false) : null,
       child: MouseRegion(
-        onEnter: (_) { setState(() => _hovering = true); _glowCtrl.forward(); },
-        onExit: (_) { setState(() { _hovering = false; _pressing = false; }); _glowCtrl.reverse(); },
-        cursor: widget.onPressed != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onEnter: enabled ? (_) { setState(() => _hovering = true); _glowCtrl.forward(); } : null,
+        onExit: enabled ? (_) { setState(() { _hovering = false; _pressing = false; }); _glowCtrl.reverse(); } : null,
+        cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
         child: AnimatedBuilder(
-          animation: _glowAnim,
+          animation: Listenable.merge([_glowAnim, _bounceAnim]),
           builder: (_, __) {
             final t = _glowAnim.value;
+            final bounce = _bounceAnim.value;
+            final scale = _pressing ? 0.88 : (_hovering ? 1.08 : 1.0);
             return AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOutCubic,
               width: 38, height: 38,
-              transform: _pressing
-                  ? (Matrix4.identity()..scale(0.88))
-                  : _hovering
-                      ? (Matrix4.identity()..scale(1.08))
-                      : Matrix4.identity(),
+              transform: Matrix4.identity()..scale(scale),
               transformAlignment: Alignment.center,
               decoration: BoxDecoration(
                 color: _pressing
@@ -1406,19 +1814,30 @@ class _ApexIconButtonState extends State<ApexIconButton> with SingleTickerProvid
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Icon(
-                    widget.icon,
-                    size: widget.size,
-                    color: Color.lerp(baseColor, activeColor, t),
+                  Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..scale(bounce)
+                      ..rotateZ(_hovering ? -0.1 * t : 0.0),
+                    child: Icon(
+                      widget.icon,
+                      size: widget.size,
+                      color: Color.lerp(baseColor, activeColor, t),
+                    ),
                   ),
                   if (widget.showBadge) Positioned(
                     right: 6, top: 6,
-                    child: Container(
-                      width: 8, height: 8,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: _hovering ? 9 : 8,
+                      height: _hovering ? 9 : 8,
                       decoration: BoxDecoration(
                         color: widget.badgeColor ?? AC.err,
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: (widget.badgeColor ?? AC.err).withValues(alpha: 0.5), blurRadius: 4)],
+                        boxShadow: [BoxShadow(
+                          color: (widget.badgeColor ?? AC.err).withValues(alpha: _hovering ? 0.7 : 0.5),
+                          blurRadius: _hovering ? 6 : 4,
+                        )],
                       ),
                     ),
                   ),
@@ -1456,18 +1875,31 @@ class ApexGlowFAB extends StatefulWidget {
   State<ApexGlowFAB> createState() => _ApexGlowFABState();
 }
 
-class _ApexGlowFABState extends State<ApexGlowFAB> with SingleTickerProviderStateMixin {
+class _ApexGlowFABState extends State<ApexGlowFAB> with TickerProviderStateMixin {
   late final AnimationController _pulseCtrl;
+  late final AnimationController _tapCtrl;
+  late final Animation<double> _tapAnim;
   bool _hovering = false;
 
   @override
   void initState() {
     super.initState();
     _pulseCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000))..repeat(reverse: true);
+    _tapCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _tapAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.25), weight: 25),
+      TweenSequenceItem(tween: Tween(begin: 0.25, end: -0.15), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: -0.15, end: 0.0), weight: 45),
+    ]).animate(CurvedAnimation(parent: _tapCtrl, curve: Curves.easeOutCubic));
   }
 
   @override
-  void dispose() { _pulseCtrl.dispose(); super.dispose(); }
+  void dispose() { _pulseCtrl.dispose(); _tapCtrl.dispose(); super.dispose(); }
+
+  void _onTap() {
+    _tapCtrl.forward(from: 0);
+    widget.onPressed?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1477,9 +1909,10 @@ class _ApexGlowFABState extends State<ApexGlowFAB> with SingleTickerProviderStat
       onExit: (_) => setState(() => _hovering = false),
       cursor: SystemMouseCursors.click,
       child: AnimatedBuilder(
-        animation: _pulseCtrl,
+        animation: Listenable.merge([_pulseCtrl, _tapAnim]),
         builder: (_, __) {
           final pulse = _pulseCtrl.value;
+          final tapRot = _tapAnim.value;
           return AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             transform: _hovering ? (Matrix4.identity()..scale(1.1)) : Matrix4.identity(),
@@ -1487,20 +1920,44 @@ class _ApexGlowFABState extends State<ApexGlowFAB> with SingleTickerProviderStat
             child: Container(
               width: 56, height: 56,
               decoration: BoxDecoration(
-                color: c,
+                gradient: LinearGradient(
+                  colors: [
+                    Color.lerp(c, Colors.white, _hovering ? 0.12 : 0.0)!,
+                    c,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
-                  BoxShadow(color: c.withValues(alpha: 0.3 + pulse * 0.15), blurRadius: 16 + pulse * 8, spreadRadius: pulse * 2),
+                  BoxShadow(
+                    color: c.withValues(alpha: 0.3 + pulse * 0.15 + (_hovering ? 0.1 : 0)),
+                    blurRadius: 16 + pulse * 8 + (_hovering ? 6 : 0),
+                    spreadRadius: pulse * 2 + (_hovering ? 1 : 0),
+                  ),
                   BoxShadow(color: c.withValues(alpha: 0.15), blurRadius: 32, spreadRadius: -2),
                 ],
               ),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: widget.onPressed,
+                  onTap: _onTap,
                   borderRadius: BorderRadius.circular(16),
                   splashColor: Colors.white24,
-                  child: Center(child: Icon(widget.icon, color: AC.navy, size: 24)),
+                  highlightColor: Colors.white10,
+                  child: Center(
+                    child: Transform.rotate(
+                      angle: tapRot,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        transform: _hovering
+                            ? (Matrix4.identity()..scale(1.12))
+                            : Matrix4.identity(),
+                        transformAlignment: Alignment.center,
+                        child: Icon(widget.icon, color: AC.navy, size: 24),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -1513,4 +1970,437 @@ class _ApexGlowFABState extends State<ApexGlowFAB> with SingleTickerProviderStat
     }
     return fab;
   }
+}
+
+// ── 34. Animated Icon — reusable hover/tap icon wrapper ──
+
+enum ApexIconEffect { scale, rotate, bounce, pulse }
+
+class ApexAnimatedIcon extends StatefulWidget {
+  final IconData icon;
+  final double size;
+  final Color? color;
+  final Color? hoverColor;
+  final VoidCallback? onTap;
+  final String? tooltip;
+  final ApexIconEffect effect;
+
+  const ApexAnimatedIcon({
+    super.key,
+    required this.icon,
+    this.size = 20,
+    this.color,
+    this.hoverColor,
+    this.onTap,
+    this.tooltip,
+    this.effect = ApexIconEffect.scale,
+  });
+
+  @override
+  State<ApexAnimatedIcon> createState() => _ApexAnimatedIconState();
+}
+
+class _ApexAnimatedIconState extends State<ApexAnimatedIcon> with TickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+  late final AnimationController _tapCtrl;
+  late final Animation<double> _tapAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+    _tapCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 350));
+    _tapAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.75), weight: 25),
+      TweenSequenceItem(tween: Tween(begin: 0.75, end: 1.15), weight: 35),
+      TweenSequenceItem(tween: Tween(begin: 1.15, end: 1.0), weight: 40),
+    ]).animate(CurvedAnimation(parent: _tapCtrl, curve: Curves.easeOutCubic));
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); _tapCtrl.dispose(); super.dispose(); }
+
+  Matrix4 _buildTransform(double t, double tap) {
+    final m = Matrix4.identity();
+    switch (widget.effect) {
+      case ApexIconEffect.scale:
+        m.scale(tap * (1.0 + 0.18 * t));
+      case ApexIconEffect.rotate:
+        m.scale(tap);
+        m.rotateZ(-0.15 * t);
+      case ApexIconEffect.bounce:
+        m.scale(tap);
+        m.translate(0.0, -3.0 * t);
+      case ApexIconEffect.pulse:
+        m.scale(tap * (1.0 + 0.1 * t));
+    }
+    return m;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final base = widget.color ?? AC.ts;
+    final hover = widget.hoverColor ?? AC.gold;
+    final interactive = widget.onTap != null;
+    final w = MouseRegion(
+      onEnter: interactive ? (_) => _ctrl.forward() : null,
+      onExit: interactive ? (_) => _ctrl.reverse() : null,
+      cursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: interactive ? () { _tapCtrl.forward(from: 0); widget.onTap!(); } : null,
+        child: AnimatedBuilder(
+          animation: Listenable.merge([_anim, _tapAnim]),
+          builder: (_, __) {
+            final t = _anim.value;
+            final tap = _tapCtrl.isAnimating ? _tapAnim.value : 1.0;
+            return Transform(
+              alignment: Alignment.center,
+              transform: _buildTransform(t, tap),
+              child: Icon(
+                widget.icon,
+                size: widget.size,
+                color: Color.lerp(base, hover, t),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+    if (widget.tooltip != null) {
+      return Tooltip(message: widget.tooltip!, preferBelow: false, child: w);
+    }
+    return w;
+  }
+}
+
+// ── 35. Menu Item — animated list-tile style navigation item ──
+
+class ApexMenuItem extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  final IconData trailingIcon;
+
+  const ApexMenuItem({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+    this.trailingIcon = Icons.chevron_left,
+  });
+
+  @override
+  State<ApexMenuItem> createState() => _ApexMenuItemState();
+}
+
+class _ApexMenuItemState extends State<ApexMenuItem> with SingleTickerProviderStateMixin {
+  bool _hov = false;
+  bool _press = false;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 250));
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) { setState(() => _hov = true); _ctrl.forward(); },
+      onExit: (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); },
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _press = true),
+        onTapUp: (_) { setState(() => _press = false); widget.onTap(); },
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedBuilder(
+          animation: _anim,
+          builder: (_, __) {
+            final t = _anim.value;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              transform: _press
+                  ? (Matrix4.identity()..scale(0.97))
+                  : _hov
+                      ? (Matrix4.identity()..translate(-3.0, 0.0))
+                      : Matrix4.identity(),
+              transformAlignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Color.lerp(AC.navy3, widget.color.withValues(alpha: 0.08), t),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Color.lerp(Colors.transparent, widget.color.withValues(alpha: 0.2), t)!,
+                ),
+                boxShadow: _hov ? [
+                  BoxShadow(color: widget.color.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(-2, 0)),
+                ] : null,
+              ),
+              child: Row(children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: widget.color.withValues(alpha: _hov ? 0.18 : 0.10),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()..scale(1.0 + 0.1 * t),
+                    child: Icon(widget.icon, color: widget.color, size: 20),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(widget.label, style: TextStyle(
+                  color: _hov ? widget.color : AC.tp,
+                  fontSize: 14,
+                  fontWeight: _hov ? FontWeight.w600 : FontWeight.w500,
+                ))),
+                AnimatedSlide(
+                  offset: Offset(_hov ? -0.3 : 0.0, 0),
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(widget.trailingIcon, color: _hov ? widget.color : AC.ts, size: 18),
+                ),
+              ]),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// ── 36. Action Tile — compact action row with icon animation ──
+
+class ApexActionTile extends StatefulWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const ApexActionTile({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  State<ApexActionTile> createState() => _ApexActionTileState();
+}
+
+class _ApexActionTileState extends State<ApexActionTile> with SingleTickerProviderStateMixin {
+  bool _hov = false;
+  bool _press = false;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 250));
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack);
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) { setState(() => _hov = true); _ctrl.forward(); },
+      onExit: (_) { setState(() { _hov = false; _press = false; }); _ctrl.reverse(); },
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _press = true),
+        onTapUp: (_) { setState(() => _press = false); widget.onTap(); },
+        onTapCancel: () => setState(() => _press = false),
+        child: AnimatedBuilder(
+          animation: _anim,
+          builder: (_, __) {
+            final t = _anim.value;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.only(bottom: 8),
+              transform: _press
+                  ? (Matrix4.identity()..scale(0.96))
+                  : Matrix4.identity(),
+              transformAlignment: Alignment.center,
+              child: Row(children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: widget.color.withValues(alpha: _hov ? 0.22 : 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: _hov ? [
+                      BoxShadow(color: widget.color.withValues(alpha: 0.15), blurRadius: 8),
+                    ] : null,
+                  ),
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..scale(1.0 + 0.15 * t)
+                      ..rotateZ(-0.08 * t),
+                    child: Icon(widget.icon, color: widget.color, size: 18),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(widget.label, style: TextStyle(
+                  color: _hov ? widget.color : AC.tp,
+                  fontSize: 14,
+                ))),
+                AnimatedSlide(
+                  offset: Offset(_hov ? -0.3 : 0.0, 0),
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(Icons.chevron_left, color: _hov ? widget.color : AC.ts, size: 20),
+                ),
+              ]),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// ── 37. Workflow Stepper — step progress indicator for multi-step flows ──
+
+class ApexWorkflowStepper extends StatelessWidget {
+  final List<String> steps;
+  final int currentStep;
+  final Color? activeColor;
+
+  const ApexWorkflowStepper({
+    super.key,
+    required this.steps,
+    required this.currentStep,
+    this.activeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = activeColor ?? AC.gold;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: AC.navy2,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AC.bdr.withValues(alpha: 0.15)),
+      ),
+      child: Row(children: List.generate(steps.length * 2 - 1, (i) {
+        if (i.isOdd) {
+          final done = (i ~/ 2) < currentStep;
+          return Expanded(child: Container(
+            height: 2,
+            color: done ? c : AC.bdr.withValues(alpha: 0.3),
+          ));
+        }
+        final idx = i ~/ 2;
+        final isDone = idx < currentStep;
+        final isActive = idx == currentStep;
+        return Column(mainAxisSize: MainAxisSize.min, children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            width: 28, height: 28,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isDone ? c : isActive ? c.withValues(alpha: 0.15) : AC.navy3,
+              border: Border.all(color: isDone || isActive ? c : AC.bdr, width: isActive ? 2 : 1.5),
+            ),
+            child: Center(child: isDone
+              ? Icon(Icons.check, color: AC.btnFg, size: 14)
+              : Text('${idx + 1}', style: TextStyle(
+                  color: isActive ? c : AC.ts,
+                  fontSize: 11, fontWeight: FontWeight.bold))),
+          ),
+          const SizedBox(height: 4),
+          Text(steps[idx], style: TextStyle(
+            color: isActive ? c : isDone ? AC.tp : AC.td,
+            fontSize: 9, fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ]);
+      })),
+    );
+  }
+}
+
+// ── 38. Password Strength Indicator ──
+
+class ApexPasswordStrength extends StatelessWidget {
+  final String password;
+  const ApexPasswordStrength({super.key, required this.password});
+
+  int get _strength {
+    if (password.isEmpty) return 0;
+    int s = 0;
+    if (password.length >= 6) s++;
+    if (password.length >= 10) s++;
+    if (RegExp(r'[A-Z]').hasMatch(password)) s++;
+    if (RegExp(r'[0-9]').hasMatch(password)) s++;
+    if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) s++;
+    return s;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (password.isEmpty) return const SizedBox.shrink();
+    final s = _strength;
+    final labels = ['', 'ضعيفة جداً', 'ضعيفة', 'متوسطة', 'قوية', 'ممتازة'];
+    final colors = [AC.bdr, AC.err, AC.err, AC.warn, AC.ok, AC.ok];
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: List.generate(5, (i) => Expanded(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            height: 3,
+            margin: EdgeInsets.only(left: i > 0 ? 4 : 0),
+            decoration: BoxDecoration(
+              color: i < s ? colors[s] : AC.bdr.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ))),
+        const SizedBox(height: 4),
+        Text(labels[s], style: TextStyle(color: colors[s], fontSize: 10)),
+      ]),
+    );
+  }
+}
+
+// ── 39. Loading Indicator — spinner with optional message ──
+
+Widget apexLoading({String message = 'جارٍ التحميل...'}) {
+  return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+    CircularProgressIndicator(strokeWidth: 2.5, color: AC.gold),
+    const SizedBox(height: 14),
+    Text(message, style: TextStyle(color: AC.ts, fontSize: 12)),
+  ]));
+}
+
+// ── 41. Consistent SnackBar helper ──
+
+void apexSnack(BuildContext context, String message, {bool isError = false, bool isWarning = false}) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(message, style: TextStyle(color: AC.tp)),
+    backgroundColor: isError ? AC.err : isWarning ? AC.warn : AC.ok,
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    duration: const Duration(seconds: 3),
+  ));
 }

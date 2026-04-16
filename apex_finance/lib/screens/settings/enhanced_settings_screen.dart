@@ -45,10 +45,19 @@ class _SettState extends ConsumerState<EnhancedSettingsScreen> {
     } catch (_) {}
   }
 
-  void _logout() {
+  Future<void> _logout() async {
+    final ok = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
+      backgroundColor: AC.navy2,
+      title: Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c', style: TextStyle(color: AC.gold)),
+      content: Text('\u0647\u0644 \u062a\u0631\u064a\u062f \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c\u061f', style: TextStyle(color: AC.tp)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text('\u0625\u0644\u063a\u0627\u0621', style: TextStyle(color: AC.ts))),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('\u062e\u0631\u0648\u062c', style: TextStyle(color: AC.err))),
+      ]));
+    if (ok != true) return;
     S.clear();
     ApiService.setToken('');
-    context.go('/login');
+    if (mounted) context.go('/login');
   }
 
   @override
