@@ -710,6 +710,15 @@ try:
 except Exception as e:
     logging.error(f"Analytics routes not mounted: {e}", exc_info=True)
 
+# ── Invoice OCR extraction
+try:
+    from app.core.ocr_routes import router as ocr_router
+
+    app.include_router(ocr_router)
+    logging.info("OCR routes mounted at /ocr/*")
+except Exception as e:
+    logging.error(f"OCR routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
