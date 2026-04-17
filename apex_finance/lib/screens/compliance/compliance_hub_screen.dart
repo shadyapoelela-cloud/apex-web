@@ -243,6 +243,13 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.gold,
                     onTap: () => context.go('/compliance/fx-converter'),
                   ),
+                  _toolCard(
+                    icon: Icons.analytics_outlined,
+                    title: 'انحرافات التكاليف',
+                    subtitle: 'Material · Labour · Overhead',
+                    color: AC.warn,
+                    onTap: () => context.go('/compliance/cost-variance'),
+                  ),
                 ],
               );
             }),

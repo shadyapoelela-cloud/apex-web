@@ -158,6 +158,7 @@ class _ComplianceHealthWidgetState extends State<ComplianceHealthWidget> {
       ('/compliance/audit-trail',   Icons.lock_outline, 'سجل التدقيق',  AC.purple),
       ('/compliance/journal-entry-builder', Icons.edit_note, 'بنّاء القيود', AC.purple),
       ('/compliance/fx-converter',  Icons.swap_horiz,   'FX',             AC.gold),
+      ('/compliance/cost-variance', Icons.analytics_outlined, 'الانحرافات', AC.warn),
     ];
 
     return Wrap(

@@ -383,6 +383,12 @@ class ApiService {
   static Future<ApiResult> fxRevalue(Map body) => _post('/fx/revalue', body);
   static Future<ApiResult> fxCurrencies() => _get('/fx/currencies');
 
+  // ── Cost Accounting / Variance ──
+  static Future<ApiResult> costVarianceMaterial(Map body) => _post('/cost/variance/material', body);
+  static Future<ApiResult> costVarianceLabour(Map body) => _post('/cost/variance/labour', body);
+  static Future<ApiResult> costVarianceOverhead(Map body) => _post('/cost/variance/overhead', body);
+  static Future<ApiResult> costVarianceComprehensive(Map body) => _post('/cost/variance/comprehensive', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
