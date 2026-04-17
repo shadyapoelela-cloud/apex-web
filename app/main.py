@@ -658,6 +658,14 @@ try:
 except Exception as _e:
     logging.warning(f"ZATCA E2E router not mounted: {_e}")
 
+# Proactive AI scans (mounted at /api/v1/ai/scan).
+try:
+    from app.ai.routes import router as ai_scan_router
+    app.include_router(ai_scan_router)
+    logging.info("AI proactive router mounted at /api/v1/ai")
+except Exception as _e:
+    logging.warning(f"AI proactive router not mounted: {_e}")
+
 # Webhooks (Developer Platform) mounted at /api/v1/webhooks/*.
 try:
     from app.core.webhooks import router as webhooks_router

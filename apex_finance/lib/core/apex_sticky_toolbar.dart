@@ -10,7 +10,9 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'apex_notification_bell_live.dart';
 import 'design_tokens.dart';
+import 'session.dart';
 import 'theme.dart';
 
 /// Primary action button descriptor for the toolbar.
@@ -37,6 +39,12 @@ class ApexStickyToolbar extends StatelessWidget {
   final List<Widget>? breadcrumb;
   final double height;
 
+  /// Show the global ApexNotificationBellLive before the action list.
+  /// Defaults to true — every screen gets the live bell for free.
+  /// Opt out by passing `showBell: false` on admin / onboarding
+  /// screens where the bell would be visual noise.
+  final bool showBell;
+
   const ApexStickyToolbar({
     super.key,
     this.title,
@@ -44,6 +52,7 @@ class ApexStickyToolbar extends StatelessWidget {
     this.actions = const [],
     this.breadcrumb,
     this.height = 56,
+    this.showBell = true,
   });
 
   @override
@@ -77,6 +86,10 @@ class ApexStickyToolbar extends StatelessWidget {
               ),
             ),
           const Spacer(),
+          if (showBell) ...[
+            _GlobalBell(),
+            const SizedBox(width: AppSpacing.sm),
+          ],
           for (final a in actions) ...[
             const SizedBox(width: AppSpacing.sm),
             _ActionButton(action: a),
@@ -84,6 +97,23 @@ class ApexStickyToolbar extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Inlined here (not a separate import) to avoid a circular dependency
+/// between apex_sticky_toolbar ↔ apex_notification_bell_live. Just a
+/// lookup of the current user + a passthrough to the live bell.
+class _GlobalBell extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Resolve the user id lazily from Session so unauthenticated
+    // screens (login, register) still render the toolbar without
+    // crashing on a null user.
+    final uid = S.uid;
+    if (uid == null || uid.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return ApexNotificationBellLive(userId: uid);
   }
 }
 
