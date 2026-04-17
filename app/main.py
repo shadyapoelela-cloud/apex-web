@@ -746,6 +746,15 @@ try:
 except Exception as e:
     logging.error(f"Cost accounting routes not mounted: {e}", exc_info=True)
 
+# ── Financial Statements (TB / IS / BS / Close)
+try:
+    from app.core.fin_statements_routes import router as fs_router
+
+    app.include_router(fs_router)
+    logging.info("Financial statements routes mounted (TB / IS / BS / closing)")
+except Exception as e:
+    logging.error(f"Financial statements routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
