@@ -6,6 +6,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
+import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
 import '../../widgets/hybrid_sidebar.dart';
 
@@ -54,18 +55,18 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
   Widget build(BuildContext context) {
     return HybridSidebar(child: Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('مركز الامتثال (ZATCA / IFRS / SOCPA)',
-          style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: AC.gold),
-            onPressed: _loading ? null : _refreshChain,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
+      body: Column(children: [
+        ApexStickyToolbar(
+          title: 'مركز الامتثال (ZATCA / IFRS / SOCPA)',
+          actions: [
+            ApexToolbarAction(
+              label: 'تحديث',
+              icon: Icons.refresh,
+              onPressed: _loading ? null : _refreshChain,
+            ),
+          ],
+        ),
+        Expanded(child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -340,7 +341,8 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
             _refsCard(),
           ],
         ),
-      ),
+      )),
+      ]),
     ));
   }
 

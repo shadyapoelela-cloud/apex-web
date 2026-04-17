@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
 
 class VatReturnScreen extends StatefulWidget {
@@ -90,11 +91,9 @@ class _VatReturnScreenState extends State<VatReturnScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('إقرار ضريبة القيمة المضافة', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
-      ),
-      body: LayoutBuilder(builder: (ctx, cons) {
+      body: Column(children: [
+        const ApexStickyToolbar(title: 'إقرار ضريبة القيمة المضافة'),
+        Expanded(child: LayoutBuilder(builder: (ctx, cons) {
         final wide = cons.maxWidth > 960;
         if (!wide) {
           return SingleChildScrollView(
@@ -109,7 +108,8 @@ class _VatReturnScreenState extends State<VatReturnScreen> {
           Expanded(flex: 5,
             child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: _results())),
         ]);
-      }),
+      })),
+      ]),
     );
   }
 
