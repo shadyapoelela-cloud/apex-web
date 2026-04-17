@@ -215,6 +215,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.gold,
                     onTap: () => context.go('/compliance/executive'),
                   ),
+                  _toolCard(
+                    icon: Icons.account_balance,
+                    title: 'تغطية خدمة الدين',
+                    subtitle: 'DSCR + قدرة الاقتراض',
+                    color: AC.ok,
+                    onTap: () => context.go('/compliance/dscr'),
+                  ),
+                  _toolCard(
+                    icon: Icons.query_stats,
+                    title: 'تقييم الأعمال',
+                    subtitle: 'WACC + DCF',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/valuation'),
+                  ),
                 ],
               );
             }),

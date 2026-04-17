@@ -367,6 +367,11 @@ class ApiService {
   static Future<ApiResult> ocrExtractInvoice(String text) =>
       _post('/ocr/invoice/extract', {'text': text});
 
+  // ── Valuation: DSCR + WACC + DCF ──
+  static Future<ApiResult> dscrAnalyze(Map body) => _post('/dscr/analyze', body);
+  static Future<ApiResult> waccCompute(Map body) => _post('/wacc/compute', body);
+  static Future<ApiResult> dcfAnalyze(Map body) => _post('/dcf/analyze', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

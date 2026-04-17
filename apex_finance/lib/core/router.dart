@@ -64,6 +64,8 @@ import '../screens/compliance/working_capital_screen.dart';
 import '../screens/compliance/health_score_screen.dart';
 import '../screens/compliance/executive_dashboard_screen.dart';
 import '../screens/compliance/ocr_screen.dart';
+import '../screens/compliance/dscr_screen.dart';
+import '../screens/compliance/valuation_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -185,6 +187,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/ocr',
       pageBuilder: (c, s) => _apexPage(const OcrScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/dscr',
+      pageBuilder: (c, s) => _apexPage(const DscrScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/valuation',
+      pageBuilder: (c, s) => _apexPage(const ValuationScreen(), s),
     ),
 
     // Account

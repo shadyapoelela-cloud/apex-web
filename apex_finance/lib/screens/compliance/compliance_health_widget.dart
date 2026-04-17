@@ -150,6 +150,8 @@ class _ComplianceHealthWidgetState extends State<ComplianceHealthWidget> {
       ('/compliance/working-capital', Icons.sync,       'WC + CCC',     AC.gold),
       ('/compliance/health-score',  Icons.speed,        'الصحة المالية', AC.info),
       ('/compliance/ocr',           Icons.document_scanner, 'OCR',        AC.purple),
+      ('/compliance/dscr',          Icons.account_balance, 'DSCR',        AC.ok),
+      ('/compliance/valuation',     Icons.query_stats,  'DCF',            AC.info),
       ('/compliance/executive',     Icons.dashboard_customize, 'CFO Dashboard', AC.gold),
       ('/compliance/journal-entries', Icons.confirmation_number, 'القيود', AC.purple),
       ('/compliance/depreciation',  Icons.auto_graph,   'الإهلاك',      AC.warn),
