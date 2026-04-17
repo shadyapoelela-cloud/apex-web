@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/copilot/copilot_screen.dart';
+import '../screens/showcase/apex_showcase_screen.dart';
 import '../screens/financial/financial_ops_screen.dart';
 import '../screens/knowledge/knowledge_brain_screen.dart';
 import '../screens/audit/audit_workflow_screen.dart';
@@ -115,6 +116,13 @@ final appRouter = GoRouter(
 
     // Main app (with bottom nav)
     GoRoute(path: '/home', pageBuilder: (c, s) => _apexPage(const MainNav(), s)),
+
+    // Apex Components Showcase — demos every new shared component.
+    // Reachable via Cmd+K -> "Apex Showcase" or directly.
+    GoRoute(
+      path: '/showcase',
+      pageBuilder: (c, s) => _apexPage(const ApexShowcaseScreen(), s),
+    ),
 
     // ── Compliance (ZATCA / IFRS / SOCPA) ──
     GoRoute(

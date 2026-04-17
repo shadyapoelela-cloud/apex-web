@@ -109,6 +109,16 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/compliance/breakeven'),
     ),
 
+    // ── Apex Components Showcase ──
+    ApexCommand(
+      id: 'nav_apex_showcase',
+      label: 'معرض مكوّنات APEX',
+      subtitle: 'شاهد كل المكوّنات الجديدة في مكان واحد (Sprint 35)',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.auto_awesome_outlined,
+      onRun: (ctx) => GoRouter.of(ctx).go('/showcase'),
+    ),
+
     // ── Actions ──
     ApexCommand.action(
       id: 'action_new_journal_entry',
