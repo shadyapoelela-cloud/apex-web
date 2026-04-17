@@ -123,12 +123,25 @@ for _mod in [
     "app.core.offline_sync",
     "app.core.tenant_branding",
     "app.core.activity_log",
+    "app.core.auto_log",
     "app.integrations.zatca.retry_queue",
 ]:
     try:
         __import__(_mod)
     except Exception as _e:
         logging.warning(f"{_mod} models not registered: {_e}")
+
+# Wire auto-log status listeners onto the models that have a `status`
+# column. Each registration is cheap (dict entry) and idempotent.
+try:
+    from app.core.auto_log import register_auto_log
+    from app.core.offline_sync import SyncOperation
+    from app.integrations.zatca.retry_queue import ZatcaSubmission
+    register_auto_log(SyncOperation, entity_type="sync_op")
+    register_auto_log(ZatcaSubmission, entity_type="zatca_submission")
+    logging.info("Auto-log status listeners registered on 2 models")
+except Exception as _e:
+    logging.warning(f"Auto-log registration failed: {_e}")
 
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r

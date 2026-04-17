@@ -179,34 +179,29 @@ def _to_out(row: ActivityLog) -> ActivityOut:
     )
 
 
-@router.get("/{entity_type}/{entity_id}")
-def list_activity(
-    entity_type: str,
-    entity_id: str,
-    limit: int = 100,
-    offset: int = 0,
-):
-    """Return newest-first activity for one record."""
-    limit = max(1, min(limit, 500))
-    offset = max(0, offset)
+# NOTE: Route declaration order matters. FastAPI matches in the order
+# routes are registered, so we declare the more specific `/recent/...`
+# path BEFORE the generic `/{entity_type}/{entity_id}` pattern —
+# otherwise the latter would steal `/recent/<type>` into
+# list_activity(entity_type='recent', entity_id=<type>).
+
+
+@router.get("/recent/{entity_type}")
+def list_recent_across(entity_type: str, limit: int = 50):
+    """Dashboard feed: latest activity across all records of a type."""
+    limit = max(1, min(limit, 200))
     db = SessionLocal()
     try:
-        q = (
+        rows = (
             db.query(ActivityLog)
-            .filter(
-                ActivityLog.entity_type == entity_type,
-                ActivityLog.entity_id == entity_id,
-            )
+            .filter(ActivityLog.entity_type == entity_type)
             .order_by(ActivityLog.created_at.desc())
-            .offset(offset)
             .limit(limit)
+            .all()
         )
-        rows = q.all()
         return {
             "success": True,
             "data": [_to_out(r).model_dump() for r in rows],
-            "limit": limit,
-            "offset": offset,
         }
     finally:
         db.close()
@@ -237,22 +232,34 @@ def add_comment(entity_type: str, entity_id: str, payload: CommentIn):
         db.close()
 
 
-@router.get("/recent/{entity_type}")
-def list_recent_across(entity_type: str, limit: int = 50):
-    """Dashboard feed: latest activity across all records of a type."""
-    limit = max(1, min(limit, 200))
+@router.get("/{entity_type}/{entity_id}")
+def list_activity(
+    entity_type: str,
+    entity_id: str,
+    limit: int = 100,
+    offset: int = 0,
+):
+    """Return newest-first activity for one record."""
+    limit = max(1, min(limit, 500))
+    offset = max(0, offset)
     db = SessionLocal()
     try:
-        rows = (
+        q = (
             db.query(ActivityLog)
-            .filter(ActivityLog.entity_type == entity_type)
+            .filter(
+                ActivityLog.entity_type == entity_type,
+                ActivityLog.entity_id == entity_id,
+            )
             .order_by(ActivityLog.created_at.desc())
+            .offset(offset)
             .limit(limit)
-            .all()
         )
+        rows = q.all()
         return {
             "success": True,
             "data": [_to_out(r).model_dump() for r in rows],
+            "limit": limit,
+            "offset": offset,
         }
     finally:
         db.close()
