@@ -553,6 +553,23 @@ try:
 except Exception as _e:
     logging.warning(f"Tenant query guard not attached: {_e}")
 
+# Audit log — captures every state-changing request with redacted body preview.
+# Required for SOC 2 Type II + PDPL compliance. Disable via AUDIT_LOG_ENABLED=false.
+try:
+    from app.core.audit_log import AuditLogMiddleware
+    app.add_middleware(AuditLogMiddleware)
+    logging.info("Audit log middleware registered")
+except Exception as _e:
+    logging.warning(f"Audit log middleware not registered: {_e}")
+
+# WebSocket notifications router — real-time feed for user / tenant / entity channels.
+try:
+    from app.core.websocket_hub import router as ws_router
+    app.include_router(ws_router)
+    logging.info("WebSocket notifications router mounted at /ws/*")
+except Exception as _e:
+    logging.warning(f"WebSocket router not mounted: {_e}")
+
 # WhatsApp Business Cloud webhook (verification handshake + inbound events).
 # Only mounted if the module imports cleanly — optional integration.
 try:

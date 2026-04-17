@@ -11,7 +11,9 @@ import '../../core/apex_auto_save.dart';
 import '../../core/apex_data_table.dart';
 import '../../core/apex_filter_bar.dart';
 import '../../core/apex_form_field.dart';
+import '../../core/apex_preview_panel.dart';
 import '../../core/apex_shimmer.dart';
+import '../../core/apex_status_bar.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
@@ -123,7 +125,17 @@ class _ApexShowcaseScreenState extends State<ApexShowcaseScreen> {
                     _autoSaveDemo(),
                   ),
                   _section(
-                    '6. Command Palette (Cmd+K)',
+                    '6. ApexStatusBar',
+                    'شريط تدفق حالات السجل (Draft → Sent → Paid → ...)',
+                    _statusBarDemo(),
+                  ),
+                  _section(
+                    '7. ApexPreviewPanel',
+                    'لوحة معاينة يمنى للسجلات (400px) — Xero-style',
+                    _previewPanelDemo(),
+                  ),
+                  _section(
+                    '8. Command Palette (Cmd+K)',
                     'اضغط Ctrl+K من أي مكان لفتح لوحة الأوامر',
                     _paletteHint(),
                   ),
@@ -368,7 +380,103 @@ class _ApexShowcaseScreenState extends State<ApexShowcaseScreen> {
     );
   }
 
-  // ── 6. Palette hint ──
+  // ── 6. Status bar ──
+  Widget _statusBarDemo() {
+    return ApexStatusBar(
+      steps: const [
+        ApexStatusStep(id: 'draft', label: 'مسودة', state: ApexStepState.done),
+        ApexStatusStep(id: 'sent', label: 'مُرسلة', state: ApexStepState.done),
+        ApexStatusStep(id: 'paid', label: 'مدفوعة', state: ApexStepState.current),
+        ApexStatusStep(id: 'archived', label: 'مؤرشفة', state: ApexStepState.upcoming),
+      ],
+      onStepTap: (step) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tapped: ${step.label}')),
+        );
+      },
+    );
+  }
+
+  // ── 7. Preview panel ──
+  Widget _previewPanelDemo() {
+    return SizedBox(
+      height: 400,
+      child: Row(
+        children: [
+          Expanded(
+            child: Center(
+              child: Text(
+                '← لوحة المعاينة',
+                style: TextStyle(color: AC.ts, fontSize: AppFontSize.lg),
+              ),
+            ),
+          ),
+          ApexPreviewPanel(
+            width: 360,
+            title: 'فاتورة #INV-2026-0042',
+            subtitle: 'شركة الأمل • 2026-04-17',
+            statusBadge: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AC.ok.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(AppRadius.full),
+              ),
+              child: Text('مدفوعة',
+                  style: TextStyle(color: AC.ok, fontWeight: FontWeight.w600)),
+            ),
+            actions: [
+              ApexToolbarAction(
+                label: 'فتح',
+                icon: Icons.open_in_new,
+                primary: true,
+                onPressed: () {},
+              ),
+              ApexToolbarAction(
+                label: 'تحميل PDF',
+                icon: Icons.download,
+                onPressed: () {},
+              ),
+            ],
+            onClose: () {},
+            children: [
+              ApexPreviewRow.text('رقم الفاتورة', 'INV-2026-0042'),
+              ApexPreviewRow.text('العميل', 'شركة الأمل للتجارة'),
+              ApexPreviewRow.text('تاريخ الإصدار', '2026-04-17'),
+              ApexPreviewRow.text('تاريخ الاستحقاق', '2026-05-17'),
+              ApexPreviewRow(
+                label: 'الإجمالي',
+                value: Text(
+                  '${formatSarAmount(3750.00)} ر.س',
+                  style: TextStyle(
+                    color: AC.gold,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+              const Divider(),
+              Text('الخطوات',
+                  style: TextStyle(
+                      color: AC.ts, fontSize: AppFontSize.md)),
+              const SizedBox(height: AppSpacing.sm),
+              ApexStatusBar(
+                steps: const [
+                  ApexStatusStep(
+                      id: 'draft', label: 'مسودة', state: ApexStepState.done),
+                  ApexStatusStep(
+                      id: 'sent', label: 'مُرسلة', state: ApexStepState.done),
+                  ApexStatusStep(
+                      id: 'paid', label: 'مدفوعة', state: ApexStepState.current),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── 8. Palette hint ──
   Widget _paletteHint() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),

@@ -131,6 +131,11 @@ def _before_compile(query: Query) -> Query:
     if not tenant_aware_mappers:
         return query
 
+    # `.filter()` on a query that already has LIMIT/OFFSET would raise —
+    # disable assertions so the guard works mid-pagination too. This is safe
+    # because we're only adding a WHERE clause, not reordering the query.
+    query = query.enable_assertions(False)
+
     # If no tenant bound and we're in strict mode, raise loud.
     if tenant is None:
         if TENANT_STRICT:
