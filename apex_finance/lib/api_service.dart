@@ -363,6 +363,10 @@ class ApiService {
   static Future<ApiResult> workingCapitalAnalyze(Map body) => _post('/working-capital/analyze', body);
   static Future<ApiResult> healthScoreCompute(Map body) => _post('/health-score/compute', body);
 
+  // ── OCR: Invoice extraction ──
+  static Future<ApiResult> ocrExtractInvoice(String text) =>
+      _post('/ocr/invoice/extract', {'text': text});
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

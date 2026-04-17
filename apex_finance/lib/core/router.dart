@@ -62,6 +62,8 @@ import '../screens/compliance/inventory_screen.dart';
 import '../screens/compliance/aging_screen.dart';
 import '../screens/compliance/working_capital_screen.dart';
 import '../screens/compliance/health_score_screen.dart';
+import '../screens/compliance/executive_dashboard_screen.dart';
+import '../screens/compliance/ocr_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -175,6 +177,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/health-score',
       pageBuilder: (c, s) => _apexPage(const HealthScoreScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/executive',
+      pageBuilder: (c, s) => _apexPage(const ExecutiveDashboardScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/ocr',
+      pageBuilder: (c, s) => _apexPage(const OcrScreen(), s),
     ),
 
     // Account

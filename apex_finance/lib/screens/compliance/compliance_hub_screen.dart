@@ -201,6 +201,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.info,
                     onTap: () => context.go('/compliance/health-score'),
                   ),
+                  _toolCard(
+                    icon: Icons.document_scanner,
+                    title: 'OCR الفواتير',
+                    subtitle: 'استخراج الحقول تلقائياً',
+                    color: AC.purple,
+                    onTap: () => context.go('/compliance/ocr'),
+                  ),
+                  _toolCard(
+                    icon: Icons.dashboard_customize,
+                    title: 'لوحة CFO التنفيذية',
+                    subtitle: 'كل الأدوات في مكان واحد',
+                    color: AC.gold,
+                    onTap: () => context.go('/compliance/executive'),
+                  ),
                 ],
               );
             }),
