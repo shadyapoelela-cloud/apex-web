@@ -22,6 +22,7 @@ from app.phase1.models.platform_models import (
     gen_uuid,
 )
 from app.core.social_auth_verify import verify_google_id_token, verify_apple_identity_token
+from app.core.compliance_service import write_audit_event
 
 router = APIRouter()
 
@@ -98,6 +99,13 @@ async def google_sign_in(req: GoogleSignInRequest):
                 )
             )
             db.commit()
+            write_audit_event(
+                action="user.login",
+                actor_user_id=user.id,
+                entity_type="user",
+                entity_id=user.id,
+                metadata={"method": "google", "verified": identity.verified},
+            )
             return {
                 "success": True,
                 "is_new_user": False,
@@ -131,6 +139,13 @@ async def google_sign_in(req: GoogleSignInRequest):
             )
             db.add(session)
             db.commit()
+            write_audit_event(
+                action="user.register",
+                actor_user_id=new_user.id,
+                entity_type="user",
+                entity_id=new_user.id,
+                metadata={"method": "google", "verified": identity.verified},
+            )
             return {
                 "success": True,
                 "is_new_user": True,
@@ -195,6 +210,13 @@ async def apple_sign_in(req: AppleSignInRequest):
                 )
             )
             db.commit()
+            write_audit_event(
+                action="user.login",
+                actor_user_id=user.id,
+                entity_type="user",
+                entity_id=user.id,
+                metadata={"method": "apple", "verified": identity.verified},
+            )
             return {
                 "success": True,
                 "is_new_user": False,
@@ -222,6 +244,13 @@ async def apple_sign_in(req: AppleSignInRequest):
             )
             db.add(session)
             db.commit()
+            write_audit_event(
+                action="user.register",
+                actor_user_id=new_user.id,
+                entity_type="user",
+                entity_id=new_user.id,
+                metadata={"method": "apple", "verified": identity.verified},
+            )
             return {
                 "success": True,
                 "is_new_user": True,

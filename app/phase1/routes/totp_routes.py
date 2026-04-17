@@ -22,6 +22,7 @@ from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from app.core.auth_utils import extract_user_id
+from app.core.compliance_service import write_audit_event
 from app.core.totp_service import (
     build_encrypted_columns,
     consume_recovery_code,
@@ -68,6 +69,12 @@ async def totp_setup(authorization: Optional[str] = Header(None)):
         user.totp_recovery_codes_hashed = hashed_codes
         user.totp_enabled_at = None  # reset — must re-verify
         db.commit()
+        write_audit_event(
+            action="totp.setup",
+            actor_user_id=user_id,
+            entity_type="user",
+            entity_id=user_id,
+        )
 
         return TotpSetupResponse(
             provisioning_uri=result.provisioning_uri,
@@ -94,12 +101,18 @@ async def totp_verify(req: TotpVerifyRequest, authorization: Optional[str] = Hea
 
         # Try TOTP first.
         if verify_totp_code(user.totp_secret_encrypted, req.code):
-            if user.totp_enabled_at is None:
+            activated = user.totp_enabled_at is None
+            if activated:
                 user.totp_enabled_at = datetime.now(timezone.utc)
-                db.commit()
-                return {"success": True, "activated": True, "method": "totp"}
             db.commit()
-            return {"success": True, "activated": False, "method": "totp"}
+            write_audit_event(
+                action="totp.verify",
+                actor_user_id=user_id,
+                entity_type="user",
+                entity_id=user_id,
+                metadata={"method": "totp", "activated": activated},
+            )
+            return {"success": True, "activated": activated, "method": "totp"}
 
         # Fall back to recovery code (normalized to upper, ignore stray dashes).
         if user.totp_recovery_codes_hashed:
@@ -110,8 +123,21 @@ async def totp_verify(req: TotpVerifyRequest, authorization: Optional[str] = Hea
                 if user.totp_enabled_at is None:
                     user.totp_enabled_at = datetime.now(timezone.utc)
                 db.commit()
+                write_audit_event(
+                    action="totp.verify",
+                    actor_user_id=user_id,
+                    entity_type="user",
+                    entity_id=user_id,
+                    metadata={"method": "recovery", "activated": True},
+                )
                 return {"success": True, "activated": True, "method": "recovery"}
 
+        write_audit_event(
+            action="totp.verify.failed",
+            actor_user_id=user_id,
+            entity_type="user",
+            entity_id=user_id,
+        )
         raise HTTPException(status_code=401, detail="Invalid TOTP or recovery code")
     finally:
         db.close()
@@ -142,6 +168,12 @@ async def totp_disable(req: TotpVerifyRequest, authorization: Optional[str] = He
         user.totp_enabled_at = None
         user.totp_recovery_codes_hashed = None
         db.commit()
+        write_audit_event(
+            action="totp.disable",
+            actor_user_id=user_id,
+            entity_type="user",
+            entity_id=user_id,
+        )
         return {"success": True, "disabled": True}
     finally:
         db.close()
