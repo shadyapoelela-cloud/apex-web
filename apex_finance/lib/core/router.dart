@@ -70,6 +70,7 @@ import '../screens/compliance/journal_entry_builder_screen.dart';
 import '../screens/compliance/fx_converter_screen.dart';
 import '../screens/compliance/cost_variance_screen.dart';
 import '../screens/compliance/fin_statements_screen.dart';
+import '../screens/compliance/cashflow_statement_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -215,6 +216,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/financial-statements',
       pageBuilder: (c, s) => _apexPage(const FinStatementsScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/cashflow-statement',
+      pageBuilder: (c, s) => _apexPage(const CashflowStatementScreen(), s),
     ),
 
     // Account

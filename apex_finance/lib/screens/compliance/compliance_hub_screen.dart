@@ -257,6 +257,13 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.ok,
                     onTap: () => context.go('/compliance/financial-statements'),
                   ),
+                  _toolCard(
+                    icon: Icons.water_drop,
+                    title: 'قائمة التدفقات',
+                    subtitle: 'IAS 7 · CFO · CFI · CFF',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/cashflow-statement'),
+                  ),
                 ],
               );
             }),

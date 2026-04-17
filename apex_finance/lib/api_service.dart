@@ -396,6 +396,10 @@ class ApiService {
   static Future<ApiResult> fsClosingEntries(Map body) => _post('/fs/closing-entries', body);
   static Future<ApiResult> fsClassifications() => _get('/fs/classifications');
 
+  // ── Full Cash Flow Statement (IAS 7) ──
+  static Future<ApiResult> cfsBuild(Map body) => _post('/cfs/build', body);
+  static Future<ApiResult> cfsClassifications() => _get('/cfs/classifications');
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
