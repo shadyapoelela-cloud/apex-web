@@ -264,6 +264,13 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.info,
                     onTap: () => context.go('/compliance/cashflow-statement'),
                   ),
+                  _toolCard(
+                    icon: Icons.gavel,
+                    title: 'ضريبة الاستقطاع',
+                    subtitle: 'WHT KSA · 5-20% حسب الفئة',
+                    color: AC.err,
+                    onTap: () => context.go('/compliance/wht'),
+                  ),
                 ],
               );
             }),

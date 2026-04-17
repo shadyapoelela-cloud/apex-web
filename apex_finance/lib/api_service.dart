@@ -400,6 +400,12 @@ class ApiService {
   static Future<ApiResult> cfsBuild(Map body) => _post('/cfs/build', body);
   static Future<ApiResult> cfsClassifications() => _get('/cfs/classifications');
 
+  // ── Withholding Tax (KSA) ──
+  static Future<ApiResult> whtCompute(Map body) => _post('/wht/compute', body);
+  static Future<ApiResult> whtBatch(Map body) => _post('/wht/batch', body);
+  static Future<ApiResult> whtCategories() => _get('/wht/categories');
+  static Future<ApiResult> whtRates() => _get('/wht/rates');
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
