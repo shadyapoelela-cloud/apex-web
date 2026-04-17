@@ -719,6 +719,15 @@ try:
 except Exception as e:
     logging.error(f"OCR routes not mounted: {e}", exc_info=True)
 
+# ── DSCR + WACC + DCF valuation
+try:
+    from app.core.valuation_routes import router as valuation_router
+
+    app.include_router(valuation_router)
+    logging.info("Valuation routes mounted (dscr, wacc, dcf)")
+except Exception as e:
+    logging.error(f"Valuation routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
