@@ -313,6 +313,13 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.warn,
                     onTap: () => context.go('/compliance/transfer-pricing'),
                   ),
+                  _toolCard(
+                    icon: Icons.all_inclusive,
+                    title: 'الأدوات المتقدمة',
+                    subtitle: 'SBP·IP·Agri·RETT·P2·VAT-G·Jobs',
+                    color: AC.gold,
+                    onTap: () => context.go('/compliance/extras-tools'),
+                  ),
                 ],
               );
             }),

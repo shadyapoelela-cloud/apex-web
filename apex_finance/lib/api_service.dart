@@ -442,6 +442,16 @@ class ApiService {
   static Future<ApiResult> tpAnalyse(Map body) => _post('/tp/analyse', body);
   static Future<ApiResult> tpMethods() => _get('/tp/methods');
 
+  // ── Extras: IFRS 2/40/41, RETT, P2, VAT-G, Job ──
+  static Future<ApiResult> sbpCompute(Map body) => _post('/sbp/compute', body);
+  static Future<ApiResult> investmentPropertyCompute(Map body) => _post('/investment-property/compute', body);
+  static Future<ApiResult> agricultureCompute(Map body) => _post('/agriculture/compute', body);
+  static Future<ApiResult> rettCompute(Map body) => _post('/rett/compute', body);
+  static Future<ApiResult> pillarTwoCompute(Map body) => _post('/pillar-two/compute', body);
+  static Future<ApiResult> vatGroupCompute(Map body) => _post('/vat-group/compute', body);
+  static Future<ApiResult> jobAnalyse(Map body) => _post('/job/analyse', body);
+  static Future<ApiResult> extrasEnums() => _get('/extras/enums');
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
