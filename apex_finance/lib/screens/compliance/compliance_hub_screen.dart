@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../widgets/hybrid_sidebar.dart';
 
 class ComplianceHubScreen extends StatefulWidget {
   const ComplianceHubScreen({super.key});
@@ -51,7 +52,7 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return HybridSidebar(child: Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
         title: Text('مركز الامتثال (ZATCA / IFRS / SOCPA)',
@@ -340,7 +341,7 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _statusBar() {

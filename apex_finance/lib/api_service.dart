@@ -177,7 +177,11 @@ class ApiService {
       final res = await request.send();
       if(res.statusCode==200) return await res.stream.toBytes();
       return null;
-    } catch(_) { return null; }
+    } catch(e, st) {
+      // ignore: avoid_print
+      print('ApiService.downloadSignedInvoice failed: $e\n$st');
+      return null;
+    }
   }
 
   // ── Templates ──
@@ -190,7 +194,10 @@ class ApiService {
         (html.document.createElement('a') as html.AnchorElement)..href=url..download=downloadName..click();
         html.Url.revokeObjectUrl(url);
       }
-    } catch(_) {}
+    } catch(e, st) {
+      // ignore: avoid_print
+      print('ApiService.downloadTrialBalanceTemplate failed: $e\n$st');
+    }
   }
 
   // ── Knowledge ──
