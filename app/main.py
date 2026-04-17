@@ -828,6 +828,15 @@ try:
 except Exception as e:
     logging.error(f"Transfer pricing routes not mounted: {e}", exc_info=True)
 
+# ── Advanced IFRS + Tax + Job Costing (SBP/IAS40/IAS41/RETT/P2/VATG/Job)
+try:
+    from app.core.extras_routes import router as extras_router
+
+    app.include_router(extras_router)
+    logging.info("Extras routes mounted (sbp/ip/agri/rett/p2/vatg/job)")
+except Exception as e:
+    logging.error(f"Extras routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
