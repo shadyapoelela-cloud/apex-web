@@ -272,7 +272,24 @@ except Exception as e:
 
 
 def _run_startup():
-    """Initialize all phase databases and seed data."""
+    """Initialize all phase databases and seed data.
+
+    Order:
+      1. Run Alembic migrations if enabled (production by default).
+         In dev, fall through to init_*_db() / create_all().
+    """
+    # 1) Alembic upgrade head — production path. In dev this is a no-op
+    #    unless RUN_MIGRATIONS_ON_STARTUP=true is set explicitly.
+    try:
+        from app.core.db_migrations import run_migrations_on_startup
+
+        run_migrations_on_startup()
+    except RuntimeError:
+        # Production migration failure — refuse to continue silently.
+        raise
+    except Exception:
+        logging.error("Migration runner crashed", exc_info=True)
+
     if KB:
         try:
             init_kb()
@@ -360,28 +377,88 @@ def _run_startup():
         logging.error("Compliance core init error", exc_info=True)
 
 
-def _validate_env():
-    """Validate critical environment variables at startup."""
-    env = os.environ.get("ENVIRONMENT", "development")
-    jwt = os.environ.get("JWT_SECRET", "")
-    admin = os.environ.get("ADMIN_SECRET", "")
-    db_url = os.environ.get("DATABASE_URL", "")
+_PROD_INSECURE_DEFAULTS = {
+    "JWT_SECRET": {"apex-dev-secret-CHANGE-IN-PRODUCTION", "test-secret", ""},
+    "ADMIN_SECRET": {"apex-admin-2026", "apex-admin-dev-only", "test-admin", ""},
+}
 
-    if env == "production":
-        missing = []
-        if not jwt or jwt == "apex-dev-secret-CHANGE-IN-PRODUCTION":
-            missing.append("JWT_SECRET")
-        if not admin or admin == "apex-admin-2026":
-            missing.append("ADMIN_SECRET")
-        if not db_url:
-            missing.append("DATABASE_URL")
-        if missing:
-            raise RuntimeError(f"PRODUCTION: Missing/default env vars: {', '.join(missing)}")
-    else:
-        if not jwt or jwt == "apex-dev-secret-CHANGE-IN-PRODUCTION":
-            logging.warning("⚠ JWT_SECRET using default — set in production!")
-        if not admin or admin == "apex-admin-2026":
-            logging.warning("⚠ ADMIN_SECRET using default — set in production!")
+# Backend env vars that, when selected, require secrets/config to be present.
+# Format: { BACKEND_VAR: { active_value: [required_secret_vars] } }
+_BACKEND_REQUIREMENTS = {
+    "EMAIL_BACKEND": {
+        "smtp": ["SMTP_USER", "SMTP_PASSWORD"],
+        "sendgrid": ["SENDGRID_API_KEY", "SENDGRID_FROM"],
+    },
+    "SMS_BACKEND": {
+        "unifonic": ["UNIFONIC_APP_SID"],
+        "twilio": ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER"],
+    },
+    "PAYMENT_BACKEND": {
+        "stripe": ["STRIPE_SECRET_KEY"],
+    },
+    "STORAGE_BACKEND": {
+        "s3": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "S3_BUCKET"],
+    },
+}
+
+
+def _validate_env():
+    """Strict environment validation.
+
+    In production, fails fast if any critical variable is missing or is still
+    a known insecure default. The list of failures is logged in full so ops
+    can fix them all in one round-trip.
+
+    In development, emits warnings without blocking startup.
+    """
+    env = os.environ.get("ENVIRONMENT", "development").lower()
+    is_prod = env in ("production", "prod")
+    problems: list[str] = []
+    warnings_list: list[str] = []
+
+    def _bad(var: str) -> bool:
+        val = os.environ.get(var, "")
+        insecure = _PROD_INSECURE_DEFAULTS.get(var, set())
+        if not val or val in insecure:
+            return True
+        if var == "JWT_SECRET" and len(val) < 32:
+            return True
+        return False
+
+    # Always-critical vars
+    for var in ("JWT_SECRET", "ADMIN_SECRET"):
+        if _bad(var):
+            (problems if is_prod else warnings_list).append(
+                f"{var} is missing or using an insecure default"
+            )
+
+    # DB is critical in prod only — dev falls back to SQLite.
+    if is_prod and not os.environ.get("DATABASE_URL"):
+        problems.append("DATABASE_URL is required in production")
+
+    # CORS must not be wildcard in prod.
+    if is_prod:
+        cors = os.environ.get("CORS_ORIGINS", "")
+        if not cors or cors.strip() == "*":
+            problems.append("CORS_ORIGINS must be an explicit allowlist (not '*') in production")
+
+    # Backend-specific secret checks.
+    for backend_var, configs in _BACKEND_REQUIREMENTS.items():
+        active = os.environ.get(backend_var, "").lower()
+        required = configs.get(active, [])
+        for req in required:
+            if not os.environ.get(req):
+                msg = f"{backend_var}={active} requires {req}"
+                (problems if is_prod else warnings_list).append(msg)
+
+    for w in warnings_list:
+        logging.warning("⚠ env: %s", w)
+
+    if problems:
+        message = "PRODUCTION env validation failed:\n  - " + "\n  - ".join(problems)
+        if is_prod:
+            raise RuntimeError(message)
+        logging.warning(message)
 
 
 _validate_env()
@@ -455,11 +532,27 @@ async def global_exception_handler(request, exc):
 
 
 # ======================================================================
-# In-memory rate limiter — tiered per-path limits, per-IP, proxy-aware.
-# Resets on restart. Replace with Redis-backed slowapi for multi-instance prod.
+# Rate limiter — tiered per-path limits, per-IP, proxy-aware.
+# Backend is pluggable: RATE_LIMIT_BACKEND=memory (default, per-process) or
+# RATE_LIMIT_BACKEND=redis (shared across instances via REDIS_URL).
+# See app/core/rate_limit_backend.py.
 # ======================================================================
-_rate_limits = defaultdict(list)  # (ip, bucket) -> [timestamp, ...]
-_RATE_LIMIT_MAX_KEYS = 20000  # prevent memory leak from IP flooding
+from app.core.rate_limit_backend import (
+    MemoryBackend,
+    get_backend as _get_rate_backend,
+)
+
+# Expose the memory backend's internal store as _rate_limits so that
+# existing tests that call `_rate_limits.clear()` between test cases
+# continue to work without modification. For Redis backends, this is a
+# dummy dict (tests targeting per-process counters don't apply there).
+_rate_backend_instance = _get_rate_backend()
+if isinstance(_rate_backend_instance, MemoryBackend):
+    _rate_limits = _rate_backend_instance._store
+else:
+    _rate_limits = defaultdict(list)
+
+_RATE_LIMIT_MAX_KEYS = 20000  # kept for backward compatibility; enforced in MemoryBackend
 
 # Legacy module-level aliases (retained so older tests / external tooling keep working).
 # The active limits are in _RATE_TIERS below — these just mirror the default bucket.
@@ -520,22 +613,14 @@ async def rate_limit_middleware(request, call_next):
     if path_raw in ("/health", "/", "/docs", "/openapi.json", "/redoc"):
         return await call_next(request)
     client_ip = _get_client_ip(request)
-    path = path_raw
-    window, limit, bucket = _pick_tier(path)
-    key = (client_ip, bucket)
+    window, limit, bucket = _pick_tier(path_raw)
+    key = f"{client_ip}:{bucket}"
+
+    backend = _get_rate_backend()
+    count, reset_in = backend.hit(key, window)
     now = time.time()
-    # Prevent memory leak: evict oldest keys if too many tracked
-    if len(_rate_limits) > _RATE_LIMIT_MAX_KEYS:
-        oldest = sorted(
-            _rate_limits.keys(), key=lambda k: _rate_limits[k][-1] if _rate_limits[k] else 0
-        )
-        for k in oldest[: _RATE_LIMIT_MAX_KEYS // 2]:
-            del _rate_limits[k]
-    # Clean old entries for this bucket
-    _rate_limits[key] = [t for t in _rate_limits[key] if now - t < window]
-    remaining = limit - len(_rate_limits[key])
-    if remaining <= 0:
-        reset_in = int(window - (now - _rate_limits[key][0])) if _rate_limits[key] else window
+
+    if count > limit:
         return JSONResponse(
             status_code=429,
             headers={
@@ -544,14 +629,18 @@ async def rate_limit_middleware(request, call_next):
                 "X-RateLimit-Remaining": "0",
                 "X-RateLimit-Reset": str(int(now + reset_in)),
             },
-            content={"success": False, "error": "طلبات كثيرة جداً. الرجاء الانتظار.", "retry_after": reset_in},
+            content={
+                "success": False,
+                "error": "طلبات كثيرة جداً. الرجاء الانتظار.",
+                "retry_after": reset_in,
+            },
         )
-    _rate_limits[key].append(now)
+
     response = await call_next(request)
     # Expose remaining quota to clients
     response.headers["X-RateLimit-Limit"] = str(limit)
-    response.headers["X-RateLimit-Remaining"] = str(max(0, remaining - 1))
-    response.headers["X-RateLimit-Reset"] = str(int(now + window))
+    response.headers["X-RateLimit-Remaining"] = str(max(0, limit - count))
+    response.headers["X-RateLimit-Reset"] = str(int(now + reset_in))
     return response
 
 
