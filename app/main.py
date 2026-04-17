@@ -386,6 +386,13 @@ def _validate_env():
 
 _validate_env()
 
+# Bootstrap observability (JSON logs + optional Sentry) as early as
+# possible so startup errors below land in the configured sinks.
+from app.core.observability import configure_logging, init_sentry
+
+configure_logging()
+init_sentry()
+
 
 @asynccontextmanager
 async def lifespan(app):
