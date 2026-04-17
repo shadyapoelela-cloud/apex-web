@@ -162,6 +162,9 @@ class _ComplianceHealthWidgetState extends State<ComplianceHealthWidget> {
       ('/compliance/financial-statements', Icons.auto_graph, 'القوائم المالية', AC.ok),
       ('/compliance/cashflow-statement', Icons.water_drop, 'CFS', AC.info),
       ('/compliance/wht',            Icons.gavel,        'WHT',            AC.err),
+      ('/compliance/consolidation',  Icons.merge_type,   'التوحيد',         AC.purple),
+      ('/compliance/deferred-tax',   Icons.schedule_send, 'DT',             AC.info),
+      ('/compliance/lease',          Icons.timeline,     'Lease',           AC.ok),
     ];
 
     return Wrap(

@@ -406,6 +406,16 @@ class ApiService {
   static Future<ApiResult> whtCategories() => _get('/wht/categories');
   static Future<ApiResult> whtRates() => _get('/wht/rates');
 
+  // ── Consolidation (IFRS 10) ──
+  static Future<ApiResult> consolidate(Map body) => _post('/consol/build', body);
+
+  // ── Deferred Tax (IAS 12) ──
+  static Future<ApiResult> deferredTaxCompute(Map body) => _post('/dt/compute', body);
+  static Future<ApiResult> deferredTaxCategories() => _get('/dt/categories');
+
+  // ── Lease Accounting (IFRS 16) ──
+  static Future<ApiResult> leaseBuild(Map body) => _post('/lease/build', body);
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

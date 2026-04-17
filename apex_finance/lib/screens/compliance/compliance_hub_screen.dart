@@ -271,6 +271,27 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.err,
                     onTap: () => context.go('/compliance/wht'),
                   ),
+                  _toolCard(
+                    icon: Icons.merge_type,
+                    title: 'القوائم الموحّدة',
+                    subtitle: 'IFRS 10 · NCI + Interco',
+                    color: AC.purple,
+                    onTap: () => context.go('/compliance/consolidation'),
+                  ),
+                  _toolCard(
+                    icon: Icons.schedule_send,
+                    title: 'الضرائب المؤجّلة',
+                    subtitle: 'IAS 12 · DTA/DTL',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/deferred-tax'),
+                  ),
+                  _toolCard(
+                    icon: Icons.timeline,
+                    title: 'محاسبة الإيجار',
+                    subtitle: 'IFRS 16 · ROU + Liability',
+                    color: AC.ok,
+                    onTap: () => context.go('/compliance/lease'),
+                  ),
                 ],
               );
             }),

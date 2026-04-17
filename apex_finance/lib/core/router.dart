@@ -72,6 +72,9 @@ import '../screens/compliance/cost_variance_screen.dart';
 import '../screens/compliance/fin_statements_screen.dart';
 import '../screens/compliance/cashflow_statement_screen.dart';
 import '../screens/compliance/wht_screen.dart';
+import '../screens/compliance/consolidation_screen.dart';
+import '../screens/compliance/deferred_tax_screen.dart';
+import '../screens/compliance/lease_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -225,6 +228,18 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/wht',
       pageBuilder: (c, s) => _apexPage(const WhtScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/consolidation',
+      pageBuilder: (c, s) => _apexPage(const ConsolidationScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/deferred-tax',
+      pageBuilder: (c, s) => _apexPage(const DeferredTaxScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/lease',
+      pageBuilder: (c, s) => _apexPage(const LeaseScreen(), s),
     ),
 
     // Account
