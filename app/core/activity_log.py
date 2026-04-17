@@ -108,10 +108,55 @@ def log_activity(
         db.add(row)
         if own_session:
             db.commit()
+        # Fire-and-forget WebSocket push so any connected clients
+        # (Chatter panels, Notification Bell, dashboards) see the new
+        # event instantly without polling. Never fails the caller.
+        _publish_activity_event(row)
         return row.id
     finally:
         if own_session:
             db.close()
+
+
+def _publish_activity_event(row: "ActivityLog") -> None:
+    """Best-effort push to the entity channel + the author's user channel.
+
+    Runs asynchronously when there's a live event loop (FastAPI request
+    context). Swallows every error — we never want the HTTP handler or
+    the SQLAlchemy flush to fail because WebSocket delivery did.
+    """
+    try:
+        import asyncio
+        from app.core.websocket_hub import (
+            publish_to_entity,
+            publish_to_user,
+        )
+
+        payload = {
+            "type": f"activity.{row.action}",
+            "activity_id": row.id,
+            "entity_type": row.entity_type,
+            "entity_id": row.entity_id,
+            "action": row.action,
+            "summary": row.summary,
+            "user_name": row.user_name,
+            "timestamp": row.created_at.isoformat() if row.created_at else None,
+        }
+
+        async def _push() -> None:
+            await publish_to_entity(row.entity_type, row.entity_id, payload)
+            if row.user_id:
+                await publish_to_user(row.user_id, payload)
+
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(_push())
+        except RuntimeError:
+            # No running loop (e.g. invoked from a sync script) — skip.
+            # The row is still persisted; only the push is skipped.
+            pass
+    except Exception as e:  # pragma: no cover
+        logger.debug("activity ws-push skipped: %s", e)
 
 
 def log_status_change(
@@ -208,8 +253,14 @@ def list_recent_across(entity_type: str, limit: int = 50):
 
 
 @router.post("/{entity_type}/{entity_id}/comment", status_code=201)
-def add_comment(entity_type: str, entity_id: str, payload: CommentIn):
-    """Add a human comment / internal note to the activity stream."""
+async def add_comment(entity_type: str, entity_id: str, payload: CommentIn):
+    """Add a human comment / internal note to the activity stream.
+
+    Declared async so the WebSocket push (scheduled inside
+    log_activity via loop.create_task) runs on the same event loop
+    that serves this request. Sync handlers land in a threadpool where
+    there's no running loop — the push would then silently skip.
+    """
     tenant = current_tenant()
     if not entity_type or not entity_id:
         raise HTTPException(status_code=400, detail="entity_type and entity_id required")
@@ -222,6 +273,12 @@ def add_comment(entity_type: str, entity_id: str, payload: CommentIn):
         user_id=payload.user_id,
         user_name=payload.user_name,
     )
+    # Yield once so the create_task'd push gets a chance to run before
+    # we return to the caller (makes the behaviour predictable in tests
+    # without blocking on actual network sockets).
+    import asyncio as _aio
+    await _aio.sleep(0)
+
     db = SessionLocal()
     try:
         row = db.query(ActivityLog).filter(ActivityLog.id == new_id).first()
