@@ -1,0 +1,407 @@
+[] APEX
+[] Module Hierarchy Map V4
+[] 6 Module Groups → 46 Sub-Modules → 320+ Screens
+[] Display pattern: Cards → Sidebar → Tabs + Dropdown
+[] Owner: Shady  ·  April 18, 2026
+[Heading 1] 1 · The 3-Level Display Pattern
+[] APEX follows a three-level navigation pattern inspired by the best enterprise platforms of 2026. Each level uses a distinct UI affordance matched to cognitive load and usage frequency.
+[Heading 3] Why Tabs + Dropdown (not pure slides, not pure dropdown)
+[List Paragraph] Discoverability — Top 3–5 most-used screens visible at all times — users see them, can count them.
+[List Paragraph] Scalability — When a sub-module has 8–12 screens, the less-used half goes into "More ▾" dropdown — no tab-row wrapping or squeezing.
+[List Paragraph] Keyboard efficiency — Number keys 1–5 jump to visible tabs; ⌘K opens the dropdown searchable.
+[List Paragraph] Mobile-ready — Tabs collapse to horizontal scroll on narrow screens; dropdown stays functional.
+[List Paragraph] Permission-aware — Tabs the user cannot access are hidden — not grayed — to reduce cognitive clutter.
+[Heading 3] Visual Behaviour
+[List Paragraph] Active tab: brand-colored underline + bold label.
+[List Paragraph] Hover tab: background tint + cursor pointer.
+[List Paragraph] "More ▾" opens a popover listing the overflow screens with icons + short descriptions.
+[List Paragraph] Popover supports search (⌘K inside), recent items pinned top, keyboard ↑↓.
+[List Paragraph] User can pin an overflow item to visible tabs via right-click → "Pin to tabs".
+[List Paragraph] Tab order is user-customizable (drag-to-reorder) and stored per user per sub-module.
+[Heading 1] 2 · ERP System — 11 Sub-Modules
+[] The ERP group is the daily operational backbone. Visible in the sidebar of the ERP module group shell. Treasury added per V4 refinement.
+[] 2.1 · Dashboard
+[] Consolidated overview across all ERP sub-modules — KPIs, alerts, recent activity, upcoming deadlines.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Custom Widgets · Drill-Through · Export Snapshot · Dashboard Settings
+[] 2.2 · General Ledger
+[] Core accounting: chart of accounts, journals, trial balance, financial statements.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Recurring JE · Reversing Entries · Adjusting Entries · Consolidation · Audit Trail · GL Settings
+[] 2.3 · Sales & AR
+[] Customer-facing revenue cycle: quotes → invoices → payments → statements.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Credit Notes · Recurring Invoices · Price Lists · Aging Report · Sales Orders · Import Customers · Sales Settings
+[] 2.4 · Purchasing & AP
+[] Procure-to-pay: vendors, RFQs, POs, bills, payments, three-way match.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] RFQs · Expense Claims · Vendor Scorecards · Aging AP · Batch Payment Run · Purchase Settings
+[] 2.5 · Inventory
+[] Items, warehouses, stock moves, counts, reorder.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Variants Matrix · Bills of Material · Reorder Rules · Stock Valuation · Serial/Lot Tracking · Inventory Settings
+[] 2.6 · Treasury & Banking
+[] Bank accounts, transactions, reconciliation, cash flow forecasting, FX.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Forecasting · Bank Feeds · Loans & Facilities · Investments · Treasury Settings
+[] 2.7 · HR & Payroll
+[] Employees, org chart, contracts, payroll runs, leaves, attendance, GOSI/WPS.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Contracts · End-of-Service · GOSI Submissions · WPS / Mudad · Training · Expense Reimbursements · HR Settings
+[] 2.8 · Projects
+[] Projects, tasks, timesheets, billing, budgets.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Budgets vs. Actual · Resource Allocation · Milestones · Deliverables · Project Settings
+[] 2.9 · CRM
+[] Leads, opportunities, pipeline, activities, campaigns, email integration.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Campaigns · Email Sync · Lead Scoring AI · Win/Loss Analysis · CRM Settings
+[] 2.10 · ZATCA & Tax
+[] E-invoicing, VAT returns, withholding, certificates, regulatory filings.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Fatoora CSID · Credit/Debit Notes · Tax Codes · Zakat Return · Tax Settings
+[] 2.11 · Reports & Analytics
+[] Financial, operational, custom reports; scheduled delivery.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Saved Views · Report History · Subscriptions · Export Center · Report Settings
+[Heading 1] 3 · Audit & Review — 7 Sub-Modules
+[] CaseWare-class audit workflow with engagement lifecycle, risk assessment, workpapers, and signoff.
+[] 3.1 · Audit Dashboard
+[] Overview of engagements, risks, deadlines, team capacity.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] KPIs · Hours Summary · Archive Access · Custom Widgets
+[] 3.2 · Engagement Planning
+[] Client acceptance, scope, materiality, team, budget.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Engagement Letter · Independence · Prior Year Carryforward · Planning Meeting · Planning Settings
+[] 3.3 · Risk Assessment
+[] Risk register, assertions, controls, RoMM matrix.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] ITGC Assessment · Process Narratives · Walkthroughs · Risk Linkage · Risk Settings
+[] 3.4 · Workpapers
+[] Index tree, lead schedules, tick marks, cross-references.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Import TB · Evidence Library · Analytics · Roll-Forward · WP Settings
+[] 3.5 · Control Testing
+[] Test plans, sampling, results, exceptions.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Sample Size Calc · Random Selection · MUS · Deficiency Log · Test Settings
+[] 3.6 · Report Issuance
+[] Opinion builder, letters, governance, management letter.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Going Concern · KAMs · Other Information · Translations · Report Settings
+[] 3.7 · Quality Control
+[] Team assignment, review notes, EQCR, archive.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Consultation Log · Monitoring File · Independence Declarations · QC Settings
+[Heading 1] 4 · Feasibility Studies — 8 Sub-Modules
+[] Full lifecycle of investment and project feasibility studies from idea to decision report.
+[] 4.1 · Feasibility Dashboard
+[] Portfolio view of all feasibility projects with stage funnel.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] KPIs · Pipeline Value · Archive · Dashboard Settings
+[] 4.2 · Project Setup
+[] Identity, scope, template, team assignment, currency, horizon.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Stakeholders · Budget for Study · Deliverables Plan · Kick-off
+[] 4.3 · Market Analysis
+[] TAM/SAM/SOM, competitors, demand, pricing strategy.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Survey Results · PESTEL · Porter Five Forces · Market Settings
+[] 4.4 · Cost & Revenue Model
+[] Capex, Opex, revenue drivers, working capital.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Escalation Assumptions · Depreciation · Cost Curves · Tax Shield · Model Settings
+[] 4.5 · Pro-Forma Financials
+[] P&L, balance sheet, cash flow projections, 3–10 years.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Ratios · Sources & Uses · Working Capital Detail · Projection Settings
+[] 4.6 · Valuation & Decision Metrics
+[] NPV, IRR, MIRR, Payback, DSCR, LLCR.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Unlevered vs. Levered · Residual Value · Real Options · Valuation Settings
+[] 4.7 · Sensitivity & Risk
+[] One-way, two-way, Monte Carlo simulation, scenarios.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Risk Register · Mitigation Plan · Stress Tests · Simulation Settings
+[] 4.8 · Final Report
+[] Executive summary, sections, appendices, export.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] AI Draft · Arabic Version · Board Deck · Report Settings
+[Heading 1] 5 · External Financial Analysis — 7 Sub-Modules
+[] Analyze third-party entities from their published statements: ratios, benchmarking, valuation, credit.
+[] 5.1 · Analysis Dashboard
+[] Portfolio of analysis projects, peer comparisons, alerts.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Portfolio KPIs · Archived Projects · Dashboard Settings
+[] 5.2 · Upload Statements
+[] File drop (PDF/Excel), OCR, account mapping, validation.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Template Library · Multi-Period Bulk · Mapping Presets · Upload Settings
+[] 5.3 · Ratio Analysis
+[] Liquidity, leverage, profitability, activity, market ratios.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Custom Ratios · Trend Analysis · DuPont · Formula Transparency · Ratio Settings
+[] 5.4 · Industry Benchmarking
+[] Sector picker, peer set, quartile compare, radar.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Data Sources · Custom Peers · Regional Filters · Benchmark Settings
+[] 5.5 · Valuation Models
+[] DCF, trading comps, precedent transactions, NAV, football field.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] WACC Builder · Terminal Value · LBO Model · Sum-of-Parts · Valuation Settings
+[] 5.6 · Credit Analysis
+[] Credit score, risk rating, covenants, early warning.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Z-Score / Altman · Rating Migration · Stress Scenarios · Credit Settings
+[] 5.7 · Analytical Reports
+[] Executive, credit, due diligence, valuation templates.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] AI Narrative · Arabic Version · Branding · Report Settings
+[Heading 1] 6 · Professional Service Providers — 6 Sub-Modules
+[] Two-sided marketplace: clients request services (accounting, audit, legal, tax, valuation), providers deliver. Legal & Contracts added in V4.
+[] 6.1 · Provider Dashboard
+[] Provider-side view: earnings, active jobs, ratings, pipeline.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Payouts History · Tax Docs · Profile Health · Dashboard Settings
+[] 6.2 · Marketplace
+[] Browse, search, filter providers by specialization, rating, location.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Featured · Top Rated · Verified Only · Near Me · Filter Presets
+[] 6.3 · Legal & Contracts
+[] Draft, e-sign, milestones, variations, dispute resolution.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Escrow · Disputes · Termination · Legal Archive · Legal Settings
+[] 6.4 · Tasks & Deliverables
+[] Kanban/list of assigned tasks, files, chat, approvals.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Time Tracking · Approvals · Version History · Task Settings
+[] 6.5 · Billing & Payments
+[] Invoices issued to client, escrow, releases, payouts.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Tax Certificates · Currency Conversion · Fee Breakdown · Billing Settings
+[] 6.6 · Ratings & Reviews
+[] Give/receive ratings post-engagement with response and analytics.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Public Profile Preview · Flag Abuse · Review Settings
+[Heading 1] 7 · Eligibility & Compliance — 7 Sub-Modules
+[] Regulatory and governance center for Saudi compliance: ZATCA, GOSI, WPS, AML, eligibility, board governance.
+[] 7.1 · Compliance Dashboard
+[] Status snapshot, upcoming deadlines, alerts, certificate health.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Compliance Score · Action Items · Audit-Ready Binder · Dashboard Settings
+[] 7.2 · Eligibility Check
+[] SME, IPO, Tadawul, tenders, grants — run criteria & gap report.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] SME Classification · Nomu/Main IPO · Kafalah Loan · Government Tender · Grant Programs · Eligibility Settings
+[] 7.3 · ZATCA Compliance
+[] E-invoicing readiness, VAT returns, certificates, filings.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Fatoora CSID · Test Environment · Bulk Resubmit · ZATCA Settings
+[] 7.4 · GOSI & WPS
+[] Employee roster, monthly submissions, Mudad sync, variance detection.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Contribution Rates · New Hire Flow · Termination Flow · GOSI Settings
+[] 7.5 · AML & KYC
+[] Screening, monitoring, SAR/STR, case management.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] PEP Lists · Sanctions Lists · Structuring Alerts · KYC Library · AML Settings
+[] 7.6 · Governance & Board
+[] Board pack, minutes, resolutions, policies, committee tracking.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Committees · Conflicts Register · Voting Records · Governance Settings
+[] 7.7 · Compliance Reports
+[] Regulatory, board, audit-ready, bespoke reports.
+[] Visible Tabs (left→right):
+[] More ▾ dropdown:
+[] Filing Archive · Auditor Access · Export Center · Report Settings
+[Heading 1] 8 · Grand Summary Matrix
+[] At-a-glance count of sub-modules and screens per module group.
+[Heading 3] AI & Knowledge — Horizontal Layer (Not a Module Group)
+[] Per V4 decision, Copilot + Knowledge Brain + Smart Reports are NOT a separate module group. They appear as:
+[List Paragraph] Right-rail Chatter tab "AI" on every record screen.
+[List Paragraph] Command palette ⌘K for NL commands across all modules.
+[List Paragraph] Field-level "Explain ?" tooltips.
+[List Paragraph] Gallery of 5 agents accessible via Settings → AI Agents.
+[List Paragraph] Knowledge Brain search icon in top bar (global).
+[Heading 3] Layout Recap
+[List Paragraph] Level 1 — Cards on Launchpad (6 colored cards + module switcher popover).
+[List Paragraph] Level 2 — Sidebar items (46 sub-modules total, 6-11 per group, user-favorite pinning).
+[List Paragraph] Level 3 — Top Tabs (up to 5 visible) + "More ▾" dropdown for overflow.
+[List Paragraph] Shortcut: Alt+1..9 jumps to Nth sub-module · 1..5 jumps to Nth tab · ⌘K searches tabs.
+[Heading 3] Customization Promise
+[] Every user can pin any dropdown screen to visible tabs, reorder visible tabs, and save tab order per sub-module. Admins set tenant-wide defaults. Permissions hide unauthorized tabs entirely — no grayed items.
+[Heading 1] 9 · Implementation Notes
+[Heading 3] Component Names (Flutter)
+[List Paragraph] ApexLaunchpad · ApexModuleSwitcher · ApexSidebar · ApexSubModuleShell
+[List Paragraph] ApexTabBar (visible + overflow) · ApexTabsOverflowPopover · ApexScreenHost
+[List Paragraph] ApexBreadcrumb · ApexChatterRail · ApexCommandPalette
+[Heading 3] Routing (GoRouter)
+[List Paragraph] /app/{group}/{subModule}/{screen}
+[List Paragraph] Examples: /app/erp/sales/invoices · /app/audit/workpapers/tick-marks · /app/feas/valuation/monte-carlo
+[List Paragraph] Deep-linkable: pasting URL into another user's browser opens same screen (with permission check).
+[Heading 3] Permission Matrix Tuning
+[List Paragraph] RBAC capability format: {group}.{subModule}.{screen}.{action} — e.g., erp.sales.invoices.post, audit.workpapers.ticks.edit.
+[List Paragraph] Role bundles pre-package common capability sets (Accountant, HR Manager, Auditor).
+[List Paragraph] Field-level overrides: mark-up fields (salary, cost) to require additional capability.
+[Heading 3] Analytics Events
+[List Paragraph] module_switched, sub_module_opened, tab_activated, dropdown_opened, overflow_item_pinned.
+[List Paragraph] Use these to auto-surface frequently used dropdown items ("Would you like to pin X?" suggestion after 3 opens in a week).
+[Heading 3] First-Run Onboarding
+[List Paragraph] New user lands on Launchpad. Coach-marks highlight the 6 module cards.
+[List Paragraph] Click any card: coach-mark highlights sidebar, then tab bar, then "More ▾".
+[List Paragraph] Shortcut card on first login ("Press ⌘K to search anything").
+[Heading 3] Closing Note
+[] This V4 hierarchy is the definitive information-architecture blueprint for APEX. All subsequent sprint planning, RFCs, and design specs reference screen IDs from Sections 2-7. Treat each "Visible Tab" and "More ▾" entry as a separate ticket in the backlog.
+[] — Shady · APEX Financial Platform · April 18, 2026
+--- TABLE 0 ---
+Level | What It Contains | UI Pattern | Inspired By
+1 — Module Groups | 6 top-level domains (ERP, Audit, Feas, Providers, External, Compliance) | Cards on Launchpad + Module Switcher popover | SAP Fiori Spaces, Zoho One Apps, Microsoft 365 Launcher
+2 — Sub-Modules | 46 functional areas (Sales, Workpapers, Ratios, ...) | Persistent Left Sidebar, collapsible | Linear, Notion, Pennylane, Xero 2026
+3 — Screens | 320+ specific views/workflows within each sub-module | Top Tabs (visible 3–5) + "More ▾" dropdown for overflow | GitHub repo tabs, Linear project tabs, Slack channel tabs
+--- TABLE 1 ---
+Overview | KPIs | Alerts | Activity | Calendar
+--- TABLE 2 ---
+CoA Tree | Journals | Trial Balance | Financial Statements | Period Close
+--- TABLE 3 ---
+Customers | Invoices | Payments | Statements | Quotes
+--- TABLE 4 ---
+Vendors | Purchase Orders | Bills | Payments | Goods Receipts
+--- TABLE 5 ---
+Items | Stock On-Hand | Stock Moves | Warehouses | Cycle Counts
+--- TABLE 6 ---
+Bank Accounts | Transactions | Reconciliation | Cash Flow | FX Rates
+--- TABLE 7 ---
+Employees | Org Chart | Payroll Runs | Leaves | Attendance
+--- TABLE 8 ---
+Projects | Tasks | Timesheets | Gantt | Billing
+--- TABLE 9 ---
+Leads | Opportunities | Pipeline | Activities | Contacts
+--- TABLE 10 ---
+E-Invoice Clearance | VAT Return | Withholding Tax | Certificates | Filings Log
+--- TABLE 11 ---
+Financial | Operational | Custom Builder | Scheduled | Templates
+--- TABLE 12 ---
+Active Engagements | Risk Heatmap | Deadlines | Team Capacity | Issues
+--- TABLE 13 ---
+Client Info | Acceptance | Scope | Materiality | Team & Budget
+--- TABLE 14 ---
+Risk Register | Assertions | Controls | RoMM Matrix | Fraud Risks
+--- TABLE 15 ---
+Index Tree | Lead Sheets | Trial Balance | Tick Marks | References
+--- TABLE 16 ---
+Test Plans | Samples | Results | Exceptions | Conclusion
+--- TABLE 17 ---
+Opinion Builder | Audit Report | Management Letter | Governance Report | Rep Letter
+--- TABLE 18 ---
+Review Notes | Assignments | Signoff | EQCR | Archive
+--- TABLE 19 ---
+Portfolio | Stage Funnel | Decisions | Team Load | Alerts
+--- TABLE 20 ---
+Identity | Scope | Template | Team | Settings
+--- TABLE 21 ---
+TAM/SAM/SOM | Competitors | Demand Model | Pricing | Sources
+--- TABLE 22 ---
+Capex | Opex | Revenue | Working Capital | Financing
+--- TABLE 23 ---
+P&L | Balance Sheet | Cash Flow | Funding Plan | Covenants
+--- TABLE 24 ---
+NPV / IRR | Payback | DSCR / LLCR | WACC | Summary
+--- TABLE 25 ---
+1-Way Sensitivity | 2-Way Grid | Monte Carlo | Scenarios | Tornado
+--- TABLE 26 ---
+Executive Summary | Sections | Appendices | Export | Review & Signoff
+--- TABLE 27 ---
+Projects | Peer Compare | Alerts | Activity | Saved Views
+--- TABLE 28 ---
+Upload | Parse & OCR | Mapping | Validation | History
+--- TABLE 29 ---
+Liquidity | Leverage | Profitability | Activity | Market
+--- TABLE 30 ---
+Sector | Peer Set | Quartile Chart | Radar | Time Series
+--- TABLE 31 ---
+DCF | Trading Comps | Precedents | NAV | Football Field
+--- TABLE 32 ---
+Credit Score | Risk Rating | Covenants | Cash Flow Coverage | Early Warning
+--- TABLE 33 ---
+Executive | Credit Memo | Due Diligence | Valuation Opinion | Custom
+--- TABLE 34 ---
+Earnings | Active Jobs | Ratings | Pipeline | Calendar
+--- TABLE 35 ---
+Browse | Saved Searches | Compare | Map View | Recently Viewed
+--- TABLE 36 ---
+Contracts | Templates | E-Signature | Milestones | Variations
+--- TABLE 37 ---
+Kanban | List | Timeline | Files | Chat
+--- TABLE 38 ---
+Invoices | Escrow | Payouts | Disputes | Statements
+--- TABLE 39 ---
+My Reviews | Give Review | Responses | Analytics | Disputes
+--- TABLE 40 ---
+Status | Deadlines | Alerts | Certificates | Filings Log
+--- TABLE 41 ---
+Run Check | My Checks | Criteria Library | Gap Report | Remediation Plan
+--- TABLE 42 ---
+E-Invoicing Status | VAT Calendar | Certificates | Clearance Log | Corrections
+--- TABLE 43 ---
+Roster | Monthly Submission | Mudad / WPS | Variance | History
+--- TABLE 44 ---
+Screening | Cases | Monitoring Rules | SAR Filings | Watchlist
+--- TABLE 45 ---
+Board Pack | Meetings | Minutes | Resolutions | Policies
+--- TABLE 46 ---
+Regulatory | Board | Audit-Ready | Custom | Scheduled
+--- TABLE 47 ---
+Module Group | Sub-Modules | Visible Tabs (avg) | Dropdown Items (avg) | Total Screens
+ERP System | 11 | 5 | 6 | ≈ 121
+Audit & Review | 7 | 5 | 4–5 | ≈ 70
+Feasibility Studies | 8 | 5 | 4 | ≈ 72
+External Analysis | 7 | 5 | 4 | ≈ 63
+Service Providers | 6 | 5 | 4 | ≈ 54
+Compliance & Eligibility | 7 | 5 | 4 | ≈ 63
+TOTAL | 46 | 5 | 4–6 | ≈ 443
