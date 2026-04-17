@@ -34,8 +34,15 @@ class ApexWhatsNewHub extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
                   _group(context, 'الواجهة المشتركة (Apex Layer)', [
                     _Item(
+                      icon: Icons.palette,
+                      title: '🎨 مولّد السمات (جديد)',
+                      subtitle: '3 متغيرات → 14 لوناً — Linear-style',
+                      route: '/theme-generator',
+                      status: _Status.done,
+                    ),
+                    _Item(
                       icon: Icons.map,
-                      title: '🗺️ خريطة APEX الكاملة (جديد)',
+                      title: '🗺️ خريطة APEX الكاملة',
                       subtitle: 'كل الشاشات والمسارات في مكان واحد',
                       route: '/apex-map',
                       status: _Status.done,

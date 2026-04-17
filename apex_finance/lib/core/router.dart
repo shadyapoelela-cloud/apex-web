@@ -18,6 +18,7 @@ import '../screens/whats_new/sprint42_longterm_screen.dart';
 import '../screens/whats_new/sprint43_platform_screen.dart';
 import '../screens/whats_new/sprint44_operations_screen.dart';
 import '../screens/whats_new/apex_map_screen.dart';
+import '../screens/whats_new/theme_generator_screen.dart';
 import '../screens/financial/financial_ops_screen.dart';
 import '../screens/knowledge/knowledge_brain_screen.dart';
 import '../screens/audit/audit_workflow_screen.dart';
@@ -195,6 +196,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/apex-map',
       pageBuilder: (c, s) => _apexPage(const ApexMapScreen(), s),
+    ),
+    GoRoute(
+      path: '/theme-generator',
+      pageBuilder: (c, s) => _apexPage(const ThemeGeneratorScreen(), s),
     ),
     GoRoute(
       path: '/startup-metrics',
