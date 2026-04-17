@@ -2,6 +2,11 @@
 import 'package:go_router/go_router.dart';
 import '../screens/copilot/copilot_screen.dart';
 import '../screens/showcase/apex_showcase_screen.dart';
+import '../screens/whats_new/apex_whats_new_hub.dart';
+import '../screens/whats_new/uae_corp_tax_screen.dart';
+import '../screens/whats_new/startup_metrics_screen.dart';
+import '../screens/whats_new/industry_packs_screen.dart';
+import '../screens/whats_new/feature_demos_screen.dart';
 import '../screens/financial/financial_ops_screen.dart';
 import '../screens/knowledge/knowledge_brain_screen.dart';
 import '../screens/audit/audit_workflow_screen.dart';
@@ -105,7 +110,9 @@ CustomTransitionPage<void> _apexPage(Widget child, GoRouterState state) =>
 
 final appRouter = GoRouter(
   refreshListenable: authRefresh,
-  initialLocation: '/login',
+  // '/whats-new' is the landing page during the demo review so you see
+  // the new features immediately. Change back to '/login' for production.
+  initialLocation: '/whats-new',
   // redirect: disabled for now - auth handled in login screen,
     routes: [
     // Auth
@@ -122,6 +129,48 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/showcase',
       pageBuilder: (c, s) => _apexPage(const ApexShowcaseScreen(), s),
+    ),
+    // What's New Hub — landing page for every backend capability added.
+    GoRoute(
+      path: '/whats-new',
+      pageBuilder: (c, s) => _apexPage(const ApexWhatsNewHub(), s),
+    ),
+    // Interactive demos of each new backend feature.
+    GoRoute(
+      path: '/uae-corp-tax',
+      pageBuilder: (c, s) => _apexPage(const UaeCorpTaxScreen(), s),
+    ),
+    GoRoute(
+      path: '/startup-metrics',
+      pageBuilder: (c, s) => _apexPage(const StartupMetricsScreen(), s),
+    ),
+    GoRoute(
+      path: '/industry-packs',
+      pageBuilder: (c, s) => _apexPage(const IndustryPacksScreen(), s),
+    ),
+    GoRoute(
+      path: '/payments-playground',
+      pageBuilder: (c, s) => _apexPage(const PaymentsPlaygroundScreen(), s),
+    ),
+    GoRoute(
+      path: '/ap-pipeline-demo',
+      pageBuilder: (c, s) => _apexPage(const ApPipelineScreen(), s),
+    ),
+    GoRoute(
+      path: '/bank-ocr-demo',
+      pageBuilder: (c, s) => _apexPage(const BankOcrDemoScreen(), s),
+    ),
+    GoRoute(
+      path: '/gosi-demo',
+      pageBuilder: (c, s) => _apexPage(const GosiCalcScreen(), s),
+    ),
+    GoRoute(
+      path: '/eosb-demo',
+      pageBuilder: (c, s) => _apexPage(const EosbCalcScreen(), s),
+    ),
+    GoRoute(
+      path: '/whatsapp-demo',
+      pageBuilder: (c, s) => _apexPage(const WhatsAppDemoScreen(), s),
     ),
 
     // ── Compliance (ZATCA / IFRS / SOCPA) ──

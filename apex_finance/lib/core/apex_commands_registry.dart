@@ -109,7 +109,15 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/compliance/breakeven'),
     ),
 
-    // ── Apex Components Showcase ──
+    // ── What's New (featured first) ──
+    ApexCommand(
+      id: 'nav_whats_new',
+      label: '🚀 ما الجديد في APEX',
+      subtitle: '50+ ميزة جديدة — Hub كامل',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.rocket_launch,
+      onRun: (ctx) => GoRouter.of(ctx).go('/whats-new'),
+    ),
     ApexCommand(
       id: 'nav_apex_showcase',
       label: 'معرض مكوّنات APEX',
@@ -117,6 +125,79 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       kind: ApexCommandKind.navigation,
       icon: Icons.auto_awesome_outlined,
       onRun: (ctx) => GoRouter.of(ctx).go('/showcase'),
+    ),
+    // ── Interactive demos of each new backend feature ──
+    ApexCommand(
+      id: 'nav_uae_corp_tax',
+      label: 'حاسبة ضريبة الشركات UAE',
+      subtitle: '9% + 375K exempt + SBR + QFZP',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.account_balance,
+      onRun: (ctx) => GoRouter.of(ctx).go('/uae-corp-tax'),
+    ),
+    ApexCommand(
+      id: 'nav_startup_metrics',
+      label: 'Startup Metrics Live',
+      subtitle: 'Burn / Runway / MRR / LTV / Rule of 40',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.trending_up,
+      onRun: (ctx) => GoRouter.of(ctx).go('/startup-metrics'),
+    ),
+    ApexCommand(
+      id: 'nav_industry_packs',
+      label: 'حزم الصناعات',
+      subtitle: 'F&B / مقاولات / عيادات / لوجستيك / خدمات',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.apps,
+      onRun: (ctx) => GoRouter.of(ctx).go('/industry-packs'),
+    ),
+    ApexCommand(
+      id: 'nav_payments_playground',
+      label: 'Payments Playground',
+      subtitle: 'Mada / STC Pay / Apple Pay / Tabby',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.payment,
+      onRun: (ctx) => GoRouter.of(ctx).go('/payments-playground'),
+    ),
+    ApexCommand(
+      id: 'nav_ap_pipeline',
+      label: 'AP Agent Pipeline',
+      subtitle: 'محاكاة تدفق اعتماد الفواتير الذاتي',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.smart_toy_outlined,
+      onRun: (ctx) => GoRouter.of(ctx).go('/ap-pipeline-demo'),
+    ),
+    ApexCommand(
+      id: 'nav_bank_ocr',
+      label: 'Bank OCR Demo',
+      subtitle: 'تحليل كشوف بنكية CSV بالعربية',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.compare_arrows,
+      onRun: (ctx) => GoRouter.of(ctx).go('/bank-ocr-demo'),
+    ),
+    ApexCommand(
+      id: 'nav_gosi_demo',
+      label: 'حاسبة GOSI / GPSSA',
+      subtitle: 'KSA 10/12% | UAE 5/12.5%',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.calculate,
+      onRun: (ctx) => GoRouter.of(ctx).go('/gosi-demo'),
+    ),
+    ApexCommand(
+      id: 'nav_eosb_demo',
+      label: 'مكافأة نهاية الخدمة EOSB',
+      subtitle: 'KSA Art. 84-85 + UAE Art. 51-52',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.logout,
+      onRun: (ctx) => GoRouter.of(ctx).go('/eosb-demo'),
+    ),
+    ApexCommand(
+      id: 'nav_whatsapp_demo',
+      label: 'قوالب WhatsApp',
+      subtitle: '7 قوالب عربية معتمدة',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.chat_bubble_outline,
+      onRun: (ctx) => GoRouter.of(ctx).go('/whatsapp-demo'),
     ),
 
     // ── Actions ──
