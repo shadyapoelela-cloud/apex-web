@@ -34,8 +34,15 @@ class ApexWhatsNewHub extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
                   _group(context, 'الواجهة المشتركة (Apex Layer)', [
                     _Item(
+                      icon: Icons.map,
+                      title: '🗺️ خريطة APEX الكاملة (جديد)',
+                      subtitle: 'كل الشاشات والمسارات في مكان واحد',
+                      route: '/apex-map',
+                      status: _Status.done,
+                    ),
+                    _Item(
                       icon: Icons.precision_manufacturing,
-                      title: 'Sprint 44 — عمليات التصنيع (جديد)',
+                      title: 'Sprint 44 — عمليات التصنيع',
                       subtitle: 'Work Orders + Gantt + Responsive Audit',
                       route: '/sprint44-operations',
                       status: _Status.done,
