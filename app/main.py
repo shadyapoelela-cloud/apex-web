@@ -117,6 +117,8 @@ for _mod in [
     "app.core.webhooks",
     "app.core.saved_views",
     "app.services.copilot_memory",
+    "app.core.dimensional_accounting",
+    "app.core.consolidation_intercompany",
 ]:
     try:
         __import__(_mod)
@@ -613,6 +615,14 @@ try:
     logging.info("Webhooks router mounted at /api/v1/webhooks/*")
 except Exception as _e:
     logging.warning(f"Webhooks router not mounted: {_e}")
+
+# Dimensional accounting router at /api/v1/dimensions/*.
+try:
+    from app.core.dimensional_accounting import router as dim_router
+    app.include_router(dim_router)
+    logging.info("Dimensions router mounted at /api/v1/dimensions/*")
+except Exception as _e:
+    logging.warning(f"Dimensions router not mounted: {_e}")
 
 # Governed AI model registration (no routes yet — consumed by AI modules).
 try:

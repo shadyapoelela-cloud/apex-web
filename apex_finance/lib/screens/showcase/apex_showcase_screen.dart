@@ -11,6 +11,7 @@ import '../../core/apex_auto_save.dart';
 import '../../core/apex_data_table.dart';
 import '../../core/apex_filter_bar.dart';
 import '../../core/apex_form_field.dart';
+import '../../core/apex_flexible_columns.dart';
 import '../../core/apex_preview_panel.dart';
 import '../../core/apex_shimmer.dart';
 import '../../core/apex_status_bar.dart';
@@ -133,6 +134,11 @@ class _ApexShowcaseScreenState extends State<ApexShowcaseScreen> {
                     '7. ApexPreviewPanel',
                     'لوحة معاينة يمنى للسجلات (400px) — Xero-style',
                     _previewPanelDemo(),
+                  ),
+                  _section(
+                    '9. ApexFlexibleColumnLayout (3-column)',
+                    'SAP Fiori-style master-detail-detail — عمود البداية 25% + التفاصيل 25% + الثانوي 50%',
+                    _fclDemo(),
                   ),
                   _section(
                     '8. Command Palette (Cmd+K)',
@@ -472,6 +478,19 @@ class _ApexShowcaseScreenState extends State<ApexShowcaseScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  // ── 9. Flexible Column Layout ──
+  Widget _fclDemo() {
+    return SizedBox(
+      height: 300,
+      child: ApexFlexibleColumnLayout(
+        mode: FclMode.endExpanded,
+        list: Container(color: AC.navy2, child: Center(child: Text('القائمة', style: TextStyle(color: AC.tp)))),
+        detail: Container(color: AC.navy3, child: Center(child: Text('التفاصيل', style: TextStyle(color: AC.tp)))),
+        secondary: Container(color: AC.navy2, child: Center(child: Text('ثانوي', style: TextStyle(color: AC.tp)))),
       ),
     );
   }
