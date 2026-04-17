@@ -851,7 +851,7 @@ def root():
     phases = [P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8, HAS_P9, HAS_P10, HAS_P11]
     return {
         "name": "APEX Financial Platform API",
-        "version": "11.5.0",
+        "version": "12.0.0",
         "status": "running",
         "phases_active": sum(phases),
         "phases_total": 11,
@@ -1341,7 +1341,7 @@ def health():
     status = "ok" if db_ok else "degraded"
     return {
         "status": status,
-        "version": "11.5.0",
+        "version": "12.0.0",
         "database": db_ok,
         "phases": {
             "p1": P1,

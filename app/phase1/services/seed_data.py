@@ -35,7 +35,7 @@ def seed_all():
     except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"success": False, "error": "Internal server error"}
+        return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
     finally:
         db.close()
 
