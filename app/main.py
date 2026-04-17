@@ -755,6 +755,15 @@ try:
 except Exception as e:
     logging.error(f"Financial statements routes not mounted: {e}", exc_info=True)
 
+# ── Full Cash Flow Statement (IAS 7)
+try:
+    from app.core.cashflow_statement_routes import router as cfs_router
+
+    app.include_router(cfs_router)
+    logging.info("Cash flow statement routes mounted (IAS 7 indirect)")
+except Exception as e:
+    logging.error(f"Cash flow statement routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
