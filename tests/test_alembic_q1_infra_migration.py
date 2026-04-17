@@ -21,14 +21,18 @@ def _alembic_cfg():
     return Config(ini)
 
 
-def test_head_includes_q1_infra_migration():
-    """The new migration is the current head."""
+def test_q1_infra_migration_is_in_history():
+    """The Q1 infra migration is reachable from the current head.
+
+    NB: it may not be the head itself — later migrations (e.g. the
+    PostgreSQL RLS policies migration) can have been added on top.
+    What we care about is that the migration hasn't been dropped."""
     from alembic.script import ScriptDirectory
 
     cfg = _alembic_cfg()
     script = ScriptDirectory.from_config(cfg)
-    heads = set(script.get_heads())
-    assert "c7f1a9b02e10" in heads
+    all_revs = {r.revision for r in script.walk_revisions()}
+    assert "c7f1a9b02e10" in all_revs
 
 
 def test_upgrade_is_idempotent_with_existing_tables():

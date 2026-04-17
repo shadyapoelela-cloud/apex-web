@@ -585,6 +585,17 @@ try:
 except Exception as _e:
     logging.warning(f"Tenant query guard not attached: {_e}")
 
+# PostgreSQL RLS — database-layer tenant isolation. No-op on SQLite
+# so dev + tests are unchanged. Works together with the app-layer
+# guard above (defense in depth).
+try:
+    from app.core.rls_session import install_rls_session_hook
+    from app.phase1.models.platform_models import engine as _rls_engine
+    install_rls_session_hook(_rls_engine)
+    logging.info("RLS session hook installed")
+except Exception as _e:
+    logging.warning(f"RLS session hook not installed: {_e}")
+
 # Audit log — captures every state-changing request with redacted body preview.
 # Required for SOC 2 Type II + PDPL compliance. Disable via AUDIT_LOG_ENABLED=false.
 try:
