@@ -773,6 +773,33 @@ try:
 except Exception as e:
     logging.error(f"WHT routes not mounted: {e}", exc_info=True)
 
+# ── Consolidation (IFRS 10)
+try:
+    from app.core.consolidation_routes import router as consol_router
+
+    app.include_router(consol_router)
+    logging.info("Consolidation routes mounted (build)")
+except Exception as e:
+    logging.error(f"Consolidation routes not mounted: {e}", exc_info=True)
+
+# ── Deferred Tax (IAS 12)
+try:
+    from app.core.deferred_tax_routes import router as dt_router
+
+    app.include_router(dt_router)
+    logging.info("Deferred tax routes mounted (compute / categories)")
+except Exception as e:
+    logging.error(f"Deferred tax routes not mounted: {e}", exc_info=True)
+
+# ── Lease Accounting (IFRS 16)
+try:
+    from app.core.lease_routes import router as lease_router
+
+    app.include_router(lease_router)
+    logging.info("Lease routes mounted (IFRS 16 build)")
+except Exception as e:
+    logging.error(f"Lease routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
