@@ -288,54 +288,9 @@ def _run_startup():
 
         # ── Schema-drift auto-repair on startup ──
         try:
-            import re
+            from app.core.schema_drift import apply_drift_fixes_on_startup
             from app.phase1.models.platform_models import SessionLocal as _SL
-            from sqlalchemy import text as _t
-            _IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-            _TYPE_WHITELIST = {"VARCHAR", "REAL", "INTEGER", "TEXT", "TIMESTAMP",
-                               "BOOLEAN", "JSON", "JSONB", "NUMERIC", "DATE"}
-            _DRIFT_FIXES = [
-                ("user_security_events", "details", "JSON"),
-                ("user_security_events", "user_agent", "VARCHAR(500)"),
-                ("users", "last_login_at", "TIMESTAMP"),
-                ("users", "locked_until", "TIMESTAMP"),
-                ("users", "failed_login_count", "INTEGER DEFAULT 0"),
-                ("user_profiles", "avatar_url", "VARCHAR(500)"),
-                # plans table drift (Render production)
-                ("plans", "currency", "VARCHAR(3) DEFAULT 'SAR'"),
-                ("plans", "target_user_ar", "VARCHAR(200)"),
-                ("plans", "target_user_en", "VARCHAR(200)"),
-                ("plans", "sort_order", "INTEGER DEFAULT 0"),
-                ("plans", "description_ar", "TEXT"),
-                ("plans", "description_en", "TEXT"),
-                # plan_features drift
-                ("plan_features", "value_type", "VARCHAR(30) DEFAULT 'count'"),
-                ("plan_features", "description_ar", "TEXT"),
-                ("plan_features", "description_en", "TEXT"),
-                # subscription_entitlements drift
-                ("subscription_entitlements", "value_type", "VARCHAR(30) DEFAULT 'count'"),
-                # user_subscriptions drift
-                ("user_subscriptions", "billing_cycle", "VARCHAR(20) DEFAULT 'monthly'"),
-            ]
-            _db = _SL()
-            _added = 0
-            for _tbl, _cn, _ct in _DRIFT_FIXES:
-                if not _IDENT.match(_tbl) or not _IDENT.match(_cn):
-                    continue
-                _th = _ct.split(" ")[0].split("(")[0].upper()
-                if _th not in _TYPE_WHITELIST:
-                    continue
-                try:
-                    _db.execute(_t(
-                        f"ALTER TABLE {_tbl} ADD COLUMN IF NOT EXISTS {_cn} {_ct}"
-                    ))
-                    _db.commit()
-                    _added += 1
-                except Exception:
-                    _db.rollback()
-            _db.close()
-            if _added > 0:
-                logging.info(f"Schema drift auto-repair: {_added} columns ensured")
+            apply_drift_fixes_on_startup(_SL)
         except Exception as _sdr:
             logging.warning(f"Schema drift repair skipped: {_sdr}")
     if P2:
@@ -1040,52 +995,13 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
     except Exception as _e2:
         results["s2_cols"] = "error"
 
-    # ── Schema drift repair: add missing columns on platform tables ──
+    # ── Schema drift repair via shared module ──
     try:
-        import re
-        _IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-        _TYPE_WHITELIST = {"VARCHAR", "REAL", "INTEGER", "TEXT", "TIMESTAMP",
-                           "BOOLEAN", "JSON", "JSONB", "NUMERIC", "DATE"}
-        # Known columns that may be missing on older Render schemas
-        _DRIFT_FIXES = [
-            ("user_security_events", "details",   "JSON"),
-            ("user_security_events", "user_agent", "VARCHAR(500)"),
-            ("users",                "last_login_at", "TIMESTAMP"),
-            ("users",                "locked_until",  "TIMESTAMP"),
-            ("users",                "failed_login_count", "INTEGER DEFAULT 0"),
-            ("user_profiles",        "avatar_url",  "VARCHAR(500)"),
-            # plans + related drift
-            ("plans",                "currency", "VARCHAR(3) DEFAULT 'SAR'"),
-            ("plans",                "target_user_ar", "VARCHAR(200)"),
-            ("plans",                "target_user_en", "VARCHAR(200)"),
-            ("plans",                "sort_order", "INTEGER DEFAULT 0"),
-            ("plans",                "description_ar", "TEXT"),
-            ("plans",                "description_en", "TEXT"),
-            ("plan_features",        "value_type", "VARCHAR(30) DEFAULT 'count'"),
-            ("plan_features",        "description_ar", "TEXT"),
-            ("plan_features",        "description_en", "TEXT"),
-            ("subscription_entitlements", "value_type", "VARCHAR(30) DEFAULT 'count'"),
-            ("user_subscriptions",   "billing_cycle", "VARCHAR(20) DEFAULT 'monthly'"),
-        ]
-        db = SessionLocal()
-        drift_added = 0
-        for _tbl, _cn, _ct in _DRIFT_FIXES:
-            if not _IDENT.match(_tbl) or not _IDENT.match(_cn):
-                continue
-            _type_head = _ct.split(" ")[0].split("(")[0].upper()
-            if _type_head not in _TYPE_WHITELIST:
-                continue
-            try:
-                # PostgreSQL supports "ADD COLUMN IF NOT EXISTS"
-                db.execute(_t2(
-                    f"ALTER TABLE {_tbl} ADD COLUMN IF NOT EXISTS {_cn} {_ct}"
-                ))
-                db.commit()
-                drift_added += 1
-            except Exception:
-                db.rollback()
-        db.close()
-        results["schema_drift"] = f"OK - {drift_added} columns ensured"
+        from app.core.schema_drift import apply_drift_fixes
+        _r = apply_drift_fixes(SessionLocal)
+        results["schema_drift"] = (
+            f"OK - {_r['added']} added, {_r['errors']} errors, {_r['skipped']} skipped"
+        )
     except Exception as _e3:
         results["schema_drift"] = f"error: {type(_e3).__name__}"
 
