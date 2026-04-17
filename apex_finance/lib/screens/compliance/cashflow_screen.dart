@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class CashFlowScreen extends StatefulWidget {
@@ -78,10 +79,7 @@ class _CashFlowScreenState extends State<CashFlowScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('قائمة التدفقات النقدية', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
-      ),
+      appBar: ApexAppBar(title: 'قائمة التدفقات النقدية'),
       body: LayoutBuilder(builder: (ctx, cons) {
         final wide = cons.maxWidth > 960;
         if (!wide) {

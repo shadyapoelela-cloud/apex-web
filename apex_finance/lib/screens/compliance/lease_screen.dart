@@ -5,6 +5,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class LeaseScreen extends StatefulWidget {
@@ -68,10 +69,7 @@ class _LeaseScreenState extends State<LeaseScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('محاسبة الإيجار (IFRS 16)', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
-    ),
+    appBar: ApexAppBar(title: 'محاسبة الإيجار (IFRS 16)'),
     body: LayoutBuilder(builder: (ctx, cons) {
       final wide = cons.maxWidth > 1000;
       if (!wide) return SingleChildScrollView(padding: const EdgeInsets.all(16),

@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class ValuationScreen extends StatefulWidget {
@@ -72,8 +73,7 @@ class _ValuationScreenState extends State<ValuationScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('تقييم الأعمال (DCF)', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2),
+    appBar: ApexAppBar(title: 'تقييم الأعمال (DCF)'),
     body: LayoutBuilder(builder: (ctx, cons) {
       final wide = cons.maxWidth > 900;
       if (!wide) return SingleChildScrollView(padding: const EdgeInsets.all(16),

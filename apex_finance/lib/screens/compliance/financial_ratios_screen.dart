@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class FinancialRatiosScreen extends StatefulWidget {
@@ -102,10 +103,7 @@ class _FinancialRatiosScreenState extends State<FinancialRatiosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('المؤشرات المالية', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
-      ),
+      appBar: ApexAppBar(title: 'المؤشرات المالية'),
       body: LayoutBuilder(builder: (ctx, cons) {
         final wide = cons.maxWidth > 1000;
         if (!wide) {

@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class CashflowStatementScreen extends StatefulWidget {
@@ -105,11 +106,7 @@ class _CashflowStatementScreenState extends State<CashflowStatementScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('قائمة التدفقات النقدية (IAS 7)',
-        style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
-    ),
+    appBar: ApexAppBar(title: 'قائمة التدفقات النقدية (IAS 7)'),
     body: LayoutBuilder(builder: (ctx, cons) {
       final wide = cons.maxWidth > 1000;
       if (!wide) return SingleChildScrollView(padding: const EdgeInsets.all(16),
