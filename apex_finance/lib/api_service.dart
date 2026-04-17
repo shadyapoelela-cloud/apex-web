@@ -389,6 +389,13 @@ class ApiService {
   static Future<ApiResult> costVarianceOverhead(Map body) => _post('/cost/variance/overhead', body);
   static Future<ApiResult> costVarianceComprehensive(Map body) => _post('/cost/variance/comprehensive', body);
 
+  // ── Financial Statements (TB / IS / BS / Close) ──
+  static Future<ApiResult> fsTrialBalance(Map body) => _post('/fs/trial-balance', body);
+  static Future<ApiResult> fsIncomeStatement(Map body) => _post('/fs/income-statement', body);
+  static Future<ApiResult> fsBalanceSheet(Map body) => _post('/fs/balance-sheet', body);
+  static Future<ApiResult> fsClosingEntries(Map body) => _post('/fs/closing-entries', body);
+  static Future<ApiResult> fsClassifications() => _get('/fs/classifications');
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

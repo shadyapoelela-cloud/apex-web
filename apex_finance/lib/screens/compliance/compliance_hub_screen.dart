@@ -250,6 +250,13 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.warn,
                     onTap: () => context.go('/compliance/cost-variance'),
                   ),
+                  _toolCard(
+                    icon: Icons.auto_graph,
+                    title: 'القوائم المالية',
+                    subtitle: 'TB · IS · BS · Closing',
+                    color: AC.ok,
+                    onTap: () => context.go('/compliance/financial-statements'),
+                  ),
                 ],
               );
             }),
