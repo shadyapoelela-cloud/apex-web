@@ -100,6 +100,17 @@ try:
 except Exception as e:
     logging.warning(f"Compliance models import failed: {e}")
 
+# HR + AP Agent models — added 2026-04-17. Import here (side-effect) so the
+# tables register with Base.metadata and `create_all()` / Alembic pick them up.
+try:
+    from app.hr import models as _hr_models  # noqa: F401
+except Exception as e:
+    logging.warning(f"HR models import failed: {e}")
+try:
+    from app.features.ap_agent import models as _ap_models  # noqa: F401
+except Exception as e:
+    logging.warning(f"AP Agent models import failed: {e}")
+
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
     from app.knowledge_brain.models.db_models import init_db as init_kb
@@ -519,6 +530,27 @@ app.add_middleware(
     expose_headers=["Content-Disposition", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
     max_age=600,
 )
+
+# Multi-tenant ContextVar middleware — binds tenant_id from JWT/header/query
+# for the duration of each request. Non-breaking: skipped endpoints listed
+# in TenantContextMiddleware._TENANT_FREE_PREFIXES bypass it. Enforcement
+# of "tenant required" is opt-in via TENANT_STRICT=true.
+try:
+    from app.core.tenant_context import TenantContextMiddleware
+    app.add_middleware(TenantContextMiddleware)
+    logging.info("Tenant context middleware registered")
+except Exception as _e:
+    logging.warning(f"Tenant context middleware not registered: {_e}")
+
+# WhatsApp Business Cloud webhook (verification handshake + inbound events).
+# Only mounted if the module imports cleanly — optional integration.
+try:
+    from app.integrations.whatsapp.webhook import router as wa_webhook_router
+    app.include_router(wa_webhook_router)
+    logging.info("WhatsApp webhook router mounted at /integrations/whatsapp/*")
+except Exception as _e:
+    logging.warning(f"WhatsApp webhook router not mounted: {_e}")
+
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
 from collections import defaultdict

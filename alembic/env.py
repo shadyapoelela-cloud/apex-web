@@ -34,6 +34,11 @@ from app.sprint5_analysis.models.analysis_models import *
 from app.sprint6_registry.models.registry_models import *
 from app.knowledge_brain.models.db_models import *
 
+# New modules (HR, AP Agent) — added 2026-04-17 as part of Q1-Q2 scaffolds.
+# These must be registered so `alembic revision --autogenerate` detects them.
+from app.hr.models import *  # noqa: F401,F403
+from app.features.ap_agent.models import *  # noqa: F401,F403
+
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
