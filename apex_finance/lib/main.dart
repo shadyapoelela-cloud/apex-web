@@ -390,7 +390,6 @@ class _MainNavS extends ConsumerState<MainNav> {
   List _notifs = [];
   double _fabX = 20;
   double _fabY = 100;
-  String _userName = S.dname ?? 'User';
   String _clientLabel = '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644';
   int _hoveredDrawerIndex = -1;
   @override
@@ -657,13 +656,6 @@ class _MainNavS extends ConsumerState<MainNav> {
   }
 
 
-
-
-  Widget _sectionHeader(String label) => Padding(
-    padding: EdgeInsets.only(top: 12, bottom: 4, right: 16, left: 16),
-    child: Text(label, textAlign: TextAlign.right, style: TextStyle(
-      color: AC.gold, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
-  );
 
 
   /// Smart COA navigation — checks top-bar client selection (v6.7)
@@ -1506,7 +1498,6 @@ class _ClientsS extends ConsumerState<ClientsTab> {
       '\u0631\u0641\u0639 \u0627\u0644\u0645\u0633\u062a\u0646\u062f\u0627\u062a',
       '\u0627\u0644\u0645\u0631\u0627\u062c\u0639\u0629 \u0648\u0627\u0644\u062a\u0623\u0643\u064a\u062f',
     ];
-    final icons = [Icons.category, Icons.person, Icons.phone, Icons.business_center, Icons.work, Icons.upload_file, Icons.check_circle];
     showDialog(context: ctx, builder: (dc) => StatefulBuilder(builder: (bc, setSt) =>
       Dialog(backgroundColor: Colors.transparent, insetPadding: EdgeInsets.all(24),
         child: Container(
