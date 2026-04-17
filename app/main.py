@@ -444,8 +444,20 @@ app.add_middleware(
 )
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
-from collections import defaultdict
 import time
+
+from app.core.rate_limit_backend import InMemoryBackend, pick_backend
+
+# Rate-limit backend is process-global: Redis when REDIS_URL is set, else
+# an in-memory fallback. Chosen once at import time so the middleware
+# stays allocation-free on the hot path.
+_rate_backend = pick_backend()
+
+# Back-compat alias for tests that call `_rate_limits.clear()` between runs.
+# Points to the in-memory bucket dict when the backend is InMemoryBackend;
+# becomes an inert dict otherwise (Redis flushes via FLUSHDB, which tests
+# that need it should invoke explicitly).
+_rate_limits = _rate_backend._hits if isinstance(_rate_backend, InMemoryBackend) else {}
 
 
 @app.exception_handler(Exception)
@@ -455,11 +467,9 @@ async def global_exception_handler(request, exc):
 
 
 # ======================================================================
-# In-memory rate limiter — tiered per-path limits, per-IP, proxy-aware.
-# Resets on restart. Replace with Redis-backed slowapi for multi-instance prod.
+# Rate limiter — tiered per-path limits, per-IP, proxy-aware.
+# Backend is chosen above (Redis when REDIS_URL is set; in-memory otherwise).
 # ======================================================================
-_rate_limits = defaultdict(list)  # (ip, bucket) -> [timestamp, ...]
-_RATE_LIMIT_MAX_KEYS = 20000  # prevent memory leak from IP flooding
 
 # Legacy module-level aliases (retained so older tests / external tooling keep working).
 # The active limits are in _RATE_TIERS below — these just mirror the default bucket.
@@ -522,20 +532,11 @@ async def rate_limit_middleware(request, call_next):
     client_ip = _get_client_ip(request)
     path = path_raw
     window, limit, bucket = _pick_tier(path)
-    key = (client_ip, bucket)
+    key = f"{client_ip}|{bucket}"
     now = time.time()
-    # Prevent memory leak: evict oldest keys if too many tracked
-    if len(_rate_limits) > _RATE_LIMIT_MAX_KEYS:
-        oldest = sorted(
-            _rate_limits.keys(), key=lambda k: _rate_limits[k][-1] if _rate_limits[k] else 0
-        )
-        for k in oldest[: _RATE_LIMIT_MAX_KEYS // 2]:
-            del _rate_limits[k]
-    # Clean old entries for this bucket
-    _rate_limits[key] = [t for t in _rate_limits[key] if now - t < window]
-    remaining = limit - len(_rate_limits[key])
-    if remaining <= 0:
-        reset_in = int(window - (now - _rate_limits[key][0])) if _rate_limits[key] else window
+
+    allowed, remaining, reset_in = _rate_backend.hit(key, window, limit)
+    if not allowed:
         return JSONResponse(
             status_code=429,
             headers={
@@ -546,11 +547,9 @@ async def rate_limit_middleware(request, call_next):
             },
             content={"success": False, "error": "طلبات كثيرة جداً. الرجاء الانتظار.", "retry_after": reset_in},
         )
-    _rate_limits[key].append(now)
     response = await call_next(request)
-    # Expose remaining quota to clients
     response.headers["X-RateLimit-Limit"] = str(limit)
-    response.headers["X-RateLimit-Remaining"] = str(max(0, remaining - 1))
+    response.headers["X-RateLimit-Remaining"] = str(remaining)
     response.headers["X-RateLimit-Reset"] = str(int(now + window))
     return response
 
