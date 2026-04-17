@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 
 import '../../core/apex_data_table.dart';
 import '../../core/apex_inline_editable.dart';
+import '../../core/apex_recent_items.dart';
+import '../../core/apex_saved_views.dart';
+import '../../core/apex_semantic_field.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
@@ -24,6 +27,22 @@ class Sprint35FoundationScreen extends StatefulWidget {
 }
 
 class _Sprint35FoundationScreenState extends State<Sprint35FoundationScreen> {
+  // Filter state for the saved-views demo.
+  Map<String, dynamic> _filters = {'status': 'all', 'min_amount': 0};
+
+  @override
+  void initState() {
+    super.initState();
+    // Demonstrate the "recently visited" rail by recording this screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ApexRecentItems.record(
+        route: '/sprint35-foundation',
+        label: 'ديمو Sprint 35-36',
+        icon: Icons.bolt,
+      );
+    });
+  }
+
   // In-memory invoice list — editable inline.
   final List<_Invoice> _rows = List.generate(12, (i) {
     return _Invoice(
@@ -55,6 +74,12 @@ class _Sprint35FoundationScreenState extends State<Sprint35FoundationScreen> {
                   _banner(),
                   const SizedBox(height: AppSpacing.xl),
                   _shortcutCard(),
+                  const SizedBox(height: AppSpacing.xl),
+                  _savedViewsCard(),
+                  const SizedBox(height: AppSpacing.xl),
+                  _validationCard(),
+                  const SizedBox(height: AppSpacing.xl),
+                  _recentItemsCard(),
                   const SizedBox(height: AppSpacing.xl),
                   _inlineEditCard(),
                 ],
@@ -119,6 +144,146 @@ class _Sprint35FoundationScreenState extends State<Sprint35FoundationScreen> {
             _ShortcutChip(key_: 'Alt+8', label: 'المعرفة'),
             _ShortcutChip(key_: 'Alt+9', label: 'ما الجديد'),
             _ShortcutChip(key_: 'Ctrl+K', label: 'Command Palette'),
+          ],
+        ),
+      );
+
+  Widget _savedViewsCard() => _card(
+        icon: Icons.bookmark_outline,
+        title: 'عروض مرشّحات محفوظة (Saved Views)',
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'متصل بـ /api/v1/saved-views — احفظ مجموعة المرشّحات الحالية واستعدها بنقرة واحدة. اضغط "+" لحفظ، ضغطة مطوّلة للحذف.',
+              style: TextStyle(color: AC.ts, fontSize: AppFontSize.sm),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Container(
+              decoration: BoxDecoration(
+                color: AC.navy3,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                border: Border.all(color: AC.bdr),
+              ),
+              child: ApexSavedViewsBar(
+                screen: 'sprint35_demo_invoices',
+                currentPayload: _filters,
+                onApply: (view) {
+                  setState(() => _filters = view.payload);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('طُبِّق "${view.name}"'),
+                    duration: const Duration(seconds: 2),
+                  ));
+                },
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'المرشّحات النشطة: ${_filters.toString()}',
+              style: TextStyle(
+                  color: AC.td,
+                  fontSize: AppFontSize.xs,
+                  fontFamily: 'monospace'),
+            ),
+          ],
+        ),
+      );
+
+  Widget _validationCard() => _card(
+        icon: Icons.rule_folder_outlined,
+        title: 'تحقق لحظي بألوان دلالية (SAP Fiori style)',
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'لكل حقل حدود ملوّنة حسب حالة التحقق: رمادي=خامل، أزرق=معلومة، أصفر=تحذير، أحمر=خطأ، أخضر=صالح.',
+              style: TextStyle(color: AC.ts, fontSize: AppFontSize.sm),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            ApexSemanticField(
+              label: 'رقم ضريبي (VAT/TRN)',
+              hint: '15 رقماً لـ VAT السعودي أو UAE',
+              required: true,
+              keyboardType: TextInputType.number,
+              prefixIcon: Icons.receipt_long,
+              validator: (v) {
+                if (v.length < 10) {
+                  return ValidationResult.warn('أكمل الرقم...');
+                }
+                if (v.length == 15 && RegExp(r'^\d+$').hasMatch(v)) {
+                  return ValidationResult.ok;
+                }
+                if (!RegExp(r'^\d+$').hasMatch(v)) {
+                  return ValidationResult.error('أرقام فقط');
+                }
+                return ValidationResult.warn('يجب أن يكون 15 رقماً');
+              },
+            ),
+            const SizedBox(height: AppSpacing.md),
+            ApexSemanticField(
+              label: 'IBAN',
+              hint: 'SA...',
+              prefixIcon: Icons.account_balance,
+              validator: (v) {
+                final cleaned = v.replaceAll(' ', '').toUpperCase();
+                if (cleaned.length < 4) {
+                  return ValidationResult.info('ابدأ بـ رمز الدولة (SA/AE)');
+                }
+                if (!cleaned.startsWith(RegExp(r'^(SA|AE)'))) {
+                  return ValidationResult.error('يجب أن يبدأ بـ SA أو AE');
+                }
+                if (cleaned.startsWith('SA') && cleaned.length != 24) {
+                  return ValidationResult.warn(
+                      'IBAN السعودي 24 حرفاً (الحالي ${cleaned.length})');
+                }
+                if (cleaned.startsWith('AE') && cleaned.length != 23) {
+                  return ValidationResult.warn(
+                      'IBAN الإماراتي 23 حرفاً (الحالي ${cleaned.length})');
+                }
+                return ValidationResult.ok;
+              },
+            ),
+          ],
+        ),
+      );
+
+  Widget _recentItemsCard() => _card(
+        icon: Icons.history,
+        title: 'الزيارات الأخيرة (Recently Visited)',
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'آخر 5 شاشات فتحتَها — محفوظة في localStorage وتعود بعد الإنعاش. جرّب زيارة بعض الشاشات ثم عُد:',
+              style: TextStyle(color: AC.ts, fontSize: AppFontSize.sm),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const ApexRecentRail(horizontal: true),
+            const SizedBox(height: AppSpacing.md),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                for (final it in const [
+                  ('/showcase', 'معرض المكونات', Icons.view_headline),
+                  ('/whats-new', 'ما الجديد', Icons.rocket_launch),
+                  ('/uae-corp-tax', 'UAE Tax', Icons.account_balance),
+                  ('/startup-metrics', 'مقاييس', Icons.trending_up),
+                  ('/industry-packs', 'حزم الصناعات', Icons.factory),
+                ])
+                  OutlinedButton.icon(
+                    icon: Icon(it.$3, size: 16),
+                    label: Text(it.$2),
+                    onPressed: () {
+                      ApexRecentItems.record(
+                        route: it.$1,
+                        label: it.$2,
+                        icon: it.$3,
+                      );
+                    },
+                  ),
+              ],
+            ),
           ],
         ),
       );
