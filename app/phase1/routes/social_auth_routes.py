@@ -4,11 +4,15 @@ Google Sign-In + Apple Sign-In + Mobile with Country Code
 Per Architecture Doc v5 Section 5
 """
 
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
 import json
 import logging
+
+_SESSION_TTL_HOURS = 24
 
 from app.phase1.models.platform_models import (
     User,
@@ -17,6 +21,7 @@ from app.phase1.models.platform_models import (
     SessionLocal,
     gen_uuid,
 )
+from app.core.social_auth_verify import verify_google_id_token, verify_apple_identity_token
 
 router = APIRouter()
 
@@ -54,27 +59,34 @@ class LinkSocialAccountRequest(BaseModel):
 
 @router.post("/auth/social/google", tags=["Social Auth"])
 async def google_sign_in(req: GoogleSignInRequest):
-    """
-    Google Sign-In: creates account if new, or logs in if exists.
+    """Google Sign-In: creates account if new, or logs in if exists.
 
-    ⚠ WARNING: id_token is NOT validated against Google API.
-    Production requires: google-auth library to verify token signature + audience.
+    The id_token is verified against Google's JWKS and the configured
+    GOOGLE_OAUTH_CLIENT_ID audience. In development, if the env var is
+    not set, the caller-supplied email is trusted with a warning logged.
     """
-    logging.warning("Google sign-in: id_token NOT verified (production must validate)")
+    identity = verify_google_id_token(req.id_token, dev_email_hint=req.email)
+    verified_email = identity.email
+    # Only use the caller-supplied display_name/photo_url if the verifier
+    # didn't return its own (dev-bypass path).
+    display_name = identity.display_name or req.display_name
+    photo_url = identity.photo_url or req.photo_url
+
     db = SessionLocal()
     try:
-        if not req.email:
-            raise HTTPException(status_code=400, detail="Email is required from Google token")
-
-        user = db.query(User).filter(User.email == req.email).first()
+        user = db.query(User).filter(User.email == verified_email).first()
 
         if user:
             # Existing user - login
             session = UserSession(
                 id=gen_uuid(),
                 user_id=user.id,
+                # Placeholder matches auth_service.py pattern; a real access/refresh
+                # token pair should be minted here in a follow-up PR.
+                token_hash=f"pending:google:{gen_uuid()}",
                 device_info="google_sign_in",
                 ip_address="social_auth",
+                expires_at=datetime.now(timezone.utc) + timedelta(hours=_SESSION_TTL_HOURS),
             )
             db.add(session)
             db.add(
@@ -99,12 +111,12 @@ async def google_sign_in(req: GoogleSignInRequest):
             }
         else:
             # New user - register
-            username = req.email.split("@")[0] + "_g"
+            username = verified_email.split("@")[0] + "_g"
             new_user = User(
                 id=gen_uuid(),
                 username=username,
-                email=req.email,
-                display_name=req.display_name or username,
+                email=verified_email,
+                display_name=display_name or username,
                 password_hash="SOCIAL_AUTH_NO_PASSWORD",
                 auth_provider="google",
             )
@@ -112,8 +124,10 @@ async def google_sign_in(req: GoogleSignInRequest):
             session = UserSession(
                 id=gen_uuid(),
                 user_id=new_user.id,
+                token_hash=f"pending:google:{gen_uuid()}",
                 device_info="google_sign_in",
                 ip_address="social_auth",
+                expires_at=datetime.now(timezone.utc) + timedelta(hours=_SESSION_TTL_HOURS),
             )
             db.add(session)
             db.commit()
