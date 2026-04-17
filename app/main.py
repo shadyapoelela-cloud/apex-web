@@ -594,6 +594,21 @@ try:
 except Exception as _e:
     logging.warning(f"Saved views router not mounted: {_e}")
 
+# Webhooks (Developer Platform) mounted at /api/v1/webhooks/*.
+try:
+    from app.core.webhooks import router as webhooks_router
+    app.include_router(webhooks_router)
+    logging.info("Webhooks router mounted at /api/v1/webhooks/*")
+except Exception as _e:
+    logging.warning(f"Webhooks router not mounted: {_e}")
+
+# Governed AI model registration (no routes yet — consumed by AI modules).
+try:
+    from app.core import governed_ai as _governed_ai  # noqa: F401
+    logging.info("Governed AI model registered")
+except Exception as _e:
+    logging.warning(f"Governed AI not registered: {_e}")
+
 # WhatsApp Business Cloud webhook (verification handshake + inbound events).
 # Only mounted if the module imports cleanly — optional integration.
 try:
