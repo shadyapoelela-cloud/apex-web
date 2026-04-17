@@ -75,6 +75,8 @@ import '../screens/compliance/wht_screen.dart';
 import '../screens/compliance/consolidation_screen.dart';
 import '../screens/compliance/deferred_tax_screen.dart';
 import '../screens/compliance/lease_screen.dart';
+import '../screens/compliance/ifrs_tools_screen.dart';
+import '../screens/compliance/fixed_assets_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -240,6 +242,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/lease',
       pageBuilder: (c, s) => _apexPage(const LeaseScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/ifrs-tools',
+      pageBuilder: (c, s) => _apexPage(const IfrsToolsScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/fixed-assets',
+      pageBuilder: (c, s) => _apexPage(const FixedAssetsScreen(), s),
     ),
 
     // Account

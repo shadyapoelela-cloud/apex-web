@@ -416,6 +416,28 @@ class ApiService {
   // ── Lease Accounting (IFRS 16) ──
   static Future<ApiResult> leaseBuild(Map body) => _post('/lease/build', body);
 
+  // ── IFRS 15 Revenue Recognition ──
+  static Future<ApiResult> revenueRecognise(Map body) => _post('/revenue/recognise', body);
+
+  // ── IAS 19 End-of-Service Benefits ──
+  static Future<ApiResult> eosbCompute(Map body) => _post('/eosb/compute', body);
+  static Future<ApiResult> eosbReasons() => _get('/eosb/reasons');
+
+  // ── IAS 36 Impairment ──
+  static Future<ApiResult> impairmentTest(Map body) => _post('/impairment/test', body);
+
+  // ── IFRS 9 ECL ──
+  static Future<ApiResult> eclCompute(Map body) => _post('/ecl/compute', body);
+  static Future<ApiResult> eclDefaults() => _get('/ecl/defaults');
+
+  // ── IAS 37 Provisions ──
+  static Future<ApiResult> provisionsClassify(Map body) => _post('/provisions/classify', body);
+  static Future<ApiResult> provisionsLevels() => _get('/provisions/levels');
+
+  // ── Fixed Assets Register ──
+  static Future<ApiResult> fixedAssetBuild(Map body) => _post('/fa/build', body);
+  static Future<ApiResult> fixedAssetMethods() => _get('/fa/methods');
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

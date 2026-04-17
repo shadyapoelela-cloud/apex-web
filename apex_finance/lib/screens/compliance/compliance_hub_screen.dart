@@ -292,6 +292,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.ok,
                     onTap: () => context.go('/compliance/lease'),
                   ),
+                  _toolCard(
+                    icon: Icons.style,
+                    title: 'أدوات IFRS',
+                    subtitle: 'Revenue·EOSB·Impair·ECL·Provisions',
+                    color: AC.purple,
+                    onTap: () => context.go('/compliance/ifrs-tools'),
+                  ),
+                  _toolCard(
+                    icon: Icons.inventory,
+                    title: 'سجل الأصول الثابتة',
+                    subtitle: 'Lifecycle · Dep · Reval · Dispose',
+                    color: AC.info,
+                    onTap: () => context.go('/compliance/fixed-assets'),
+                  ),
                 ],
               );
             }),
