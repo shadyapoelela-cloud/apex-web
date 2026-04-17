@@ -102,7 +102,7 @@ FEATURE_DESCRIPTIONS = {
 
 def seed_plan_limits():
     """Seed plan_limits table with all plan features"""
-    from app.phase8.models.phase8_models import PlanLimit
+    from app.phase8.models.phase8_models import P8PlanLimit as PlanLimit
 
     db = SessionLocal()
     try:

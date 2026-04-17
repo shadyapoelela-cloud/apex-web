@@ -320,7 +320,8 @@ def _run_startup():
     if HAS_P10:
         try:
             init_phase10_db()
-            seed_welcome_notification()
+            # seed_welcome_notification requires a user_id — skipped at startup
+            # Called per-user after registration instead.
         except Exception:
             logging.error("Phase 10 init error", exc_info=True)
     if HAS_P11:
@@ -799,6 +800,24 @@ try:
     logging.info("Lease routes mounted (IFRS 16 build)")
 except Exception as e:
     logging.error(f"Lease routes not mounted: {e}", exc_info=True)
+
+# ── IFRS extras: Revenue 15, EOSB 19, Impairment 36, ECL 9, Provisions 37
+try:
+    from app.core.ifrs_extras_routes import router as ifrs_router
+
+    app.include_router(ifrs_router)
+    logging.info("IFRS extras routes mounted (revenue / eosb / impairment / ecl / provisions)")
+except Exception as e:
+    logging.error(f"IFRS extras routes not mounted: {e}", exc_info=True)
+
+# ── Fixed Assets Register
+try:
+    from app.core.fixed_assets_routes import router as fa_router
+
+    app.include_router(fa_router)
+    logging.info("Fixed assets routes mounted (lifecycle: cap/dep/reval/imp/dispose)")
+except Exception as e:
+    logging.error(f"Fixed assets routes not mounted: {e}", exc_info=True)
 
 
 @app.get("/")
