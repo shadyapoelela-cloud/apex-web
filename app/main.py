@@ -578,6 +578,22 @@ try:
 except Exception as _e:
     logging.warning(f"HR routes not mounted: {_e}")
 
+# API versioning — stamps X-API-Version on every response.
+try:
+    from app.core.api_version import ApiVersionHeaderMiddleware
+    app.add_middleware(ApiVersionHeaderMiddleware)
+    logging.info("API version middleware registered (X-API-Version header)")
+except Exception as _e:
+    logging.warning(f"API version middleware not registered: {_e}")
+
+# Saved filter views (mounted at /api/v1/saved-views/*).
+try:
+    from app.core.saved_views import router as saved_views_router
+    app.include_router(saved_views_router)
+    logging.info("Saved views router mounted at /api/v1/saved-views/*")
+except Exception as _e:
+    logging.warning(f"Saved views router not mounted: {_e}")
+
 # WhatsApp Business Cloud webhook (verification handshake + inbound events).
 # Only mounted if the module imports cleanly — optional integration.
 try:

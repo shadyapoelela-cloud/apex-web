@@ -199,6 +199,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.chat_bubble_outline,
       onRun: (ctx) => GoRouter.of(ctx).go('/whatsapp-demo'),
     ),
+    ApexCommand(
+      id: 'nav_onboarding',
+      label: 'معالج الإعداد (Onboarding)',
+      subtitle: '5 خطوات لإعداد شركتك في أقل من 5 دقائق',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.rocket_launch,
+      onRun: (ctx) => GoRouter.of(ctx).go('/onboarding'),
+    ),
 
     // ── Actions ──
     ApexCommand.action(
