@@ -6,6 +6,8 @@ Per execution document sections 3, 4, 5, 10, 13, 15.
 """
 
 import logging
+
+from app.core.error_messages import Errors
 from app.phase1.models.platform_models import (
     Role,
     Permission,
@@ -35,7 +37,7 @@ def seed_all():
     except Exception:
         db.rollback()
         logging.error("Operation failed", exc_info=True)
-        return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+        return {"success": False, "error": Errors.INTERNAL}
     finally:
         db.close()
 

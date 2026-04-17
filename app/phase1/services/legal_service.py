@@ -7,6 +7,8 @@ Per execution document section 15.
 
 import logging
 from typing import Optional
+
+from app.core.error_messages import Errors
 from app.phase1.models.platform_models import (
     PolicyDocument,
     PolicyAcceptanceLog,
@@ -117,7 +119,7 @@ class LegalService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 

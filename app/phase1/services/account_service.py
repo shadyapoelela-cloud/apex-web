@@ -7,6 +7,8 @@ Per execution document Section 9.
 
 from typing import Optional
 import logging
+
+from app.core.error_messages import Errors
 from app.phase1.models.platform_models import (
     User,
     UserProfile,
@@ -119,7 +121,7 @@ class AccountService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 
@@ -292,7 +294,7 @@ class AccountService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 
@@ -323,6 +325,6 @@ class AccountService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()

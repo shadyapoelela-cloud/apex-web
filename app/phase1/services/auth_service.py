@@ -1,4 +1,4 @@
-﻿"""
+"""
 APEX Platform â€" Auth Service (Security Patched)
 â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 - bcrypt password hashing (replaces SHA-256)
@@ -41,6 +41,7 @@ from app.phase1.models.platform_models import (
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 from app.core.auth_utils import JWT_SECRET, JWT_ALGORITHM
+from app.core.error_messages import Errors
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS", "30"))
@@ -273,7 +274,7 @@ class AuthService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 
@@ -388,7 +389,7 @@ class AuthService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 
@@ -411,7 +412,7 @@ class AuthService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 
@@ -441,7 +442,7 @@ class AuthService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 
@@ -479,7 +480,7 @@ class AuthService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 
@@ -511,7 +512,7 @@ class AuthService:
         except Exception:
             db.rollback()
             logging.error("Operation failed", exc_info=True)
-            return {"success": False, "error": "خطأ داخلي في الخادم — حاول لاحقاً أو تواصل مع الدعم"}
+            return {"success": False, "error": Errors.INTERNAL}
         finally:
             db.close()
 
