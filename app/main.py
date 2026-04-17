@@ -515,7 +515,28 @@ async def lifespan(app):
             await init_coa_engine()
         except Exception:
             logging.error("COA Engine init error", exc_info=True)
+
+    # Proactive AI scheduler — opt-in via PROACTIVE_AI_ENABLED=true.
+    # Runs run_all_scans() every 6h and pushes findings to the bell
+    # through activity_log + WebSocket.
+    _stop_ai = None
+    try:
+        from app.ai.scheduler import (
+            start_proactive_scheduler,
+            stop_proactive_scheduler as _stop_ai,
+        )
+        start_proactive_scheduler()
+    except Exception as _e:
+        logging.warning(f"Proactive AI scheduler not armed: {_e}")
+
     yield
+
+    # Clean shutdown of the scheduler task if it was armed.
+    if _stop_ai is not None:
+        try:
+            await _stop_ai()
+        except Exception as _e:
+            logging.debug(f"Scheduler shutdown: {_e}")
 
 
 app = FastAPI(
