@@ -34,8 +34,15 @@ class ApexWhatsNewHub extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
                   _group(context, 'الواجهة المشتركة (Apex Layer)', [
                     _Item(
+                      icon: Icons.factory_outlined,
+                      title: 'Sprint 39-40 — توسّع ERP (جديد)',
+                      subtitle: 'HR + CRM Kanban + Workflow rules',
+                      route: '/sprint39-erp',
+                      status: _Status.done,
+                    ),
+                    _Item(
                       icon: Icons.view_quilt,
-                      title: 'Sprint 38 — قابل للتكوين (جديد)',
+                      title: 'Sprint 38 — قابل للتكوين',
                       subtitle: 'لوحة Drag-drop + مركز إشعارات + مخططات',
                       route: '/sprint38-composable',
                       status: _Status.done,
