@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class NotificationDetailScreen extends StatelessWidget {

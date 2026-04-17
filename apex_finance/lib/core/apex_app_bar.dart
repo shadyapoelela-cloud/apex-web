@@ -24,23 +24,37 @@ class ApexAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// PreferredSizeWidget — Flutter auto-injects it.
   final Widget? leading;
 
+  /// Optional secondary bar under the toolbar — typically a TabBar.
+  /// Modelled on Material AppBar.bottom to support screens that use
+  /// tabs under the header without rebuilding the whole Scaffold.
+  final PreferredSizeWidget? bottom;
+
   const ApexAppBar({
     super.key,
     required this.title,
     this.actions = const [],
     this.leading,
+    this.bottom,
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(_kBarHeight);
+  Size get preferredSize {
+    final bottomH = bottom?.preferredSize.height ?? 0;
+    return Size.fromHeight(_kBarHeight + bottomH);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ApexStickyToolbar(
+    final toolbar = ApexStickyToolbar(
       title: title,
       actions: actions,
       leading: leading,
       height: _kBarHeight,
+    );
+    if (bottom == null) return toolbar;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [toolbar, bottom!],
     );
   }
 }

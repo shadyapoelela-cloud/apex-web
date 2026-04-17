@@ -5,6 +5,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class _TDRow {
@@ -96,10 +97,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('الضرائب المؤجّلة (IAS 12)', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
-    ),
+    appBar: ApexAppBar(title: 'الضرائب المؤجّلة (IAS 12)'),
     body: LayoutBuilder(builder: (ctx, cons) {
       final wide = cons.maxWidth > 1000;
       if (!wide) return SingleChildScrollView(padding: const EdgeInsets.all(16),

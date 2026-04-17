@@ -9,6 +9,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class OcrScreen extends StatefulWidget {
@@ -62,8 +63,7 @@ class _OcrScreenState extends State<OcrScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('استخراج بيانات الفاتورة (OCR)',
-      style: TextStyle(color: AC.gold)), backgroundColor: AC.navy2),
+    appBar: ApexAppBar(title: 'استخراج بيانات الفاتورة (OCR)'),
     body: LayoutBuilder(builder: (ctx, cons) {
       final wide = cons.maxWidth > 960;
       if (!wide) return SingleChildScrollView(padding: const EdgeInsets.all(16),

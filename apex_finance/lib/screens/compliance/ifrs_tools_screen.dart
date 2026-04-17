@@ -10,6 +10,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class IfrsToolsScreen extends StatefulWidget {
@@ -37,9 +38,8 @@ class _IfrsToolsScreenState extends State<IfrsToolsScreen>
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('أدوات IFRS', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
+    appBar: ApexAppBar(
+      title: 'أدوات IFRS',
       bottom: TabBar(
         controller: _tab,
         isScrollable: true,
