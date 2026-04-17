@@ -111,6 +111,18 @@ try:
 except Exception as e:
     logging.warning(f"AP Agent models import failed: {e}")
 
+# Self-registering model modules (tables auto-added to Base.metadata)
+for _mod in [
+    "app.core.governed_ai",
+    "app.core.webhooks",
+    "app.core.saved_views",
+    "app.services.copilot_memory",
+]:
+    try:
+        __import__(_mod)
+    except Exception as _e:
+        logging.warning(f"{_mod} models not registered: {_e}")
+
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
     from app.knowledge_brain.models.db_models import init_db as init_kb
