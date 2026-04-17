@@ -301,6 +301,21 @@ def _run_startup():
                 ("users", "locked_until", "TIMESTAMP"),
                 ("users", "failed_login_count", "INTEGER DEFAULT 0"),
                 ("user_profiles", "avatar_url", "VARCHAR(500)"),
+                # plans table drift (Render production)
+                ("plans", "currency", "VARCHAR(3) DEFAULT 'SAR'"),
+                ("plans", "target_user_ar", "VARCHAR(200)"),
+                ("plans", "target_user_en", "VARCHAR(200)"),
+                ("plans", "sort_order", "INTEGER DEFAULT 0"),
+                ("plans", "description_ar", "TEXT"),
+                ("plans", "description_en", "TEXT"),
+                # plan_features drift
+                ("plan_features", "value_type", "VARCHAR(30) DEFAULT 'count'"),
+                ("plan_features", "description_ar", "TEXT"),
+                ("plan_features", "description_en", "TEXT"),
+                # subscription_entitlements drift
+                ("subscription_entitlements", "value_type", "VARCHAR(30) DEFAULT 'count'"),
+                # user_subscriptions drift
+                ("user_subscriptions", "billing_cycle", "VARCHAR(20) DEFAULT 'monthly'"),
             ]
             _db = _SL()
             _added = 0
@@ -1172,6 +1187,18 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
             ("users",                "locked_until",  "TIMESTAMP"),
             ("users",                "failed_login_count", "INTEGER DEFAULT 0"),
             ("user_profiles",        "avatar_url",  "VARCHAR(500)"),
+            # plans + related drift
+            ("plans",                "currency", "VARCHAR(3) DEFAULT 'SAR'"),
+            ("plans",                "target_user_ar", "VARCHAR(200)"),
+            ("plans",                "target_user_en", "VARCHAR(200)"),
+            ("plans",                "sort_order", "INTEGER DEFAULT 0"),
+            ("plans",                "description_ar", "TEXT"),
+            ("plans",                "description_en", "TEXT"),
+            ("plan_features",        "value_type", "VARCHAR(30) DEFAULT 'count'"),
+            ("plan_features",        "description_ar", "TEXT"),
+            ("plan_features",        "description_en", "TEXT"),
+            ("subscription_entitlements", "value_type", "VARCHAR(30) DEFAULT 'count'"),
+            ("user_subscriptions",   "billing_cycle", "VARCHAR(20) DEFAULT 'monthly'"),
         ]
         db = SessionLocal()
         drift_added = 0
