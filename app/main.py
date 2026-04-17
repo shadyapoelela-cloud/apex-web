@@ -393,9 +393,17 @@ async def lifespan(app):
 app = FastAPI(
     title="APEX Financial Platform API",
     description="APEX Financial Analysis Platform - All 11 Phases + 6 Sprints",
-    version="11.5.0",
+    version="12.0.0",
     lifespan=lifespan,
 )
+
+# Unified error response shape ({success:false, error:{code, message_ar, ...}})
+try:
+    from app.core.error_handlers import register_error_handlers
+    register_error_handlers(app)
+    logging.info("Unified error handlers registered")
+except Exception as _e:
+    logging.error(f"Error handlers registration failed: {_e}", exc_info=True)
 _cors_env = os.environ.get("CORS_ORIGINS", "")
 _cors_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else ["*"]
 _allow_creds = "*" not in _cors_origins  # credentials forbidden with wildcard
@@ -952,9 +960,20 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
             ("approved_at", "TIMESTAMP"),
             ("classification_issues_json", "TEXT DEFAULT '[]'"),
         ]
+        # Defensive allowlist — ALL values must be simple identifiers.
+        import re
+        _IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+        _TYPE_WHITELIST = {"VARCHAR", "REAL", "INTEGER", "TEXT", "TIMESTAMP", "BOOLEAN"}
         db = SessionLocal()
         added = 0
         for _cn, _ct in _cols:
+            # Validate column name is a safe identifier
+            if not _IDENT.match(_cn):
+                continue
+            # Validate column type starts with an allowed type
+            _type_head = _ct.split(" ")[0].split("(")[0].upper()
+            if _type_head not in _TYPE_WHITELIST:
+                continue
             if _cn not in existing_cols:
                 try:
                     db.execute(_t2(f"ALTER TABLE client_chart_of_accounts ADD COLUMN {_cn} {_ct}"))
