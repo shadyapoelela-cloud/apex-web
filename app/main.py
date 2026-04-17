@@ -682,6 +682,22 @@ try:
 except Exception as _e:
     logging.warning(f"Notifications router not mounted: {_e}")
 
+# Reports download — materialises the URL generate_report tool hands out.
+try:
+    from app.core.reports_download import router as reports_dl_router
+    app.include_router(reports_dl_router)
+    logging.info("Reports download router mounted at /api/v1/reports")
+except Exception as _e:
+    logging.warning(f"Reports download router not mounted: {_e}")
+
+# System health — aggregate status of every Apex subsystem.
+try:
+    from app.core.system_health import router as system_health_router
+    app.include_router(system_health_router)
+    logging.info("System health router mounted at /api/v1/system")
+except Exception as _e:
+    logging.warning(f"System health router not mounted: {_e}")
+
 # Offline sync push/status (mounted at /api/v1/sync).
 try:
     from app.core.offline_sync import router as offline_sync_router
