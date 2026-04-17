@@ -642,6 +642,22 @@ try:
 except Exception as _e:
     logging.warning(f"Activity log router not mounted: {_e}")
 
+# Offline sync push/status (mounted at /api/v1/sync).
+try:
+    from app.core.offline_sync import router as offline_sync_router
+    app.include_router(offline_sync_router)
+    logging.info("Offline sync router mounted at /api/v1/sync")
+except Exception as _e:
+    logging.warning(f"Offline sync router not mounted: {_e}")
+
+# ZATCA end-to-end submit (mounted at /api/v1/zatca/submit-e2e + /submission).
+try:
+    from app.core.zatca_submit_e2e import router as zatca_e2e_router
+    app.include_router(zatca_e2e_router)
+    logging.info("ZATCA E2E router mounted at /api/v1/zatca")
+except Exception as _e:
+    logging.warning(f"ZATCA E2E router not mounted: {_e}")
+
 # Webhooks (Developer Platform) mounted at /api/v1/webhooks/*.
 try:
     from app.core.webhooks import router as webhooks_router
