@@ -200,17 +200,29 @@ class AuthService:
                         )
                     )
 
-            db.add(
-                UserSecurityEvent(
-                    id=gen_uuid(),
-                    user_id=user.id,
-                    event_type="registration",
-                    ip_address="",
-                    details={"method": "email"},
+            # Security event — best-effort; tolerate older schema missing columns
+            try:
+                db.add(
+                    UserSecurityEvent(
+                        id=gen_uuid(),
+                        user_id=user.id,
+                        event_type="registration",
+                        ip_address="",
+                        details={"method": "email"},
+                    )
                 )
-            )
+            except Exception:
+                logging.warning("UserSecurityEvent insert failed; continuing", exc_info=True)
 
-            db.commit()
+            try:
+                db.commit()
+            except Exception as commit_exc:
+                logging.error(f"Registration commit failed: {commit_exc}", exc_info=True)
+                db.rollback()
+                return {
+                    "success": False,
+                    "error": "تعذّر حفظ الحساب. قد تكون قاعدة البيانات بحاجة إلى تحديث. تواصل مع الدعم.",
+                }
 
             roles = [RoleCode.registered_user.value]
 
