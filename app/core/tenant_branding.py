@@ -20,7 +20,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import Boolean, Column, DateTime, Float, String
 
-from app.core.api_versioning import v1_prefix
+from app.core.api_version import v1_prefix
 from app.core.tenant_guard import TenantMixin, current_tenant
 from app.phase1.models.platform_models import Base, SessionLocal
 

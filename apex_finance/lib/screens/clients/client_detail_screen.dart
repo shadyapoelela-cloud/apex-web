@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../api_service.dart';
+import '../../core/apex_chatter_connected.dart';
 import '../../core/theme.dart';
 import '../../core/ui_components.dart';
 
@@ -884,24 +885,15 @@ class _ClientDetailScreenState extends State<ClientDetailScreen>
   // TAB 4: ACTIVITY TIMELINE
   // ════════════════════════════════════════
   Widget _buildActivityTab() {
-    final activities = [
-      ('تم اعتماد شجرة حسابات العميل', 'الجودة: 87% — جميع الحسابات معتمدة', 'قبل ساعتين', Icons.check_circle_outline, greenC),
-      ('تم رفع شهادة التسجيل الضريبي', 'المستند بانتظار المراجعة', 'قبل 4 ساعات', Icons.upload_file, blueC),
-      ('تم إنشاء ملف العميل', 'بيانات أساسية + معلومات الاتصال', 'أمس', Icons.person_add, gold),
-      ('فحص الامتثال — ناجح', 'جميع المستندات الإلزامية سارية', 'قبل يومين', Icons.shield, greenC),
-      ('تحديث بيانات الاتصال', 'تم تحديث البريد الإلكتروني ورقم الهاتف', 'قبل 3 أيام', Icons.edit, orangeC),
-    ];
-
+    // Wired to the real /api/v1/activity backend (activity_log.py). All
+    // comments + system events (status changes, emails, uploads)
+    // surface here chronologically. Replaces the previous hardcoded
+    // demo feed.
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        children: activities.map((a) => apexFeedItem(
-          title: a.$1,
-          subtitle: a.$2,
-          time: a.$3,
-          icon: a.$4,
-          accentColor: a.$5,
-        )).toList(),
+      child: ApexChatterConnected(
+        entityType: 'client',
+        entityId: '${widget.clientId}',
       ),
     );
   }

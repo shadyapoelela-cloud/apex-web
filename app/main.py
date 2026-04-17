@@ -122,6 +122,7 @@ for _mod in [
     "app.core.marketplace_enhanced",
     "app.core.offline_sync",
     "app.core.tenant_branding",
+    "app.core.activity_log",
     "app.integrations.zatca.retry_queue",
 ]:
     try:
@@ -619,6 +620,14 @@ try:
     logging.info("Tenant branding router mounted at /api/v1/tenant/branding")
 except Exception as _e:
     logging.warning(f"Tenant branding router not mounted: {_e}")
+
+# Activity log / Chatter timeline (mounted at /api/v1/activity).
+try:
+    from app.core.activity_log import router as activity_log_router
+    app.include_router(activity_log_router)
+    logging.info("Activity log router mounted at /api/v1/activity")
+except Exception as _e:
+    logging.warning(f"Activity log router not mounted: {_e}")
 
 # Webhooks (Developer Platform) mounted at /api/v1/webhooks/*.
 try:

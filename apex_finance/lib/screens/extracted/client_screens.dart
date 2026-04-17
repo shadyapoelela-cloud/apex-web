@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/apex_data_table.dart';
 import '../../core/apex_filter_bar.dart';
+import '../../core/apex_saved_views.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
 import '../../core/shared_constants.dart';
@@ -116,6 +117,30 @@ class _ClientListS extends State<ClientListScreen> {
                 _applyFilter();
               });
             },
+          ),
+          // 3. Saved Views bar — users persist filter presets to the
+          // backend (/api/v1/saved-views) and restore with one click.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: ApexSavedViewsBar(
+              screen: 'clients',
+              currentPayload: {
+                'search': _filter.searchText,
+                'chips': _filter.activeChipKeys.toList(),
+              },
+              onApply: (view) {
+                final p = view.payload;
+                setState(() {
+                  _filter = ApexFilterState(
+                    searchText: (p['search'] as String?) ?? '',
+                    activeChipKeys: {
+                      ...((p['chips'] as List?)?.cast<String>() ?? const []),
+                    },
+                  );
+                  _applyFilter();
+                });
+              },
+            ),
           ),
           // 3. Apex Data Table (or Shimmer while loading)
           Expanded(
