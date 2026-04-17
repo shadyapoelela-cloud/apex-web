@@ -34,8 +34,15 @@ class ApexWhatsNewHub extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
                   _group(context, 'الواجهة المشتركة (Apex Layer)', [
                     _Item(
+                      icon: Icons.auto_awesome_motion,
+                      title: 'Sprint 37-38 — تجربة محسَّنة (جديد)',
+                      subtitle: 'مبدّل تطبيقات + معاينة يمنى + شريط سياقي',
+                      route: '/sprint37-experience',
+                      status: _Status.done,
+                    ),
+                    _Item(
                       icon: Icons.bolt,
-                      title: 'Sprint 35-36 — الأساس (جديد)',
+                      title: 'Sprint 35-36 — الأساس',
                       subtitle: 'تحرير مضمّن + Alt+1..9 + تحقق لحظي',
                       route: '/sprint35-foundation',
                       status: _Status.done,
