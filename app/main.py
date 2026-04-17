@@ -764,6 +764,15 @@ try:
 except Exception as e:
     logging.error(f"Cash flow statement routes not mounted: {e}", exc_info=True)
 
+# ── Withholding Tax (WHT) KSA
+try:
+    from app.core.wht_routes import router as wht_router
+
+    app.include_router(wht_router)
+    logging.info("WHT routes mounted (compute / batch / categories / rates)")
+except Exception as e:
+    logging.error(f"WHT routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
