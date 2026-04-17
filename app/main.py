@@ -737,6 +737,15 @@ try:
 except Exception as e:
     logging.error(f"Ledger routes not mounted: {e}", exc_info=True)
 
+# ── Cost Accounting / Variance Analysis
+try:
+    from app.core.cost_accounting_routes import router as cost_router
+
+    app.include_router(cost_router)
+    logging.info("Cost accounting routes mounted (variance: material/labour/overhead/comprehensive)")
+except Exception as e:
+    logging.error(f"Cost accounting routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
