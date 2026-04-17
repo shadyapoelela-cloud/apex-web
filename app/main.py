@@ -674,6 +674,14 @@ try:
 except Exception as _e:
     logging.warning(f"Activity log router not mounted: {_e}")
 
+# Notifications list API — bootstraps the bell with history on mount.
+try:
+    from app.core.notifications_api import router as notifications_router
+    app.include_router(notifications_router)
+    logging.info("Notifications router mounted at /api/v1/notifications")
+except Exception as _e:
+    logging.warning(f"Notifications router not mounted: {_e}")
+
 # Offline sync push/status (mounted at /api/v1/sync).
 try:
     from app.core.offline_sync import router as offline_sync_router

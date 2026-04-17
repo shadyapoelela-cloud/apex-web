@@ -10,10 +10,15 @@
 /// ```
 library;
 
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+import 'api_config.dart';
 import 'apex_notification_bell.dart';
 import 'apex_ws_client.dart';
+import 'session.dart';
 
 class ApexNotificationBellLive extends StatefulWidget {
   /// If null, we fall back to `S.uid` at build time. Passing it in
@@ -49,6 +54,46 @@ class _ApexNotificationBellLiveState extends State<ApexNotificationBellLive> {
     if (uid != null && uid.isNotEmpty) {
       _sub = ApexWsClient.instance.subscribe('user:$uid');
       _sub!.events.listen(_onEvent);
+    }
+    // Bootstrap the bell with recent history on mount so the user
+    // sees accumulated events instead of an empty list until the
+    // next live push arrives.
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    try {
+      final uri = Uri.parse('$apiBase/api/v1/notifications?limit=30'
+          '${widget.userId != null ? "&user_id=${widget.userId}" : ""}');
+      final t = S.token;
+      final res = await http.get(uri, headers: {
+        if (t != null && t.isNotEmpty) 'Authorization': 'Bearer $t',
+      });
+      if (res.statusCode != 200 || !mounted) return;
+      final body = jsonDecode(res.body) as Map<String, dynamic>;
+      final data = (body['data'] as List).cast<Map<String, dynamic>>();
+      final loaded = <ApexNotification>[];
+      for (final row in data) {
+        loaded.add(ApexNotification(
+          id: row['id'] as String,
+          title: row['title'] as String? ?? 'نشاط',
+          body: row['body'] as String? ?? '',
+          timestamp: DateTime.tryParse(row['timestamp'] as String? ?? '') ??
+              DateTime.now(),
+          severity: row['severity'] as String? ?? 'info',
+        ));
+      }
+      // Merge with any live events that arrived during the HTTP call.
+      setState(() {
+        final existingIds = _items.map((n) => n.id).toSet();
+        _items = [
+          ..._items,
+          ...loaded.where((n) => !existingIds.contains(n.id)),
+        ];
+        _items.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      });
+    } catch (_) {
+      // Non-fatal — the bell still works via WS alone. Silent failure.
     }
   }
 
