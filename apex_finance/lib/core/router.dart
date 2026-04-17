@@ -77,6 +77,7 @@ import '../screens/compliance/deferred_tax_screen.dart';
 import '../screens/compliance/lease_screen.dart';
 import '../screens/compliance/ifrs_tools_screen.dart';
 import '../screens/compliance/fixed_assets_screen.dart';
+import '../screens/compliance/transfer_pricing_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -250,6 +251,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/fixed-assets',
       pageBuilder: (c, s) => _apexPage(const FixedAssetsScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/transfer-pricing',
+      pageBuilder: (c, s) => _apexPage(const TransferPricingScreen(), s),
     ),
 
     // Account

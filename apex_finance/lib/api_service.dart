@@ -438,6 +438,10 @@ class ApiService {
   static Future<ApiResult> fixedAssetBuild(Map body) => _post('/fa/build', body);
   static Future<ApiResult> fixedAssetMethods() => _get('/fa/methods');
 
+  // ── Transfer Pricing ──
+  static Future<ApiResult> tpAnalyse(Map body) => _post('/tp/analyse', body);
+  static Future<ApiResult> tpMethods() => _get('/tp/methods');
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {

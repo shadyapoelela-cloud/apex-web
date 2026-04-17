@@ -167,6 +167,7 @@ class _ComplianceHealthWidgetState extends State<ComplianceHealthWidget> {
       ('/compliance/lease',          Icons.timeline,     'Lease',           AC.ok),
       ('/compliance/ifrs-tools',     Icons.style,        'IFRS',            AC.purple),
       ('/compliance/fixed-assets',   Icons.inventory,    'FA',              AC.info),
+      ('/compliance/transfer-pricing', Icons.compare,    'TP',              AC.warn),
     ];
 
     return Wrap(

@@ -306,6 +306,13 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.info,
                     onTap: () => context.go('/compliance/fixed-assets'),
                   ),
+                  _toolCard(
+                    icon: Icons.compare,
+                    title: 'تسعير التحويل',
+                    subtitle: 'BEPS 13 · KSA TP · CbCR',
+                    color: AC.warn,
+                    onTap: () => context.go('/compliance/transfer-pricing'),
+                  ),
                 ],
               );
             }),
