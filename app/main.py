@@ -285,6 +285,44 @@ def _run_startup():
             seed1()
         except Exception:
             logging.error("Phase 1 startup error", exc_info=True)
+
+        # ── Schema-drift auto-repair on startup ──
+        try:
+            import re
+            from app.phase1.models.platform_models import SessionLocal as _SL
+            from sqlalchemy import text as _t
+            _IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+            _TYPE_WHITELIST = {"VARCHAR", "REAL", "INTEGER", "TEXT", "TIMESTAMP",
+                               "BOOLEAN", "JSON", "JSONB", "NUMERIC", "DATE"}
+            _DRIFT_FIXES = [
+                ("user_security_events", "details", "JSON"),
+                ("user_security_events", "user_agent", "VARCHAR(500)"),
+                ("users", "last_login_at", "TIMESTAMP"),
+                ("users", "locked_until", "TIMESTAMP"),
+                ("users", "failed_login_count", "INTEGER DEFAULT 0"),
+                ("user_profiles", "avatar_url", "VARCHAR(500)"),
+            ]
+            _db = _SL()
+            _added = 0
+            for _tbl, _cn, _ct in _DRIFT_FIXES:
+                if not _IDENT.match(_tbl) or not _IDENT.match(_cn):
+                    continue
+                _th = _ct.split(" ")[0].split("(")[0].upper()
+                if _th not in _TYPE_WHITELIST:
+                    continue
+                try:
+                    _db.execute(_t(
+                        f"ALTER TABLE {_tbl} ADD COLUMN IF NOT EXISTS {_cn} {_ct}"
+                    ))
+                    _db.commit()
+                    _added += 1
+                except Exception:
+                    _db.rollback()
+            _db.close()
+            if _added > 0:
+                logging.info(f"Schema drift auto-repair: {_added} columns ensured")
+        except Exception as _sdr:
+            logging.warning(f"Schema drift repair skipped: {_sdr}")
     if P2:
         try:
             seed_client_types()
