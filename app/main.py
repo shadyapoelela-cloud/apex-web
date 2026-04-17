@@ -986,6 +986,43 @@ def reinit_db(secret: str = Query(None), x_admin_secret: str = Header(None, alia
     except Exception as _e2:
         results["s2_cols"] = "error"
 
+    # ── Schema drift repair: add missing columns on platform tables ──
+    try:
+        import re
+        _IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+        _TYPE_WHITELIST = {"VARCHAR", "REAL", "INTEGER", "TEXT", "TIMESTAMP",
+                           "BOOLEAN", "JSON", "JSONB", "NUMERIC", "DATE"}
+        # Known columns that may be missing on older Render schemas
+        _DRIFT_FIXES = [
+            ("user_security_events", "details",   "JSON"),
+            ("user_security_events", "user_agent", "VARCHAR(500)"),
+            ("users",                "last_login_at", "TIMESTAMP"),
+            ("users",                "locked_until",  "TIMESTAMP"),
+            ("users",                "failed_login_count", "INTEGER DEFAULT 0"),
+            ("user_profiles",        "avatar_url",  "VARCHAR(500)"),
+        ]
+        db = SessionLocal()
+        drift_added = 0
+        for _tbl, _cn, _ct in _DRIFT_FIXES:
+            if not _IDENT.match(_tbl) or not _IDENT.match(_cn):
+                continue
+            _type_head = _ct.split(" ")[0].split("(")[0].upper()
+            if _type_head not in _TYPE_WHITELIST:
+                continue
+            try:
+                # PostgreSQL supports "ADD COLUMN IF NOT EXISTS"
+                db.execute(_t2(
+                    f"ALTER TABLE {_tbl} ADD COLUMN IF NOT EXISTS {_cn} {_ct}"
+                ))
+                db.commit()
+                drift_added += 1
+            except Exception:
+                db.rollback()
+        db.close()
+        results["schema_drift"] = f"OK - {drift_added} columns ensured"
+    except Exception as _e3:
+        results["schema_drift"] = f"error: {type(_e3).__name__}"
+
     # Sprint 3 tables
     try:
         from app.sprint3.models.sprint3_models import init_sprint3_db
