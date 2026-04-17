@@ -200,7 +200,9 @@ class AuthService:
                         )
                     )
 
-            # Security event — best-effort; tolerate older schema missing columns
+            # Security event — best-effort; tolerate older schema missing
+            # columns or column types by trying with `details` first and
+            # falling back to the minimal field set.
             try:
                 db.add(
                     UserSecurityEvent(
@@ -211,18 +213,37 @@ class AuthService:
                         details={"method": "email"},
                     )
                 )
-            except Exception:
-                logging.warning("UserSecurityEvent insert failed; continuing", exc_info=True)
-
-            try:
                 db.commit()
-            except Exception as commit_exc:
-                logging.error(f"Registration commit failed: {commit_exc}", exc_info=True)
+            except Exception as e1:
+                logging.warning(f"Security event full insert failed: {e1}")
                 db.rollback()
-                return {
-                    "success": False,
-                    "error": "تعذّر حفظ الحساب. قد تكون قاعدة البيانات بحاجة إلى تحديث. تواصل مع الدعم.",
-                }
+                # Retry WITHOUT details column (schema drift tolerance)
+                try:
+                    # Re-add User + dependents since rollback cleared them
+                    # (this path only triggers on schema drift on old Render DBs)
+                    existing = db.query(User).filter(User.id == user.id).first()
+                    if not existing:
+                        db.add(user)
+                        db.add(UserProfile(id=gen_uuid(), user_id=user.id))
+                        role = db.query(Role).filter(Role.code == RoleCode.registered_user.value).first()
+                        if role:
+                            db.add(UserRole(id=gen_uuid(), user_id=user.id, role_id=role.id))
+                    db.add(
+                        UserSecurityEvent(
+                            id=gen_uuid(),
+                            user_id=user.id,
+                            event_type="registration",
+                            ip_address="",
+                        )
+                    )
+                    db.commit()
+                except Exception as e2:
+                    logging.error(f"Registration retry failed: {e2}", exc_info=True)
+                    db.rollback()
+                    return {
+                        "success": False,
+                        "error": "تعذّر حفظ الحساب. قد تحتاج قاعدة البيانات إلى تحديث الـ schema. تواصل مع الدعم.",
+                    }
 
             roles = [RoleCode.registered_user.value]
 
