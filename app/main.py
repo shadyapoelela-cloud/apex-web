@@ -884,6 +884,30 @@ except Exception as e:
     logging.error(f"Extras routes not mounted: {e}", exc_info=True)
 
 
+@app.get("/_debug/register_trace", tags=["Debug"])
+def debug_register_trace():
+    """Temporary diagnostic endpoint to reveal actual register exception.
+    Will be removed once schema drift is resolved."""
+    import traceback
+    from app.phase1.services import auth_service as _auth
+    import random
+    rnd = random.randint(100000, 999999)
+    try:
+        result = _auth.auth_service.register(
+            username=f"dbg_{rnd}",
+            email=f"dbg{rnd}@debug.test",
+            password="ApexDbg@2026",
+            display_name="Debug User",
+        )
+        return {"result": result, "note": "register returned normally"}
+    except Exception as e:
+        return {
+            "exception_type": type(e).__name__,
+            "exception_message": str(e),
+            "traceback": traceback.format_exc(),
+        }
+
+
 @app.get("/")
 def root():
     phases = [P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8, HAS_P9, HAS_P10, HAS_P11]
