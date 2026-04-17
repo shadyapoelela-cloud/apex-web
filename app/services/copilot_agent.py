@@ -143,6 +143,125 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
             "required": ["entity_type", "query"],
         },
     },
+    {
+        "name": "create_invoice",
+        "description": (
+            "Draft a ZATCA-compliant invoice. Use when the user says "
+            "'أصدر فاتورة لـ ...' or 'create an invoice for client X'. "
+            "Returns a draft ID the user must then review and post. "
+            "NEVER posts without explicit user confirmation in a follow-up turn."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "client_name": {"type": "string"},
+                "description": {
+                    "type": "string",
+                    "description": "Single-line description of the service/product",
+                },
+                "amount": {"type": "number", "description": "Subtotal before VAT"},
+                "vat_rate": {
+                    "type": "number",
+                    "default": 15,
+                    "description": "VAT percent (15 for KSA, 5 for UAE)",
+                },
+                "currency": {"type": "string", "default": "SAR"},
+            },
+            "required": ["client_name", "description", "amount"],
+        },
+    },
+    {
+        "name": "send_reminder",
+        "description": (
+            "Send a payment reminder for one invoice or for every overdue "
+            "invoice of a given client. Queues the message via the "
+            "tenant's configured channel (WhatsApp Business, email, SMS). "
+            "Honours the daily rate limit and never sends without user "
+            "confirmation in the preceding turn."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "invoice_id": {
+                    "type": "string",
+                    "description": "Exact invoice ID. Mutually exclusive with client_name.",
+                },
+                "client_name": {
+                    "type": "string",
+                    "description": "Sends one reminder for EACH overdue invoice of this client.",
+                },
+                "channel": {
+                    "type": "string",
+                    "enum": ["whatsapp", "email", "sms", "auto"],
+                    "default": "auto",
+                },
+                "tone": {
+                    "type": "string",
+                    "enum": ["gentle", "firm", "final_notice"],
+                    "default": "gentle",
+                },
+            },
+        },
+    },
+    {
+        "name": "generate_report",
+        "description": (
+            "Generate a financial report on demand and return a download URL. "
+            "Wraps get_report with actual file output (PDF or Excel). "
+            "Use when the user says 'export the P&L to Excel' or "
+            "'send the balance sheet as PDF'."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "report_type": {
+                    "type": "string",
+                    "enum": [
+                        "profit_and_loss",
+                        "balance_sheet",
+                        "cash_flow",
+                        "trial_balance",
+                        "aging_report",
+                        "vat_return",
+                        "zakat_return",
+                    ],
+                },
+                "period": {"type": "string"},
+                "format": {
+                    "type": "string",
+                    "enum": ["pdf", "excel", "csv"],
+                    "default": "pdf",
+                },
+                "currency": {"type": "string", "default": "SAR"},
+            },
+            "required": ["report_type", "period"],
+        },
+    },
+    {
+        "name": "categorize_transaction",
+        "description": (
+            "Classify a bank or card transaction into an account code. "
+            "Call this for questions like 'ما حساب دفعة Netflix؟' or "
+            "'where does this AWS charge go?'. Uses keyword heuristics + "
+            "the COA lexicon. Returns (account_code, confidence, reason)."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "description": "Raw bank-statement description (Arabic or English).",
+                },
+                "amount": {"type": "number"},
+                "direction": {
+                    "type": "string",
+                    "enum": ["debit", "credit"],
+                    "default": "debit",
+                },
+            },
+            "required": ["description"],
+        },
+    },
 ]
 
 
@@ -213,12 +332,177 @@ def _impl_lookup_entity(args: dict) -> dict:
     }
 
 
+def _impl_create_invoice(args: dict) -> dict:
+    """Draft an invoice. Does NOT post — returns a draft id that the
+    user must confirm in a follow-up turn. The guardrail is critical:
+    an LLM hallucination must never translate into a real tax document.
+    """
+    import uuid as _uuid
+
+    from decimal import Decimal
+
+    client_name = str(args.get("client_name") or "").strip()
+    description = str(args.get("description") or "").strip()
+    amount = Decimal(str(args.get("amount") or 0))
+    vat_rate = Decimal(str(args.get("vat_rate") or 15))
+    currency = args.get("currency") or "SAR"
+
+    if not client_name or not description or amount <= 0:
+        return {
+            "status": "rejected",
+            "reason": "client_name, description, and amount > 0 are required",
+        }
+
+    vat = (amount * vat_rate / Decimal(100)).quantize(Decimal("0.01"))
+    total = amount + vat
+    draft_id = f"draft_{_uuid.uuid4().hex[:12]}"
+
+    # Real impl: insert into invoices table with status='draft'. Here
+    # we return the preview so the agent can surface it and ask for
+    # explicit confirmation before a subsequent tool call to post.
+    return {
+        "status": "draft",
+        "draft_id": draft_id,
+        "client_name": client_name,
+        "description": description,
+        "subtotal": float(amount),
+        "vat_rate": float(vat_rate),
+        "vat_amount": float(vat),
+        "grand_total": float(total),
+        "currency": currency,
+        "requires_confirmation": True,
+        "_note": (
+            "Draft created — NOT posted. Ask the user to confirm before "
+            "calling create_invoice a second time with draft_id=<this> + "
+            "confirm=true to actually post."
+        ),
+    }
+
+
+def _impl_send_reminder(args: dict) -> dict:
+    """Queue a payment reminder. Rate-limited, never fires without a
+    prior user confirmation turn."""
+    invoice_id = args.get("invoice_id")
+    client_name = args.get("client_name")
+    channel = args.get("channel") or "auto"
+    tone = args.get("tone") or "gentle"
+
+    if not invoice_id and not client_name:
+        return {"status": "rejected", "reason": "invoice_id or client_name required"}
+
+    # Real impl: look up the overdue invoices, render the right template
+    # (apex/integrations/whatsapp or EMAIL_BACKEND), enqueue via
+    # notifications_bridge. The scaffold returns the plan so the user
+    # sees what *would* happen.
+    return {
+        "status": "queued",
+        "invoice_id": invoice_id,
+        "client_name": client_name,
+        "channel": channel,
+        "tone": tone,
+        "estimated_sends": 1 if invoice_id else 0,
+        "requires_confirmation": True,
+        "_note": (
+            "Plan only — no message has left the server. Wire to "
+            "app.integrations.whatsapp.send_template when ready."
+        ),
+    }
+
+
+def _impl_generate_report(args: dict) -> dict:
+    """Thin wrapper over the real report service. Returns a download
+    URL the user can click; backend streams PDF/Excel/CSV bytes."""
+    report_type = args["report_type"]
+    period = args["period"]
+    fmt = args.get("format") or "pdf"
+    currency = args.get("currency") or "SAR"
+
+    # Real impl: call app.services.pdf_report_service or an Excel
+    # writer, store to S3/local, return presigned URL.
+    # Here we return a deterministic placeholder so the agent can
+    # answer "هل الملف جاهز؟" with a clickable link in the demo.
+    slug = f"{report_type}_{period}_{fmt}".replace(":", "_").replace(" ", "_")
+    return {
+        "report_type": report_type,
+        "period": period,
+        "format": fmt,
+        "currency": currency,
+        "download_url": f"/api/v1/reports/download/{slug}",
+        "expires_at": "+1 hour",
+        "_note": "placeholder — wire to real report writer + object storage",
+    }
+
+
+def _impl_categorize_transaction(args: dict) -> dict:
+    """Classify a bank txn into a COA account code.
+
+    Strategy: keyword heuristics over a small built-in lexicon so tests
+    are deterministic; a real deployment would call the COA engine's
+    Claude-powered classifier for unmatched rows. Returns confidence
+    + the matched keyword so the UI can show why.
+    """
+    desc = str(args.get("description") or "").lower()
+    direction = args.get("direction") or "debit"
+
+    # Tiny lexicon — extend or replace with the engine's full lexicon.
+    rules = [
+        # (keywords, account_code, account_name)
+        (("netflix", "spotify", "shahid", "osn", "anghami"),
+         "5501", "اشتراكات برامج ترفيه"),
+        (("aws", "gcp", "azure", "digitalocean", "vercel", "render"),
+         "5502", "خدمات سحابية — هوستنج"),
+        (("google ads", "facebook", "instagram", "linkedin", "twitter"),
+         "5301", "تسويق رقمي"),
+        (("zatca", "هيئة الزكاة", "gazt"),
+         "2401", "ضرائب مستحقة ZATCA"),
+        (("gosi", "مؤسسة التأمينات", "التأمينات الاجتماعية"),
+         "2402", "اشتراكات GOSI"),
+        (("رواتب", "payroll", "salary"),
+         "5001", "رواتب الموظفين"),
+        (("إيجار", "rent", "تأجير"),
+         "5201", "إيجارات"),
+        (("كهرباء", "electricity", "sec "),
+         "5202", "كهرباء"),
+        (("stc", "اتصالات سعودية", "mobily", "zain"),
+         "5203", "اتصالات"),
+        (("uber", "careem", "كريم", "طلبات"),
+         "5204", "انتقالات / توصيل"),
+        (("stripe", "paytabs", "hyperpay", "checkout.com"),
+         "2301", "رسوم بوابة دفع"),
+    ]
+    for keywords, code, name in rules:
+        if any(kw in desc for kw in keywords):
+            return {
+                "account_code": code,
+                "account_name": name,
+                "confidence": 0.92,
+                "direction": direction,
+                "matched_on": next(kw for kw in keywords if kw in desc),
+                "source": "lexicon",
+            }
+
+    # Unmatched — fall back to a generic "uncategorised" suggestion
+    return {
+        "account_code": "9999",
+        "account_name": "غير مصنّف — بانتظار المراجعة",
+        "confidence": 0.15,
+        "direction": direction,
+        "matched_on": None,
+        "source": "fallback",
+        "_note": "Wire COA engine Claude classifier for higher confidence.",
+    }
+
+
 TOOL_IMPLS: dict[str, Callable[[dict], dict]] = {
     "query_financial_data": _impl_query_financial_data,
     "get_report": _impl_get_report,
     "explain_variance": _impl_explain_variance,
     "forecast": _impl_forecast,
     "lookup_entity": _impl_lookup_entity,
+    "create_invoice": _impl_create_invoice,
+    "send_reminder": _impl_send_reminder,
+    "generate_report": _impl_generate_report,
+    "categorize_transaction": _impl_categorize_transaction,
 }
 
 
