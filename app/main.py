@@ -360,29 +360,11 @@ def _run_startup():
         logging.error("Compliance core init error", exc_info=True)
 
 
-def _validate_env():
-    """Validate critical environment variables at startup."""
-    env = os.environ.get("ENVIRONMENT", "development")
-    jwt = os.environ.get("JWT_SECRET", "")
-    admin = os.environ.get("ADMIN_SECRET", "")
-    db_url = os.environ.get("DATABASE_URL", "")
-
-    if env == "production":
-        missing = []
-        if not jwt or jwt == "apex-dev-secret-CHANGE-IN-PRODUCTION":
-            missing.append("JWT_SECRET")
-        if not admin or admin == "apex-admin-2026":
-            missing.append("ADMIN_SECRET")
-        if not db_url:
-            missing.append("DATABASE_URL")
-        if missing:
-            raise RuntimeError(f"PRODUCTION: Missing/default env vars: {', '.join(missing)}")
-    else:
-        if not jwt or jwt == "apex-dev-secret-CHANGE-IN-PRODUCTION":
-            logging.warning("⚠ JWT_SECRET using default — set in production!")
-        if not admin or admin == "apex-admin-2026":
-            logging.warning("⚠ ADMIN_SECRET using default — set in production!")
-
+# Environment validation lives in app/core/env_validator.py. It is the
+# single source of truth for startup checks. run_and_log() logs every
+# warning and raises on any error — production refuses to boot with
+# missing/default critical vars.
+from app.core.env_validator import run_and_log as _validate_env
 
 _validate_env()
 
