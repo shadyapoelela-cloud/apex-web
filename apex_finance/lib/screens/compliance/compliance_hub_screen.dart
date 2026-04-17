@@ -229,6 +229,20 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     color: AC.info,
                     onTap: () => context.go('/compliance/valuation'),
                   ),
+                  _toolCard(
+                    icon: Icons.edit_note,
+                    title: 'بنّاء القيود',
+                    subtitle: 'قيود متوازنة + 10 قوالب',
+                    color: AC.purple,
+                    onTap: () => context.go('/compliance/journal-entry-builder'),
+                  ),
+                  _toolCard(
+                    icon: Icons.swap_horiz,
+                    title: 'محوّل العملات',
+                    subtitle: 'FX + IAS 21 revaluation',
+                    color: AC.gold,
+                    onTap: () => context.go('/compliance/fx-converter'),
+                  ),
                 ],
               );
             }),

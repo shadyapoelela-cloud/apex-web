@@ -66,6 +66,8 @@ import '../screens/compliance/executive_dashboard_screen.dart';
 import '../screens/compliance/ocr_screen.dart';
 import '../screens/compliance/dscr_screen.dart';
 import '../screens/compliance/valuation_screen.dart';
+import '../screens/compliance/journal_entry_builder_screen.dart';
+import '../screens/compliance/fx_converter_screen.dart';
 import 'package:file_picker/file_picker.dart';
 
 final authRefresh = ValueNotifier<int>(0);
@@ -195,6 +197,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/compliance/valuation',
       pageBuilder: (c, s) => _apexPage(const ValuationScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/journal-entry-builder',
+      pageBuilder: (c, s) => _apexPage(const JournalEntryBuilderScreen(), s),
+    ),
+    GoRoute(
+      path: '/compliance/fx-converter',
+      pageBuilder: (c, s) => _apexPage(const FxConverterScreen(), s),
     ),
 
     // Account

@@ -372,6 +372,17 @@ class ApiService {
   static Future<ApiResult> waccCompute(Map body) => _post('/wacc/compute', body);
   static Future<ApiResult> dcfAnalyze(Map body) => _post('/dcf/analyze', body);
 
+  // ── Journal Entry Builder ──
+  static Future<ApiResult> jeBuild(Map body) => _post('/je/build', body);
+  static Future<ApiResult> jeTemplates() => _get('/je/templates');
+  static Future<ApiResult> jeGetTemplate(String code) => _get('/je/templates/$code');
+
+  // ── Multi-currency FX ──
+  static Future<ApiResult> fxConvert(Map body) => _post('/fx/convert', body);
+  static Future<ApiResult> fxBatch(Map body) => _post('/fx/batch', body);
+  static Future<ApiResult> fxRevalue(Map body) => _post('/fx/revalue', body);
+  static Future<ApiResult> fxCurrencies() => _get('/fx/currencies');
+
   // ── Quick Analysis (MultipartRequest) ──
   static Future<ApiResult> analyzeQuick({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
