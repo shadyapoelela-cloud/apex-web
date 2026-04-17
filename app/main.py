@@ -119,6 +119,7 @@ for _mod in [
     "app.services.copilot_memory",
     "app.core.dimensional_accounting",
     "app.core.consolidation_intercompany",
+    "app.core.marketplace_enhanced",
 ]:
     try:
         __import__(_mod)

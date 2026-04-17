@@ -155,25 +155,41 @@ class AuditLogEntry(AuditBase):
 
 _engine = None
 _Session = None
+import threading as _audit_threading
+_init_lock = _audit_threading.Lock()
 
 
 def _get_session_factory():
-    """Lazy-initialize the audit DB engine. Falls back to main DB if no
-    AUDIT_DATABASE_URL is set."""
+    """Lazy-initialize the audit DB engine. Thread-safe — the background
+    executor that persists audit rows can call this concurrently with
+    the main thread."""
     global _engine, _Session
     if _Session is not None:
         return _Session
 
-    url = AUDIT_DB_URL
-    if not url:
-        # Fall back to main DB — same connection string as everything else.
-        url = os.environ.get("DATABASE_URL", "sqlite:///apex.db")
+    with _init_lock:
+        if _Session is not None:
+            return _Session
 
-    connect_args = {"check_same_thread": False} if url.startswith("sqlite") else {}
-    _engine = create_engine(url, connect_args=connect_args, future=True)
-    AuditBase.metadata.create_all(_engine)  # idempotent
-    _Session = sessionmaker(bind=_engine, expire_on_commit=False, future=True)
-    return _Session
+        url = AUDIT_DB_URL
+        if not url:
+            url = os.environ.get("DATABASE_URL", "sqlite:///apex.db")
+
+        connect_args = {"check_same_thread": False} if url.startswith("sqlite") else {}
+        _engine = create_engine(url, connect_args=connect_args, future=True)
+
+        # create_all has checkfirst=True by default but under concurrent
+        # initialization the check→create window can race. Catch the
+        # "already exists" race and move on — schema is already good.
+        try:
+            AuditBase.metadata.create_all(_engine)
+        except Exception as e:
+            if "already exists" not in str(e).lower():
+                raise
+            logger.info("audit_log table already exists — skipping create")
+
+        _Session = sessionmaker(bind=_engine, expire_on_commit=False, future=True)
+        return _Session
 
 
 def _persist(entry_dict: dict) -> None:
@@ -199,19 +215,35 @@ def _client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-def _user_id_from_auth(request: Request) -> Optional[str]:
-    """Peek at the JWT sub without verifying signature — the auth layer
-    verifies later. For audit we only need the claim."""
+def _jwt_claims(request: Request) -> dict:
+    """Peek at JWT claims without verifying signature — the auth layer
+    verifies later. Returns {} on any failure. We decode ONCE here rather
+    than twice (user_id + tenant_id) so requests pay a single cost."""
     auth = request.headers.get("authorization", "")
     if not auth.lower().startswith("bearer "):
-        return None
+        return {}
     try:
         import jwt
 
-        claims = jwt.decode(auth[7:].strip(), options={"verify_signature": False})
-        return str(claims.get("sub") or claims.get("user_id") or "") or None
+        return jwt.decode(auth[7:].strip(), options={"verify_signature": False}) or {}
     except Exception:
-        return None
+        return {}
+
+
+def _user_id_from_auth(request: Request) -> Optional[str]:
+    claims = _jwt_claims(request)
+    v = claims.get("sub") or claims.get("user_id")
+    return str(v) if v else None
+
+
+def _tenant_id_from_auth(request: Request) -> Optional[str]:
+    """Critical: read tenant_id DIRECTLY from the JWT here, not via
+    current_tenant(). Because AuditLogMiddleware sits OUTSIDE
+    TenantContextMiddleware in the stack, the ContextVar has already been
+    reset by the time we're writing the audit entry post-response."""
+    claims = _jwt_claims(request)
+    v = claims.get("tenant_id") or claims.get("tid")
+    return str(v) if v else None
 
 
 def _should_audit(request: Request) -> bool:
@@ -258,7 +290,13 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
             "id": str(uuid.uuid4()),
             "timestamp": datetime.now(timezone.utc),
             "user_id": _user_id_from_auth(request),
-            "tenant_id": current_tenant(),
+            # Read tenant from JWT here — current_tenant() has been reset
+            # by the inner TenantContextMiddleware's finally block by the
+            # time we reach this code. Fall back to ContextVar + header
+            # so JWT-less flows (admin / system) still get a value if set.
+            "tenant_id": _tenant_id_from_auth(request)
+                or current_tenant()
+                or request.headers.get("X-Tenant-Id"),
             "ip_address": _client_ip(request),
             "user_agent": (request.headers.get("user-agent") or "")[:500],
             "method": request.method,

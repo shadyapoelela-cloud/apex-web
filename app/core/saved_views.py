@@ -116,6 +116,16 @@ def list_saved_views(screen: str, user_id: Optional[str] = None):
 def create_saved_view(payload: SavedViewIn, user_id: Optional[str] = None):
     db = SessionLocal()
     try:
+        # App-layer duplicate guard — SQLite treats NULL as distinct in
+        # UNIQUE, so the composite constraint on (tenant_id,user_id,
+        # screen,name) misfires when either nullable column is NULL.
+        existing = db.query(SavedView).filter(
+            SavedView.screen == payload.screen,
+            SavedView.name == payload.name,
+            SavedView.user_id == user_id,
+        ).first()
+        if existing is not None:
+            raise HTTPException(status_code=409, detail="A view with this name already exists")
         view = SavedView(
             id=str(uuid.uuid4()),
             user_id=user_id,

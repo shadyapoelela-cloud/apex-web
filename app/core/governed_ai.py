@@ -227,16 +227,26 @@ def undo_action(action_id: str, user_id: str, max_age_days: int = 30) -> dict:
                 "error": f"reverse_callback_unknown: {entry.reverse_callback_name}",
             }
         args = json.loads(entry.reverse_args_json) if entry.reverse_args_json else {}
+        # Transaction contract for reverse callbacks:
+        #   fn(args, db) MUST NOT commit — it adds/mutates the session
+        #   then returns. We commit (reverse + undo-mark together) so a
+        #   failure at either step leaves the DB unchanged.
         try:
             result = fn(args, db)
         except Exception as e:
+            db.rollback()
             logger.error("Reverse callback failed: %s", e, exc_info=True)
             return {"success": False, "error": f"reverse_failed: {e}"}
 
         entry.undone = True
         entry.undone_at = datetime.now(timezone.utc)
         entry.undone_by_user_id = user_id
-        db.commit()
+        try:
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            logger.error("Undo commit failed: %s", e, exc_info=True)
+            return {"success": False, "error": f"commit_failed: {e}"}
         return {"success": True, "data": {"id": action_id, "reverse_result": result}}
     finally:
         db.close()
