@@ -889,11 +889,12 @@ def debug_register_trace():
     """Temporary diagnostic endpoint to reveal actual register exception.
     Will be removed once schema drift is resolved."""
     import traceback
-    from app.phase1.services import auth_service as _auth
+    from app.phase1.services.auth_service import AuthService
     import random
     rnd = random.randint(100000, 999999)
+    _svc = AuthService()
     try:
-        result = _auth.auth_service.register(
+        result = _svc.register(
             username=f"dbg_{rnd}",
             email=f"dbg{rnd}@debug.test",
             password="ApexDbg@2026",
