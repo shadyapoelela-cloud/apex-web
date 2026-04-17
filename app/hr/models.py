@@ -30,6 +30,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
+from app.core.tenant_guard import TenantMixin
 from app.phase1.models.platform_models import Base
 
 
@@ -44,7 +45,7 @@ def _utcnow() -> datetime:
 # ── Employee ─────────────────────────────────────────────────
 
 
-class Employee(Base):
+class Employee(Base, TenantMixin):
     """Full employee record.
 
     Covers the minimum needed for Saudi & UAE payroll + GOSI + WPS:
@@ -59,7 +60,6 @@ class Employee(Base):
     )
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    tenant_id = Column(String(36), index=True, nullable=True)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
 
     employee_number = Column(String(32), nullable=False, index=True)
@@ -121,13 +121,12 @@ class Employee(Base):
 # ── Leave ────────────────────────────────────────────────────
 
 
-class LeaveRequest(Base):
+class LeaveRequest(Base, TenantMixin):
     """A single leave request with approval workflow."""
 
     __tablename__ = "hr_leave_requests"
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    tenant_id = Column(String(36), index=True, nullable=True)
     employee_id = Column(
         String(36),
         ForeignKey("hr_employees.id", ondelete="CASCADE"),
@@ -159,7 +158,7 @@ class LeaveRequest(Base):
 # ── Payroll ─────────────────────────────────────────────────
 
 
-class PayrollRun(Base):
+class PayrollRun(Base, TenantMixin):
     """One monthly payroll batch."""
 
     __tablename__ = "hr_payroll_runs"
@@ -168,7 +167,6 @@ class PayrollRun(Base):
     )
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    tenant_id = Column(String(36), index=True, nullable=True)
 
     period = Column(String(7), nullable=False, index=True)  # 'YYYY-MM'
 
@@ -193,7 +191,7 @@ class PayrollRun(Base):
     )
 
 
-class Payslip(Base):
+class Payslip(Base, TenantMixin):
     """Per-employee result of a payroll run."""
 
     __tablename__ = "hr_payslips"
@@ -202,7 +200,6 @@ class Payslip(Base):
     )
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    tenant_id = Column(String(36), index=True, nullable=True)
 
     payroll_run_id = Column(
         String(36), ForeignKey("hr_payroll_runs.id", ondelete="CASCADE"), nullable=False

@@ -25,6 +25,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
+from app.core.tenant_guard import TenantMixin
 from app.phase1.models.platform_models import Base
 
 
@@ -48,13 +49,12 @@ class APInvoiceStatus(str, Enum):
     ERROR = "error"
 
 
-class APInvoice(Base):
+class APInvoice(Base, TenantMixin):
     """One inbound vendor invoice travelling through the AP pipeline."""
 
     __tablename__ = "ap_invoices"
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    tenant_id = Column(String(36), index=True, nullable=True)
 
     # Ingestion
     source = Column(String(16), nullable=False)  # 'email' | 'whatsapp' | 'upload'
@@ -108,7 +108,7 @@ class APInvoice(Base):
     )
 
 
-class APLineItem(Base):
+class APLineItem(Base, TenantMixin):
     """One line on the inbound AP invoice."""
 
     __tablename__ = "ap_line_items"

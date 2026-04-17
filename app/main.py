@@ -542,6 +542,17 @@ try:
 except Exception as _e:
     logging.warning(f"Tenant context middleware not registered: {_e}")
 
+# Tenant query guard — auto-filters SELECTs on TenantMixin tables by
+# current_tenant() and auto-populates tenant_id on inserts. Non-breaking:
+# tables that don't inherit TenantMixin are unaffected.
+try:
+    from app.core.tenant_guard import attach_tenant_guard
+    from app.phase1.models.platform_models import engine as _tenant_engine
+    attach_tenant_guard(_tenant_engine)
+    logging.info("Tenant query guard attached")
+except Exception as _e:
+    logging.warning(f"Tenant query guard not attached: {_e}")
+
 # WhatsApp Business Cloud webhook (verification handshake + inbound events).
 # Only mounted if the module imports cleanly — optional integration.
 try:
