@@ -7,9 +7,12 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../core/apex_command_palette.dart';
+import '../core/apex_commands_registry.dart';
 import '../core/router.dart';
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
@@ -46,7 +49,27 @@ class ApexApp extends ConsumerWidget {
         routerConfig: appRouter,
         theme: theme,
         locale: isAr ? const Locale('ar') : const Locale('en'),
+        builder: (context, child) {
+          // Wrap every route in a global Cmd+K / Ctrl+K handler so the command
+          // palette is reachable from anywhere in the app.
+          return CallbackShortcuts(
+            bindings: {
+              const SingleActivator(LogicalKeyboardKey.keyK, control: true):
+                  () => _openPalette(context),
+              const SingleActivator(LogicalKeyboardKey.keyK, meta: true):
+                  () => _openPalette(context),
+            },
+            child: Focus(autofocus: true, child: child ?? const SizedBox.shrink()),
+          );
+        },
       ),
+    );
+  }
+
+  void _openPalette(BuildContext context) {
+    showApexCommandPalette(
+      context,
+      commands: buildAppCommands(context),
     );
   }
 }
