@@ -121,6 +121,7 @@ for _mod in [
     "app.core.consolidation_intercompany",
     "app.core.marketplace_enhanced",
     "app.core.offline_sync",
+    "app.core.tenant_branding",
     "app.integrations.zatca.retry_queue",
 ]:
     try:
@@ -610,6 +611,14 @@ try:
     logging.info("Saved views router mounted at /api/v1/saved-views/*")
 except Exception as _e:
     logging.warning(f"Saved views router not mounted: {_e}")
+
+# Tenant branding / white-label (mounted at /api/v1/tenant/branding).
+try:
+    from app.core.tenant_branding import router as tenant_branding_router
+    app.include_router(tenant_branding_router)
+    logging.info("Tenant branding router mounted at /api/v1/tenant/branding")
+except Exception as _e:
+    logging.warning(f"Tenant branding router not mounted: {_e}")
 
 # Webhooks (Developer Platform) mounted at /api/v1/webhooks/*.
 try:
