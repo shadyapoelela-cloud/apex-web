@@ -22,6 +22,7 @@ import 'package:http/http.dart' as http;
 
 import 'api_config.dart';
 import 'apex_chatter.dart';
+import 'apex_ws_client.dart';
 import 'design_tokens.dart';
 import 'session.dart';
 import 'theme.dart';
@@ -50,20 +51,70 @@ class _ApexChatterConnectedState extends State<ApexChatterConnected> {
   bool _loading = true;
   String? _error;
   Timer? _timer;
+  ApexWsSubscription? _wsSub;
 
   @override
   void initState() {
     super.initState();
     _load();
-    if (widget.refreshEvery > Duration.zero) {
-      _timer = Timer.periodic(widget.refreshEvery, (_) => _load());
+    // Realtime: subscribe to this entity's channel. When the server
+    // publishes an activity event, append it to the local list so the
+    // user sees it without waiting for the 30s polling cycle.
+    _wsSub = ApexWsClient.instance
+        .subscribe('entity:${widget.entityType}:${widget.entityId}');
+    _wsSub!.events.listen(_onWsEvent);
+    // Keep polling as a safety net in case the socket drops and
+    // reconnect fails — but throttle it: polling was every 30 s, with
+    // WS live we can relax to every 2 minutes.
+    final pollEvery = widget.refreshEvery > Duration.zero
+        ? Duration(milliseconds: widget.refreshEvery.inMilliseconds * 4)
+        : Duration.zero;
+    if (pollEvery > Duration.zero) {
+      _timer = Timer.periodic(pollEvery, (_) => _load());
     }
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _wsSub?.cancel();
     super.dispose();
+  }
+
+  void _onWsEvent(Map<String, dynamic> msg) {
+    if (!mounted) return;
+    final action = msg['action'] as String?;
+    final summary = (msg['summary'] as String?) ?? '';
+    final author = (msg['user_name'] as String?) ?? 'النظام';
+    final ts = DateTime.tryParse(msg['timestamp'] as String? ?? '') ??
+        DateTime.now();
+    final ChatterEntry entry;
+    switch (action) {
+      case 'commented':
+        entry = ChatterEntry.message(author, summary, ts);
+        break;
+      case 'note':
+        entry = ChatterEntry.note(author, summary, ts);
+        break;
+      case 'attachment_added':
+        entry = ChatterEntry.attachment(author, summary, ts);
+        break;
+      default:
+        entry = ChatterEntry.system(summary, ts);
+    }
+    // Dedupe by (author+summary+timestamp-second) to avoid double-
+    // inserting when the same event arrives via both WS and the
+    // next poll fetch.
+    final dedupeKey = '${entry.author}|${entry.content}|'
+        '${entry.timestamp.millisecondsSinceEpoch ~/ 1000}';
+    final alreadyThere = _entries.any((e) {
+      final k = '${e.author}|${e.content}|'
+          '${e.timestamp.millisecondsSinceEpoch ~/ 1000}';
+      return k == dedupeKey;
+    });
+    if (!alreadyThere) {
+      setState(() => _entries = [entry, ..._entries]);
+    }
   }
 
   Uri _listUrl() => Uri.parse(
