@@ -570,6 +570,14 @@ try:
 except Exception as _e:
     logging.warning(f"WebSocket router not mounted: {_e}")
 
+# HR routes — Employee CRUD + Leave + Payroll.
+try:
+    from app.hr.routes import router as hr_router
+    app.include_router(hr_router)
+    logging.info("HR routes mounted at /hr/*")
+except Exception as _e:
+    logging.warning(f"HR routes not mounted: {_e}")
+
 # WhatsApp Business Cloud webhook (verification handshake + inbound events).
 # Only mounted if the module imports cleanly — optional integration.
 try:

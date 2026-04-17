@@ -283,26 +283,10 @@ def parse_statement(content: bytes, filename: str = "", bank_hint: Optional[str]
 
 
 def _parse_pdf(content: bytes, bank_hint: Optional[str] = None) -> ParsedStatement:
-    """PDF parsing — text-layer first, Claude Vision as fallback.
+    """PDF parsing — delegated to the dedicated module."""
+    from app.integrations.bank_ocr.pdf_parser import parse_pdf as _real_pdf
 
-    For text-layer PDFs: pdfplumber extracts tables by bank template.
-    For scanned PDFs: delegate to Claude Vision (requires ANTHROPIC_API_KEY).
-    """
-    vision_enabled = os.environ.get("OCR_VISION_ENABLED", "false").lower() == "true"
-    return ParsedStatement(
-        bank=bank_hint or "pdf_unknown",
-        account_number=None,
-        currency="SAR",
-        period_start=None,
-        period_end=None,
-        opening_balance=None,
-        closing_balance=None,
-        transactions=[],
-        warnings=[
-            "PDF parsing not yet implemented — requires pdfplumber (text layer) "
-            + ("+ anthropic (vision fallback)" if vision_enabled else ""),
-        ],
-    )
+    return _real_pdf(content, bank_hint=bank_hint)
 
 
 def _parse_xlsx(content: bytes) -> ParsedStatement:
