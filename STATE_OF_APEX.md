@@ -124,6 +124,36 @@ router.dart · session.dart · shared_constants.dart · theme.dart · ui_compone
 
 ---
 
+## 6a) اكتشاف إضافي — Alembic env.py مكسور
+
+عند تشغيل `alembic revision --autogenerate` وُجد خلل في `alembic/env.py`:
+
+**السبب**: `env.py` يستخدم wildcard imports من ~18 module، وكل module يعرّف `Base = declarative_base()` مستقلّ. آخر import (`from app.knowledge_brain.models.db_models import *`) يغطّي اسم `Base` المحلّي، فيصبح `target_metadata = Base.metadata` مربوطاً بـ KB.Base (14 جدول) بدل phase1.Base (58 جدول).
+
+**الإثبات**:
+```
+phase1.Base: 58 tables (users, plan_features, user_security_events, ...)
+KB.Base:     14 tables
+Base after all imports IS KB.Base: True
+target_metadata tables: 14
+```
+
+**الأثر**: أي `alembic revision --autogenerate` يعتقد خطأً أن 58 جدول يجب حذفها من الإنتاج. تطبيق autogen الناتج **سيحذف جدول `users`** والبيانات معه.
+
+**الحل** (يحتاج PR مستقل — ليس P0 لأن `create_all` يعمل):
+1. تحويل كل `Base = declarative_base()` إلى `Base` مشترك في `app/core/base.py`، أو
+2. في `env.py`: دمج metadata يدوياً:
+   ```python
+   from sqlalchemy import MetaData
+   combined = MetaData()
+   for base in [phase1.Base, phase2.Base, ..., kb.Base]:
+       for t in base.metadata.tables.values():
+           t.to_metadata(combined)
+   target_metadata = combined
+   ```
+
+**قرار حالي**: لن نضيف migrations جديدة حتى يُصلَح env.py. نبقي baseline واحدة و`create_all` يتولّى schema في dev.
+
 ## 7) ما التالي
 
 Wave 0 انتهت. المتابعة بـ **Wave 1 — Security Hardening**:
