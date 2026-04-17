@@ -819,6 +819,15 @@ try:
 except Exception as e:
     logging.error(f"Fixed assets routes not mounted: {e}", exc_info=True)
 
+# ── Transfer Pricing (BEPS Action 13 + KSA ZATCA TP)
+try:
+    from app.core.transfer_pricing_routes import router as tp_router
+
+    app.include_router(tp_router)
+    logging.info("Transfer pricing routes mounted (analyse / methods)")
+except Exception as e:
+    logging.error(f"Transfer pricing routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
