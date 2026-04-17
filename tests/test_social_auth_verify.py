@@ -159,3 +159,37 @@ class TestGoogleRouteIntegration:
             json={"id_token": "x", "email": "a@b.com"},
         )
         assert resp.status_code == 500
+
+
+class TestAppleRouteIntegration:
+    """Verify /auth/social/apple runs identity_tokens through the verifier."""
+
+    def test_dev_bypass_still_creates_user(self, client: TestClient):
+        resp = client.post(
+            "/auth/social/apple",
+            json={
+                "identity_token": "fake-but-ok-in-dev",
+                "authorization_code": "code",
+                "email": "apple@example.COM",
+                "full_name": "Apple Tester",
+            },
+        )
+        assert resp.status_code == 200, resp.text
+        body = resp.json()
+        assert body["success"] is True
+        assert body["user"]["email"] == "apple@example.com"
+
+    def test_missing_email_rejected(self, client: TestClient):
+        resp = client.post(
+            "/auth/social/apple",
+            json={"identity_token": "x", "authorization_code": "c"},
+        )
+        assert resp.status_code == 400
+
+    def test_production_without_client_id_rejected(self, client: TestClient, monkeypatch):
+        monkeypatch.setattr(social_auth_verify, "_IS_PRODUCTION", True)
+        resp = client.post(
+            "/auth/social/apple",
+            json={"identity_token": "x", "authorization_code": "c", "email": "a@b.com"},
+        )
+        assert resp.status_code == 500

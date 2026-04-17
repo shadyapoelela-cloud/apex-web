@@ -157,26 +157,33 @@ async def google_sign_in(req: GoogleSignInRequest):
 
 @router.post("/auth/social/apple", tags=["Social Auth"])
 async def apple_sign_in(req: AppleSignInRequest):
-    """
-    Apple Sign-In: creates account if new, or logs in if exists.
+    """Apple Sign-In: creates account if new, or logs in if exists.
 
-    ⚠ WARNING: identity_token is NOT validated against Apple API.
-    Production requires: PyJWT + Apple public key validation.
+    The identity_token is verified against Apple's JWKS
+    (https://appleid.apple.com/auth/keys) and the configured
+    APPLE_CLIENT_ID audience. In development, if APPLE_CLIENT_ID is
+    unset, the caller-supplied email is trusted with a warning logged.
     """
-    logging.warning("Apple sign-in: identity_token NOT verified (production must validate)")
+    identity = verify_apple_identity_token(
+        req.identity_token,
+        dev_email_hint=req.email,
+        dev_name_hint=req.full_name,
+    )
+    verified_email = identity.email
+    display_name = identity.display_name or req.full_name
+
     db = SessionLocal()
     try:
-        if not req.email:
-            raise HTTPException(status_code=400, detail="Email is required")
-
-        user = db.query(User).filter(User.email == req.email).first()
+        user = db.query(User).filter(User.email == verified_email).first()
 
         if user:
             session = UserSession(
                 id=gen_uuid(),
                 user_id=user.id,
+                token_hash=f"pending:apple:{gen_uuid()}",
                 device_info="apple_sign_in",
                 ip_address="social_auth",
+                expires_at=datetime.now(timezone.utc) + timedelta(hours=_SESSION_TTL_HOURS),
             )
             db.add(session)
             db.add(
@@ -195,12 +202,12 @@ async def apple_sign_in(req: AppleSignInRequest):
                 "session_id": session.id,
             }
         else:
-            username = req.email.split("@")[0] + "_a"
+            username = verified_email.split("@")[0] + "_a"
             new_user = User(
                 id=gen_uuid(),
                 username=username,
-                email=req.email,
-                display_name=req.full_name or username,
+                email=verified_email,
+                display_name=display_name or username,
                 password_hash="SOCIAL_AUTH_NO_PASSWORD",
                 auth_provider="apple",
             )
@@ -208,8 +215,10 @@ async def apple_sign_in(req: AppleSignInRequest):
             session = UserSession(
                 id=gen_uuid(),
                 user_id=new_user.id,
+                token_hash=f"pending:apple:{gen_uuid()}",
                 device_info="apple_sign_in",
                 ip_address="social_auth",
+                expires_at=datetime.now(timezone.utc) + timedelta(hours=_SESSION_TTL_HOURS),
             )
             db.add(session)
             db.commit()
