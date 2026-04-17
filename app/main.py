@@ -728,6 +728,15 @@ try:
 except Exception as e:
     logging.error(f"Valuation routes not mounted: {e}", exc_info=True)
 
+# ── Journal Entry builder + Multi-currency FX
+try:
+    from app.core.ledger_routes import router as ledger_router
+
+    app.include_router(ledger_router)
+    logging.info("Ledger routes mounted (je/build, fx/convert, fx/batch, fx/revalue)")
+except Exception as e:
+    logging.error(f"Ledger routes not mounted: {e}", exc_info=True)
+
 
 @app.get("/")
 def root():
