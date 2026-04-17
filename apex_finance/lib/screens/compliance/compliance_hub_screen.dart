@@ -18,6 +18,14 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
   bool? _chainOk;
   int? _verified;
   bool _loading = true;
+  final _searchCtl = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchCtl.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -63,6 +71,8 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
           children: [
             _statusBar(),
             const SizedBox(height: 20),
+            _searchBar(),
+            const SizedBox(height: 14),
             _sectionTitle('أدوات الامتثال'),
             const SizedBox(height: 8),
             LayoutBuilder(builder: (ctx, cons) {
@@ -381,6 +391,35 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
     );
   }
 
+  Widget _searchBar() => TextField(
+    controller: _searchCtl,
+    onChanged: (v) => setState(() => _searchQuery = v.toLowerCase().trim()),
+    style: TextStyle(color: AC.tp),
+    decoration: InputDecoration(
+      hintText: 'ابحث عن أداة (مثلاً: زكاة، VAT، IFRS 16، DCF...)',
+      hintStyle: TextStyle(color: AC.ts, fontSize: 13),
+      prefixIcon: Icon(Icons.search, color: AC.gold),
+      suffixIcon: _searchQuery.isEmpty ? null : IconButton(
+        icon: Icon(Icons.clear, color: AC.ts),
+        onPressed: () {
+          _searchCtl.clear();
+          setState(() => _searchQuery = '');
+        },
+      ),
+      filled: true,
+      fillColor: AC.navy2,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AC.bdr),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AC.gold, width: 1.5),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+    ),
+  );
+
   Widget _sectionTitle(String t) => Row(children: [
     Container(width: 4, height: 22, decoration: BoxDecoration(
       color: AC.gold, borderRadius: BorderRadius.circular(2))),
@@ -394,7 +433,15 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
     required String subtitle,
     required Color color,
     required VoidCallback onTap,
-  }) => InkWell(
+  }) {
+    // Search filter
+    if (_searchQuery.isNotEmpty) {
+      final hay = '$title $subtitle'.toLowerCase();
+      if (!hay.contains(_searchQuery)) {
+        return const SizedBox.shrink();
+      }
+    }
+    return InkWell(
     borderRadius: BorderRadius.circular(14),
     onTap: onTap,
     child: Container(
@@ -425,6 +472,7 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
       ),
     ),
   );
+  }
 
   Widget _refsCard() => Container(
     padding: const EdgeInsets.all(14),
