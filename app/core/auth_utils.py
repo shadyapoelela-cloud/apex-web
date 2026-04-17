@@ -15,19 +15,25 @@ logger = logging.getLogger(__name__)
 _ENVIRONMENT = os.environ.get("ENVIRONMENT", "development").lower()
 _IS_PRODUCTION = _ENVIRONMENT in ("production", "prod")
 
+_MIN_SECRET_BYTES = 32  # RFC 7518 §3.2 for HS256
+
 _jwt_env = os.environ.get("JWT_SECRET")
 if not _jwt_env:
     if _IS_PRODUCTION:
         raise RuntimeError(
-            "JWT_SECRET env var is REQUIRED in production. Refusing to start with insecure default."
+            "JWT_SECRET env var is REQUIRED in production. "
+            "Refusing to start with insecure default."
         )
-    _jwt_env = "apex-dev-secret-CHANGE-IN-PRODUCTION"
+    _jwt_env = "apex-dev-secret-CHANGE-IN-PRODUCTION-min32bytes"
     logger.warning("⚠ JWT_SECRET not set — using development-only fallback.")
-elif _IS_PRODUCTION and len(_jwt_env) < 32:
-    raise RuntimeError(
-        "JWT_SECRET must be at least 32 characters in production (current length: %d)."
-        % len(_jwt_env)
+elif len(_jwt_env.encode("utf-8")) < _MIN_SECRET_BYTES:
+    msg = (
+        "JWT_SECRET must be at least %d bytes for HS256 (current: %d)."
+        % (_MIN_SECRET_BYTES, len(_jwt_env.encode("utf-8")))
     )
+    if _IS_PRODUCTION:
+        raise RuntimeError(msg)
+    logger.warning("⚠ %s Dev-mode continues but this will fail in production.", msg)
 
 JWT_SECRET = _jwt_env
 JWT_ALGORITHM = "HS256"
