@@ -13,6 +13,7 @@ import '../screens/whats_new/sprint37_experience_screen.dart';
 import '../screens/whats_new/sprint38_composable_screen.dart';
 import '../screens/whats_new/sprint39_erp_screen.dart';
 import '../screens/whats_new/sprint40_payroll_reports_screen.dart';
+import '../screens/whats_new/sprint41_procurement_screen.dart';
 import '../screens/financial/financial_ops_screen.dart';
 import '../screens/knowledge/knowledge_brain_screen.dart';
 import '../screens/audit/audit_workflow_screen.dart';
@@ -166,6 +167,11 @@ final appRouter = GoRouter(
       path: '/sprint40-payroll',
       pageBuilder: (c, s) =>
           _apexPage(const Sprint40PayrollReportsScreen(), s),
+    ),
+    GoRoute(
+      path: '/sprint41-procurement',
+      pageBuilder: (c, s) =>
+          _apexPage(const Sprint41ProcurementScreen(), s),
     ),
     GoRoute(
       path: '/startup-metrics',

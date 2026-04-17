@@ -34,8 +34,15 @@ class ApexWhatsNewHub extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
                   _group(context, 'الواجهة المشتركة (Apex Layer)', [
                     _Item(
+                      icon: Icons.inventory_outlined,
+                      title: 'Sprint 41 — شراء واستلام (جديد)',
+                      subtitle: 'باركود + 3-Way Match + مركز إشعارات',
+                      route: '/sprint41-procurement',
+                      status: _Status.done,
+                    ),
+                    _Item(
                       icon: Icons.analytics_outlined,
-                      title: 'Sprint 40 — رواتب + تقارير (جديد)',
+                      title: 'Sprint 40 — رواتب + تقارير',
                       subtitle: 'GOSI/WPS + بانِي تقارير Drag-drop',
                       route: '/sprint40-payroll',
                       status: _Status.done,
