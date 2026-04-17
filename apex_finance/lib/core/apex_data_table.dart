@@ -28,6 +28,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'design_tokens.dart';
 import 'theme.dart';
 
@@ -222,11 +223,19 @@ class _ApexDataTableState<T> extends State<ApexDataTable<T>> {
       ],
     );
 
-    final child = InkWell(
-      onTap: col.sortable && col.sortValue != null ? () => _onHeaderTap(col) : null,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        child: Align(alignment: col.alignment, child: content),
+    final sortLabel = isSorted
+        ? (_sortDir == _SortDir.asc ? 'مرتبة تصاعدياً' : 'مرتبة تنازلياً')
+        : '';
+    final child = Semantics(
+      label: '${col.label} $sortLabel',
+      button: col.sortable && col.sortValue != null,
+      sortKey: col.sortable ? OrdinalSortKey(0) : null,
+      child: InkWell(
+        onTap: col.sortable && col.sortValue != null ? () => _onHeaderTap(col) : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          child: Align(alignment: col.alignment, child: content),
+        ),
       ),
     );
 
@@ -246,10 +255,13 @@ class _ApexDataTableState<T> extends State<ApexDataTable<T>> {
                 ? AC.navy2
                 : AC.navy;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hoveredIndex = index),
-      onExit: (_) => setState(() => _hoveredIndex = null),
-      child: InkWell(
+    return Semantics(
+      button: widget.onRowTap != null,
+      selected: selected,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hoveredIndex = index),
+        onExit: (_) => setState(() => _hoveredIndex = null),
+        child: InkWell(
         onTap: widget.onRowTap != null ? () => widget.onRowTap!(row) : null,
         child: Container(
           height: widget.rowHeight,
@@ -282,6 +294,7 @@ class _ApexDataTableState<T> extends State<ApexDataTable<T>> {
           ),
         ),
       ),
+    ),
     );
   }
 

@@ -120,6 +120,8 @@ for _mod in [
     "app.core.dimensional_accounting",
     "app.core.consolidation_intercompany",
     "app.core.marketplace_enhanced",
+    "app.core.offline_sync",
+    "app.integrations.zatca.retry_queue",
 ]:
     try:
         __import__(_mod)

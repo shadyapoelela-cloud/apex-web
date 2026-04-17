@@ -8,6 +8,7 @@ import '../screens/whats_new/startup_metrics_screen.dart';
 import '../screens/whats_new/industry_packs_screen.dart';
 import '../screens/whats_new/feature_demos_screen.dart';
 import '../screens/whats_new/onboarding_wizard_screen.dart';
+import '../screens/whats_new/sprint35_foundation_screen.dart';
 import '../screens/financial/financial_ops_screen.dart';
 import '../screens/knowledge/knowledge_brain_screen.dart';
 import '../screens/audit/audit_workflow_screen.dart';
@@ -140,6 +141,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/uae-corp-tax',
       pageBuilder: (c, s) => _apexPage(const UaeCorpTaxScreen(), s),
+    ),
+    GoRoute(
+      path: '/sprint35-foundation',
+      pageBuilder: (c, s) => _apexPage(const Sprint35FoundationScreen(), s),
     ),
     GoRoute(
       path: '/startup-metrics',
