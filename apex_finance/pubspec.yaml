@@ -46,6 +46,12 @@ dependencies:
   shared_preferences: ^2.3.4
   intl: ^0.19.0
   qr_flutter: ^4.1.0
+  # V2 Blueprint § 2.0.1 — Syncfusion DataGrid for screens that need
+  # freeze columns + virtual scroll for >1000 rows. Community license
+  # is free for companies <$1M revenue. ApexDataTable remains the
+  # default for small lists; this is an opt-in alternative.
+  syncfusion_flutter_datagrid: ^29.1.38
+  syncfusion_flutter_core: ^29.1.38
 
 dev_dependencies:
   flutter_test:

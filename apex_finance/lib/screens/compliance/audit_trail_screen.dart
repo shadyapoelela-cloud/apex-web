@@ -8,6 +8,8 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
+import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
 
 class AuditTrailScreen extends StatefulWidget {
@@ -85,13 +87,12 @@ class _AuditTrailScreenState extends State<AuditTrailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('سجل التدقيق (Audit Trail)', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
+      appBar: ApexAppBar(
+        title: 'سجل التدقيق (Audit Trail)',
         actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: AC.gold),
-            tooltip: 'إعادة التحقق',
+          ApexToolbarAction(
+            label: 'تحقّق',
+            icon: Icons.refresh,
             onPressed: _loading ? null : _verify,
           ),
         ],

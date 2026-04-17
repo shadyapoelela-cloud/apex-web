@@ -8,6 +8,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class CostVarianceScreen extends StatefulWidget {
@@ -35,9 +36,8 @@ class _CostVarianceScreenState extends State<CostVarianceScreen>
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('تحليل انحرافات التكاليف', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
+    appBar: ApexAppBar(
+      title: 'تحليل انحرافات التكاليف',
       bottom: TabBar(
         controller: _tab,
         indicatorColor: AC.gold,

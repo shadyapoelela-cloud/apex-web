@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../api_service.dart';
+import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
 
 class ZatcaInvoiceBuilderScreen extends StatefulWidget {
@@ -168,11 +169,19 @@ class _ZatcaInvoiceBuilderScreenState extends State<ZatcaInvoiceBuilderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('منشئ الفاتورة (ZATCA)', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
+      body: Column(
+        children: [
+          const ApexStickyToolbar(title: 'منشئ الفاتورة (ZATCA Phase 2)'),
+          Expanded(
+            child: _bodyContent(),
+          ),
+        ],
       ),
-      body: LayoutBuilder(builder: (ctx, cons) {
+    );
+  }
+
+  Widget _bodyContent() {
+    return LayoutBuilder(builder: (ctx, cons) {
         final wide = cons.maxWidth > 960;
         final form = _buildForm();
         final result = _buildResult();
@@ -202,8 +211,7 @@ class _ZatcaInvoiceBuilderScreenState extends State<ZatcaInvoiceBuilderScreen> {
             ),
           ],
         );
-      }),
-    );
+      });
   }
 
   // ── Left column: form ──────────────────────────────────────────

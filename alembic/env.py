@@ -34,6 +34,18 @@ from app.sprint5_analysis.models.analysis_models import *
 from app.sprint6_registry.models.registry_models import *
 from app.knowledge_brain.models.db_models import *
 
+# New modules (HR, AP Agent) — added 2026-04-17 as part of Q1-Q2 scaffolds.
+# These must be registered so `alembic revision --autogenerate` detects them.
+from app.hr.models import *  # noqa: F401,F403
+from app.features.ap_agent.models import *  # noqa: F401,F403
+
+# Newer infra modules — register so migrations include them.
+# Added 2026-04-17 (PWA sync, ZATCA retry, branding, activity log).
+from app.core.offline_sync import SyncOperation  # noqa: F401
+from app.integrations.zatca.retry_queue import ZatcaSubmission  # noqa: F401
+from app.core.tenant_branding import TenantBranding  # noqa: F401
+from app.core.activity_log import ActivityLog  # noqa: F401
+
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

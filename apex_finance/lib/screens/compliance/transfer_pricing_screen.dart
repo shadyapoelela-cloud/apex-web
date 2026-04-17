@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class TransferPricingScreen extends StatefulWidget {
@@ -95,10 +96,7 @@ class _TransferPricingScreenState extends State<TransferPricingScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('تسعير التحويل (BEPS 13)', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
-    ),
+    appBar: ApexAppBar(title: 'تسعير التحويل (BEPS 13)'),
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

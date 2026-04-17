@@ -7,12 +7,30 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../core/apex_command_palette.dart';
+import '../core/apex_commands_registry.dart';
 import '../core/router.dart';
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
+
+/// Odoo-style keyboard shortcuts: Alt+1..9 jump directly to a module group.
+/// Kept in one place so the list of anchors stays in sync with the sidebar.
+const Map<int, String> _altModuleShortcuts = {
+  1: '/home',
+  2: '/compliance/executive-dashboard',
+  3: '/compliance/journal-entries',
+  4: '/compliance/zatca-invoice',
+  5: '/compliance/vat-return',
+  6: '/compliance/bank-rec',
+  7: '/copilot',
+  8: '/knowledge',
+  9: '/whats-new',
+};
 
 /// Root widget. Wires theme, locale, RTL direction, and the GoRouter.
 class ApexApp extends ConsumerWidget {
@@ -46,7 +64,47 @@ class ApexApp extends ConsumerWidget {
         routerConfig: appRouter,
         theme: theme,
         locale: isAr ? const Locale('ar') : const Locale('en'),
+        builder: (context, child) {
+          // Wrap every route in a global Cmd+K / Ctrl+K handler so the command
+          // palette is reachable from anywhere in the app, plus Alt+1..9 for
+          // one-keystroke navigation between the main module groups.
+          final digitKeys = <LogicalKeyboardKey>[
+            LogicalKeyboardKey.digit1,
+            LogicalKeyboardKey.digit2,
+            LogicalKeyboardKey.digit3,
+            LogicalKeyboardKey.digit4,
+            LogicalKeyboardKey.digit5,
+            LogicalKeyboardKey.digit6,
+            LogicalKeyboardKey.digit7,
+            LogicalKeyboardKey.digit8,
+            LogicalKeyboardKey.digit9,
+          ];
+          final bindings = <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.keyK, control: true):
+                () => _openPalette(context),
+            const SingleActivator(LogicalKeyboardKey.keyK, meta: true):
+                () => _openPalette(context),
+          };
+          for (var i = 0; i < digitKeys.length; i++) {
+            final n = i + 1;
+            final target = _altModuleShortcuts[n];
+            if (target == null) continue;
+            bindings[SingleActivator(digitKeys[i], alt: true)] =
+                () => GoRouter.of(context).go(target);
+          }
+          return CallbackShortcuts(
+            bindings: bindings,
+            child: Focus(autofocus: true, child: child ?? const SizedBox.shrink()),
+          );
+        },
       ),
+    );
+  }
+
+  void _openPalette(BuildContext context) {
+    showApexCommandPalette(
+      context,
+      commands: buildAppCommands(context),
     );
   }
 }

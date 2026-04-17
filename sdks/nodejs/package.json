@@ -1,0 +1,18 @@
+{
+  "name": "@apex/sdk",
+  "version": "0.1.0",
+  "description": "Official Node.js SDK for the APEX Financial Platform API",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "keywords": ["apex", "accounting", "financial", "zatca", "sdk"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "src/"
+  ]
+}

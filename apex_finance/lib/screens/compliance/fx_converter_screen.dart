@@ -8,6 +8,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class FxConverterScreen extends StatefulWidget {
@@ -50,9 +51,8 @@ class _FxConverterScreenState extends State<FxConverterScreen>
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('محوّل العملات — FX', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
+    appBar: ApexAppBar(
+      title: 'محوّل العملات — FX',
       bottom: TabBar(
         controller: _tab,
         indicatorColor: AC.gold,
