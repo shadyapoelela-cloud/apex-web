@@ -35,6 +35,7 @@ import '../../screens/v4_compliance/deferred_tax_screen.dart';
 import '../../screens/v4_compliance/risk_register_screen.dart';
 import '../../screens/v4_compliance/bcp_screen.dart';
 import '../../screens/v4_compliance/lease_accounting_screen.dart';
+import '../../screens/v4_compliance/revenue_recognition_screen.dart';
 import '../../screens/v4_compliance/whistleblower_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
@@ -46,11 +47,13 @@ import '../../screens/v4_erp/benefits_eos_screen.dart';
 import '../../screens/v4_erp/board_pack_screen.dart';
 import '../../screens/v4_erp/budget_vs_actual_screen.dart';
 import '../../screens/v4_erp/cap_table_screen.dart';
+import '../../screens/v4_erp/credit_notes_screen.dart';
 import '../../screens/v4_erp/credit_scoring_screen.dart';
 import '../../screens/v4_erp/customer_loyalty_screen.dart';
 import '../../screens/v4_erp/fleet_management_screen.dart';
 import '../../screens/v4_erp/intercompany_screen.dart';
 import '../../screens/v4_erp/price_list_screen.dart';
+import '../../screens/v4_erp/warehouse_management_screen.dart';
 import '../../screens/v4_erp/warranty_service_screen.dart';
 import '../../screens/v4_erp/integrations_hub_screen.dart';
 import '../../screens/v4_erp/performance_reviews_screen.dart';
@@ -293,6 +296,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/price-list': (ctx) => const PriceListScreen(),
   // Wave 103 — Warranty & Service
   'erp/operations/warranty': (ctx) => const WarrantyServiceScreen(),
+  // Wave 104 — Warehouse Management (WMS)
+  'erp/operations/warehouse': (ctx) => const WarehouseManagementScreen(),
+  // Wave 105 — Revenue Recognition (IFRS 15)
+  'compliance/tax/revenue-recognition': (ctx) => const RevenueRecognitionScreen(),
+  // Wave 106 — Credit Notes & Refunds
+  'erp/finance/credit-notes': (ctx) => const CreditNotesScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
