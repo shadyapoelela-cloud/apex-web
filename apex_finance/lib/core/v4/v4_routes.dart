@@ -15,6 +15,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/v4_erp/sales_customers_screen.dart';
 import 'apex_launchpad.dart';
 import 'apex_screen_host.dart';
 import 'apex_sub_module_shell.dart';
@@ -89,11 +90,13 @@ String _slug(String id) {
   return parts.length > 2 ? parts.sublist(2).join('-') : id;
 }
 
-/// Until each screen is wired to a real Flutter view, render an
-/// empty-first-time state explaining what the screen WILL do. This is
-/// intentional scaffolding — no screen should ship behind a "coming
-/// soon" state once it has a backing API.
+/// Maps a V4Screen.id to its real Flutter widget. Screens not yet
+/// wired fall through to the default "defined-but-not-implemented"
+/// state host — a deliberate scaffolding that makes coverage gaps
+/// visible rather than hiding them behind a generic "coming soon".
 Widget _defaultScreenHost(BuildContext ctx, V4Screen screen) {
+  final wired = _wiredScreens[screen.id];
+  if (wired != null) return wired(ctx);
   return ApexScreenHost(
     state: ApexScreenState.emptyFirstTime,
     title: screen.labelAr,
@@ -102,6 +105,12 @@ Widget _defaultScreenHost(BuildContext ctx, V4Screen screen) {
         'ستنضم إلى التنفيذ ضمن الموجة المخصصة لهذه الوحدة.',
   );
 }
+
+/// Registry of wired V4 screens. Add an entry when a screen's widget
+/// is ready — the shell picks it up automatically via its screen id.
+final Map<String, Widget Function(BuildContext)> _wiredScreens = {
+  'erp-sales-customers': (ctx) => const SalesCustomersScreen(),
+};
 
 class _NotFound extends StatelessWidget {
   const _NotFound();
