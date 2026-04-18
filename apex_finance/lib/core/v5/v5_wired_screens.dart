@@ -27,6 +27,9 @@ import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
+import '../../screens/v4_erp/asset_tracking_screen.dart';
+import '../../screens/v4_erp/budget_planning_screen.dart';
+import '../../screens/v4_erp/whatsapp_business_screen.dart';
 import '../../screens/v4_compliance/audit_acceptance_screen.dart';
 import '../../screens/v4_compliance/audit_kickoff_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
@@ -35,6 +38,7 @@ import '../../screens/v4_compliance/deferred_tax_screen.dart';
 import '../../screens/v4_compliance/risk_register_screen.dart';
 import '../../screens/v4_compliance/bcp_screen.dart';
 import '../../screens/v4_compliance/lease_accounting_screen.dart';
+import '../../screens/v4_compliance/quality_management_screen.dart';
 import '../../screens/v4_compliance/revenue_recognition_screen.dart';
 import '../../screens/v4_compliance/whistleblower_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
@@ -302,6 +306,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'compliance/tax/revenue-recognition': (ctx) => const RevenueRecognitionScreen(),
   // Wave 106 — Credit Notes & Refunds
   'erp/finance/credit-notes': (ctx) => const CreditNotesScreen(),
+  // Wave 107 — Quality Management (ISO 9001)
+  'compliance/regulatory/quality': (ctx) => const QualityManagementScreen(),
+  // Wave 108 — Asset Tracking (Barcode/RFID)
+  'erp/operations/asset-tracking': (ctx) => const AssetTrackingScreen(),
+  // Wave 109 — Budget Planning Workflow
+  'erp/finance/budget-planning': (ctx) => const BudgetPlanningScreen(),
+  // 🎉 Wave 110 — WhatsApp Business (MILESTONE)
+  'erp/operations/whatsapp': (ctx) => const WhatsappBusinessScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
