@@ -390,6 +390,8 @@ List<V5Service> v5Services = [
           V5Chip(id: 'inventory', labelAr: 'المخزون', labelEn: 'Inventory', icon: Icons.inventory),
           V5Chip(id: 'projects', labelAr: 'المشاريع', labelEn: 'Projects', icon: Icons.work),
           V5Chip(id: 'crm', labelAr: 'إدارة العملاء', labelEn: 'CRM', icon: Icons.contacts),
+          V5Chip(id: 'customers-360', labelAr: 'العميل 360°', labelEn: 'Customer 360°', icon: Icons.person_pin_circle),
+          V5Chip(id: 'suppliers', labelAr: 'المورّدون 360°', labelEn: 'Suppliers 360°', icon: Icons.store),
           V5Chip(id: 'manufacturing', labelAr: 'التصنيع', labelEn: 'Manufacturing', icon: Icons.precision_manufacturing),
         ],
       ),
