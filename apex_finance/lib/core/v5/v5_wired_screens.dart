@@ -33,6 +33,7 @@ import '../../screens/v4_compliance/audit_planning_screen.dart';
 import '../../screens/v4_compliance/controls_library_screen.dart';
 import '../../screens/v4_compliance/deferred_tax_screen.dart';
 import '../../screens/v4_compliance/risk_register_screen.dart';
+import '../../screens/v4_compliance/bcp_screen.dart';
 import '../../screens/v4_compliance/whistleblower_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
@@ -44,8 +45,10 @@ import '../../screens/v4_erp/benefits_eos_screen.dart';
 import '../../screens/v4_erp/board_pack_screen.dart';
 import '../../screens/v4_erp/budget_vs_actual_screen.dart';
 import '../../screens/v4_erp/cap_table_screen.dart';
+import '../../screens/v4_erp/fleet_management_screen.dart';
 import '../../screens/v4_erp/integrations_hub_screen.dart';
 import '../../screens/v4_erp/performance_reviews_screen.dart';
+import '../../screens/v4_erp/recruitment_ats_screen.dart';
 import '../../screens/v4_erp/subscription_management_screen.dart';
 import '../../screens/v4_erp/cost_centers_screen.dart';
 import '../../screens/v4_erp/cybersecurity_dashboard_screen.dart';
@@ -266,6 +269,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/hr/performance': (ctx) => const PerformanceReviewsScreen(),
   // Wave 94 — Integrations Hub
   'erp/finance/integrations': (ctx) => const IntegrationsHubScreen(),
+  // Wave 95 — Recruitment / ATS
+  'erp/hr/recruitment': (ctx) => const RecruitmentAtsScreen(),
+  // Wave 96 — Fleet Management
+  'erp/operations/fleet': (ctx) => const FleetManagementScreen(),
+  // Wave 97 — Business Continuity Plan
+  'compliance/regulatory/bcp': (ctx) => const BcpScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
