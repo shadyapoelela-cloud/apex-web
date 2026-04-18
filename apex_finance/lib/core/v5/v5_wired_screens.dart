@@ -33,6 +33,7 @@ import '../../screens/v4_compliance/audit_planning_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
 import '../../screens/v4_compliance/uae_ct_screen.dart';
+import '../../screens/v4_compliance/vat_return_builder_screen.dart';
 import '../../screens/v4_compliance/wht_calculator_v5_screen.dart';
 import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
 import '../../screens/v4_erp/benefits_eos_screen.dart';
@@ -42,6 +43,8 @@ import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/activity_log_screen.dart';
+import '../../screens/v4_erp/close_checklist_screen.dart';
+import '../../screens/v4_erp/project_profitability_screen.dart';
 import '../../screens/v4_erp/contract_management_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
 import '../../screens/v4_erp/document_vault_screen.dart';
@@ -176,6 +179,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
   // Wave 64 — Activity Log / Audit Trail
   'compliance/regulatory/activity-log': (ctx) => const ActivityLogScreen(),
+  // Wave 65 — VAT Return Builder
+  'compliance/tax/vat-return': (ctx) => const VatReturnBuilderScreen(),
+  // Wave 66 — Project Profitability
+  'erp/operations/project-pnl': (ctx) => const ProjectProfitabilityScreen(),
+  // Wave 67 — Financial Close Checklist
+  'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
