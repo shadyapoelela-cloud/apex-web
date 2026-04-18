@@ -31,7 +31,9 @@ import '../../screens/v4_erp/asset_tracking_screen.dart';
 import '../../screens/v4_erp/budget_planning_screen.dart';
 import '../../screens/v4_erp/construction_screen.dart';
 import '../../screens/v4_erp/ecommerce_store_screen.dart';
+import '../../screens/v4_erp/field_service_screen.dart';
 import '../../screens/v4_erp/franchise_management_screen.dart';
+import '../../screens/v4_erp/restaurant_pos_screen.dart';
 import '../../screens/v4_erp/grant_management_screen.dart';
 import '../../screens/v4_erp/subscription_billing_screen.dart';
 import '../../screens/v4_erp/healthcare_claims_screen.dart';
@@ -338,6 +340,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
   // Wave 118 — ESG Sustainability Report (GRI/SASB/TCFD)
   'compliance/regulatory/sustainability': (ctx) => const SustainabilityReportScreen(),
+  // Wave 119 — Field Service Management
+  'erp/operations/field-service': (ctx) => const FieldServiceScreen(),
+  // 🎉 Wave 120 — Restaurant POS (MILESTONE)
+  'erp/operations/restaurant-pos': (ctx) => const RestaurantPosScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results

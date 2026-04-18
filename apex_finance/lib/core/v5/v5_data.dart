@@ -535,6 +535,8 @@ List<V5Service> v5Services = [
           V5Chip(id: 'grants', labelAr: 'إدارة المنح (NGO)', labelEn: 'Grant Management', icon: Icons.volunteer_activism),
           V5Chip(id: 'franchise', labelAr: 'الامتياز التجاري', labelEn: 'Franchise', icon: Icons.store_mall_directory),
           V5Chip(id: 'ecommerce', labelAr: 'المتجر الإلكتروني', labelEn: 'E-Commerce', icon: Icons.shopping_bag),
+          V5Chip(id: 'field-service', labelAr: 'الخدمة الميدانية', labelEn: 'Field Service', icon: Icons.engineering),
+          V5Chip(id: 'restaurant-pos', labelAr: 'نقاط بيع المطاعم 🎉', labelEn: 'Restaurant POS', icon: Icons.restaurant),
           V5Chip(id: 'contracts', labelAr: 'العقود', labelEn: 'Contracts', icon: Icons.gavel),
           V5Chip(id: 'manufacturing', labelAr: 'التصنيع', labelEn: 'Manufacturing', icon: Icons.precision_manufacturing),
         ],
