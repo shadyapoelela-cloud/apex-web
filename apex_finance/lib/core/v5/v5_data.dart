@@ -276,6 +276,12 @@ List<V5Service> v5Services = [
             icon: Icons.pie_chart,
           ),
           V5Chip(
+            id: 'budget-actual',
+            labelAr: 'الموازنة مقابل الفعلي',
+            labelEn: 'Budget vs Actual',
+            icon: Icons.compare_arrows,
+          ),
+          V5Chip(
             id: 'reports',
             labelAr: 'التقارير',
             labelEn: 'Reports',

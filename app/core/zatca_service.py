@@ -258,10 +258,16 @@ def build_ubl_xml(inv: ZatcaInvoice, pih_b64: Optional[str]) -> str:
 
     buyer_block = ""
     if b is not None:
+        buyer_vat_line = (
+            '<cac:PartyIdentification><cbc:ID schemeID="VAT">'
+            f'{_e(b.vat_number)}'
+            '</cbc:ID></cac:PartyIdentification>'
+            if b.vat_number else ''
+        )
         buyer_block = (
             '  <cac:AccountingCustomerParty>\n'
             '    <cac:Party>\n'
-            f'      {"<cac:PartyIdentification><cbc:ID schemeID=\"VAT\">" + _e(b.vat_number) + "</cbc:ID></cac:PartyIdentification>" if b.vat_number else ""}\n'
+            f'      {buyer_vat_line}\n'
             '      <cac:PartyName>\n'
             f'        <cbc:Name>{_e(b.name)}</cbc:Name>\n'
             '      </cac:PartyName>\n'
