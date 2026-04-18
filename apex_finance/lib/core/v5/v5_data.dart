@@ -238,6 +238,12 @@ List<V5Service> v5Services = [
             labelEn: 'Chart of Accounts',
             icon: Icons.account_tree,
           ),
+          V5Chip(
+            id: 'fixed-assets',
+            labelAr: 'الأصول الثابتة',
+            labelEn: 'Fixed Assets',
+            icon: Icons.business,
+          ),
           _chipFromV4('erp', 'sales', labelOverrideAr: 'حسابات القبض'),
           V5Chip(
             id: 'sales-workflow',

@@ -27,11 +27,15 @@ import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
+import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
+import '../../screens/v4_erp/fixed_assets_register_screen.dart';
 import '../../screens/v4_erp/general_ledger_screen.dart';
+import '../../screens/v4_erp/leave_management_screen.dart';
+import '../../screens/v4_erp/manufacturing_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
 import '../../screens/v4_erp/financial_statements_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
@@ -110,6 +114,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/gl': (ctx) => const GeneralLedgerScreen(),
   // Wave 42 — 13-week Cash Flow Forecast
   'erp/treasury/cashflow': (ctx) => const CashFlowForecastScreen(),
+  // Wave 43 — Zakat Calculator (ZATCA-compliant)
+  'compliance/tax/zakat': (ctx) => const ZakatCalculatorV5Screen(),
+  // Wave 44 — Fixed Assets Register
+  'erp/finance/fixed-assets': (ctx) => const FixedAssetsRegisterScreen(),
+  // Wave 45 — Leave Management
+  'erp/hr/leaves': (ctx) => const LeaveManagementScreen(),
+  // Wave 46 — Manufacturing & BOM
+  'erp/operations/manufacturing': (ctx) => const ManufacturingScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
