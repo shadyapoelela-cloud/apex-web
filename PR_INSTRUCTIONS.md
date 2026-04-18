@@ -155,6 +155,63 @@ Base: `claude/brave-yonath-wave-10` ← Head: `claude/brave-yonath-wave-11`
 Base: `claude/brave-yonath-wave-11` ← Head: `claude/brave-yonath-wave-12`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-11...claude/brave-yonath-wave-12?expand=1>
 
+### PR #18 — Wave 16 (AI bank reconciliation UI — wires Wave 15 backend)
+Base: `claude/brave-yonath-wave-15` ← Head: `claude/brave-yonath-wave-16`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-15...claude/brave-yonath-wave-16?expand=1>
+
+```
+Title: Wave 16: AI bank reconciliation UI (wires Wave 15 backend)
+
+Body:
+Flutter UI completing Wave 15. Accountants pick an unreconciled bank
+transaction, enter candidate entries, and either see a ranked proposal
+list or route the top candidate through the Wave 7 AI guardrail in one
+click. NEEDS_APPROVAL decisions deep-link into the existing AI
+Oversight screen from Wave 8 — no new approval surface needed.
+
+apex_finance/lib/screens/v4_erp/bank_reconciliation_screen.dart (new):
+- Two-pane layout, responsive: side-by-side above 900px, stacked
+  vertically below. Left pane is the unreconciled-txns list
+  (auto-loaded from /bank-feeds/transactions?unreconciled_only=true),
+  right pane is the candidate builder + results.
+- Txn list: one row per unreconciled bank_tx with color ribbon
+  (green credit ↓ / amber debit ↑), description + counterparty +
+  date, amount right-aligned in monospace. Selected row gets a gold
+  wash.
+- Candidate builder: starts with one empty candidate; "+ مرشح جديد"
+  appends more. Each candidate is a compact 5-field card (id /
+  amount / date / vendor / description). Empty candidates are
+  silently skipped on submit.
+- Two actions: "اقترح مطابقات" POSTs /bank-rec/propose with
+  min_score=0.0 so the UI can show every candidate with its score;
+  "طابق تلقائياً" POSTs /bank-rec/auto-match with the real bank_tx_id
+  so AUTO_APPLIED paths post the reconciliation in-band.
+- Proposal cards: score badge (green ≥95 / gold ≥70 / amber ≥40 /
+  red <40) plus per-feature chips (مبلغ/تاريخ/مورِّد/وصف) so the user
+  can see *why* a proposal ranks where it does.
+- Auto-match card: verdict pill (auto_applied green, needs_approval
+  amber, rejected red), confidence % badge, the guardrail reason
+  text straight from the backend, and — on needs_approval — a
+  "راجعها في ضوابط الذكاء" chip that GOes to
+  /app/compliance/gov/ai-oversight so the user lands on the pending
+  row without leaving the flow.
+- On auto_applied success the left pane reloads so the just-matched
+  row disappears from the unreconciled list.
+
+apex_finance/lib/api_service.dart: two new methods — bankRecPropose,
+bankRecAutoMatch. Both are simple POST wrappers; the screen does all
+the payload shaping so future callers (e.g. a "bulk auto-match"
+command palette action) can reuse them unchanged.
+
+apex_finance/lib/core/v4/v4_routes.dart._wiredScreens: registers
+'erp-tre-rec' → BankReconciliationScreen. Sixth V4 screen wired to
+real backend data after ERP Customers, Compliance Status, ZATCA
+Queue, AI Guardrails, ZATCA CSID, Bank Feeds.
+
+Verification: dart analyze clean, flutter build web succeeds (36s),
+pytest unchanged at 1133 pass.
+```
+
 ### PR #17 — Wave 15 (AI bank reconciliation — guardrail-gated auto-match)
 Base: `main` ← Head: `claude/brave-yonath-wave-15`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/main...claude/brave-yonath-wave-15?expand=1>

@@ -20,6 +20,7 @@ import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/bank_feeds_screen.dart';
+import '../../screens/v4_erp/bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
 import 'apex_launchpad.dart';
 import 'apex_screen_host.dart';
@@ -136,6 +137,13 @@ final Map<String, Widget Function(BuildContext)> _wiredScreens = {
   // the user's perspective. A dedicated "Bank Feeds" tab will land
   // when the Treasury sub-module's overflow is populated.
   'erp-tre-txns': (ctx) => const BankFeedsScreen(),
+  // Wave 16: AI bank reconciliation (Wave 15 backend). Wired under
+  // ERP > Treasury > "Reconciliation" tab. Users pick an unreconciled
+  // bank_tx, enter candidates, and either see a ranked proposal list
+  // (propose) or route the top candidate through the Wave 7 AI
+  // guardrail (auto-match). NEEDS_APPROVAL rows deep-link into the
+  // AI Oversight screen.
+  'erp-tre-rec': (ctx) => const BankReconciliationScreen(),
 };
 
 class _NotFound extends StatelessWidget {

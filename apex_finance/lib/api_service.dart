@@ -462,6 +462,17 @@ class ApiService {
         {'entity_type': entityType, 'entity_id': entityId},
       );
 
+  // ── AI Bank Reconciliation (Wave 15 backend, Wave 16 UI). ──
+  // Scores a bank transaction against candidate entries and optionally
+  // routes the top proposal through the Wave 7 AI guardrail. The
+  // guardrail persists every decision as an AiSuggestion row; when a
+  // row lands in needs_approval, the user approves/rejects it from the
+  // AI Guardrails screen (compliance-gov-ai-oversight).
+  static Future<ApiResult> bankRecPropose(Map body) =>
+      _post('/bank-rec/propose', body);
+  static Future<ApiResult> bankRecAutoMatch(Map body) =>
+      _post('/bank-rec/auto-match', body);
+
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);
   static Future<ApiResult> taxVatReturn(Map body) => _post('/tax/vat/return', body);
