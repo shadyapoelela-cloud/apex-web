@@ -27,9 +27,11 @@ import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
+import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
+import '../../screens/v4_erp/general_ledger_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
 import '../../screens/v4_erp/financial_statements_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
@@ -40,6 +42,7 @@ import '../../screens/v4_erp/je_builder_screen.dart';
 import '../../screens/v4_erp/sales_workflow_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
+import '../../screens/v4_erp/payroll_run_screen.dart';
 import '../../screens/v4_erp/projects_screen.dart';
 import '../../screens/v4_erp/purchasing_ap_screen.dart';
 
@@ -66,6 +69,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/ap': (ctx) => const PurchasingApScreen(),
   // Wave 18 — HR Employees
   'erp/hr/employees': (ctx) => const HrEmployeesScreen(),
+  // Wave 40 — Payroll Run
+  'erp/hr/payroll': (ctx) => const PayrollRunScreen(),
   // Wave 19 — Projects (Tasks/Timesheets/Gantt/Billing)
   'erp/operations/projects': (ctx) => const ProjectsScreen(),
   // Wave 20 — CRM (Leads/Opportunities/Pipeline/Activities/Contacts)
@@ -99,7 +104,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // Wave 39 — Financial Statements + CoA + Inventory (CRITICAL)
   'erp/finance/statements': (ctx) => const FinancialStatementsScreen(),
   'erp/finance/coa-editor': (ctx) => const CoaEditorScreen(),
-  'erp/operations/inventory-detailed': (ctx) => const InventoryDetailedScreen(),
+  // Inventory chip is now wired to the detailed view
+  'erp/operations/inventory': (ctx) => const InventoryDetailedScreen(),
+  // Wave 41 — General Ledger viewer (replaces confusing ApexStudio wiring)
+  'erp/finance/gl': (ctx) => const GeneralLedgerScreen(),
+  // Wave 42 — 13-week Cash Flow Forecast
+  'erp/treasury/cashflow': (ctx) => const CashFlowForecastScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
@@ -113,11 +123,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // Connected Planning Drivers (#16) — Anaplan replacement
   'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
   // Mobile Receipt Capture (#20) — Expensify replacement
-  'erp/finance/consolidation': (ctx) => const MobileReceiptScreen(),
+  // Lives under Operations as a dedicated chip, not under Finance.
+  'erp/operations/mobile-receipt': (ctx) => const MobileReceiptScreen(),
   // Client Portal (#12) — Freshbooks replacement
-  'erp/finance/reports': (ctx) => const ClientPortalScreen(),
+  'platform/portal/client': (ctx) => const ClientPortalScreen(),
   // APEX Studio no-code (#11) — Odoo Studio replacement
-  'erp/finance/gl': (ctx) => const ApexStudioScreen(),
+  'platform/studio/builder': (ctx) => const ApexStudioScreen(),
 
   // ── Marketplace ──────────────────────────────────────────────────
   // APEX Match AI pairing (#15) — Toptal-style
