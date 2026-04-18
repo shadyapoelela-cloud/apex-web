@@ -47,7 +47,10 @@ import '../../screens/v4_erp/activity_log_screen.dart';
 import '../../screens/v4_erp/ai_copilot_screen.dart';
 import '../../screens/v4_erp/anomaly_detector_screen.dart';
 import '../../screens/v4_erp/approval_workflows_screen.dart';
+import '../../screens/v4_erp/break_even_screen.dart';
 import '../../screens/v4_erp/commission_engine_screen.dart';
+import '../../screens/v4_erp/esg_dashboard_screen.dart';
+import '../../screens/v4_erp/scenario_planning_screen.dart';
 import '../../screens/v4_erp/bank_guarantees_screen.dart';
 import '../../screens/v4_erp/close_checklist_screen.dart';
 import '../../screens/v4_erp/okrs_scorecard_screen.dart';
@@ -212,6 +215,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/hr/commissions': (ctx) => const CommissionEngineScreen(),
   // Wave 76 — Vendor Onboarding Wizard
   'erp/operations/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
+  // Wave 77 — ESG / Sustainability
+  'erp/finance/esg': (ctx) => const EsgDashboardScreen(),
+  // Wave 78 — Scenario Planning / What-If
+  'erp/finance/scenarios': (ctx) => const ScenarioPlanningScreen(),
+  // Wave 79 — Break-Even Analysis
+  'erp/finance/breakeven': (ctx) => const BreakEvenScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
