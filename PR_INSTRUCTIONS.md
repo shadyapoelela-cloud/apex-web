@@ -143,6 +143,55 @@ Base: `claude/brave-yonath-wave-7` ← Head: `claude/brave-yonath-wave-8`
 Base: `claude/brave-yonath-wave-8` ← Head: `claude/brave-yonath-wave-9`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-8...claude/brave-yonath-wave-9?expand=1>
 
+### PR #12 — Wave 10 (fix Alembic multi-Base env.py — closes Wave 0 debt)
+Base: `claude/brave-yonath-wave-9` ← Head: `claude/brave-yonath-wave-10`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-9...claude/brave-yonath-wave-10?expand=1>
+
+```
+Title: Wave 10: fix Alembic multi-Base env.py (closes Wave 0 debt)
+
+Body:
+Pays down the technical debt from STATE_OF_APEX §6a: the old env.py's
+wildcard imports silently rebound `Base` to the Knowledge-Brain base,
+so target_metadata saw 14 tables instead of 95. Any autogenerate run
+would produce a migration that DROPS the users table + 94 others.
+
+Root cause:
+  from app.phase1.models.platform_models import Base
+  from app.phase1.models.platform_models import *
+  ... 18 wildcard imports ...
+  from app.knowledge_brain.models.db_models import *  # shadows Base
+
+Fix:
+- Import each Base under a distinct alias (PhaseBase /
+  KnowledgeBrainBase). Wildcard imports can no longer shadow.
+- Replace wildcard side-effect imports with importlib.import_module()
+  over an explicit module list. Same effect, obvious intent.
+- target_metadata points at PhaseBase.metadata. KB runs against a
+  SEPARATE engine (KB_DATABASE_URL) — including it would produce
+  false drift. KB schema stays managed by create_all at startup.
+- Confirmed working: after the fix, autogenerate against a
+  create_all'd DB produces an EMPTY migration (zero drift),
+  proving metadata and DB are in sync. The old version would have
+  emitted ~1021 lines of incorrect drop_table ops.
+
+tests/test_alembic_env_fix.py (5 tests) pins the invariant:
+- target_metadata is PhaseBase.metadata (not KB.Base.metadata).
+- Table count ≥ 80 — any regression to the wildcard shadow crashes
+  this threshold immediately.
+- Spot checks: users, user_sessions, audit_trail,
+  zatca_submission_queue, ai_suggestion are all registered.
+- KB tables are NOT in phase1 metadata (confirms separation).
+- DB_URL re-exports correctly.
+
+STATE_OF_APEX.md §6a is marked resolved with historical context
+preserved for future archaeology.
+
+Verification: 1036 → 1041 pass (+5 new) · 2 skip · 0 fail.
+```
+
+---
+
 ```
 Title: Wave 9: ZATCA retry queue background worker (closes Wave 5)
 

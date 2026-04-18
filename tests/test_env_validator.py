@@ -23,6 +23,7 @@ def _good_prod_env(monkeypatch):
     monkeypatch.setenv("REDIS_URL", "redis://r:6379/0")
     monkeypatch.setenv("SENTRY_DSN", "https://p@s.ingest.sentry.io/1")
     monkeypatch.setenv("TOTP_ENCRYPTION_KEY", "k" * 44)  # looks like a Fernet key
+    monkeypatch.setenv("ZATCA_CERT_ENCRYPTION_KEY", "z" * 44)  # Wave 11
     monkeypatch.setenv("GOOGLE_OAUTH_CLIENT_ID", "test.apps.googleusercontent.com")
     monkeypatch.setenv("APPLE_CLIENT_ID", "com.apex.app")
 
@@ -70,6 +71,21 @@ class TestProductionRequirements:
         monkeypatch.delenv("TOTP_ENCRYPTION_KEY", raising=False)
         result = env_validator.validate_env()
         assert any("TOTP_ENCRYPTION_KEY" in e for e in result.errors)
+
+    def test_missing_zatca_cert_key_fails_in_prod(self, monkeypatch):
+        _good_prod_env(monkeypatch)
+        monkeypatch.delenv("ZATCA_CERT_ENCRYPTION_KEY", raising=False)
+        result = env_validator.validate_env()
+        assert any("ZATCA_CERT_ENCRYPTION_KEY" in e for e in result.errors)
+
+    def test_zatca_cert_key_missing_in_dev_only_warns(self, monkeypatch):
+        monkeypatch.setenv("ENVIRONMENT", "development")
+        monkeypatch.setenv("JWT_SECRET", "x" * 40)
+        monkeypatch.setenv("ADMIN_SECRET", "y" * 20)
+        monkeypatch.delenv("ZATCA_CERT_ENCRYPTION_KEY", raising=False)
+        result = env_validator.validate_env()
+        assert result.is_ok()
+        assert any("ZATCA_CERT_ENCRYPTION_KEY" in w for w in result.warnings)
 
     def test_cors_wildcard_is_warning_not_error(self, monkeypatch):
         _good_prod_env(monkeypatch)

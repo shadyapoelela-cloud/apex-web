@@ -148,6 +148,20 @@ def validate_env() -> EnvCheck:
             "ZATCA_WORKER_ENABLED not set — retry queue will not process automatically"
         )
 
+    # ZATCA CSID cert encryption (Wave 11): a dedicated key for cert/
+    # private-key storage at rest. Dev falls back to a JWT_SECRET-
+    # derived key with a warning; production must set it explicitly.
+    if not os.environ.get("ZATCA_CERT_ENCRYPTION_KEY"):
+        if is_prod:
+            errors.append(
+                "ZATCA_CERT_ENCRYPTION_KEY is required in production "
+                "(generate with Fernet.generate_key())"
+            )
+        else:
+            warnings.append(
+                "ZATCA_CERT_ENCRYPTION_KEY not set — dev deriving from JWT_SECRET"
+            )
+
     return EnvCheck(errors=errors, warnings=warnings)
 
 
