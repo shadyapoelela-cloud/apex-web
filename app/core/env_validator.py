@@ -140,6 +140,14 @@ def validate_env() -> EnvCheck:
             "APPLE_CLIENT_ID not set — Apple sign-in will fail in production"
         )
 
+    # ZATCA queue worker (Wave 9): off by default so dev doesn't drain
+    # the queue silently. In production, flip it on once the real
+    # Fatoora HTTP client is wired into the worker's submit_fn.
+    if not os.environ.get("ZATCA_WORKER_ENABLED"):
+        warnings.append(
+            "ZATCA_WORKER_ENABLED not set — retry queue will not process automatically"
+        )
+
     return EnvCheck(errors=errors, warnings=warnings)
 
 

@@ -530,6 +530,17 @@ const complianceGovernance = V4SubModule(
     V4Screen(id: 'compliance-gov-resolutions', labelAr: 'القرارات', labelEn: 'Resolutions', icon: Icons.gavel),
     V4Screen(id: 'compliance-gov-policies', labelAr: 'السياسات', labelEn: 'Policies', icon: Icons.policy),
   ],
+  overflow: [
+    // AI Guardrails is policy-enforcement for AI decisions — it belongs
+    // under Governance until the AI Agents gallery (Settings → Agents)
+    // ships in a later wave.
+    V4Screen(
+      id: 'compliance-gov-ai-oversight',
+      labelAr: 'رقابة الذكاء الاصطناعي',
+      labelEn: 'AI Oversight',
+      icon: Icons.policy_outlined,
+    ),
+  ],
 );
 
 const complianceReports = V4SubModule(

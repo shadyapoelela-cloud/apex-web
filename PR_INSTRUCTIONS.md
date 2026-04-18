@@ -131,6 +131,79 @@ Base: `claude/brave-yonath-wave-4` ← Head: `claude/brave-yonath-wave-5`
 Base: `claude/brave-yonath-wave-5` ← Head: `claude/brave-yonath-wave-6`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-5...claude/brave-yonath-wave-6?expand=1>
 
+### PR #9 — Wave 7 (Confidence-gated AI guardrails)
+Base: `claude/brave-yonath-wave-6` ← Head: `claude/brave-yonath-wave-7`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-6...claude/brave-yonath-wave-7?expand=1>
+
+### PR #10 — Wave 8 (AI Guardrails UI — wires Wave 7 backend)
+Base: `claude/brave-yonath-wave-7` ← Head: `claude/brave-yonath-wave-8`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-7...claude/brave-yonath-wave-8?expand=1>
+
+```
+Title: Wave 8: AI Guardrails Flutter UI (wires Wave 7 backend)
+
+Body:
+Controllers and accountants now have a single screen to review every
+AI decision — pending approvals with inline approve/reject, auto-
+applied rows ready for retroactive takedown, rejection trail for the
+audit binder.
+
+Files:
+- ai_guardrails_screen.dart: 5 filter chips with live counts from
+  /ai/guardrails/stats. Suggestion cards show source icon (Copilot /
+  COA / OCR), action type, target id, Arabic reasoning, the gate_reason
+  explainer, a confidence % badge (green ≥95%, amber 80-94%, red <80%),
+  and a red "تدميري" pill when destructive=True so the reason for
+  needing approval is visible at a glance. Needs-approval rows render
+  inline موافقة/رفض buttons; reject opens an optional-Arabic-reason
+  dialog wired to the backend rejection_reason column.
+- api_service.dart: six new methods mirroring the Wave 7 routes.
+- v4_groups_data.dart: adds "compliance-gov-ai-oversight" as an
+  overflow entry under Compliance > Governance — AI policy enforcement
+  lives with governance until the Settings → AI Agents gallery ships.
+- v4_routes.dart: registers AiGuardrailsScreen under that id. Fourth
+  V4 screen wired to real data (ERP Customers / Compliance Status /
+  ZATCA Queue / AI Guardrails).
+
+Verification: dart analyze clean, flutter build web succeeds (44s),
+pytest unchanged at 1019 pass.
+```
+
+---
+
+```
+Title: Wave 7: confidence-gated AI guardrails (pattern #102)
+
+Body:
+Every AI-generated suggestion — Copilot, COA classifier, receipt OCR,
+vendor matcher — now passes through a gate before it can write real
+data. Closes the biggest risk of embedding AI deeper in the
+accounting workflow: silent bad posting.
+
+Rules:
+- confidence < min_confidence (default 0.95) → needs_approval.
+- destructive=True → needs_approval regardless of confidence.
+- confidence outside [0, 1] → rejected outright (guards against
+  model bugs returning sentinel values).
+- min_confidence overridable per-suggestion so stricter pipelines
+  (COA auto-posting) opt into 0.98 without changing the module.
+
+Three layers:
+1. ai_suggestion table with gate_reason, status, approval trail.
+   Confidence stored as 0-1000 permille for deterministic equality.
+2. ai_guardrails.py: pure Suggestion/GuardedDecision/Verdict types +
+   guard/approve/reject/list_rows/stats. guard() writes the row and
+   fires an audit event (ai.gate.auto_applied / needs_approval /
+   rejected / approved / rejected_by_human) through the Wave 1 hash
+   chain. The guardrail is ADVISORY — never touches domain tables.
+3. /ai/guardrails routes: evaluate / list / stats / {id} / approve /
+   reject. Approve on a terminal-non-approved row returns 409.
+
+28 new tests. Pytest: 991 → 1019 pass · 2 skip · 0 fail.
+```
+
+---
+
 ```
 Title: Wave 6: ZATCA retry queue Flutter UI (wires Wave 5 backend)
 
