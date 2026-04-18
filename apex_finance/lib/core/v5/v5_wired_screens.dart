@@ -17,8 +17,10 @@ import 'package:flutter/material.dart';
 import '../../screens/v4_ai/ai_guardrails_screen.dart';
 import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
+import '../../screens/v4_compliance/audit_reporting_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/gosi_wps_screen.dart';
+import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
@@ -92,9 +94,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── Audit ────────────────────────────────────────────────────────
   'audit/fieldwork/risk': (ctx) => const ComplianceStatusScreen(),
-  // Automated Audit Analytics — Inflo/MindBridge replacement
-  'audit/fieldwork/workpapers': (ctx) => const AuditAnalyticsScreen(),
+  // Wave 17 Audit Analytics (Inflo/MindBridge replacement)
   'audit/fieldwork/control': (ctx) => const AuditAnalyticsScreen(),
+  // Wave 23 — Workpapers detailed view (CaseWare-class)
+  'audit/fieldwork/workpapers': (ctx) => const WorkpapersDetailScreen(),
+  // Wave 24 — Audit Reporting (Opinion Builder + Management Letter + QC)
+  'audit/reporting/opinion': (ctx) => const AuditReportingScreen(),
+  'audit/reporting/ml': (ctx) => const AuditReportingScreen(),
+  'audit/reporting/qc': (ctx) => const AuditReportingScreen(),
 
   // ── AI Settings (horizontal layer — still accessible via /app) ───
   'compliance/regulatory/aml': (ctx) => const AiGuardrailsScreen(),
