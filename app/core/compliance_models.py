@@ -252,6 +252,112 @@ class ZatcaCsid(Base):
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
 
+class BankFeedConnection(Base):
+    """
+    Bank-feed connection to an external aggregator (Wave 13).
+
+    Pattern #137 from APEX_GLOBAL_RESEARCH_210: SAMA Open Banking
+    aggregation via Lean / Tarabut / Salt Edge — the real differentiator
+    over CSV-upload competitors (Qoyod / Wafeq).
+
+    One row per connected bank account. Access tokens + refresh tokens
+    are stored Fernet-encrypted at rest with BANK_FEEDS_ENCRYPTION_KEY
+    (falls back to JWT_SECRET-derived in dev, same pattern as TOTP +
+    CSID modules).
+    """
+
+    __tablename__ = "bank_feed_connection"
+    __table_args__ = (
+        Index("ix_bfc_tenant", "tenant_id"),
+        Index("ix_bfc_status", "status"),
+        Index("ix_bfc_provider", "provider"),
+        UniqueConstraint(
+            "tenant_id",
+            "provider",
+            "external_account_id",
+            name="uq_bfc_tenant_provider_account",
+        ),
+    )
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    tenant_id = Column(String(36), nullable=False, index=True)
+    provider = Column(String(30), nullable=False)  # lean | tarabut | saltedge | mock
+    external_account_id = Column(String(120), nullable=False)
+
+    # Metadata the provider returned about the account.
+    bank_name = Column(String(120), nullable=True)
+    account_name = Column(String(200), nullable=True)
+    account_number_masked = Column(String(60), nullable=True)
+    iban_masked = Column(String(60), nullable=True)
+    currency = Column(String(3), nullable=True)
+
+    # Encrypted tokens (provider-specific). Plaintext NEVER leaves the
+    # server side — get_decrypted_token() is the only reader, used by
+    # the sync path.
+    access_token_encrypted = Column(Text, nullable=True)
+    refresh_token_encrypted = Column(Text, nullable=True)
+    token_expires_at = Column(DateTime, nullable=True)
+
+    status = Column(String(20), nullable=False, default="connected")
+    # connected | reauth_required | disconnected | error
+
+    last_sync_at = Column(DateTime, nullable=True)
+    last_sync_error = Column(Text, nullable=True)
+    last_sync_txn_count = Column(Integer, nullable=True)
+
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class BankFeedTransaction(Base):
+    """
+    Normalized transaction pulled from a provider via BankFeedConnection.
+
+    Provider-specific raw payloads are preserved in `raw_json` so we
+    can re-run the normalization if we find a bug, without re-hitting
+    the provider's rate limit.
+    """
+
+    __tablename__ = "bank_feed_transaction"
+    __table_args__ = (
+        Index("ix_bft_connection_date", "connection_id", "txn_date"),
+        Index("ix_bft_tenant_date", "tenant_id", "txn_date"),
+        UniqueConstraint(
+            "connection_id",
+            "external_id",
+            name="uq_bft_connection_external_id",
+        ),
+    )
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    tenant_id = Column(String(36), nullable=False, index=True)
+    connection_id = Column(String(36), nullable=False, index=True)
+
+    external_id = Column(String(120), nullable=False)  # provider's txn id
+
+    txn_date = Column(DateTime, nullable=False)
+    amount = Column(String(40), nullable=False)  # decimal string for exactness
+    currency = Column(String(3), nullable=False)
+    description = Column(Text, nullable=True)
+    counterparty = Column(String(200), nullable=True)
+    direction = Column(String(10), nullable=False)  # "debit" | "credit"
+
+    # Suggested GL category from the provider (if any) + a confidence
+    # score so downstream AI classifiers know whether to trust it.
+    category_hint = Column(String(80), nullable=True)
+
+    # Reconciliation pointer — set when a user (or AI) matches this row
+    # to an existing journal entry or invoice.
+    matched_entity_type = Column(String(40), nullable=True)  # "journal_entry" | "invoice"
+    matched_entity_id = Column(String(36), nullable=True)
+    matched_at = Column(DateTime, nullable=True)
+    matched_by = Column(String(36), nullable=True)
+
+    raw_json = Column(JSON, nullable=True)  # provider's untouched payload
+
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+
+
 def init_compliance_db():
     from app.phase1.models.platform_models import engine
 
@@ -262,4 +368,6 @@ def init_compliance_db():
         "zatca_submission_queue",
         "ai_suggestion",
         "zatca_csid",
+        "bank_feed_connection",
+        "bank_feed_transaction",
     ]

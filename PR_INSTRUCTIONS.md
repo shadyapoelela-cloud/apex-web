@@ -151,6 +151,49 @@ Base: `claude/brave-yonath-wave-9` ← Head: `claude/brave-yonath-wave-10`
 Base: `claude/brave-yonath-wave-10` ← Head: `claude/brave-yonath-wave-11`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-10...claude/brave-yonath-wave-11?expand=1>
 
+### PR #14 — Wave 12 (CSID management UI — wires Wave 11 backend)
+Base: `claude/brave-yonath-wave-11` ← Head: `claude/brave-yonath-wave-12`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-11...claude/brave-yonath-wave-12?expand=1>
+
+```
+Title: Wave 12: CSID management screen (wires Wave 11 backend)
+
+Body:
+Flutter UI completing Wave 11. Accountants see every Fatoora cert on
+a single screen — color-coded by expiry, with a top banner when ≥1
+cert is within 30 days of expiring.
+
+zatca_csid_screen.dart:
+- Expiry banner (amber) when ≥1 active cert ≤ 30 days from expiring,
+  counting only actives so already-handled rows don't nag.
+- 5 status chips (All / سارية / قيد التجديد / منتهية / ملغاة) with
+  live counts + segmented env control (All / Sandbox / Production).
+- CSID cards: subject + cert_serial monospace + expiry date + three
+  badges (env / status / days-to-expiry). Days badge: red ≤7, amber
+  ≤30, green otherwise.
+- Inline revoke button on active/renewing rows with optional-Arabic-
+  reason dialog wired to the backend rejection_reason field.
+- Revoked rows display the rejection_reason inline in a red callout.
+- "مسح المنتهية" admin button → sweep_expired after confirm. Safe:
+  doesn't delete, only flips active→expired.
+- All flows through ApexScreenHost: loading / empty-first-time (with
+  an explanation of what CSID is) / empty-after-filter / error.
+
+api_service.dart: six new client methods covering stats, list,
+expiring-soon, detail, revoke, sweep-expired. Critically — NO method
+returns decrypted cert/key material. The Wave 11 invariant is that
+plaintext never leaves the server; this client preserves it.
+
+v4_routes.dart._wiredScreens gains compliance-zatca-certs →
+ZatcaCsidScreen. Fifth V4 screen wired to real backend data after
+ERP Customers, Compliance Status, ZATCA Queue, AI Guardrails.
+
+Verification: dart analyze clean, flutter build web succeeds (45s),
+pytest unchanged at 1074 pass.
+```
+
+---
+
 ```
 Title: Wave 11: ZATCA CSID lifecycle (encrypted keystore, expiry alerts, rotation)
 
