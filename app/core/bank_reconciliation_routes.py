@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 
 from app.core.auth_utils import extract_user_id
 from app.core.bank_reconciliation import (
+    approve_and_reconcile,
     auto_match_via_guardrail,
     propose_matches,
 )
@@ -106,3 +107,37 @@ async def auto_match_route(
         destructive=req.destructive,
     )
     return {"success": True, "data": result.to_dict()}
+
+
+@router.post("/approve/{row_id}")
+async def approve_and_reconcile_route(
+    row_id: str, user_id: str = Depends(_auth)
+) -> Dict[str, Any]:
+    """Approve a bank-rec AiSuggestion AND execute the reconciliation.
+
+    The generic /ai/guardrails/{id}/approve only flips the suggestion
+    status; it has no hook to call bank_feeds.mark_reconciled for the
+    bank-rec action_type. This dedicated endpoint closes that gap.
+
+    Returns 404 when the suggestion doesn't exist, 400 when it's not a
+    bank-rec row or its after_json is malformed, and 502 when approval
+    succeeded but the bank_tx has disappeared between the suggestion
+    being created and the human approving it.
+    """
+    try:
+        out = approve_and_reconcile(row_id, user_id=user_id)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not out["reconciled"]:
+        # Suggestion flipped to approved but reconcile failed → surface
+        # the partial state to the UI so the operator can investigate.
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "message": out.get("error") or "reconcile failed",
+                "partial": out,
+            },
+        )
+    return {"success": True, "data": out}

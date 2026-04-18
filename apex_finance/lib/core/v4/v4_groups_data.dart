@@ -518,7 +518,12 @@ const complianceAml = V4SubModule(
 );
 
 const complianceGovernance = V4SubModule(
-  id: 'governance',
+  // NOTE: sub id is 'gov' (not 'governance') so URL resolution lines
+  // up with the `compliance-gov-*` screen-id prefix used by all six
+  // tabs/overflow entries below. Without this, the whole Governance
+  // sub-module is unreachable via URL — the router builds
+  // `$groupId-$subId-$slug` and matches against screen ids.
+  id: 'gov',
   labelAr: 'الحوكمة والمجلس',
   labelEn: 'Governance & Board',
   icon: Icons.account_balance_outlined,

@@ -155,12 +155,25 @@ def _to_date(v: Any) -> Optional[date]:
 # ── Feature scores (each returns a float in [0.0, 1.0]) ───────────────
 
 
-def _amount_score(a: Optional[Decimal], b: Optional[Decimal]) -> float:
+def _amount_score(
+    a: Optional[Decimal],
+    b: Optional[Decimal],
+    *,
+    currency_a: Optional[str] = None,
+    currency_b: Optional[str] = None,
+) -> float:
     """1.0 when identical. Decays linearly with relative difference so
     a 10 SAR vs 10.02 SAR pair still scores ~0.998, while 10 SAR vs
     1000 SAR scores near zero. Returns 0.0 when either side is missing
-    or either is zero with the other non-zero."""
+    or either is zero with the other non-zero. Also returns 0.0 when
+    both sides carry a currency AND they disagree (100 SAR cannot
+    reconcile 100 USD no matter how close the numbers look)."""
     if a is None or b is None:
+        return 0.0
+    # Currency guard: only activates when BOTH sides declare a currency.
+    # If either side omits it, assume the caller vetted currencies
+    # upstream (e.g. same-account scope) — don't invent a mismatch.
+    if currency_a and currency_b and currency_a.strip().upper() != currency_b.strip().upper():
         return 0.0
     if a == 0 and b == 0:
         return 1.0
@@ -254,6 +267,8 @@ def score_pair(
     s_amt = _amount_score(
         _to_decimal(bank_tx.get("amount")),
         _to_decimal(candidate.get("amount")),
+        currency_a=bank_tx.get("currency"),
+        currency_b=candidate.get("currency"),
     )
     s_date = _date_score(
         _to_date(bank_tx.get("date")),
@@ -344,6 +359,42 @@ class AutoMatchResult:
         }
 
 
+# Synthetic verdict for the idempotency short-circuit. Not a real
+# ai_guardrails Verdict because the guardrail never fires on this path
+# — we return early BEFORE building a Suggestion.
+_VERDICT_ALREADY_MATCHED = "already_matched"
+
+
+def _already_reconciled(bank_tx_id: Optional[str]) -> Optional[Dict[str, Any]]:
+    """Return {entity_type, entity_id, matched_at, matched_by} if
+    `bank_tx_id` already points at a reconciled bank_feed_transaction
+    row. None otherwise (including when bank_tx_id is missing or the
+    row doesn't exist — auto_match_via_guardrail falls through to its
+    normal path in those cases)."""
+    if not bank_tx_id:
+        return None
+    from app.core.bank_feeds import BankFeedTransaction
+    from app.phase1.models.platform_models import SessionLocal
+
+    db = SessionLocal()
+    try:
+        row = (
+            db.query(BankFeedTransaction)
+            .filter(BankFeedTransaction.id == bank_tx_id)
+            .first()
+        )
+        if row is None or row.matched_entity_id is None:
+            return None
+        return {
+            "entity_type": row.matched_entity_type,
+            "entity_id": row.matched_entity_id,
+            "matched_at": row.matched_at.isoformat() if row.matched_at else None,
+            "matched_by": row.matched_by,
+        }
+    finally:
+        db.close()
+
+
 def auto_match_via_guardrail(
     bank_tx: Dict[str, Any],
     candidates: Iterable[Dict[str, Any]],
@@ -368,7 +419,28 @@ def auto_match_via_guardrail(
     the guardrail is the only filter — otherwise a borderline score
     like 0.28 would be silently dropped instead of being routed to
     needs_approval.
+
+    Idempotency: if `bank_tx_id` already points at a reconciled
+    bank_feed_transaction row, this function returns immediately with
+    verdict="already_matched" and does NOT create a new AiSuggestion.
+    Without this guard, a second call would (a) duplicate the
+    suggestion queue and (b) overwrite the existing matched_entity_id
+    (which may have been a deliberate human choice).
     """
+    existing = _already_reconciled(bank_tx_id)
+    if existing is not None:
+        return AutoMatchResult(
+            verdict=_VERDICT_ALREADY_MATCHED,
+            row_id=None,
+            score=0.0,
+            best_candidate_id=str(existing["entity_id"]),
+            reason=(
+                f"سبق مطابقة هذه الحركة مع "
+                f"{existing['entity_type']}/{existing['entity_id']}."
+            ),
+            matched=True,
+        )
+
     score_kwargs.setdefault("min_score", 0.0)
     proposals = propose_matches(bank_tx, candidates, **score_kwargs)
 
@@ -456,3 +528,103 @@ def auto_match_via_guardrail(
         reason=decision.reason,
         matched=matched,
     )
+
+
+# ── Human approval path ───────────────────────────────────────────────
+
+
+def approve_and_reconcile(row_id: str, user_id: str) -> Dict[str, Any]:
+    """Approve a bank-rec AiSuggestion AND execute the reconciliation.
+
+    The generic `/ai/guardrails/{id}/approve` route only flips the
+    suggestion's status — it has no way to know that a bank-rec row
+    needs `bank_feeds.mark_reconciled` to be called too. Without this
+    dedicated path, a human-approved NEEDS_APPROVAL bank-rec decision
+    is cosmetic: the suggestion shows "approved" but the bank_tx stays
+    unreconciled forever.
+
+    Flow:
+      1. Read the suggestion. Reject if it's not a bank-rec row
+         (source/action_type guards) — we won't dispatch to
+         mark_reconciled on suggestions from other sources.
+      2. Extract bank_tx_id + candidate_id + entity_type from
+         after_json (shape set by auto_match_via_guardrail).
+      3. Call ai_guardrails.approve(row_id, user_id) — this handles
+         the terminal-state guard, audit event, and idempotent re-run.
+      4. Call bank_feeds.mark_reconciled(...).
+
+    Returns a dict with row_id + matched_entity fields so the caller
+    can render a confirmation card without a second round-trip.
+
+    Raises:
+      LookupError — suggestion not found.
+      ValueError  — suggestion exists but is not a bank-rec row, or is
+                    missing the expected after_json shape.
+    """
+    from app.core.ai_guardrails import approve as _approve_suggestion
+    from app.core.ai_guardrails import get_row
+    from app.core.bank_feeds import mark_reconciled
+
+    row = get_row(row_id)
+    if row is None:
+        raise LookupError(f"suggestion {row_id} not found")
+
+    # Source + action_type guard: this endpoint only services bank-rec
+    # suggestions. A generic approval route should be used for anything
+    # else (COA, OCR, Copilot, ...).
+    if row.get("source") != "bank_reconciliation":
+        raise ValueError(
+            f"suggestion {row_id} is not a bank_reconciliation row "
+            f"(source={row.get('source')!r})"
+        )
+    if row.get("action_type") != "match_bank_transaction":
+        raise ValueError(
+            f"suggestion {row_id} has unexpected action_type "
+            f"{row.get('action_type')!r}"
+        )
+
+    after = row.get("after") or {}
+    bank_tx_id = after.get("bank_tx_id")
+    candidate_id = after.get("candidate_id")
+    entity_type = after.get("entity_type") or "journal_entry"
+    if not bank_tx_id or not candidate_id:
+        raise ValueError(
+            f"suggestion {row_id} is missing bank_tx_id or candidate_id "
+            "in after_json — cannot reconcile."
+        )
+
+    # 1) Flip the suggestion to approved (idempotent when already so).
+    _approve_suggestion(row_id, user_id=user_id)
+
+    # 2) Post the reconciliation. If the bank_tx row has vanished since
+    # the suggestion was created, we surface the error rather than
+    # silently leaving state inconsistent — the suggestion is approved
+    # but no reconciliation happened.
+    reconcile_error: Optional[str] = None
+    try:
+        mark_reconciled(
+            str(bank_tx_id),
+            entity_type=entity_type,
+            entity_id=str(candidate_id),
+            user_id=user_id,
+        )
+        reconciled = True
+    except LookupError as exc:
+        logger.warning(
+            "approve_and_reconcile: bank_tx %r missing at approval time "
+            "(suggestion %r already flipped to approved): %s",
+            bank_tx_id,
+            row_id,
+            exc,
+        )
+        reconciled = False
+        reconcile_error = str(exc)
+
+    return {
+        "row_id": row_id,
+        "bank_tx_id": bank_tx_id,
+        "candidate_id": candidate_id,
+        "entity_type": entity_type,
+        "reconciled": reconciled,
+        "error": reconcile_error,
+    }
