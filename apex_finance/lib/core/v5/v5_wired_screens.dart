@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 // Reuse existing brave-yonath screens (Waves 2-14).
 // These imports may trigger transitive package imports; build verifies.
 import '../../screens/v4_ai/ai_guardrails_screen.dart';
+import '../../screens/v4_compliance/audit_analytics_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
@@ -51,6 +52,9 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── Audit ────────────────────────────────────────────────────────
   'audit/fieldwork/risk': (ctx) => const ComplianceStatusScreen(),
+  // Automated Audit Analytics — Inflo/MindBridge replacement
+  'audit/fieldwork/workpapers': (ctx) => const AuditAnalyticsScreen(),
+  'audit/fieldwork/control': (ctx) => const AuditAnalyticsScreen(),
 
   // ── AI Settings (horizontal layer — still accessible via /app) ───
   'compliance/regulatory/aml': (ctx) => const AiGuardrailsScreen(),
