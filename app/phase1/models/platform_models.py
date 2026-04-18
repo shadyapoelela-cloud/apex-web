@@ -179,6 +179,14 @@ class User(Base):
     is_deleted = Column(Boolean, default=False)
     deleted_at = Column(DateTime(timezone=True), nullable=True)
 
+    # TOTP 2FA (Wave 1 PR#4). Secret is stored Fernet-encrypted; recovery
+    # codes are stored as a JSON array of bcrypt hashes (only the hash;
+    # never the raw code). totp_enabled_at is set after the first valid
+    # code proves the user scanned the QR successfully.
+    totp_secret_encrypted = Column(Text, nullable=True)
+    totp_enabled_at = Column(DateTime(timezone=True), nullable=True)
+    totp_recovery_codes_hashed = Column(Text, nullable=True)  # JSON array
+
     # Timestamps
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
