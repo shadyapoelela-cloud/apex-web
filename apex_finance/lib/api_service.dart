@@ -472,6 +472,11 @@ class ApiService {
       _post('/bank-rec/propose', body);
   static Future<ApiResult> bankRecAutoMatch(Map body) =>
       _post('/bank-rec/auto-match', body);
+  // Wave 17 gap fix: dedicated approval endpoint that ALSO calls
+  // mark_reconciled. The generic /ai/guardrails/{id}/approve only
+  // flips the suggestion status — use this one for bank-rec rows.
+  static Future<ApiResult> bankRecApprove(String rowId) =>
+      _post('/bank-rec/approve/$rowId', const {});
 
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);

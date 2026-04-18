@@ -78,6 +78,70 @@ class TestAmountScore:
         assert br._amount_score(None, Decimal("10")) == 0.0
         assert br._amount_score(Decimal("10"), None) == 0.0
 
+    # Wave 17 gap fix #3: currency mismatch must zero the amount score.
+    def test_currency_mismatch_zeros(self):
+        s = br._amount_score(
+            Decimal("100"),
+            Decimal("100"),
+            currency_a="SAR",
+            currency_b="USD",
+        )
+        assert s == 0.0
+
+    def test_currency_same_still_scores(self):
+        s = br._amount_score(
+            Decimal("100"),
+            Decimal("100"),
+            currency_a="SAR",
+            currency_b="sar",  # case-insensitive
+        )
+        assert s == pytest.approx(1.0)
+
+    def test_currency_one_side_missing_ignored(self):
+        # If the caller vetted currency upstream, missing side shouldn't
+        # invent a mismatch.
+        s = br._amount_score(
+            Decimal("100"),
+            Decimal("100"),
+            currency_a=None,
+            currency_b="SAR",
+        )
+        assert s == pytest.approx(1.0)
+
+
+class TestScorePairCurrency:
+    """Gap #3 propagated through score_pair + propose_matches."""
+
+    def test_currency_mismatch_drops_total(self):
+        bank = {
+            "id": "B1",
+            "amount": "100",
+            "date": "2026-04-01",
+            "vendor": "STC",
+            "description": "Bill",
+            "currency": "SAR",
+        }
+        cand = dict(bank, id="C1", currency="USD")
+        total = br.score_pair(bank, cand).total
+        # Amount contributes 0 (50%); date/vendor/desc all 1.0 (50%).
+        assert total == pytest.approx(0.50)
+
+    def test_propose_respects_currency(self):
+        bank = {
+            "id": "B1",
+            "amount": "100",
+            "date": "2026-04-01",
+            "vendor": "STC",
+            "description": "Bill",
+            "currency": "SAR",
+        }
+        same = dict(bank, id="C-SAR")
+        other = dict(bank, id="C-USD", currency="USD")
+        props = br.propose_matches(bank, [same, other], min_score=0.0)
+        # Same-currency candidate must rank first.
+        assert props[0]["candidate_id"] == "C-SAR"
+        assert props[0]["score"] > props[1]["score"]
+
 
 class TestDateScore:
     def test_same_day_one(self):
@@ -336,6 +400,207 @@ class TestProposeRoute:
             json={"bank_tx": {"amount": "1"}, "date_window_days": -5},
         )
         assert r.status_code == 422
+
+
+# ── Wave 17 gap fixes ─────────────────────────────────────────────────
+
+
+class TestIdempotency:
+    """Gap #4: calling auto-match on an already-reconciled bank_tx must
+    short-circuit rather than creating a duplicate suggestion or
+    overwriting the existing matched_entity_id."""
+
+    def _seed_reconciled_row(self) -> str:
+        rid = bf.connect(
+            ConnectionInput(
+                tenant_id="t1",
+                provider="mock",
+                account=ProviderAccount(
+                    external_account_id="acct-idem",
+                    bank_name="Bank",
+                    currency="SAR",
+                ),
+                tokens=ProviderAuthTokens(access_token="X" * 40),
+            )
+        )
+        bf.sync_account(rid)
+        txn_id = bf.list_transactions(connection_id=rid)[0]["id"]
+        bf.mark_reconciled(
+            txn_id,
+            entity_type="journal_entry",
+            entity_id="JE-HUMAN-PICK",
+            user_id="human",
+        )
+        return txn_id
+
+    def test_already_matched_short_circuit(self):
+        txn_id = self._seed_reconciled_row()
+        # Even with a perfect candidate, auto_match should NOT fire.
+        result = br.auto_match_via_guardrail(
+            {"id": txn_id, "amount": "1250", "date": "2026-04-01"},
+            [{"id": "JE-AI", "amount": "1250", "date": "2026-04-01"}],
+            bank_tx_id=txn_id,
+            tenant_id="t1",
+        )
+        assert result.verdict == "already_matched"
+        assert result.matched is True
+        assert result.best_candidate_id == "JE-HUMAN-PICK"
+        # Crucially: no AiSuggestion was created.
+        db = SessionLocal()
+        try:
+            count = db.query(AiSuggestion).count()
+        finally:
+            db.close()
+        assert count == 0
+
+    def test_already_matched_preserves_human_choice(self):
+        """The existing matched_entity_id stays untouched."""
+        txn_id = self._seed_reconciled_row()
+        br.auto_match_via_guardrail(
+            {"id": txn_id, "amount": "1250", "date": "2026-04-01"},
+            [{"id": "JE-AI", "amount": "1250", "date": "2026-04-01"}],
+            bank_tx_id=txn_id,
+        )
+        db = SessionLocal()
+        try:
+            row = (
+                db.query(BankFeedTransaction)
+                .filter(BankFeedTransaction.id == txn_id)
+                .one()
+            )
+            assert row.matched_entity_id == "JE-HUMAN-PICK"
+            assert row.matched_entity_type == "journal_entry"
+        finally:
+            db.close()
+
+
+class TestApproveAndReconcile:
+    """Gap #2: human approval of a NEEDS_APPROVAL bank-rec suggestion
+    must actually reconcile the bank_tx, not just flip the status."""
+
+    def _seed_needs_approval(self) -> tuple[str, str]:
+        rid = bf.connect(
+            ConnectionInput(
+                tenant_id="t1",
+                provider="mock",
+                account=ProviderAccount(
+                    external_account_id="acct-app",
+                    bank_name="Bank",
+                    currency="SAR",
+                ),
+                tokens=ProviderAuthTokens(access_token="X" * 40),
+            )
+        )
+        bf.sync_account(rid)
+        bank_row = bf.list_transactions(connection_id=rid)[0]
+        txn_id = bank_row["id"]
+
+        # Weak candidate → score <0.95 → NEEDS_APPROVAL.
+        weak = {
+            "id": "JE-WEAK",
+            "amount": bank_row["amount"],
+            "date": "2026-08-20",
+            "vendor": "مورد مختلف",
+            "description": "غير ذات صلة",
+        }
+        result = br.auto_match_via_guardrail(
+            {
+                "id": txn_id,
+                "amount": bank_row["amount"],
+                "date": bank_row["txn_date"],
+                "vendor": bank_row.get("counterparty"),
+                "description": bank_row.get("description"),
+            },
+            [weak],
+            bank_tx_id=txn_id,
+            tenant_id="t1",
+        )
+        assert result.verdict == "needs_approval"
+        assert result.row_id
+        return result.row_id, txn_id
+
+    def test_approve_reconciles(self):
+        row_id, txn_id = self._seed_needs_approval()
+        out = br.approve_and_reconcile(row_id, user_id="approver-1")
+        assert out["reconciled"] is True
+        # The bank_tx now carries the AI's proposed candidate.
+        db = SessionLocal()
+        try:
+            row = (
+                db.query(BankFeedTransaction)
+                .filter(BankFeedTransaction.id == txn_id)
+                .one()
+            )
+            assert row.matched_entity_id == "JE-WEAK"
+            assert row.matched_by == "approver-1"
+        finally:
+            db.close()
+
+    def test_approve_unknown_row_raises(self):
+        with pytest.raises(LookupError):
+            br.approve_and_reconcile("no-such-id", user_id="u")
+
+    def test_approve_rejects_non_bank_rec_source(self):
+        """The bank-rec approval endpoint must refuse suggestions from
+        other sources (Copilot, COA, ...) — they belong on the generic
+        /ai/guardrails/{id}/approve route."""
+        from app.core.ai_guardrails import Suggestion, guard
+
+        decision = guard(
+            Suggestion(
+                source="copilot",
+                action_type="categorize_txn",
+                after={"category": "x"},
+                confidence=0.80,  # → NEEDS_APPROVAL
+            )
+        )
+        with pytest.raises(ValueError):
+            br.approve_and_reconcile(decision.row_id, user_id="u")
+
+
+class TestApproveRoute:
+    def test_requires_auth(self, client: TestClient):
+        r = client.post("/bank-rec/approve/any-id")
+        assert r.status_code == 401
+
+    def test_approve_route_happy_path(self, client: TestClient, auth_header):
+        # Seed a NEEDS_APPROVAL row the same way as above.
+        helper = TestApproveAndReconcile()
+        row_id, txn_id = helper._seed_needs_approval()
+
+        r = client.post(
+            f"/bank-rec/approve/{row_id}", headers=auth_header
+        )
+        assert r.status_code == 200, r.text
+        data = r.json()["data"]
+        assert data["reconciled"] is True
+        assert data["bank_tx_id"] == txn_id
+
+    def test_approve_route_unknown_returns_404(
+        self, client: TestClient, auth_header
+    ):
+        r = client.post(
+            "/bank-rec/approve/does-not-exist", headers=auth_header
+        )
+        assert r.status_code == 404
+
+    def test_approve_route_wrong_source_returns_400(
+        self, client: TestClient, auth_header
+    ):
+        from app.core.ai_guardrails import Suggestion, guard
+
+        decision = guard(
+            Suggestion(
+                source="copilot",
+                action_type="categorize_txn",
+                after={"category": "x"},
+                confidence=0.80,
+            )
+        )
+        r = client.post(
+            f"/bank-rec/approve/{decision.row_id}", headers=auth_header
+        )
+        assert r.status_code == 400
 
 
 class TestAutoMatchRoute:

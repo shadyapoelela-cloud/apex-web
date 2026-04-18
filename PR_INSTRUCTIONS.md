@@ -155,6 +155,90 @@ Base: `claude/brave-yonath-wave-10` ← Head: `claude/brave-yonath-wave-11`
 Base: `claude/brave-yonath-wave-11` ← Head: `claude/brave-yonath-wave-12`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-11...claude/brave-yonath-wave-12?expand=1>
 
+### PR #19 — Wave 17 (Bank-rec gap fixes — approval reconciles, currency guard, idempotency, routing)
+Base: `claude/brave-yonath-wave-16` ← Head: `claude/brave-yonath-wave-17`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-16...claude/brave-yonath-wave-17?expand=1>
+
+```
+Title: Wave 17: bank-rec gap fixes (approval reconciles, currency guard, idempotency, governance routing)
+
+Body:
+Four correctness gaps found during review of Waves 15 + 16, closed in
+one focused PR. No new features.
+
+Gap 1 — AI Oversight sub-module unreachable by URL (pre-existing from
+Wave 8): `complianceGovernance.id='governance'` but every child
+screen uses the `compliance-gov-*` id prefix. The V4 router builds
+`{group}-{sub}-{slug}` from URL segments and matches against screen
+ids, so the six Governance screens (Board Pack / Meetings / Minutes /
+Resolutions / Policies / AI Oversight) were all dead links. The
+Wave 16 UI deep-link into AI Oversight inherited the same broken
+path.
+
+Fix: rename the sub-module id from `governance` → `gov` in
+v4_groups_data.dart. All six screens now resolve. Comment pins the
+invariant so a future edit can't silently re-break it.
+
+Gap 2 — Human approval didn't actually reconcile (Wave 15): the
+generic `/ai/guardrails/{id}/approve` just flips the suggestion
+status. For bank-rec suggestions it never called
+`bank_feeds.mark_reconciled`, so an accountant approving a
+NEEDS_APPROVAL row left the bank_tx unreconciled forever —
+approval was cosmetic.
+
+Fix: new `approve_and_reconcile(row_id, user_id)` in
+bank_reconciliation.py that
+  (a) reads the AiSuggestion row,
+  (b) rejects non-bank-rec sources (ValueError → 400 on the route),
+  (c) validates after_json shape (bank_tx_id + candidate_id present),
+  (d) calls ai_guardrails.approve() then bank_feeds.mark_reconciled(),
+  (e) surfaces partial-state (approved but not reconciled) as 502 so
+      the operator sees it instead of silent desync.
+Dedicated `POST /bank-rec/approve/{row_id}` route + matching
+ApiService.bankRecApprove() on the client. The generic approval path
+still works for anything else (COA, OCR, Copilot).
+
+Gap 3 — Currency mismatch passed scoring (Wave 15): _amount_score
+ignored currency, so 100 SAR vs 100 USD scored 1.0 on amount.
+
+Fix: _amount_score now takes optional currency_a / currency_b and
+returns 0.0 when both are provided AND differ (case-insensitive).
+When either side omits currency, behaviour is unchanged — upstream
+is assumed to have vetted it. score_pair + propose_matches propagate
+the currency through from bank_tx / candidate dicts.
+
+Gap 4 — auto-match was not idempotent (Wave 15): a second call on an
+already-reconciled bank_tx (a) created a duplicate AiSuggestion row
+and (b) overwrote the existing matched_entity_id — which may have
+been a deliberate human pick.
+
+Fix: new _already_reconciled() guard at the top of
+auto_match_via_guardrail. When the bank_tx is already matched, the
+function returns verdict="already_matched" WITHOUT creating a new
+suggestion or calling mark_reconciled. The matched_entity_id stays
+untouched.
+
+Tests (14 new in tests/test_bank_reconciliation.py, bringing the
+file to 44):
+- Amount score: currency mismatch → 0; same-currency (case-
+  insensitive) still scores 1.0; one-side-missing currency is not
+  treated as mismatch.
+- score_pair + propose: currency mismatch drops the total by the
+  amount-weight share; same-currency candidate ranks first when both
+  are provided.
+- Idempotency: already-matched short-circuits with no new
+  AiSuggestion; existing matched_entity_id is preserved.
+- approve_and_reconcile: approves a needs_approval row and actually
+  flips matched_entity_id/by on the bank_tx; unknown row raises
+  LookupError; non-bank-rec source raises ValueError.
+- Route: auth required, happy path returns 200 with reconciled=true,
+  unknown row → 404, wrong source → 400.
+
+Test suite: 1133 → 1147 pass (+14 new) · 2 skip · 0 fail.
+Flutter: dart analyze clean on V4 surface; flutter build web
+succeeds (36s).
+```
+
 ### PR #18 — Wave 16 (AI bank reconciliation UI — wires Wave 15 backend)
 Base: `claude/brave-yonath-wave-15` ← Head: `claude/brave-yonath-wave-16`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-15...claude/brave-yonath-wave-16?expand=1>
