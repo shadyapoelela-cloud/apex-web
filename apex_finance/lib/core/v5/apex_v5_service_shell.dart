@@ -477,7 +477,7 @@ class _SidebarItemState extends State<_SidebarItem> {
 // Chip Row — dashboard first + specialized chips
 // ──────────────────────────────────────────────────────────────────────
 
-class _ChipRow extends StatelessWidget {
+class _ChipRow extends StatefulWidget {
   final V5Service service;
   final V5MainModule mainModule;
   final String activeChipId;
@@ -489,27 +489,176 @@ class _ChipRow extends StatelessWidget {
   });
 
   @override
+  State<_ChipRow> createState() => _ChipRowState();
+}
+
+class _ChipRowState extends State<_ChipRow> {
+  final ScrollController _scrollCtrl = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
+  void _scrollBy(double delta) {
+    if (!_scrollCtrl.hasClients) return;
+    final target = (_scrollCtrl.offset + delta)
+        .clamp(0.0, _scrollCtrl.position.maxScrollExtent);
+    _scrollCtrl.animateTo(
+      target,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final surface = Theme.of(context).colorScheme.surface;
     return Container(
       height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      color: Theme.of(context).colorScheme.surface,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (final chip in mainModule.chips)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _ChipItem(
-                  chip: chip,
-                  isActive: chip.id == activeChipId,
-                  serviceColor: service.color,
-                  onTap: () => context.go(
-                    '/app/${service.id}/${mainModule.id}/${chip.id}',
+      color: surface,
+      child: Row(
+        children: [
+          // Scroll-left arrow (visual order — works in both LTR/RTL).
+          _ScrollArrow(
+            icon: Icons.chevron_left,
+            onTap: () => _scrollBy(-220),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              controller: _scrollCtrl,
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                children: [
+                  for (final chip in widget.mainModule.chips)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _ChipItem(
+                        chip: chip,
+                        isActive: chip.id == widget.activeChipId,
+                        serviceColor: widget.service.color,
+                        onTap: () => context.go(
+                          '/app/${widget.service.id}/${widget.mainModule.id}/${chip.id}',
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          _ScrollArrow(
+            icon: Icons.chevron_right,
+            onTap: () => _scrollBy(220),
+          ),
+          // "All chips" dropdown — guaranteed way to reach any chip.
+          _AllChipsMenu(
+            service: widget.service,
+            mainModule: widget.mainModule,
+            activeChipId: widget.activeChipId,
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScrollArrow extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _ScrollArrow({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(icon, size: 20, color: Colors.black54),
+      onPressed: onTap,
+      tooltip: 'تمرير',
+      splashRadius: 18,
+      padding: const EdgeInsets.all(4),
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+    );
+  }
+}
+
+class _AllChipsMenu extends StatelessWidget {
+  final V5Service service;
+  final V5MainModule mainModule;
+  final String activeChipId;
+
+  const _AllChipsMenu({
+    required this.service,
+    required this.mainModule,
+    required this.activeChipId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      tooltip: 'كل الشاشات',
+      position: PopupMenuPosition.under,
+      onSelected: (chipId) => context.go(
+        '/app/${service.id}/${mainModule.id}/$chipId',
+      ),
+      itemBuilder: (ctx) => [
+        for (final chip in mainModule.chips)
+          PopupMenuItem<String>(
+            value: chip.id,
+            child: Row(
+              children: [
+                Icon(
+                  chip.icon,
+                  size: 16,
+                  color: chip.id == activeChipId
+                      ? service.color
+                      : Colors.black54,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  chip.labelAr,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: chip.id == activeChipId
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                    color: chip.id == activeChipId
+                        ? service.color
+                        : Colors.black87,
                   ),
                 ),
+                if (chip.id == activeChipId) ...[
+                  const SizedBox(width: 8),
+                  Icon(Icons.check, size: 14, color: service.color),
+                ],
+              ],
+            ),
+          ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        margin: const EdgeInsets.only(right: 4),
+        decoration: BoxDecoration(
+          color: service.color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: service.color.withOpacity(0.25)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.apps, size: 14, color: service.color),
+            const SizedBox(width: 6),
+            Text(
+              'كل الشاشات (${mainModule.chips.length})',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: service.color,
               ),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.arrow_drop_down, size: 16, color: service.color),
           ],
         ),
       ),

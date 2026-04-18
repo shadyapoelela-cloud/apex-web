@@ -33,7 +33,27 @@ class V5DemoApp extends StatelessWidget {
       routes: v5Routes(),
       errorBuilder: (ctx, state) => Scaffold(
         body: Center(
-          child: Text('Error: ${state.error}'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.warning_amber, size: 48, color: Colors.amber),
+              const SizedBox(height: 12),
+              const Text('المسار غير موجود', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              Text(state.uri.toString(), style: const TextStyle(fontSize: 12, color: Colors.black54, fontFamily: 'monospace')),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () => ctx.go('/app'),
+                icon: const Icon(Icons.home, size: 16),
+                label: const Text('العودة إلى Launchpad'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFD4AF37),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -220,7 +220,37 @@ List<V5Service> v5Services = [
             widgets: _financeDashboardWidgets,
           ),
           _chipFromV4('erp', 'gl', labelOverrideAr: 'دفتر الأستاذ العام'),
+          V5Chip(
+            id: 'je-builder',
+            labelAr: 'قيود اليومية',
+            labelEn: 'Journal Entries',
+            icon: Icons.edit_note,
+          ),
+          V5Chip(
+            id: 'period-close',
+            labelAr: 'إقفال الفترة',
+            labelEn: 'Period Close',
+            icon: Icons.lock_clock,
+          ),
+          V5Chip(
+            id: 'coa-editor',
+            labelAr: 'دليل الحسابات',
+            labelEn: 'Chart of Accounts',
+            icon: Icons.account_tree,
+          ),
+          V5Chip(
+            id: 'fixed-assets',
+            labelAr: 'الأصول الثابتة',
+            labelEn: 'Fixed Assets',
+            icon: Icons.business,
+          ),
           _chipFromV4('erp', 'sales', labelOverrideAr: 'حسابات القبض'),
+          V5Chip(
+            id: 'sales-workflow',
+            labelAr: 'دورة المبيعات',
+            labelEn: 'Sales Workflow',
+            icon: Icons.point_of_sale,
+          ),
           V5Chip(
             id: 'invoices',
             labelAr: 'الفواتير',
@@ -232,6 +262,12 @@ List<V5Service> v5Services = [
             labelAr: 'حسابات الدفع',
             labelEn: 'Accounts Payable',
             icon: Icons.receipt_long,
+          ),
+          V5Chip(
+            id: 'statements',
+            labelAr: 'القوائم المالية',
+            labelEn: 'Financial Statements',
+            icon: Icons.insert_chart,
           ),
           V5Chip(
             id: 'budgets',
@@ -246,10 +282,22 @@ List<V5Service> v5Services = [
             icon: Icons.assessment,
           ),
           V5Chip(
+            id: 'custom-reports',
+            labelAr: 'منشئ التقارير',
+            labelEn: 'Report Builder',
+            icon: Icons.dashboard_customize,
+          ),
+          V5Chip(
             id: 'consolidation',
             labelAr: 'التوحيد',
             labelEn: 'Consolidation',
             icon: Icons.merge,
+          ),
+          V5Chip(
+            id: 'onboarding',
+            labelAr: 'رحلة الإعداد',
+            labelEn: 'Onboarding',
+            icon: Icons.auto_awesome,
           ),
         ],
       ),

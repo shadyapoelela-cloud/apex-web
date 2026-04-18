@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 
 // Reuse existing brave-yonath screens (Waves 2-14).
 // These imports may trigger transitive package imports; build verifies.
-import '../../screens/v4_ai/ai_guardrails_screen.dart';
+import '../../screens/v4_ai/ai_agents_gallery_screen.dart';
 import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
 import '../../screens/v4_compliance/audit_reporting_screen.dart';
@@ -23,26 +23,35 @@ import '../../screens/v4_compliance/gosi_wps_screen.dart';
 import '../../screens/v4_compliance/governance_screen.dart';
 import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
-import '../../screens/v4_compliance/zatca_csid_screen.dart';
-import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
-import '../../screens/v4_erp/bank_feeds_screen.dart';
+import '../../screens/v4_compliance/audit_planning_screen.dart';
+import '../../screens/v4_compliance/wht_calculator_v5_screen.dart';
+import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
+import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
+import '../../screens/v4_erp/fixed_assets_register_screen.dart';
+import '../../screens/v4_erp/fx_management_screen.dart';
+import '../../screens/v4_erp/general_ledger_screen.dart';
+import '../../screens/v4_erp/leave_management_screen.dart';
+import '../../screens/v4_erp/manufacturing_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
+import '../../screens/v4_erp/financial_statements_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
 import '../../screens/v4_erp/industry_packs_screen.dart';
 import '../../screens/v4_erp/marketplace_deep_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
+import '../../screens/v4_erp/je_builder_screen.dart';
+import '../../screens/v4_erp/sales_workflow_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
+import '../../screens/v4_erp/payroll_run_screen.dart';
 import '../../screens/v4_erp/projects_screen.dart';
 import '../../screens/v4_erp/purchasing_ap_screen.dart';
-import '../../screens/v4_erp/sales_customers_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -54,8 +63,11 @@ typedef V5ChipBuilder = Widget Function(BuildContext ctx);
 
 final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── ERP ──────────────────────────────────────────────────────────
-  'erp/finance/sales': (ctx) => const SalesCustomersScreen(),
-  'erp/treasury/banks': (ctx) => const BankFeedsScreen(),
+  // Note: 'erp/finance/sales' and 'erp/treasury/banks' are intentionally
+  // NOT wired in this POC build — they call the authenticated backend
+  // and would show "unauthorized" without a login flow. They stay in
+  // production (the screens still exist) and fall back to the V5
+  // default dashboard/coming-soon in the POC.
   // Multiple Views demo (Enhancement #4)
   'erp/finance/invoices': (ctx) => const InvoicesMultiViewScreen(),
   // Wave 16 — AI Bank Reconciliation (V5.1 POC)
@@ -64,6 +76,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/ap': (ctx) => const PurchasingApScreen(),
   // Wave 18 — HR Employees
   'erp/hr/employees': (ctx) => const HrEmployeesScreen(),
+  // Wave 40 — Payroll Run
+  'erp/hr/payroll': (ctx) => const PayrollRunScreen(),
   // Wave 19 — Projects (Tasks/Timesheets/Gantt/Billing)
   'erp/operations/projects': (ctx) => const ProjectsScreen(),
   // Wave 20 — CRM (Leads/Opportunities/Pipeline/Activities/Contacts)
@@ -89,6 +103,38 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'marketplace/client/industry-packs': (ctx) => const IndustryPacksScreen(),
   // Wave 34 — Help Center
   'platform/help/center': (ctx) => const HelpCenterScreen(),
+  // Wave 37 — JE Builder + Period Close (CRITICAL)
+  'erp/finance/je-builder': (ctx) => const JeBuilderScreen(),
+  'erp/finance/period-close': (ctx) => const PeriodCloseScreen(),
+  // Wave 38 — Sales Workflow (CRITICAL)
+  'erp/finance/sales-workflow': (ctx) => const SalesWorkflowScreen(),
+  // Wave 39 — Financial Statements + CoA + Inventory (CRITICAL)
+  'erp/finance/statements': (ctx) => const FinancialStatementsScreen(),
+  'erp/finance/coa-editor': (ctx) => const CoaEditorScreen(),
+  // Inventory chip is now wired to the detailed view
+  'erp/operations/inventory': (ctx) => const InventoryDetailedScreen(),
+  // Wave 41 — General Ledger viewer (replaces confusing ApexStudio wiring)
+  'erp/finance/gl': (ctx) => const GeneralLedgerScreen(),
+  // Wave 42 — 13-week Cash Flow Forecast
+  'erp/treasury/cashflow': (ctx) => const CashFlowForecastScreen(),
+  // Wave 43 — Zakat Calculator (ZATCA-compliant)
+  'compliance/tax/zakat': (ctx) => const ZakatCalculatorV5Screen(),
+  // Wave 44 — Fixed Assets Register
+  'erp/finance/fixed-assets': (ctx) => const FixedAssetsRegisterScreen(),
+  // Wave 45 — Leave Management
+  'erp/hr/leaves': (ctx) => const LeaveManagementScreen(),
+  // Wave 46 — Manufacturing & BOM
+  'erp/operations/manufacturing': (ctx) => const ManufacturingScreen(),
+  // Wave 47 — WHT Calculator (ZATCA withholding tax)
+  'compliance/tax/wht': (ctx) => const WhtCalculatorV5Screen(),
+  // Wave 48 — Audit Engagement Planning
+  'audit/engagement/planning': (ctx) => const AuditPlanningScreen(),
+  // Wave 49 — FX / Currency Management
+  'erp/treasury/fx': (ctx) => const FxManagementScreen(),
+  // Wave 35 — AI Agents Gallery
+  'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
+  // Wave 36 — Global Search Results
+  'platform/search/results': (ctx) => const GlobalSearchScreen(),
   // Wave 29 — Admin Panel (Tenant Settings + Users + Integrations)
   'platform/admin/settings': (ctx) => const AdminPanelScreen(),
   // Wave 30 — Custom Report Builder
@@ -98,20 +144,20 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // Connected Planning Drivers (#16) — Anaplan replacement
   'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
   // Mobile Receipt Capture (#20) — Expensify replacement
-  'erp/finance/consolidation': (ctx) => const MobileReceiptScreen(),
+  // Lives under Operations as a dedicated chip, not under Finance.
+  'erp/operations/mobile-receipt': (ctx) => const MobileReceiptScreen(),
   // Client Portal (#12) — Freshbooks replacement
-  'erp/finance/reports': (ctx) => const ClientPortalScreen(),
+  'platform/portal/client': (ctx) => const ClientPortalScreen(),
   // APEX Studio no-code (#11) — Odoo Studio replacement
-  'erp/finance/gl': (ctx) => const ApexStudioScreen(),
+  'platform/studio/builder': (ctx) => const ApexStudioScreen(),
 
   // ── Marketplace ──────────────────────────────────────────────────
   // APEX Match AI pairing (#15) — Toptal-style
   'marketplace/client/browse': (ctx) => const ApexMatchScreen(),
 
   // ── Compliance & Tax ─────────────────────────────────────────────
-  'compliance/zatca/csid': (ctx) => const ZatcaCsidScreen(),
-  'compliance/zatca/zatca-queue': (ctx) => const ZatcaQueueScreen(),
-  'compliance/zatca/queue': (ctx) => const ZatcaQueueScreen(),
+  // ZATCA CSID / queue screens call the authenticated backend — not
+  // wired in POC (same reason as sales/banks above).
   // Real-time GCC Tax Calculator — World-first feature
   'compliance/tax/vat': (ctx) => const RealtimeTaxScreen(),
   'compliance/tax/realtime': (ctx) => const RealtimeTaxScreen(),
@@ -133,10 +179,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'audit/reporting/ml': (ctx) => const AuditReportingScreen(),
   'audit/reporting/qc': (ctx) => const AuditReportingScreen(),
 
-  // ── AI Settings (horizontal layer — still accessible via /app) ───
-  'compliance/regulatory/aml': (ctx) => const AiGuardrailsScreen(),
-  // Note: Guardrails UI is the most generic "AI review queue" we have.
-  // In production it moves to /settings/ai-agents.
+  // Note: AiGuardrailsScreen is API-backed so it's not wired here.
+  // In production it lives under /settings/ai-agents with auth.
 };
 
 /// Returns true if a chip has a wired screen.
