@@ -431,6 +431,12 @@ List<V5Service> v5Services = [
             labelEn: 'Subscription Billing',
             icon: Icons.autorenew,
           ),
+          V5Chip(
+            id: 'ai-analyst',
+            labelAr: 'المحلل المالي AI 🎉',
+            labelEn: 'AI Financial Analyst',
+            icon: Icons.auto_awesome,
+          ),
         ],
       ),
       V5MainModule(

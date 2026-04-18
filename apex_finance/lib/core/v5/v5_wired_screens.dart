@@ -25,6 +25,7 @@ import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
+import '../../screens/v4_erp/ai_financial_analyst_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_erp/asset_tracking_screen.dart';
@@ -356,6 +357,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/education': (ctx) => const EducationLmsScreen(),
   // Wave 124 — Transport & Logistics (TMS)
   'erp/operations/transport': (ctx) => const TransportLogisticsScreen(),
+  // 🎉 Wave 125 — AI Financial Analyst (CAPSTONE)
+  'erp/finance/ai-analyst': (ctx) => const AiFinancialAnalystScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
