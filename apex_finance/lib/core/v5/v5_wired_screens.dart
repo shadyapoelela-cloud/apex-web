@@ -31,9 +31,13 @@ import '../../screens/v4_erp/asset_tracking_screen.dart';
 import '../../screens/v4_erp/budget_planning_screen.dart';
 import '../../screens/v4_erp/construction_screen.dart';
 import '../../screens/v4_erp/ecommerce_store_screen.dart';
+import '../../screens/v4_erp/education_lms_screen.dart';
 import '../../screens/v4_erp/field_service_screen.dart';
 import '../../screens/v4_erp/franchise_management_screen.dart';
+import '../../screens/v4_erp/hotel_pms_screen.dart';
+import '../../screens/v4_erp/marketing_automation_screen.dart';
 import '../../screens/v4_erp/restaurant_pos_screen.dart';
+import '../../screens/v4_erp/transport_logistics_screen.dart';
 import '../../screens/v4_erp/grant_management_screen.dart';
 import '../../screens/v4_erp/subscription_billing_screen.dart';
 import '../../screens/v4_erp/healthcare_claims_screen.dart';
@@ -344,6 +348,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/field-service': (ctx) => const FieldServiceScreen(),
   // 🎉 Wave 120 — Restaurant POS (MILESTONE)
   'erp/operations/restaurant-pos': (ctx) => const RestaurantPosScreen(),
+  // Wave 121 — Hotel PMS (Opera-class)
+  'erp/operations/hotel-pms': (ctx) => const HotelPmsScreen(),
+  // Wave 122 — Marketing Automation (HubSpot-class)
+  'erp/operations/marketing': (ctx) => const MarketingAutomationScreen(),
+  // Wave 123 — Education SIS
+  'erp/operations/education': (ctx) => const EducationLmsScreen(),
+  // Wave 124 — Transport & Logistics (TMS)
+  'erp/operations/transport': (ctx) => const TransportLogisticsScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
