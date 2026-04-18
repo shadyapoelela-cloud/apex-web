@@ -21,6 +21,7 @@ import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/bank_feeds_screen.dart';
+import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
@@ -35,6 +36,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── ERP ──────────────────────────────────────────────────────────
   'erp/finance/sales': (ctx) => const SalesCustomersScreen(),
   'erp/treasury/banks': (ctx) => const BankFeedsScreen(),
+  // Multiple Views demo (Enhancement #4)
+  'erp/finance/invoices': (ctx) => const InvoicesMultiViewScreen(),
   // Wave 16 — AI Bank Reconciliation (V5.1 POC)
   'erp/treasury/recon': (ctx) => const AiBankReconciliationScreen(),
 

@@ -222,6 +222,12 @@ List<V5Service> v5Services = [
           _chipFromV4('erp', 'gl', labelOverrideAr: 'دفتر الأستاذ العام'),
           _chipFromV4('erp', 'sales', labelOverrideAr: 'حسابات القبض'),
           V5Chip(
+            id: 'invoices',
+            labelAr: 'الفواتير',
+            labelEn: 'Invoices',
+            icon: Icons.receipt,
+          ),
+          V5Chip(
             id: 'ap',
             labelAr: 'حسابات الدفع',
             labelEn: 'Accounts Payable',
