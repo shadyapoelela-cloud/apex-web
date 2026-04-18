@@ -395,6 +395,12 @@ List<V5Service> v5Services = [
             labelEn: 'Cap Table',
             icon: Icons.donut_large,
           ),
+          V5Chip(
+            id: 'integrations',
+            labelAr: 'التكاملات API',
+            labelEn: 'Integrations Hub',
+            icon: Icons.hub,
+          ),
         ],
       ),
       V5MainModule(
@@ -441,6 +447,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'commissions', labelAr: 'العمولات', labelEn: 'Commissions', icon: Icons.emoji_events),
           const V5Chip(id: 'self-service', labelAr: 'بوابة الموظف', labelEn: 'ESS Portal', icon: Icons.person_pin),
           const V5Chip(id: 'training', labelAr: 'التدريب والأكاديمية', labelEn: 'Training & LMS', icon: Icons.school),
+          const V5Chip(id: 'performance', labelAr: 'تقييم الأداء', labelEn: 'Performance Reviews', icon: Icons.trending_up),
         ],
       ),
       V5MainModule(
@@ -588,6 +595,7 @@ List<V5Service> v5Services = [
           V5Chip(id: 'activity-log', labelAr: 'سجل النشاط', labelEn: 'Activity Log', icon: Icons.shield),
           V5Chip(id: 'cybersecurity', labelAr: 'الأمن السيبراني', labelEn: 'Cybersecurity', icon: Icons.security),
           V5Chip(id: 'risk-register', labelAr: 'سجل المخاطر', labelEn: 'Risk Register', icon: Icons.shield),
+          V5Chip(id: 'whistleblower', labelAr: 'البلاغات الأخلاقية', labelEn: 'Whistleblower', icon: Icons.shield_moon),
         ],
       ),
     ],
