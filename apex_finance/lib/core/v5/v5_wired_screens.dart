@@ -25,8 +25,25 @@ import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
+import '../../screens/v4_erp/ai_financial_analyst_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
+import '../../screens/v4_erp/asset_tracking_screen.dart';
+import '../../screens/v4_erp/budget_planning_screen.dart';
+import '../../screens/v4_erp/construction_screen.dart';
+import '../../screens/v4_erp/ecommerce_store_screen.dart';
+import '../../screens/v4_erp/education_lms_screen.dart';
+import '../../screens/v4_erp/field_service_screen.dart';
+import '../../screens/v4_erp/franchise_management_screen.dart';
+import '../../screens/v4_erp/hotel_pms_screen.dart';
+import '../../screens/v4_erp/marketing_automation_screen.dart';
+import '../../screens/v4_erp/restaurant_pos_screen.dart';
+import '../../screens/v4_erp/transport_logistics_screen.dart';
+import '../../screens/v4_erp/grant_management_screen.dart';
+import '../../screens/v4_erp/subscription_billing_screen.dart';
+import '../../screens/v4_erp/healthcare_claims_screen.dart';
+import '../../screens/v4_erp/real_estate_screen.dart';
+import '../../screens/v4_erp/whatsapp_business_screen.dart';
 import '../../screens/v4_compliance/audit_acceptance_screen.dart';
 import '../../screens/v4_compliance/audit_kickoff_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
@@ -35,7 +52,9 @@ import '../../screens/v4_compliance/deferred_tax_screen.dart';
 import '../../screens/v4_compliance/risk_register_screen.dart';
 import '../../screens/v4_compliance/bcp_screen.dart';
 import '../../screens/v4_compliance/lease_accounting_screen.dart';
+import '../../screens/v4_compliance/quality_management_screen.dart';
 import '../../screens/v4_compliance/revenue_recognition_screen.dart';
+import '../../screens/v4_compliance/sustainability_report_screen.dart';
 import '../../screens/v4_compliance/whistleblower_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
@@ -302,6 +321,44 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'compliance/tax/revenue-recognition': (ctx) => const RevenueRecognitionScreen(),
   // Wave 106 — Credit Notes & Refunds
   'erp/finance/credit-notes': (ctx) => const CreditNotesScreen(),
+  // Wave 107 — Quality Management (ISO 9001)
+  'compliance/regulatory/quality': (ctx) => const QualityManagementScreen(),
+  // Wave 108 — Asset Tracking (Barcode/RFID)
+  'erp/operations/asset-tracking': (ctx) => const AssetTrackingScreen(),
+  // Wave 109 — Budget Planning Workflow
+  'erp/finance/budget-planning': (ctx) => const BudgetPlanningScreen(),
+  // 🎉 Wave 110 — WhatsApp Business (MILESTONE)
+  'erp/operations/whatsapp': (ctx) => const WhatsappBusinessScreen(),
+  // Wave 111 — Construction Project Accounting
+  'erp/operations/construction': (ctx) => const ConstructionScreen(),
+  // Wave 112 — Real Estate Property Management
+  'erp/operations/real-estate': (ctx) => const RealEstateScreen(),
+  // Wave 113 — Healthcare Claims Processing
+  'erp/operations/healthcare': (ctx) => const HealthcareClaimsScreen(),
+  // Wave 114 — NGO / Grant Management
+  'erp/operations/grants': (ctx) => const GrantManagementScreen(),
+  // Wave 115 — Franchise Management
+  'erp/operations/franchise': (ctx) => const FranchiseManagementScreen(),
+  // Wave 116 — E-Commerce Store
+  'erp/operations/ecommerce': (ctx) => const EcommerceStoreScreen(),
+  // Wave 117 — Subscription Billing (Stripe-class)
+  'erp/finance/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
+  // Wave 118 — ESG Sustainability Report (GRI/SASB/TCFD)
+  'compliance/regulatory/sustainability': (ctx) => const SustainabilityReportScreen(),
+  // Wave 119 — Field Service Management
+  'erp/operations/field-service': (ctx) => const FieldServiceScreen(),
+  // 🎉 Wave 120 — Restaurant POS (MILESTONE)
+  'erp/operations/restaurant-pos': (ctx) => const RestaurantPosScreen(),
+  // Wave 121 — Hotel PMS (Opera-class)
+  'erp/operations/hotel-pms': (ctx) => const HotelPmsScreen(),
+  // Wave 122 — Marketing Automation (HubSpot-class)
+  'erp/operations/marketing': (ctx) => const MarketingAutomationScreen(),
+  // Wave 123 — Education SIS
+  'erp/operations/education': (ctx) => const EducationLmsScreen(),
+  // Wave 124 — Transport & Logistics (TMS)
+  'erp/operations/transport': (ctx) => const TransportLogisticsScreen(),
+  // 🎉 Wave 125 — AI Financial Analyst (CAPSTONE)
+  'erp/finance/ai-analyst': (ctx) => const AiFinancialAnalystScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
