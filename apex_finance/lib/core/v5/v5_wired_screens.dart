@@ -28,11 +28,14 @@ import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
+import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
 import '../../screens/v4_compliance/uae_ct_screen.dart';
 import '../../screens/v4_compliance/wht_calculator_v5_screen.dart';
 import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
+import '../../screens/v4_erp/benefits_eos_screen.dart';
 import '../../screens/v4_erp/budget_vs_actual_screen.dart';
+import '../../screens/v4_erp/expense_claims_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
@@ -140,6 +143,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'compliance/tax/tp': (ctx) => const TransferPricingV5Screen(),
   // Wave 52 — Budget vs Actual
   'erp/finance/budget-actual': (ctx) => const BudgetVsActualScreen(),
+  // Wave 53 — Benefits & End-of-Service
+  'erp/hr/benefits': (ctx) => const BenefitsEosScreen(),
+  // Wave 54 — Tax Calendar (unified deadlines)
+  'compliance/tax/calendar': (ctx) => const TaxCalendarScreen(),
+  // Wave 55 — Expense Claims
+  'erp/finance/expenses': (ctx) => const ExpenseClaimsScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results

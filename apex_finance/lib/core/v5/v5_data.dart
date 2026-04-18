@@ -305,6 +305,12 @@ List<V5Service> v5Services = [
             labelEn: 'Onboarding',
             icon: Icons.auto_awesome,
           ),
+          V5Chip(
+            id: 'expenses',
+            labelAr: 'مطالبات المصروفات',
+            labelEn: 'Expense Claims',
+            icon: Icons.receipt,
+          ),
         ],
       ),
       V5MainModule(
@@ -438,6 +444,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'zakat', labelAr: 'الزكاة', labelEn: 'Zakat', icon: Icons.star),
           const V5Chip(id: 'uae_ct', labelAr: 'ضريبة الشركات الإماراتية', labelEn: 'UAE CT', icon: Icons.flag),
           const V5Chip(id: 'tp', labelAr: 'أسعار التحويل', labelEn: 'Transfer Pricing', icon: Icons.swap_horiz),
+          const V5Chip(id: 'calendar', labelAr: 'الرزنامة الضريبية', labelEn: 'Tax Calendar', icon: Icons.calendar_month),
         ],
       ),
       V5MainModule(
