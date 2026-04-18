@@ -30,6 +30,7 @@ import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_compliance/audit_acceptance_screen.dart';
 import '../../screens/v4_compliance/audit_kickoff_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
+import '../../screens/v4_compliance/deferred_tax_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
 import '../../screens/v4_compliance/uae_ct_screen.dart';
@@ -43,6 +44,7 @@ import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/activity_log_screen.dart';
+import '../../screens/v4_erp/anomaly_detector_screen.dart';
 import '../../screens/v4_erp/approval_workflows_screen.dart';
 import '../../screens/v4_erp/bank_guarantees_screen.dart';
 import '../../screens/v4_erp/close_checklist_screen.dart';
@@ -56,6 +58,7 @@ import '../../screens/v4_erp/customer_360_screen.dart';
 import '../../screens/v4_erp/fixed_assets_register_screen.dart';
 import '../../screens/v4_erp/fx_management_screen.dart';
 import '../../screens/v4_erp/general_ledger_screen.dart';
+import '../../screens/v4_erp/helpdesk_tickets_screen.dart';
 import '../../screens/v4_erp/leave_management_screen.dart';
 import '../../screens/v4_erp/manufacturing_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
@@ -194,6 +197,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/treasury/guarantees': (ctx) => const BankGuaranteesScreen(),
   // Wave 70 — Approval Workflows & DoA Matrix
   'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
+  // Wave 71 — Deferred Tax (IAS 12)
+  'compliance/tax/deferred': (ctx) => const DeferredTaxScreen(),
+  // Wave 72 — Helpdesk / Tickets
+  'erp/operations/tickets': (ctx) => const HelpdeskTicketsScreen(),
+  // Wave 73 — AI Anomaly Detector
+  'erp/finance/anomalies': (ctx) => const AnomalyDetectorScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results

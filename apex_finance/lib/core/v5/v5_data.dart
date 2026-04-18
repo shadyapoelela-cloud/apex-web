@@ -341,6 +341,12 @@ List<V5Service> v5Services = [
             labelEn: 'Approval Workflows',
             icon: Icons.approval,
           ),
+          V5Chip(
+            id: 'anomalies',
+            labelAr: 'كاشف الشذوذ AI',
+            labelEn: 'AI Anomaly Detector',
+            icon: Icons.psychology,
+          ),
         ],
       ),
       V5MainModule(
@@ -424,6 +430,7 @@ List<V5Service> v5Services = [
           V5Chip(id: 'suppliers', labelAr: 'المورّدون 360°', labelEn: 'Suppliers 360°', icon: Icons.store),
           V5Chip(id: 'pipeline', labelAr: 'أنبوب المبيعات', labelEn: 'Sales Pipeline', icon: Icons.filter_alt),
           V5Chip(id: 'project-pnl', labelAr: 'ربحية المشاريع', labelEn: 'Project P&L', icon: Icons.analytics),
+          V5Chip(id: 'tickets', labelAr: 'تذاكر الدعم', labelEn: 'Helpdesk', icon: Icons.support_agent),
           V5Chip(id: 'contracts', labelAr: 'العقود', labelEn: 'Contracts', icon: Icons.gavel),
           V5Chip(id: 'manufacturing', labelAr: 'التصنيع', labelEn: 'Manufacturing', icon: Icons.precision_manufacturing),
         ],
@@ -482,6 +489,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'tp', labelAr: 'أسعار التحويل', labelEn: 'Transfer Pricing', icon: Icons.swap_horiz),
           const V5Chip(id: 'calendar', labelAr: 'الرزنامة الضريبية', labelEn: 'Tax Calendar', icon: Icons.calendar_month),
           const V5Chip(id: 'vat-return', labelAr: 'إقرار VAT', labelEn: 'VAT Return', icon: Icons.description),
+          const V5Chip(id: 'deferred', labelAr: 'الضريبة المؤجلة', labelEn: 'Deferred Tax', icon: Icons.account_balance_wallet),
         ],
       ),
       V5MainModule(
