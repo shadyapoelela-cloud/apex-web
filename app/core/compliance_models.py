@@ -91,8 +91,52 @@ class AuditTrail(Base):
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
 
+class ZatcaSubmissionQueue(Base):
+    """
+    Persisted retry queue for ZATCA Fatoora submissions (Wave 5 PR#1).
+
+    Invoices that fail to clear or that we can't even submit (because
+    the Fatoora gateway is down) land here with an exponential backoff
+    schedule. A worker — or a manual /zatca/queue/process call — picks
+    up rows whose next_retry_at has passed and re-attempts submission.
+
+    Status lifecycle:
+        pending  → next_retry_at <= now, eligible for a new attempt.
+        cleared  → ZATCA accepted it. Terminal.
+        giveup   → exceeded max_attempts. Terminal. Requires human action.
+        draft    → enqueued but never attempted yet.
+    """
+
+    __tablename__ = "zatca_submission_queue"
+    __table_args__ = (
+        Index("ix_zatca_queue_status_next_retry", "status", "next_retry_at"),
+        Index("ix_zatca_queue_invoice", "invoice_id"),
+        Index("ix_zatca_queue_tenant", "tenant_id"),
+    )
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    tenant_id = Column(String(36), nullable=True, index=True)
+    invoice_id = Column(String(36), nullable=False, index=True)
+    payload = Column(JSON, nullable=False)  # serialized UBL XML or full request
+
+    status = Column(String(20), nullable=False, default="draft")
+    attempts = Column(Integer, nullable=False, default=0)
+    max_attempts = Column(Integer, nullable=False, default=7)
+
+    next_retry_at = Column(DateTime, nullable=True, index=True)
+    last_attempt_at = Column(DateTime, nullable=True)
+    last_error_code = Column(String(80), nullable=True)
+    last_error_message = Column(Text, nullable=True)
+
+    cleared_uuid = Column(String(64), nullable=True)  # ZATCA-issued clearance uuid
+    cleared_at = Column(DateTime, nullable=True)
+
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+
 def init_compliance_db():
     from app.phase1.models.platform_models import engine
 
     Base.metadata.create_all(bind=engine)
-    return ["journal_entry_sequence", "audit_trail"]
+    return ["journal_entry_sequence", "audit_trail", "zatca_submission_queue"]

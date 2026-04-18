@@ -119,6 +119,43 @@ Base: `claude/brave-yonath-wave-1-5` ← Head: `claude/brave-yonath-wave-2`
 Base: `claude/brave-yonath-wave-2` ← Head: `claude/brave-yonath-wave-3`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-2...claude/brave-yonath-wave-3?expand=1>
 
+### PR #6 — Wave 4 (Full V4 Launchpad + Compliance Status screen)
+Base: `claude/brave-yonath-wave-3` ← Head: `claude/brave-yonath-wave-4`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-3...claude/brave-yonath-wave-4?expand=1>
+
+```
+Title: Wave 4: populate all 6 V4 groups + first Compliance screen
+
+Body:
+Brings the V4 Launchpad from "1 populated group + 5 coming-soon
+placeholders" to all 6 groups fully enumerated per the V4 Module
+Hierarchy Map, then wires the first non-ERP screen to prove the
+registry pattern travels across groups.
+
+- PR#1 v4_groups_data.dart: 454 lines of pure const data adding 35
+  sub-modules × 5 visible tabs = 175 new V4Screen entries across
+  Audit & Review, Feasibility Studies, External Financial Analysis,
+  Service Providers, and Eligibility & Compliance. Total V4 screen
+  registry grows 65 → 240. Every Launchpad card now drops into a
+  real Sidebar + TabBar — no more "قريبًا" dialogs.
+  Stable screen-id convention {group}-{sub}-{slug} is preserved so
+  analytics keyed on those ids stay valid through any future
+  reordering.
+- PR#2 compliance_status_screen.dart: hero circular score gauge +
+  responsive 3/2/1 grid of 6 KPI cards (ZATCA cert, wave, VAT return,
+  GOSI submission, AML cases, invoice rejection rate). Data is
+  placeholder until /compliance/status lands in a later backend wave;
+  the layout won't need to change when it does.
+- v4_routes.dart._wiredScreens adds compliance-dashboard-status →
+  ComplianceStatusScreen. All other new sub-modules still render via
+  the default "defined-but-not-implemented" host.
+
+Verification: dart analyze clean, flutter build web succeeds (~56s),
+pytest unchanged at 967 pass.
+```
+
+---
+
 ```
 Title: Wave 3: anomaly detector — duplicate payments, round numbers, off-hours, new vendor, spikes
 
