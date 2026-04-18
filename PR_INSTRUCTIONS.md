@@ -147,6 +147,53 @@ Base: `claude/brave-yonath-wave-8` ← Head: `claude/brave-yonath-wave-9`
 Base: `claude/brave-yonath-wave-9` ← Head: `claude/brave-yonath-wave-10`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-9...claude/brave-yonath-wave-10?expand=1>
 
+### PR #13 — Wave 11 (ZATCA CSID lifecycle — encrypted keystore + expiry)
+Base: `claude/brave-yonath-wave-10` ← Head: `claude/brave-yonath-wave-11`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-10...claude/brave-yonath-wave-11?expand=1>
+
+```
+Title: Wave 11: ZATCA CSID lifecycle (encrypted keystore, expiry alerts, rotation)
+
+Body:
+Patterns #121 and #173 — CSID lifecycle UX and encrypted keystore
+with 60/30/7-day alerts. Without this, an expired Fatoora cert
+silently breaks every submission until someone notices.
+
+Three layers mirroring Waves 5 / 7 / 9:
+
+1. compliance_models.py: new `zatca_csid` table with
+   cert_pem_encrypted, private_key_pem_encrypted, cert_serial,
+   issued_at, expires_at, status (active/expired/revoked/renewing),
+   compliance_csid, production_csid, revocation audit fields.
+2. zatca_csid.py: Fernet-encrypted at rest. The only function that
+   returns decrypted material is get_active_csid(tenant, env) —
+   used by the submission pipeline; never by routes. register /
+   list / stats / get_row return metadata projections with a
+   denormalized days_to_expiry. expiring_soon(days) feeds the
+   dashboard banner. sweep_expired() flips past-due active rows.
+   Every transition emits an audit event through the Wave 1 hash
+   chain (zatca.csid.register / expired / revoked / renewing).
+3. zatca_csid_routes.py: 8 endpoints behind auth. Route-layer
+   invariant enforced by tests: no endpoint returns plaintext.
+
+env_validator.py: ZATCA_CERT_ENCRYPTION_KEY is required in
+production, warned in dev (pattern matches TOTP_ENCRYPTION_KEY
+from Wave 1 PR#4).
+
+tests (31 CSID + 2 env-validator):
+- Encryption round-trip preserves material.
+- Ciphertext ≠ plaintext at rest.
+- list/get_row never leak plaintext OR ciphertext fields.
+- Lifecycle transitions + idempotency + cross-state guards.
+- expiring_soon windowing + sweep_expired flipping.
+- "grep plaintext" check on list endpoint response body.
+- ZATCA_CERT_ENCRYPTION_KEY missing → prod error, dev warning.
+
+Test suite: 1041 → 1074 pass (+33 new) · 2 skip · 0 fail.
+```
+
+---
+
 ```
 Title: Wave 10: fix Alembic multi-Base env.py (closes Wave 0 debt)
 
