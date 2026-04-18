@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 
 // Reuse existing brave-yonath screens (Waves 2-14).
 // These imports may trigger transitive package imports; build verifies.
+import '../../screens/v4_ai/ai_agents_gallery_screen.dart';
 import '../../screens/v4_ai/ai_guardrails_screen.dart';
 import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
@@ -89,6 +90,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'marketplace/client/industry-packs': (ctx) => const IndustryPacksScreen(),
   // Wave 34 — Help Center
   'platform/help/center': (ctx) => const HelpCenterScreen(),
+  // Wave 35 — AI Agents Gallery
+  'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
+  // Wave 36 — Global Search Results
+  'platform/search/results': (ctx) => const GlobalSearchScreen(),
   // Wave 29 — Admin Panel (Tenant Settings + Users + Integrations)
   'platform/admin/settings': (ctx) => const AdminPanelScreen(),
   // Wave 30 — Custom Report Builder
