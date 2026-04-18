@@ -13,6 +13,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/v5_showcase/v5_showcase_screen.dart';
 import 'apex_v5_service_shell.dart';
 import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
@@ -25,6 +26,10 @@ List<RouteBase> v5Routes() => [
       GoRoute(
         path: '/app',
         builder: (ctx, state) => const V5Launchpad(),
+      ),
+      GoRoute(
+        path: '/showcase',
+        builder: (ctx, state) => const V5ShowcaseScreen(),
       ),
       GoRoute(
         path: '/app/:service',
@@ -131,6 +136,68 @@ class V5Launchpad extends StatelessWidget {
                     ],
                   ),
                 ],
+              ),
+              const SizedBox(height: 20),
+
+              // Showcase CTA banner
+              GestureDetector(
+                onTap: () => context.go('/showcase'),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFD4AF37), Color(0xFF7C3AED)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.emoji_events, color: Colors.white, size: 28),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'معرض V5.1 — 18 تحسين تستبدل 18 منصّة عالمية',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'قيمة سنوية مُدمجة ~\$400K · اضغط للاستكشاف',
+                              style: TextStyle(color: Colors.white70, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.25),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Row(
+                          children: [
+                            Text(
+                              'استكشف',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(Icons.arrow_back, color: Colors.white, size: 14),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
 
