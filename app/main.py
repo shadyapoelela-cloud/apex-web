@@ -619,6 +619,7 @@ from app.phase1.routes.social_auth_routes import router as social_auth_r
 from app.phase1.routes.totp_routes import router as totp_r
 from app.core.anomaly_routes import router as anomaly_r
 from app.core.zatca_queue_routes import router as zatca_queue_r
+from app.core.ai_guardrails_routes import router as ai_guardrails_r
 from app.copilot.routes.copilot_routes import router as copilot_router
 
 app.include_router(onboarding_r, tags=["Onboarding"])
@@ -628,6 +629,7 @@ app.include_router(social_auth_r, tags=["Social Auth"])
 app.include_router(totp_r, tags=["Auth / 2FA"])
 app.include_router(anomaly_r)
 app.include_router(zatca_queue_r)
+app.include_router(ai_guardrails_r)
 app.include_router(copilot_router)
 
 # ── Compliance Core: Journal Entry Sequence + immutable Audit Trail
