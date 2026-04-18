@@ -27,10 +27,14 @@ import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
+import '../../screens/v4_compliance/audit_acceptance_screen.dart';
+import '../../screens/v4_compliance/audit_kickoff_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
+import '../../screens/v4_compliance/deferred_tax_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
 import '../../screens/v4_compliance/uae_ct_screen.dart';
+import '../../screens/v4_compliance/vat_return_builder_screen.dart';
 import '../../screens/v4_compliance/wht_calculator_v5_screen.dart';
 import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
 import '../../screens/v4_erp/benefits_eos_screen.dart';
@@ -39,10 +43,22 @@ import '../../screens/v4_erp/expense_claims_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
+import '../../screens/v4_erp/activity_log_screen.dart';
+import '../../screens/v4_erp/anomaly_detector_screen.dart';
+import '../../screens/v4_erp/approval_workflows_screen.dart';
+import '../../screens/v4_erp/bank_guarantees_screen.dart';
+import '../../screens/v4_erp/close_checklist_screen.dart';
+import '../../screens/v4_erp/okrs_scorecard_screen.dart';
+import '../../screens/v4_erp/project_profitability_screen.dart';
+import '../../screens/v4_erp/contract_management_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
+import '../../screens/v4_erp/document_vault_screen.dart';
+import '../../screens/v4_erp/executive_dashboard_v5_screen.dart';
+import '../../screens/v4_erp/customer_360_screen.dart';
 import '../../screens/v4_erp/fixed_assets_register_screen.dart';
 import '../../screens/v4_erp/fx_management_screen.dart';
 import '../../screens/v4_erp/general_ledger_screen.dart';
+import '../../screens/v4_erp/helpdesk_tickets_screen.dart';
 import '../../screens/v4_erp/leave_management_screen.dart';
 import '../../screens/v4_erp/manufacturing_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
@@ -58,6 +74,8 @@ import '../../screens/v4_erp/onboarding_screen.dart';
 import '../../screens/v4_erp/payroll_run_screen.dart';
 import '../../screens/v4_erp/projects_screen.dart';
 import '../../screens/v4_erp/purchasing_ap_screen.dart';
+import '../../screens/v4_erp/sales_pipeline_screen.dart';
+import '../../screens/v4_erp/supplier_360_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -149,6 +167,42 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'compliance/tax/calendar': (ctx) => const TaxCalendarScreen(),
   // Wave 55 — Expense Claims
   'erp/finance/expenses': (ctx) => const ExpenseClaimsScreen(),
+  // Wave 56 — Audit Acceptance
+  'audit/engagement/acceptance': (ctx) => const AuditAcceptanceScreen(),
+  // Wave 57 — Supplier 360
+  'erp/operations/suppliers': (ctx) => const Supplier360Screen(),
+  // Wave 58 — Customer 360
+  'erp/operations/customers-360': (ctx) => const Customer360Screen(),
+  // Wave 59 — Audit Kickoff
+  'audit/engagement/kickoff': (ctx) => const AuditKickoffScreen(),
+  // Wave 60 — Sales Pipeline (Kanban)
+  'erp/operations/pipeline': (ctx) => const SalesPipelineScreen(),
+  // Wave 61 — Contract Management
+  'erp/operations/contracts': (ctx) => const ContractManagementScreen(),
+  // Wave 62 — Executive Dashboard (C-Suite)
+  'erp/finance/exec': (ctx) => const ExecutiveDashboardV5Screen(),
+  // Wave 63 — Document Vault / DMS
+  'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
+  // Wave 64 — Activity Log / Audit Trail
+  'compliance/regulatory/activity-log': (ctx) => const ActivityLogScreen(),
+  // Wave 65 — VAT Return Builder
+  'compliance/tax/vat-return': (ctx) => const VatReturnBuilderScreen(),
+  // Wave 66 — Project Profitability
+  'erp/operations/project-pnl': (ctx) => const ProjectProfitabilityScreen(),
+  // Wave 67 — Financial Close Checklist
+  'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
+  // Wave 68 — OKRs / KPI Scorecard
+  'erp/finance/okrs': (ctx) => const OkrsScorecardScreen(),
+  // Wave 69 — Bank Guarantees & L/Cs
+  'erp/treasury/guarantees': (ctx) => const BankGuaranteesScreen(),
+  // Wave 70 — Approval Workflows & DoA Matrix
+  'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
+  // Wave 71 — Deferred Tax (IAS 12)
+  'compliance/tax/deferred': (ctx) => const DeferredTaxScreen(),
+  // Wave 72 — Helpdesk / Tickets
+  'erp/operations/tickets': (ctx) => const HelpdeskTicketsScreen(),
+  // Wave 73 — AI Anomaly Detector
+  'erp/finance/anomalies': (ctx) => const AnomalyDetectorScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
