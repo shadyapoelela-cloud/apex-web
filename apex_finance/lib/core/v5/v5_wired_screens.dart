@@ -23,7 +23,9 @@ import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/bank_feeds_screen.dart';
+import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
+import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
 
@@ -45,6 +47,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/treasury/recon': (ctx) => const AiBankReconciliationScreen(),
   // Onboarding Journey (#8)
   'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
+  // Connected Planning Drivers (#16) — Anaplan replacement
+  'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
+  // Mobile Receipt Capture (#20) — Expensify replacement
+  'erp/finance/consolidation': (ctx) => const MobileReceiptScreen(),
 
   // ── Marketplace ──────────────────────────────────────────────────
   // APEX Match AI pairing (#15) — Toptal-style
