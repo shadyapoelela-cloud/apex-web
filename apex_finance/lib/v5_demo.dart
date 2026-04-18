@@ -15,6 +15,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'core/v5/apex_v5_shortcuts.dart';
+import 'core/v5/apex_v5_undo_toast.dart';
 import 'core/v5/v5_routes.dart';
 
 void main() {
@@ -42,7 +44,11 @@ class V5DemoApp extends StatelessWidget {
       locale: const Locale('ar'),
       builder: (ctx, child) => Directionality(
         textDirection: TextDirection.rtl,
-        child: child!,
+        child: ApexV5GlobalShortcuts(
+          child: ApexV5UndoShortcutListener(
+            child: child!,
+          ),
+        ),
       ),
       theme: ThemeData(
         useMaterial3: true,

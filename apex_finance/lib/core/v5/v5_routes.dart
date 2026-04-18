@@ -18,6 +18,7 @@ import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
 import 'v5_data.dart';
 import 'v5_models.dart';
+import 'v5_wired_screens.dart';
 
 /// List of routes to be spread into the top-level GoRouter.routes.
 List<RouteBase> v5Routes() => [
@@ -52,10 +53,16 @@ List<RouteBase> v5Routes() => [
           if (main == null) return const _V5NotFound();
           final chip = main.chipById(state.pathParameters['chip']!);
           if (chip == null) return const _V5NotFound();
+          // Only provide builder if a wired screen exists for this chip;
+          // otherwise let the shell fall through to dashboard / v4 / coming-soon.
+          final wired = getWiredBuilder(svc.id, main.id, chip.id);
           return ApexV5ServiceShell(
             service: svc,
             mainModule: main,
             activeChip: chip,
+            chipBodyBuilder: wired != null
+                ? (ctx, _) => wired(ctx)
+                : null,
           );
         },
       ),
