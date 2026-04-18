@@ -28,8 +28,11 @@ import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
+import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
+import '../../screens/v4_compliance/uae_ct_screen.dart';
 import '../../screens/v4_compliance/wht_calculator_v5_screen.dart';
 import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
+import '../../screens/v4_erp/budget_vs_actual_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
@@ -131,6 +134,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'audit/engagement/planning': (ctx) => const AuditPlanningScreen(),
   // Wave 49 — FX / Currency Management
   'erp/treasury/fx': (ctx) => const FxManagementScreen(),
+  // Wave 50 — UAE Corporate Tax
+  'compliance/tax/uae_ct': (ctx) => const UaeCtScreen(),
+  // Wave 51 — Transfer Pricing
+  'compliance/tax/tp': (ctx) => const TransferPricingV5Screen(),
+  // Wave 52 — Budget vs Actual
+  'erp/finance/budget-actual': (ctx) => const BudgetVsActualScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
