@@ -23,6 +23,10 @@ import 'v5_wired_screens.dart';
 
 /// List of routes to be spread into the top-level GoRouter.routes.
 List<RouteBase> v5Routes() => [
+      // Root redirects to launchpad (POC has no auth)
+      GoRoute(path: '/', redirect: (ctx, state) => '/app'),
+      GoRoute(path: '/login', redirect: (ctx, state) => '/app'),
+      GoRoute(path: '/home', redirect: (ctx, state) => '/app'),
       GoRoute(
         path: '/app',
         builder: (ctx, state) => const V5Launchpad(),
