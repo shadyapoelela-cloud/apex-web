@@ -342,6 +342,11 @@ class ApiService {
   static Future<ApiResult> translateZatcaRejection(Map payload) =>
       _post('/zatca/errors/translate', {'payload': payload});
 
+  // ── Anomaly detector (Wave 3 PR#1). ──
+  // Caller supplies transactions; server runs 5 detectors and returns findings.
+  static Future<ApiResult> scanAnomalies(List<Map> transactions, {Map<String, dynamic>? options}) =>
+      _post('/anomalies/scan', {'transactions': transactions, ...?options});
+
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);
   static Future<ApiResult> taxVatReturn(Map body) => _post('/tax/vat/return', body);
