@@ -15,11 +15,17 @@ import 'package:flutter/material.dart';
 // Reuse existing brave-yonath screens (Waves 2-14).
 // These imports may trigger transitive package imports; build verifies.
 import '../../screens/v4_ai/ai_guardrails_screen.dart';
+import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
+import '../../screens/v4_compliance/audit_reporting_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
+import '../../screens/v4_compliance/gosi_wps_screen.dart';
+import '../../screens/v4_compliance/governance_screen.dart';
+import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
+import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
@@ -27,7 +33,9 @@ import '../../screens/v4_erp/bank_feeds_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
+import '../../screens/v4_erp/feasibility_deep_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
+import '../../screens/v4_erp/marketplace_deep_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
@@ -59,6 +67,27 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/projects': (ctx) => const ProjectsScreen(),
   // Wave 20 — CRM (Leads/Opportunities/Pipeline/Activities/Contacts)
   'erp/operations/crm': (ctx) => const CrmScreen(),
+  // Wave 25 — Feasibility Market Analysis (Advisory)
+  'advisory/feasibility/market': (ctx) => const FeasibilityMarketScreen(),
+  'advisory/feasibility/sensitivity': (ctx) => const FeasibilityMarketScreen(),
+  // Wave 26 — External Analysis (Benchmarking + Credit)
+  'advisory/external/benchmarking': (ctx) => const ExternalAnalysisScreen(),
+  'advisory/external/credit': (ctx) => const ExternalAnalysisScreen(),
+
+  // ── Marketplace Deep ─────────────────────────────────────────────
+  // Wave 27 — Marketplace Billing/Escrow/Payouts
+  'marketplace/client/billing': (ctx) => const MarketplaceBillingScreen(),
+  'marketplace/provider/payouts': (ctx) => const MarketplaceBillingScreen(),
+
+  // Wave 28 — Eligibility Check (KSA SME/Nomu/Tadawul)
+  'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
+  'compliance/regulatory/governance': (ctx) => const GovernanceScreen(),
+  // Wave 32 — Notifications Center
+  'platform/notifications/center': (ctx) => const NotificationsCenterScreen(),
+  // Wave 29 — Admin Panel (Tenant Settings + Users + Integrations)
+  'platform/admin/settings': (ctx) => const AdminPanelScreen(),
+  // Wave 30 — Custom Report Builder
+  'erp/finance/custom-reports': (ctx) => const ReportBuilderScreen(),
   // Onboarding Journey (#8)
   'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
   // Connected Planning Drivers (#16) — Anaplan replacement
@@ -82,11 +111,22 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'compliance/tax/vat': (ctx) => const RealtimeTaxScreen(),
   'compliance/tax/realtime': (ctx) => const RealtimeTaxScreen(),
 
+  // Wave 21 — GOSI & WPS UI
+  'compliance/regulatory/gosi': (ctx) => const GosiWpsScreen(),
+  'compliance/regulatory/wps': (ctx) => const GosiWpsScreen(),
+  // Wave 22 — AML & KYC (override the previous placeholder)
+  'compliance/regulatory/aml': (ctx) => const AmlKycScreen(),
+
   // ── Audit ────────────────────────────────────────────────────────
   'audit/fieldwork/risk': (ctx) => const ComplianceStatusScreen(),
-  // Automated Audit Analytics — Inflo/MindBridge replacement
-  'audit/fieldwork/workpapers': (ctx) => const AuditAnalyticsScreen(),
+  // Wave 17 Audit Analytics (Inflo/MindBridge replacement)
   'audit/fieldwork/control': (ctx) => const AuditAnalyticsScreen(),
+  // Wave 23 — Workpapers detailed view (CaseWare-class)
+  'audit/fieldwork/workpapers': (ctx) => const WorkpapersDetailScreen(),
+  // Wave 24 — Audit Reporting (Opinion Builder + Management Letter + QC)
+  'audit/reporting/opinion': (ctx) => const AuditReportingScreen(),
+  'audit/reporting/ml': (ctx) => const AuditReportingScreen(),
+  'audit/reporting/qc': (ctx) => const AuditReportingScreen(),
 
   // ── AI Settings (horizontal layer — still accessible via /app) ───
   'compliance/regulatory/aml': (ctx) => const AiGuardrailsScreen(),
