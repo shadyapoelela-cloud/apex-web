@@ -30,7 +30,10 @@ import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_erp/asset_tracking_screen.dart';
 import '../../screens/v4_erp/budget_planning_screen.dart';
 import '../../screens/v4_erp/construction_screen.dart';
+import '../../screens/v4_erp/ecommerce_store_screen.dart';
+import '../../screens/v4_erp/franchise_management_screen.dart';
 import '../../screens/v4_erp/grant_management_screen.dart';
+import '../../screens/v4_erp/subscription_billing_screen.dart';
 import '../../screens/v4_erp/healthcare_claims_screen.dart';
 import '../../screens/v4_erp/real_estate_screen.dart';
 import '../../screens/v4_erp/whatsapp_business_screen.dart';
@@ -44,6 +47,7 @@ import '../../screens/v4_compliance/bcp_screen.dart';
 import '../../screens/v4_compliance/lease_accounting_screen.dart';
 import '../../screens/v4_compliance/quality_management_screen.dart';
 import '../../screens/v4_compliance/revenue_recognition_screen.dart';
+import '../../screens/v4_compliance/sustainability_report_screen.dart';
 import '../../screens/v4_compliance/whistleblower_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
@@ -326,6 +330,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/healthcare': (ctx) => const HealthcareClaimsScreen(),
   // Wave 114 — NGO / Grant Management
   'erp/operations/grants': (ctx) => const GrantManagementScreen(),
+  // Wave 115 — Franchise Management
+  'erp/operations/franchise': (ctx) => const FranchiseManagementScreen(),
+  // Wave 116 — E-Commerce Store
+  'erp/operations/ecommerce': (ctx) => const EcommerceStoreScreen(),
+  // Wave 117 — Subscription Billing (Stripe-class)
+  'erp/finance/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
+  // Wave 118 — ESG Sustainability Report (GRI/SASB/TCFD)
+  'compliance/regulatory/sustainability': (ctx) => const SustainabilityReportScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
