@@ -371,6 +371,12 @@ List<V5Service> v5Services = [
             labelEn: 'Break-Even',
             icon: Icons.balance,
           ),
+          V5Chip(
+            id: 'knowledge',
+            labelAr: 'قاعدة المعرفة',
+            labelEn: 'Knowledge Base',
+            icon: Icons.menu_book,
+          ),
         ],
       ),
       V5MainModule(
@@ -415,6 +421,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'leaves', labelAr: 'الإجازات', labelEn: 'Leaves', icon: Icons.event),
           const V5Chip(id: 'benefits', labelAr: 'المزايا', labelEn: 'Benefits', icon: Icons.health_and_safety),
           const V5Chip(id: 'commissions', labelAr: 'العمولات', labelEn: 'Commissions', icon: Icons.emoji_events),
+          const V5Chip(id: 'self-service', labelAr: 'بوابة الموظف', labelEn: 'ESS Portal', icon: Icons.person_pin),
         ],
       ),
       V5MainModule(
@@ -608,6 +615,7 @@ List<V5Service> v5Services = [
             dashboardWidgets: [],
           ),
           V5Chip(id: 'workpapers', labelAr: 'أوراق العمل', labelEn: 'Workpapers', icon: Icons.folder),
+          V5Chip(id: 'controls-library', labelAr: 'مكتبة الضوابط', labelEn: 'Controls Library', icon: Icons.security),
           V5Chip(id: 'risk', labelAr: 'تقييم المخاطر', labelEn: 'Risk Assessment', icon: Icons.warning),
           V5Chip(id: 'control', labelAr: 'اختبار الضوابط', labelEn: 'Control Testing', icon: Icons.rule),
         ],

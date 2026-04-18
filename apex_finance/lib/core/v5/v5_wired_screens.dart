@@ -30,6 +30,7 @@ import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_compliance/audit_acceptance_screen.dart';
 import '../../screens/v4_compliance/audit_kickoff_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
+import '../../screens/v4_compliance/controls_library_screen.dart';
 import '../../screens/v4_compliance/deferred_tax_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
@@ -58,12 +59,14 @@ import '../../screens/v4_erp/project_profitability_screen.dart';
 import '../../screens/v4_erp/contract_management_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
 import '../../screens/v4_erp/document_vault_screen.dart';
+import '../../screens/v4_erp/employee_self_service_screen.dart';
 import '../../screens/v4_erp/executive_dashboard_v5_screen.dart';
 import '../../screens/v4_erp/customer_360_screen.dart';
 import '../../screens/v4_erp/fixed_assets_register_screen.dart';
 import '../../screens/v4_erp/fx_management_screen.dart';
 import '../../screens/v4_erp/general_ledger_screen.dart';
 import '../../screens/v4_erp/helpdesk_tickets_screen.dart';
+import '../../screens/v4_erp/knowledge_base_screen.dart';
 import '../../screens/v4_erp/leave_management_screen.dart';
 import '../../screens/v4_erp/manufacturing_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
@@ -221,6 +224,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/scenarios': (ctx) => const ScenarioPlanningScreen(),
   // Wave 79 — Break-Even Analysis
   'erp/finance/breakeven': (ctx) => const BreakEvenScreen(),
+  // Wave 80 — Internal Controls Library
+  'audit/fieldwork/controls-library': (ctx) => const ControlsLibraryScreen(),
+  // Wave 81 — Employee Self-Service
+  'erp/hr/self-service': (ctx) => const EmployeeSelfServiceScreen(),
+  // Wave 82 — Knowledge Base
+  'erp/finance/knowledge': (ctx) => const KnowledgeBaseScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
