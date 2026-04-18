@@ -407,6 +407,12 @@ List<V5Service> v5Services = [
             labelEn: 'Intercompany',
             icon: Icons.sync_alt,
           ),
+          V5Chip(
+            id: 'credit',
+            labelAr: 'التصنيف الائتماني',
+            labelEn: 'Credit Scoring',
+            icon: Icons.credit_score,
+          ),
         ],
       ),
       V5MainModule(
@@ -500,6 +506,8 @@ List<V5Service> v5Services = [
           V5Chip(id: 'requisitions', labelAr: 'طلبات الشراء', labelEn: 'Purchase Requisitions', icon: Icons.shopping_cart),
           V5Chip(id: 'fleet', labelAr: 'الأسطول', labelEn: 'Fleet', icon: Icons.local_shipping),
           V5Chip(id: 'loyalty', labelAr: 'برنامج الولاء 🎉', labelEn: 'Loyalty Program', icon: Icons.loyalty),
+          V5Chip(id: 'price-list', labelAr: 'قائمة الأسعار', labelEn: 'Price List', icon: Icons.price_change),
+          V5Chip(id: 'warranty', labelAr: 'الضمانات والخدمة', labelEn: 'Warranty & Service', icon: Icons.verified),
           V5Chip(id: 'contracts', labelAr: 'العقود', labelEn: 'Contracts', icon: Icons.gavel),
           V5Chip(id: 'manufacturing', labelAr: 'التصنيع', labelEn: 'Manufacturing', icon: Icons.precision_manufacturing),
         ],

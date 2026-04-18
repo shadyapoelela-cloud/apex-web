@@ -46,9 +46,12 @@ import '../../screens/v4_erp/benefits_eos_screen.dart';
 import '../../screens/v4_erp/board_pack_screen.dart';
 import '../../screens/v4_erp/budget_vs_actual_screen.dart';
 import '../../screens/v4_erp/cap_table_screen.dart';
+import '../../screens/v4_erp/credit_scoring_screen.dart';
 import '../../screens/v4_erp/customer_loyalty_screen.dart';
 import '../../screens/v4_erp/fleet_management_screen.dart';
 import '../../screens/v4_erp/intercompany_screen.dart';
+import '../../screens/v4_erp/price_list_screen.dart';
+import '../../screens/v4_erp/warranty_service_screen.dart';
 import '../../screens/v4_erp/integrations_hub_screen.dart';
 import '../../screens/v4_erp/performance_reviews_screen.dart';
 import '../../screens/v4_erp/recruitment_ats_screen.dart';
@@ -284,6 +287,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/intercompany': (ctx) => const IntercompanyScreen(),
   // 🎉 Wave 100 — Customer Loyalty & Rewards (MILESTONE)
   'erp/operations/loyalty': (ctx) => const CustomerLoyaltyScreen(),
+  // Wave 101 — Customer Credit Scoring
+  'erp/finance/credit': (ctx) => const CreditScoringScreen(),
+  // Wave 102 — Price List & Catalog
+  'erp/operations/price-list': (ctx) => const PriceListScreen(),
+  // Wave 103 — Warranty & Service
+  'erp/operations/warranty': (ctx) => const WarrantyServiceScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
