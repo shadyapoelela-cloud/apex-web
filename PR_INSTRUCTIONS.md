@@ -123,6 +123,49 @@ Base: `claude/brave-yonath-wave-2` ← Head: `claude/brave-yonath-wave-3`
 Base: `claude/brave-yonath-wave-3` ← Head: `claude/brave-yonath-wave-4`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-3...claude/brave-yonath-wave-4?expand=1>
 
+### PR #7 — Wave 5 (ZATCA offline retry queue — exponential backoff)
+Base: `claude/brave-yonath-wave-4` ← Head: `claude/brave-yonath-wave-5`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-4...claude/brave-yonath-wave-5?expand=1>
+
+```
+Title: Wave 5: ZATCA offline retry queue (1m→5m→30m→2h→12h→24h→48h)
+
+Body:
+Makes APEX resilient to Fatoora outages — the single biggest
+operational risk for a ZATCA-integrated product in MENA.
+
+Design: 3 layers separated so nothing is coupled to the HTTP client.
+
+1. compliance_models.py adds `zatca_submission_queue`:
+   (tenant_id, invoice_id, payload, status, attempts, max_attempts,
+   next_retry_at, last_error_code, last_error_message, cleared_uuid),
+   indexed on (status, next_retry_at) for the hot due-query path.
+2. zatca_retry_queue.py: pure functions over the ORM. enqueue(),
+   due_for_retry(), record_success(), record_failure(), and a
+   process_due(submit_fn) drain loop that lets the caller pass any
+   submit function — so the module stays HTTP-free and tests run
+   fully offline. Backoff ladder is 1m/5m/30m/2h/12h/24h/48h; the
+   7th failure transitions to "giveup" requiring human action.
+   Every state transition emits an audit-trail event via the hash
+   chain from Wave 1 PR#6.
+3. zatca_queue_routes.py: five endpoints — enqueue, list (with
+   status/tenant filter), stats for KPI cards, detail drawer, and
+   a DRY-RUN process endpoint. The real run is 501 from HTTP
+   deliberately — the production worker imports process_due()
+   directly with the real ZATCA client so the HTTP layer never
+   accidentally hits Fatoora.
+
+tests/test_zatca_retry_queue.py: 24 tests covering enqueue +
+draft-vs-pending, backoff timing at 1m and 5m, giveup after
+max_attempts, idempotent success, due_for_retry exclusion rules,
+process_due drain + exception-as-failure, route auth + validation +
+501 on non-dry-run.
+
+Test suite: 967 → 991 pass (+24 new) · 2 skip · 0 fail.
+```
+
+---
+
 ```
 Title: Wave 4: populate all 6 V4 groups + first Compliance screen
 
