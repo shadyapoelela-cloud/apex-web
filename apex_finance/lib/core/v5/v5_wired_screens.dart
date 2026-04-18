@@ -26,6 +26,7 @@ import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_erp/bank_feeds_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
+import '../../screens/v4_erp/hr_employees_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
@@ -50,6 +51,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/treasury/recon': (ctx) => const AiBankReconciliationScreen(),
   // Wave 17 — Purchasing & AP (replaces AP placeholder)
   'erp/finance/ap': (ctx) => const PurchasingApScreen(),
+  // Wave 18 — HR Employees
+  'erp/hr/employees': (ctx) => const HrEmployeesScreen(),
   // Onboarding Journey (#8)
   'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
   // Connected Planning Drivers (#16) — Anaplan replacement
