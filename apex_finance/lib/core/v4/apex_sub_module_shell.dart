@@ -22,6 +22,7 @@ import 'package:go_router/go_router.dart';
 
 import '../design_tokens.dart';
 import '../theme.dart';
+import 'apex_command_palette.dart';
 import 'apex_screen_host.dart';
 import 'apex_tab_bar.dart';
 import 'v4_groups.dart';
@@ -51,7 +52,8 @@ class ApexSubModuleShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final isNarrow = MediaQuery.of(context).size.width < 900;
 
-    return Scaffold(
+    return ApexCommandPaletteHost(
+      child: Scaffold(
       backgroundColor: AC.navy,
       body: Column(
         children: [
@@ -97,6 +99,7 @@ class ApexSubModuleShell extends StatelessWidget {
               ),
             )
           : null,
+      ),
     );
   }
 
@@ -156,8 +159,45 @@ class _GroupRibbon extends StatelessWidget {
             ),
           ),
         ),
-        // Placeholder for future global search / bell / avatar.
-        Icon(Icons.search, color: AC.ts),
+        // Tappable search opens the command palette; keyboard users
+        // get the same overlay via Ctrl+K via ApexCommandPaletteHost.
+        Tooltip(
+          message: 'بحث سريع — Ctrl+K',
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+            onTap: () => showApexCommandPalette(context),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search, color: AC.ts, size: 18),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AC.navy3,
+                      borderRadius: BorderRadius.circular(AppRadius.xs),
+                    ),
+                    child: Text(
+                      'Ctrl K',
+                      style: TextStyle(
+                        color: AC.ts,
+                        fontSize: AppFontSize.xs,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ],
     ),
   );
