@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 // These imports may trigger transitive package imports; build verifies.
 import '../../screens/v4_ai/ai_guardrails_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
+import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
@@ -40,8 +41,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── Compliance & Tax ─────────────────────────────────────────────
   'compliance/zatca/csid': (ctx) => const ZatcaCsidScreen(),
   'compliance/zatca/zatca-queue': (ctx) => const ZatcaQueueScreen(),
-  // Also register under the v5_data chip id for ZATCA queue
   'compliance/zatca/queue': (ctx) => const ZatcaQueueScreen(),
+  // Real-time GCC Tax Calculator — World-first feature
+  'compliance/tax/vat': (ctx) => const RealtimeTaxScreen(),
+  'compliance/tax/realtime': (ctx) => const RealtimeTaxScreen(),
 
   // ── Audit ────────────────────────────────────────────────────────
   'audit/fieldwork/risk': (ctx) => const ComplianceStatusScreen(),
