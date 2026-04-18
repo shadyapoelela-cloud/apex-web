@@ -29,6 +29,7 @@ import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
+import '../../screens/v4_erp/purchasing_ap_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
@@ -47,6 +48,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/invoices': (ctx) => const InvoicesMultiViewScreen(),
   // Wave 16 — AI Bank Reconciliation (V5.1 POC)
   'erp/treasury/recon': (ctx) => const AiBankReconciliationScreen(),
+  // Wave 17 — Purchasing & AP (replaces AP placeholder)
+  'erp/finance/ap': (ctx) => const PurchasingApScreen(),
   // Onboarding Journey (#8)
   'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
   // Connected Planning Drivers (#16) — Anaplan replacement
