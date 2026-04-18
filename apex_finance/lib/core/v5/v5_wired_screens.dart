@@ -15,8 +15,10 @@ import 'package:flutter/material.dart';
 // Reuse existing brave-yonath screens (Waves 2-14).
 // These imports may trigger transitive package imports; build verifies.
 import '../../screens/v4_ai/ai_guardrails_screen.dart';
+import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
+import '../../screens/v4_compliance/gosi_wps_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
@@ -81,6 +83,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // Real-time GCC Tax Calculator — World-first feature
   'compliance/tax/vat': (ctx) => const RealtimeTaxScreen(),
   'compliance/tax/realtime': (ctx) => const RealtimeTaxScreen(),
+
+  // Wave 21 — GOSI & WPS UI
+  'compliance/regulatory/gosi': (ctx) => const GosiWpsScreen(),
+  'compliance/regulatory/wps': (ctx) => const GosiWpsScreen(),
+  // Wave 22 — AML & KYC (override the previous placeholder)
+  'compliance/regulatory/aml': (ctx) => const AmlKycScreen(),
 
   // ── Audit ────────────────────────────────────────────────────────
   'audit/fieldwork/risk': (ctx) => const ComplianceStatusScreen(),
