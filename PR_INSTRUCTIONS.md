@@ -159,6 +159,48 @@ Base: `claude/brave-yonath-wave-11` ← Head: `claude/brave-yonath-wave-12`
 Base: `claude/brave-yonath-wave-12` ← Head: `claude/brave-yonath-wave-13`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-12...claude/brave-yonath-wave-13?expand=1>
 
+### PR #16 — Wave 14 (Bank Feeds UI — wires Wave 13)
+Base: `claude/brave-yonath-wave-13` ← Head: `claude/brave-yonath-wave-14`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-13...claude/brave-yonath-wave-14?expand=1>
+
+```
+Title: Wave 14: Bank Feeds UI (connections + transactions + reconcile)
+
+Body:
+Flutter UI completing Wave 13. Single-screen view of every connected
+bank with inline sync / disconnect / reconcile.
+
+bank_feeds_screen.dart:
+- Stats strip: total / connected / reauth / transactions /
+  unreconciled with color-coded pills.
+- Horizontal connection cards — "All accounts" first, then one per
+  connection with bank + masked IBAN + last-sync + status pill +
+  sync/disconnect icon buttons. Gold border on the selected card.
+- Transactions toolbar: "غير مطابقة فقط" switch round-trips to the
+  /bank-feeds/transactions?unreconciled_only=true flag.
+- Transaction rows with direction-coded ribbon (credit green ↓,
+  debit amber ↑), description + counterparty + date + optional
+  provider category_hint chip. Monospace amount with + / − prefix.
+- Inline "مطابقة" button on unmatched rows → reconcile dialog with
+  entity-type ChoiceChips (journal_entry / invoice / bill) and a
+  free-text entity-id field.
+- All branches via ApexScreenHost — empty-first-time explains what
+  Lean/Tarabut do and lists available providers.
+
+api_service.dart: nine new methods covering stats / providers /
+connections list + detail + connect / sync / disconnect /
+transactions / reconcile. Enforces the Wave 13 invariant — no
+method exposes decrypted tokens.
+
+v4_routes.dart._wiredScreens: 'erp-tre-txns' → BankFeedsScreen.
+Sixth V4 screen wired to real backend data.
+
+Verification: dart analyze clean, flutter build web succeeds (47s),
+pytest unchanged at 1103 pass.
+```
+
+---
+
 ```
 Title: Wave 13: Bank Feeds abstraction — provider-agnostic core + mock
 
