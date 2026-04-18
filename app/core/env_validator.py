@@ -162,6 +162,19 @@ def validate_env() -> EnvCheck:
                 "ZATCA_CERT_ENCRYPTION_KEY not set — dev deriving from JWT_SECRET"
             )
 
+    # Bank feeds token encryption (Wave 13): same pattern as TOTP + CSID.
+    # A dedicated key lets ops rotate bank credentials independently.
+    if not os.environ.get("BANK_FEEDS_ENCRYPTION_KEY"):
+        if is_prod:
+            errors.append(
+                "BANK_FEEDS_ENCRYPTION_KEY is required in production "
+                "(generate with Fernet.generate_key())"
+            )
+        else:
+            warnings.append(
+                "BANK_FEEDS_ENCRYPTION_KEY not set — dev deriving from JWT_SECRET"
+            )
+
     return EnvCheck(errors=errors, warnings=warnings)
 
 
