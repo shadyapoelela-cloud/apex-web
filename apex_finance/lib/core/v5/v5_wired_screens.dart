@@ -29,6 +29,10 @@ import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_erp/asset_tracking_screen.dart';
 import '../../screens/v4_erp/budget_planning_screen.dart';
+import '../../screens/v4_erp/construction_screen.dart';
+import '../../screens/v4_erp/grant_management_screen.dart';
+import '../../screens/v4_erp/healthcare_claims_screen.dart';
+import '../../screens/v4_erp/real_estate_screen.dart';
 import '../../screens/v4_erp/whatsapp_business_screen.dart';
 import '../../screens/v4_compliance/audit_acceptance_screen.dart';
 import '../../screens/v4_compliance/audit_kickoff_screen.dart';
@@ -314,6 +318,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/budget-planning': (ctx) => const BudgetPlanningScreen(),
   // 🎉 Wave 110 — WhatsApp Business (MILESTONE)
   'erp/operations/whatsapp': (ctx) => const WhatsappBusinessScreen(),
+  // Wave 111 — Construction Project Accounting
+  'erp/operations/construction': (ctx) => const ConstructionScreen(),
+  // Wave 112 — Real Estate Property Management
+  'erp/operations/real-estate': (ctx) => const RealEstateScreen(),
+  // Wave 113 — Healthcare Claims Processing
+  'erp/operations/healthcare': (ctx) => const HealthcareClaimsScreen(),
+  // Wave 114 — NGO / Grant Management
+  'erp/operations/grants': (ctx) => const GrantManagementScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
