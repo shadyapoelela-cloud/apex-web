@@ -22,7 +22,9 @@ import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
+import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_erp/bank_feeds_screen.dart';
+import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
@@ -51,6 +53,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
   // Mobile Receipt Capture (#20) — Expensify replacement
   'erp/finance/consolidation': (ctx) => const MobileReceiptScreen(),
+  // Client Portal (#12) — Freshbooks replacement
+  'erp/finance/reports': (ctx) => const ClientPortalScreen(),
+  // APEX Studio no-code (#11) — Odoo Studio replacement
+  'erp/finance/gl': (ctx) => const ApexStudioScreen(),
 
   // ── Marketplace ──────────────────────────────────────────────────
   // APEX Match AI pairing (#15) — Toptal-style
