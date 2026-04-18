@@ -347,6 +347,12 @@ List<V5Service> v5Services = [
             labelEn: 'AI Anomaly Detector',
             icon: Icons.psychology,
           ),
+          V5Chip(
+            id: 'copilot',
+            labelAr: 'مساعد AI',
+            labelEn: 'AI Copilot',
+            icon: Icons.auto_awesome,
+          ),
         ],
       ),
       V5MainModule(
@@ -390,6 +396,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'payroll', labelAr: 'الرواتب', labelEn: 'Payroll', icon: Icons.payments),
           const V5Chip(id: 'leaves', labelAr: 'الإجازات', labelEn: 'Leaves', icon: Icons.event),
           const V5Chip(id: 'benefits', labelAr: 'المزايا', labelEn: 'Benefits', icon: Icons.health_and_safety),
+          const V5Chip(id: 'commissions', labelAr: 'العمولات', labelEn: 'Commissions', icon: Icons.emoji_events),
         ],
       ),
       V5MainModule(
@@ -431,6 +438,7 @@ List<V5Service> v5Services = [
           V5Chip(id: 'pipeline', labelAr: 'أنبوب المبيعات', labelEn: 'Sales Pipeline', icon: Icons.filter_alt),
           V5Chip(id: 'project-pnl', labelAr: 'ربحية المشاريع', labelEn: 'Project P&L', icon: Icons.analytics),
           V5Chip(id: 'tickets', labelAr: 'تذاكر الدعم', labelEn: 'Helpdesk', icon: Icons.support_agent),
+          V5Chip(id: 'vendor-onboarding', labelAr: 'إدخال مورد', labelEn: 'Vendor Onboarding', icon: Icons.person_add),
           V5Chip(id: 'contracts', labelAr: 'العقود', labelEn: 'Contracts', icon: Icons.gavel),
           V5Chip(id: 'manufacturing', labelAr: 'التصنيع', labelEn: 'Manufacturing', icon: Icons.precision_manufacturing),
         ],
