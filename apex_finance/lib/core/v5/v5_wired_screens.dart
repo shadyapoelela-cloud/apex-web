@@ -31,6 +31,7 @@ import '../../screens/v4_erp/bank_feeds_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
+import '../../screens/v4_erp/feasibility_deep_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
@@ -63,6 +64,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/projects': (ctx) => const ProjectsScreen(),
   // Wave 20 — CRM (Leads/Opportunities/Pipeline/Activities/Contacts)
   'erp/operations/crm': (ctx) => const CrmScreen(),
+  // Wave 25 — Feasibility Market Analysis (Advisory)
+  'advisory/feasibility/market': (ctx) => const FeasibilityMarketScreen(),
+  'advisory/feasibility/sensitivity': (ctx) => const FeasibilityMarketScreen(),
+  // Wave 26 — External Analysis (Benchmarking + Credit)
+  'advisory/external/benchmarking': (ctx) => const ExternalAnalysisScreen(),
+  'advisory/external/credit': (ctx) => const ExternalAnalysisScreen(),
   // Onboarding Journey (#8)
   'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
   // Connected Planning Drivers (#16) — Anaplan replacement
