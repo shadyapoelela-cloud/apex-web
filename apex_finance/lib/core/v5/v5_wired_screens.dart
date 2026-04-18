@@ -35,6 +35,7 @@ import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
+import '../../screens/v4_erp/industry_packs_screen.dart';
 import '../../screens/v4_erp/marketplace_deep_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
@@ -84,6 +85,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'compliance/regulatory/governance': (ctx) => const GovernanceScreen(),
   // Wave 32 — Notifications Center
   'platform/notifications/center': (ctx) => const NotificationsCenterScreen(),
+  // Wave 33 — Industry Packs (F&B / Manufacturing / Healthcare / Logistics / Retail)
+  'marketplace/client/industry-packs': (ctx) => const IndustryPacksScreen(),
+  // Wave 34 — Help Center
+  'platform/help/center': (ctx) => const HelpCenterScreen(),
   // Wave 29 — Admin Panel (Tenant Settings + Users + Integrations)
   'platform/admin/settings': (ctx) => const AdminPanelScreen(),
   // Wave 30 — Custom Report Builder
