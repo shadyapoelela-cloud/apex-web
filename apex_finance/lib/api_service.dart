@@ -411,6 +411,57 @@ class ApiService {
   static Future<ApiResult> zatcaCsidSweepExpired() =>
       _post('/zatca/csid/sweep-expired', const {});
 
+  // ── Bank Feeds (Wave 13 + 14). ──
+  // No method returns decrypted tokens — the backend never exposes
+  // them over HTTP. These are metadata + lifecycle operations only.
+  static Future<ApiResult> bankFeedsStats({String? tenantId}) => _get(
+      '/bank-feeds/stats${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> bankFeedsProviders() => _get('/bank-feeds/providers');
+  static Future<ApiResult> bankFeedsConnections({
+    String? tenantId,
+    String? provider,
+    String? status,
+    int limit = 100,
+  }) {
+    final qp = <String, String>{'limit': '$limit'};
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    if (provider != null) qp['provider'] = provider;
+    if (status != null) qp['status'] = status;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/bank-feeds/connections?$qs');
+  }
+  static Future<ApiResult> bankFeedsConnectionDetail(String id) =>
+      _get('/bank-feeds/connections/$id');
+  static Future<ApiResult> bankFeedsConnect(Map body) =>
+      _post('/bank-feeds/connections', body);
+  static Future<ApiResult> bankFeedsSync(String id) =>
+      _post('/bank-feeds/connections/$id/sync', const {});
+  static Future<ApiResult> bankFeedsDisconnect(String id, {String? reason}) =>
+      _post('/bank-feeds/connections/$id/disconnect', {if (reason != null) 'reason': reason});
+  static Future<ApiResult> bankFeedsTransactions({
+    String? tenantId,
+    String? connectionId,
+    bool unreconciledOnly = false,
+    int limit = 200,
+  }) {
+    final qp = <String, String>{
+      'limit': '$limit',
+      'unreconciled_only': '$unreconciledOnly',
+    };
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    if (connectionId != null) qp['connection_id'] = connectionId;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/bank-feeds/transactions?$qs');
+  }
+  static Future<ApiResult> bankFeedsReconcile(String txnId, {
+    required String entityType,
+    required String entityId,
+  }) =>
+      _post(
+        '/bank-feeds/transactions/$txnId/reconcile',
+        {'entity_type': entityType, 'entity_id': entityId},
+      );
+
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);
   static Future<ApiResult> taxVatReturn(Map body) => _post('/tax/vat/return', body);
