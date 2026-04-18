@@ -15,6 +15,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/v4_ai/ai_guardrails_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
@@ -120,6 +121,10 @@ final Map<String, Widget Function(BuildContext)> _wiredScreens = {
   // endpoints (/zatca/queue, /stats, /{id}). Surfaced under the
   // Compliance > ZATCA sub-module's "Clearance Log" tab.
   'compliance-zatca-log': (ctx) => const ZatcaQueueScreen(),
+  // Wave 8: AI Guardrails queue (Wave 7 backend) — lives under
+  // Compliance > Governance as "AI Oversight" since the gate is a
+  // policy-enforcement tool for AI-proposed changes.
+  'compliance-gov-ai-oversight': (ctx) => const AiGuardrailsScreen(),
 };
 
 class _NotFound extends StatelessWidget {

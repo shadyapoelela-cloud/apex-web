@@ -362,6 +362,24 @@ class ApiService {
   static Future<ApiResult> zatcaQueueProcess({bool dryRun = true, int limit = 50}) =>
       _post('/zatca/queue/process', {'dry_run': dryRun, 'limit': limit});
 
+  // ── AI Guardrails (Wave 7 + 8). ──
+  static Future<ApiResult> aiGuardrailsStats({String? tenantId}) => _get(
+      '/ai/guardrails/stats${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> aiGuardrailsList({String? status, String? source, String? tenantId, int limit = 100}) {
+    final qp = <String, String>{'limit': '$limit'};
+    if (status != null) qp['status'] = status;
+    if (source != null) qp['source'] = source;
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/ai/guardrails?$qs');
+  }
+  static Future<ApiResult> aiGuardrailsDetail(String id) => _get('/ai/guardrails/$id');
+  static Future<ApiResult> aiGuardrailsEvaluate(Map body) => _post('/ai/guardrails/evaluate', body);
+  static Future<ApiResult> aiGuardrailsApprove(String id) =>
+      _post('/ai/guardrails/$id/approve', const {});
+  static Future<ApiResult> aiGuardrailsReject(String id, {String? reason}) =>
+      _post('/ai/guardrails/$id/reject', {if (reason != null) 'reason': reason});
+
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);
   static Future<ApiResult> taxVatReturn(Map body) => _post('/tax/vat/return', body);
