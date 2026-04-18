@@ -353,6 +353,24 @@ List<V5Service> v5Services = [
             labelEn: 'AI Copilot',
             icon: Icons.auto_awesome,
           ),
+          V5Chip(
+            id: 'esg',
+            labelAr: 'الاستدامة ESG',
+            labelEn: 'ESG',
+            icon: Icons.eco,
+          ),
+          V5Chip(
+            id: 'scenarios',
+            labelAr: 'سيناريوهات What-If',
+            labelEn: 'What-If Scenarios',
+            icon: Icons.insights,
+          ),
+          V5Chip(
+            id: 'breakeven',
+            labelAr: 'نقطة التعادل',
+            labelEn: 'Break-Even',
+            icon: Icons.balance,
+          ),
         ],
       ),
       V5MainModule(
