@@ -35,10 +35,13 @@ import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
+import '../../screens/v4_erp/financial_statements_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
 import '../../screens/v4_erp/industry_packs_screen.dart';
 import '../../screens/v4_erp/marketplace_deep_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
+import '../../screens/v4_erp/je_builder_screen.dart';
+import '../../screens/v4_erp/sales_workflow_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
 import '../../screens/v4_erp/projects_screen.dart';
@@ -90,6 +93,15 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'marketplace/client/industry-packs': (ctx) => const IndustryPacksScreen(),
   // Wave 34 — Help Center
   'platform/help/center': (ctx) => const HelpCenterScreen(),
+  // Wave 37 — JE Builder + Period Close (CRITICAL)
+  'erp/finance/je-builder': (ctx) => const JeBuilderScreen(),
+  'erp/finance/period-close': (ctx) => const PeriodCloseScreen(),
+  // Wave 38 — Sales Workflow (CRITICAL)
+  'erp/finance/sales-workflow': (ctx) => const SalesWorkflowScreen(),
+  // Wave 39 — Financial Statements + CoA + Inventory (CRITICAL)
+  'erp/finance/statements': (ctx) => const FinancialStatementsScreen(),
+  'erp/finance/coa-editor': (ctx) => const CoaEditorScreen(),
+  'erp/operations/inventory-detailed': (ctx) => const InventoryDetailedScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
