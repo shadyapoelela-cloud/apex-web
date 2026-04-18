@@ -127,6 +127,38 @@ Base: `claude/brave-yonath-wave-3` ← Head: `claude/brave-yonath-wave-4`
 Base: `claude/brave-yonath-wave-4` ← Head: `claude/brave-yonath-wave-5`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-4...claude/brave-yonath-wave-5?expand=1>
 
+### PR #8 — Wave 6 (ZATCA queue UI — stats strip + filterable list)
+Base: `claude/brave-yonath-wave-5` ← Head: `claude/brave-yonath-wave-6`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-5...claude/brave-yonath-wave-6?expand=1>
+
+```
+Title: Wave 6: ZATCA retry queue Flutter UI (wires Wave 5 backend)
+
+Body:
+Flutter UI completing Wave 5. Accountants can now see which invoices
+are stuck with ZATCA, why, and when the next retry fires — without
+shelling into a Postgres console.
+
+Files:
+- zatca_queue_screen.dart — stats strip (5 filter chips: All,
+  Pending, Cleared, Giveup, Draft — each with live count), color-
+  ribbon list rows with invoice id + attempts badge + last-error or
+  next-retry, and a detail drawer fetched from /zatca/queue/{id}.
+  Every branch routes through ApexScreenHost (loading / empty-first-
+  time with ladder explanation / empty-after-filter / error-with-
+  retry) so conventions stay identical to the other V4 screens.
+- api_service.dart — five client methods mirroring the Wave 5 routes
+  (stats, list, detail, enqueue, process).
+- v4_routes.dart._wiredScreens — "compliance-zatca-log" now points
+  at ZatcaQueueScreen. Third V4 screen wired to real data after
+  ERP Customers (Wave 2 PR#3) and Compliance Status (Wave 4 PR#2).
+
+Verification: dart analyze clean, flutter build web succeeds (49s),
+pytest unchanged at 991 pass.
+```
+
+---
+
 ```
 Title: Wave 5: ZATCA offline retry queue (1m→5m→30m→2h→12h→24h→48h)
 
