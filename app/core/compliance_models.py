@@ -193,6 +193,65 @@ class AiSuggestion(Base):
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
 
+class ZatcaCsid(Base):
+    """
+    ZATCA Fatoora CSID (Cryptographic Stamp Identifier) lifecycle
+    (Wave 11). Pattern #121 from APEX_GLOBAL_RESEARCH_210 — "CSID
+    lifecycle UX (issue / renew / sandbox↔prod)".
+
+    Security model:
+    - cert_pem_encrypted and private_key_pem_encrypted are stored
+      Fernet-encrypted at rest (same key derivation as TOTP —
+      ZATCA_CERT_ENCRYPTION_KEY in production, derived from
+      JWT_SECRET in dev with a logged warning).
+    - The raw cert / key only surface via decrypt helpers in
+      zatca_csid.py. Routes never return them in API responses.
+
+    Expiry handling: expires_at is denormalized from the cert's
+    notAfter field at register time so dashboard queries can filter
+    by "expiring in N days" without round-tripping through the
+    crypto library for every row.
+    """
+
+    __tablename__ = "zatca_csid"
+    __table_args__ = (
+        Index("ix_zatca_csid_tenant_env", "tenant_id", "environment"),
+        Index("ix_zatca_csid_status", "status"),
+        Index("ix_zatca_csid_expires_at", "expires_at"),
+        UniqueConstraint(
+            "tenant_id",
+            "environment",
+            "cert_serial",
+            name="uq_zatca_csid_tenant_env_serial",
+        ),
+    )
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    tenant_id = Column(String(36), nullable=False, index=True)
+    environment = Column(String(20), nullable=False)  # "sandbox" | "production"
+
+    cert_pem_encrypted = Column(Text, nullable=False)
+    private_key_pem_encrypted = Column(Text, nullable=False)
+
+    cert_subject = Column(String(300), nullable=True)  # CN / O / OU summary
+    cert_serial = Column(String(120), nullable=True)  # issuer-assigned serial
+    issued_at = Column(DateTime, nullable=True)       # cert.notBefore
+    expires_at = Column(DateTime, nullable=False)     # cert.notAfter
+
+    status = Column(String(20), nullable=False, default="active")
+    # active | expired | revoked | renewing
+
+    compliance_csid = Column(String(120), nullable=True)  # ZATCA-issued id
+    production_csid = Column(String(120), nullable=True)  # after prod onboarding
+
+    revoked_at = Column(DateTime, nullable=True)
+    revoked_by = Column(String(36), nullable=True)
+    revocation_reason = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+
 def init_compliance_db():
     from app.phase1.models.platform_models import engine
 
@@ -202,4 +261,5 @@ def init_compliance_db():
         "audit_trail",
         "zatca_submission_queue",
         "ai_suggestion",
+        "zatca_csid",
     ]
