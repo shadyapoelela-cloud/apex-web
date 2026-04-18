@@ -18,6 +18,7 @@ import '../../screens/v4_ai/ai_guardrails_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
+import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/bank_feeds_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
 
@@ -33,7 +34,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── ERP ──────────────────────────────────────────────────────────
   'erp/finance/sales': (ctx) => const SalesCustomersScreen(),
   'erp/treasury/banks': (ctx) => const BankFeedsScreen(),
-  // Wave 16 (future): 'erp/treasury/recon' → AI Bank Reconciliation UI
+  // Wave 16 — AI Bank Reconciliation (V5.1 POC)
+  'erp/treasury/recon': (ctx) => const AiBankReconciliationScreen(),
 
   // ── Compliance & Tax ─────────────────────────────────────────────
   'compliance/zatca/csid': (ctx) => const ZatcaCsidScreen(),
