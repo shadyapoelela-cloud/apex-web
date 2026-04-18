@@ -347,6 +347,21 @@ class ApiService {
   static Future<ApiResult> scanAnomalies(List<Map> transactions, {Map<String, dynamic>? options}) =>
       _post('/anomalies/scan', {'transactions': transactions, ...?options});
 
+  // ── ZATCA offline retry queue (Wave 5). ──
+  static Future<ApiResult> zatcaQueueStats({String? tenantId}) => _get(
+      '/zatca/queue/stats${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> zatcaQueueList({String? status, String? tenantId, int limit = 100}) {
+    final qp = <String, String>{'limit': '$limit'};
+    if (status != null) qp['status'] = status;
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/zatca/queue?$qs');
+  }
+  static Future<ApiResult> zatcaQueueDetail(String id) => _get('/zatca/queue/$id');
+  static Future<ApiResult> zatcaQueueEnqueue(Map body) => _post('/zatca/queue/enqueue', body);
+  static Future<ApiResult> zatcaQueueProcess({bool dryRun = true, int limit = 50}) =>
+      _post('/zatca/queue/process', {'dry_run': dryRun, 'limit': limit});
+
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);
   static Future<ApiResult> taxVatReturn(Map body) => _post('/tax/vat/return', body);

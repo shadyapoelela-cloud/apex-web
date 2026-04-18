@@ -15,6 +15,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/v4_compliance/compliance_status_screen.dart';
+import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
 import 'apex_launchpad.dart';
 import 'apex_screen_host.dart';
@@ -110,6 +112,14 @@ Widget _defaultScreenHost(BuildContext ctx, V4Screen screen) {
 /// is ready — the shell picks it up automatically via its screen id.
 final Map<String, Widget Function(BuildContext)> _wiredScreens = {
   'erp-sales-customers': (ctx) => const SalesCustomersScreen(),
+  // Wave 4 PR#2: first non-ERP V4 screen. Uses the status dashboard
+  // pattern — KPI cards + hero score band. Data placeholder until the
+  // Wave 5 backend exposes /compliance/status.
+  'compliance-dashboard-status': (ctx) => const ComplianceStatusScreen(),
+  // Wave 6: the ZATCA retry queue UI consumes the Wave 5 backend
+  // endpoints (/zatca/queue, /stats, /{id}). Surfaced under the
+  // Compliance > ZATCA sub-module's "Clearance Log" tab.
+  'compliance-zatca-log': (ctx) => const ZatcaQueueScreen(),
 };
 
 class _NotFound extends StatelessWidget {
