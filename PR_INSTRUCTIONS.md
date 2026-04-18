@@ -155,6 +155,69 @@ Base: `claude/brave-yonath-wave-10` ← Head: `claude/brave-yonath-wave-11`
 Base: `claude/brave-yonath-wave-11` ← Head: `claude/brave-yonath-wave-12`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-11...claude/brave-yonath-wave-12?expand=1>
 
+### PR #15 — Wave 13 (Bank Feeds abstraction — Lean / Tarabut / Salt Edge)
+Base: `claude/brave-yonath-wave-12` ← Head: `claude/brave-yonath-wave-13`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-12...claude/brave-yonath-wave-13?expand=1>
+
+```
+Title: Wave 13: Bank Feeds abstraction — provider-agnostic core + mock
+
+Body:
+Pattern #137 — SAMA Open Banking aggregation via Lean / Tarabut /
+Salt Edge. The real differentiator over Qoyod / Wafeq, which still
+require CSV upload.
+
+Three layers mirroring Waves 5 / 7 / 11:
+
+1. bank_feed_connection + bank_feed_transaction tables:
+   tenant-scoped, unique on (tenant, provider, external_account_id)
+   and (connection_id, external_id). Tokens are Fernet-encrypted;
+   raw provider payloads preserved in raw_json for re-normalization.
+   Reconciliation pointers (matched_entity_type/id, matched_at/by)
+   set the table up for AI bank-rec in future waves.
+
+2. bank_feeds.py — core:
+   - Abstract BankFeedProvider with fetch_transactions(tokens,
+     account, since). Concrete Lean/Tarabut/Salt Edge adapters will
+     live outside this module so the core stays vendor-free.
+   - MockBankFeedProvider registered at import: deterministic
+     2-transaction fixture so the pipeline runs offline in dev/tests.
+   - register_provider / get_provider / available_providers build a
+     runtime adapter registry.
+   - Lifecycle: connect / sync / disconnect / reconcile. Every
+     transition audits through the Wave 1 hash chain. sync guards
+     against duplicates via (connection_id, external_id); errors
+     are isolated to the connection row.
+   - BANK_FEEDS_ENCRYPTION_KEY env (prod-required; dev derives from
+     JWT_SECRET with a warning — same pattern as TOTP + CSID).
+
+3. bank_feeds_routes.py — 9 endpoints:
+     POST  /bank-feeds/connections
+     GET   /bank-feeds/connections
+     GET   /bank-feeds/connections/{id}
+     POST  /bank-feeds/connections/{id}/sync        (409 if wrong status)
+     POST  /bank-feeds/connections/{id}/disconnect
+     GET   /bank-feeds/transactions
+     POST  /bank-feeds/transactions/{id}/reconcile
+     GET   /bank-feeds/stats
+     GET   /bank-feeds/providers
+   Route invariant (enforced by tests): no endpoint returns the
+   decrypted access/refresh tokens.
+
+Tests (27 bank-feeds + 2 env):
+- Encryption round-trip + ciphertext ≠ plaintext at rest.
+- Unknown provider rejected; empty token rejected.
+- sync idempotent (duplicates counted, not re-inserted).
+- sync on disconnected row raises ValueError → 409 from route.
+- provider-exception isolation: flips status=error + stores message.
+- reconcile marks match + emits audit event.
+- Route "grep plaintext in response" check passes.
+
+Test suite: 1074 → 1103 pass (+29 new) · 2 skip · 0 fail.
+```
+
+---
+
 ```
 Title: Wave 12: CSID management screen (wires Wave 11 backend)
 
