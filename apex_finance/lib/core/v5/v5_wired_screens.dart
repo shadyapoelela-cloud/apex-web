@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 // Reuse existing brave-yonath screens (Waves 2-14).
 // These imports may trigger transitive package imports; build verifies.
 import '../../screens/v4_ai/ai_agents_gallery_screen.dart';
-import '../../screens/v4_ai/ai_guardrails_screen.dart';
 import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
 import '../../screens/v4_compliance/audit_reporting_screen.dart';
@@ -24,13 +23,10 @@ import '../../screens/v4_compliance/gosi_wps_screen.dart';
 import '../../screens/v4_compliance/governance_screen.dart';
 import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
-import '../../screens/v4_compliance/zatca_csid_screen.dart';
-import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
-import '../../screens/v4_erp/bank_feeds_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
@@ -46,7 +42,6 @@ import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
 import '../../screens/v4_erp/projects_screen.dart';
 import '../../screens/v4_erp/purchasing_ap_screen.dart';
-import '../../screens/v4_erp/sales_customers_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -58,8 +53,11 @@ typedef V5ChipBuilder = Widget Function(BuildContext ctx);
 
 final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── ERP ──────────────────────────────────────────────────────────
-  'erp/finance/sales': (ctx) => const SalesCustomersScreen(),
-  'erp/treasury/banks': (ctx) => const BankFeedsScreen(),
+  // Note: 'erp/finance/sales' and 'erp/treasury/banks' are intentionally
+  // NOT wired in this POC build — they call the authenticated backend
+  // and would show "unauthorized" without a login flow. They stay in
+  // production (the screens still exist) and fall back to the V5
+  // default dashboard/coming-soon in the POC.
   // Multiple Views demo (Enhancement #4)
   'erp/finance/invoices': (ctx) => const InvoicesMultiViewScreen(),
   // Wave 16 — AI Bank Reconciliation (V5.1 POC)
@@ -126,9 +124,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'marketplace/client/browse': (ctx) => const ApexMatchScreen(),
 
   // ── Compliance & Tax ─────────────────────────────────────────────
-  'compliance/zatca/csid': (ctx) => const ZatcaCsidScreen(),
-  'compliance/zatca/zatca-queue': (ctx) => const ZatcaQueueScreen(),
-  'compliance/zatca/queue': (ctx) => const ZatcaQueueScreen(),
+  // ZATCA CSID / queue screens call the authenticated backend — not
+  // wired in POC (same reason as sales/banks above).
   // Real-time GCC Tax Calculator — World-first feature
   'compliance/tax/vat': (ctx) => const RealtimeTaxScreen(),
   'compliance/tax/realtime': (ctx) => const RealtimeTaxScreen(),
@@ -150,10 +147,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'audit/reporting/ml': (ctx) => const AuditReportingScreen(),
   'audit/reporting/qc': (ctx) => const AuditReportingScreen(),
 
-  // ── AI Settings (horizontal layer — still accessible via /app) ───
-  'compliance/regulatory/aml': (ctx) => const AiGuardrailsScreen(),
-  // Note: Guardrails UI is the most generic "AI review queue" we have.
-  // In production it moves to /settings/ai-agents.
+  // Note: AiGuardrailsScreen is API-backed so it's not wired here.
+  // In production it lives under /settings/ai-agents with auth.
 };
 
 /// Returns true if a chip has a wired screen.
