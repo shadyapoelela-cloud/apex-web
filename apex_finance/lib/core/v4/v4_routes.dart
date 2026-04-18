@@ -19,6 +19,7 @@ import '../../screens/v4_ai/ai_guardrails_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
+import '../../screens/v4_erp/bank_feeds_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
 import 'apex_launchpad.dart';
 import 'apex_screen_host.dart';
@@ -130,6 +131,11 @@ final Map<String, Widget Function(BuildContext)> _wiredScreens = {
   // Compliance > ZATCA Compliance > "Certificates" tab with expiry
   // banner + revoke actions.
   'compliance-zatca-certs': (ctx) => const ZatcaCsidScreen(),
+  // Wave 14: Bank feeds UI (Wave 13 backend). Wired under ERP >
+  // Treasury > "Transactions" since bank feeds ARE transactions from
+  // the user's perspective. A dedicated "Bank Feeds" tab will land
+  // when the Treasury sub-module's overflow is populated.
+  'erp-tre-txns': (ctx) => const BankFeedsScreen(),
 };
 
 class _NotFound extends StatelessWidget {
