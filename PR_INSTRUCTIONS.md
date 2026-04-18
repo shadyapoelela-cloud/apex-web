@@ -135,6 +135,42 @@ Base: `claude/brave-yonath-wave-5` ← Head: `claude/brave-yonath-wave-6`
 Base: `claude/brave-yonath-wave-6` ← Head: `claude/brave-yonath-wave-7`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-6...claude/brave-yonath-wave-7?expand=1>
 
+### PR #10 — Wave 8 (AI Guardrails UI — wires Wave 7 backend)
+Base: `claude/brave-yonath-wave-7` ← Head: `claude/brave-yonath-wave-8`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-7...claude/brave-yonath-wave-8?expand=1>
+
+```
+Title: Wave 8: AI Guardrails Flutter UI (wires Wave 7 backend)
+
+Body:
+Controllers and accountants now have a single screen to review every
+AI decision — pending approvals with inline approve/reject, auto-
+applied rows ready for retroactive takedown, rejection trail for the
+audit binder.
+
+Files:
+- ai_guardrails_screen.dart: 5 filter chips with live counts from
+  /ai/guardrails/stats. Suggestion cards show source icon (Copilot /
+  COA / OCR), action type, target id, Arabic reasoning, the gate_reason
+  explainer, a confidence % badge (green ≥95%, amber 80-94%, red <80%),
+  and a red "تدميري" pill when destructive=True so the reason for
+  needing approval is visible at a glance. Needs-approval rows render
+  inline موافقة/رفض buttons; reject opens an optional-Arabic-reason
+  dialog wired to the backend rejection_reason column.
+- api_service.dart: six new methods mirroring the Wave 7 routes.
+- v4_groups_data.dart: adds "compliance-gov-ai-oversight" as an
+  overflow entry under Compliance > Governance — AI policy enforcement
+  lives with governance until the Settings → AI Agents gallery ships.
+- v4_routes.dart: registers AiGuardrailsScreen under that id. Fourth
+  V4 screen wired to real data (ERP Customers / Compliance Status /
+  ZATCA Queue / AI Guardrails).
+
+Verification: dart analyze clean, flutter build web succeeds (44s),
+pytest unchanged at 1019 pass.
+```
+
+---
+
 ```
 Title: Wave 7: confidence-gated AI guardrails (pattern #102)
 
