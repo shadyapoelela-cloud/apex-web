@@ -384,7 +384,26 @@ async def lifespan(app):
             await init_coa_engine()
         except Exception:
             logging.error("COA Engine init error", exc_info=True)
-    yield
+
+    # Wave 9 — ZATCA queue background worker. No-op unless
+    # ZATCA_WORKER_ENABLED is set; stops cleanly on shutdown.
+    try:
+        from app.core.zatca_queue_worker import get_default_worker
+
+        _zatca_worker = get_default_worker()
+        await _zatca_worker.start()
+    except Exception:
+        logging.error("ZATCA worker start error", exc_info=True)
+        _zatca_worker = None
+
+    try:
+        yield
+    finally:
+        if _zatca_worker is not None:
+            try:
+                await _zatca_worker.stop()
+            except Exception:
+                logging.error("ZATCA worker stop error", exc_info=True)
 
 
 app = FastAPI(
