@@ -12,6 +12,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'v4_groups_data.dart';
+
 /// Stable identifier for screen telemetry. Never renames once shipped —
 /// analytics pipelines key on these strings.
 typedef ScreenId = String;
@@ -378,7 +380,7 @@ const _auditGroup = V4ModuleGroup(
   icon: Icons.fact_check_outlined,
   color: Color(0xFF2563EB), // blue-600
   descriptionAr: 'دورة ارتباط تدقيق كاملة بمعايير CaseWare: تخطيط، مخاطر، أوراق عمل.',
-  subModules: [],
+  subModules: auditSubModules,
 );
 
 const _feasGroup = V4ModuleGroup(
@@ -388,7 +390,7 @@ const _feasGroup = V4ModuleGroup(
   icon: Icons.insights,
   color: Color(0xFF7C3AED), // violet-600
   descriptionAr: 'دورة كاملة لدراسات الجدوى من الفكرة إلى تقرير القرار.',
-  subModules: [],
+  subModules: feasSubModules,
 );
 
 const _externalGroup = V4ModuleGroup(
@@ -398,7 +400,7 @@ const _externalGroup = V4ModuleGroup(
   icon: Icons.analytics_outlined,
   color: Color(0xFF0891B2), // cyan-600
   descriptionAr: 'تحليل منشآت من بياناتها المنشورة: نسب، مقارنات، تقييم، ائتمان.',
-  subModules: [],
+  subModules: externalSubModules,
 );
 
 const _providersGroup = V4ModuleGroup(
@@ -408,7 +410,7 @@ const _providersGroup = V4ModuleGroup(
   icon: Icons.store_mall_directory_outlined,
   color: Color(0xFFDB2777), // pink-600
   descriptionAr: 'سوق ذو جانبين: العملاء يطلبون خدمات، المهنيون ينفذون.',
-  subModules: [],
+  subModules: providersSubModules,
 );
 
 const _complianceGroup = V4ModuleGroup(
@@ -418,7 +420,7 @@ const _complianceGroup = V4ModuleGroup(
   icon: Icons.policy_outlined,
   color: Color(0xFF059669), // emerald-600
   descriptionAr: 'مركز الحوكمة — ZATCA، GOSI، WPS، AML، إفصاحات مجلس.',
-  subModules: [],
+  subModules: complianceSubModules,
 );
 
 /// The canonical list of module groups — renders the Launchpad in order.
