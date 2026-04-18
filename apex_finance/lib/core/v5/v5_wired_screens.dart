@@ -24,6 +24,7 @@ import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
+import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
@@ -80,6 +81,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // Wave 28 — Eligibility Check (KSA SME/Nomu/Tadawul)
   'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
   'compliance/regulatory/governance': (ctx) => const EligibilityCheckScreen(),
+  // Wave 29 — Admin Panel (Tenant Settings + Users + Integrations)
+  'platform/admin/settings': (ctx) => const AdminPanelScreen(),
+  // Wave 30 — Custom Report Builder
+  'erp/finance/custom-reports': (ctx) => const ReportBuilderScreen(),
   // Onboarding Journey (#8)
   'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
   // Connected Planning Drivers (#16) — Anaplan replacement
