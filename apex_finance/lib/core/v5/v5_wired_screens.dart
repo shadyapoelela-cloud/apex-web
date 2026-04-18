@@ -33,6 +33,7 @@ import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
 import '../../screens/v4_erp/feasibility_deep_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
+import '../../screens/v4_erp/marketplace_deep_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
 import '../../screens/v4_erp/onboarding_screen.dart';
@@ -70,6 +71,15 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // Wave 26 — External Analysis (Benchmarking + Credit)
   'advisory/external/benchmarking': (ctx) => const ExternalAnalysisScreen(),
   'advisory/external/credit': (ctx) => const ExternalAnalysisScreen(),
+
+  // ── Marketplace Deep ─────────────────────────────────────────────
+  // Wave 27 — Marketplace Billing/Escrow/Payouts
+  'marketplace/client/billing': (ctx) => const MarketplaceBillingScreen(),
+  'marketplace/provider/payouts': (ctx) => const MarketplaceBillingScreen(),
+
+  // Wave 28 — Eligibility Check (KSA SME/Nomu/Tadawul)
+  'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
+  'compliance/regulatory/governance': (ctx) => const EligibilityCheckScreen(),
   // Onboarding Journey (#8)
   'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
   // Connected Planning Drivers (#16) — Anaplan replacement
