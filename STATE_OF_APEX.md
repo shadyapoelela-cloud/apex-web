@@ -124,7 +124,16 @@ router.dart · session.dart · shared_constants.dart · theme.dart · ui_compone
 
 ---
 
-## 6a) اكتشاف إضافي — Alembic env.py مكسور
+## 6a) ~~اكتشاف إضافي — Alembic env.py مكسور~~ ✅ أُصلح في Wave 10
+
+**الحالة الراهنة**: `alembic/env.py` يستخدم `PhaseBase` alias صريح ويتجنّب wildcard shadowing. target_metadata يحوي 95 جدولاً فعلياً. autogenerate يعمل بدقة. خمسة اختبارات regression في `tests/test_alembic_env_fix.py` تمنع الـ bug من العودة.
+
+المحتوى الأصلي أدناه محفوظ للسياق التاريخي.
+
+---
+
+### السياق الأصلي للـ bug (للتاريخ)
+
 
 عند تشغيل `alembic revision --autogenerate` وُجد خلل في `alembic/env.py`:
 
