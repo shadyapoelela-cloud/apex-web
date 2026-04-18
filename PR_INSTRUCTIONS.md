@@ -139,6 +139,55 @@ Base: `claude/brave-yonath-wave-6` ← Head: `claude/brave-yonath-wave-7`
 Base: `claude/brave-yonath-wave-7` ← Head: `claude/brave-yonath-wave-8`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-7...claude/brave-yonath-wave-8?expand=1>
 
+### PR #11 — Wave 9 (ZATCA queue background worker — closes Wave 5)
+Base: `claude/brave-yonath-wave-8` ← Head: `claude/brave-yonath-wave-9`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-8...claude/brave-yonath-wave-9?expand=1>
+
+```
+Title: Wave 9: ZATCA retry queue background worker (closes Wave 5)
+
+Body:
+Until now the Wave 5 retry queue only drained when someone hit the
+dry-run endpoint. With this PR the queue processes itself on a
+configurable interval — Wave 5 now stands alone.
+
+zatca_queue_worker.py:
+- ZatcaQueueWorker: asyncio task that calls process_due() every N
+  seconds. Injectable submit_fn preserves Wave 5's rule that the queue
+  module stays free of any HTTP client.
+- Opt-in via ZATCA_WORKER_ENABLED; dev + test default OFF so imports
+  never silently drain the queue. Interval and batch_limit configurable
+  via env (clamped: interval ≥ 10s, batch ∈ [1, 500]).
+- Graceful shutdown: stop() sets a stop-event AND cancels the task.
+  The loop sleeps via wait_for(stop_event, timeout=interval) so
+  shutdown is always bounded by cancellation, not by interval.
+- default_noop_submit() drop-in until the real Fatoora HTTP client
+  gets wired.
+
+main.py lifespan:
+- get_default_worker().start() on startup + stop() in finally block
+  of the yield so service restarts never leave the worker dangling.
+
+env_validator.py:
+- Warns when ZATCA_WORKER_ENABLED is unset (same pattern as Wave 7
+  for REDIS_URL / SENTRY_DSN), so operators see in the startup log
+  that automatic queue processing is off.
+
+tests/test_zatca_queue_worker.py: 17 tests —
+- Flag semantics (disabled by default + 5 truthy values + constructor
+  override).
+- Interval + batch_limit clamping.
+- run_once() invokes submit_fn per due row + tracks summary +
+  iteration count + failure path rescheduling.
+- start/stop lifecycle: disabled no-op, clean drain + stop, double-
+  start no-op, stop-before-start no-op.
+- default_noop_submit never raises, get_default_worker is stable.
+
+Test suite: 1019 → 1036 pass (+17 new) · 2 skip · 0 fail.
+```
+
+---
+
 ```
 Title: Wave 8: AI Guardrails Flutter UI (wires Wave 7 backend)
 
