@@ -135,8 +135,71 @@ class ZatcaSubmissionQueue(Base):
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
 
+class AiSuggestion(Base):
+    """
+    Confidence-gated AI suggestion queue (Wave 7 PR#1).
+
+    Every AI proposal — whether from the Copilot, the COA classifier,
+    the OCR pipeline, or any future agent — lands here before being
+    applied to real data. The gate_decision column is set by the
+    guardrail at write time:
+
+      auto_applied       — confidence >= min_confidence AND NOT destructive.
+      needs_approval     — confidence below threshold OR destructive action.
+      rejected           — guardrail rejected outright (confidence <=0 etc.).
+
+    Humans transition needs_approval rows to approved/rejected with an
+    audit event; auto_applied rows can still be reverted by a subsequent
+    manual rejection.
+    """
+
+    __tablename__ = "ai_suggestion"
+    __table_args__ = (
+        Index("ix_ai_suggestion_status", "status"),
+        Index("ix_ai_suggestion_tenant", "tenant_id"),
+        Index("ix_ai_suggestion_created", "created_at"),
+    )
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    tenant_id = Column(String(36), nullable=True, index=True)
+    source = Column(String(60), nullable=False)  # "copilot" | "coa" | "ocr" | ...
+    action_type = Column(String(60), nullable=False)  # e.g. "categorize_txn"
+
+    # Subject of the suggestion — free-form so each source owns its shape.
+    target_type = Column(String(60), nullable=True)  # "transaction" | "invoice" | ...
+    target_id = Column(String(64), nullable=True)
+
+    # Full structured suggestion (before → after diff).
+    before_json = Column(JSON, nullable=True)
+    after_json = Column(JSON, nullable=False)
+    reasoning = Column(Text, nullable=True)  # human-readable AI explanation
+
+    # The confidence score the model reported. Accept [0.0, 1.0].
+    confidence = Column(Integer, nullable=False)  # stored as permille (0-1000)
+    destructive = Column(Integer, nullable=False, default=0)  # 0/1 flag
+
+    # Lifecycle state.
+    status = Column(String(20), nullable=False)
+    gate_reason = Column(String(120), nullable=True)  # why gate decided as it did
+
+    # Approval details.
+    approved_by = Column(String(36), nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    rejected_by = Column(String(36), nullable=True)
+    rejected_at = Column(DateTime, nullable=True)
+    rejection_reason = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+
 def init_compliance_db():
     from app.phase1.models.platform_models import engine
 
     Base.metadata.create_all(bind=engine)
-    return ["journal_entry_sequence", "audit_trail", "zatca_submission_queue"]
+    return [
+        "journal_entry_sequence",
+        "audit_trail",
+        "zatca_submission_queue",
+        "ai_suggestion",
+    ]
