@@ -42,6 +42,9 @@ import '../../screens/v4_erp/benefits_eos_screen.dart';
 import '../../screens/v4_erp/board_pack_screen.dart';
 import '../../screens/v4_erp/budget_vs_actual_screen.dart';
 import '../../screens/v4_erp/cost_centers_screen.dart';
+import '../../screens/v4_erp/cybersecurity_dashboard_screen.dart';
+import '../../screens/v4_erp/investment_portfolio_screen.dart';
+import '../../screens/v4_erp/purchase_requisition_screen.dart';
 import '../../screens/v4_erp/training_lms_screen.dart';
 import '../../screens/v4_erp/expense_claims_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
@@ -239,6 +242,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/hr/training': (ctx) => const TrainingLmsScreen(),
   // Wave 85 — Cost Centers Analysis
   'erp/finance/cost-centers': (ctx) => const CostCentersScreen(),
+  // Wave 86 — Cybersecurity SOC Dashboard
+  'compliance/regulatory/cybersecurity': (ctx) => const CybersecurityDashboardScreen(),
+  // Wave 87 — Purchase Requisition
+  'erp/operations/requisitions': (ctx) => const PurchaseRequisitionScreen(),
+  // Wave 88 — Investment Portfolio
+  'erp/treasury/investments': (ctx) => const InvestmentPortfolioScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
