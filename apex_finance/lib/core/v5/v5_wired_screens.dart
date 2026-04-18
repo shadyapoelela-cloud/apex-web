@@ -20,6 +20,7 @@ import '../../screens/v4_compliance/audit_analytics_screen.dart';
 import '../../screens/v4_compliance/audit_reporting_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/gosi_wps_screen.dart';
+import '../../screens/v4_compliance/governance_screen.dart';
 import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_screen.dart';
@@ -80,7 +81,9 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // Wave 28 — Eligibility Check (KSA SME/Nomu/Tadawul)
   'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
-  'compliance/regulatory/governance': (ctx) => const EligibilityCheckScreen(),
+  'compliance/regulatory/governance': (ctx) => const GovernanceScreen(),
+  // Wave 32 — Notifications Center
+  'platform/notifications/center': (ctx) => const NotificationsCenterScreen(),
   // Wave 29 — Admin Panel (Tenant Settings + Users + Integrations)
   'platform/admin/settings': (ctx) => const AdminPanelScreen(),
   // Wave 30 — Custom Report Builder
