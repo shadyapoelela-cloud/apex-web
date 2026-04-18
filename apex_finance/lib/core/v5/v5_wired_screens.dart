@@ -28,6 +28,7 @@ import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_compliance/audit_acceptance_screen.dart';
+import '../../screens/v4_compliance/audit_kickoff_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
@@ -40,6 +41,7 @@ import '../../screens/v4_erp/expense_claims_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
+import '../../screens/v4_erp/contract_management_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
 import '../../screens/v4_erp/customer_360_screen.dart';
 import '../../screens/v4_erp/fixed_assets_register_screen.dart';
@@ -60,6 +62,7 @@ import '../../screens/v4_erp/onboarding_screen.dart';
 import '../../screens/v4_erp/payroll_run_screen.dart';
 import '../../screens/v4_erp/projects_screen.dart';
 import '../../screens/v4_erp/purchasing_ap_screen.dart';
+import '../../screens/v4_erp/sales_pipeline_screen.dart';
 import '../../screens/v4_erp/supplier_360_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
@@ -158,6 +161,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/suppliers': (ctx) => const Supplier360Screen(),
   // Wave 58 — Customer 360
   'erp/operations/customers-360': (ctx) => const Customer360Screen(),
+  // Wave 59 — Audit Kickoff
+  'audit/engagement/kickoff': (ctx) => const AuditKickoffScreen(),
+  // Wave 60 — Sales Pipeline (Kanban)
+  'erp/operations/pipeline': (ctx) => const SalesPipelineScreen(),
+  // Wave 61 — Contract Management
+  'erp/operations/contracts': (ctx) => const ContractManagementScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
