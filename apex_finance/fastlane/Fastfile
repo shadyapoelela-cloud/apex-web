@@ -1,0 +1,84 @@
+# fastlane — automation for APEX mobile releases.
+#
+# Install fastlane once on your CI or dev machine:
+#   sudo gem install fastlane  (or brew install fastlane)
+#
+# Android lanes:
+#   fastlane android build_debug     — signed debug APK for local testing
+#   fastlane android build_release   — release AAB ready for Play internal
+#   fastlane android play_internal   — uploads the AAB to Play internal track
+#
+# iOS lanes (requires macOS + Xcode):
+#   fastlane ios build_dev           — simulator / device debug build
+#   fastlane ios build_release       — release archive
+#   fastlane ios testflight          — uploads to TestFlight
+#
+# All lanes call `flutter build` internally so you never run flutter
+# commands by hand.
+
+default_platform(:android)
+
+# ── Android ─────────────────────────────────────────────
+
+platform :android do
+  desc "Debug APK — universal, unsigned"
+  lane :build_debug do
+    sh "cd .. && flutter build apk --debug"
+    UI.success "APK at ../build/app/outputs/flutter-apk/app-debug.apk"
+  end
+
+  desc "Release AAB — signed, ready for Play internal testing"
+  lane :build_release do
+    unless File.exist?("../android/key.properties")
+      UI.user_error!(
+        "android/key.properties not found. Create it with the signing " \
+        "config (see MOBILE_BUILD.md). Never commit it — it's gitignored."
+      )
+    end
+    sh "cd .. && flutter build appbundle --release"
+    UI.success "AAB at ../build/app/outputs/bundle/release/app-release.aab"
+  end
+
+  desc "Upload latest AAB to Play Store internal testing track"
+  lane :play_internal do
+    build_release
+    upload_to_play_store(
+      track: "internal",
+      aab: "../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      metadata_path: "./metadata/android",
+    )
+  end
+end
+
+# ── iOS ─────────────────────────────────────────────────
+
+platform :ios do
+  desc "Debug build for simulator / connected device"
+  lane :build_dev do
+    sh "cd .. && flutter build ios --debug --no-codesign"
+  end
+
+  desc "Release archive — signed with Apple Developer team"
+  lane :build_release do
+    sh "cd .. && flutter build ios --release"
+    build_app(
+      workspace: "../ios/Runner.xcworkspace",
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build_ios",
+    )
+  end
+
+  desc "Upload latest archive to TestFlight"
+  lane :testflight do
+    build_release
+    upload_to_testflight(
+      ipa: "./build_ios/Runner.ipa",
+      skip_waiting_for_build_processing: true,
+    )
+  end
+end

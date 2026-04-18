@@ -1,0 +1,12 @@
+# Global Appfile for both platforms.
+# Override via ENV or per-lane to avoid committing real credentials.
+
+# Android — Play Console service account JSON. Never commit the key file.
+json_key_file(ENV["GOOGLE_PLAY_JSON_KEY_FILE"] || "./play-console-key.json")
+package_name(ENV["ANDROID_PACKAGE_NAME"] || "com.apexfinance.apex_finance")
+
+# iOS — Apple Developer portal.
+apple_id(ENV["APPLE_ID"] || "")
+itc_team_id(ENV["ITC_TEAM_ID"] || "")
+team_id(ENV["APPLE_TEAM_ID"] || "")
+app_identifier(ENV["IOS_BUNDLE_ID"] || "com.apexfinance.apex")

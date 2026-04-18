@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class _Inv {
@@ -73,8 +74,7 @@ class _AgingScreenState extends State<AgingScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('تقرير الأعمار (AR/AP)', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2),
+    appBar: ApexAppBar(title: 'تقرير الأعمار (AR/AP)'),
     body: SingleChildScrollView(padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         _form(),

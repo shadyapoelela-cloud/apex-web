@@ -10,6 +10,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
 
 class JournalEntriesScreen extends StatefulWidget {
@@ -114,26 +115,38 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('أرقام القيود (ZATCA)', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _infoBanner(),
-            const SizedBox(height: 16),
-            _inputCard(),
-            const SizedBox(height: 16),
-            if (_error != null) _errorBanner(_error!),
-            const SizedBox(height: 8),
-            if (_peekData != null) _peekCard(),
-            const SizedBox(height: 16),
-            _reservedList(),
-          ],
-        ),
+      body: Column(
+        children: [
+          ApexStickyToolbar(
+            title: 'أرقام القيود (ZATCA)',
+            actions: [
+              ApexToolbarAction(
+                label: 'استعلام',
+                icon: Icons.search,
+                onPressed: _loading ? null : _peek,
+              ),
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _infoBanner(),
+                  const SizedBox(height: 16),
+                  _inputCard(),
+                  const SizedBox(height: 16),
+                  if (_error != null) _errorBanner(_error!),
+                  const SizedBox(height: 8),
+                  if (_peekData != null) _peekCard(),
+                  const SizedBox(height: 16),
+                  _reservedList(),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

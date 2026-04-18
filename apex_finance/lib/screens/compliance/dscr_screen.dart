@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class DscrScreen extends StatefulWidget {
@@ -50,8 +51,7 @@ class _DscrScreenState extends State<DscrScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('تغطية خدمة الدين (DSCR)', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2),
+    appBar: ApexAppBar(title: 'تغطية خدمة الدين (DSCR)'),
     body: LayoutBuilder(builder: (ctx, cons) {
       final wide = cons.maxWidth > 900;
       if (!wide) return SingleChildScrollView(padding: const EdgeInsets.all(16),

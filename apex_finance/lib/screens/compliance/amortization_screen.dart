@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class AmortizationScreen extends StatefulWidget {
@@ -59,10 +60,7 @@ class _AmortizationScreenState extends State<AmortizationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('جدول أقساط القرض', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
-      ),
+      appBar: ApexAppBar(title: 'جدول أقساط القرض'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

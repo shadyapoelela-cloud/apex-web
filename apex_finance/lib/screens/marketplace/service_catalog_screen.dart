@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 import '../../core/ui_components.dart';
 import '../../api_service.dart';
@@ -33,7 +34,7 @@ class _ServiceCatalogS extends State<ServiceCatalogScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('كتالوج الخدمات', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy2),
+    appBar: ApexAppBar(title: 'كتالوج الخدمات'),
     body: Column(children: [
       SingleChildScrollView(scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.all(12),

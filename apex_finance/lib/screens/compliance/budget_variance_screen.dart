@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class _BudgetLine {
@@ -91,10 +92,7 @@ class _BudgetVarianceScreenState extends State<BudgetVarianceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('الميزانية مقابل الفعلي', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
-      ),
+      appBar: ApexAppBar(title: 'الميزانية مقابل الفعلي'),
       body: LayoutBuilder(builder: (ctx, cons) {
         final wide = cons.maxWidth > 960;
         if (!wide) {

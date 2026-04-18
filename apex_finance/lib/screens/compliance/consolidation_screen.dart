@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class ConsolidationScreen extends StatefulWidget {
@@ -95,10 +96,7 @@ class _ConsolidationScreenState extends State<ConsolidationScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('القوائم الموحّدة (IFRS 10)', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
-    ),
+    appBar: ApexAppBar(title: 'القوائم الموحّدة (IFRS 10)'),
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

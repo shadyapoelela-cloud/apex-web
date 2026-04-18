@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class InvestmentScreen extends StatefulWidget {
@@ -74,10 +75,7 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(
-        title: Text('تقييم الاستثمار (NPV / IRR)', style: TextStyle(color: AC.gold)),
-        backgroundColor: AC.navy2,
-      ),
+      appBar: ApexAppBar(title: 'تقييم الاستثمار (NPV / IRR)'),
       body: LayoutBuilder(builder: (ctx, cons) {
         final wide = cons.maxWidth > 960;
         if (!wide) {

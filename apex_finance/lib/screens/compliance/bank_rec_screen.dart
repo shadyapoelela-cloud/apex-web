@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
 
 class _RecItem {
@@ -70,14 +71,15 @@ class _BankRecScreenState extends State<BankRecScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(title: Text('التسوية البنكية', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2),
-    body: SingleChildScrollView(padding: const EdgeInsets.all(16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        _form(),
-        const SizedBox(height: 16),
-        if (_result != null) _results(),
-      ])),
+    body: Column(children: [
+      const ApexStickyToolbar(title: 'التسوية البنكية'),
+      Expanded(child: SingleChildScrollView(padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          _form(),
+          const SizedBox(height: 16),
+          if (_result != null) _results(),
+        ]))),
+    ]),
   );
 
   Widget _form() => Container(

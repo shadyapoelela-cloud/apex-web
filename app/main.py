@@ -100,6 +100,49 @@ try:
 except Exception as e:
     logging.warning(f"Compliance models import failed: {e}")
 
+# HR + AP Agent models — added 2026-04-17. Import here (side-effect) so the
+# tables register with Base.metadata and `create_all()` / Alembic pick them up.
+try:
+    from app.hr import models as _hr_models  # noqa: F401
+except Exception as e:
+    logging.warning(f"HR models import failed: {e}")
+try:
+    from app.features.ap_agent import models as _ap_models  # noqa: F401
+except Exception as e:
+    logging.warning(f"AP Agent models import failed: {e}")
+
+# Self-registering model modules (tables auto-added to Base.metadata)
+for _mod in [
+    "app.core.governed_ai",
+    "app.core.webhooks",
+    "app.core.saved_views",
+    "app.services.copilot_memory",
+    "app.core.dimensional_accounting",
+    "app.core.consolidation_intercompany",
+    "app.core.marketplace_enhanced",
+    "app.core.offline_sync",
+    "app.core.tenant_branding",
+    "app.core.activity_log",
+    "app.core.auto_log",
+    "app.integrations.zatca.retry_queue",
+]:
+    try:
+        __import__(_mod)
+    except Exception as _e:
+        logging.warning(f"{_mod} models not registered: {_e}")
+
+# Wire auto-log status listeners onto the models that have a `status`
+# column. Each registration is cheap (dict entry) and idempotent.
+try:
+    from app.core.auto_log import register_auto_log
+    from app.core.offline_sync import SyncOperation
+    from app.integrations.zatca.retry_queue import ZatcaSubmission
+    register_auto_log(SyncOperation, entity_type="sync_op")
+    register_auto_log(ZatcaSubmission, entity_type="zatca_submission")
+    logging.info("Auto-log status listeners registered on 2 models")
+except Exception as _e:
+    logging.warning(f"Auto-log registration failed: {_e}")
+
 try:
     from app.knowledge_brain.api.routes.knowledge_routes import router as kb_r
     from app.knowledge_brain.models.db_models import init_db as init_kb
@@ -272,7 +315,24 @@ except Exception as e:
 
 
 def _run_startup():
-    """Initialize all phase databases and seed data."""
+    """Initialize all phase databases and seed data.
+
+    Order:
+      1. Run Alembic migrations if enabled (production by default).
+         In dev, fall through to init_*_db() / create_all().
+    """
+    # 1) Alembic upgrade head — production path. In dev this is a no-op
+    #    unless RUN_MIGRATIONS_ON_STARTUP=true is set explicitly.
+    try:
+        from app.core.db_migrations import run_migrations_on_startup
+
+        run_migrations_on_startup()
+    except RuntimeError:
+        # Production migration failure — refuse to continue silently.
+        raise
+    except Exception:
+        logging.error("Migration runner crashed", exc_info=True)
+
     if KB:
         try:
             init_kb()
@@ -360,20 +420,91 @@ def _run_startup():
         logging.error("Compliance core init error", exc_info=True)
 
 
-# Environment validation lives in app/core/env_validator.py. It is the
-# single source of truth for startup checks. run_and_log() logs every
-# warning and raises on any error — production refuses to boot with
-# missing/default critical vars.
-from app.core.env_validator import run_and_log as _validate_env
+_PROD_INSECURE_DEFAULTS = {
+    "JWT_SECRET": {"apex-dev-secret-CHANGE-IN-PRODUCTION", "test-secret", ""},
+    "ADMIN_SECRET": {"apex-admin-2026", "apex-admin-dev-only", "test-admin", ""},
+}
+
+# Backend env vars that, when selected, require secrets/config to be present.
+# Format: { BACKEND_VAR: { active_value: [required_secret_vars] } }
+_BACKEND_REQUIREMENTS = {
+    "EMAIL_BACKEND": {
+        "smtp": ["SMTP_USER", "SMTP_PASSWORD"],
+        "sendgrid": ["SENDGRID_API_KEY", "SENDGRID_FROM"],
+    },
+    "SMS_BACKEND": {
+        "unifonic": ["UNIFONIC_APP_SID"],
+        "twilio": ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER"],
+    },
+    "PAYMENT_BACKEND": {
+        "stripe": ["STRIPE_SECRET_KEY"],
+    },
+    "STORAGE_BACKEND": {
+        "s3": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "S3_BUCKET"],
+    },
+}
+
+
+def _validate_env():
+    """Strict environment validation.
+
+    In production, fails fast if any critical variable is missing or is still
+    a known insecure default. The list of failures is logged in full so ops
+    can fix them all in one round-trip.
+
+    In development, emits warnings without blocking startup.
+    """
+    env = os.environ.get("ENVIRONMENT", "development").lower()
+    is_prod = env in ("production", "prod")
+    problems: list[str] = []
+    warnings_list: list[str] = []
+
+    def _bad(var: str) -> bool:
+        val = os.environ.get(var, "")
+        insecure = _PROD_INSECURE_DEFAULTS.get(var, set())
+        if not val or val in insecure:
+            return True
+        if var == "JWT_SECRET" and len(val) < 32:
+            return True
+        return False
+
+    # Always-critical vars
+    for var in ("JWT_SECRET", "ADMIN_SECRET"):
+        if _bad(var):
+            (problems if is_prod else warnings_list).append(
+                f"{var} is missing or using an insecure default"
+            )
+
+    # DB is critical in prod only — dev falls back to SQLite.
+    if is_prod and not os.environ.get("DATABASE_URL"):
+        problems.append("DATABASE_URL is required in production")
+
+    # CORS must not be wildcard in prod.
+    if is_prod:
+        cors = os.environ.get("CORS_ORIGINS", "")
+        if not cors or cors.strip() == "*":
+            problems.append("CORS_ORIGINS must be an explicit allowlist (not '*') in production")
+
+    # Backend-specific secret checks.
+    for backend_var, configs in _BACKEND_REQUIREMENTS.items():
+        active = os.environ.get(backend_var, "").lower()
+        required = configs.get(active, [])
+        for req in required:
+            if not os.environ.get(req):
+                msg = f"{backend_var}={active} requires {req}"
+                (problems if is_prod else warnings_list).append(msg)
+
+    for w in warnings_list:
+        logging.warning("⚠ env: %s", w)
+
+    if problems:
+        message = "PRODUCTION env validation failed:\n  - " + "\n  - ".join(problems)
+        if is_prod:
+            raise RuntimeError(message)
+        logging.warning(message)
+
 
 _validate_env()
-
-# Bootstrap observability (JSON logs + optional Sentry) as early as
-# possible so startup errors below land in the configured sinks.
-from app.core.observability import configure_logging, init_sentry
-
-configure_logging()
-init_sentry()
 
 
 @asynccontextmanager
@@ -385,25 +516,27 @@ async def lifespan(app):
         except Exception:
             logging.error("COA Engine init error", exc_info=True)
 
-    # Wave 9 — ZATCA queue background worker. No-op unless
-    # ZATCA_WORKER_ENABLED is set; stops cleanly on shutdown.
+    # Proactive AI scheduler — opt-in via PROACTIVE_AI_ENABLED=true.
+    # Runs run_all_scans() every 6h and pushes findings to the bell
+    # through activity_log + WebSocket.
+    _stop_ai = None
     try:
-        from app.core.zatca_queue_worker import get_default_worker
+        from app.ai.scheduler import (
+            start_proactive_scheduler,
+            stop_proactive_scheduler as _stop_ai,
+        )
+        start_proactive_scheduler()
+    except Exception as _e:
+        logging.warning(f"Proactive AI scheduler not armed: {_e}")
 
-        _zatca_worker = get_default_worker()
-        await _zatca_worker.start()
-    except Exception:
-        logging.error("ZATCA worker start error", exc_info=True)
-        _zatca_worker = None
+    yield
 
-    try:
-        yield
-    finally:
-        if _zatca_worker is not None:
-            try:
-                await _zatca_worker.stop()
-            except Exception:
-                logging.error("ZATCA worker stop error", exc_info=True)
+    # Clean shutdown of the scheduler task if it was armed.
+    if _stop_ai is not None:
+        try:
+            await _stop_ai()
+        except Exception as _e:
+            logging.debug(f"Scheduler shutdown: {_e}")
 
 
 app = FastAPI(
@@ -450,22 +583,181 @@ app.add_middleware(
     expose_headers=["Content-Disposition", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
     max_age=600,
 )
+
+# Multi-tenant ContextVar middleware — binds tenant_id from JWT/header/query
+# for the duration of each request. Non-breaking: skipped endpoints listed
+# in TenantContextMiddleware._TENANT_FREE_PREFIXES bypass it. Enforcement
+# of "tenant required" is opt-in via TENANT_STRICT=true.
+try:
+    from app.core.tenant_context import TenantContextMiddleware
+    app.add_middleware(TenantContextMiddleware)
+    logging.info("Tenant context middleware registered")
+except Exception as _e:
+    logging.warning(f"Tenant context middleware not registered: {_e}")
+
+# Tenant query guard — auto-filters SELECTs on TenantMixin tables by
+# current_tenant() and auto-populates tenant_id on inserts. Non-breaking:
+# tables that don't inherit TenantMixin are unaffected.
+try:
+    from app.core.tenant_guard import attach_tenant_guard
+    from app.phase1.models.platform_models import engine as _tenant_engine
+    attach_tenant_guard(_tenant_engine)
+    logging.info("Tenant query guard attached")
+except Exception as _e:
+    logging.warning(f"Tenant query guard not attached: {_e}")
+
+# PostgreSQL RLS — database-layer tenant isolation. No-op on SQLite
+# so dev + tests are unchanged. Works together with the app-layer
+# guard above (defense in depth).
+try:
+    from app.core.rls_session import install_rls_session_hook
+    from app.phase1.models.platform_models import engine as _rls_engine
+    install_rls_session_hook(_rls_engine)
+    logging.info("RLS session hook installed")
+except Exception as _e:
+    logging.warning(f"RLS session hook not installed: {_e}")
+
+# Audit log — captures every state-changing request with redacted body preview.
+# Required for SOC 2 Type II + PDPL compliance. Disable via AUDIT_LOG_ENABLED=false.
+try:
+    from app.core.audit_log import AuditLogMiddleware
+    app.add_middleware(AuditLogMiddleware)
+    logging.info("Audit log middleware registered")
+except Exception as _e:
+    logging.warning(f"Audit log middleware not registered: {_e}")
+
+# WebSocket notifications router — real-time feed for user / tenant / entity channels.
+try:
+    from app.core.websocket_hub import router as ws_router
+    app.include_router(ws_router)
+    logging.info("WebSocket notifications router mounted at /ws/*")
+except Exception as _e:
+    logging.warning(f"WebSocket router not mounted: {_e}")
+
+# HR routes — Employee CRUD + Leave + Payroll.
+try:
+    from app.hr.routes import router as hr_router
+    app.include_router(hr_router)
+    logging.info("HR routes mounted at /hr/*")
+except Exception as _e:
+    logging.warning(f"HR routes not mounted: {_e}")
+
+# API versioning — stamps X-API-Version on every response.
+try:
+    from app.core.api_version import ApiVersionHeaderMiddleware
+    app.add_middleware(ApiVersionHeaderMiddleware)
+    logging.info("API version middleware registered (X-API-Version header)")
+except Exception as _e:
+    logging.warning(f"API version middleware not registered: {_e}")
+
+# Saved filter views (mounted at /api/v1/saved-views/*).
+try:
+    from app.core.saved_views import router as saved_views_router
+    app.include_router(saved_views_router)
+    logging.info("Saved views router mounted at /api/v1/saved-views/*")
+except Exception as _e:
+    logging.warning(f"Saved views router not mounted: {_e}")
+
+# Tenant branding / white-label (mounted at /api/v1/tenant/branding).
+try:
+    from app.core.tenant_branding import router as tenant_branding_router
+    app.include_router(tenant_branding_router)
+    logging.info("Tenant branding router mounted at /api/v1/tenant/branding")
+except Exception as _e:
+    logging.warning(f"Tenant branding router not mounted: {_e}")
+
+# Activity log / Chatter timeline (mounted at /api/v1/activity).
+try:
+    from app.core.activity_log import router as activity_log_router
+    app.include_router(activity_log_router)
+    logging.info("Activity log router mounted at /api/v1/activity")
+except Exception as _e:
+    logging.warning(f"Activity log router not mounted: {_e}")
+
+# Notifications list API — bootstraps the bell with history on mount.
+try:
+    from app.core.notifications_api import router as notifications_router
+    app.include_router(notifications_router)
+    logging.info("Notifications router mounted at /api/v1/notifications")
+except Exception as _e:
+    logging.warning(f"Notifications router not mounted: {_e}")
+
+# Reports download — materialises the URL generate_report tool hands out.
+try:
+    from app.core.reports_download import router as reports_dl_router
+    app.include_router(reports_dl_router)
+    logging.info("Reports download router mounted at /api/v1/reports")
+except Exception as _e:
+    logging.warning(f"Reports download router not mounted: {_e}")
+
+# System health — aggregate status of every Apex subsystem.
+try:
+    from app.core.system_health import router as system_health_router
+    app.include_router(system_health_router)
+    logging.info("System health router mounted at /api/v1/system")
+except Exception as _e:
+    logging.warning(f"System health router not mounted: {_e}")
+
+# Offline sync push/status (mounted at /api/v1/sync).
+try:
+    from app.core.offline_sync import router as offline_sync_router
+    app.include_router(offline_sync_router)
+    logging.info("Offline sync router mounted at /api/v1/sync")
+except Exception as _e:
+    logging.warning(f"Offline sync router not mounted: {_e}")
+
+# ZATCA end-to-end submit (mounted at /api/v1/zatca/submit-e2e + /submission).
+try:
+    from app.core.zatca_submit_e2e import router as zatca_e2e_router
+    app.include_router(zatca_e2e_router)
+    logging.info("ZATCA E2E router mounted at /api/v1/zatca")
+except Exception as _e:
+    logging.warning(f"ZATCA E2E router not mounted: {_e}")
+
+# Proactive AI scans (mounted at /api/v1/ai/scan).
+try:
+    from app.ai.routes import router as ai_scan_router
+    app.include_router(ai_scan_router)
+    logging.info("AI proactive router mounted at /api/v1/ai")
+except Exception as _e:
+    logging.warning(f"AI proactive router not mounted: {_e}")
+
+# Webhooks (Developer Platform) mounted at /api/v1/webhooks/*.
+try:
+    from app.core.webhooks import router as webhooks_router
+    app.include_router(webhooks_router)
+    logging.info("Webhooks router mounted at /api/v1/webhooks/*")
+except Exception as _e:
+    logging.warning(f"Webhooks router not mounted: {_e}")
+
+# Dimensional accounting router at /api/v1/dimensions/*.
+try:
+    from app.core.dimensional_accounting import router as dim_router
+    app.include_router(dim_router)
+    logging.info("Dimensions router mounted at /api/v1/dimensions/*")
+except Exception as _e:
+    logging.warning(f"Dimensions router not mounted: {_e}")
+
+# Governed AI model registration (no routes yet — consumed by AI modules).
+try:
+    from app.core import governed_ai as _governed_ai  # noqa: F401
+    logging.info("Governed AI model registered")
+except Exception as _e:
+    logging.warning(f"Governed AI not registered: {_e}")
+
+# WhatsApp Business Cloud webhook (verification handshake + inbound events).
+# Only mounted if the module imports cleanly — optional integration.
+try:
+    from app.integrations.whatsapp.webhook import router as wa_webhook_router
+    app.include_router(wa_webhook_router)
+    logging.info("WhatsApp webhook router mounted at /integrations/whatsapp/*")
+except Exception as _e:
+    logging.warning(f"WhatsApp webhook router not mounted: {_e}")
+
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
+from collections import defaultdict
 import time
-
-from app.core.rate_limit_backend import InMemoryBackend, pick_backend
-
-# Rate-limit backend is process-global: Redis when REDIS_URL is set, else
-# an in-memory fallback. Chosen once at import time so the middleware
-# stays allocation-free on the hot path.
-_rate_backend = pick_backend()
-
-# Back-compat alias for tests that call `_rate_limits.clear()` between runs.
-# Points to the in-memory bucket dict when the backend is InMemoryBackend;
-# becomes an inert dict otherwise (Redis flushes via FLUSHDB, which tests
-# that need it should invoke explicitly).
-_rate_limits = _rate_backend._hits if isinstance(_rate_backend, InMemoryBackend) else {}
 
 
 @app.exception_handler(Exception)
@@ -476,8 +768,26 @@ async def global_exception_handler(request, exc):
 
 # ======================================================================
 # Rate limiter — tiered per-path limits, per-IP, proxy-aware.
-# Backend is chosen above (Redis when REDIS_URL is set; in-memory otherwise).
+# Backend is pluggable: RATE_LIMIT_BACKEND=memory (default, per-process) or
+# RATE_LIMIT_BACKEND=redis (shared across instances via REDIS_URL).
+# See app/core/rate_limit_backend.py.
 # ======================================================================
+from app.core.rate_limit_backend import (
+    MemoryBackend,
+    get_backend as _get_rate_backend,
+)
+
+# Expose the memory backend's internal store as _rate_limits so that
+# existing tests that call `_rate_limits.clear()` between test cases
+# continue to work without modification. For Redis backends, this is a
+# dummy dict (tests targeting per-process counters don't apply there).
+_rate_backend_instance = _get_rate_backend()
+if isinstance(_rate_backend_instance, MemoryBackend):
+    _rate_limits = _rate_backend_instance._store
+else:
+    _rate_limits = defaultdict(list)
+
+_RATE_LIMIT_MAX_KEYS = 20000  # kept for backward compatibility; enforced in MemoryBackend
 
 # Legacy module-level aliases (retained so older tests / external tooling keep working).
 # The active limits are in _RATE_TIERS below — these just mirror the default bucket.
@@ -538,13 +848,14 @@ async def rate_limit_middleware(request, call_next):
     if path_raw in ("/health", "/", "/docs", "/openapi.json", "/redoc"):
         return await call_next(request)
     client_ip = _get_client_ip(request)
-    path = path_raw
-    window, limit, bucket = _pick_tier(path)
-    key = f"{client_ip}|{bucket}"
+    window, limit, bucket = _pick_tier(path_raw)
+    key = f"{client_ip}:{bucket}"
+
+    backend = _get_rate_backend()
+    count, reset_in = backend.hit(key, window)
     now = time.time()
 
-    allowed, remaining, reset_in = _rate_backend.hit(key, window, limit)
-    if not allowed:
+    if count > limit:
         return JSONResponse(
             status_code=429,
             headers={
@@ -553,12 +864,18 @@ async def rate_limit_middleware(request, call_next):
                 "X-RateLimit-Remaining": "0",
                 "X-RateLimit-Reset": str(int(now + reset_in)),
             },
-            content={"success": False, "error": "طلبات كثيرة جداً. الرجاء الانتظار.", "retry_after": reset_in},
+            content={
+                "success": False,
+                "error": "طلبات كثيرة جداً. الرجاء الانتظار.",
+                "retry_after": reset_in,
+            },
         )
+
     response = await call_next(request)
+    # Expose remaining quota to clients
     response.headers["X-RateLimit-Limit"] = str(limit)
-    response.headers["X-RateLimit-Remaining"] = str(remaining)
-    response.headers["X-RateLimit-Reset"] = str(int(now + window))
+    response.headers["X-RateLimit-Remaining"] = str(max(0, limit - count))
+    response.headers["X-RateLimit-Reset"] = str(int(now + reset_in))
     return response
 
 
@@ -635,26 +952,12 @@ from app.phase2.routes.onboarding_routes import router as onboarding_r
 from app.phase2.routes.archive_routes import router as archive_r
 from app.phase2.routes.service_catalog_routes import router as catalog_r
 from app.phase1.routes.social_auth_routes import router as social_auth_r
-from app.phase1.routes.totp_routes import router as totp_r
-from app.core.anomaly_routes import router as anomaly_r
-from app.core.zatca_queue_routes import router as zatca_queue_r
-from app.core.zatca_csid_routes import router as zatca_csid_r
-from app.core.ai_guardrails_routes import router as ai_guardrails_r
-from app.core.bank_feeds_routes import router as bank_feeds_r
-from app.core.bank_reconciliation_routes import router as bank_rec_r
 from app.copilot.routes.copilot_routes import router as copilot_router
 
 app.include_router(onboarding_r, tags=["Onboarding"])
 app.include_router(archive_r, tags=["Archive"])
 app.include_router(catalog_r, tags=["Service Catalog"])
 app.include_router(social_auth_r, tags=["Social Auth"])
-app.include_router(totp_r, tags=["Auth / 2FA"])
-app.include_router(anomaly_r)
-app.include_router(zatca_queue_r)
-app.include_router(zatca_csid_r)
-app.include_router(ai_guardrails_r)
-app.include_router(bank_feeds_r)
-app.include_router(bank_rec_r)
 app.include_router(copilot_router)
 
 # ── Compliance Core: Journal Entry Sequence + immutable Audit Trail

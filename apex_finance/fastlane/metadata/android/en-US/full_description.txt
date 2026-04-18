@@ -1,0 +1,25 @@
+APEX Finance — the unified financial and ERP platform purpose-built for Saudi Arabia and the GCC.
+
+KEY FEATURES
+• ZATCA Phase 2 e-invoicing — UBL 2.1 XML, TLV QR, full Fatoora API integration
+• VAT, Zakat, WHT returns — one-click calculation against KSA 15% / UAE 5% regimes
+• GOSI + WPS payroll — Mudad-compliant SIF file generation for every payroll run
+• Bank reconciliation — connect Al Rajhi, SNB, Alinma, or upload MT940 statements
+• AI Copilot — ask any question about your books in Arabic or English
+• Proactive AI — alerts you to overdue invoices, anomalies, and cashflow risks
+• Multi-entity consolidation — IFRS 10 compliant, automatic FX translation
+• Inventory, CRM, HR, Manufacturing BOM modules
+• White-label for accounting firms — your brand, APEX engine
+
+WHO IT'S FOR
+• SME business owners who want the full picture in one app
+• Accounting firms serving multiple clients
+• CFOs who need real-time financial intelligence
+• Anyone required to submit ZATCA Phase 2 compliant invoices
+
+COMPLIANCE
+• ZATCA Phase 2 certified pipeline
+• UAE FTA e-invoicing ready
+• SOC 2 Type II + ISO 27001 in progress
+• PDPL compliant data handling
+• Full audit trail on every transaction

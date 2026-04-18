@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
 
 class ExtrasToolsScreen extends StatefulWidget {
@@ -24,9 +25,8 @@ class _ExtrasToolsScreenState extends State<ExtrasToolsScreen>
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('الأدوات المتقدمة', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
+    appBar: ApexAppBar(
+      title: 'الأدوات المتقدمة',
       bottom: TabBar(
         controller: _tab,
         isScrollable: true,

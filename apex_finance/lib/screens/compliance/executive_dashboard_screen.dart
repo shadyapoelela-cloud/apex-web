@@ -11,6 +11,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
+import '../../core/apex_app_bar.dart';
+import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
 
 class ExecutiveDashboardScreen extends StatefulWidget {
@@ -52,12 +54,12 @@ class _ExecutiveDashboardScreenState extends State<ExecutiveDashboardScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AC.navy,
-    appBar: AppBar(
-      title: Text('لوحة قيادة المدير المالي', style: TextStyle(color: AC.gold)),
-      backgroundColor: AC.navy2,
+    appBar: ApexAppBar(
+      title: 'لوحة قيادة المدير المالي',
       actions: [
-        IconButton(
-          icon: Icon(Icons.refresh, color: AC.gold),
+        ApexToolbarAction(
+          label: 'تحديث',
+          icon: Icons.refresh,
           onPressed: _loading ? null : _load,
         ),
       ],
