@@ -19,6 +19,10 @@ from pydantic import BaseModel, Field
 
 from app.core.auth_utils import extract_user_id
 from app.core.compliance_service import write_audit_event
+from app.core.zatca_error_translator import (
+    explain_code,
+    translate_rejection,
+)
 from app.core.zatca_service import (
     ZatcaBuyer,
     ZatcaLineItem,
@@ -216,3 +220,37 @@ async def build_invoice(
             "xml": result.xml,
         },
     }
+
+
+# ══════════════════════════════════════════════════════════════
+# Error translator — Arabic, human-readable ZATCA rejection explainer.
+# Pattern #184 from APEX_GLOBAL_RESEARCH_210.
+# ══════════════════════════════════════════════════════════════
+
+
+@router.get("/errors/explain")
+async def explain_error_code(
+    code: str,
+    _user_id: str = Depends(_auth),
+):
+    """Look up an Arabic explanation for a ZATCA error code.
+
+    Called by the UI when an accountant clicks "ما معنى هذا الرمز؟"
+    on a rejected invoice. Returns a known=False stub with a
+    support-handoff message when the code is not yet translated.
+    """
+    return {"success": True, "data": explain_code(code)}
+
+
+class TranslateRejectionRequest(BaseModel):
+    payload: dict = Field(..., description="The raw ZATCA rejection JSON")
+
+
+@router.post("/errors/translate")
+async def translate_rejection_payload(
+    body: TranslateRejectionRequest,
+    _user_id: str = Depends(_auth),
+):
+    """Translate a full ZATCA rejection response to an Arabic summary."""
+    summary = translate_rejection(body.payload)
+    return {"success": True, "data": summary.to_dict()}

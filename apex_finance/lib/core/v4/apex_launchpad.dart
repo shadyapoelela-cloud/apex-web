@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 
 import '../design_tokens.dart';
 import '../theme.dart';
+import 'apex_command_palette.dart';
 import 'v4_groups.dart';
 
 class ApexLaunchpad extends StatelessWidget {
@@ -17,7 +18,8 @@ class ApexLaunchpad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ApexCommandPaletteHost(
+      child: Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
         backgroundColor: AC.navy,
@@ -30,6 +32,18 @@ class ApexLaunchpad extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            child: Tooltip(
+              message: 'بحث سريع — Ctrl+K',
+              child: IconButton(
+                icon: Icon(Icons.search, color: AC.ts),
+                onPressed: () => showApexCommandPalette(context),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -83,6 +97,7 @@ class ApexLaunchpad extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }
