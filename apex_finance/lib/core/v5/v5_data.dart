@@ -377,6 +377,18 @@ List<V5Service> v5Services = [
             labelEn: 'Knowledge Base',
             icon: Icons.menu_book,
           ),
+          V5Chip(
+            id: 'board',
+            labelAr: 'بوابة المجلس',
+            labelEn: 'Board Portal',
+            icon: Icons.account_balance,
+          ),
+          V5Chip(
+            id: 'cost-centers',
+            labelAr: 'مراكز التكلفة',
+            labelEn: 'Cost Centers',
+            icon: Icons.pie_chart,
+          ),
         ],
       ),
       V5MainModule(
@@ -422,6 +434,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'benefits', labelAr: 'المزايا', labelEn: 'Benefits', icon: Icons.health_and_safety),
           const V5Chip(id: 'commissions', labelAr: 'العمولات', labelEn: 'Commissions', icon: Icons.emoji_events),
           const V5Chip(id: 'self-service', labelAr: 'بوابة الموظف', labelEn: 'ESS Portal', icon: Icons.person_pin),
+          const V5Chip(id: 'training', labelAr: 'التدريب والأكاديمية', labelEn: 'Training & LMS', icon: Icons.school),
         ],
       ),
       V5MainModule(
