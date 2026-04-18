@@ -1,0 +1,113 @@
+/// APEX V4 — GoRoute definitions (Wave 1.5).
+///
+/// New routes are added under `/app/...` and coexist with the existing
+/// 99 routes in router.dart. Nothing is removed in this PR; the V4
+/// shell is opt-in until sub-modules are fully migrated. See
+/// blueprints/APEX_V4_Module_Hierarchy.txt for the target IA.
+///
+/// Route tree:
+///   /app                        → Launchpad
+///   /app/{group}                → first sub-module of group
+///   /app/{group}/{sub}          → first visible tab of sub-module
+///   /app/{group}/{sub}/{screen} → specific screen
+library;
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import 'apex_launchpad.dart';
+import 'apex_screen_host.dart';
+import 'apex_sub_module_shell.dart';
+import 'v4_groups.dart';
+
+/// Public list of routes — imported from router.dart and spread into
+/// the top-level GoRouter.routes array.
+List<RouteBase> v4Routes() => [
+      GoRoute(
+        path: '/app',
+        builder: (ctx, state) => const ApexLaunchpad(),
+      ),
+      GoRoute(
+        path: '/app/:group',
+        redirect: (ctx, state) {
+          final group = v4GroupById(state.pathParameters['group']!);
+          if (group == null || group.subModules.isEmpty) return '/app';
+          final firstSub = group.subModules.first;
+          final firstScreen = firstSub.visibleTabs.isNotEmpty
+              ? firstSub.visibleTabs.first
+              : (firstSub.overflow.isNotEmpty ? firstSub.overflow.first : null);
+          if (firstScreen == null) return '/app';
+          return '/app/${group.id}/${firstSub.id}/${_slug(firstScreen.id)}';
+        },
+      ),
+      GoRoute(
+        path: '/app/:group/:sub',
+        redirect: (ctx, state) {
+          final group = v4GroupById(state.pathParameters['group']!);
+          final sub = group?.subModuleById(state.pathParameters['sub']!);
+          if (group == null || sub == null) return '/app';
+          final first = sub.visibleTabs.isNotEmpty
+              ? sub.visibleTabs.first
+              : (sub.overflow.isNotEmpty ? sub.overflow.first : null);
+          if (first == null) return '/app';
+          return '/app/${group.id}/${sub.id}/${_slug(first.id)}';
+        },
+      ),
+      GoRoute(
+        path: '/app/:group/:sub/:screen',
+        builder: (ctx, state) {
+          final groupId = state.pathParameters['group']!;
+          final subId = state.pathParameters['sub']!;
+          final screenSlug = state.pathParameters['screen']!;
+
+          final group = v4GroupById(groupId);
+          final sub = group?.subModuleById(subId);
+          if (group == null || sub == null) {
+            return const _NotFound();
+          }
+
+          final fullScreenId = '$groupId-$subId-$screenSlug';
+          final screen = sub.allScreens.firstWhere(
+            (s) => s.id == fullScreenId,
+            orElse: () => sub.visibleTabs.isNotEmpty
+                ? sub.visibleTabs.first
+                : sub.overflow.first,
+          );
+
+          return ApexSubModuleShell(
+            group: group,
+            subModule: sub,
+            activeScreen: screen,
+            screenBuilder: (ctx, scr) => _defaultScreenHost(ctx, scr),
+          );
+        },
+      ),
+    ];
+
+String _slug(String id) {
+  final parts = id.split('-');
+  return parts.length > 2 ? parts.sublist(2).join('-') : id;
+}
+
+/// Until each screen is wired to a real Flutter view, render an
+/// empty-first-time state explaining what the screen WILL do. This is
+/// intentional scaffolding — no screen should ship behind a "coming
+/// soon" state once it has a backing API.
+Widget _defaultScreenHost(BuildContext ctx, V4Screen screen) {
+  return ApexScreenHost(
+    state: ApexScreenState.emptyFirstTime,
+    title: screen.labelAr,
+    description:
+        'هذه الشاشة تم تعريفها في هيكل V4 ولم تُربط بواجهة تفصيلية بعد. '
+        'ستنضم إلى التنفيذ ضمن الموجة المخصصة لهذه الوحدة.',
+  );
+}
+
+class _NotFound extends StatelessWidget {
+  const _NotFound();
+
+  @override
+  Widget build(BuildContext context) => const Scaffold(
+        body: Center(child: Text('غير موجود')),
+      );
+}

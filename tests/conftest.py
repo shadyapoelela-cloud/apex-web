@@ -7,7 +7,12 @@ import pytest
 
 # Set test environment variables BEFORE any app imports
 os.environ["DATABASE_URL"] = "sqlite:///test.db"
-os.environ["JWT_SECRET"] = "test-secret"
+# 32+ bytes keeps PyJWT's InsecureKeyLengthWarning quiet (PyJWT requires
+# SHA-256 HMAC keys to meet the RFC 7518 §3.2 minimum). Deterministic so
+# token fixtures below remain stable across test runs.
+os.environ["JWT_SECRET"] = "apex-test-jwt-secret-32bytes-min-length"
+# Admin secret has no length constraint (arbitrary shared secret).
+# Several tests hardcode the "test-admin" string — keep it stable.
 os.environ["ADMIN_SECRET"] = "test-admin"
 
 import jwt
