@@ -336,6 +336,11 @@ class ApiService {
   static Future<ApiResult> zatcaValidateVat(String vatNumber) =>
       _post('/zatca/validate-vat', {'vat_number': vatNumber});
   static Future<ApiResult> zatcaBuildInvoice(Map body) => _post('/zatca/invoice/build', body);
+  // ZATCA Arabic rejection translator (Wave 2 PR#4 / PR#5).
+  static Future<ApiResult> explainZatcaCode(String code) =>
+      _get('/zatca/errors/explain?code=${Uri.encodeQueryComponent(code)}');
+  static Future<ApiResult> translateZatcaRejection(Map payload) =>
+      _post('/zatca/errors/translate', {'payload': payload});
 
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);
