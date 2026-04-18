@@ -39,7 +39,10 @@ import '../../screens/v4_compliance/vat_return_builder_screen.dart';
 import '../../screens/v4_compliance/wht_calculator_v5_screen.dart';
 import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
 import '../../screens/v4_erp/benefits_eos_screen.dart';
+import '../../screens/v4_erp/board_pack_screen.dart';
 import '../../screens/v4_erp/budget_vs_actual_screen.dart';
+import '../../screens/v4_erp/cost_centers_screen.dart';
+import '../../screens/v4_erp/training_lms_screen.dart';
 import '../../screens/v4_erp/expense_claims_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
@@ -230,6 +233,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/hr/self-service': (ctx) => const EmployeeSelfServiceScreen(),
   // Wave 82 — Knowledge Base
   'erp/finance/knowledge': (ctx) => const KnowledgeBaseScreen(),
+  // Wave 83 — Board Pack / Meeting Portal
+  'erp/finance/board': (ctx) => const BoardPackScreen(),
+  // Wave 84 — Training / LMS
+  'erp/hr/training': (ctx) => const TrainingLmsScreen(),
+  // Wave 85 — Cost Centers Analysis
+  'erp/finance/cost-centers': (ctx) => const CostCentersScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
