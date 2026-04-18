@@ -26,6 +26,7 @@ import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_erp/bank_feeds_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
+import '../../screens/v4_erp/crm_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
 import '../../screens/v4_erp/invoices_multi_view_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
@@ -56,6 +57,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/hr/employees': (ctx) => const HrEmployeesScreen(),
   // Wave 19 — Projects (Tasks/Timesheets/Gantt/Billing)
   'erp/operations/projects': (ctx) => const ProjectsScreen(),
+  // Wave 20 — CRM (Leads/Opportunities/Pipeline/Activities/Contacts)
+  'erp/operations/crm': (ctx) => const CrmScreen(),
   // Onboarding Journey (#8)
   'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
   // Connected Planning Drivers (#16) — Anaplan replacement
