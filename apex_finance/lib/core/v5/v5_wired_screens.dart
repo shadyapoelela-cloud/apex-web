@@ -33,6 +33,8 @@ import '../../screens/v4_erp/budget_planning_screen.dart';
 import '../../screens/v4_erp/construction_screen.dart';
 import '../../screens/v4_erp/ecommerce_store_screen.dart';
 import '../../screens/v4_erp/education_lms_screen.dart';
+import '../../screens/v4_erp/employee_wellness_screen.dart';
+import '../../screens/v4_erp/ma_deal_room_screen.dart';
 import '../../screens/v4_erp/field_service_screen.dart';
 import '../../screens/v4_erp/franchise_management_screen.dart';
 import '../../screens/v4_erp/hotel_pms_screen.dart';
@@ -53,8 +55,10 @@ import '../../screens/v4_compliance/risk_register_screen.dart';
 import '../../screens/v4_compliance/bcp_screen.dart';
 import '../../screens/v4_compliance/lease_accounting_screen.dart';
 import '../../screens/v4_compliance/quality_management_screen.dart';
+import '../../screens/v4_compliance/legal_contract_ai_screen.dart';
 import '../../screens/v4_compliance/revenue_recognition_screen.dart';
 import '../../screens/v4_compliance/sustainability_report_screen.dart';
+import '../../screens/v4_compliance/tax_optimizer_screen.dart';
 import '../../screens/v4_compliance/whistleblower_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
@@ -359,6 +363,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/transport': (ctx) => const TransportLogisticsScreen(),
   // 🎉 Wave 125 — AI Financial Analyst (CAPSTONE)
   'erp/finance/ai-analyst': (ctx) => const AiFinancialAnalystScreen(),
+  // Wave 126 — Legal Contract AI Review
+  'compliance/regulatory/legal-ai': (ctx) => const LegalContractAiScreen(),
+  // Wave 127 — Tax Planning & Optimization Simulator
+  'compliance/tax/optimizer': (ctx) => const TaxOptimizerScreen(),
+  // Wave 128 — M&A Deal Room / Virtual DD
+  'erp/finance/ma-deal-room': (ctx) => const MaDealRoomScreen(),
+  // Wave 129 — Employee Wellness & Engagement
+  'erp/hr/wellness': (ctx) => const EmployeeWellnessScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
