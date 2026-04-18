@@ -1,4 +1,4 @@
-﻿"""
+"""
 APEX Platform - Social Authentication APIs
 Google Sign-In + Apple Sign-In + Mobile with Country Code
 Per Architecture Doc v5 Section 5

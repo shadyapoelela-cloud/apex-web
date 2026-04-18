@@ -52,6 +52,7 @@ dependencies:
   # default for small lists; this is an opt-in alternative.
   syncfusion_flutter_datagrid: ^29.1.38
   syncfusion_flutter_core: ^29.1.38
+  hijri: ^3.0.0
 
 dev_dependencies:
   flutter_test:

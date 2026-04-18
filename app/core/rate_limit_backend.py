@@ -1,155 +1,156 @@
 """
-APEX Platform -- Rate limit storage backend.
+APEX — Rate-limit backends (Wave 1 PR#5).
 
-Two implementations:
-  1. MemoryBackend — thread-safe in-memory counter. Fine for single-instance
-     deploys (Render free tier, local dev). Resets on restart.
-  2. RedisBackend — shared counters across instances via Redis INCR + EXPIRE.
-     Activated by RATE_LIMIT_BACKEND=redis. Falls back to memory if Redis
-     is unreachable at startup (logged warning, no crash).
+Replaces the in-memory `defaultdict(list)` in app/main.py with a backend
+abstraction that supports a distributed Redis implementation for
+multi-instance deployments. The in-memory backend is kept as the fallback
+so local development and the test suite do not require a running Redis.
 
-The backend exposes a single method: hit(key, window_seconds) -> (count, reset_in)
-which increments the counter for (key, current_window) and returns the current
-count plus seconds until the window rolls over.
-
-This is intentionally minimal — not a drop-in slowapi replacement, but a
-production-grade fix for the 'in-memory only' limitation while keeping the
-tiered-path logic in main.py untouched.
+Design:
+- Both backends implement the same `hit(key, window, limit)` contract,
+  returning (allowed, remaining, reset_in_seconds).
+- Redis uses a sorted-set per (ip, bucket): scores are timestamps and
+  members are unique tokens, giving a true sliding window.
+- Pick_backend() chooses based on REDIS_URL. If Redis is requested but
+  unreachable at import time, we log a warning and fall back to memory
+  rather than crashing the worker.
 """
+
+from __future__ import annotations
 
 import logging
 import os
-import threading
+import secrets as _secrets
 import time
-from typing import Protocol
+from collections import defaultdict
+from typing import Tuple
 
 logger = logging.getLogger(__name__)
 
-RATE_LIMIT_BACKEND = os.environ.get("RATE_LIMIT_BACKEND", "memory").lower()
-REDIS_URL = os.environ.get("REDIS_URL", "")
-RATE_LIMIT_KEY_PREFIX = "apex:rl:"
+_MAX_IN_MEMORY_KEYS = 20_000  # prevent runaway memory if an IP floods with many buckets
 
 
-class RateLimitBackend(Protocol):
-    """Any backend must implement hit(key, window_seconds) -> (count, reset_in_seconds)."""
+class RateLimitBackend:
+    """Minimal interface. hit() is the only hot-path call."""
 
-    def hit(self, key: str, window_seconds: int) -> tuple[int, int]: ...
+    name = "abstract"
 
-    def reset(self, key: str) -> None: ...
+    def hit(self, key: str, window: int, limit: int) -> Tuple[bool, int, int]:
+        """Record a request and return (allowed, remaining, reset_in_seconds).
+
+        `allowed` is False iff the request is over-limit. `remaining` is the
+        count left in the current window *after* this request when allowed,
+        or 0 when rejected. `reset_in_seconds` is the integer seconds until
+        the oldest tracked hit expires from the window.
+        """
+        raise NotImplementedError
 
 
-class MemoryBackend:
-    """Sliding-window counter stored in a process-local dict.
+class InMemoryBackend(RateLimitBackend):
+    """Single-process fallback. Not safe across workers."""
 
-    Each entry: key -> list[float timestamps within current window].
-    Thread-safe via a single lock; fine for gunicorn workers on one machine
-    because each worker has its own process memory (shared-nothing) — limits
-    will be per-worker, not global. For global limits across workers or
-    instances, use RedisBackend.
-    """
+    name = "memory"
 
-    MAX_KEYS = 20000
+    def __init__(self) -> None:
+        self._hits: dict[str, list[float]] = defaultdict(list)
 
-    def __init__(self):
-        self._store: dict[str, list[float]] = {}
-        self._lock = threading.Lock()
-
-    def hit(self, key: str, window_seconds: int) -> tuple[int, int]:
+    def hit(self, key: str, window: int, limit: int) -> Tuple[bool, int, int]:
         now = time.time()
-        with self._lock:
-            if len(self._store) > self.MAX_KEYS:
-                # Evict half the entries (oldest last-seen first)
-                ordered = sorted(
-                    self._store.items(), key=lambda kv: kv[1][-1] if kv[1] else 0
-                )
-                for k, _ in ordered[: self.MAX_KEYS // 2]:
-                    self._store.pop(k, None)
-            bucket = self._store.setdefault(key, [])
-            bucket[:] = [t for t in bucket if now - t < window_seconds]
-            bucket.append(now)
-            reset_in = int(window_seconds - (now - bucket[0])) if bucket else window_seconds
-            return len(bucket), max(reset_in, 1)
+        # Evict oldest keys if tracking balloons — bounds worst-case memory.
+        if len(self._hits) > _MAX_IN_MEMORY_KEYS:
+            ordered = sorted(
+                self._hits.keys(),
+                key=lambda k: self._hits[k][-1] if self._hits[k] else 0,
+            )
+            for k in ordered[: _MAX_IN_MEMORY_KEYS // 2]:
+                del self._hits[k]
 
-    def reset(self, key: str) -> None:
-        with self._lock:
-            self._store.pop(key, None)
+        bucket = [t for t in self._hits[key] if now - t < window]
+        self._hits[key] = bucket
+
+        if len(bucket) >= limit:
+            reset_in = int(window - (now - bucket[0])) if bucket else window
+            return False, 0, max(reset_in, 1)
+
+        bucket.append(now)
+        remaining = max(0, limit - len(bucket))
+        return True, remaining, window
 
 
-class RedisBackend:
-    """Fixed-window counter stored in Redis.
+class RedisBackend(RateLimitBackend):
+    """Sorted-set sliding-window limiter backed by Redis.
 
-    Strategy: bucket key = f"{prefix}{key}:{window_start}". INCR + EXPIRE.
-    Simpler than sliding-window but atomic and fast. For most brute-force
-    defense this is sufficient; if strict sliding-window is needed later,
-    swap to a Lua script with ZADD/ZREMRANGEBYSCORE.
+    Key layout: ``ratelimit:{namespaced_key}`` — one ZSET per (ip, bucket).
+    Scores are unix timestamps; members are random tokens so hits never
+    collide even at the same microsecond. ZREMRANGEBYSCORE prunes expired
+    entries before each count.
     """
 
-    def __init__(self, client):
-        self._r = client
+    name = "redis"
 
-    def hit(self, key: str, window_seconds: int) -> tuple[int, int]:
-        now = int(time.time())
-        window_start = now - (now % window_seconds)
-        reset_in = window_seconds - (now - window_start)
-        bucket_key = f"{RATE_LIMIT_KEY_PREFIX}{key}:{window_start}"
-        try:
-            pipe = self._r.pipeline()
-            pipe.incr(bucket_key, 1)
-            pipe.expire(bucket_key, window_seconds + 5)  # tiny buffer
-            count, _ = pipe.execute()
-            return int(count), max(int(reset_in), 1)
-        except Exception as e:
-            logger.warning("Redis rate-limit hit failed (%s); allowing request", e)
-            # Fail open: a Redis blip must never 500 user traffic.
-            return 1, window_seconds
+    def __init__(self, redis_client, *, key_prefix: str = "apex:ratelimit:") -> None:
+        self._r = redis_client
+        self._prefix = key_prefix
 
-    def reset(self, key: str) -> None:
-        try:
-            # Without scanning, we don't know which window keys exist.
-            # Keys expire on their own — reset is a no-op in practice.
-            pass
-        except Exception:
-            pass
+    @classmethod
+    def from_url(cls, url: str) -> "RedisBackend":
+        import redis  # lazy import — requirements.txt pins the package
 
-
-def _make_redis_client():
-    """Build a redis client from REDIS_URL. Returns None if unavailable."""
-    if not REDIS_URL:
-        logger.warning("RATE_LIMIT_BACKEND=redis but REDIS_URL not set; using memory")
-        return None
-    try:
-        import redis  # type: ignore
-    except ImportError:
-        logger.warning("redis package not installed; using memory backend")
-        return None
-    try:
-        client = redis.Redis.from_url(REDIS_URL, decode_responses=True, socket_timeout=2)
+        client = redis.from_url(url, socket_timeout=0.5, socket_connect_timeout=0.5)
+        # Force a round-trip so a misconfigured URL surfaces here rather than
+        # later under load. PING is cheap and never rate-limited server-side.
         client.ping()
-        logger.info("Rate limiter: Redis backend connected")
-        return client
+        return cls(client)
+
+    def hit(self, key: str, window: int, limit: int) -> Tuple[bool, int, int]:
+        now_ms = int(time.time() * 1000)
+        window_ms = window * 1000
+        cutoff = now_ms - window_ms
+        redis_key = f"{self._prefix}{key}"
+
+        pipe = self._r.pipeline()
+        # Prune old entries before counting.
+        pipe.zremrangebyscore(redis_key, 0, cutoff)
+        pipe.zcard(redis_key)
+        _, count = pipe.execute()
+
+        if count >= limit:
+            # Get the oldest entry so we can report an accurate reset time.
+            oldest = self._r.zrange(redis_key, 0, 0, withscores=True)
+            if oldest:
+                oldest_ts_ms = int(oldest[0][1])
+                reset_in = max(1, int((oldest_ts_ms + window_ms - now_ms) / 1000))
+            else:
+                reset_in = window
+            return False, 0, reset_in
+
+        # Accept the hit: add this request + refresh TTL so idle keys expire.
+        member = f"{now_ms}:{_secrets.token_hex(4)}"
+        pipe = self._r.pipeline()
+        pipe.zadd(redis_key, {member: now_ms})
+        pipe.expire(redis_key, window + 5)  # small grace so ZADD after prune still covers
+        pipe.execute()
+        remaining = max(0, limit - count - 1)
+        return True, remaining, window
+
+
+def pick_backend() -> RateLimitBackend:
+    """Select the backend based on REDIS_URL. Falls back to in-memory on
+    any connection error with a loud warning — we never want a Redis
+    outage to take the whole service down."""
+
+    url = os.environ.get("REDIS_URL")
+    if not url:
+        return InMemoryBackend()
+
+    try:
+        backend = RedisBackend.from_url(url)
+        logger.info("Rate limiter: using Redis backend at %s", url)
+        return backend
     except Exception as e:
-        logger.warning("Redis ping failed (%s); falling back to memory backend", e)
-        return None
-
-
-_backend: RateLimitBackend | None = None
-
-
-def get_backend() -> RateLimitBackend:
-    """Return the active rate-limit backend (singleton)."""
-    global _backend
-    if _backend is not None:
-        return _backend
-    if RATE_LIMIT_BACKEND == "redis":
-        client = _make_redis_client()
-        if client is not None:
-            _backend = RedisBackend(client)
-            return _backend
-    _backend = MemoryBackend()
-    return _backend
-
-
-def _reset_for_tests() -> None:
-    """Test helper — clear singleton so tests can inject a fresh backend."""
-    global _backend
-    _backend = None
+        logger.warning(
+            "Rate limiter: Redis unreachable (%s) — falling back to in-memory. "
+            "This is NOT safe across multiple workers.",
+            e,
+        )
+        return InMemoryBackend()

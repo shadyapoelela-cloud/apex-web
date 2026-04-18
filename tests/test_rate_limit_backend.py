@@ -1,115 +1,121 @@
-"""Tests for app.core.rate_limit_backend.
+"""
+Tests for app/core/rate_limit_backend.py (Wave 1 PR#5).
 
 Covers:
-  - MemoryBackend counter increments, resets per window
-  - Memory eviction under load (MAX_KEYS)
-  - get_backend falls back to memory if Redis isn't available
-  - Redis fail-open: backend returns (1, window) on Redis exception
+- InMemoryBackend: first N hits are allowed, (N+1)th returns 429, window
+  resets after expiry, keys are isolated, and the max-keys eviction
+  prevents unbounded growth.
+- RedisBackend: same semantics using a mocked Redis pipeline.
+- pick_backend(): honours REDIS_URL; falls back on connection errors.
 """
 
+import os
 import time
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-
-def _fresh_backend_module():
-    from app.core import rate_limit_backend
-
-    rate_limit_backend._reset_for_tests()
-    return rate_limit_backend
+from app.core import rate_limit_backend as rlb
 
 
-def test_memory_backend_increments():
-    mod = _fresh_backend_module()
-    b = mod.MemoryBackend()
-    count1, reset1 = b.hit("ip:default", 60)
-    count2, reset2 = b.hit("ip:default", 60)
-    count3, reset3 = b.hit("ip:default", 60)
-    assert count1 == 1
-    assert count2 == 2
-    assert count3 == 3
-    # reset_in should be positive and bounded by window
-    assert 0 < reset1 <= 60
+class TestInMemoryBackend:
+    def test_first_hits_allowed_then_blocked(self):
+        b = rlb.InMemoryBackend()
+        for _ in range(3):
+            allowed, remaining, _ = b.hit("k", window=60, limit=3)
+            assert allowed is True
+        allowed, remaining, reset = b.hit("k", window=60, limit=3)
+        assert allowed is False
+        assert remaining == 0
+        assert reset >= 1
+
+    def test_remaining_counts_down(self):
+        b = rlb.InMemoryBackend()
+        _, r1, _ = b.hit("k", window=60, limit=5)
+        _, r2, _ = b.hit("k", window=60, limit=5)
+        _, r3, _ = b.hit("k", window=60, limit=5)
+        assert (r1, r2, r3) == (4, 3, 2)
+
+    def test_keys_are_isolated(self):
+        b = rlb.InMemoryBackend()
+        for _ in range(3):
+            assert b.hit("a", 60, 3)[0] is True
+        # "b" still has fresh budget.
+        assert b.hit("b", 60, 3)[0] is True
+
+    def test_window_expiry(self, monkeypatch):
+        b = rlb.InMemoryBackend()
+        fake_now = [1000.0]
+        monkeypatch.setattr(time, "time", lambda: fake_now[0])
+        assert b.hit("k", window=10, limit=1)[0] is True
+        assert b.hit("k", window=10, limit=1)[0] is False
+        fake_now[0] += 11  # skip past the window
+        assert b.hit("k", window=10, limit=1)[0] is True
+
+    def test_eviction_when_key_count_exceeds_cap(self, monkeypatch):
+        b = rlb.InMemoryBackend()
+        monkeypatch.setattr(rlb, "_MAX_IN_MEMORY_KEYS", 10)
+        for i in range(15):
+            b.hit(f"k{i}", 60, 5)
+        # After eviction we keep at most 10 buckets.
+        assert len(b._hits) <= 10
 
 
-def test_memory_backend_isolates_keys():
-    mod = _fresh_backend_module()
-    b = mod.MemoryBackend()
-    b.hit("ip_a:default", 60)
-    b.hit("ip_a:default", 60)
-    count_b, _ = b.hit("ip_b:default", 60)
-    assert count_b == 1  # ip_b has its own bucket
+class TestRedisBackend:
+    def _mk_client(self, count_after_prune: int, oldest_ts_ms: int | None = None):
+        """Return a mock redis client that emulates pipeline + zrange."""
+        client = MagicMock()
+        # First pipe: zremrangebyscore + zcard → returns (0, count_after_prune)
+        pipe_execute_outputs = [[0, count_after_prune], [1, True]]
+        pipe = MagicMock()
+        pipe.execute.side_effect = pipe_execute_outputs
+        client.pipeline.return_value = pipe
+        # zrange used only when over-limit
+        if oldest_ts_ms is None:
+            client.zrange.return_value = []
+        else:
+            client.zrange.return_value = [(b"m", float(oldest_ts_ms))]
+        return client, pipe
+
+    def test_allowed_when_under_limit(self):
+        client, pipe = self._mk_client(count_after_prune=2)
+        backend = rlb.RedisBackend(client)
+        allowed, remaining, reset = backend.hit("k", window=60, limit=5)
+        assert allowed is True
+        assert remaining == 2  # 5 - 2 - 1 (the new hit)
+        # pipeline called twice: prune+count, then add+expire
+        assert pipe.execute.call_count == 2
+
+    def test_blocked_when_at_or_above_limit(self):
+        now_ms = int(time.time() * 1000)
+        oldest = now_ms - 20_000  # 20s ago, in a 60s window
+        client, _ = self._mk_client(count_after_prune=5, oldest_ts_ms=oldest)
+        backend = rlb.RedisBackend(client)
+        allowed, remaining, reset = backend.hit("k", window=60, limit=5)
+        assert allowed is False
+        assert remaining == 0
+        # reset ≈ 60 - 20 = 40s. Allow +/- 2s tolerance for clock jitter.
+        assert 35 <= reset <= 45
 
 
-def test_memory_backend_window_rollover(monkeypatch):
-    """Entries older than window_seconds should be purged on next hit."""
-    mod = _fresh_backend_module()
-    b = mod.MemoryBackend()
+class TestPickBackend:
+    def test_no_redis_url_returns_memory(self, monkeypatch):
+        monkeypatch.delenv("REDIS_URL", raising=False)
+        assert isinstance(rlb.pick_backend(), rlb.InMemoryBackend)
 
-    now_val = 1000.0
-    monkeypatch.setattr("time.time", lambda: now_val)
-    b.hit("ip:bucket", window_seconds=10)
-    b.hit("ip:bucket", window_seconds=10)
+    def test_redis_url_set_but_unreachable_falls_back(self, monkeypatch, caplog):
+        monkeypatch.setenv("REDIS_URL", "redis://127.0.0.1:1/0")
+        # Make from_url raise — simulates a connection failure.
+        with patch.object(
+            rlb.RedisBackend, "from_url", side_effect=RuntimeError("down")
+        ):
+            backend = rlb.pick_backend()
+        assert isinstance(backend, rlb.InMemoryBackend)
+        assert any("falling back" in r.message for r in caplog.records)
 
-    # Jump forward past the window
-    now_val = 1020.0
-    count, _ = b.hit("ip:bucket", window_seconds=10)
-    assert count == 1  # old entries purged
-
-
-def test_memory_backend_eviction_limit():
-    mod = _fresh_backend_module()
-    b = mod.MemoryBackend()
-    # Populate over MAX_KEYS — use small limit for test speed
-    b.MAX_KEYS = 100
-    for i in range(150):
-        b.hit(f"ip{i}:default", 60)
-    # After eviction, store size must be <= MAX_KEYS
-    assert len(b._store) <= b.MAX_KEYS
-
-
-def test_get_backend_defaults_to_memory(monkeypatch):
-    monkeypatch.setenv("RATE_LIMIT_BACKEND", "memory")
-    mod = _fresh_backend_module()
-    # Reload module-level config
-    mod.RATE_LIMIT_BACKEND = "memory"
-    backend = mod.get_backend()
-    assert isinstance(backend, mod.MemoryBackend)
-
-
-def test_get_backend_redis_falls_back_when_url_missing(monkeypatch):
-    monkeypatch.setenv("RATE_LIMIT_BACKEND", "redis")
-    monkeypatch.delenv("REDIS_URL", raising=False)
-    mod = _fresh_backend_module()
-    mod.RATE_LIMIT_BACKEND = "redis"
-    mod.REDIS_URL = ""
-    backend = mod.get_backend()
-    # No REDIS_URL → should fall back to memory
-    assert isinstance(backend, mod.MemoryBackend)
-
-
-def test_redis_backend_fail_open_on_exception():
-    """If Redis throws, we must allow the request (fail open)."""
-    mod = _fresh_backend_module()
-    fake_client = MagicMock()
-    fake_client.pipeline.side_effect = Exception("redis down")
-    b = mod.RedisBackend(fake_client)
-    count, reset_in = b.hit("ip:default", 60)
-    assert count == 1  # Treated as first hit → allowed
-    assert reset_in == 60
-
-
-def test_redis_backend_increments_via_pipeline():
-    mod = _fresh_backend_module()
-    fake_client = MagicMock()
-    fake_pipe = MagicMock()
-    fake_pipe.execute.return_value = [3, True]
-    fake_client.pipeline.return_value = fake_pipe
-
-    b = mod.RedisBackend(fake_client)
-    count, reset_in = b.hit("ip:default", 60)
-    assert count == 3
-    assert 0 < reset_in <= 60
-    fake_pipe.incr.assert_called_once()
-    fake_pipe.expire.assert_called_once()
+    def test_redis_url_reachable_returns_redis(self, monkeypatch):
+        monkeypatch.setenv("REDIS_URL", "redis://fake/0")
+        fake_backend = MagicMock(spec=rlb.RedisBackend)
+        with patch.object(rlb.RedisBackend, "from_url", return_value=fake_backend):
+            backend = rlb.pick_backend()
+        assert backend is fake_backend

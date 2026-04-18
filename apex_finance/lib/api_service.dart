@@ -336,6 +336,147 @@ class ApiService {
   static Future<ApiResult> zatcaValidateVat(String vatNumber) =>
       _post('/zatca/validate-vat', {'vat_number': vatNumber});
   static Future<ApiResult> zatcaBuildInvoice(Map body) => _post('/zatca/invoice/build', body);
+  // ZATCA Arabic rejection translator (Wave 2 PR#4 / PR#5).
+  static Future<ApiResult> explainZatcaCode(String code) =>
+      _get('/zatca/errors/explain?code=${Uri.encodeQueryComponent(code)}');
+  static Future<ApiResult> translateZatcaRejection(Map payload) =>
+      _post('/zatca/errors/translate', {'payload': payload});
+
+  // ── Anomaly detector (Wave 3 PR#1). ──
+  // Caller supplies transactions; server runs 5 detectors and returns findings.
+  static Future<ApiResult> scanAnomalies(List<Map> transactions, {Map<String, dynamic>? options}) =>
+      _post('/anomalies/scan', {'transactions': transactions, ...?options});
+
+  // ── ZATCA offline retry queue (Wave 5). ──
+  static Future<ApiResult> zatcaQueueStats({String? tenantId}) => _get(
+      '/zatca/queue/stats${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> zatcaQueueList({String? status, String? tenantId, int limit = 100}) {
+    final qp = <String, String>{'limit': '$limit'};
+    if (status != null) qp['status'] = status;
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/zatca/queue?$qs');
+  }
+  static Future<ApiResult> zatcaQueueDetail(String id) => _get('/zatca/queue/$id');
+  static Future<ApiResult> zatcaQueueEnqueue(Map body) => _post('/zatca/queue/enqueue', body);
+  static Future<ApiResult> zatcaQueueProcess({bool dryRun = true, int limit = 50}) =>
+      _post('/zatca/queue/process', {'dry_run': dryRun, 'limit': limit});
+
+  // ── AI Guardrails (Wave 7 + 8). ──
+  static Future<ApiResult> aiGuardrailsStats({String? tenantId}) => _get(
+      '/ai/guardrails/stats${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> aiGuardrailsList({String? status, String? source, String? tenantId, int limit = 100}) {
+    final qp = <String, String>{'limit': '$limit'};
+    if (status != null) qp['status'] = status;
+    if (source != null) qp['source'] = source;
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/ai/guardrails?$qs');
+  }
+  static Future<ApiResult> aiGuardrailsDetail(String id) => _get('/ai/guardrails/$id');
+  static Future<ApiResult> aiGuardrailsEvaluate(Map body) => _post('/ai/guardrails/evaluate', body);
+  static Future<ApiResult> aiGuardrailsApprove(String id) =>
+      _post('/ai/guardrails/$id/approve', const {});
+  static Future<ApiResult> aiGuardrailsReject(String id, {String? reason}) =>
+      _post('/ai/guardrails/$id/reject', {if (reason != null) 'reason': reason});
+
+  // ── ZATCA CSID lifecycle (Wave 11 + 12). ──
+  // Note: no method ever returns the decrypted cert / key — the backend
+  // won't expose it over HTTP. These client methods handle metadata +
+  // lifecycle transitions only.
+  static Future<ApiResult> zatcaCsidStats({String? tenantId}) => _get(
+      '/zatca/csid/stats${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> zatcaCsidList({
+    String? tenantId,
+    String? environment,
+    String? status,
+    int limit = 100,
+  }) {
+    final qp = <String, String>{'limit': '$limit'};
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    if (environment != null) qp['environment'] = environment;
+    if (status != null) qp['status'] = status;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/zatca/csid?$qs');
+  }
+  static Future<ApiResult> zatcaCsidExpiringSoon({int days = 30, String? tenantId}) {
+    final qp = <String, String>{'days': '$days'};
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/zatca/csid/expiring-soon?$qs');
+  }
+  static Future<ApiResult> zatcaCsidDetail(String id) => _get('/zatca/csid/$id');
+  static Future<ApiResult> zatcaCsidRevoke(String id, {String? reason}) =>
+      _post('/zatca/csid/$id/revoke', {if (reason != null) 'reason': reason});
+  static Future<ApiResult> zatcaCsidSweepExpired() =>
+      _post('/zatca/csid/sweep-expired', const {});
+
+  // ── Bank Feeds (Wave 13 + 14). ──
+  // No method returns decrypted tokens — the backend never exposes
+  // them over HTTP. These are metadata + lifecycle operations only.
+  static Future<ApiResult> bankFeedsStats({String? tenantId}) => _get(
+      '/bank-feeds/stats${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> bankFeedsProviders() => _get('/bank-feeds/providers');
+  static Future<ApiResult> bankFeedsConnections({
+    String? tenantId,
+    String? provider,
+    String? status,
+    int limit = 100,
+  }) {
+    final qp = <String, String>{'limit': '$limit'};
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    if (provider != null) qp['provider'] = provider;
+    if (status != null) qp['status'] = status;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/bank-feeds/connections?$qs');
+  }
+  static Future<ApiResult> bankFeedsConnectionDetail(String id) =>
+      _get('/bank-feeds/connections/$id');
+  static Future<ApiResult> bankFeedsConnect(Map body) =>
+      _post('/bank-feeds/connections', body);
+  static Future<ApiResult> bankFeedsSync(String id) =>
+      _post('/bank-feeds/connections/$id/sync', const {});
+  static Future<ApiResult> bankFeedsDisconnect(String id, {String? reason}) =>
+      _post('/bank-feeds/connections/$id/disconnect', {if (reason != null) 'reason': reason});
+  static Future<ApiResult> bankFeedsTransactions({
+    String? tenantId,
+    String? connectionId,
+    bool unreconciledOnly = false,
+    int limit = 200,
+  }) {
+    final qp = <String, String>{
+      'limit': '$limit',
+      'unreconciled_only': '$unreconciledOnly',
+    };
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    if (connectionId != null) qp['connection_id'] = connectionId;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/bank-feeds/transactions?$qs');
+  }
+  static Future<ApiResult> bankFeedsReconcile(String txnId, {
+    required String entityType,
+    required String entityId,
+  }) =>
+      _post(
+        '/bank-feeds/transactions/$txnId/reconcile',
+        {'entity_type': entityType, 'entity_id': entityId},
+      );
+
+  // ── AI Bank Reconciliation (Wave 15 backend, Wave 16 UI). ──
+  // Scores a bank transaction against candidate entries and optionally
+  // routes the top proposal through the Wave 7 AI guardrail. The
+  // guardrail persists every decision as an AiSuggestion row; when a
+  // row lands in needs_approval, the user approves/rejects it from the
+  // AI Guardrails screen (compliance-gov-ai-oversight).
+  static Future<ApiResult> bankRecPropose(Map body) =>
+      _post('/bank-rec/propose', body);
+  static Future<ApiResult> bankRecAutoMatch(Map body) =>
+      _post('/bank-rec/auto-match', body);
+  // Wave 17 gap fix: dedicated approval endpoint that ALSO calls
+  // mark_reconciled. The generic /ai/guardrails/{id}/approve only
+  // flips the suggestion status — use this one for bank-rec rows.
+  static Future<ApiResult> bankRecApprove(String rowId) =>
+      _post('/bank-rec/approve/$rowId', const {});
 
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);

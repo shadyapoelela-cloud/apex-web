@@ -100,6 +100,7 @@ import '../screens/compliance/fixed_assets_screen.dart';
 import '../screens/compliance/transfer_pricing_screen.dart';
 import '../screens/compliance/extras_tools_screen.dart';
 import 'package:file_picker/file_picker.dart';
+import 'v4/v4_routes.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
@@ -129,6 +130,11 @@ final appRouter = GoRouter(
   initialLocation: '/whats-new',
   // redirect: disabled for now - auth handled in login screen,
     routes: [
+    // ── V4 shell (Wave 1.5) ──
+    // New hierarchical IA under /app/... Coexists with the legacy flat
+    // routes below; nothing is removed in this PR.
+    ...v4Routes(),
+
     // Auth
     GoRoute(path: '/login', pageBuilder: (c, s) => _apexPage(const SlideAuthScreen(), s)),
     // GoRoute(path: '/login-old', builder: (c, s) => const LoginScreen()),
