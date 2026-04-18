@@ -32,6 +32,7 @@ import '../../screens/v4_compliance/audit_kickoff_screen.dart';
 import '../../screens/v4_compliance/audit_planning_screen.dart';
 import '../../screens/v4_compliance/controls_library_screen.dart';
 import '../../screens/v4_compliance/deferred_tax_screen.dart';
+import '../../screens/v4_compliance/risk_register_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
 import '../../screens/v4_compliance/uae_ct_screen.dart';
@@ -41,6 +42,8 @@ import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
 import '../../screens/v4_erp/benefits_eos_screen.dart';
 import '../../screens/v4_erp/board_pack_screen.dart';
 import '../../screens/v4_erp/budget_vs_actual_screen.dart';
+import '../../screens/v4_erp/cap_table_screen.dart';
+import '../../screens/v4_erp/subscription_management_screen.dart';
 import '../../screens/v4_erp/cost_centers_screen.dart';
 import '../../screens/v4_erp/cybersecurity_dashboard_screen.dart';
 import '../../screens/v4_erp/investment_portfolio_screen.dart';
@@ -248,6 +251,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/requisitions': (ctx) => const PurchaseRequisitionScreen(),
   // Wave 88 — Investment Portfolio
   'erp/treasury/investments': (ctx) => const InvestmentPortfolioScreen(),
+  // Wave 89 — Cap Table / Shareholders
+  'erp/finance/cap-table': (ctx) => const CapTableScreen(),
+  // Wave 90 — Enterprise Risk Register
+  'compliance/regulatory/risk-register': (ctx) => const RiskRegisterScreen(),
+  // Wave 91 — Subscription Management (SaaS Billing)
+  'marketplace/billing/subscriptions': (ctx) => const SubscriptionManagementScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results

@@ -389,6 +389,12 @@ List<V5Service> v5Services = [
             labelEn: 'Cost Centers',
             icon: Icons.pie_chart,
           ),
+          V5Chip(
+            id: 'cap-table',
+            labelAr: 'هيكل الملكية',
+            labelEn: 'Cap Table',
+            icon: Icons.donut_large,
+          ),
         ],
       ),
       V5MainModule(
@@ -581,6 +587,7 @@ List<V5Service> v5Services = [
           V5Chip(id: 'governance', labelAr: 'الحوكمة والمجلس', labelEn: 'Governance', icon: Icons.account_tree),
           V5Chip(id: 'activity-log', labelAr: 'سجل النشاط', labelEn: 'Activity Log', icon: Icons.shield),
           V5Chip(id: 'cybersecurity', labelAr: 'الأمن السيبراني', labelEn: 'Cybersecurity', icon: Icons.security),
+          V5Chip(id: 'risk-register', labelAr: 'سجل المخاطر', labelEn: 'Risk Register', icon: Icons.shield),
         ],
       ),
     ],
