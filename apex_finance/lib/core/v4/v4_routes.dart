@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../screens/v4_ai/ai_guardrails_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
+import '../../screens/v4_compliance/zatca_csid_screen.dart';
 import '../../screens/v4_compliance/zatca_queue_screen.dart';
 import '../../screens/v4_erp/sales_customers_screen.dart';
 import 'apex_launchpad.dart';
@@ -125,6 +126,10 @@ final Map<String, Widget Function(BuildContext)> _wiredScreens = {
   // Compliance > Governance as "AI Oversight" since the gate is a
   // policy-enforcement tool for AI-proposed changes.
   'compliance-gov-ai-oversight': (ctx) => const AiGuardrailsScreen(),
+  // Wave 12: CSID lifecycle management (Wave 11 backend). Wired under
+  // Compliance > ZATCA Compliance > "Certificates" tab with expiry
+  // banner + revoke actions.
+  'compliance-zatca-certs': (ctx) => const ZatcaCsidScreen(),
 };
 
 class _NotFound extends StatelessWidget {

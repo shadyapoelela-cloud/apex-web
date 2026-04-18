@@ -380,6 +380,37 @@ class ApiService {
   static Future<ApiResult> aiGuardrailsReject(String id, {String? reason}) =>
       _post('/ai/guardrails/$id/reject', {if (reason != null) 'reason': reason});
 
+  // ── ZATCA CSID lifecycle (Wave 11 + 12). ──
+  // Note: no method ever returns the decrypted cert / key — the backend
+  // won't expose it over HTTP. These client methods handle metadata +
+  // lifecycle transitions only.
+  static Future<ApiResult> zatcaCsidStats({String? tenantId}) => _get(
+      '/zatca/csid/stats${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> zatcaCsidList({
+    String? tenantId,
+    String? environment,
+    String? status,
+    int limit = 100,
+  }) {
+    final qp = <String, String>{'limit': '$limit'};
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    if (environment != null) qp['environment'] = environment;
+    if (status != null) qp['status'] = status;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/zatca/csid?$qs');
+  }
+  static Future<ApiResult> zatcaCsidExpiringSoon({int days = 30, String? tenantId}) {
+    final qp = <String, String>{'days': '$days'};
+    if (tenantId != null) qp['tenant_id'] = tenantId;
+    final qs = qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&');
+    return _get('/zatca/csid/expiring-soon?$qs');
+  }
+  static Future<ApiResult> zatcaCsidDetail(String id) => _get('/zatca/csid/$id');
+  static Future<ApiResult> zatcaCsidRevoke(String id, {String? reason}) =>
+      _post('/zatca/csid/$id/revoke', {if (reason != null) 'reason': reason});
+  static Future<ApiResult> zatcaCsidSweepExpired() =>
+      _post('/zatca/csid/sweep-expired', const {});
+
   // ── Tax: Zakat + VAT calculators ──
   static Future<ApiResult> taxZakatCompute(Map body) => _post('/tax/zakat/compute', body);
   static Future<ApiResult> taxVatReturn(Map body) => _post('/tax/vat/return', body);
