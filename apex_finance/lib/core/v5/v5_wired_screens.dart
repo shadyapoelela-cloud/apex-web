@@ -44,8 +44,10 @@ import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/activity_log_screen.dart';
+import '../../screens/v4_erp/ai_copilot_screen.dart';
 import '../../screens/v4_erp/anomaly_detector_screen.dart';
 import '../../screens/v4_erp/approval_workflows_screen.dart';
+import '../../screens/v4_erp/commission_engine_screen.dart';
 import '../../screens/v4_erp/bank_guarantees_screen.dart';
 import '../../screens/v4_erp/close_checklist_screen.dart';
 import '../../screens/v4_erp/okrs_scorecard_screen.dart';
@@ -76,6 +78,7 @@ import '../../screens/v4_erp/projects_screen.dart';
 import '../../screens/v4_erp/purchasing_ap_screen.dart';
 import '../../screens/v4_erp/sales_pipeline_screen.dart';
 import '../../screens/v4_erp/supplier_360_screen.dart';
+import '../../screens/v4_erp/vendor_onboarding_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -203,6 +206,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/tickets': (ctx) => const HelpdeskTicketsScreen(),
   // Wave 73 — AI Anomaly Detector
   'erp/finance/anomalies': (ctx) => const AnomalyDetectorScreen(),
+  // Wave 74 — AI Copilot / Chat
+  'erp/finance/copilot': (ctx) => const AiCopilotScreen(),
+  // Wave 75 — Sales Commission Engine
+  'erp/hr/commissions': (ctx) => const CommissionEngineScreen(),
+  // Wave 76 — Vendor Onboarding Wizard
+  'erp/operations/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
