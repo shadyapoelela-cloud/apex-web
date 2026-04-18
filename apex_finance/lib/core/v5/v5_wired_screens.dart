@@ -43,7 +43,10 @@ import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
 import '../../screens/v4_erp/activity_log_screen.dart';
+import '../../screens/v4_erp/approval_workflows_screen.dart';
+import '../../screens/v4_erp/bank_guarantees_screen.dart';
 import '../../screens/v4_erp/close_checklist_screen.dart';
+import '../../screens/v4_erp/okrs_scorecard_screen.dart';
 import '../../screens/v4_erp/project_profitability_screen.dart';
 import '../../screens/v4_erp/contract_management_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
@@ -185,6 +188,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/project-pnl': (ctx) => const ProjectProfitabilityScreen(),
   // Wave 67 — Financial Close Checklist
   'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
+  // Wave 68 — OKRs / KPI Scorecard
+  'erp/finance/okrs': (ctx) => const OkrsScorecardScreen(),
+  // Wave 69 — Bank Guarantees & L/Cs
+  'erp/treasury/guarantees': (ctx) => const BankGuaranteesScreen(),
+  // Wave 70 — Approval Workflows & DoA Matrix
+  'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results

@@ -329,6 +329,18 @@ List<V5Service> v5Services = [
             labelEn: 'Close Checklist',
             icon: Icons.checklist,
           ),
+          V5Chip(
+            id: 'okrs',
+            labelAr: 'الأهداف OKRs',
+            labelEn: 'OKRs',
+            icon: Icons.track_changes,
+          ),
+          V5Chip(
+            id: 'workflows',
+            labelAr: 'مسارات الاعتماد',
+            labelEn: 'Approval Workflows',
+            icon: Icons.approval,
+          ),
         ],
       ),
       V5MainModule(
@@ -434,6 +446,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'recon', labelAr: 'المطابقة البنكية', labelEn: 'Reconciliation', icon: Icons.compare_arrows),
           const V5Chip(id: 'cashflow', labelAr: 'التدفق النقدي', labelEn: 'Cash Flow', icon: Icons.waterfall_chart),
           const V5Chip(id: 'fx', labelAr: 'صرف العملات', labelEn: 'FX', icon: Icons.currency_exchange),
+          const V5Chip(id: 'guarantees', labelAr: 'الضمانات والاعتمادات', labelEn: 'Guarantees & L/Cs', icon: Icons.verified_user),
         ],
       ),
     ],
