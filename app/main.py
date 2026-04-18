@@ -773,8 +773,8 @@ async def global_exception_handler(request, exc):
 # See app/core/rate_limit_backend.py.
 # ======================================================================
 from app.core.rate_limit_backend import (
-    MemoryBackend,
-    get_backend as _get_rate_backend,
+    InMemoryBackend as MemoryBackend,
+    pick_backend as _get_rate_backend,
 )
 
 # Expose the memory backend's internal store as _rate_limits so that
@@ -783,7 +783,8 @@ from app.core.rate_limit_backend import (
 # dummy dict (tests targeting per-process counters don't apply there).
 _rate_backend_instance = _get_rate_backend()
 if isinstance(_rate_backend_instance, MemoryBackend):
-    _rate_limits = _rate_backend_instance._store
+    # main's InMemoryBackend uses `_hits`; HEAD used `_store` — alias for compatibility.
+    _rate_limits = _rate_backend_instance._hits
 else:
     _rate_limits = defaultdict(list)
 
@@ -852,7 +853,8 @@ async def rate_limit_middleware(request, call_next):
     key = f"{client_ip}:{bucket}"
 
     backend = _get_rate_backend()
-    count, reset_in = backend.hit(key, window)
+    # main's InMemoryBackend.hit returns (allowed, count, reset_in) with 3 args.
+    _allowed, count, reset_in = backend.hit(key, window, limit)
     now = time.time()
 
     if count > limit:
