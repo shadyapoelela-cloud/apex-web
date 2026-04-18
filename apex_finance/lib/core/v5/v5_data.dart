@@ -311,6 +311,18 @@ List<V5Service> v5Services = [
             labelEn: 'Expense Claims',
             icon: Icons.receipt,
           ),
+          V5Chip(
+            id: 'exec',
+            labelAr: 'لوحة التنفيذيين',
+            labelEn: 'Executive Dashboard',
+            icon: Icons.star,
+          ),
+          V5Chip(
+            id: 'documents',
+            labelAr: 'خزانة الوثائق',
+            labelEn: 'Document Vault',
+            icon: Icons.folder_shared,
+          ),
         ],
       ),
       V5MainModule(
@@ -490,6 +502,7 @@ List<V5Service> v5Services = [
           V5Chip(id: 'wps', labelAr: 'نظام حماية الأجور', labelEn: 'WPS', icon: Icons.shield),
           V5Chip(id: 'aml', labelAr: 'مكافحة غسل الأموال', labelEn: 'AML', icon: Icons.gavel),
           V5Chip(id: 'governance', labelAr: 'الحوكمة والمجلس', labelEn: 'Governance', icon: Icons.account_tree),
+          V5Chip(id: 'activity-log', labelAr: 'سجل النشاط', labelEn: 'Activity Log', icon: Icons.shield),
         ],
       ),
     ],

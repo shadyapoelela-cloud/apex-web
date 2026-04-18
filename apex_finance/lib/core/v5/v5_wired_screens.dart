@@ -41,8 +41,11 @@ import '../../screens/v4_erp/expense_claims_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
 import '../../screens/v4_erp/connected_planning_screen.dart';
+import '../../screens/v4_erp/activity_log_screen.dart';
 import '../../screens/v4_erp/contract_management_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
+import '../../screens/v4_erp/document_vault_screen.dart';
+import '../../screens/v4_erp/executive_dashboard_v5_screen.dart';
 import '../../screens/v4_erp/customer_360_screen.dart';
 import '../../screens/v4_erp/fixed_assets_register_screen.dart';
 import '../../screens/v4_erp/fx_management_screen.dart';
@@ -167,6 +170,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/pipeline': (ctx) => const SalesPipelineScreen(),
   // Wave 61 — Contract Management
   'erp/operations/contracts': (ctx) => const ContractManagementScreen(),
+  // Wave 62 — Executive Dashboard (C-Suite)
+  'erp/finance/exec': (ctx) => const ExecutiveDashboardV5Screen(),
+  // Wave 63 — Document Vault / DMS
+  'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
+  // Wave 64 — Activity Log / Audit Trail
+  'compliance/regulatory/activity-log': (ctx) => const ActivityLogScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results
