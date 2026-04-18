@@ -34,6 +34,7 @@ import '../../screens/v4_compliance/controls_library_screen.dart';
 import '../../screens/v4_compliance/deferred_tax_screen.dart';
 import '../../screens/v4_compliance/risk_register_screen.dart';
 import '../../screens/v4_compliance/bcp_screen.dart';
+import '../../screens/v4_compliance/lease_accounting_screen.dart';
 import '../../screens/v4_compliance/whistleblower_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
@@ -45,7 +46,9 @@ import '../../screens/v4_erp/benefits_eos_screen.dart';
 import '../../screens/v4_erp/board_pack_screen.dart';
 import '../../screens/v4_erp/budget_vs_actual_screen.dart';
 import '../../screens/v4_erp/cap_table_screen.dart';
+import '../../screens/v4_erp/customer_loyalty_screen.dart';
 import '../../screens/v4_erp/fleet_management_screen.dart';
+import '../../screens/v4_erp/intercompany_screen.dart';
 import '../../screens/v4_erp/integrations_hub_screen.dart';
 import '../../screens/v4_erp/performance_reviews_screen.dart';
 import '../../screens/v4_erp/recruitment_ats_screen.dart';
@@ -275,6 +278,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/operations/fleet': (ctx) => const FleetManagementScreen(),
   // Wave 97 — Business Continuity Plan
   'compliance/regulatory/bcp': (ctx) => const BcpScreen(),
+  // Wave 98 — Lease Accounting (IFRS 16)
+  'compliance/tax/leases': (ctx) => const LeaseAccountingScreen(),
+  // Wave 99 — Intercompany Reconciliation
+  'erp/finance/intercompany': (ctx) => const IntercompanyScreen(),
+  // 🎉 Wave 100 — Customer Loyalty & Rewards (MILESTONE)
+  'erp/operations/loyalty': (ctx) => const CustomerLoyaltyScreen(),
   // Wave 35 — AI Agents Gallery
   'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
   // Wave 36 — Global Search Results

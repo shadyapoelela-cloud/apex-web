@@ -401,6 +401,12 @@ List<V5Service> v5Services = [
             labelEn: 'Integrations Hub',
             icon: Icons.hub,
           ),
+          V5Chip(
+            id: 'intercompany',
+            labelAr: 'المعاملات بين الشركات',
+            labelEn: 'Intercompany',
+            icon: Icons.sync_alt,
+          ),
         ],
       ),
       V5MainModule(
@@ -493,6 +499,7 @@ List<V5Service> v5Services = [
           V5Chip(id: 'vendor-onboarding', labelAr: 'إدخال مورد', labelEn: 'Vendor Onboarding', icon: Icons.person_add),
           V5Chip(id: 'requisitions', labelAr: 'طلبات الشراء', labelEn: 'Purchase Requisitions', icon: Icons.shopping_cart),
           V5Chip(id: 'fleet', labelAr: 'الأسطول', labelEn: 'Fleet', icon: Icons.local_shipping),
+          V5Chip(id: 'loyalty', labelAr: 'برنامج الولاء 🎉', labelEn: 'Loyalty Program', icon: Icons.loyalty),
           V5Chip(id: 'contracts', labelAr: 'العقود', labelEn: 'Contracts', icon: Icons.gavel),
           V5Chip(id: 'manufacturing', labelAr: 'التصنيع', labelEn: 'Manufacturing', icon: Icons.precision_manufacturing),
         ],
@@ -553,6 +560,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'calendar', labelAr: 'الرزنامة الضريبية', labelEn: 'Tax Calendar', icon: Icons.calendar_month),
           const V5Chip(id: 'vat-return', labelAr: 'إقرار VAT', labelEn: 'VAT Return', icon: Icons.description),
           const V5Chip(id: 'deferred', labelAr: 'الضريبة المؤجلة', labelEn: 'Deferred Tax', icon: Icons.account_balance_wallet),
+          const V5Chip(id: 'leases', labelAr: 'الإيجارات IFRS 16', labelEn: 'Leases (IFRS 16)', icon: Icons.home_work),
         ],
       ),
       V5MainModule(
