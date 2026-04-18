@@ -155,6 +155,71 @@ Base: `claude/brave-yonath-wave-10` ← Head: `claude/brave-yonath-wave-11`
 Base: `claude/brave-yonath-wave-11` ← Head: `claude/brave-yonath-wave-12`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-11...claude/brave-yonath-wave-12?expand=1>
 
+### PR #17 — Wave 15 (AI bank reconciliation — guardrail-gated auto-match)
+Base: `main` ← Head: `claude/brave-yonath-wave-15`
+**Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/main...claude/brave-yonath-wave-15?expand=1>
+
+```
+Title: Wave 15: AI bank reconciliation — guardrail-gated auto-match
+
+Body:
+Closes the loop the Bank Feeds waves opened. Wave 13 ingested the
+transactions; Wave 14 let a human reconcile them one-by-one in the
+UI; Wave 15 scores every (bank_tx, candidate) pair and pushes the
+top proposal through the Wave 7 AI guardrail so high-confidence
+matches auto-post while weak ones land in the /ai/guardrails
+needs_approval queue.
+
+Two-layer design, same shape as Waves 5 / 7 / 11 / 13:
+
+1. app/core/bank_reconciliation.py — pure scoring + guardrail bridge:
+   - Weighted feature vector (sum = 1.0):
+       _W_AMOUNT = 0.50   (exact-amount match dominates)
+       _W_DATE   = 0.25   (linear decay across a 7-day default window)
+       _W_VENDOR = 0.20   (Arabic-folded Jaccard on tokens)
+       _W_DESC   = 0.05   (token Jaccard, tiebreaker only)
+     Weights are asserted at import so a future edit can't silently
+     drift. Amount score returns 0 on sign mismatch (a credit can't
+     reconcile a debit).
+   - propose_matches(bank_tx, candidates, *, date_window_days=7,
+     min_score=0.3, top_k=5) → ranked proposals with a full score
+     breakdown so the UI can render a "why this matched" tooltip.
+   - auto_match_via_guardrail() pins min_score=0.0 inside the
+     guardrail pipeline — otherwise a borderline 0.28 score would
+     be silently dropped instead of being routed to needs_approval.
+     Top candidate wraps into a Suggestion(source=
+     "bank_reconciliation", action_type="match_bank_transaction")
+     and goes through ai_guardrails.guard(). On AUTO_APPLIED with a
+     real bank_tx_id the function calls bank_feeds.mark_reconciled
+     (imported locally so the scoring math stays DB-free for unit
+     tests and to avoid any future circular-import risk).
+   - Vendor + description folding reuses the same NFKD +
+     alef/yeh/teh-marbuta normalization as Wave 3 anomaly_detector.
+
+2. app/core/bank_reconciliation_routes.py — two endpoints:
+     POST /bank-rec/propose      — score only, no writes
+     POST /bank-rec/auto-match   — score + guardrail; on AUTO_APPLIED
+                                    the bank_feed_transaction row is
+                                    marked reconciled in-band.
+   Both require auth. Pydantic ReconTxn model mirrors
+   BankFeedTransaction so the UI passes rows through without a
+   translation layer.
+
+Tests (30 new in tests/test_bank_reconciliation.py):
+- Feature scorers: amount identity / linear decay / sign mismatch /
+  missing fields; date same-day vs decay vs outside-window; vendor
+  Arabic folding + token Jaccard; weights sum + ordering invariants.
+- propose_matches: ranking, min_score filter, top_k cap, date decay.
+- auto_match_via_guardrail: high-score → AUTO_APPLIED; low-score →
+  NEEDS_APPROVAL; no candidates → REJECTED; destructive flag forces
+  approval even at 100% confidence; AUTO_APPLIED path actually flips
+  matched_entity_id/type on the BankFeedTransaction row.
+- Routes: auth required; propose happy path; auto-match high-score
+  full end-to-end; auto-match low-score routes to needs_approval.
+
+Test suite: 1103 → 1133 pass (+30 new) · 2 skip · 0 fail.
+```
+
 ### PR #15 — Wave 13 (Bank Feeds abstraction — Lean / Tarabut / Salt Edge)
 Base: `claude/brave-yonath-wave-12` ← Head: `claude/brave-yonath-wave-13`
 **Open**: <https://github.com/shadyapoelela-cloud/apex-web/compare/claude/brave-yonath-wave-12...claude/brave-yonath-wave-13?expand=1>

@@ -641,6 +641,7 @@ from app.core.zatca_queue_routes import router as zatca_queue_r
 from app.core.zatca_csid_routes import router as zatca_csid_r
 from app.core.ai_guardrails_routes import router as ai_guardrails_r
 from app.core.bank_feeds_routes import router as bank_feeds_r
+from app.core.bank_reconciliation_routes import router as bank_rec_r
 from app.copilot.routes.copilot_routes import router as copilot_router
 
 app.include_router(onboarding_r, tags=["Onboarding"])
@@ -653,6 +654,7 @@ app.include_router(zatca_queue_r)
 app.include_router(zatca_csid_r)
 app.include_router(ai_guardrails_r)
 app.include_router(bank_feeds_r)
+app.include_router(bank_rec_r)
 app.include_router(copilot_router)
 
 # ── Compliance Core: Journal Entry Sequence + immutable Audit Trail
