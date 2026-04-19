@@ -186,6 +186,10 @@ import '../../screens/v5_2/purchasing_ap_v52_screen.dart';
 import '../../screens/v5_2/expense_claims_v52_screen.dart';
 import '../../screens/v5_2/risk_register_v52_screen.dart';
 import '../../screens/v5_2/ma_deal_room_v52_screen.dart';
+import '../../screens/v5_2/ai_analyst_v52_screen.dart';
+import '../../screens/v5_2/financial_statements_v52_screen.dart';
+import '../../screens/v5_2/fixed_assets_v52_screen.dart';
+import '../../screens/v5_2/workpapers_v52_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -206,8 +210,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/period-close': (ctx) => const CloseChecklistScreen(),
   'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
   'erp/finance/coa-editor': (ctx) => const CoaEditorScreen(),
-  'erp/finance/fixed-assets': (ctx) => const FixedAssetsRegisterScreen(),
-  'erp/finance/statements': (ctx) => const FinancialStatementsScreen(),
+  'erp/finance/fixed-assets': (ctx) => const FixedAssetsV52Screen(),  // V5.2
+  'erp/finance/statements': (ctx) => const FinancialStatementsV52Screen(),  // V5.2
   'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
   'erp/finance/budget-actual': (ctx) => const BudgetVsActualScreen(),
   'erp/finance/budget-planning': (ctx) => const BudgetPlanningScreen(),
@@ -215,7 +219,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/scenarios': (ctx) => const ScenarioPlanningScreen(),
   'erp/finance/breakeven': (ctx) => const BreakEvenScreen(),
   'erp/finance/anomalies': (ctx) => const AnomalyDetectorScreen(),
-  'erp/finance/ai-analyst': (ctx) => const AiFinancialAnalystScreen(),
+  'erp/finance/ai-analyst': (ctx) => const AiAnalystV52Screen(),  // V5.2
   'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
   'erp/finance/integrations': (ctx) => const IntegrationsHubScreen(),
   'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
@@ -514,7 +518,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'audit/risk/going-concern': (ctx) => const ComplianceStatusScreen(),
 
   // 3.3 Workpapers
-  'audit/workpapers/workpapers': (ctx) => const WorkpapersDetailScreen(),
+  'audit/workpapers/workpapers': (ctx) => const WorkpapersV52Screen(),  // V5.2
   'audit/workpapers/trial-balance-tie': (ctx) => const WorkpapersDetailScreen(),
   'audit/workpapers/evidence': (ctx) => const WorkpapersDetailScreen(),
 
