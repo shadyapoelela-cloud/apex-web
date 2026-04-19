@@ -94,7 +94,11 @@ from app.core.activity_log import ActivityLog  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # disable_existing_loggers=False is critical: otherwise fileConfig's
+    # default (True) silently marks every already-loaded app logger as
+    # disabled, which breaks pytest caplog capture for the rest of the
+    # session in any test file that runs an alembic command.
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 target_metadata = PhaseBase.metadata
 
