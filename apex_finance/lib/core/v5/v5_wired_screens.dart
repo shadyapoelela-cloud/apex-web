@@ -190,6 +190,10 @@ import '../../screens/v5_2/ai_analyst_v52_screen.dart';
 import '../../screens/v5_2/financial_statements_v52_screen.dart';
 import '../../screens/v5_2/fixed_assets_v52_screen.dart';
 import '../../screens/v5_2/workpapers_v52_screen.dart';
+import '../../screens/v5_2/period_close_v52_screen.dart';
+import '../../screens/v5_2/payroll_run_v52_screen.dart';
+import '../../screens/v5_2/budget_planning_v52_screen.dart';
+import '../../screens/v5_2/hotel_pms_v52_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -207,14 +211,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── 1.1 Finance (GL) ─────────────────────────────────────────────
   'erp/finance/gl': (ctx) => const GeneralLedgerScreen(),
   'erp/finance/je-builder': (ctx) => const JeBuilderV52Screen(),  // V5.2 ObjectPage
-  'erp/finance/period-close': (ctx) => const CloseChecklistScreen(),
+  'erp/finance/period-close': (ctx) => const PeriodCloseV52Screen(),  // V5.2
   'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
   'erp/finance/coa-editor': (ctx) => const CoaEditorScreen(),
   'erp/finance/fixed-assets': (ctx) => const FixedAssetsV52Screen(),  // V5.2
   'erp/finance/statements': (ctx) => const FinancialStatementsV52Screen(),  // V5.2
   'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
   'erp/finance/budget-actual': (ctx) => const BudgetVsActualScreen(),
-  'erp/finance/budget-planning': (ctx) => const BudgetPlanningScreen(),
+  'erp/finance/budget-planning': (ctx) => const BudgetPlanningV52Screen(),  // V5.2
   'erp/finance/cost-centers': (ctx) => const CostCentersScreen(),
   'erp/finance/scenarios': (ctx) => const ScenarioPlanningScreen(),
   'erp/finance/breakeven': (ctx) => const BreakEvenScreen(),
@@ -275,7 +279,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── 1.9 HR & Payroll ─────────────────────────────────────────────
   'erp/hr/employees': (ctx) => const HrEmployeesScreen(),
-  'erp/hr/payroll': (ctx) => const PayrollRunScreen(),
+  'erp/hr/payroll': (ctx) => const PayrollRunV52Screen(),  // V5.2
   'erp/hr/leaves': (ctx) => const LeaveManagementScreen(),
   'erp/hr/benefits': (ctx) => const BenefitsEosScreen(),
   'erp/hr/commissions': (ctx) => const CommissionEngineScreen(),
@@ -307,7 +311,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/manufacturing/shop-floor': (ctx) => const ShopFloorScreen(),
 
   // ── 1.13 Hotel PMS ───────────────────────────────────────────────
-  'erp/hotel-pms/hotel-pms': (ctx) => const HotelPmsScreen(),
+  'erp/hotel-pms/hotel-pms': (ctx) => const HotelPmsV52Screen(),  // V5.2
 
   // ── 1.14 Construction ────────────────────────────────────────────
   'erp/construction/construction': (ctx) => const ConstructionScreen(),
