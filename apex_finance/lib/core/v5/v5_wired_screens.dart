@@ -194,6 +194,11 @@ import '../../screens/v5_2/period_close_v52_screen.dart';
 import '../../screens/v5_2/payroll_run_v52_screen.dart';
 import '../../screens/v5_2/budget_planning_v52_screen.dart';
 import '../../screens/v5_2/hotel_pms_v52_screen.dart';
+import '../../screens/v5_2/profit_centers_v52_screen.dart';
+import '../../screens/v5_2/internal_orders_v52_screen.dart';
+import '../../screens/v5_2/dimensions_v52_screen.dart';
+import '../../screens/v5_2/recurring_entries_v52_screen.dart';
+import '../../screens/v5_2/ai_reconciliation_v52_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -228,6 +233,13 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/integrations': (ctx) => const IntegrationsHubScreen(),
   'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
   'erp/finance/onboarding': (ctx) => const OnboardingV52Screen(),  // V5.2 Wizard
+
+  // V5.2 New Finance Chips (Week 1)
+  'erp/finance/profit-centers': (ctx) => const ProfitCentersV52Screen(),
+  'erp/finance/internal-orders': (ctx) => const InternalOrdersV52Screen(),
+  'erp/finance/dimensions': (ctx) => const DimensionsV52Screen(),
+  'erp/finance/recurring-entries': (ctx) => const RecurringEntriesV52Screen(),
+  'erp/finance/ai-reconciliation': (ctx) => const AiReconciliationV52Screen(),
 
   // ── 1.2 Consolidation ────────────────────────────────────────────
   'erp/consolidation/consolidation': (ctx) => const ConsolidationScreen(),
