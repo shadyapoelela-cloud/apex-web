@@ -17,6 +17,7 @@ import '../../screens/v5_showcase/v5_showcase_screen.dart';
 import 'apex_v5_service_shell.dart';
 import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
+import 'apps_hub_screen.dart';
 import 'v5_data.dart';
 import 'v5_models.dart';
 import 'v5_wired_screens.dart';
@@ -40,7 +41,21 @@ List<RouteBase> v5Routes() => [
         redirect: (ctx, state) {
           final svc = v5ServiceById(state.pathParameters['service']!);
           if (svc == null || svc.mainModules.isEmpty) return '/app';
+          // ERP with 16 apps — show the Apps Hub grid by default.
+          // Other services with fewer apps jump straight to the first.
+          if (svc.mainModules.length >= 6) {
+            return '/app/${svc.id}/apps';
+          }
           return '/app/${svc.id}/${svc.mainModules.first.id}';
+        },
+      ),
+      // Apps Hub — Odoo-style grid of all apps in a service.
+      GoRoute(
+        path: '/app/:service/apps',
+        builder: (ctx, state) {
+          final svc = v5ServiceById(state.pathParameters['service']!);
+          if (svc == null) return const _V5NotFound();
+          return AppsHubScreen(service: svc);
         },
       ),
       GoRoute(

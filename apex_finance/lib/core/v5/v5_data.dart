@@ -1,7 +1,19 @@
-/// APEX V5.1 — Hierarchy data.
+/// APEX V5.1 — Hierarchy data (V4 Blueprint restructure).
 ///
-/// 5 Services × 15 Main Modules × 70 Chips.
-/// POC scope: ERP fully populated; other services skeleton-only.
+/// 6 Services × 51 Apps (V5MainModules) × ~170 Chips.
+///
+/// **ERP = 16 Apps** (per V4 INTEGRATION_PLAN_V2.md blueprint):
+///   1.1 Finance (GL)        1.9  HR & Payroll
+///   1.2 Consolidation       1.10 Projects & Jobs
+///   1.3 Treasury & Banking  1.11 CRM & Marketing
+///   1.4 Sales & AR          1.12 Manufacturing
+///   1.5 Purchasing & AP     1.13 Hotel PMS
+///   1.6 Expenses            1.14 Construction
+///   1.7 POS                 1.15 Industry Packs
+///   1.8 Inventory & Cost    1.16 Reports & BI
+///
+/// Horizontal layer (NOT chips): Cmd+K, AI Copilot, Live Bell,
+/// Knowledge search, Entity Scope Selector — rendered once in shell.
 ///
 /// Each chip maps either to a V4SubModule (reusing existing tabs) OR
 /// to a dashboard definition (new in V5).
@@ -22,7 +34,7 @@ const _financeDashboardWidgets = <V5DashboardWidget>[
     labelEn: 'Overdue invoices > 90 days',
     icon: Icons.warning_amber,
     kind: V5WidgetKind.actionList,
-    actionRoute: '/app/erp/finance/ar?filter=overdue-90',
+    actionRoute: '/app/erp/sales/ar?filter=overdue-90',
     actionLabelAr: 'أرسل تذكير للكل',
     dataEndpoint: '/ar/aging?bucket=90+',
     severity: V5WidgetSeverity.critical,
@@ -147,6 +159,254 @@ const _complianceDashboardWidgets = <V5DashboardWidget>[
   ),
 ];
 
+const _salesDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'فرص مفتوحة في خط الأنابيب',
+    labelEn: 'Open pipeline opportunities',
+    icon: Icons.filter_alt,
+    kind: V5WidgetKind.kpi,
+    actionRoute: '/app/erp/crm-marketing/pipeline',
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'فواتير صدرت اليوم',
+    labelEn: 'Invoices issued today',
+    icon: Icons.receipt,
+    kind: V5WidgetKind.kpi,
+    actionRoute: '/app/erp/sales/invoices',
+    severity: V5WidgetSeverity.success,
+  ),
+  V5DashboardWidget(
+    labelAr: 'عملاء جُدد هذا الشهر',
+    labelEn: 'New customers this month',
+    icon: Icons.person_add,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+];
+
+const _purchasingDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'أوامر شراء تنتظر الاعتماد',
+    labelEn: 'POs pending approval',
+    icon: Icons.pending_actions,
+    kind: V5WidgetKind.actionList,
+    actionRoute: '/app/erp/purchasing/requisitions',
+    actionLabelAr: 'اعتمد',
+    severity: V5WidgetSeverity.warning,
+  ),
+  V5DashboardWidget(
+    labelAr: 'فواتير موردين غير مدفوعة',
+    labelEn: 'Unpaid vendor bills',
+    icon: Icons.receipt_long,
+    kind: V5WidgetKind.kpi,
+    actionRoute: '/app/erp/purchasing/ap',
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'موردون يحتاجون تجديد عقد',
+    labelEn: 'Suppliers needing contract renewal',
+    icon: Icons.autorenew,
+    kind: V5WidgetKind.actionList,
+    severity: V5WidgetSeverity.warning,
+  ),
+];
+
+const _inventoryDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'أصناف تحتاج إعادة طلب',
+    labelEn: 'Items needing reorder',
+    icon: Icons.warning,
+    kind: V5WidgetKind.actionList,
+    actionLabelAr: 'أنشئ أوامر شراء',
+    severity: V5WidgetSeverity.warning,
+  ),
+  V5DashboardWidget(
+    labelAr: 'أصناف منتهية الصلاحية',
+    labelEn: 'Expired items',
+    icon: Icons.event_busy,
+    kind: V5WidgetKind.actionList,
+    severity: V5WidgetSeverity.critical,
+  ),
+  V5DashboardWidget(
+    labelAr: 'قيمة المخزون الحالية',
+    labelEn: 'Current inventory value',
+    icon: Icons.inventory,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+];
+
+const _hrDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'إجازات معلّقة',
+    labelEn: 'Pending leaves',
+    icon: Icons.event_available,
+    kind: V5WidgetKind.actionList,
+    actionLabelAr: 'اعتمد',
+    severity: V5WidgetSeverity.warning,
+  ),
+  V5DashboardWidget(
+    labelAr: 'عدد الموظفين',
+    labelEn: 'Headcount',
+    icon: Icons.groups,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'إجمالي راتب الشهر',
+    labelEn: 'Monthly payroll',
+    icon: Icons.payments,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.success,
+  ),
+];
+
+const _projectsDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'مشاريع نشطة',
+    labelEn: 'Active projects',
+    icon: Icons.work,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'مشاريع متأخرة عن الجدول',
+    labelEn: 'Projects behind schedule',
+    icon: Icons.schedule,
+    kind: V5WidgetKind.actionList,
+    severity: V5WidgetSeverity.critical,
+  ),
+  V5DashboardWidget(
+    labelAr: 'الاستغلال الحالي للموارد',
+    labelEn: 'Current resource utilization',
+    icon: Icons.insights,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+];
+
+const _manufacturingDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'أوامر إنتاج نشطة',
+    labelEn: 'Active production orders',
+    icon: Icons.precision_manufacturing,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'اختناقات في قائمة المواد',
+    labelEn: 'BOM bottlenecks',
+    icon: Icons.warning,
+    kind: V5WidgetKind.actionList,
+    severity: V5WidgetSeverity.critical,
+  ),
+  V5DashboardWidget(
+    labelAr: 'معدل جودة الخط',
+    labelEn: 'Line quality rate',
+    icon: Icons.verified,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.success,
+  ),
+];
+
+const _posDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'مبيعات اليوم',
+    labelEn: 'Sales today',
+    icon: Icons.point_of_sale,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.success,
+  ),
+  V5DashboardWidget(
+    labelAr: 'فروع نشطة',
+    labelEn: 'Active outlets',
+    icon: Icons.storefront,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'جلسات مفتوحة',
+    labelEn: 'Open shifts',
+    icon: Icons.schedule,
+    kind: V5WidgetKind.actionList,
+    severity: V5WidgetSeverity.warning,
+  ),
+];
+
+const _reportsDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'تقارير جاهزة',
+    labelEn: 'Ready reports',
+    icon: Icons.assessment,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'لوحات مخصصة',
+    labelEn: 'Custom dashboards',
+    icon: Icons.dashboard_customize,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'درجة الاستدامة ESG',
+    labelEn: 'ESG Score',
+    icon: Icons.eco,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.success,
+  ),
+];
+
+const _consolidationDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'كيانات مشمولة',
+    labelEn: 'Entities consolidated',
+    icon: Icons.merge,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+  V5DashboardWidget(
+    labelAr: 'معاملات بين الشركات تنتظر التسوية',
+    labelEn: 'Intercompany open items',
+    icon: Icons.sync_alt,
+    kind: V5WidgetKind.actionList,
+    severity: V5WidgetSeverity.warning,
+  ),
+  V5DashboardWidget(
+    labelAr: 'حقوق الملكية',
+    labelEn: 'Equity position',
+    icon: Icons.donut_large,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.success,
+  ),
+];
+
+const _expensesDashboardWidgets = <V5DashboardWidget>[
+  V5DashboardWidget(
+    labelAr: 'مطالبات تنتظر الاعتماد',
+    labelEn: 'Claims pending approval',
+    icon: Icons.pending_actions,
+    kind: V5WidgetKind.actionList,
+    actionLabelAr: 'راجع',
+    severity: V5WidgetSeverity.warning,
+  ),
+  V5DashboardWidget(
+    labelAr: 'مطالبات خارج السياسة',
+    labelEn: 'Policy violations',
+    icon: Icons.report_problem,
+    kind: V5WidgetKind.actionList,
+    severity: V5WidgetSeverity.critical,
+  ),
+  V5DashboardWidget(
+    labelAr: 'إنفاق الشهر',
+    labelEn: 'Month-to-date spend',
+    icon: Icons.account_balance_wallet,
+    kind: V5WidgetKind.kpi,
+    severity: V5WidgetSeverity.info,
+  ),
+];
+
 // ──────────────────────────────────────────────────────────────────────
 // Helper — convert V4SubModule into V5Chip.
 // ──────────────────────────────────────────────────────────────────────
@@ -192,25 +452,26 @@ V5Chip _dashboardChip({
     );
 
 // ──────────────────────────────────────────────────────────────────────
-// The 5 V5 Services.
+// The 6 V5 Services.
 // ──────────────────────────────────────────────────────────────────────
 
 List<V5Service> v5Services = [
-  // ── Service 1: ERP ──────────────────────────────────────────────────
+  // ── Service 1: ERP — 16 Apps (V4 Blueprint restructure) ─────────────
   V5Service(
     id: 'erp',
     labelAr: 'المحاسبة والعمليات',
     labelEn: 'ERP',
     icon: Icons.business_center,
     color: const Color(0xFFD4AF37), // Gold
-    descriptionAr: 'العمليات اليومية — محاسبة، مخزون، خزينة، موارد بشرية',
+    descriptionAr: 'العمليات اليومية — 16 تطبيق متخصص',
     mainModules: [
+      // 1.1 Finance (GL) — core accounting ledger
       V5MainModule(
         id: 'finance',
-        labelAr: 'الإدارة المالية',
-        labelEn: 'Finance',
+        labelAr: 'المحاسبة المالية',
+        labelEn: 'Finance (GL)',
         icon: Icons.bar_chart,
-        descriptionAr: 'دفتر الأستاذ، الذمم، الموازنات، التقارير',
+        descriptionAr: 'دفتر الأستاذ، القيود، الإقفال، القوائم المالية',
         chips: [
           _dashboardChip(
             id: 'dashboard',
@@ -220,348 +481,55 @@ List<V5Service> v5Services = [
             widgets: _financeDashboardWidgets,
           ),
           _chipFromV4('erp', 'gl', labelOverrideAr: 'دفتر الأستاذ العام'),
-          V5Chip(
-            id: 'je-builder',
-            labelAr: 'قيود اليومية',
-            labelEn: 'Journal Entries',
-            icon: Icons.edit_note,
-          ),
-          V5Chip(
-            id: 'period-close',
-            labelAr: 'إقفال الفترة',
-            labelEn: 'Period Close',
-            icon: Icons.lock_clock,
-          ),
-          V5Chip(
-            id: 'coa-editor',
-            labelAr: 'دليل الحسابات',
-            labelEn: 'Chart of Accounts',
-            icon: Icons.account_tree,
-          ),
-          V5Chip(
-            id: 'fixed-assets',
-            labelAr: 'الأصول الثابتة',
-            labelEn: 'Fixed Assets',
-            icon: Icons.business,
-          ),
-          _chipFromV4('erp', 'sales', labelOverrideAr: 'حسابات القبض'),
-          V5Chip(
-            id: 'sales-workflow',
-            labelAr: 'دورة المبيعات',
-            labelEn: 'Sales Workflow',
-            icon: Icons.point_of_sale,
-          ),
-          V5Chip(
-            id: 'invoices',
-            labelAr: 'الفواتير',
-            labelEn: 'Invoices',
-            icon: Icons.receipt,
-          ),
-          V5Chip(
-            id: 'ap',
-            labelAr: 'حسابات الدفع',
-            labelEn: 'Accounts Payable',
-            icon: Icons.receipt_long,
-          ),
-          V5Chip(
-            id: 'statements',
-            labelAr: 'القوائم المالية',
-            labelEn: 'Financial Statements',
-            icon: Icons.insert_chart,
-          ),
-          V5Chip(
-            id: 'budgets',
-            labelAr: 'الموازنات',
-            labelEn: 'Budgets',
-            icon: Icons.pie_chart,
-          ),
-          V5Chip(
-            id: 'budget-actual',
-            labelAr: 'الموازنة مقابل الفعلي',
-            labelEn: 'Budget vs Actual',
-            icon: Icons.compare_arrows,
-          ),
-          V5Chip(
-            id: 'reports',
-            labelAr: 'التقارير',
-            labelEn: 'Reports',
-            icon: Icons.assessment,
-          ),
-          V5Chip(
-            id: 'custom-reports',
-            labelAr: 'منشئ التقارير',
-            labelEn: 'Report Builder',
-            icon: Icons.dashboard_customize,
-          ),
-          V5Chip(
-            id: 'consolidation',
-            labelAr: 'التوحيد',
-            labelEn: 'Consolidation',
-            icon: Icons.merge,
-          ),
-          V5Chip(
-            id: 'onboarding',
-            labelAr: 'رحلة الإعداد',
-            labelEn: 'Onboarding',
-            icon: Icons.auto_awesome,
-          ),
-          V5Chip(
-            id: 'expenses',
-            labelAr: 'مطالبات المصروفات',
-            labelEn: 'Expense Claims',
-            icon: Icons.receipt,
-          ),
-          V5Chip(
-            id: 'exec',
-            labelAr: 'لوحة التنفيذيين',
-            labelEn: 'Executive Dashboard',
-            icon: Icons.star,
-          ),
-          V5Chip(
-            id: 'documents',
-            labelAr: 'خزانة الوثائق',
-            labelEn: 'Document Vault',
-            icon: Icons.folder_shared,
-          ),
-          V5Chip(
-            id: 'close-checklist',
-            labelAr: 'قائمة الإقفال',
-            labelEn: 'Close Checklist',
-            icon: Icons.checklist,
-          ),
-          V5Chip(
-            id: 'okrs',
-            labelAr: 'الأهداف OKRs',
-            labelEn: 'OKRs',
-            icon: Icons.track_changes,
-          ),
-          V5Chip(
-            id: 'workflows',
-            labelAr: 'مسارات الاعتماد',
-            labelEn: 'Approval Workflows',
-            icon: Icons.approval,
-          ),
-          V5Chip(
-            id: 'anomalies',
-            labelAr: 'كاشف الشذوذ AI',
-            labelEn: 'AI Anomaly Detector',
-            icon: Icons.psychology,
-          ),
-          V5Chip(
-            id: 'copilot',
-            labelAr: 'مساعد AI',
-            labelEn: 'AI Copilot',
-            icon: Icons.auto_awesome,
-          ),
-          V5Chip(
-            id: 'esg',
-            labelAr: 'الاستدامة ESG',
-            labelEn: 'ESG',
-            icon: Icons.eco,
-          ),
-          V5Chip(
-            id: 'scenarios',
-            labelAr: 'سيناريوهات What-If',
-            labelEn: 'What-If Scenarios',
-            icon: Icons.insights,
-          ),
-          V5Chip(
-            id: 'breakeven',
-            labelAr: 'نقطة التعادل',
-            labelEn: 'Break-Even',
-            icon: Icons.balance,
-          ),
-          V5Chip(
-            id: 'knowledge',
-            labelAr: 'قاعدة المعرفة',
-            labelEn: 'Knowledge Base',
-            icon: Icons.menu_book,
-          ),
-          V5Chip(
-            id: 'board',
-            labelAr: 'بوابة المجلس',
-            labelEn: 'Board Portal',
-            icon: Icons.account_balance,
-          ),
-          V5Chip(
-            id: 'cost-centers',
-            labelAr: 'مراكز التكلفة',
-            labelEn: 'Cost Centers',
-            icon: Icons.pie_chart,
-          ),
-          V5Chip(
-            id: 'cap-table',
-            labelAr: 'هيكل الملكية',
-            labelEn: 'Cap Table',
-            icon: Icons.donut_large,
-          ),
-          V5Chip(
-            id: 'integrations',
-            labelAr: 'التكاملات API',
-            labelEn: 'Integrations Hub',
-            icon: Icons.hub,
-          ),
-          V5Chip(
-            id: 'intercompany',
-            labelAr: 'المعاملات بين الشركات',
-            labelEn: 'Intercompany',
-            icon: Icons.sync_alt,
-          ),
-          V5Chip(
-            id: 'credit',
-            labelAr: 'التصنيف الائتماني',
-            labelEn: 'Credit Scoring',
-            icon: Icons.credit_score,
-          ),
-          V5Chip(
-            id: 'credit-notes',
-            labelAr: 'إشعارات الدائن',
-            labelEn: 'Credit Notes',
-            icon: Icons.assignment_return,
-          ),
-          V5Chip(
-            id: 'budget-planning',
-            labelAr: 'تخطيط الموازنات',
-            labelEn: 'Budget Planning',
-            icon: Icons.account_tree,
-          ),
-          V5Chip(
-            id: 'subscription-billing',
-            labelAr: 'فوترة الاشتراكات',
-            labelEn: 'Subscription Billing',
-            icon: Icons.autorenew,
-          ),
-          V5Chip(
-            id: 'ai-analyst',
-            labelAr: 'المحلل المالي AI 🎉',
-            labelEn: 'AI Financial Analyst',
-            icon: Icons.auto_awesome,
-          ),
-          V5Chip(
-            id: 'ma-deal-room',
-            labelAr: 'غرفة صفقات M&A',
-            labelEn: 'M&A Deal Room',
-            icon: Icons.handshake,
-          ),
+          const V5Chip(id: 'je-builder', labelAr: 'قيود اليومية', labelEn: 'Journal Entries', icon: Icons.edit_note),
+          const V5Chip(id: 'period-close', labelAr: 'إقفال الفترة', labelEn: 'Period Close', icon: Icons.lock_clock),
+          const V5Chip(id: 'close-checklist', labelAr: 'قائمة الإقفال', labelEn: 'Close Checklist', icon: Icons.checklist),
+          const V5Chip(id: 'coa-editor', labelAr: 'دليل الحسابات', labelEn: 'Chart of Accounts', icon: Icons.account_tree),
+          const V5Chip(id: 'fixed-assets', labelAr: 'الأصول الثابتة', labelEn: 'Fixed Assets', icon: Icons.business),
+          const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart),
+          const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart),
+          const V5Chip(id: 'budget-actual', labelAr: 'الموازنة مقابل الفعلي', labelEn: 'Budget vs Actual', icon: Icons.compare_arrows),
+          const V5Chip(id: 'budget-planning', labelAr: 'تخطيط الموازنات', labelEn: 'Budget Planning', icon: Icons.account_tree),
+          const V5Chip(id: 'cost-centers', labelAr: 'مراكز التكلفة', labelEn: 'Cost Centers', icon: Icons.pie_chart),
+          const V5Chip(id: 'scenarios', labelAr: 'سيناريوهات What-If', labelEn: 'What-If Scenarios', icon: Icons.insights),
+          const V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even', icon: Icons.balance),
+          const V5Chip(id: 'anomalies', labelAr: 'كاشف الشذوذ AI', labelEn: 'AI Anomaly Detector', icon: Icons.psychology),
+          const V5Chip(id: 'ai-analyst', labelAr: 'المحلل المالي AI', labelEn: 'AI Financial Analyst', icon: Icons.auto_awesome),
+          const V5Chip(id: 'workflows', labelAr: 'مسارات الاعتماد', labelEn: 'Approval Workflows', icon: Icons.approval),
+          const V5Chip(id: 'integrations', labelAr: 'التكاملات API', labelEn: 'Integrations Hub', icon: Icons.hub),
+          const V5Chip(id: 'documents', labelAr: 'خزانة الوثائق', labelEn: 'Document Vault', icon: Icons.folder_shared),
+          const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome),
         ],
       ),
+
+      // 1.2 Consolidation — multi-entity rollup (NEW)
       V5MainModule(
-        id: 'hr',
-        labelAr: 'الموارد البشرية والرواتب',
-        labelEn: 'HR & Payroll',
-        icon: Icons.people,
-        descriptionAr: 'الموظفون، الرواتب، الإجازات، GOSI/WPS',
+        id: 'consolidation',
+        labelAr: 'التوحيد والكيانات',
+        labelEn: 'Consolidation',
+        icon: Icons.merge,
+        descriptionAr: 'توحيد كيانات متعددة، معاملات بين الشركات، هيكل الملكية',
         chips: [
           _dashboardChip(
             id: 'dashboard',
-            labelAr: 'لوحة الموارد البشرية',
-            labelEn: 'HR Dashboard',
+            labelAr: 'لوحة التوحيد',
+            labelEn: 'Consolidation Dashboard',
             icon: Icons.dashboard,
-            widgets: const [
-              V5DashboardWidget(
-                labelAr: 'إجازات معلّقة',
-                labelEn: 'Pending leaves',
-                icon: Icons.event_available,
-                kind: V5WidgetKind.actionList,
-                actionLabelAr: 'اعتمد',
-                severity: V5WidgetSeverity.warning,
-              ),
-              V5DashboardWidget(
-                labelAr: 'عدد الموظفين',
-                labelEn: 'Headcount',
-                icon: Icons.groups,
-                kind: V5WidgetKind.kpi,
-                severity: V5WidgetSeverity.info,
-              ),
-              V5DashboardWidget(
-                labelAr: 'إجمالي راتب الشهر',
-                labelEn: 'Monthly payroll',
-                icon: Icons.payments,
-                kind: V5WidgetKind.kpi,
-                severity: V5WidgetSeverity.success,
-              ),
-            ],
+            widgets: _consolidationDashboardWidgets,
           ),
-          const V5Chip(id: 'employees', labelAr: 'الموظفون', labelEn: 'Employees', icon: Icons.person),
-          const V5Chip(id: 'payroll', labelAr: 'الرواتب', labelEn: 'Payroll', icon: Icons.payments),
-          const V5Chip(id: 'leaves', labelAr: 'الإجازات', labelEn: 'Leaves', icon: Icons.event),
-          const V5Chip(id: 'benefits', labelAr: 'المزايا', labelEn: 'Benefits', icon: Icons.health_and_safety),
-          const V5Chip(id: 'commissions', labelAr: 'العمولات', labelEn: 'Commissions', icon: Icons.emoji_events),
-          const V5Chip(id: 'self-service', labelAr: 'بوابة الموظف', labelEn: 'ESS Portal', icon: Icons.person_pin),
-          const V5Chip(id: 'training', labelAr: 'التدريب والأكاديمية', labelEn: 'Training & LMS', icon: Icons.school),
-          const V5Chip(id: 'performance', labelAr: 'تقييم الأداء', labelEn: 'Performance Reviews', icon: Icons.trending_up),
-          const V5Chip(id: 'recruitment', labelAr: 'التوظيف ATS', labelEn: 'Recruitment', icon: Icons.person_search),
-          const V5Chip(id: 'wellness', labelAr: 'صحة الموظفين', labelEn: 'Wellness', icon: Icons.favorite),
+          const V5Chip(id: 'consolidation', labelAr: 'التوحيد', labelEn: 'Consolidation', icon: Icons.merge),
+          const V5Chip(id: 'intercompany', labelAr: 'المعاملات بين الشركات', labelEn: 'Intercompany', icon: Icons.sync_alt),
+          const V5Chip(id: 'cap-table', labelAr: 'هيكل الملكية', labelEn: 'Cap Table', icon: Icons.donut_large),
+          const V5Chip(id: 'board', labelAr: 'بوابة المجلس', labelEn: 'Board Portal', icon: Icons.account_balance),
+          const V5Chip(id: 'ma-deal-room', labelAr: 'غرفة صفقات M&A', labelEn: 'M&A Deal Room', icon: Icons.handshake),
         ],
       ),
-      V5MainModule(
-        id: 'operations',
-        labelAr: 'العمليات',
-        labelEn: 'Operations',
-        icon: Icons.inventory_2,
-        descriptionAr: 'المخزون، المشاريع، إدارة العملاء، التصنيع',
-        chips: const [
-          V5Chip(
-            id: 'dashboard',
-            labelAr: 'لوحة العمليات',
-            labelEn: 'Operations Dashboard',
-            icon: Icons.dashboard,
-            isDashboard: true,
-            dashboardWidgets: [
-              V5DashboardWidget(
-                labelAr: 'أصناف تحتاج إعادة طلب',
-                labelEn: 'Items needing reorder',
-                icon: Icons.warning,
-                kind: V5WidgetKind.actionList,
-                actionLabelAr: 'أنشئ أوامر شراء',
-                severity: V5WidgetSeverity.warning,
-              ),
-              V5DashboardWidget(
-                labelAr: 'أوامر الشراء المفتوحة',
-                labelEn: 'Open POs',
-                icon: Icons.shopping_cart,
-                kind: V5WidgetKind.kpi,
-                severity: V5WidgetSeverity.info,
-              ),
-            ],
-          ),
-          V5Chip(id: 'inventory', labelAr: 'المخزون', labelEn: 'Inventory', icon: Icons.inventory),
-          V5Chip(id: 'projects', labelAr: 'المشاريع', labelEn: 'Projects', icon: Icons.work),
-          V5Chip(id: 'crm', labelAr: 'إدارة العملاء', labelEn: 'CRM', icon: Icons.contacts),
-          V5Chip(id: 'customers-360', labelAr: 'العميل 360°', labelEn: 'Customer 360°', icon: Icons.person_pin_circle),
-          V5Chip(id: 'suppliers', labelAr: 'المورّدون 360°', labelEn: 'Suppliers 360°', icon: Icons.store),
-          V5Chip(id: 'pipeline', labelAr: 'أنبوب المبيعات', labelEn: 'Sales Pipeline', icon: Icons.filter_alt),
-          V5Chip(id: 'project-pnl', labelAr: 'ربحية المشاريع', labelEn: 'Project P&L', icon: Icons.analytics),
-          V5Chip(id: 'tickets', labelAr: 'تذاكر الدعم', labelEn: 'Helpdesk', icon: Icons.support_agent),
-          V5Chip(id: 'vendor-onboarding', labelAr: 'إدخال مورد', labelEn: 'Vendor Onboarding', icon: Icons.person_add),
-          V5Chip(id: 'requisitions', labelAr: 'طلبات الشراء', labelEn: 'Purchase Requisitions', icon: Icons.shopping_cart),
-          V5Chip(id: 'fleet', labelAr: 'الأسطول', labelEn: 'Fleet', icon: Icons.local_shipping),
-          V5Chip(id: 'loyalty', labelAr: 'برنامج الولاء 🎉', labelEn: 'Loyalty Program', icon: Icons.loyalty),
-          V5Chip(id: 'price-list', labelAr: 'قائمة الأسعار', labelEn: 'Price List', icon: Icons.price_change),
-          V5Chip(id: 'warranty', labelAr: 'الضمانات والخدمة', labelEn: 'Warranty & Service', icon: Icons.verified),
-          V5Chip(id: 'warehouse', labelAr: 'إدارة المستودعات', labelEn: 'Warehouse Mgmt', icon: Icons.warehouse),
-          V5Chip(id: 'asset-tracking', labelAr: 'تتبع الأصول (RFID)', labelEn: 'Asset Tracking', icon: Icons.qr_code_scanner),
-          V5Chip(id: 'whatsapp', labelAr: 'WhatsApp Business 🎉', labelEn: 'WhatsApp Business', icon: Icons.chat),
-          V5Chip(id: 'construction', labelAr: 'مقاولات البناء', labelEn: 'Construction', icon: Icons.engineering),
-          V5Chip(id: 'real-estate', labelAr: 'إدارة العقارات', labelEn: 'Real Estate', icon: Icons.apartment),
-          V5Chip(id: 'healthcare', labelAr: 'مطالبات صحية', labelEn: 'Healthcare Claims', icon: Icons.local_hospital),
-          V5Chip(id: 'grants', labelAr: 'إدارة المنح (NGO)', labelEn: 'Grant Management', icon: Icons.volunteer_activism),
-          V5Chip(id: 'franchise', labelAr: 'الامتياز التجاري', labelEn: 'Franchise', icon: Icons.store_mall_directory),
-          V5Chip(id: 'ecommerce', labelAr: 'المتجر الإلكتروني', labelEn: 'E-Commerce', icon: Icons.shopping_bag),
-          V5Chip(id: 'field-service', labelAr: 'الخدمة الميدانية', labelEn: 'Field Service', icon: Icons.engineering),
-          V5Chip(id: 'restaurant-pos', labelAr: 'نقاط بيع المطاعم 🎉', labelEn: 'Restaurant POS', icon: Icons.restaurant),
-          V5Chip(id: 'hotel-pms', labelAr: 'إدارة الفنادق PMS', labelEn: 'Hotel PMS', icon: Icons.hotel),
-          V5Chip(id: 'marketing', labelAr: 'أتمتة التسويق', labelEn: 'Marketing Automation', icon: Icons.campaign),
-          V5Chip(id: 'education', labelAr: 'إدارة المدارس', labelEn: 'Education SIS', icon: Icons.school),
-          V5Chip(id: 'transport', labelAr: 'النقل واللوجستيات', labelEn: 'Transport TMS', icon: Icons.local_shipping),
-          V5Chip(id: 'contracts', labelAr: 'العقود', labelEn: 'Contracts', icon: Icons.gavel),
-          V5Chip(id: 'manufacturing', labelAr: 'التصنيع', labelEn: 'Manufacturing', icon: Icons.precision_manufacturing),
-        ],
-      ),
+
+      // 1.3 Treasury & Banking — unchanged
       V5MainModule(
         id: 'treasury',
-        labelAr: 'الخزينة',
-        labelEn: 'Treasury',
+        labelAr: 'الخزينة والبنوك',
+        labelEn: 'Treasury & Banking',
         icon: Icons.account_balance,
         descriptionAr: 'البنوك، المطابقة، التدفق النقدي، صرف العملات',
         chips: [
@@ -578,6 +546,306 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'fx', labelAr: 'صرف العملات', labelEn: 'FX', icon: Icons.currency_exchange),
           const V5Chip(id: 'guarantees', labelAr: 'الضمانات والاعتمادات', labelEn: 'Guarantees & L/Cs', icon: Icons.verified_user),
           const V5Chip(id: 'investments', labelAr: 'محفظة الاستثمار', labelEn: 'Investment Portfolio', icon: Icons.show_chart),
+        ],
+      ),
+
+      // 1.4 Sales & AR
+      V5MainModule(
+        id: 'sales',
+        labelAr: 'المبيعات والذمم المدينة',
+        labelEn: 'Sales & AR',
+        icon: Icons.point_of_sale,
+        descriptionAr: 'دورة المبيعات، الفواتير، الذمم، الأسعار، العقود',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة المبيعات',
+            labelEn: 'Sales Dashboard',
+            icon: Icons.dashboard,
+            widgets: _salesDashboardWidgets,
+          ),
+          _chipFromV4('erp', 'sales', labelOverrideAr: 'حسابات القبض'),
+          const V5Chip(id: 'sales-workflow', labelAr: 'دورة المبيعات', labelEn: 'Sales Workflow', icon: Icons.point_of_sale),
+          const V5Chip(id: 'invoices', labelAr: 'الفواتير', labelEn: 'Invoices', icon: Icons.receipt),
+          const V5Chip(id: 'credit-notes', labelAr: 'إشعارات الدائن', labelEn: 'Credit Notes', icon: Icons.assignment_return),
+          const V5Chip(id: 'price-list', labelAr: 'قائمة الأسعار', labelEn: 'Price List', icon: Icons.price_change),
+          const V5Chip(id: 'contracts', labelAr: 'العقود', labelEn: 'Contracts', icon: Icons.gavel),
+          const V5Chip(id: 'subscription-billing', labelAr: 'فوترة الاشتراكات', labelEn: 'Subscription Billing', icon: Icons.autorenew),
+          const V5Chip(id: 'credit', labelAr: 'التصنيف الائتماني', labelEn: 'Credit Scoring', icon: Icons.credit_score),
+        ],
+      ),
+
+      // 1.5 Purchasing & AP
+      V5MainModule(
+        id: 'purchasing',
+        labelAr: 'المشتريات والذمم الدائنة',
+        labelEn: 'Purchasing & AP',
+        icon: Icons.shopping_cart,
+        descriptionAr: 'الموردون، طلبات الشراء، عروض الأسعار، المدفوعات',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة المشتريات',
+            labelEn: 'Purchasing Dashboard',
+            icon: Icons.dashboard,
+            widgets: _purchasingDashboardWidgets,
+          ),
+          const V5Chip(id: 'ap', labelAr: 'حسابات الدفع', labelEn: 'Accounts Payable', icon: Icons.receipt_long),
+          const V5Chip(id: 'suppliers', labelAr: 'المورّدون 360°', labelEn: 'Suppliers 360°', icon: Icons.store),
+          const V5Chip(id: 'vendor-onboarding', labelAr: 'إدخال مورد', labelEn: 'Vendor Onboarding', icon: Icons.person_add),
+          const V5Chip(id: 'requisitions', labelAr: 'طلبات الشراء', labelEn: 'Purchase Requisitions', icon: Icons.shopping_cart),
+          const V5Chip(id: 'procurement-rfq', labelAr: 'عروض الأسعار RFQ', labelEn: 'Procurement RFQ', icon: Icons.request_quote),
+        ],
+      ),
+
+      // 1.6 Expenses & Reimbursements (NEW)
+      V5MainModule(
+        id: 'expenses',
+        labelAr: 'المصروفات والتعويضات',
+        labelEn: 'Expenses',
+        icon: Icons.receipt,
+        descriptionAr: 'مطالبات الموظفين، البطاقات، السفر، السياسات',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة المصروفات',
+            labelEn: 'Expenses Dashboard',
+            icon: Icons.dashboard,
+            widgets: _expensesDashboardWidgets,
+          ),
+          const V5Chip(id: 'expenses', labelAr: 'مطالبات المصروفات', labelEn: 'Expense Claims', icon: Icons.receipt),
+          const V5Chip(id: 'corporate-cards', labelAr: 'بطاقات الشركة', labelEn: 'Corporate Cards', icon: Icons.credit_card),
+          const V5Chip(id: 'travel', labelAr: 'السفر والإقامة', labelEn: 'Travel & Per Diem', icon: Icons.flight),
+        ],
+      ),
+
+      // 1.7 POS (NEW — first-class)
+      V5MainModule(
+        id: 'pos',
+        labelAr: 'نقاط البيع',
+        labelEn: 'Point of Sale',
+        icon: Icons.point_of_sale,
+        descriptionAr: 'نقاط البيع للمطاعم والتجزئة والخدمات',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة نقاط البيع',
+            labelEn: 'POS Dashboard',
+            icon: Icons.dashboard,
+            widgets: _posDashboardWidgets,
+          ),
+          const V5Chip(id: 'restaurant-pos', labelAr: 'نقاط بيع المطاعم 🎉', labelEn: 'Restaurant POS', icon: Icons.restaurant),
+          const V5Chip(id: 'retail-pos', labelAr: 'نقاط بيع التجزئة', labelEn: 'Retail POS', icon: Icons.storefront),
+          const V5Chip(id: 'service-pos', labelAr: 'نقاط بيع الخدمات', labelEn: 'Service POS', icon: Icons.room_service),
+        ],
+      ),
+
+      // 1.8 Inventory & Cost
+      V5MainModule(
+        id: 'inventory',
+        labelAr: 'المخزون والتكلفة',
+        labelEn: 'Inventory & Cost',
+        icon: Icons.inventory_2,
+        descriptionAr: 'المستودعات، الأصناف، التتبع، الأسطول، الضمانات',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة المخزون',
+            labelEn: 'Inventory Dashboard',
+            icon: Icons.dashboard,
+            widgets: _inventoryDashboardWidgets,
+          ),
+          const V5Chip(id: 'inventory', labelAr: 'المخزون', labelEn: 'Inventory', icon: Icons.inventory),
+          const V5Chip(id: 'warehouse', labelAr: 'إدارة المستودعات', labelEn: 'Warehouse Mgmt', icon: Icons.warehouse),
+          const V5Chip(id: 'asset-tracking', labelAr: 'تتبع الأصول (RFID)', labelEn: 'Asset Tracking', icon: Icons.qr_code_scanner),
+          const V5Chip(id: 'fleet', labelAr: 'الأسطول', labelEn: 'Fleet', icon: Icons.local_shipping),
+          const V5Chip(id: 'warranty', labelAr: 'الضمانات والخدمة', labelEn: 'Warranty & Service', icon: Icons.verified),
+        ],
+      ),
+
+      // 1.9 HR & Payroll — unchanged
+      V5MainModule(
+        id: 'hr',
+        labelAr: 'الموارد البشرية والرواتب',
+        labelEn: 'HR & Payroll',
+        icon: Icons.people,
+        descriptionAr: 'الموظفون، الرواتب، الإجازات، GOSI/WPS',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة الموارد البشرية',
+            labelEn: 'HR Dashboard',
+            icon: Icons.dashboard,
+            widgets: _hrDashboardWidgets,
+          ),
+          const V5Chip(id: 'employees', labelAr: 'الموظفون', labelEn: 'Employees', icon: Icons.person),
+          const V5Chip(id: 'payroll', labelAr: 'الرواتب', labelEn: 'Payroll', icon: Icons.payments),
+          const V5Chip(id: 'leaves', labelAr: 'الإجازات', labelEn: 'Leaves', icon: Icons.event),
+          const V5Chip(id: 'benefits', labelAr: 'المزايا', labelEn: 'Benefits', icon: Icons.health_and_safety),
+          const V5Chip(id: 'commissions', labelAr: 'العمولات', labelEn: 'Commissions', icon: Icons.emoji_events),
+          const V5Chip(id: 'self-service', labelAr: 'بوابة الموظف', labelEn: 'ESS Portal', icon: Icons.person_pin),
+          const V5Chip(id: 'training', labelAr: 'التدريب والأكاديمية', labelEn: 'Training & LMS', icon: Icons.school),
+          const V5Chip(id: 'performance', labelAr: 'تقييم الأداء', labelEn: 'Performance Reviews', icon: Icons.trending_up),
+          const V5Chip(id: 'recruitment', labelAr: 'التوظيف ATS', labelEn: 'Recruitment', icon: Icons.person_search),
+          const V5Chip(id: 'wellness', labelAr: 'صحة الموظفين', labelEn: 'Wellness', icon: Icons.favorite),
+        ],
+      ),
+
+      // 1.10 Projects & Jobs
+      V5MainModule(
+        id: 'projects',
+        labelAr: 'المشاريع والمهام',
+        labelEn: 'Projects & Jobs',
+        icon: Icons.work,
+        descriptionAr: 'إدارة المشاريع، ربحية العمل، الموارد، الفوترة بالمراحل',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة المشاريع',
+            labelEn: 'Projects Dashboard',
+            icon: Icons.dashboard,
+            widgets: _projectsDashboardWidgets,
+          ),
+          const V5Chip(id: 'projects', labelAr: 'المشاريع', labelEn: 'Projects', icon: Icons.work),
+          const V5Chip(id: 'project-pnl', labelAr: 'ربحية المشاريع', labelEn: 'Project P&L', icon: Icons.analytics),
+          const V5Chip(id: 'tickets', labelAr: 'تذاكر الدعم', labelEn: 'Helpdesk', icon: Icons.support_agent),
+          const V5Chip(id: 'resource-allocation', labelAr: 'تخصيص الموارد', labelEn: 'Resource Allocation', icon: Icons.group_work),
+          const V5Chip(id: 'milestone-billing', labelAr: 'فوترة المراحل', labelEn: 'Milestone Billing', icon: Icons.flag),
+        ],
+      ),
+
+      // 1.11 CRM & Marketing
+      V5MainModule(
+        id: 'crm-marketing',
+        labelAr: 'علاقات العملاء والتسويق',
+        labelEn: 'CRM & Marketing',
+        icon: Icons.contacts,
+        descriptionAr: 'إدارة العملاء، الأنبوب، الحملات، الولاء، التواصل',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة CRM والتسويق',
+            labelEn: 'CRM Dashboard',
+            icon: Icons.dashboard,
+            widgets: _salesDashboardWidgets,
+          ),
+          const V5Chip(id: 'crm', labelAr: 'إدارة العملاء', labelEn: 'CRM', icon: Icons.contacts),
+          const V5Chip(id: 'customers-360', labelAr: 'العميل 360°', labelEn: 'Customer 360°', icon: Icons.person_pin_circle),
+          const V5Chip(id: 'pipeline', labelAr: 'أنبوب المبيعات', labelEn: 'Sales Pipeline', icon: Icons.filter_alt),
+          const V5Chip(id: 'marketing', labelAr: 'أتمتة التسويق', labelEn: 'Marketing Automation', icon: Icons.campaign),
+          const V5Chip(id: 'loyalty', labelAr: 'برنامج الولاء 🎉', labelEn: 'Loyalty Program', icon: Icons.loyalty),
+          const V5Chip(id: 'whatsapp', labelAr: 'WhatsApp Business 🎉', labelEn: 'WhatsApp Business', icon: Icons.chat),
+        ],
+      ),
+
+      // 1.12 Manufacturing (first-class)
+      V5MainModule(
+        id: 'manufacturing',
+        labelAr: 'التصنيع',
+        labelEn: 'Manufacturing',
+        icon: Icons.precision_manufacturing,
+        descriptionAr: 'أوامر الإنتاج، قائمة المواد، خط الإنتاج، الجودة',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة التصنيع',
+            labelEn: 'Manufacturing Dashboard',
+            icon: Icons.dashboard,
+            widgets: _manufacturingDashboardWidgets,
+          ),
+          const V5Chip(id: 'manufacturing', labelAr: 'أوامر الإنتاج', labelEn: 'Production Orders', icon: Icons.precision_manufacturing),
+          const V5Chip(id: 'bom-mrp', labelAr: 'قائمة المواد BOM/MRP', labelEn: 'BOM / MRP', icon: Icons.account_tree),
+          const V5Chip(id: 'shop-floor', labelAr: 'إدارة خط الإنتاج', labelEn: 'Shop Floor', icon: Icons.factory),
+        ],
+      ),
+
+      // 1.13 Hotel PMS (first-class)
+      V5MainModule(
+        id: 'hotel-pms',
+        labelAr: 'إدارة الفنادق PMS',
+        labelEn: 'Hotel PMS',
+        icon: Icons.hotel,
+        descriptionAr: 'حجوزات، غرف، نزلاء، فوترة فندقية',
+        chips: const [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الفندق',
+            labelEn: 'Hotel Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'hotel-pms', labelAr: 'إدارة الفندق', labelEn: 'Hotel PMS', icon: Icons.hotel),
+        ],
+      ),
+
+      // 1.14 Construction (first-class)
+      V5MainModule(
+        id: 'construction',
+        labelAr: 'مقاولات البناء',
+        labelEn: 'Construction',
+        icon: Icons.engineering,
+        descriptionAr: 'مشاريع إنشائية، مراحل، تكلفة، مطالبات',
+        chips: const [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة البناء',
+            labelEn: 'Construction Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'construction', labelAr: 'مقاولات البناء', labelEn: 'Construction', icon: Icons.engineering),
+        ],
+      ),
+
+      // 1.15 Industry Packs — simple verticals under one umbrella
+      V5MainModule(
+        id: 'industry-packs',
+        labelAr: 'حزم القطاعات',
+        labelEn: 'Industry Packs',
+        icon: Icons.apps,
+        descriptionAr: 'قطاعات متخصصة — عقارات، صحة، تعليم، نقل، منح، امتياز، إلكترونيات، خدمة ميدانية',
+        chips: const [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة القطاعات',
+            labelEn: 'Industry Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'real-estate', labelAr: 'إدارة العقارات', labelEn: 'Real Estate', icon: Icons.apartment),
+          V5Chip(id: 'healthcare', labelAr: 'مطالبات صحية', labelEn: 'Healthcare Claims', icon: Icons.local_hospital),
+          V5Chip(id: 'education', labelAr: 'إدارة المدارس', labelEn: 'Education SIS', icon: Icons.school),
+          V5Chip(id: 'transport', labelAr: 'النقل واللوجستيات', labelEn: 'Transport TMS', icon: Icons.local_shipping),
+          V5Chip(id: 'grants', labelAr: 'إدارة المنح (NGO)', labelEn: 'Grant Management', icon: Icons.volunteer_activism),
+          V5Chip(id: 'franchise', labelAr: 'الامتياز التجاري', labelEn: 'Franchise', icon: Icons.store_mall_directory),
+          V5Chip(id: 'ecommerce', labelAr: 'المتجر الإلكتروني', labelEn: 'E-Commerce', icon: Icons.shopping_bag),
+          V5Chip(id: 'field-service', labelAr: 'الخدمة الميدانية', labelEn: 'Field Service', icon: Icons.engineering),
+        ],
+      ),
+
+      // 1.16 Reports & BI
+      V5MainModule(
+        id: 'reports-bi',
+        labelAr: 'التقارير والذكاء',
+        labelEn: 'Reports & BI',
+        icon: Icons.assessment,
+        descriptionAr: 'التقارير الجاهزة، منشئ التقارير، لوحة التنفيذيين، OKRs، ESG',
+        chips: [
+          _dashboardChip(
+            id: 'dashboard',
+            labelAr: 'لوحة التقارير',
+            labelEn: 'Reports Dashboard',
+            icon: Icons.dashboard,
+            widgets: _reportsDashboardWidgets,
+          ),
+          const V5Chip(id: 'reports', labelAr: 'التقارير', labelEn: 'Reports', icon: Icons.assessment),
+          const V5Chip(id: 'custom-reports', labelAr: 'منشئ التقارير', labelEn: 'Report Builder', icon: Icons.dashboard_customize),
+          const V5Chip(id: 'exec', labelAr: 'لوحة التنفيذيين', labelEn: 'Executive Dashboard', icon: Icons.star),
+          const V5Chip(id: 'okrs', labelAr: 'الأهداف OKRs', labelEn: 'OKRs', icon: Icons.track_changes),
+          const V5Chip(id: 'esg', labelAr: 'الاستدامة ESG', labelEn: 'ESG', icon: Icons.eco),
         ],
       ),
     ],
@@ -666,6 +934,8 @@ List<V5Service> v5Services = [
           V5Chip(id: 'quality', labelAr: 'إدارة الجودة QMS', labelEn: 'Quality Mgmt', icon: Icons.verified_user),
           V5Chip(id: 'sustainability', labelAr: 'تقارير الاستدامة ESG', labelEn: 'ESG Report', icon: Icons.eco),
           V5Chip(id: 'legal-ai', labelAr: 'المراجعة القانونية AI', labelEn: 'Legal Contract AI', icon: Icons.gavel),
+          V5Chip(id: 'compliance-calendar', labelAr: 'رزنامة الامتثال', labelEn: 'Compliance Calendar', icon: Icons.event_note),
+          V5Chip(id: 'legal-docs-automation', labelAr: 'أتمتة الوثائق القانونية', labelEn: 'Legal Docs Automation', icon: Icons.description),
         ],
       ),
     ],
@@ -779,7 +1049,7 @@ List<V5Service> v5Services = [
         labelAr: 'التحليل الخارجي',
         labelEn: 'External Analysis',
         icon: Icons.search,
-        descriptionAr: 'الرفع، النسب، المقارنة المرجعية، الائتمان',
+        descriptionAr: 'الرفع، النسب، المقارنة المرجعية، الائتمان، محلل دليل الحسابات',
         chips: [
           V5Chip(
             id: 'dashboard',
@@ -790,6 +1060,7 @@ List<V5Service> v5Services = [
             dashboardWidgets: [],
           ),
           V5Chip(id: 'upload', labelAr: 'الرفع والقراءة الضوئية', labelEn: 'Upload & OCR', icon: Icons.upload_file),
+          V5Chip(id: 'coa-analyzer', labelAr: 'محلل دليل الحسابات AI', labelEn: 'CoA Analyzer (AI)', icon: Icons.account_tree),
           V5Chip(id: 'ratios', labelAr: 'النسب المالية', labelEn: 'Ratios', icon: Icons.analytics),
           V5Chip(id: 'benchmarking', labelAr: 'المقارنة المرجعية', labelEn: 'Benchmarking', icon: Icons.compare),
           V5Chip(id: 'credit', labelAr: 'التحليل الائتماني', labelEn: 'Credit', icon: Icons.credit_score),
@@ -897,7 +1168,7 @@ const v5Workspaces = <V5Workspace>[
       V5Shortcut(serviceId: 'erp', mainId: 'treasury', chipId: 'dashboard', labelAr: 'لوحة الخزينة', icon: Icons.account_balance),
       V5Shortcut(serviceId: 'compliance', mainId: 'tax', chipId: 'dashboard', labelAr: 'لوحة الضرائب', icon: Icons.request_quote),
       V5Shortcut(serviceId: 'advisory', mainId: 'feasibility', chipId: 'dashboard', labelAr: 'دراسات الجدوى', icon: Icons.lightbulb),
-      V5Shortcut(serviceId: 'erp', mainId: 'finance', chipId: 'reports', labelAr: 'التقارير', icon: Icons.assessment),
+      V5Shortcut(serviceId: 'erp', mainId: 'reports-bi', chipId: 'dashboard', labelAr: 'التقارير', icon: Icons.assessment),
     ],
   ),
   V5Workspace(
@@ -909,7 +1180,7 @@ const v5Workspaces = <V5Workspace>[
     descriptionAr: 'العمليات اليومية — قيود، فواتير، مطابقة، ضرائب',
     shortcuts: [
       V5Shortcut(serviceId: 'erp', mainId: 'finance', chipId: 'gl', labelAr: 'دفتر الأستاذ', icon: Icons.book),
-      V5Shortcut(serviceId: 'erp', mainId: 'finance', chipId: 'sales', labelAr: 'حسابات القبض', icon: Icons.receipt),
+      V5Shortcut(serviceId: 'erp', mainId: 'sales', chipId: 'sales', labelAr: 'حسابات القبض', icon: Icons.receipt),
       V5Shortcut(serviceId: 'erp', mainId: 'treasury', chipId: 'recon', labelAr: 'المطابقة البنكية', icon: Icons.compare_arrows),
       V5Shortcut(serviceId: 'compliance', mainId: 'zatca', chipId: 'zatca', labelAr: 'زاتكا', icon: Icons.receipt),
       V5Shortcut(serviceId: 'compliance', mainId: 'tax', chipId: 'vat', labelAr: 'VAT', icon: Icons.percent),

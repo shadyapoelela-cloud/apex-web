@@ -1,19 +1,30 @@
 /// APEX V5.1 — Wired Screens Registry.
 ///
 /// Maps V5 chip paths (`{service}/{main}/{chip}`) to the existing
-/// Flutter screens built in brave-yonath (Waves 1-15).
+/// Flutter screens built in brave-yonath (Waves 1-146).
 ///
 /// Pure additive — we don't duplicate logic, we reuse widgets.
 ///
-/// To add more wired screens: append to the _wired map. If a chip is
-/// not in the map, V5 falls back to its default behaviour (dashboard
-/// widgets or V4 sub-module reuse or coming-soon banner).
+/// V4 Blueprint restructure (Phase 1): ERP is now 16 apps instead of 4.
+/// Route keys updated to match new module IDs:
+///   - sales → erp/sales/* (was erp/finance/*)
+///   - purchasing → erp/purchasing/* (was erp/finance/ap + erp/operations/*)
+///   - consolidation → erp/consolidation/* (was erp/finance/*)
+///   - inventory → erp/inventory/* (was erp/operations/*)
+///   - projects → erp/projects/* (was erp/operations/*)
+///   - crm-marketing → erp/crm-marketing/* (was erp/operations/*)
+///   - manufacturing → erp/manufacturing/* (first-class)
+///   - hotel-pms → erp/hotel-pms/* (first-class)
+///   - construction → erp/construction/* (first-class)
+///   - industry-packs → erp/industry-packs/* (was erp/operations/*)
+///   - reports-bi → erp/reports-bi/* (was erp/finance/*)
+///   - expenses → erp/expenses/* (was erp/finance/expenses)
+///   - pos → erp/pos/* (was erp/operations/*)
 library;
 
 import 'package:flutter/material.dart';
 
-// Reuse existing brave-yonath screens (Waves 2-14).
-// These imports may trigger transitive package imports; build verifies.
+// Reuse existing brave-yonath screens (Waves 2-146).
 import '../../screens/v4_ai/ai_agents_gallery_screen.dart';
 import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
@@ -58,6 +69,14 @@ import '../../screens/v4_erp/franchise_management_screen.dart';
 import '../../screens/v4_erp/hotel_pms_screen.dart';
 import '../../screens/v4_erp/marketing_automation_screen.dart';
 import '../../screens/v4_erp/restaurant_pos_screen.dart';
+import '../../screens/v4_erp/retail_pos_screen.dart';
+import '../../screens/v4_erp/service_pos_screen.dart';
+import '../../screens/v4_erp/corporate_cards_screen.dart';
+import '../../screens/v4_erp/travel_per_diem_screen.dart';
+import '../../screens/v4_erp/bom_mrp_screen.dart';
+import '../../screens/v4_erp/shop_floor_screen.dart';
+import '../../screens/v4_erp/resource_allocation_screen.dart';
+import '../../screens/v4_erp/milestone_billing_screen.dart';
 import '../../screens/v4_erp/transport_logistics_screen.dart';
 import '../../screens/v4_erp/grant_management_screen.dart';
 import '../../screens/v4_erp/subscription_billing_screen.dart';
@@ -160,322 +179,298 @@ import '../../screens/v4_erp/vendor_onboarding_screen.dart';
 typedef V5ChipBuilder = Widget Function(BuildContext ctx);
 
 final Map<String, V5ChipBuilder> v5WiredScreens = {
-  // ── ERP ──────────────────────────────────────────────────────────
-  // Note: 'erp/finance/sales' and 'erp/treasury/banks' are intentionally
-  // NOT wired in this POC build — they call the authenticated backend
-  // and would show "unauthorized" without a login flow. They stay in
-  // production (the screens still exist) and fall back to the V5
-  // default dashboard/coming-soon in the POC.
-  // Multiple Views demo (Enhancement #4)
-  'erp/finance/invoices': (ctx) => const InvoicesMultiViewScreen(),
-  // Wave 16 — AI Bank Reconciliation (V5.1 POC)
+  // ════════════════════════════════════════════════════════════════════
+  // ERP — 16 Apps (V4 Blueprint restructure)
+  // ════════════════════════════════════════════════════════════════════
+
+  // ── 1.1 Finance (GL) ─────────────────────────────────────────────
+  'erp/finance/gl': (ctx) => const GeneralLedgerScreen(),
+  'erp/finance/je-builder': (ctx) => const JeBuilderScreen(),
+  'erp/finance/period-close': (ctx) => const CloseChecklistScreen(),
+  'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
+  'erp/finance/coa-editor': (ctx) => const CoaEditorScreen(),
+  'erp/finance/fixed-assets': (ctx) => const FixedAssetsRegisterScreen(),
+  'erp/finance/statements': (ctx) => const FinancialStatementsScreen(),
+  'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
+  'erp/finance/budget-actual': (ctx) => const BudgetVsActualScreen(),
+  'erp/finance/budget-planning': (ctx) => const BudgetPlanningScreen(),
+  'erp/finance/cost-centers': (ctx) => const CostCentersScreen(),
+  'erp/finance/scenarios': (ctx) => const ScenarioPlanningScreen(),
+  'erp/finance/breakeven': (ctx) => const BreakEvenScreen(),
+  'erp/finance/anomalies': (ctx) => const AnomalyDetectorScreen(),
+  'erp/finance/ai-analyst': (ctx) => const AiFinancialAnalystScreen(),
+  'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
+  'erp/finance/integrations': (ctx) => const IntegrationsHubScreen(),
+  'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
+  'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
+
+  // ── 1.2 Consolidation ────────────────────────────────────────────
+  'erp/consolidation/consolidation': (ctx) => const ConsolidationScreen(),
+  'erp/consolidation/intercompany': (ctx) => const IntercompanyScreen(),
+  'erp/consolidation/cap-table': (ctx) => const CapTableScreen(),
+  'erp/consolidation/board': (ctx) => const BoardPackScreen(),
+  'erp/consolidation/ma-deal-room': (ctx) => const MaDealRoomScreen(),
+
+  // ── 1.3 Treasury & Banking ───────────────────────────────────────
   'erp/treasury/recon': (ctx) => const AiBankReconciliationScreen(),
-  // Wave 17 — Purchasing & AP (replaces AP placeholder)
-  'erp/finance/ap': (ctx) => const PurchasingApScreen(),
-  // Wave 18 — HR Employees
+  'erp/treasury/cashflow': (ctx) => const CashFlowForecastScreen(),
+  'erp/treasury/fx': (ctx) => const FxManagementScreen(),
+  'erp/treasury/guarantees': (ctx) => const BankGuaranteesScreen(),
+  'erp/treasury/investments': (ctx) => const InvestmentPortfolioScreen(),
+
+  // ── 1.4 Sales & AR ───────────────────────────────────────────────
+  'erp/sales/sales-workflow': (ctx) => const SalesWorkflowScreen(),
+  'erp/sales/invoices': (ctx) => const InvoicesMultiViewScreen(),
+  'erp/sales/credit-notes': (ctx) => const CreditNotesScreen(),
+  'erp/sales/price-list': (ctx) => const PriceListScreen(),
+  'erp/sales/contracts': (ctx) => const ContractManagementScreen(),
+  'erp/sales/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
+  'erp/sales/credit': (ctx) => const CreditScoringScreen(),
+
+  // ── 1.5 Purchasing & AP ──────────────────────────────────────────
+  'erp/purchasing/ap': (ctx) => const PurchasingApScreen(),
+  'erp/purchasing/suppliers': (ctx) => const Supplier360Screen(),
+  'erp/purchasing/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
+  'erp/purchasing/requisitions': (ctx) => const PurchaseRequisitionScreen(),
+  'erp/purchasing/procurement-rfq': (ctx) => const ProcurementRfqScreen(),
+
+  // ── 1.6 Expenses & Reimbursements ────────────────────────────────
+  'erp/expenses/expenses': (ctx) => const ExpenseClaimsScreen(),
+  'erp/expenses/mobile-receipt': (ctx) => const MobileReceiptScreen(),
+  'erp/expenses/corporate-cards': (ctx) => const CorporateCardsScreen(),
+  'erp/expenses/travel': (ctx) => const TravelPerDiemScreen(),
+
+  // ── 1.7 POS ──────────────────────────────────────────────────────
+  'erp/pos/restaurant-pos': (ctx) => const RestaurantPosScreen(),
+  'erp/pos/retail-pos': (ctx) => const RetailPosScreen(),
+  'erp/pos/service-pos': (ctx) => const ServicePosScreen(),
+
+  // ── 1.8 Inventory & Cost ─────────────────────────────────────────
+  'erp/inventory/inventory': (ctx) => const InventoryDetailedScreen(),
+  'erp/inventory/warehouse': (ctx) => const WarehouseManagementScreen(),
+  'erp/inventory/asset-tracking': (ctx) => const AssetTrackingScreen(),
+  'erp/inventory/fleet': (ctx) => const FleetManagementScreen(),
+  'erp/inventory/warranty': (ctx) => const WarrantyServiceScreen(),
+
+  // ── 1.9 HR & Payroll ─────────────────────────────────────────────
   'erp/hr/employees': (ctx) => const HrEmployeesScreen(),
-  // Wave 40 — Payroll Run
   'erp/hr/payroll': (ctx) => const PayrollRunScreen(),
-  // Wave 19 — Projects (Tasks/Timesheets/Gantt/Billing)
-  'erp/operations/projects': (ctx) => const ProjectsScreen(),
-  // Wave 20 — CRM (Leads/Opportunities/Pipeline/Activities/Contacts)
-  'erp/operations/crm': (ctx) => const CrmScreen(),
-  // Wave 25 — Feasibility Market Analysis (Advisory)
+  'erp/hr/leaves': (ctx) => const LeaveManagementScreen(),
+  'erp/hr/benefits': (ctx) => const BenefitsEosScreen(),
+  'erp/hr/commissions': (ctx) => const CommissionEngineScreen(),
+  'erp/hr/self-service': (ctx) => const EmployeeSelfServiceScreen(),
+  'erp/hr/training': (ctx) => const TrainingLmsScreen(),
+  'erp/hr/performance': (ctx) => const PerformanceReviewsScreen(),
+  'erp/hr/recruitment': (ctx) => const RecruitmentAtsScreen(),
+  'erp/hr/wellness': (ctx) => const EmployeeWellnessScreen(),
+
+  // ── 1.10 Projects & Jobs ─────────────────────────────────────────
+  'erp/projects/projects': (ctx) => const ProjectsScreen(),
+  'erp/projects/project-pnl': (ctx) => const ProjectProfitabilityScreen(),
+  'erp/projects/tickets': (ctx) => const HelpdeskTicketsScreen(),
+  'erp/projects/resource-allocation': (ctx) => const ResourceAllocationScreen(),
+  'erp/projects/milestone-billing': (ctx) => const MilestoneBillingScreen(),
+
+  // ── 1.11 CRM & Marketing ─────────────────────────────────────────
+  'erp/crm-marketing/crm': (ctx) => const CrmScreen(),
+  'erp/crm-marketing/customers-360': (ctx) => const Customer360Screen(),
+  'erp/crm-marketing/pipeline': (ctx) => const SalesPipelineScreen(),
+  'erp/crm-marketing/marketing': (ctx) => const MarketingAutomationScreen(),
+  'erp/crm-marketing/loyalty': (ctx) => const CustomerLoyaltyScreen(),
+  'erp/crm-marketing/whatsapp': (ctx) => const WhatsappBusinessScreen(),
+  'erp/crm-marketing/customer-success': (ctx) => const CustomerSuccessScreen(),
+
+  // ── 1.12 Manufacturing ───────────────────────────────────────────
+  'erp/manufacturing/manufacturing': (ctx) => const ManufacturingScreen(),
+  'erp/manufacturing/bom-mrp': (ctx) => const BomMrpScreen(),
+  'erp/manufacturing/shop-floor': (ctx) => const ShopFloorScreen(),
+
+  // ── 1.13 Hotel PMS ───────────────────────────────────────────────
+  'erp/hotel-pms/hotel-pms': (ctx) => const HotelPmsScreen(),
+
+  // ── 1.14 Construction ────────────────────────────────────────────
+  'erp/construction/construction': (ctx) => const ConstructionScreen(),
+
+  // ── 1.15 Industry Packs ──────────────────────────────────────────
+  'erp/industry-packs/real-estate': (ctx) => const RealEstateScreen(),
+  'erp/industry-packs/healthcare': (ctx) => const HealthcareClaimsScreen(),
+  'erp/industry-packs/education': (ctx) => const EducationLmsScreen(),
+  'erp/industry-packs/transport': (ctx) => const TransportLogisticsScreen(),
+  'erp/industry-packs/grants': (ctx) => const GrantManagementScreen(),
+  'erp/industry-packs/franchise': (ctx) => const FranchiseManagementScreen(),
+  'erp/industry-packs/ecommerce': (ctx) => const EcommerceStoreScreen(),
+  'erp/industry-packs/field-service': (ctx) => const FieldServiceScreen(),
+
+  // ── 1.16 Reports & BI ────────────────────────────────────────────
+  'erp/reports-bi/reports': (ctx) => const AuditReportingScreen(),
+  'erp/reports-bi/custom-reports': (ctx) => const ReportBuilderScreen(),
+  'erp/reports-bi/exec': (ctx) => const ExecutiveDashboardV5Screen(),
+  'erp/reports-bi/okrs': (ctx) => const OkrsScorecardScreen(),
+  'erp/reports-bi/knowledge': (ctx) => const KnowledgeBaseScreen(),
+  'erp/reports-bi/esg': (ctx) => const EsgDashboardScreen(),
+  'erp/reports-bi/bi': (ctx) => const BusinessIntelligenceScreen(),
+  'erp/reports-bi/legal-docs': (ctx) => const LegalDocsAutomationScreen(),
+
+  // ════════════════════════════════════════════════════════════════════
+  // Advisory
+  // ════════════════════════════════════════════════════════════════════
+
   'advisory/feasibility/market': (ctx) => const FeasibilityMarketScreen(),
   'advisory/feasibility/sensitivity': (ctx) => const FeasibilityMarketScreen(),
-  // Wave 26 — External Analysis (Benchmarking + Credit)
+  'advisory/feasibility/proforma': (ctx) => const ProformaStatementsScreen(),
+  'advisory/feasibility/valuation': (ctx) => const ValuationModelsScreen(),
+  'advisory/external/upload': (ctx) => const FinancialUploadScreen(),
+  'advisory/external/coa-analyzer': (ctx) => const CoaEditorScreen(),
   'advisory/external/benchmarking': (ctx) => const ExternalAnalysisScreen(),
   'advisory/external/credit': (ctx) => const ExternalAnalysisScreen(),
-  // Wave 130 — Advisory Tools re-using existing screens
+  'advisory/external/ratios': (ctx) => const AdvancedRatiosScreen(),
   'advisory/tools/fixed_assets': (ctx) => const FixedAssetsRegisterScreen(),
   'advisory/tools/depreciation': (ctx) => const DepreciationScreen(),
   'advisory/tools/lease': (ctx) => const LeaseAccountingScreen(),
   'advisory/tools/breakeven': (ctx) => const BreakEvenScreen(),
-  // Wave 131 — Pro-Forma Financial Statements
-  'advisory/feasibility/proforma': (ctx) => const ProformaStatementsScreen(),
-  // Wave 132 — Valuation Models (DCF, Multiples, LBO)
-  'advisory/feasibility/valuation': (ctx) => const ValuationModelsScreen(),
-  // Wave 133 — Financial Upload + OCR
-  'advisory/external/upload': (ctx) => const FinancialUploadScreen(),
-  // Wave 134 — Advanced Ratios Dashboard (25 ratios)
-  'advisory/external/ratios': (ctx) => const AdvancedRatiosScreen(),
-  // Finance consolidation + reports → existing screens
-  'erp/finance/consolidation': (ctx) => const ConsolidationScreen(),
-  'erp/finance/reports': (ctx) => const AuditReportingScreen(),
 
-  // ── Marketplace Deep ─────────────────────────────────────────────
-  // Wave 27 — Marketplace Billing/Escrow/Payouts
-  'marketplace/client/billing': (ctx) => const MarketplaceBillingScreen(),
-  'marketplace/provider/payouts': (ctx) => const MarketplaceBillingScreen(),
-  // Wave 135 — Client RFP + Proposals
-  'marketplace/client/requests': (ctx) => const MarketplaceClientRequestsScreen(),
-  // Wave 136 — Provider Profile + Certifications
-  'marketplace/provider/profile': (ctx) => const MarketplaceProviderProfileScreen(),
-  // Wave 137 — Provider Active Jobs
-  'marketplace/provider/jobs': (ctx) => const MarketplaceProviderJobsScreen(),
-  // Wave 138 — Provider Ratings & Reviews
-  'marketplace/provider/ratings': (ctx) => const MarketplaceProviderRatingsScreen(),
-  // Wave 139 — ZATCA CSID Certificate Manager
-  'compliance/zatca/csid': (ctx) => const ZatcaCsidManagerScreen(),
-  // Wave 140 — ZATCA Error Decoder
-  'compliance/zatca/errors': (ctx) => const ZatcaErrorDecoderScreen(),
-  // Wave 141 — Unified Tax Filing Center
-  'compliance/tax/filings': (ctx) => const TaxFilingCenterScreen(),
-  // Wave 142 — Business Intelligence 360°
-  'erp/finance/bi': (ctx) => const BusinessIntelligenceScreen(),
-  // Wave 143 — Procurement RFQ Workflow
-  'erp/operations/procurement-rfq': (ctx) => const ProcurementRfqScreen(),
-  // Wave 144 — Customer Success Platform
-  'erp/operations/customer-success': (ctx) => const CustomerSuccessScreen(),
-  // Wave 145 — Legal Document Automation
-  'erp/finance/legal-docs': (ctx) => const LegalDocsAutomationScreen(),
-  // Wave 146 — Global Compliance Calendar
-  'compliance/regulatory/compliance-calendar': (ctx) => const ComplianceCalendarGlobalScreen(),
+  // ════════════════════════════════════════════════════════════════════
+  // Marketplace
+  // ════════════════════════════════════════════════════════════════════
 
-  // Wave 28 — Eligibility Check (KSA SME/Nomu/Tadawul)
-  'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
-  'compliance/regulatory/governance': (ctx) => const GovernanceScreen(),
-  // Wave 32 — Notifications Center
-  'platform/notifications/center': (ctx) => const NotificationsCenterScreen(),
-  // Wave 33 — Industry Packs (F&B / Manufacturing / Healthcare / Logistics / Retail)
-  'marketplace/client/industry-packs': (ctx) => const IndustryPacksScreen(),
-  // Wave 34 — Help Center
-  'platform/help/center': (ctx) => const HelpCenterScreen(),
-  // Wave 37 — JE Builder + Period Close (CRITICAL)
-  'erp/finance/je-builder': (ctx) => const JeBuilderScreen(),
-  'erp/finance/period-close': (ctx) => const PeriodCloseScreen(),
-  // Wave 38 — Sales Workflow (CRITICAL)
-  'erp/finance/sales-workflow': (ctx) => const SalesWorkflowScreen(),
-  // Wave 39 — Financial Statements + CoA + Inventory (CRITICAL)
-  'erp/finance/statements': (ctx) => const FinancialStatementsScreen(),
-  'erp/finance/coa-editor': (ctx) => const CoaEditorScreen(),
-  // Inventory chip is now wired to the detailed view
-  'erp/operations/inventory': (ctx) => const InventoryDetailedScreen(),
-  // Wave 41 — General Ledger viewer (replaces confusing ApexStudio wiring)
-  'erp/finance/gl': (ctx) => const GeneralLedgerScreen(),
-  // Wave 42 — 13-week Cash Flow Forecast
-  'erp/treasury/cashflow': (ctx) => const CashFlowForecastScreen(),
-  // Wave 43 — Zakat Calculator (ZATCA-compliant)
-  'compliance/tax/zakat': (ctx) => const ZakatCalculatorV5Screen(),
-  // Wave 44 — Fixed Assets Register
-  'erp/finance/fixed-assets': (ctx) => const FixedAssetsRegisterScreen(),
-  // Wave 45 — Leave Management
-  'erp/hr/leaves': (ctx) => const LeaveManagementScreen(),
-  // Wave 46 — Manufacturing & BOM
-  'erp/operations/manufacturing': (ctx) => const ManufacturingScreen(),
-  // Wave 47 — WHT Calculator (ZATCA withholding tax)
-  'compliance/tax/wht': (ctx) => const WhtCalculatorV5Screen(),
-  // Wave 48 — Audit Engagement Planning
-  'audit/engagement/planning': (ctx) => const AuditPlanningScreen(),
-  // Wave 49 — FX / Currency Management
-  'erp/treasury/fx': (ctx) => const FxManagementScreen(),
-  // Wave 50 — UAE Corporate Tax
-  'compliance/tax/uae_ct': (ctx) => const UaeCtScreen(),
-  // Wave 51 — Transfer Pricing
-  'compliance/tax/tp': (ctx) => const TransferPricingV5Screen(),
-  // Wave 52 — Budget vs Actual
-  'erp/finance/budget-actual': (ctx) => const BudgetVsActualScreen(),
-  // Wave 53 — Benefits & End-of-Service
-  'erp/hr/benefits': (ctx) => const BenefitsEosScreen(),
-  // Wave 54 — Tax Calendar (unified deadlines)
-  'compliance/tax/calendar': (ctx) => const TaxCalendarScreen(),
-  // Wave 55 — Expense Claims
-  'erp/finance/expenses': (ctx) => const ExpenseClaimsScreen(),
-  // Wave 56 — Audit Acceptance
-  'audit/engagement/acceptance': (ctx) => const AuditAcceptanceScreen(),
-  // Wave 57 — Supplier 360
-  'erp/operations/suppliers': (ctx) => const Supplier360Screen(),
-  // Wave 58 — Customer 360
-  'erp/operations/customers-360': (ctx) => const Customer360Screen(),
-  // Wave 59 — Audit Kickoff
-  'audit/engagement/kickoff': (ctx) => const AuditKickoffScreen(),
-  // Wave 60 — Sales Pipeline (Kanban)
-  'erp/operations/pipeline': (ctx) => const SalesPipelineScreen(),
-  // Wave 61 — Contract Management
-  'erp/operations/contracts': (ctx) => const ContractManagementScreen(),
-  // Wave 62 — Executive Dashboard (C-Suite)
-  'erp/finance/exec': (ctx) => const ExecutiveDashboardV5Screen(),
-  // Wave 63 — Document Vault / DMS
-  'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
-  // Wave 64 — Activity Log / Audit Trail
-  'compliance/regulatory/activity-log': (ctx) => const ActivityLogScreen(),
-  // Wave 65 — VAT Return Builder
-  'compliance/tax/vat-return': (ctx) => const VatReturnBuilderScreen(),
-  // Wave 66 — Project Profitability
-  'erp/operations/project-pnl': (ctx) => const ProjectProfitabilityScreen(),
-  // Wave 67 — Financial Close Checklist
-  'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
-  // Wave 68 — OKRs / KPI Scorecard
-  'erp/finance/okrs': (ctx) => const OkrsScorecardScreen(),
-  // Wave 69 — Bank Guarantees & L/Cs
-  'erp/treasury/guarantees': (ctx) => const BankGuaranteesScreen(),
-  // Wave 70 — Approval Workflows & DoA Matrix
-  'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
-  // Wave 71 — Deferred Tax (IAS 12)
-  'compliance/tax/deferred': (ctx) => const DeferredTaxScreen(),
-  // Wave 72 — Helpdesk / Tickets
-  'erp/operations/tickets': (ctx) => const HelpdeskTicketsScreen(),
-  // Wave 73 — AI Anomaly Detector
-  'erp/finance/anomalies': (ctx) => const AnomalyDetectorScreen(),
-  // Wave 74 — AI Copilot / Chat
-  'erp/finance/copilot': (ctx) => const AiCopilotScreen(),
-  // Wave 75 — Sales Commission Engine
-  'erp/hr/commissions': (ctx) => const CommissionEngineScreen(),
-  // Wave 76 — Vendor Onboarding Wizard
-  'erp/operations/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
-  // Wave 77 — ESG / Sustainability
-  'erp/finance/esg': (ctx) => const EsgDashboardScreen(),
-  // Wave 78 — Scenario Planning / What-If
-  'erp/finance/scenarios': (ctx) => const ScenarioPlanningScreen(),
-  // Wave 79 — Break-Even Analysis
-  'erp/finance/breakeven': (ctx) => const BreakEvenScreen(),
-  // Wave 80 — Internal Controls Library
-  'audit/fieldwork/controls-library': (ctx) => const ControlsLibraryScreen(),
-  // Wave 81 — Employee Self-Service
-  'erp/hr/self-service': (ctx) => const EmployeeSelfServiceScreen(),
-  // Wave 82 — Knowledge Base
-  'erp/finance/knowledge': (ctx) => const KnowledgeBaseScreen(),
-  // Wave 83 — Board Pack / Meeting Portal
-  'erp/finance/board': (ctx) => const BoardPackScreen(),
-  // Wave 84 — Training / LMS
-  'erp/hr/training': (ctx) => const TrainingLmsScreen(),
-  // Wave 85 — Cost Centers Analysis
-  'erp/finance/cost-centers': (ctx) => const CostCentersScreen(),
-  // Wave 86 — Cybersecurity SOC Dashboard
-  'compliance/regulatory/cybersecurity': (ctx) => const CybersecurityDashboardScreen(),
-  // Wave 87 — Purchase Requisition
-  'erp/operations/requisitions': (ctx) => const PurchaseRequisitionScreen(),
-  // Wave 88 — Investment Portfolio
-  'erp/treasury/investments': (ctx) => const InvestmentPortfolioScreen(),
-  // Wave 89 — Cap Table / Shareholders
-  'erp/finance/cap-table': (ctx) => const CapTableScreen(),
-  // Wave 90 — Enterprise Risk Register
-  'compliance/regulatory/risk-register': (ctx) => const RiskRegisterScreen(),
-  // Wave 91 — Subscription Management (SaaS Billing)
-  'marketplace/billing/subscriptions': (ctx) => const SubscriptionManagementScreen(),
-  // Wave 92 — Whistleblower / Ethics Hotline
-  'compliance/regulatory/whistleblower': (ctx) => const WhistleblowerScreen(),
-  // Wave 93 — Performance Reviews (360°)
-  'erp/hr/performance': (ctx) => const PerformanceReviewsScreen(),
-  // Wave 94 — Integrations Hub
-  'erp/finance/integrations': (ctx) => const IntegrationsHubScreen(),
-  // Wave 95 — Recruitment / ATS
-  'erp/hr/recruitment': (ctx) => const RecruitmentAtsScreen(),
-  // Wave 96 — Fleet Management
-  'erp/operations/fleet': (ctx) => const FleetManagementScreen(),
-  // Wave 97 — Business Continuity Plan
-  'compliance/regulatory/bcp': (ctx) => const BcpScreen(),
-  // Wave 98 — Lease Accounting (IFRS 16)
-  'compliance/tax/leases': (ctx) => const LeaseAccountingScreen(),
-  // Wave 99 — Intercompany Reconciliation
-  'erp/finance/intercompany': (ctx) => const IntercompanyScreen(),
-  // 🎉 Wave 100 — Customer Loyalty & Rewards (MILESTONE)
-  'erp/operations/loyalty': (ctx) => const CustomerLoyaltyScreen(),
-  // Wave 101 — Customer Credit Scoring
-  'erp/finance/credit': (ctx) => const CreditScoringScreen(),
-  // Wave 102 — Price List & Catalog
-  'erp/operations/price-list': (ctx) => const PriceListScreen(),
-  // Wave 103 — Warranty & Service
-  'erp/operations/warranty': (ctx) => const WarrantyServiceScreen(),
-  // Wave 104 — Warehouse Management (WMS)
-  'erp/operations/warehouse': (ctx) => const WarehouseManagementScreen(),
-  // Wave 105 — Revenue Recognition (IFRS 15)
-  'compliance/tax/revenue-recognition': (ctx) => const RevenueRecognitionScreen(),
-  // Wave 106 — Credit Notes & Refunds
-  'erp/finance/credit-notes': (ctx) => const CreditNotesScreen(),
-  // Wave 107 — Quality Management (ISO 9001)
-  'compliance/regulatory/quality': (ctx) => const QualityManagementScreen(),
-  // Wave 108 — Asset Tracking (Barcode/RFID)
-  'erp/operations/asset-tracking': (ctx) => const AssetTrackingScreen(),
-  // Wave 109 — Budget Planning Workflow
-  'erp/finance/budget-planning': (ctx) => const BudgetPlanningScreen(),
-  // 🎉 Wave 110 — WhatsApp Business (MILESTONE)
-  'erp/operations/whatsapp': (ctx) => const WhatsappBusinessScreen(),
-  // Wave 111 — Construction Project Accounting
-  'erp/operations/construction': (ctx) => const ConstructionScreen(),
-  // Wave 112 — Real Estate Property Management
-  'erp/operations/real-estate': (ctx) => const RealEstateScreen(),
-  // Wave 113 — Healthcare Claims Processing
-  'erp/operations/healthcare': (ctx) => const HealthcareClaimsScreen(),
-  // Wave 114 — NGO / Grant Management
-  'erp/operations/grants': (ctx) => const GrantManagementScreen(),
-  // Wave 115 — Franchise Management
-  'erp/operations/franchise': (ctx) => const FranchiseManagementScreen(),
-  // Wave 116 — E-Commerce Store
-  'erp/operations/ecommerce': (ctx) => const EcommerceStoreScreen(),
-  // Wave 117 — Subscription Billing (Stripe-class)
-  'erp/finance/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
-  // Wave 118 — ESG Sustainability Report (GRI/SASB/TCFD)
-  'compliance/regulatory/sustainability': (ctx) => const SustainabilityReportScreen(),
-  // Wave 119 — Field Service Management
-  'erp/operations/field-service': (ctx) => const FieldServiceScreen(),
-  // 🎉 Wave 120 — Restaurant POS (MILESTONE)
-  'erp/operations/restaurant-pos': (ctx) => const RestaurantPosScreen(),
-  // Wave 121 — Hotel PMS (Opera-class)
-  'erp/operations/hotel-pms': (ctx) => const HotelPmsScreen(),
-  // Wave 122 — Marketing Automation (HubSpot-class)
-  'erp/operations/marketing': (ctx) => const MarketingAutomationScreen(),
-  // Wave 123 — Education SIS
-  'erp/operations/education': (ctx) => const EducationLmsScreen(),
-  // Wave 124 — Transport & Logistics (TMS)
-  'erp/operations/transport': (ctx) => const TransportLogisticsScreen(),
-  // 🎉 Wave 125 — AI Financial Analyst (CAPSTONE)
-  'erp/finance/ai-analyst': (ctx) => const AiFinancialAnalystScreen(),
-  // Wave 126 — Legal Contract AI Review
-  'compliance/regulatory/legal-ai': (ctx) => const LegalContractAiScreen(),
-  // Wave 127 — Tax Planning & Optimization Simulator
-  'compliance/tax/optimizer': (ctx) => const TaxOptimizerScreen(),
-  // Wave 128 — M&A Deal Room / Virtual DD
-  'erp/finance/ma-deal-room': (ctx) => const MaDealRoomScreen(),
-  // Wave 129 — Employee Wellness & Engagement
-  'erp/hr/wellness': (ctx) => const EmployeeWellnessScreen(),
-  // Wave 35 — AI Agents Gallery
-  'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
-  // Wave 36 — Global Search Results
-  'platform/search/results': (ctx) => const GlobalSearchScreen(),
-  // Wave 29 — Admin Panel (Tenant Settings + Users + Integrations)
-  'platform/admin/settings': (ctx) => const AdminPanelScreen(),
-  // Wave 30 — Custom Report Builder
-  'erp/finance/custom-reports': (ctx) => const ReportBuilderScreen(),
-  // Onboarding Journey (#8)
-  'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
-  // Connected Planning Drivers (#16) — Anaplan replacement
-  'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
-  // Mobile Receipt Capture (#20) — Expensify replacement
-  // Lives under Operations as a dedicated chip, not under Finance.
-  'erp/operations/mobile-receipt': (ctx) => const MobileReceiptScreen(),
-  // Client Portal (#12) — Freshbooks replacement
-  'platform/portal/client': (ctx) => const ClientPortalScreen(),
-  // APEX Studio no-code (#11) — Odoo Studio replacement
-  'platform/studio/builder': (ctx) => const ApexStudioScreen(),
-
-  // ── Marketplace ──────────────────────────────────────────────────
-  // APEX Match AI pairing (#15) — Toptal-style
   'marketplace/client/browse': (ctx) => const ApexMatchScreen(),
+  'marketplace/client/requests': (ctx) => const MarketplaceClientRequestsScreen(),
+  'marketplace/client/billing': (ctx) => const MarketplaceBillingScreen(),
+  'marketplace/client/industry-packs': (ctx) => const IndustryPacksScreen(),
+  'marketplace/provider/profile': (ctx) => const MarketplaceProviderProfileScreen(),
+  'marketplace/provider/jobs': (ctx) => const MarketplaceProviderJobsScreen(),
+  'marketplace/provider/payouts': (ctx) => const MarketplaceBillingScreen(),
+  'marketplace/provider/ratings': (ctx) => const MarketplaceProviderRatingsScreen(),
+  'marketplace/billing/subscriptions': (ctx) => const SubscriptionManagementScreen(),
 
-  // ── Compliance & Tax ─────────────────────────────────────────────
-  // ZATCA CSID / queue screens call the authenticated backend — not
-  // wired in POC (same reason as sales/banks above).
-  // Real-time GCC Tax Calculator — World-first feature
+  // ════════════════════════════════════════════════════════════════════
+  // Compliance & Tax
+  // ════════════════════════════════════════════════════════════════════
+
   'compliance/tax/vat': (ctx) => const RealtimeTaxScreen(),
   'compliance/tax/realtime': (ctx) => const RealtimeTaxScreen(),
+  'compliance/tax/wht': (ctx) => const WhtCalculatorV5Screen(),
+  'compliance/tax/zakat': (ctx) => const ZakatCalculatorV5Screen(),
+  'compliance/tax/uae_ct': (ctx) => const UaeCtScreen(),
+  'compliance/tax/tp': (ctx) => const TransferPricingV5Screen(),
+  'compliance/tax/calendar': (ctx) => const TaxCalendarScreen(),
+  'compliance/tax/vat-return': (ctx) => const VatReturnBuilderScreen(),
+  'compliance/tax/deferred': (ctx) => const DeferredTaxScreen(),
+  'compliance/tax/leases': (ctx) => const LeaseAccountingScreen(),
+  'compliance/tax/revenue-recognition': (ctx) => const RevenueRecognitionScreen(),
+  'compliance/tax/optimizer': (ctx) => const TaxOptimizerScreen(),
+  'compliance/tax/filings': (ctx) => const TaxFilingCenterScreen(),
 
-  // Wave 21 — GOSI & WPS UI
+  'compliance/zatca/csid': (ctx) => const ZatcaCsidManagerScreen(),
+  'compliance/zatca/errors': (ctx) => const ZatcaErrorDecoderScreen(),
+
   'compliance/regulatory/gosi': (ctx) => const GosiWpsScreen(),
   'compliance/regulatory/wps': (ctx) => const GosiWpsScreen(),
-  // Wave 22 — AML & KYC (override the previous placeholder)
   'compliance/regulatory/aml': (ctx) => const AmlKycScreen(),
+  'compliance/regulatory/governance': (ctx) => const GovernanceScreen(),
+  'compliance/regulatory/activity-log': (ctx) => const ActivityLogScreen(),
+  'compliance/regulatory/cybersecurity': (ctx) => const CybersecurityDashboardScreen(),
+  'compliance/regulatory/risk-register': (ctx) => const RiskRegisterScreen(),
+  'compliance/regulatory/whistleblower': (ctx) => const WhistleblowerScreen(),
+  'compliance/regulatory/bcp': (ctx) => const BcpScreen(),
+  'compliance/regulatory/quality': (ctx) => const QualityManagementScreen(),
+  'compliance/regulatory/sustainability': (ctx) => const SustainabilityReportScreen(),
+  'compliance/regulatory/legal-ai': (ctx) => const LegalContractAiScreen(),
+  'compliance/regulatory/compliance-calendar': (ctx) => const ComplianceCalendarGlobalScreen(),
+  'compliance/regulatory/legal-docs-automation': (ctx) => const LegalDocsAutomationScreen(),
+  'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
 
-  // ── Audit ────────────────────────────────────────────────────────
-  'audit/fieldwork/risk': (ctx) => const ComplianceStatusScreen(),
-  // Wave 17 Audit Analytics (Inflo/MindBridge replacement)
-  'audit/fieldwork/control': (ctx) => const AuditAnalyticsScreen(),
-  // Wave 23 — Workpapers detailed view (CaseWare-class)
+  // ════════════════════════════════════════════════════════════════════
+  // Audit
+  // ════════════════════════════════════════════════════════════════════
+
+  'audit/engagement/planning': (ctx) => const AuditPlanningScreen(),
+  'audit/engagement/acceptance': (ctx) => const AuditAcceptanceScreen(),
+  'audit/engagement/kickoff': (ctx) => const AuditKickoffScreen(),
   'audit/fieldwork/workpapers': (ctx) => const WorkpapersDetailScreen(),
-  // Wave 24 — Audit Reporting (Opinion Builder + Management Letter + QC)
+  'audit/fieldwork/controls-library': (ctx) => const ControlsLibraryScreen(),
+  'audit/fieldwork/risk': (ctx) => const ComplianceStatusScreen(),
+  'audit/fieldwork/control': (ctx) => const AuditAnalyticsScreen(),
   'audit/reporting/opinion': (ctx) => const AuditReportingScreen(),
   'audit/reporting/ml': (ctx) => const AuditReportingScreen(),
   'audit/reporting/qc': (ctx) => const AuditReportingScreen(),
+
+  // ════════════════════════════════════════════════════════════════════
+  // Platform (horizontal layer) — rendered in shell, not as chips
+  // ════════════════════════════════════════════════════════════════════
+
+  'platform/notifications/center': (ctx) => const NotificationsCenterScreen(),
+  'platform/help/center': (ctx) => const HelpCenterScreen(),
+  'platform/ai/agents': (ctx) => const AiAgentsGalleryScreen(),
+  'platform/ai/copilot': (ctx) => const AiCopilotScreen(),
+  'platform/search/results': (ctx) => const GlobalSearchScreen(),
+  'platform/admin/settings': (ctx) => const AdminPanelScreen(),
+  'platform/portal/client': (ctx) => const ClientPortalScreen(),
+  'platform/studio/builder': (ctx) => const ApexStudioScreen(),
+
+  // ════════════════════════════════════════════════════════════════════
+  // Backward-compat aliases (old V4 routes → new V5.1 routes)
+  // These preserve deep-linked bookmarks during the transition.
+  // ════════════════════════════════════════════════════════════════════
+
+  // finance → sales/purchasing/consolidation/expenses/reports-bi
+  'erp/finance/ap': (ctx) => const PurchasingApScreen(),
+  'erp/finance/sales-workflow': (ctx) => const SalesWorkflowScreen(),
+  'erp/finance/invoices': (ctx) => const InvoicesMultiViewScreen(),
+  'erp/finance/credit-notes': (ctx) => const CreditNotesScreen(),
+  'erp/finance/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
+  'erp/finance/credit': (ctx) => const CreditScoringScreen(),
+  'erp/finance/consolidation': (ctx) => const ConsolidationScreen(),
+  'erp/finance/intercompany': (ctx) => const IntercompanyScreen(),
+  'erp/finance/cap-table': (ctx) => const CapTableScreen(),
+  'erp/finance/board': (ctx) => const BoardPackScreen(),
+  'erp/finance/ma-deal-room': (ctx) => const MaDealRoomScreen(),
+  'erp/finance/expenses': (ctx) => const ExpenseClaimsScreen(),
+  'erp/finance/reports': (ctx) => const AuditReportingScreen(),
+  'erp/finance/custom-reports': (ctx) => const ReportBuilderScreen(),
+  'erp/finance/exec': (ctx) => const ExecutiveDashboardV5Screen(),
+  'erp/finance/okrs': (ctx) => const OkrsScorecardScreen(),
+  'erp/finance/knowledge': (ctx) => const KnowledgeBaseScreen(),
+  'erp/finance/esg': (ctx) => const EsgDashboardScreen(),
+  'erp/finance/bi': (ctx) => const BusinessIntelligenceScreen(),
+  'erp/finance/legal-docs': (ctx) => const LegalDocsAutomationScreen(),
+  'erp/finance/copilot': (ctx) => const AiCopilotScreen(),
+
+  // operations → inventory/projects/crm-marketing/manufacturing/pos/hotel/construction/industry-packs/purchasing/sales
+  'erp/operations/inventory': (ctx) => const InventoryDetailedScreen(),
+  'erp/operations/warehouse': (ctx) => const WarehouseManagementScreen(),
+  'erp/operations/asset-tracking': (ctx) => const AssetTrackingScreen(),
+  'erp/operations/fleet': (ctx) => const FleetManagementScreen(),
+  'erp/operations/warranty': (ctx) => const WarrantyServiceScreen(),
+  'erp/operations/projects': (ctx) => const ProjectsScreen(),
+  'erp/operations/project-pnl': (ctx) => const ProjectProfitabilityScreen(),
+  'erp/operations/tickets': (ctx) => const HelpdeskTicketsScreen(),
+  'erp/operations/crm': (ctx) => const CrmScreen(),
+  'erp/operations/customers-360': (ctx) => const Customer360Screen(),
+  'erp/operations/pipeline': (ctx) => const SalesPipelineScreen(),
+  'erp/operations/loyalty': (ctx) => const CustomerLoyaltyScreen(),
+  'erp/operations/whatsapp': (ctx) => const WhatsappBusinessScreen(),
+  'erp/operations/marketing': (ctx) => const MarketingAutomationScreen(),
+  'erp/operations/customer-success': (ctx) => const CustomerSuccessScreen(),
+  'erp/operations/suppliers': (ctx) => const Supplier360Screen(),
+  'erp/operations/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
+  'erp/operations/requisitions': (ctx) => const PurchaseRequisitionScreen(),
+  'erp/operations/procurement-rfq': (ctx) => const ProcurementRfqScreen(),
+  'erp/operations/price-list': (ctx) => const PriceListScreen(),
+  'erp/operations/contracts': (ctx) => const ContractManagementScreen(),
+  'erp/operations/manufacturing': (ctx) => const ManufacturingScreen(),
+  'erp/operations/restaurant-pos': (ctx) => const RestaurantPosScreen(),
+  'erp/operations/hotel-pms': (ctx) => const HotelPmsScreen(),
+  'erp/operations/construction': (ctx) => const ConstructionScreen(),
+  'erp/operations/real-estate': (ctx) => const RealEstateScreen(),
+  'erp/operations/healthcare': (ctx) => const HealthcareClaimsScreen(),
+  'erp/operations/education': (ctx) => const EducationLmsScreen(),
+  'erp/operations/transport': (ctx) => const TransportLogisticsScreen(),
+  'erp/operations/grants': (ctx) => const GrantManagementScreen(),
+  'erp/operations/franchise': (ctx) => const FranchiseManagementScreen(),
+  'erp/operations/ecommerce': (ctx) => const EcommerceStoreScreen(),
+  'erp/operations/field-service': (ctx) => const FieldServiceScreen(),
+  'erp/operations/mobile-receipt': (ctx) => const MobileReceiptScreen(),
 
   // Note: AiGuardrailsScreen is API-backed so it's not wired here.
   // In production it lives under /settings/ai-agents with auth.

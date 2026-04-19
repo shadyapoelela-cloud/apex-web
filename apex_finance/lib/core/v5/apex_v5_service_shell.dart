@@ -15,12 +15,15 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'apex_v5_action_dashboard.dart';
 import 'apex_v5_news_ticker.dart';
 import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
+import 'cmd_k_palette.dart';
+import 'entity_scope_selector.dart';
 import 'v5_models.dart';
 
 class ApexV5ServiceShell extends StatelessWidget {
@@ -45,11 +48,22 @@ class ApexV5ServiceShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final isNarrow = MediaQuery.of(context).size.width < 900;
 
-    return Scaffold(
-      body: Column(
-        children: [
-          // ── Top Bar ──────────────────────────────────────────────
-          _TopBar(service: service, mainModule: mainModule, activeChip: activeChip),
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () {
+          CmdKPalette.show(context);
+        },
+        const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () {
+          CmdKPalette.show(context);
+        },
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          body: Column(
+            children: [
+              // ── Top Bar ──────────────────────────────────────────────
+              _TopBar(service: service, mainModule: mainModule, activeChip: activeChip),
           const ApexV5NewsTicker(),
           const Divider(height: 1),
           // ── Body: Sidebar + Content ──────────────────────────────
@@ -78,11 +92,13 @@ class ApexV5ServiceShell extends StatelessWidget {
           ),
         ],
       ),
-      drawer: isNarrow
-          ? Drawer(
-              child: _Sidebar(service: service, activeMainId: mainModule.id),
-            )
-          : null,
+          drawer: isNarrow
+              ? Drawer(
+                  child: _Sidebar(service: service, activeMainId: mainModule.id),
+                )
+              : null,
+        ),
+      ),
     );
   }
 
@@ -191,17 +207,44 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           const Spacer(),
+          // Entity Scope Selector (Wave 147) — consolidation across entities
+          const EntityScopeSelector(),
+          const SizedBox(width: 10),
           // Workspace selector
           const ApexV5WorkspaceSelector(),
           const SizedBox(width: 8),
-          // Command Palette hint button
-          _CmdKHint(),
+          // Command Palette hint button (opens on click or Ctrl+K)
+          Builder(
+            builder: (ctx) => InkWell(
+              onTap: () => CmdKPalette.show(ctx),
+              borderRadius: BorderRadius.circular(6),
+              child: _CmdKHint(),
+            ),
+          ),
           const SizedBox(width: 4),
+          // Knowledge base search (horizontal layer)
+          Builder(
+            builder: (ctx) => IconButton(
+              tooltip: 'قاعدة المعرفة',
+              icon: const Icon(Icons.menu_book_outlined),
+              onPressed: () => ctx.go('/app/erp/reports-bi/knowledge'),
+            ),
+          ),
+          // Cog icon (per-app settings)
+          Builder(
+            builder: (ctx) => IconButton(
+              tooltip: 'إعدادات ${mainModule.labelAr}',
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: () => _showAppSettings(ctx, service, mainModule),
+            ),
+          ),
           // Notifications bell
-          IconButton(
-            tooltip: 'التنبيهات',
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
+          Builder(
+            builder: (ctx) => IconButton(
+              tooltip: 'التنبيهات',
+              icon: const Icon(Icons.notifications_outlined),
+              onPressed: () => ctx.go('/app/platform/notifications/center'),
+            ),
           ),
           // Avatar
           Padding(
@@ -214,6 +257,91 @@ class _TopBar extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showAppSettings(BuildContext context, V5Service svc, V5MainModule app) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: Row(
+            children: [
+              Icon(app.icon, color: svc.color),
+              const SizedBox(width: 10),
+              Expanded(child: Text('إعدادات ${app.labelAr}', style: const TextStyle(fontSize: 16))),
+            ],
+          ),
+          content: SizedBox(
+            width: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SettingTile(
+                  icon: Icons.tune,
+                  title: 'تخصيص الشاشات',
+                  sub: 'أظهر/أخفِ الشاشات في هذا التطبيق',
+                  onTap: () {},
+                ),
+                _SettingTile(
+                  icon: Icons.lock_outline,
+                  title: 'الصلاحيات والأدوار',
+                  sub: 'من يستطيع الوصول لهذا التطبيق',
+                  onTap: () {},
+                ),
+                _SettingTile(
+                  icon: Icons.notifications_active_outlined,
+                  title: 'قواعد التنبيه',
+                  sub: 'تنبيهات ذكية مبنية على بيانات التطبيق',
+                  onTap: () {},
+                ),
+                _SettingTile(
+                  icon: Icons.api,
+                  title: 'التكامل مع API',
+                  sub: 'مفاتيح API وWebhooks للتطبيق',
+                  onTap: () {},
+                ),
+                _SettingTile(
+                  icon: Icons.import_export,
+                  title: 'استيراد / تصدير',
+                  sub: 'تصدير البيانات أو استيرادها',
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('إغلاق'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String sub;
+  final VoidCallback onTap;
+  const _SettingTile({required this.icon, required this.title, required this.sub, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: const Color(0xFFD4AF37).withOpacity(0.15),
+        child: Icon(icon, color: const Color(0xFFD4AF37), size: 18),
+      ),
+      title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+      subtitle: Text(sub, style: const TextStyle(fontSize: 11)),
+      trailing: const Icon(Icons.chevron_left, size: 18),
+      onTap: onTap,
     );
   }
 }
