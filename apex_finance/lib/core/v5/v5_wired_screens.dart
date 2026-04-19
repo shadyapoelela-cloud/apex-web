@@ -178,6 +178,10 @@ import '../../screens/v5_2/customer_360_v52_screen.dart';
 import '../../screens/v5_2/supplier_360_v52_screen.dart';
 import '../../screens/v5_2/crm_v52_screen.dart';
 import '../../screens/v5_2/vat_return_v52_screen.dart';
+import '../../screens/v5_2/sales_pipeline_v52_screen.dart';
+import '../../screens/v5_2/projects_v52_screen.dart';
+import '../../screens/v5_2/audit_planning_v52_screen.dart';
+import '../../screens/v5_2/contract_v52_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -232,7 +236,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/sales/invoices': (ctx) => const InvoicesV52Screen(),  // V5.2 MultiView
   'erp/sales/credit-notes': (ctx) => const CreditNotesScreen(),
   'erp/sales/price-list': (ctx) => const PriceListScreen(),
-  'erp/sales/contracts': (ctx) => const ContractManagementScreen(),
+  'erp/sales/contracts': (ctx) => const ContractV52Screen(),  // V5.2 ObjectPage
   'erp/sales/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
   'erp/sales/credit': (ctx) => const CreditScoringScreen(),
 
@@ -274,7 +278,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/hr/wellness': (ctx) => const EmployeeWellnessScreen(),
 
   // ── 1.10 Projects & Jobs ─────────────────────────────────────────
-  'erp/projects/projects': (ctx) => const ProjectsScreen(),
+  'erp/projects/projects': (ctx) => const ProjectsV52Screen(),  // V5.2
   'erp/projects/project-pnl': (ctx) => const ProjectProfitabilityScreen(),
   'erp/projects/tickets': (ctx) => const HelpdeskTicketsScreen(),
   'erp/projects/resource-allocation': (ctx) => const ResourceAllocationScreen(),
@@ -283,7 +287,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── 1.11 CRM & Marketing ─────────────────────────────────────────
   'erp/crm-marketing/crm': (ctx) => const CrmV52Screen(),  // V5.2 MultiView
   'erp/crm-marketing/customers-360': (ctx) => const Customer360V52Screen(),  // V5.2 ObjectPage
-  'erp/crm-marketing/pipeline': (ctx) => const SalesPipelineScreen(),
+  'erp/crm-marketing/pipeline': (ctx) => const SalesPipelineV52Screen(),  // V5.2
   'erp/crm-marketing/marketing': (ctx) => const MarketingAutomationScreen(),
   'erp/crm-marketing/loyalty': (ctx) => const CustomerLoyaltyScreen(),
   'erp/crm-marketing/whatsapp': (ctx) => const WhatsappBusinessScreen(),
@@ -496,7 +500,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // 3.1 Engagement
   'audit/engagement/acceptance': (ctx) => const AuditAcceptanceScreen(),
-  'audit/engagement/planning': (ctx) => const AuditPlanningScreen(),
+  'audit/engagement/planning': (ctx) => const AuditPlanningV52Screen(),  // V5.2 Wizard
   'audit/engagement/kickoff': (ctx) => const AuditKickoffScreen(),
   'audit/engagement/materiality': (ctx) => const AuditPlanningScreen(),
 
