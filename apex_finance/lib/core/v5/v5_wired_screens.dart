@@ -20,6 +20,10 @@ import '../../screens/v4_compliance/audit_analytics_screen.dart';
 import '../../screens/v4_compliance/audit_reporting_screen.dart';
 import '../../screens/compliance/consolidation_screen.dart';
 import '../../screens/compliance/depreciation_screen.dart';
+import '../../screens/v4_compliance/tax_filing_center_screen.dart';
+import '../../screens/v4_compliance/zatca_csid_manager_screen.dart';
+import '../../screens/v4_compliance/zatca_error_decoder_screen.dart';
+import '../../screens/v4_erp/business_intelligence_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/gosi_wps_screen.dart';
 import '../../screens/v4_compliance/governance_screen.dart';
@@ -207,6 +211,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'marketplace/provider/jobs': (ctx) => const MarketplaceProviderJobsScreen(),
   // Wave 138 — Provider Ratings & Reviews
   'marketplace/provider/ratings': (ctx) => const MarketplaceProviderRatingsScreen(),
+  // Wave 139 — ZATCA CSID Certificate Manager
+  'compliance/zatca/csid': (ctx) => const ZatcaCsidManagerScreen(),
+  // Wave 140 — ZATCA Error Decoder
+  'compliance/zatca/errors': (ctx) => const ZatcaErrorDecoderScreen(),
+  // Wave 141 — Unified Tax Filing Center
+  'compliance/tax/filings': (ctx) => const TaxFilingCenterScreen(),
+  // Wave 142 — Business Intelligence 360°
+  'erp/finance/bi': (ctx) => const BusinessIntelligenceScreen(),
 
   // Wave 28 — Eligibility Check (KSA SME/Nomu/Tadawul)
   'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
