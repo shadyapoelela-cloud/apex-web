@@ -28,6 +28,7 @@ import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
 import '../../screens/v4_erp/ai_financial_analyst_screen.dart';
+import '../../screens/v4_erp/advanced_ratios_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_erp/asset_tracking_screen.dart';
@@ -36,7 +37,10 @@ import '../../screens/v4_erp/construction_screen.dart';
 import '../../screens/v4_erp/ecommerce_store_screen.dart';
 import '../../screens/v4_erp/education_lms_screen.dart';
 import '../../screens/v4_erp/employee_wellness_screen.dart';
+import '../../screens/v4_erp/financial_upload_screen.dart';
 import '../../screens/v4_erp/ma_deal_room_screen.dart';
+import '../../screens/v4_erp/proforma_statements_screen.dart';
+import '../../screens/v4_erp/valuation_models_screen.dart';
 import '../../screens/v4_erp/field_service_screen.dart';
 import '../../screens/v4_erp/franchise_management_screen.dart';
 import '../../screens/v4_erp/hotel_pms_screen.dart';
@@ -175,9 +179,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'advisory/tools/depreciation': (ctx) => const DepreciationScreen(),
   'advisory/tools/lease': (ctx) => const LeaseAccountingScreen(),
   'advisory/tools/breakeven': (ctx) => const BreakEvenScreen(),
-  // External upload + ratios share the feasibility/external analysis screen.
-  'advisory/external/upload': (ctx) => const ExternalAnalysisScreen(),
-  'advisory/external/ratios': (ctx) => const ExternalAnalysisScreen(),
+  // Wave 131 — Pro-Forma Financial Statements
+  'advisory/feasibility/proforma': (ctx) => const ProformaStatementsScreen(),
+  // Wave 132 — Valuation Models (DCF, Multiples, LBO)
+  'advisory/feasibility/valuation': (ctx) => const ValuationModelsScreen(),
+  // Wave 133 — Financial Upload + OCR
+  'advisory/external/upload': (ctx) => const FinancialUploadScreen(),
+  // Wave 134 — Advanced Ratios Dashboard (25 ratios)
+  'advisory/external/ratios': (ctx) => const AdvancedRatiosScreen(),
   // Finance consolidation + reports → existing screens
   'erp/finance/consolidation': (ctx) => const ConsolidationScreen(),
   'erp/finance/reports': (ctx) => const AuditReportingScreen(),
