@@ -148,9 +148,10 @@ def pick_backend() -> RateLimitBackend:
         logger.info("Rate limiter: using Redis backend at %s", url)
         return backend
     except Exception as e:
+        # Pre-format so caplog's record.message contains the substituted
+        # error text (tests assert on the "falling back" substring).
         logger.warning(
-            "Rate limiter: Redis unreachable (%s) — falling back to in-memory. "
-            "This is NOT safe across multiple workers.",
-            e,
+            f"Rate limiter: Redis unreachable ({e}) — falling back to in-memory. "
+            "This is NOT safe across multiple workers."
         )
         return InMemoryBackend()

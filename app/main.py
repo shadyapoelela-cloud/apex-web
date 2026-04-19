@@ -852,12 +852,17 @@ async def rate_limit_middleware(request, call_next):
     window, limit, bucket = _pick_tier(path_raw)
     key = f"{client_ip}:{bucket}"
 
-    backend = _get_rate_backend()
-    # main's InMemoryBackend.hit returns (allowed, count, reset_in) with 3 args.
-    _allowed, count, reset_in = backend.hit(key, window, limit)
+    # Use the singleton created at import time — pick_backend() creates a
+    # fresh InMemoryBackend every call, which would reset the hit counter
+    # on every request and defeat rate limiting entirely.
+    backend = _rate_backend_instance
+    # InMemoryBackend.hit returns (allowed, remaining, reset_in).
+    # `remaining` is what's LEFT in the window, not current usage — so the
+    # block decision must come from `allowed`, not a count-vs-limit check.
+    allowed, remaining, reset_in = backend.hit(key, window, limit)
     now = time.time()
 
-    if count > limit:
+    if not allowed:
         return JSONResponse(
             status_code=429,
             headers={
@@ -876,7 +881,7 @@ async def rate_limit_middleware(request, call_next):
     response = await call_next(request)
     # Expose remaining quota to clients
     response.headers["X-RateLimit-Limit"] = str(limit)
-    response.headers["X-RateLimit-Remaining"] = str(max(0, limit - count))
+    response.headers["X-RateLimit-Remaining"] = str(remaining)
     response.headers["X-RateLimit-Reset"] = str(int(now + reset_in))
     return response
 
