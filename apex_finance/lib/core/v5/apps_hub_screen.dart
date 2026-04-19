@@ -118,27 +118,31 @@ class _AppsHubScreenState extends State<AppsHubScreen> {
               ),
             ),
 
-            // App grid
+            // App grid — Odoo-compact size (more cols, smaller tiles)
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
               sliver: SliverLayoutBuilder(
                 builder: (ctx, constraints) {
                   final w = constraints.crossAxisExtent;
-                  final cols = w > 1400
-                      ? 5
-                      : w > 1100
-                          ? 4
-                          : w > 800
-                              ? 3
-                              : w > 520
-                                  ? 2
-                                  : 1;
+                  final cols = w > 1600
+                      ? 8
+                      : w > 1300
+                          ? 7
+                          : w > 1100
+                              ? 6
+                              : w > 900
+                                  ? 5
+                                  : w > 700
+                                      ? 4
+                                      : w > 500
+                                          ? 3
+                                          : 2;
                   return SliverGrid(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: cols,
-                      childAspectRatio: 1.05,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
+                      childAspectRatio: 0.95,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (ctx, i) => _AppTile(
@@ -227,123 +231,95 @@ class _AppTileState extends State<_AppTile> {
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
+      cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () => context.go('/app/${svc.id}/${app.id}'),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          curve: Curves.easeOut,
-          transform: _hover
-              ? (Matrix4.identity()..translate(0.0, -3.0, 0.0))
-              : Matrix4.identity(),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: _hover ? svc.color : Colors.grey.shade200,
-              width: _hover ? 2 : 1,
+        child: Tooltip(
+          message: '${app.descriptionAr}\n${app.labelEn} · $chipCount شاشة',
+          waitDuration: const Duration(milliseconds: 600),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 140),
+            curve: Curves.easeOut,
+            transform: _hover
+                ? (Matrix4.identity()..translate(0.0, -2.0, 0.0))
+                : Matrix4.identity(),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: _hover ? svc.color : Colors.grey.shade200,
+                width: _hover ? 1.5 : 1,
+              ),
+              boxShadow: _hover
+                  ? [
+                      BoxShadow(
+                        color: svc.color.withOpacity(0.18),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
             ),
-            boxShadow: _hover
-                ? [
-                    BoxShadow(
-                      color: svc.color.withOpacity(0.18),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            svc.color,
-                            Color.lerp(svc.color, Colors.black, 0.25)!,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: svc.color.withOpacity(0.35),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          svc.color,
+                          Color.lerp(svc.color, Colors.black, 0.22)!,
                         ],
                       ),
-                      child: Icon(app.icon, color: Colors.white, size: 24),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: isPlaceholder
-                            ? Colors.orange.withOpacity(0.10)
-                            : Colors.green.withOpacity(0.10),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        isPlaceholder ? 'قريباً' : '$chipCount شاشة',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: isPlaceholder ? Colors.orange.shade800 : Colors.green.shade800,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  app.labelAr,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1A237E),
+                    child: Icon(app.icon, color: Colors.white, size: 22),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  app.labelEn,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: Text(
-                    app.descriptionAr,
+                  const SizedBox(height: 8),
+                  Text(
+                    app.labelAr,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.black54,
-                      height: 1.45,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A237E),
+                      height: 1.2,
                     ),
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isPlaceholder
+                          ? Colors.orange.withOpacity(0.10)
+                          : svc.color.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      isPlaceholder ? 'قريباً' : '$chipCount',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: isPlaceholder ? Colors.orange.shade800 : svc.color,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
