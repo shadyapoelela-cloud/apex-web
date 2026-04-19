@@ -23,7 +23,11 @@ import '../../screens/compliance/depreciation_screen.dart';
 import '../../screens/v4_compliance/tax_filing_center_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_manager_screen.dart';
 import '../../screens/v4_compliance/zatca_error_decoder_screen.dart';
+import '../../screens/v4_compliance/compliance_calendar_global_screen.dart';
 import '../../screens/v4_erp/business_intelligence_screen.dart';
+import '../../screens/v4_erp/customer_success_screen.dart';
+import '../../screens/v4_erp/legal_docs_automation_screen.dart';
+import '../../screens/v4_erp/procurement_rfq_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/gosi_wps_screen.dart';
 import '../../screens/v4_compliance/governance_screen.dart';
@@ -219,6 +223,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'compliance/tax/filings': (ctx) => const TaxFilingCenterScreen(),
   // Wave 142 — Business Intelligence 360°
   'erp/finance/bi': (ctx) => const BusinessIntelligenceScreen(),
+  // Wave 143 — Procurement RFQ Workflow
+  'erp/operations/procurement-rfq': (ctx) => const ProcurementRfqScreen(),
+  // Wave 144 — Customer Success Platform
+  'erp/operations/customer-success': (ctx) => const CustomerSuccessScreen(),
+  // Wave 145 — Legal Document Automation
+  'erp/finance/legal-docs': (ctx) => const LegalDocsAutomationScreen(),
+  // Wave 146 — Global Compliance Calendar
+  'compliance/regulatory/compliance-calendar': (ctx) => const ComplianceCalendarGlobalScreen(),
 
   // Wave 28 — Eligibility Check (KSA SME/Nomu/Tadawul)
   'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
