@@ -203,6 +203,10 @@ import '../../screens/v5_2/coa_editor_v52_screen.dart';
 import '../../screens/v5_2/cost_centers_v52_screen.dart';
 import '../../screens/v5_2/universal_gl_v52_screen.dart';
 import '../../screens/v5_2/financial_statements_fsv_v52_screen.dart';
+import '../../screens/v5_2/closing_cockpit_v52_screen.dart';
+import '../../screens/v5_2/integrations_hub_v52_screen.dart';
+import '../../screens/v5_2/documents_v52_screen.dart';
+import '../../screens/v5_2/advanced_settings_v52_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -220,7 +224,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── 1.1 Finance (GL) ─────────────────────────────────────────────
   'erp/finance/gl': (ctx) => const UniversalGlV52Screen(),  // V5.2 Universal GL
   'erp/finance/je-builder': (ctx) => const JeBuilderV52Screen(),  // V5.2 ObjectPage
-  'erp/finance/period-close': (ctx) => const PeriodCloseV52Screen(),  // V5.2
+  'erp/finance/period-close': (ctx) => const ClosingCockpitV52Screen(),  // V5.2 with DAG
   'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
   'erp/finance/coa-editor': (ctx) => const CoaEditorV52Screen(),  // V5.2 TreeView
   'erp/finance/fixed-assets': (ctx) => const FixedAssetsV52Screen(),  // V5.2
@@ -234,8 +238,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/anomalies': (ctx) => const AnomalyDetectorScreen(),
   'erp/finance/ai-analyst': (ctx) => const AiAnalystV52Screen(),  // V5.2
   'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
-  'erp/finance/integrations': (ctx) => const IntegrationsHubScreen(),
-  'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
+  'erp/finance/integrations': (ctx) => const IntegrationsHubV52Screen(),  // V5.2 Card Grid
+  'erp/finance/documents': (ctx) => const DocumentsV52Screen(),  // V5.2
   'erp/finance/onboarding': (ctx) => const OnboardingV52Screen(),  // V5.2 Wizard
 
   // V5.2 New Finance Chips (Week 1)
@@ -244,6 +248,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/dimensions': (ctx) => const DimensionsV52Screen(),
   'erp/finance/recurring-entries': (ctx) => const RecurringEntriesV52Screen(),
   'erp/finance/ai-reconciliation': (ctx) => const AiReconciliationV52Screen(),
+  'erp/finance/advanced-settings': (ctx) => const AdvancedSettingsV52Screen(),
 
   // ── 1.2 Consolidation ────────────────────────────────────────────
   'erp/consolidation/consolidation': (ctx) => const ConsolidationScreen(),
