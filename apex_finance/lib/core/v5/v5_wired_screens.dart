@@ -170,6 +170,11 @@ import '../../screens/v4_erp/sales_pipeline_screen.dart';
 import '../../screens/v4_erp/supplier_360_screen.dart';
 import '../../screens/v4_erp/vendor_onboarding_screen.dart';
 
+// V5.2 Reference Implementations (using unified templates)
+import '../../screens/v5_2/invoices_v52_screen.dart';
+import '../../screens/v5_2/je_builder_v52_screen.dart';
+import '../../screens/v5_2/onboarding_v52_screen.dart';
+
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
 ///
@@ -185,7 +190,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── 1.1 Finance (GL) ─────────────────────────────────────────────
   'erp/finance/gl': (ctx) => const GeneralLedgerScreen(),
-  'erp/finance/je-builder': (ctx) => const JeBuilderScreen(),
+  'erp/finance/je-builder': (ctx) => const JeBuilderV52Screen(),  // V5.2 ObjectPage
   'erp/finance/period-close': (ctx) => const CloseChecklistScreen(),
   'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
   'erp/finance/coa-editor': (ctx) => const CoaEditorScreen(),
@@ -202,7 +207,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
   'erp/finance/integrations': (ctx) => const IntegrationsHubScreen(),
   'erp/finance/documents': (ctx) => const DocumentVaultScreen(),
-  'erp/finance/onboarding': (ctx) => const OnboardingScreen(),
+  'erp/finance/onboarding': (ctx) => const OnboardingV52Screen(),  // V5.2 Wizard
 
   // ── 1.2 Consolidation ────────────────────────────────────────────
   'erp/consolidation/consolidation': (ctx) => const ConsolidationScreen(),
@@ -220,7 +225,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── 1.4 Sales & AR ───────────────────────────────────────────────
   'erp/sales/sales-workflow': (ctx) => const SalesWorkflowScreen(),
-  'erp/sales/invoices': (ctx) => const InvoicesMultiViewScreen(),
+  'erp/sales/invoices': (ctx) => const InvoicesV52Screen(),  // V5.2 MultiView
   'erp/sales/credit-notes': (ctx) => const CreditNotesScreen(),
   'erp/sales/price-list': (ctx) => const PriceListScreen(),
   'erp/sales/contracts': (ctx) => const ContractManagementScreen(),
@@ -549,7 +554,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // finance → sales/purchasing/consolidation/expenses/reports-bi
   'erp/finance/ap': (ctx) => const PurchasingApScreen(),
   'erp/finance/sales-workflow': (ctx) => const SalesWorkflowScreen(),
-  'erp/finance/invoices': (ctx) => const InvoicesMultiViewScreen(),
+  'erp/finance/invoices': (ctx) => const InvoicesV52Screen(),  // V5.2 alias
   'erp/finance/credit-notes': (ctx) => const CreditNotesScreen(),
   'erp/finance/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
   'erp/finance/credit': (ctx) => const CreditScoringScreen(),
