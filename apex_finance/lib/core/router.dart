@@ -101,6 +101,7 @@ import '../screens/compliance/transfer_pricing_screen.dart';
 import '../screens/compliance/extras_tools_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'v4/v4_routes.dart';
+import 'v5/v5_routes.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
@@ -125,14 +126,16 @@ CustomTransitionPage<void> _apexPage(Widget child, GoRouterState state) =>
 
 final appRouter = GoRouter(
   refreshListenable: authRefresh,
-  // '/whats-new' is the landing page during the demo review so you see
-  // the new features immediately. Change back to '/login' for production.
-  initialLocation: '/whats-new',
+  // V5.1: /app is the new default landing. Shows the 5-service Launchpad
+  // with 16-app ERP grid and horizontal layer (Cmd+K, Entity Scope, etc.)
+  initialLocation: '/app',
   // redirect: disabled for now - auth handled in login screen,
     routes: [
+    // ── V5.1 shell (16-app ERP + Cmd+K palette + Entity Scope) ──
+    // Registered FIRST so /app/* routes win over legacy paths.
+    ...v5Routes(),
     // ── V4 shell (Wave 1.5) ──
-    // New hierarchical IA under /app/... Coexists with the legacy flat
-    // routes below; nothing is removed in this PR.
+    // Coexists with V5; nothing is removed.
     ...v4Routes(),
 
     // Auth
