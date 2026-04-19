@@ -437,6 +437,12 @@ List<V5Service> v5Services = [
             labelEn: 'AI Financial Analyst',
             icon: Icons.auto_awesome,
           ),
+          V5Chip(
+            id: 'ma-deal-room',
+            labelAr: 'غرفة صفقات M&A',
+            labelEn: 'M&A Deal Room',
+            icon: Icons.handshake,
+          ),
         ],
       ),
       V5MainModule(
@@ -485,6 +491,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'training', labelAr: 'التدريب والأكاديمية', labelEn: 'Training & LMS', icon: Icons.school),
           const V5Chip(id: 'performance', labelAr: 'تقييم الأداء', labelEn: 'Performance Reviews', icon: Icons.trending_up),
           const V5Chip(id: 'recruitment', labelAr: 'التوظيف ATS', labelEn: 'Recruitment', icon: Icons.person_search),
+          const V5Chip(id: 'wellness', labelAr: 'صحة الموظفين', labelEn: 'Wellness', icon: Icons.favorite),
         ],
       ),
       V5MainModule(
@@ -609,6 +616,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'deferred', labelAr: 'الضريبة المؤجلة', labelEn: 'Deferred Tax', icon: Icons.account_balance_wallet),
           const V5Chip(id: 'leases', labelAr: 'الإيجارات IFRS 16', labelEn: 'Leases (IFRS 16)', icon: Icons.home_work),
           const V5Chip(id: 'revenue-recognition', labelAr: 'الاعتراف بالإيراد IFRS 15', labelEn: 'Revenue Recognition (IFRS 15)', icon: Icons.receipt_long),
+          const V5Chip(id: 'optimizer', labelAr: 'محاكي تحسين الضرائب', labelEn: 'Tax Optimizer', icon: Icons.savings),
         ],
       ),
       V5MainModule(
@@ -657,6 +665,7 @@ List<V5Service> v5Services = [
           V5Chip(id: 'bcp', labelAr: 'استمرارية الأعمال', labelEn: 'BCP / DR', icon: Icons.health_and_safety),
           V5Chip(id: 'quality', labelAr: 'إدارة الجودة QMS', labelEn: 'Quality Mgmt', icon: Icons.verified_user),
           V5Chip(id: 'sustainability', labelAr: 'تقارير الاستدامة ESG', labelEn: 'ESG Report', icon: Icons.eco),
+          V5Chip(id: 'legal-ai', labelAr: 'المراجعة القانونية AI', labelEn: 'Legal Contract AI', icon: Icons.gavel),
         ],
       ),
     ],
