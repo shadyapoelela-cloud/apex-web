@@ -18,6 +18,8 @@ import '../../screens/v4_ai/ai_agents_gallery_screen.dart';
 import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
 import '../../screens/v4_compliance/audit_reporting_screen.dart';
+import '../../screens/compliance/consolidation_screen.dart';
+import '../../screens/compliance/depreciation_screen.dart';
 import '../../screens/v4_compliance/compliance_status_screen.dart';
 import '../../screens/v4_compliance/gosi_wps_screen.dart';
 import '../../screens/v4_compliance/governance_screen.dart';
@@ -168,6 +170,17 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // Wave 26 — External Analysis (Benchmarking + Credit)
   'advisory/external/benchmarking': (ctx) => const ExternalAnalysisScreen(),
   'advisory/external/credit': (ctx) => const ExternalAnalysisScreen(),
+  // Wave 130 — Advisory Tools re-using existing screens
+  'advisory/tools/fixed_assets': (ctx) => const FixedAssetsRegisterScreen(),
+  'advisory/tools/depreciation': (ctx) => const DepreciationScreen(),
+  'advisory/tools/lease': (ctx) => const LeaseAccountingScreen(),
+  'advisory/tools/breakeven': (ctx) => const BreakEvenScreen(),
+  // External upload + ratios share the feasibility/external analysis screen.
+  'advisory/external/upload': (ctx) => const ExternalAnalysisScreen(),
+  'advisory/external/ratios': (ctx) => const ExternalAnalysisScreen(),
+  // Finance consolidation + reports → existing screens
+  'erp/finance/consolidation': (ctx) => const ConsolidationScreen(),
+  'erp/finance/reports': (ctx) => const AuditReportingScreen(),
 
   // ── Marketplace Deep ─────────────────────────────────────────────
   // Wave 27 — Marketplace Billing/Escrow/Payouts
