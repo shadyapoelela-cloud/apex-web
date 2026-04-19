@@ -465,14 +465,18 @@ List<V5Service> v5Services = [
     color: const Color(0xFFD4AF37), // Gold
     descriptionAr: 'العمليات اليومية — 16 تطبيق متخصص',
     mainModules: [
-      // 1.1 Finance (GL) — core accounting ledger
+      // 1.1 Finance (GL) — #1 in Middle East target
+      // 25 chips organized by 4-phase journey:
+      // Dashboard → Master Data → Transactions → Period Close → Reporting → Setup
       V5MainModule(
         id: 'finance',
         labelAr: 'المحاسبة المالية',
         labelEn: 'Finance (GL)',
         icon: Icons.bar_chart,
-        descriptionAr: 'دفتر الأستاذ، القيود، الإقفال، القوائم المالية',
+        descriptionAr: 'دفتر أستاذ شامل، قمرة إقفال ذكية، قوائم مالية بـ4 إصدارات، AI عربي',
+        group: AppGroup.core,
         chips: [
+          // ━━━ Dashboard ━━━
           _dashboardChip(
             id: 'dashboard',
             labelAr: 'لوحة المالية',
@@ -480,25 +484,40 @@ List<V5Service> v5Services = [
             icon: Icons.dashboard,
             widgets: _financeDashboardWidgets,
           ),
-          _chipFromV4('erp', 'gl', labelOverrideAr: 'دفتر الأستاذ العام'),
-          const V5Chip(id: 'je-builder', labelAr: 'قيود اليومية', labelEn: 'Journal Entries', icon: Icons.edit_note),
-          const V5Chip(id: 'period-close', labelAr: 'إقفال الفترة', labelEn: 'Period Close', icon: Icons.lock_clock),
-          const V5Chip(id: 'close-checklist', labelAr: 'قائمة الإقفال', labelEn: 'Close Checklist', icon: Icons.checklist),
-          const V5Chip(id: 'coa-editor', labelAr: 'دليل الحسابات', labelEn: 'Chart of Accounts', icon: Icons.account_tree),
-          const V5Chip(id: 'fixed-assets', labelAr: 'الأصول الثابتة', labelEn: 'Fixed Assets', icon: Icons.business),
-          const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart),
-          const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart),
-          const V5Chip(id: 'budget-actual', labelAr: 'الموازنة مقابل الفعلي', labelEn: 'Budget vs Actual', icon: Icons.compare_arrows),
-          const V5Chip(id: 'budget-planning', labelAr: 'تخطيط الموازنات', labelEn: 'Budget Planning', icon: Icons.account_tree),
-          const V5Chip(id: 'cost-centers', labelAr: 'مراكز التكلفة', labelEn: 'Cost Centers', icon: Icons.pie_chart),
-          const V5Chip(id: 'scenarios', labelAr: 'سيناريوهات What-If', labelEn: 'What-If Scenarios', icon: Icons.insights),
-          const V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even', icon: Icons.balance),
-          const V5Chip(id: 'anomalies', labelAr: 'كاشف الشذوذ AI', labelEn: 'AI Anomaly Detector', icon: Icons.psychology),
-          const V5Chip(id: 'ai-analyst', labelAr: 'المحلل المالي AI', labelEn: 'AI Financial Analyst', icon: Icons.auto_awesome),
-          const V5Chip(id: 'workflows', labelAr: 'مسارات الاعتماد', labelEn: 'Approval Workflows', icon: Icons.approval),
-          const V5Chip(id: 'integrations', labelAr: 'التكاملات API', labelEn: 'Integrations Hub', icon: Icons.hub),
-          const V5Chip(id: 'documents', labelAr: 'خزانة الوثائق', labelEn: 'Document Vault', icon: Icons.folder_shared),
-          const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome),
+
+          // ━━━ Master Data (5) ━━━
+          const V5Chip(id: 'coa-editor', labelAr: 'دليل الحسابات', labelEn: 'Chart of Accounts', icon: Icons.account_tree, phase: ChipPhase.setup),
+          const V5Chip(id: 'cost-centers', labelAr: 'مراكز التكلفة', labelEn: 'Cost Centers', icon: Icons.pie_chart, phase: ChipPhase.setup),
+          const V5Chip(id: 'profit-centers', labelAr: 'مراكز الربحية', labelEn: 'Profit Centers', icon: Icons.donut_small, phase: ChipPhase.setup),
+          const V5Chip(id: 'internal-orders', labelAr: 'الأوامر الداخلية', labelEn: 'Internal Orders', icon: Icons.assignment_turned_in, phase: ChipPhase.setup),
+          const V5Chip(id: 'dimensions', labelAr: 'الأبعاد المحاسبية', labelEn: 'Accounting Dimensions', icon: Icons.view_in_ar, phase: ChipPhase.setup),
+
+          // ━━━ Transactions (5) ━━━
+          _chipFromV4('erp', 'gl', labelOverrideAr: 'الأستاذ الشامل'),
+          const V5Chip(id: 'je-builder', labelAr: 'قيود اليومية', labelEn: 'Journal Entries', icon: Icons.edit_note, phase: ChipPhase.capture),
+          const V5Chip(id: 'recurring-entries', labelAr: 'القيود الدورية', labelEn: 'Recurring Entries', icon: Icons.repeat, phase: ChipPhase.capture),
+          const V5Chip(id: 'fixed-assets', labelAr: 'الأصول الثابتة', labelEn: 'Fixed Assets', icon: Icons.business, phase: ChipPhase.capture),
+          const V5Chip(id: 'ai-reconciliation', labelAr: 'المطابقات الذكية', labelEn: 'AI Reconciliation', icon: Icons.auto_fix_high, phase: ChipPhase.capture),
+
+          // ━━━ Period Close (3) ━━━
+          const V5Chip(id: 'period-close', labelAr: 'قمرة الإقفال 🎯', labelEn: 'Closing Cockpit', icon: Icons.lock_clock, phase: ChipPhase.process),
+          const V5Chip(id: 'workflows', labelAr: 'مسارات الاعتماد', labelEn: 'Approval Workflows', icon: Icons.approval, phase: ChipPhase.process),
+          const V5Chip(id: 'anomalies', labelAr: 'كاشف الشذوذ AI', labelEn: 'AI Anomaly Detector', icon: Icons.psychology, phase: ChipPhase.process),
+
+          // ━━━ Reporting (7) ━━━
+          const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart, phase: ChipPhase.report),
+          const V5Chip(id: 'ai-analyst', labelAr: 'المحلل المالي AI 🎉', labelEn: 'AI Financial Analyst', icon: Icons.auto_awesome, phase: ChipPhase.report),
+          const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart, phase: ChipPhase.report),
+          const V5Chip(id: 'budget-actual', labelAr: 'الموازنة مقابل الفعلي', labelEn: 'Budget vs Actual', icon: Icons.compare_arrows, phase: ChipPhase.report),
+          const V5Chip(id: 'budget-planning', labelAr: 'تخطيط الموازنات', labelEn: 'Budget Planning', icon: Icons.account_tree, phase: ChipPhase.report),
+          const V5Chip(id: 'scenarios', labelAr: 'سيناريوهات What-If', labelEn: 'What-If Scenarios', icon: Icons.insights, phase: ChipPhase.report),
+          const V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even', icon: Icons.balance, phase: ChipPhase.report),
+
+          // ━━━ Setup (4) ━━━
+          const V5Chip(id: 'documents', labelAr: 'خزانة الوثائق', labelEn: 'Document Vault', icon: Icons.folder_shared, phase: ChipPhase.setup),
+          const V5Chip(id: 'integrations', labelAr: 'التكاملات API', labelEn: 'Integrations Hub', icon: Icons.hub, phase: ChipPhase.setup),
+          const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome, phase: ChipPhase.setup),
+          const V5Chip(id: 'advanced-settings', labelAr: 'إعدادات متقدّمة', labelEn: 'Advanced Settings', icon: Icons.settings_applications, phase: ChipPhase.setup),
         ],
       ),
 
@@ -508,6 +527,7 @@ List<V5Service> v5Services = [
         labelAr: 'التوحيد والكيانات',
         labelEn: 'Consolidation',
         icon: Icons.merge,
+        group: AppGroup.core,
         descriptionAr: 'توحيد كيانات متعددة، معاملات بين الشركات، هيكل الملكية',
         chips: [
           _dashboardChip(
@@ -531,6 +551,7 @@ List<V5Service> v5Services = [
         labelAr: 'الخزينة والبنوك',
         labelEn: 'Treasury & Banking',
         icon: Icons.account_balance,
+        group: AppGroup.core,
         descriptionAr: 'البنوك، المطابقة، التدفق النقدي، صرف العملات',
         chips: [
           _dashboardChip(
@@ -555,6 +576,7 @@ List<V5Service> v5Services = [
         labelAr: 'المبيعات والذمم المدينة',
         labelEn: 'Sales & AR',
         icon: Icons.point_of_sale,
+        group: AppGroup.businessCycles,
         descriptionAr: 'دورة المبيعات، الفواتير، الذمم، الأسعار، العقود',
         chips: [
           _dashboardChip(
@@ -581,6 +603,7 @@ List<V5Service> v5Services = [
         labelAr: 'المشتريات والذمم الدائنة',
         labelEn: 'Purchasing & AP',
         icon: Icons.shopping_cart,
+        group: AppGroup.businessCycles,
         descriptionAr: 'الموردون، طلبات الشراء، عروض الأسعار، المدفوعات',
         chips: [
           _dashboardChip(
@@ -604,6 +627,7 @@ List<V5Service> v5Services = [
         labelAr: 'المصروفات والتعويضات',
         labelEn: 'Expenses',
         icon: Icons.receipt,
+        group: AppGroup.businessCycles,
         descriptionAr: 'مطالبات الموظفين، البطاقات، السفر، السياسات',
         chips: [
           _dashboardChip(
@@ -625,6 +649,7 @@ List<V5Service> v5Services = [
         labelAr: 'نقاط البيع',
         labelEn: 'Point of Sale',
         icon: Icons.point_of_sale,
+        group: AppGroup.businessCycles,
         descriptionAr: 'نقاط البيع للمطاعم والتجزئة والخدمات',
         chips: [
           _dashboardChip(
@@ -646,6 +671,7 @@ List<V5Service> v5Services = [
         labelAr: 'المخزون والتكلفة',
         labelEn: 'Inventory & Cost',
         icon: Icons.inventory_2,
+        group: AppGroup.operations,
         descriptionAr: 'المستودعات، الأصناف، التتبع، الأسطول، الضمانات',
         chips: [
           _dashboardChip(
@@ -669,6 +695,7 @@ List<V5Service> v5Services = [
         labelAr: 'الموارد البشرية والرواتب',
         labelEn: 'HR & Payroll',
         icon: Icons.people,
+        group: AppGroup.resources,
         descriptionAr: 'الموظفون، الرواتب، الإجازات، GOSI/WPS',
         chips: [
           _dashboardChip(
@@ -697,6 +724,7 @@ List<V5Service> v5Services = [
         labelAr: 'المشاريع والمهام',
         labelEn: 'Projects & Jobs',
         icon: Icons.work,
+        group: AppGroup.resources,
         descriptionAr: 'إدارة المشاريع، ربحية العمل، الموارد، الفوترة بالمراحل',
         chips: [
           _dashboardChip(
@@ -720,6 +748,7 @@ List<V5Service> v5Services = [
         labelAr: 'علاقات العملاء والتسويق',
         labelEn: 'CRM & Marketing',
         icon: Icons.contacts,
+        group: AppGroup.resources,
         descriptionAr: 'إدارة العملاء، الأنبوب، الحملات، الولاء، التواصل',
         chips: [
           _dashboardChip(
@@ -744,6 +773,7 @@ List<V5Service> v5Services = [
         labelAr: 'التصنيع',
         labelEn: 'Manufacturing',
         icon: Icons.precision_manufacturing,
+        group: AppGroup.operations,
         descriptionAr: 'أوامر الإنتاج، قائمة المواد، خط الإنتاج، الجودة',
         chips: [
           _dashboardChip(
@@ -765,6 +795,7 @@ List<V5Service> v5Services = [
         labelAr: 'إدارة الفنادق PMS',
         labelEn: 'Hotel PMS',
         icon: Icons.hotel,
+        group: AppGroup.operations,
         descriptionAr: 'حجوزات، غرف، نزلاء، فوترة فندقية',
         chips: const [
           V5Chip(
@@ -785,6 +816,7 @@ List<V5Service> v5Services = [
         labelAr: 'مقاولات البناء',
         labelEn: 'Construction',
         icon: Icons.engineering,
+        group: AppGroup.operations,
         descriptionAr: 'مشاريع إنشائية، مراحل، تكلفة، مطالبات',
         chips: const [
           V5Chip(
@@ -805,6 +837,7 @@ List<V5Service> v5Services = [
         labelAr: 'حزم القطاعات',
         labelEn: 'Industry Packs',
         icon: Icons.apps,
+        group: AppGroup.operations,
         descriptionAr: 'قطاعات متخصصة — عقارات، صحة، تعليم، نقل، منح، امتياز، إلكترونيات، خدمة ميدانية',
         chips: const [
           V5Chip(
@@ -832,6 +865,7 @@ List<V5Service> v5Services = [
         labelAr: 'التقارير والذكاء',
         labelEn: 'Reports & BI',
         icon: Icons.assessment,
+        group: AppGroup.output,
         descriptionAr: 'التقارير الجاهزة، منشئ التقارير، لوحة التنفيذيين، OKRs، ESG',
         chips: [
           _dashboardChip(

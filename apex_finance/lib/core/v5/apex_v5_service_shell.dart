@@ -524,16 +524,101 @@ class _Sidebar extends StatelessWidget {
             ),
           ),
           const Divider(height: 16),
-          for (int i = 0; i < service.mainModules.length; i++)
-            _SidebarItem(
-              mainModule: service.mainModules[i],
-              isActive: service.mainModules[i].id == activeMainId,
-              shortcutNumber: i + 1,
-              serviceColor: service.color,
-              onTap: () => context.go(
-                '/app/${service.id}/${service.mainModules[i].id}',
+          ..._buildGroupedItems(context),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildGroupedItems(BuildContext context) {
+    // If no apps have a group tag, render flat (old behavior)
+    final hasGroups = service.mainModules.any((m) => m.group != null);
+    if (!hasGroups) {
+      return [
+        for (int i = 0; i < service.mainModules.length; i++)
+          _SidebarItem(
+            mainModule: service.mainModules[i],
+            isActive: service.mainModules[i].id == activeMainId,
+            shortcutNumber: i + 1,
+            serviceColor: service.color,
+            onTap: () => context.go('/app/${service.id}/${service.mainModules[i].id}'),
+          ),
+      ];
+    }
+
+    // Grouped rendering — preserves data order within each group
+    final widgets = <Widget>[];
+    final groups = <AppGroup, List<(int, V5MainModule)>>{};
+    final ungrouped = <(int, V5MainModule)>[];
+
+    for (int i = 0; i < service.mainModules.length; i++) {
+      final m = service.mainModules[i];
+      if (m.group != null) {
+        groups.putIfAbsent(m.group!, () => []).add((i, m));
+      } else {
+        ungrouped.add((i, m));
+      }
+    }
+
+    // Render in AppGroup enum order
+    for (final g in AppGroup.values) {
+      final items = groups[g];
+      if (items == null || items.isEmpty) continue;
+      widgets.add(_groupHeader(g));
+      for (final (idx, m) in items) {
+        widgets.add(_SidebarItem(
+          mainModule: m,
+          isActive: m.id == activeMainId,
+          shortcutNumber: idx + 1,
+          serviceColor: service.color,
+          onTap: () => context.go('/app/${service.id}/${m.id}'),
+        ));
+      }
+    }
+
+    // Fallback for any ungrouped items
+    if (ungrouped.isNotEmpty) {
+      widgets.add(const SizedBox(height: 8));
+      for (final (idx, m) in ungrouped) {
+        widgets.add(_SidebarItem(
+          mainModule: m,
+          isActive: m.id == activeMainId,
+          shortcutNumber: idx + 1,
+          serviceColor: service.color,
+          onTap: () => context.go('/app/${service.id}/${m.id}'),
+        ));
+      }
+    }
+    return widgets;
+  }
+
+  Widget _groupHeader(AppGroup g) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 14,
+            decoration: BoxDecoration(
+              color: g.color,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Icon(g.icon, size: 12, color: g.color.withOpacity(0.8)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              g.labelAr,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: g.color,
+                letterSpacing: 0.3,
               ),
             ),
+          ),
         ],
       ),
     );
@@ -668,6 +753,94 @@ class _ChipRowState extends State<_ChipRow> {
     );
   }
 
+  List<Widget> _buildChipItems(BuildContext context) {
+    final chips = widget.mainModule.chips;
+    // If no chips have phase tags, render flat (old behavior)
+    final hasPhases = chips.any((c) => c.phase != null);
+    if (!hasPhases) {
+      return [
+        for (final chip in chips)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: _ChipItem(
+              chip: chip,
+              isActive: chip.id == widget.activeChipId,
+              serviceColor: widget.service.color,
+              onTap: () => context.go('/app/${widget.service.id}/${widget.mainModule.id}/${chip.id}'),
+            ),
+          ),
+      ];
+    }
+
+    // Phase-aware rendering with dividers
+    final widgets = <Widget>[];
+    ChipPhase? lastPhase;
+    for (final chip in chips) {
+      // Dashboard (first chip) gets no phase divider
+      if (!chip.isDashboard && chip.phase != null && chip.phase != lastPhase) {
+        widgets.add(_phaseDivider(chip.phase!));
+        lastPhase = chip.phase;
+      }
+      widgets.add(Padding(
+        padding: const EdgeInsets.only(right: 6),
+        child: _ChipItem(
+          chip: chip,
+          isActive: chip.id == widget.activeChipId,
+          serviceColor: widget.service.color,
+          onTap: () => context.go('/app/${widget.service.id}/${widget.mainModule.id}/${chip.id}'),
+        ),
+      ));
+    }
+    return widgets;
+  }
+
+  Widget _phaseDivider(ChipPhase phase) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 1,
+            height: 24,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+            decoration: BoxDecoration(
+              color: phase.color.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: phase.color.withOpacity(0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(phase.icon, size: 10, color: phase.color),
+                const SizedBox(width: 4),
+                Text(
+                  phase.labelAr,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: phase.color,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            width: 1,
+            height: 24,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(width: 4),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final surface = Theme.of(context).colorScheme.surface;
@@ -687,20 +860,7 @@ class _ChipRowState extends State<_ChipRow> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Row(
-                children: [
-                  for (final chip in widget.mainModule.chips)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: _ChipItem(
-                        chip: chip,
-                        isActive: chip.id == widget.activeChipId,
-                        serviceColor: widget.service.color,
-                        onTap: () => context.go(
-                          '/app/${widget.service.id}/${widget.mainModule.id}/${chip.id}',
-                        ),
-                      ),
-                    ),
-                ],
+                children: _buildChipItems(context),
               ),
             ),
           ),

@@ -62,6 +62,9 @@ class V5MainModule {
   /// convention — enforced at render time).
   final List<V5Chip> chips;
 
+  /// Optional app group for sidebar coloring/headers (ERP 16 apps → 5 groups).
+  final AppGroup? group;
+
   const V5MainModule({
     required this.id,
     required this.labelAr,
@@ -69,6 +72,7 @@ class V5MainModule {
     required this.icon,
     required this.descriptionAr,
     required this.chips,
+    this.group,
   });
 
   V5Chip? chipById(String id) {
@@ -250,6 +254,77 @@ enum ChipPhase {
 
   /// Final output — statements, dashboards, regulatory reports.
   report,
+}
+
+/// App group for sidebar organization (16 ERP apps → 5 colored groups).
+enum AppGroup {
+  core,            // 🟡 النواة المحاسبية (Finance/Consolidation/Treasury)
+  businessCycles,  // 🔵 دورات الأعمال (Sales/Purchasing/Expenses/POS)
+  operations,      // 🟢 العمليات والإنتاج (Inventory/Mfg/Construction/Hotel/IndustryPacks)
+  resources,       // 🟣 إدارة الموارد (HR/Projects/CRM)
+  output,          // 🟠 المخرجات (Reports & BI)
+}
+
+extension AppGroupX on AppGroup {
+  String get labelAr {
+    switch (this) {
+      case AppGroup.core:
+        return 'النواة المحاسبية';
+      case AppGroup.businessCycles:
+        return 'دورات الأعمال';
+      case AppGroup.operations:
+        return 'العمليات والإنتاج';
+      case AppGroup.resources:
+        return 'إدارة الموارد';
+      case AppGroup.output:
+        return 'المخرجات';
+    }
+  }
+
+  String get labelEn {
+    switch (this) {
+      case AppGroup.core:
+        return 'Core';
+      case AppGroup.businessCycles:
+        return 'Business Cycles';
+      case AppGroup.operations:
+        return 'Operations';
+      case AppGroup.resources:
+        return 'Resources';
+      case AppGroup.output:
+        return 'Output';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case AppGroup.core:
+        return const Color(0xFFD4AF37); // Gold
+      case AppGroup.businessCycles:
+        return const Color(0xFF1565C0); // Blue
+      case AppGroup.operations:
+        return const Color(0xFF2E7D5B); // Green
+      case AppGroup.resources:
+        return const Color(0xFF4A148C); // Purple
+      case AppGroup.output:
+        return const Color(0xFFE65100); // Orange
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case AppGroup.core:
+        return Icons.account_balance;
+      case AppGroup.businessCycles:
+        return Icons.sync;
+      case AppGroup.operations:
+        return Icons.factory;
+      case AppGroup.resources:
+        return Icons.groups;
+      case AppGroup.output:
+        return Icons.assessment;
+    }
+  }
 }
 
 extension ChipPhaseX on ChipPhase {
