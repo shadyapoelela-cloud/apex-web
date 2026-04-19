@@ -851,21 +851,22 @@ List<V5Service> v5Services = [
     ],
   ),
 
-  // ── Service 2: Compliance & Tax ─────────────────────────────────────
+  // ── Service 2: Compliance & Tax — 7 apps ─────────────────────────────
   V5Service(
     id: 'compliance',
     labelAr: 'الامتثال والضرائب',
     labelEn: 'Compliance & Tax',
     icon: Icons.shield,
     color: const Color(0xFF2E7D5B), // Emerald
-    descriptionAr: 'زاتكا، VAT، GOSI/WPS، AML، الحوكمة',
+    descriptionAr: 'زاتكا، VAT، GOSI/WPS، AML، الحوكمة، الأمن، القانون',
     mainModules: [
+      // 2.1 Tax Filings — core tax operations
       V5MainModule(
         id: 'tax',
         labelAr: 'الإقرارات الضريبية',
         labelEn: 'Tax Filings',
         icon: Icons.request_quote,
-        descriptionAr: 'VAT، WHT، الزكاة، UAE CT، أسعار التحويل',
+        descriptionAr: 'VAT، WHT، الزكاة، UAE CT، أسعار التحويل، تحسين الضرائب',
         chips: [
           _dashboardChip(
             id: 'dashboard',
@@ -875,18 +876,18 @@ List<V5Service> v5Services = [
             widgets: _complianceDashboardWidgets,
           ),
           const V5Chip(id: 'vat', labelAr: 'ضريبة القيمة المضافة', labelEn: 'VAT', icon: Icons.percent),
+          const V5Chip(id: 'vat-return', labelAr: 'إقرار VAT', labelEn: 'VAT Return', icon: Icons.description),
           const V5Chip(id: 'wht', labelAr: 'ضريبة الاستقطاع', labelEn: 'WHT', icon: Icons.money_off),
           const V5Chip(id: 'zakat', labelAr: 'الزكاة', labelEn: 'Zakat', icon: Icons.star),
           const V5Chip(id: 'uae_ct', labelAr: 'ضريبة الشركات الإماراتية', labelEn: 'UAE CT', icon: Icons.flag),
           const V5Chip(id: 'tp', labelAr: 'أسعار التحويل', labelEn: 'Transfer Pricing', icon: Icons.swap_horiz),
           const V5Chip(id: 'calendar', labelAr: 'الرزنامة الضريبية', labelEn: 'Tax Calendar', icon: Icons.calendar_month),
-          const V5Chip(id: 'vat-return', labelAr: 'إقرار VAT', labelEn: 'VAT Return', icon: Icons.description),
-          const V5Chip(id: 'deferred', labelAr: 'الضريبة المؤجلة', labelEn: 'Deferred Tax', icon: Icons.account_balance_wallet),
-          const V5Chip(id: 'leases', labelAr: 'الإيجارات IFRS 16', labelEn: 'Leases (IFRS 16)', icon: Icons.home_work),
-          const V5Chip(id: 'revenue-recognition', labelAr: 'الاعتراف بالإيراد IFRS 15', labelEn: 'Revenue Recognition (IFRS 15)', icon: Icons.receipt_long),
           const V5Chip(id: 'optimizer', labelAr: 'محاكي تحسين الضرائب', labelEn: 'Tax Optimizer', icon: Icons.savings),
+          const V5Chip(id: 'filings', labelAr: 'مركز الإقرارات', labelEn: 'Filing Center', icon: Icons.folder_special),
         ],
       ),
+
+      // 2.2 ZATCA E-Invoicing
       V5MainModule(
         id: 'zatca',
         labelAr: 'الفوترة الإلكترونية (زاتكا)',
@@ -907,55 +908,139 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'errors', labelAr: 'سجل الأخطاء', labelEn: 'Error Log', icon: Icons.error),
         ],
       ),
+
+      // 2.3 IFRS Standards (NEW — split from tax)
       V5MainModule(
-        id: 'regulatory',
-        labelAr: 'التنظيم والحوكمة',
-        labelEn: 'Regulatory',
-        icon: Icons.gavel,
-        descriptionAr: 'GOSI/WPS، مكافحة غسل الأموال، الحوكمة',
+        id: 'ifrs',
+        labelAr: 'معايير IFRS',
+        labelEn: 'IFRS Standards',
+        icon: Icons.menu_book,
+        descriptionAr: 'IFRS 15 الإيراد، IFRS 16 الإيجارات، الضريبة المؤجلة IAS 12',
         chips: const [
           V5Chip(
             id: 'dashboard',
-            labelAr: 'لوحة التنظيم',
-            labelEn: 'Regulatory Dashboard',
+            labelAr: 'لوحة IFRS',
+            labelEn: 'IFRS Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'revenue-recognition', labelAr: 'الاعتراف بالإيراد IFRS 15', labelEn: 'Revenue Recognition', icon: Icons.receipt_long),
+          V5Chip(id: 'leases', labelAr: 'الإيجارات IFRS 16', labelEn: 'Leases (IFRS 16)', icon: Icons.home_work),
+          V5Chip(id: 'deferred', labelAr: 'الضريبة المؤجلة IAS 12', labelEn: 'Deferred Tax', icon: Icons.account_balance_wallet),
+        ],
+      ),
+
+      // 2.4 Labor Compliance (GOSI + WPS)
+      V5MainModule(
+        id: 'labor',
+        labelAr: 'الامتثال العمالي',
+        labelEn: 'Labor Compliance',
+        icon: Icons.work_outline,
+        descriptionAr: 'التأمينات الاجتماعية، نظام حماية الأجور، التوطين',
+        chips: const [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة العمل',
+            labelEn: 'Labor Dashboard',
             icon: Icons.dashboard,
             isDashboard: true,
             dashboardWidgets: [],
           ),
           V5Chip(id: 'gosi', labelAr: 'التأمينات الاجتماعية', labelEn: 'GOSI', icon: Icons.health_and_safety),
           V5Chip(id: 'wps', labelAr: 'نظام حماية الأجور', labelEn: 'WPS', icon: Icons.shield),
-          V5Chip(id: 'aml', labelAr: 'مكافحة غسل الأموال', labelEn: 'AML', icon: Icons.gavel),
-          V5Chip(id: 'governance', labelAr: 'الحوكمة والمجلس', labelEn: 'Governance', icon: Icons.account_tree),
-          V5Chip(id: 'activity-log', labelAr: 'سجل النشاط', labelEn: 'Activity Log', icon: Icons.shield),
-          V5Chip(id: 'cybersecurity', labelAr: 'الأمن السيبراني', labelEn: 'Cybersecurity', icon: Icons.security),
-          V5Chip(id: 'risk-register', labelAr: 'سجل المخاطر', labelEn: 'Risk Register', icon: Icons.shield),
+          V5Chip(id: 'saudization', labelAr: 'نسبة السعودة', labelEn: 'Saudization', icon: Icons.groups),
+        ],
+      ),
+
+      // 2.5 AML & Ethics (NEW)
+      V5MainModule(
+        id: 'aml-ethics',
+        labelAr: 'مكافحة الغسل والأخلاقيات',
+        labelEn: 'AML & Ethics',
+        icon: Icons.gpp_good,
+        descriptionAr: 'AML/KYC، البلاغات الأخلاقية، سجل النشاط، العقوبات',
+        chips: const [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة AML',
+            labelEn: 'AML Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'aml', labelAr: 'مكافحة غسل الأموال', labelEn: 'AML / KYC', icon: Icons.gavel),
           V5Chip(id: 'whistleblower', labelAr: 'البلاغات الأخلاقية', labelEn: 'Whistleblower', icon: Icons.shield_moon),
-          V5Chip(id: 'bcp', labelAr: 'استمرارية الأعمال', labelEn: 'BCP / DR', icon: Icons.health_and_safety),
+          V5Chip(id: 'activity-log', labelAr: 'سجل النشاط', labelEn: 'Activity Log', icon: Icons.history_edu),
+          V5Chip(id: 'sanctions', labelAr: 'قائمة العقوبات', labelEn: 'Sanctions Screening', icon: Icons.block),
+        ],
+      ),
+
+      // 2.6 Governance & Risk (NEW)
+      V5MainModule(
+        id: 'governance-risk',
+        labelAr: 'الحوكمة والمخاطر',
+        labelEn: 'Governance & Risk',
+        icon: Icons.account_tree,
+        descriptionAr: 'الحوكمة، سجل المخاطر، الجودة، الاستدامة ESG',
+        chips: const [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الحوكمة',
+            labelEn: 'Governance Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'governance', labelAr: 'الحوكمة والمجلس', labelEn: 'Governance', icon: Icons.account_tree),
+          V5Chip(id: 'risk-register', labelAr: 'سجل المخاطر', labelEn: 'Risk Register', icon: Icons.shield),
           V5Chip(id: 'quality', labelAr: 'إدارة الجودة QMS', labelEn: 'Quality Mgmt', icon: Icons.verified_user),
           V5Chip(id: 'sustainability', labelAr: 'تقارير الاستدامة ESG', labelEn: 'ESG Report', icon: Icons.eco),
+        ],
+      ),
+
+      // 2.7 Legal & Continuity (NEW — combined Security+BCP+Legal)
+      V5MainModule(
+        id: 'legal-security',
+        labelAr: 'القانون والأمن والاستمرارية',
+        labelEn: 'Legal, Security & BCP',
+        icon: Icons.gavel,
+        descriptionAr: 'مراجعة العقود AI، أتمتة الوثائق، الأمن السيبراني، استمرارية الأعمال',
+        chips: const [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الأمن والقانون',
+            labelEn: 'Security & Legal Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
           V5Chip(id: 'legal-ai', labelAr: 'المراجعة القانونية AI', labelEn: 'Legal Contract AI', icon: Icons.gavel),
-          V5Chip(id: 'compliance-calendar', labelAr: 'رزنامة الامتثال', labelEn: 'Compliance Calendar', icon: Icons.event_note),
           V5Chip(id: 'legal-docs-automation', labelAr: 'أتمتة الوثائق القانونية', labelEn: 'Legal Docs Automation', icon: Icons.description),
+          V5Chip(id: 'compliance-calendar', labelAr: 'رزنامة الامتثال', labelEn: 'Compliance Calendar', icon: Icons.event_note),
+          V5Chip(id: 'cybersecurity', labelAr: 'الأمن السيبراني', labelEn: 'Cybersecurity', icon: Icons.security),
+          V5Chip(id: 'bcp', labelAr: 'استمرارية الأعمال', labelEn: 'BCP / DR', icon: Icons.health_and_safety),
         ],
       ),
     ],
   ),
 
-  // ── Service 3: Audit ────────────────────────────────────────────────
+  // ── Service 3: Audit — 7 apps ───────────────────────────────────────
   V5Service(
     id: 'audit',
     labelAr: 'المراجعة',
     labelEn: 'Audit',
     icon: Icons.fact_check,
     color: const Color(0xFF4A148C), // Deep Purple
-    descriptionAr: 'ارتباط، عمل ميداني، إصدار التقارير',
+    descriptionAr: 'دورة المراجعة الكاملة — ارتباط، مخاطر، ميدان، ضوابط، تحليلات، رأي، جودة',
     mainModules: const [
+      // 3.1 Engagement (Planning + Acceptance + Kickoff)
       V5MainModule(
         id: 'engagement',
         labelAr: 'الارتباط',
         labelEn: 'Engagement',
         icon: Icons.handshake,
-        descriptionAr: 'التخطيط، القبول، البدء',
+        descriptionAr: 'القبول، التخطيط، مؤشرات البدء، تحديد النطاق',
         chips: [
           V5Chip(
             id: 'dashboard',
@@ -965,38 +1050,108 @@ List<V5Service> v5Services = [
             isDashboard: true,
             dashboardWidgets: [],
           ),
-          V5Chip(id: 'planning', labelAr: 'التخطيط', labelEn: 'Planning', icon: Icons.edit_calendar),
-          V5Chip(id: 'acceptance', labelAr: 'القبول', labelEn: 'Acceptance', icon: Icons.check),
+          V5Chip(id: 'acceptance', labelAr: 'القبول والاستقلالية', labelEn: 'Acceptance & Independence', icon: Icons.check_circle),
+          V5Chip(id: 'planning', labelAr: 'التخطيط', labelEn: 'Audit Planning', icon: Icons.edit_calendar),
           V5Chip(id: 'kickoff', labelAr: 'البدء', labelEn: 'Kick-off', icon: Icons.rocket_launch),
+          V5Chip(id: 'materiality', labelAr: 'الأهمية النسبية', labelEn: 'Materiality', icon: Icons.straighten),
         ],
       ),
+
+      // 3.2 Risk Assessment (NEW standalone)
       V5MainModule(
-        id: 'fieldwork',
-        labelAr: 'العمل الميداني',
-        labelEn: 'Fieldwork',
-        icon: Icons.biotech,
-        descriptionAr: 'أوراق العمل، المخاطر، اختبار الضوابط',
+        id: 'risk',
+        labelAr: 'تقييم المخاطر',
+        labelEn: 'Risk Assessment',
+        icon: Icons.warning_amber,
+        descriptionAr: 'مخاطر الاحتيال، الأخطاء الجوهرية، مخاطر التوقف',
         chips: [
           V5Chip(
             id: 'dashboard',
-            labelAr: 'لوحة الفحص',
-            labelEn: 'Fieldwork Dashboard',
+            labelAr: 'لوحة المخاطر',
+            labelEn: 'Risk Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'risk', labelAr: 'تقييم المخاطر', labelEn: 'Risk Assessment', icon: Icons.warning),
+          V5Chip(id: 'fraud-risk', labelAr: 'مخاطر الاحتيال', labelEn: 'Fraud Risk', icon: Icons.policy),
+          V5Chip(id: 'going-concern', labelAr: 'الاستمرارية', labelEn: 'Going Concern', icon: Icons.trending_down),
+        ],
+      ),
+
+      // 3.3 Workpapers (NEW — CaseWare-class)
+      V5MainModule(
+        id: 'workpapers',
+        labelAr: 'أوراق العمل',
+        labelEn: 'Workpapers',
+        icon: Icons.folder_open,
+        descriptionAr: 'توثيق الأدلة، مراجعة الفريق، ربط القوائم المالية',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة أوراق العمل',
+            labelEn: 'Workpapers Dashboard',
             icon: Icons.dashboard,
             isDashboard: true,
             dashboardWidgets: [],
           ),
           V5Chip(id: 'workpapers', labelAr: 'أوراق العمل', labelEn: 'Workpapers', icon: Icons.folder),
-          V5Chip(id: 'controls-library', labelAr: 'مكتبة الضوابط', labelEn: 'Controls Library', icon: Icons.security),
-          V5Chip(id: 'risk', labelAr: 'تقييم المخاطر', labelEn: 'Risk Assessment', icon: Icons.warning),
-          V5Chip(id: 'control', labelAr: 'اختبار الضوابط', labelEn: 'Control Testing', icon: Icons.rule),
+          V5Chip(id: 'trial-balance-tie', labelAr: 'ربط ميزان المراجعة', labelEn: 'TB Tie-Out', icon: Icons.link),
+          V5Chip(id: 'evidence', labelAr: 'إدارة الأدلة', labelEn: 'Evidence Library', icon: Icons.receipt_long),
         ],
       ),
+
+      // 3.4 Controls Testing
+      V5MainModule(
+        id: 'controls',
+        labelAr: 'اختبار الضوابط',
+        labelEn: 'Controls Testing',
+        icon: Icons.rule,
+        descriptionAr: 'مكتبة الضوابط، اختبار التشغيل، إثبات التصميم',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الضوابط',
+            labelEn: 'Controls Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'controls-library', labelAr: 'مكتبة الضوابط', labelEn: 'Controls Library', icon: Icons.security),
+          V5Chip(id: 'control', labelAr: 'اختبار الضوابط', labelEn: 'Control Testing', icon: Icons.rule),
+          V5Chip(id: 'walkthroughs', labelAr: 'جولات التشغيل', labelEn: 'Walkthroughs', icon: Icons.directions_walk),
+        ],
+      ),
+
+      // 3.5 Audit Analytics (NEW — Inflo/MindBridge-class)
+      V5MainModule(
+        id: 'analytics',
+        labelAr: 'تحليلات المراجعة',
+        labelEn: 'Audit Analytics',
+        icon: Icons.query_stats,
+        descriptionAr: 'تحليل البيانات بالـ AI، اختبار 100%، كشف الشذوذ',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة التحليلات',
+            labelEn: 'Analytics Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'full-population', labelAr: 'اختبار 100% للمجتمع', labelEn: 'Full-Population Test', icon: Icons.all_inclusive),
+          V5Chip(id: 'ai-anomalies', labelAr: 'شذوذات AI', labelEn: 'AI Anomalies', icon: Icons.psychology),
+          V5Chip(id: 'journal-entry-testing', labelAr: 'اختبار قيود اليومية', labelEn: 'JE Testing', icon: Icons.edit_note),
+        ],
+      ),
+
+      // 3.6 Opinion & Reporting
       V5MainModule(
         id: 'reporting',
-        labelAr: 'إصدار التقارير',
-        labelEn: 'Reporting',
+        labelAr: 'الرأي وإصدار التقارير',
+        labelEn: 'Opinion & Reporting',
         icon: Icons.description,
-        descriptionAr: 'الرأي، رسالة الإدارة، ضمان الجودة',
+        descriptionAr: 'منشئ الرأي، رسالة الإدارة، تقرير المراجعة النهائي',
         chips: [
           V5Chip(
             id: 'dashboard',
@@ -1008,21 +1163,44 @@ List<V5Service> v5Services = [
           ),
           V5Chip(id: 'opinion', labelAr: 'منشئ الرأي', labelEn: 'Opinion Builder', icon: Icons.gavel),
           V5Chip(id: 'ml', labelAr: 'رسالة الإدارة', labelEn: 'Management Letter', icon: Icons.mail),
-          V5Chip(id: 'qc', labelAr: 'ضمان الجودة', labelEn: 'QC', icon: Icons.verified),
+          V5Chip(id: 'final-report', labelAr: 'التقرير النهائي', labelEn: 'Final Report', icon: Icons.picture_as_pdf),
+        ],
+      ),
+
+      // 3.7 Quality Control (NEW)
+      V5MainModule(
+        id: 'quality',
+        labelAr: 'ضبط الجودة',
+        labelEn: 'Quality Control',
+        icon: Icons.verified,
+        descriptionAr: 'مراجعة النظير، EQCR، سياسات الجودة، ISQM 1',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة ضبط الجودة',
+            labelEn: 'QC Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'qc', labelAr: 'ضمان الجودة', labelEn: 'QC Review', icon: Icons.verified),
+          V5Chip(id: 'eqcr', labelAr: 'مراجع الجودة EQCR', labelEn: 'EQCR Review', icon: Icons.person_search),
+          V5Chip(id: 'isqm1', labelAr: 'نظام الجودة ISQM 1', labelEn: 'ISQM 1 Monitoring', icon: Icons.policy),
         ],
       ),
     ],
   ),
 
-  // ── Service 4: Advisory ─────────────────────────────────────────────
+  // ── Service 4: Advisory — 8 apps (Feasibility 4 + External 4) ─────
   V5Service(
     id: 'advisory',
     labelAr: 'الاستشارات',
     labelEn: 'Advisory',
     icon: Icons.analytics,
     color: const Color(0xFF1565C0), // Blue
-    descriptionAr: 'دراسات جدوى، تحليل خارجي، أدوات مالية',
+    descriptionAr: 'دراسات جدوى، تقييم، تحليل خارجي، نسب، ائتمان، معايير IFRS',
     mainModules: const [
+      // 4.1 Feasibility Studies
       V5MainModule(
         id: 'feasibility',
         labelAr: 'دراسات الجدوى',
@@ -1040,91 +1218,251 @@ List<V5Service> v5Services = [
           ),
           V5Chip(id: 'market', labelAr: 'تحليل السوق', labelEn: 'Market Analysis', icon: Icons.query_stats),
           V5Chip(id: 'proforma', labelAr: 'القوائم التقديرية', labelEn: 'Pro-Forma', icon: Icons.calculate),
-          V5Chip(id: 'valuation', labelAr: 'التقييم', labelEn: 'Valuation', icon: Icons.monetization_on),
           V5Chip(id: 'sensitivity', labelAr: 'الحساسية', labelEn: 'Sensitivity', icon: Icons.tune),
+          V5Chip(id: 'scenario', labelAr: 'السيناريوهات', labelEn: 'Scenario Analysis', icon: Icons.insights),
         ],
       ),
+
+      // 4.2 Valuation (NEW — split from feasibility)
       V5MainModule(
-        id: 'external',
-        labelAr: 'التحليل الخارجي',
-        labelEn: 'External Analysis',
-        icon: Icons.search,
-        descriptionAr: 'الرفع، النسب، المقارنة المرجعية، الائتمان، محلل دليل الحسابات',
+        id: 'valuation',
+        labelAr: 'نماذج التقييم',
+        labelEn: 'Valuation Models',
+        icon: Icons.monetization_on,
+        descriptionAr: 'DCF، المضاعفات، LBO، تقييم الأسواق المقارنة',
         chips: [
           V5Chip(
             id: 'dashboard',
-            labelAr: 'لوحة التحليل',
-            labelEn: 'External Dashboard',
+            labelAr: 'لوحة التقييم',
+            labelEn: 'Valuation Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'valuation', labelAr: 'التقييم', labelEn: 'Valuation', icon: Icons.monetization_on),
+          V5Chip(id: 'dcf', labelAr: 'التدفقات المخصومة DCF', labelEn: 'DCF Model', icon: Icons.show_chart),
+          V5Chip(id: 'multiples', labelAr: 'المضاعفات', labelEn: 'Trading Multiples', icon: Icons.compare_arrows),
+          V5Chip(id: 'lbo', labelAr: 'نموذج LBO', labelEn: 'LBO Model', icon: Icons.account_balance),
+        ],
+      ),
+
+      // 4.3 External Upload & OCR
+      V5MainModule(
+        id: 'upload',
+        labelAr: 'الرفع والقراءة',
+        labelEn: 'Upload & OCR',
+        icon: Icons.upload_file,
+        descriptionAr: 'رفع القوائم المالية، تحليل PDF/Excel، استخراج ذكي',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الرفع',
+            labelEn: 'Upload Dashboard',
             icon: Icons.dashboard,
             isDashboard: true,
             dashboardWidgets: [],
           ),
           V5Chip(id: 'upload', labelAr: 'الرفع والقراءة الضوئية', labelEn: 'Upload & OCR', icon: Icons.upload_file),
-          V5Chip(id: 'coa-analyzer', labelAr: 'محلل دليل الحسابات AI', labelEn: 'CoA Analyzer (AI)', icon: Icons.account_tree),
-          V5Chip(id: 'ratios', labelAr: 'النسب المالية', labelEn: 'Ratios', icon: Icons.analytics),
-          V5Chip(id: 'benchmarking', labelAr: 'المقارنة المرجعية', labelEn: 'Benchmarking', icon: Icons.compare),
-          V5Chip(id: 'credit', labelAr: 'التحليل الائتماني', labelEn: 'Credit', icon: Icons.credit_score),
+          V5Chip(id: 'parse-tb', labelAr: 'استخراج ميزان المراجعة', labelEn: 'TB Parser', icon: Icons.table_rows),
+          V5Chip(id: 'classify', labelAr: 'تصنيف البنود', labelEn: 'Auto-Classify', icon: Icons.auto_fix_high),
         ],
       ),
+
+      // 4.4 CoA Analyzer (AI) — first-class per user discussion
       V5MainModule(
-        id: 'tools',
-        labelAr: 'الأدوات المالية',
-        labelEn: 'Financial Tools',
-        icon: Icons.calculate,
-        descriptionAr: 'الأصول، الإهلاك، الإيجار، التعادل',
+        id: 'coa',
+        labelAr: 'محلل دليل الحسابات AI',
+        labelEn: 'CoA Analyzer (AI)',
+        icon: Icons.account_tree,
+        descriptionAr: 'فحص دليل الحسابات بالذكاء الاصطناعي، توصيات، ربط بـ IFRS',
         chips: [
           V5Chip(
             id: 'dashboard',
-            labelAr: 'لوحة الأدوات',
-            labelEn: 'Tools Dashboard',
+            labelAr: 'لوحة دليل الحسابات',
+            labelEn: 'CoA Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'coa-analyzer', labelAr: 'محلل دليل الحسابات', labelEn: 'CoA Analyzer', icon: Icons.account_tree),
+          V5Chip(id: 'coa-mapping', labelAr: 'ربط الحسابات بمعايير IFRS', labelEn: 'IFRS Mapping', icon: Icons.link),
+          V5Chip(id: 'coa-cleanup', labelAr: 'تنظيف دليل الحسابات', labelEn: 'CoA Cleanup', icon: Icons.cleaning_services),
+        ],
+      ),
+
+      // 4.5 Ratios & Benchmarking
+      V5MainModule(
+        id: 'ratios',
+        labelAr: 'النسب والمقارنات',
+        labelEn: 'Ratios & Benchmarking',
+        icon: Icons.analytics,
+        descriptionAr: '25 نسبة مالية، مقارنة قطاعية، أداء الصناعة',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة النسب',
+            labelEn: 'Ratios Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'ratios', labelAr: 'النسب المالية', labelEn: 'Financial Ratios', icon: Icons.analytics),
+          V5Chip(id: 'benchmarking', labelAr: 'المقارنة المرجعية', labelEn: 'Benchmarking', icon: Icons.compare),
+          V5Chip(id: 'industry', labelAr: 'أداء الصناعة', labelEn: 'Industry Performance', icon: Icons.factory),
+        ],
+      ),
+
+      // 4.6 Credit Analysis
+      V5MainModule(
+        id: 'credit',
+        labelAr: 'التحليل الائتماني',
+        labelEn: 'Credit Analysis',
+        icon: Icons.credit_score,
+        descriptionAr: 'نموذج Altman Z، احتمال التعثر، تصنيف المخاطر',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الائتمان',
+            labelEn: 'Credit Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'credit', labelAr: 'التحليل الائتماني', labelEn: 'Credit Analysis', icon: Icons.credit_score),
+          V5Chip(id: 'altman-z', labelAr: 'نموذج Altman Z', labelEn: 'Altman Z-Score', icon: Icons.calculate),
+          V5Chip(id: 'pd', labelAr: 'احتمال التعثر', labelEn: 'Probability of Default', icon: Icons.warning_amber),
+        ],
+      ),
+
+      // 4.7 IFRS Tools — asset lifecycle + lease
+      V5MainModule(
+        id: 'ifrs-tools',
+        labelAr: 'أدوات IFRS',
+        labelEn: 'IFRS Tools',
+        icon: Icons.menu_book,
+        descriptionAr: 'أصول ثابتة، إهلاك، IFRS 16، معالجة الإيجارات',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة أدوات IFRS',
+            labelEn: 'IFRS Tools Dashboard',
             icon: Icons.dashboard,
             isDashboard: true,
             dashboardWidgets: [],
           ),
           V5Chip(id: 'fixed_assets', labelAr: 'الأصول الثابتة', labelEn: 'Fixed Assets', icon: Icons.domain),
           V5Chip(id: 'depreciation', labelAr: 'الإهلاك', labelEn: 'Depreciation', icon: Icons.trending_down),
-          V5Chip(id: 'lease', labelAr: 'عقود الإيجار (IFRS 16)', labelEn: 'Lease', icon: Icons.apartment),
-          V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-even', icon: Icons.balance),
+          V5Chip(id: 'lease', labelAr: 'عقود الإيجار (IFRS 16)', labelEn: 'Lease (IFRS 16)', icon: Icons.apartment),
+        ],
+      ),
+
+      // 4.8 Financial Calculators
+      V5MainModule(
+        id: 'calculators',
+        labelAr: 'الحاسبات المالية',
+        labelEn: 'Financial Calculators',
+        icon: Icons.calculate,
+        descriptionAr: 'نقطة التعادل، NPV/IRR، DSCR، WACC',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الحاسبات',
+            labelEn: 'Calculators Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even', icon: Icons.balance),
+          V5Chip(id: 'npv-irr', labelAr: 'NPV / IRR', labelEn: 'NPV / IRR', icon: Icons.timeline),
+          V5Chip(id: 'dscr', labelAr: 'DSCR تغطية خدمة الدين', labelEn: 'DSCR Calculator', icon: Icons.account_balance_wallet),
+          V5Chip(id: 'wacc', labelAr: 'التكلفة المرجحة WACC', labelEn: 'WACC Calculator', icon: Icons.percent),
         ],
       ),
     ],
   ),
 
-  // ── Service 5: Marketplace ──────────────────────────────────────────
+  // ── Service 5: Marketplace — 6 apps (Client 3 + Provider 3) ───────
   V5Service(
     id: 'marketplace',
     labelAr: 'السوق',
     labelEn: 'Marketplace',
     icon: Icons.store,
     color: const Color(0xFFE65100), // Deep Orange
-    descriptionAr: 'سوق مزدوج — عملاء يطلبون خدمات، مزوّدون يقدّمونها',
+    descriptionAr: 'سوق مزدوج — عملاء يطلبون، مزوّدون يقدّمون، ضمان ومدفوعات',
     mainModules: const [
+      // 5.1 Browse & Discover (Client)
       V5MainModule(
-        id: 'client',
-        labelAr: 'جانب العميل',
-        labelEn: 'Client Side',
-        icon: Icons.person_outline,
-        descriptionAr: 'تصفّح المزوّدين، الطلبات، الفوترة',
+        id: 'browse',
+        labelAr: 'تصفّح المزوّدين',
+        labelEn: 'Browse Providers',
+        icon: Icons.search,
+        descriptionAr: 'البحث، APEX Match AI، التصفية، المقارنة',
         chips: [
           V5Chip(
             id: 'dashboard',
-            labelAr: 'لوحة العميل',
-            labelEn: 'Client Dashboard',
+            labelAr: 'لوحة التصفّح',
+            labelEn: 'Browse Dashboard',
             icon: Icons.dashboard,
             isDashboard: true,
             dashboardWidgets: [],
           ),
-          V5Chip(id: 'browse', labelAr: 'تصفّح المزوّدين', labelEn: 'Browse Providers', icon: Icons.search),
-          V5Chip(id: 'requests', labelAr: 'طلباتي', labelEn: 'My Requests', icon: Icons.assignment),
-          V5Chip(id: 'billing', labelAr: 'الفوترة والضمان', labelEn: 'Billing & Escrow', icon: Icons.receipt_long),
+          V5Chip(id: 'browse', labelAr: 'تصفّح', labelEn: 'Browse', icon: Icons.search),
+          V5Chip(id: 'apex-match', labelAr: 'ذكاء الاقتران APEX Match', labelEn: 'APEX Match AI', icon: Icons.auto_awesome),
+          V5Chip(id: 'compare', labelAr: 'مقارنة المزوّدين', labelEn: 'Compare Providers', icon: Icons.compare),
         ],
       ),
+
+      // 5.2 Client Requests (RFPs + Projects)
+      V5MainModule(
+        id: 'client',
+        labelAr: 'طلبات العميل',
+        labelEn: 'Client Requests',
+        icon: Icons.assignment,
+        descriptionAr: 'طلبات الخدمة، العروض، المشاريع المباشرة',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الطلبات',
+            labelEn: 'Requests Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'requests', labelAr: 'طلباتي', labelEn: 'My Requests', icon: Icons.assignment),
+          V5Chip(id: 'proposals', labelAr: 'العروض المستلمة', labelEn: 'Proposals Received', icon: Icons.inbox),
+          V5Chip(id: 'active-projects', labelAr: 'المشاريع الجارية', labelEn: 'Active Projects', icon: Icons.folder_open),
+        ],
+      ),
+
+      // 5.3 Billing & Escrow (Client + Provider shared)
+      V5MainModule(
+        id: 'billing',
+        labelAr: 'الفوترة والضمان',
+        labelEn: 'Billing & Escrow',
+        icon: Icons.account_balance_wallet,
+        descriptionAr: 'ضمان المدفوعات، الفواتير، الاشتراكات، المدفوعات',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة الفوترة',
+            labelEn: 'Billing Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
+          V5Chip(id: 'billing', labelAr: 'الفوترة والضمان', labelEn: 'Billing & Escrow', icon: Icons.receipt_long),
+          V5Chip(id: 'subscriptions', labelAr: 'الاشتراكات', labelEn: 'Subscriptions', icon: Icons.autorenew),
+          V5Chip(id: 'disputes', labelAr: 'النزاعات', labelEn: 'Disputes', icon: Icons.gavel),
+        ],
+      ),
+
+      // 5.4 Provider Profile
       V5MainModule(
         id: 'provider',
-        labelAr: 'جانب المزوّد',
-        labelEn: 'Provider Side',
-        icon: Icons.business,
-        descriptionAr: 'الملف، المهام، المدفوعات، التقييمات',
+        labelAr: 'ملف المزوّد',
+        labelEn: 'Provider Profile',
+        icon: Icons.badge,
+        descriptionAr: 'الملف التعريفي، الشهادات، الخبرات، المحفظة',
         chips: [
           V5Chip(
             id: 'dashboard',
@@ -1135,9 +1473,52 @@ List<V5Service> v5Services = [
             dashboardWidgets: [],
           ),
           V5Chip(id: 'profile', labelAr: 'ملفي', labelEn: 'My Profile', icon: Icons.person),
+          V5Chip(id: 'certifications', labelAr: 'الشهادات', labelEn: 'Certifications', icon: Icons.verified),
+          V5Chip(id: 'portfolio', labelAr: 'المحفظة', labelEn: 'Portfolio', icon: Icons.photo_library),
+        ],
+      ),
+
+      // 5.5 Provider Jobs & Payouts
+      V5MainModule(
+        id: 'provider-ops',
+        labelAr: 'عمليات المزوّد',
+        labelEn: 'Provider Operations',
+        icon: Icons.work,
+        descriptionAr: 'المهام النشطة، سجل العمل، المدفوعات، الضرائب',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة العمليات',
+            labelEn: 'Ops Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
           V5Chip(id: 'jobs', labelAr: 'المهام النشطة', labelEn: 'Active Jobs', icon: Icons.work),
           V5Chip(id: 'payouts', labelAr: 'المدفوعات', labelEn: 'Payouts', icon: Icons.payments),
+          V5Chip(id: 'tax-1099', labelAr: 'التقارير الضريبية', labelEn: 'Tax Reporting', icon: Icons.description),
+        ],
+      ),
+
+      // 5.6 Ratings & Reviews
+      V5MainModule(
+        id: 'reviews',
+        labelAr: 'التقييمات والمراجعات',
+        labelEn: 'Ratings & Reviews',
+        icon: Icons.star,
+        descriptionAr: 'التقييمات من العملاء، الردود، السمعة',
+        chips: [
+          V5Chip(
+            id: 'dashboard',
+            labelAr: 'لوحة التقييمات',
+            labelEn: 'Reviews Dashboard',
+            icon: Icons.dashboard,
+            isDashboard: true,
+            dashboardWidgets: [],
+          ),
           V5Chip(id: 'ratings', labelAr: 'التقييمات', labelEn: 'Ratings', icon: Icons.star),
+          V5Chip(id: 'reviews-received', labelAr: 'مراجعات مستلمة', labelEn: 'Reviews Received', icon: Icons.rate_review),
+          V5Chip(id: 'reputation', labelAr: 'سمعة المزوّد', labelEn: 'Reputation Score', icon: Icons.military_tech),
         ],
       ),
     ],
@@ -1208,10 +1589,10 @@ const v5Workspaces = <V5Workspace>[
     color: Color(0xFF1565C0),
     descriptionAr: 'مشاريع استشارية — جدوى، تحليل خارجي، تقييم',
     shortcuts: [
-      V5Shortcut(serviceId: 'advisory', mainId: 'feasibility', chipId: 'valuation', labelAr: 'التقييم', icon: Icons.monetization_on),
-      V5Shortcut(serviceId: 'advisory', mainId: 'external', chipId: 'ratios', labelAr: 'النسب المالية', icon: Icons.analytics),
+      V5Shortcut(serviceId: 'advisory', mainId: 'valuation', chipId: 'valuation', labelAr: 'التقييم', icon: Icons.monetization_on),
+      V5Shortcut(serviceId: 'advisory', mainId: 'ratios', chipId: 'ratios', labelAr: 'النسب المالية', icon: Icons.analytics),
       V5Shortcut(serviceId: 'advisory', mainId: 'feasibility', chipId: 'sensitivity', labelAr: 'الحساسية', icon: Icons.tune),
-      V5Shortcut(serviceId: 'advisory', mainId: 'tools', chipId: 'lease', labelAr: 'IFRS 16', icon: Icons.apartment),
+      V5Shortcut(serviceId: 'advisory', mainId: 'ifrs-tools', chipId: 'lease', labelAr: 'IFRS 16', icon: Icons.apartment),
     ],
   ),
   V5Workspace(
@@ -1223,8 +1604,8 @@ const v5Workspaces = <V5Workspace>[
     descriptionAr: 'الامتثال التنظيمي — زاتكا، GOSI/WPS، AML، الحوكمة',
     shortcuts: [
       V5Shortcut(serviceId: 'compliance', mainId: 'zatca', chipId: 'dashboard', labelAr: 'لوحة الفوترة', icon: Icons.receipt),
-      V5Shortcut(serviceId: 'compliance', mainId: 'regulatory', chipId: 'gosi', labelAr: 'التأمينات', icon: Icons.health_and_safety),
-      V5Shortcut(serviceId: 'compliance', mainId: 'regulatory', chipId: 'aml', labelAr: 'مكافحة غسل الأموال', icon: Icons.gavel),
+      V5Shortcut(serviceId: 'compliance', mainId: 'labor', chipId: 'gosi', labelAr: 'التأمينات', icon: Icons.health_and_safety),
+      V5Shortcut(serviceId: 'compliance', mainId: 'aml-ethics', chipId: 'aml', labelAr: 'مكافحة غسل الأموال', icon: Icons.gavel),
       V5Shortcut(serviceId: 'compliance', mainId: 'tax', chipId: 'vat', labelAr: 'VAT', icon: Icons.percent),
     ],
   ),

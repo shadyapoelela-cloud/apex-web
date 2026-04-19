@@ -312,12 +312,53 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/reports-bi/legal-docs': (ctx) => const LegalDocsAutomationScreen(),
 
   // ════════════════════════════════════════════════════════════════════
-  // Advisory
+  // Advisory — 8 apps
   // ════════════════════════════════════════════════════════════════════
 
+  // 4.1 Feasibility
   'advisory/feasibility/market': (ctx) => const FeasibilityMarketScreen(),
   'advisory/feasibility/sensitivity': (ctx) => const FeasibilityMarketScreen(),
   'advisory/feasibility/proforma': (ctx) => const ProformaStatementsScreen(),
+  'advisory/feasibility/scenario': (ctx) => const FeasibilityMarketScreen(),
+
+  // 4.2 Valuation
+  'advisory/valuation/valuation': (ctx) => const ValuationModelsScreen(),
+  'advisory/valuation/dcf': (ctx) => const ValuationModelsScreen(),
+  'advisory/valuation/multiples': (ctx) => const ValuationModelsScreen(),
+  'advisory/valuation/lbo': (ctx) => const ValuationModelsScreen(),
+
+  // 4.3 Upload & OCR
+  'advisory/upload/upload': (ctx) => const FinancialUploadScreen(),
+  'advisory/upload/parse-tb': (ctx) => const FinancialUploadScreen(),
+  'advisory/upload/classify': (ctx) => const FinancialUploadScreen(),
+
+  // 4.4 CoA Analyzer (AI)
+  'advisory/coa/coa-analyzer': (ctx) => const CoaEditorScreen(),
+  'advisory/coa/coa-mapping': (ctx) => const CoaEditorScreen(),
+  'advisory/coa/coa-cleanup': (ctx) => const CoaEditorScreen(),
+
+  // 4.5 Ratios & Benchmarking
+  'advisory/ratios/ratios': (ctx) => const AdvancedRatiosScreen(),
+  'advisory/ratios/benchmarking': (ctx) => const ExternalAnalysisScreen(),
+  'advisory/ratios/industry': (ctx) => const ExternalAnalysisScreen(),
+
+  // 4.6 Credit
+  'advisory/credit/credit': (ctx) => const ExternalAnalysisScreen(),
+  'advisory/credit/altman-z': (ctx) => const AdvancedRatiosScreen(),
+  'advisory/credit/pd': (ctx) => const AdvancedRatiosScreen(),
+
+  // 4.7 IFRS Tools
+  'advisory/ifrs-tools/fixed_assets': (ctx) => const FixedAssetsRegisterScreen(),
+  'advisory/ifrs-tools/depreciation': (ctx) => const DepreciationScreen(),
+  'advisory/ifrs-tools/lease': (ctx) => const LeaseAccountingScreen(),
+
+  // 4.8 Calculators
+  'advisory/calculators/breakeven': (ctx) => const BreakEvenScreen(),
+  'advisory/calculators/npv-irr': (ctx) => const BreakEvenScreen(),
+  'advisory/calculators/dscr': (ctx) => const BreakEvenScreen(),
+  'advisory/calculators/wacc': (ctx) => const BreakEvenScreen(),
+
+  // Backward-compat for old advisory routes
   'advisory/feasibility/valuation': (ctx) => const ValuationModelsScreen(),
   'advisory/external/upload': (ctx) => const FinancialUploadScreen(),
   'advisory/external/coa-analyzer': (ctx) => const CoaEditorScreen(),
@@ -330,40 +371,100 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'advisory/tools/breakeven': (ctx) => const BreakEvenScreen(),
 
   // ════════════════════════════════════════════════════════════════════
-  // Marketplace
+  // Marketplace — 6 apps
   // ════════════════════════════════════════════════════════════════════
 
-  'marketplace/client/browse': (ctx) => const ApexMatchScreen(),
+  // 5.1 Browse & Discover
+  'marketplace/browse/browse': (ctx) => const ApexMatchScreen(),
+  'marketplace/browse/apex-match': (ctx) => const ApexMatchScreen(),
+  'marketplace/browse/compare': (ctx) => const ApexMatchScreen(),
+
+  // 5.2 Client Requests
   'marketplace/client/requests': (ctx) => const MarketplaceClientRequestsScreen(),
+  'marketplace/client/proposals': (ctx) => const MarketplaceClientRequestsScreen(),
+  'marketplace/client/active-projects': (ctx) => const MarketplaceClientRequestsScreen(),
+
+  // 5.3 Billing & Escrow
+  'marketplace/billing/billing': (ctx) => const MarketplaceBillingScreen(),
+  'marketplace/billing/subscriptions': (ctx) => const SubscriptionManagementScreen(),
+  'marketplace/billing/disputes': (ctx) => const MarketplaceBillingScreen(),
+
+  // 5.4 Provider Profile
+  'marketplace/provider/profile': (ctx) => const MarketplaceProviderProfileScreen(),
+  'marketplace/provider/certifications': (ctx) => const MarketplaceProviderProfileScreen(),
+  'marketplace/provider/portfolio': (ctx) => const MarketplaceProviderProfileScreen(),
+
+  // 5.5 Provider Operations
+  'marketplace/provider-ops/jobs': (ctx) => const MarketplaceProviderJobsScreen(),
+  'marketplace/provider-ops/payouts': (ctx) => const MarketplaceBillingScreen(),
+  'marketplace/provider-ops/tax-1099': (ctx) => const MarketplaceBillingScreen(),
+
+  // 5.6 Ratings & Reviews
+  'marketplace/reviews/ratings': (ctx) => const MarketplaceProviderRatingsScreen(),
+  'marketplace/reviews/reviews-received': (ctx) => const MarketplaceProviderRatingsScreen(),
+  'marketplace/reviews/reputation': (ctx) => const MarketplaceProviderRatingsScreen(),
+
+  // Backward-compat
+  'marketplace/client/browse': (ctx) => const ApexMatchScreen(),
   'marketplace/client/billing': (ctx) => const MarketplaceBillingScreen(),
   'marketplace/client/industry-packs': (ctx) => const IndustryPacksScreen(),
-  'marketplace/provider/profile': (ctx) => const MarketplaceProviderProfileScreen(),
   'marketplace/provider/jobs': (ctx) => const MarketplaceProviderJobsScreen(),
   'marketplace/provider/payouts': (ctx) => const MarketplaceBillingScreen(),
   'marketplace/provider/ratings': (ctx) => const MarketplaceProviderRatingsScreen(),
-  'marketplace/billing/subscriptions': (ctx) => const SubscriptionManagementScreen(),
 
   // ════════════════════════════════════════════════════════════════════
-  // Compliance & Tax
+  // Compliance & Tax — 7 apps
   // ════════════════════════════════════════════════════════════════════
 
+  // 2.1 Tax Filings
   'compliance/tax/vat': (ctx) => const RealtimeTaxScreen(),
-  'compliance/tax/realtime': (ctx) => const RealtimeTaxScreen(),
+  'compliance/tax/vat-return': (ctx) => const VatReturnBuilderScreen(),
   'compliance/tax/wht': (ctx) => const WhtCalculatorV5Screen(),
   'compliance/tax/zakat': (ctx) => const ZakatCalculatorV5Screen(),
   'compliance/tax/uae_ct': (ctx) => const UaeCtScreen(),
   'compliance/tax/tp': (ctx) => const TransferPricingV5Screen(),
   'compliance/tax/calendar': (ctx) => const TaxCalendarScreen(),
-  'compliance/tax/vat-return': (ctx) => const VatReturnBuilderScreen(),
-  'compliance/tax/deferred': (ctx) => const DeferredTaxScreen(),
-  'compliance/tax/leases': (ctx) => const LeaseAccountingScreen(),
-  'compliance/tax/revenue-recognition': (ctx) => const RevenueRecognitionScreen(),
   'compliance/tax/optimizer': (ctx) => const TaxOptimizerScreen(),
   'compliance/tax/filings': (ctx) => const TaxFilingCenterScreen(),
+  'compliance/tax/realtime': (ctx) => const RealtimeTaxScreen(),
 
+  // 2.2 ZATCA
   'compliance/zatca/csid': (ctx) => const ZatcaCsidManagerScreen(),
   'compliance/zatca/errors': (ctx) => const ZatcaErrorDecoderScreen(),
 
+  // 2.3 IFRS Standards (NEW app)
+  'compliance/ifrs/revenue-recognition': (ctx) => const RevenueRecognitionScreen(),
+  'compliance/ifrs/leases': (ctx) => const LeaseAccountingScreen(),
+  'compliance/ifrs/deferred': (ctx) => const DeferredTaxScreen(),
+
+  // 2.4 Labor Compliance (GOSI/WPS/Saudization)
+  'compliance/labor/gosi': (ctx) => const GosiWpsScreen(),
+  'compliance/labor/wps': (ctx) => const GosiWpsScreen(),
+  'compliance/labor/saudization': (ctx) => const GosiWpsScreen(),
+
+  // 2.5 AML & Ethics
+  'compliance/aml-ethics/aml': (ctx) => const AmlKycScreen(),
+  'compliance/aml-ethics/whistleblower': (ctx) => const WhistleblowerScreen(),
+  'compliance/aml-ethics/activity-log': (ctx) => const ActivityLogScreen(),
+  'compliance/aml-ethics/sanctions': (ctx) => const AmlKycScreen(),
+
+  // 2.6 Governance & Risk
+  'compliance/governance-risk/governance': (ctx) => const GovernanceScreen(),
+  'compliance/governance-risk/risk-register': (ctx) => const RiskRegisterScreen(),
+  'compliance/governance-risk/quality': (ctx) => const QualityManagementScreen(),
+  'compliance/governance-risk/sustainability': (ctx) => const SustainabilityReportScreen(),
+
+  // 2.7 Legal, Security & BCP
+  'compliance/legal-security/legal-ai': (ctx) => const LegalContractAiScreen(),
+  'compliance/legal-security/legal-docs-automation': (ctx) => const LegalDocsAutomationScreen(),
+  'compliance/legal-security/compliance-calendar': (ctx) => const ComplianceCalendarGlobalScreen(),
+  'compliance/legal-security/cybersecurity': (ctx) => const CybersecurityDashboardScreen(),
+  'compliance/legal-security/bcp': (ctx) => const BcpScreen(),
+
+  // Backward-compat (old compliance/regulatory/* and compliance/tax/leases|deferred)
+  'compliance/tax/leases': (ctx) => const LeaseAccountingScreen(),
+  'compliance/tax/deferred': (ctx) => const DeferredTaxScreen(),
+  'compliance/tax/revenue-recognition': (ctx) => const RevenueRecognitionScreen(),
   'compliance/regulatory/gosi': (ctx) => const GosiWpsScreen(),
   'compliance/regulatory/wps': (ctx) => const GosiWpsScreen(),
   'compliance/regulatory/aml': (ctx) => const AmlKycScreen(),
@@ -381,18 +482,50 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
 
   // ════════════════════════════════════════════════════════════════════
-  // Audit
+  // Audit — 7 apps
   // ════════════════════════════════════════════════════════════════════
 
-  'audit/engagement/planning': (ctx) => const AuditPlanningScreen(),
+  // 3.1 Engagement
   'audit/engagement/acceptance': (ctx) => const AuditAcceptanceScreen(),
+  'audit/engagement/planning': (ctx) => const AuditPlanningScreen(),
   'audit/engagement/kickoff': (ctx) => const AuditKickoffScreen(),
+  'audit/engagement/materiality': (ctx) => const AuditPlanningScreen(),
+
+  // 3.2 Risk Assessment (NEW)
+  'audit/risk/risk': (ctx) => const ComplianceStatusScreen(),
+  'audit/risk/fraud-risk': (ctx) => const ComplianceStatusScreen(),
+  'audit/risk/going-concern': (ctx) => const ComplianceStatusScreen(),
+
+  // 3.3 Workpapers
+  'audit/workpapers/workpapers': (ctx) => const WorkpapersDetailScreen(),
+  'audit/workpapers/trial-balance-tie': (ctx) => const WorkpapersDetailScreen(),
+  'audit/workpapers/evidence': (ctx) => const WorkpapersDetailScreen(),
+
+  // 3.4 Controls Testing
+  'audit/controls/controls-library': (ctx) => const ControlsLibraryScreen(),
+  'audit/controls/control': (ctx) => const AuditAnalyticsScreen(),
+  'audit/controls/walkthroughs': (ctx) => const ControlsLibraryScreen(),
+
+  // 3.5 Analytics (NEW)
+  'audit/analytics/full-population': (ctx) => const AuditAnalyticsScreen(),
+  'audit/analytics/ai-anomalies': (ctx) => const AuditAnalyticsScreen(),
+  'audit/analytics/journal-entry-testing': (ctx) => const AuditAnalyticsScreen(),
+
+  // 3.6 Opinion & Reporting
+  'audit/reporting/opinion': (ctx) => const AuditReportingScreen(),
+  'audit/reporting/ml': (ctx) => const AuditReportingScreen(),
+  'audit/reporting/final-report': (ctx) => const AuditReportingScreen(),
+
+  // 3.7 Quality (NEW)
+  'audit/quality/qc': (ctx) => const AuditReportingScreen(),
+  'audit/quality/eqcr': (ctx) => const AuditReportingScreen(),
+  'audit/quality/isqm1': (ctx) => const AuditReportingScreen(),
+
+  // Backward-compat
   'audit/fieldwork/workpapers': (ctx) => const WorkpapersDetailScreen(),
   'audit/fieldwork/controls-library': (ctx) => const ControlsLibraryScreen(),
   'audit/fieldwork/risk': (ctx) => const ComplianceStatusScreen(),
   'audit/fieldwork/control': (ctx) => const AuditAnalyticsScreen(),
-  'audit/reporting/opinion': (ctx) => const AuditReportingScreen(),
-  'audit/reporting/ml': (ctx) => const AuditReportingScreen(),
   'audit/reporting/qc': (ctx) => const AuditReportingScreen(),
 
   // ════════════════════════════════════════════════════════════════════
