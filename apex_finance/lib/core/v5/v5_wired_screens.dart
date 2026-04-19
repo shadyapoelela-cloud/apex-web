@@ -182,6 +182,10 @@ import '../../screens/v5_2/sales_pipeline_v52_screen.dart';
 import '../../screens/v5_2/projects_v52_screen.dart';
 import '../../screens/v5_2/audit_planning_v52_screen.dart';
 import '../../screens/v5_2/contract_v52_screen.dart';
+import '../../screens/v5_2/purchasing_ap_v52_screen.dart';
+import '../../screens/v5_2/expense_claims_v52_screen.dart';
+import '../../screens/v5_2/risk_register_v52_screen.dart';
+import '../../screens/v5_2/ma_deal_room_v52_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -222,7 +226,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/consolidation/intercompany': (ctx) => const IntercompanyScreen(),
   'erp/consolidation/cap-table': (ctx) => const CapTableScreen(),
   'erp/consolidation/board': (ctx) => const BoardPackScreen(),
-  'erp/consolidation/ma-deal-room': (ctx) => const MaDealRoomScreen(),
+  'erp/consolidation/ma-deal-room': (ctx) => const MaDealRoomV52Screen(),  // V5.2 ObjectPage
 
   // ── 1.3 Treasury & Banking ───────────────────────────────────────
   'erp/treasury/recon': (ctx) => const AiBankReconciliationScreen(),
@@ -241,14 +245,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/sales/credit': (ctx) => const CreditScoringScreen(),
 
   // ── 1.5 Purchasing & AP ──────────────────────────────────────────
-  'erp/purchasing/ap': (ctx) => const PurchasingApScreen(),
+  'erp/purchasing/ap': (ctx) => const PurchasingApV52Screen(),  // V5.2
   'erp/purchasing/suppliers': (ctx) => const Supplier360V52Screen(),  // V5.2 ObjectPage
   'erp/purchasing/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
   'erp/purchasing/requisitions': (ctx) => const PurchaseRequisitionScreen(),
   'erp/purchasing/procurement-rfq': (ctx) => const ProcurementRfqScreen(),
 
   // ── 1.6 Expenses & Reimbursements ────────────────────────────────
-  'erp/expenses/expenses': (ctx) => const ExpenseClaimsScreen(),
+  'erp/expenses/expenses': (ctx) => const ExpenseClaimsV52Screen(),  // V5.2
   'erp/expenses/mobile-receipt': (ctx) => const MobileReceiptScreen(),
   'erp/expenses/corporate-cards': (ctx) => const CorporateCardsScreen(),
   'erp/expenses/travel': (ctx) => const TravelPerDiemScreen(),
@@ -463,7 +467,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // 2.6 Governance & Risk
   'compliance/governance-risk/governance': (ctx) => const GovernanceScreen(),
-  'compliance/governance-risk/risk-register': (ctx) => const RiskRegisterScreen(),
+  'compliance/governance-risk/risk-register': (ctx) => const RiskRegisterV52Screen(),  // V5.2
   'compliance/governance-risk/quality': (ctx) => const QualityManagementScreen(),
   'compliance/governance-risk/sustainability': (ctx) => const SustainabilityReportScreen(),
 
