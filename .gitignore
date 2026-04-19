@@ -23,8 +23,10 @@ apex_finance/linux/flutter/generated_*
 apex_finance/macos/Flutter/GeneratedPluginRegistrant.swift
 apex_finance/windows/flutter/generated_*
 
-# Temp / backup files
+# Temp / backup files (but NOT __init__.py — that's a real Python file)
 _*.py
+!__init__.py
+!**/__init__.py
 *.tmp
 *.bak
 *.bak_*
