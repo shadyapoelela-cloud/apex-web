@@ -69,6 +69,14 @@ import '../../screens/v4_erp/franchise_management_screen.dart';
 import '../../screens/v4_erp/hotel_pms_screen.dart';
 import '../../screens/v4_erp/marketing_automation_screen.dart';
 import '../../screens/v4_erp/restaurant_pos_screen.dart';
+import '../../screens/v4_erp/retail_pos_screen.dart';
+import '../../screens/v4_erp/service_pos_screen.dart';
+import '../../screens/v4_erp/corporate_cards_screen.dart';
+import '../../screens/v4_erp/travel_per_diem_screen.dart';
+import '../../screens/v4_erp/bom_mrp_screen.dart';
+import '../../screens/v4_erp/shop_floor_screen.dart';
+import '../../screens/v4_erp/resource_allocation_screen.dart';
+import '../../screens/v4_erp/milestone_billing_screen.dart';
 import '../../screens/v4_erp/transport_logistics_screen.dart';
 import '../../screens/v4_erp/grant_management_screen.dart';
 import '../../screens/v4_erp/subscription_billing_screen.dart';
@@ -229,10 +237,13 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ── 1.6 Expenses & Reimbursements ────────────────────────────────
   'erp/expenses/expenses': (ctx) => const ExpenseClaimsScreen(),
   'erp/expenses/mobile-receipt': (ctx) => const MobileReceiptScreen(),
+  'erp/expenses/corporate-cards': (ctx) => const CorporateCardsScreen(),
+  'erp/expenses/travel': (ctx) => const TravelPerDiemScreen(),
 
   // ── 1.7 POS ──────────────────────────────────────────────────────
   'erp/pos/restaurant-pos': (ctx) => const RestaurantPosScreen(),
-  // retail-pos and service-pos placeholders — waves 148/149
+  'erp/pos/retail-pos': (ctx) => const RetailPosScreen(),
+  'erp/pos/service-pos': (ctx) => const ServicePosScreen(),
 
   // ── 1.8 Inventory & Cost ─────────────────────────────────────────
   'erp/inventory/inventory': (ctx) => const InventoryDetailedScreen(),
@@ -257,7 +268,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/projects/projects': (ctx) => const ProjectsScreen(),
   'erp/projects/project-pnl': (ctx) => const ProjectProfitabilityScreen(),
   'erp/projects/tickets': (ctx) => const HelpdeskTicketsScreen(),
-  // resource-allocation + milestone-billing — waves 154/155
+  'erp/projects/resource-allocation': (ctx) => const ResourceAllocationScreen(),
+  'erp/projects/milestone-billing': (ctx) => const MilestoneBillingScreen(),
 
   // ── 1.11 CRM & Marketing ─────────────────────────────────────────
   'erp/crm-marketing/crm': (ctx) => const CrmScreen(),
@@ -270,7 +282,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── 1.12 Manufacturing ───────────────────────────────────────────
   'erp/manufacturing/manufacturing': (ctx) => const ManufacturingScreen(),
-  // bom-mrp + shop-floor — waves 152/153
+  'erp/manufacturing/bom-mrp': (ctx) => const BomMrpScreen(),
+  'erp/manufacturing/shop-floor': (ctx) => const ShopFloorScreen(),
 
   // ── 1.13 Hotel PMS ───────────────────────────────────────────────
   'erp/hotel-pms/hotel-pms': (ctx) => const HotelPmsScreen(),
