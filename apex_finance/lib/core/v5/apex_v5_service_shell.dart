@@ -21,6 +21,7 @@ import 'apex_v5_action_dashboard.dart';
 import 'apex_v5_news_ticker.dart';
 import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
+import 'entity_scope_selector.dart';
 import 'v5_models.dart';
 
 class ApexV5ServiceShell extends StatelessWidget {
@@ -191,6 +192,9 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           const Spacer(),
+          // Entity Scope Selector (Wave 147) — consolidation across entities
+          const EntityScopeSelector(),
+          const SizedBox(width: 10),
           // Workspace selector
           const ApexV5WorkspaceSelector(),
           const SizedBox(width: 8),
