@@ -118,41 +118,23 @@ class _AppsHubScreenState extends State<AppsHubScreen> {
               ),
             ),
 
-            // App grid — Odoo-compact size (more cols, smaller tiles)
+            // App grid — Odoo Apps launcher size (very compact, fixed ~120px tile)
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-              sliver: SliverLayoutBuilder(
-                builder: (ctx, constraints) {
-                  final w = constraints.crossAxisExtent;
-                  final cols = w > 1600
-                      ? 8
-                      : w > 1300
-                          ? 7
-                          : w > 1100
-                              ? 6
-                              : w > 900
-                                  ? 5
-                                  : w > 700
-                                      ? 4
-                                      : w > 500
-                                          ? 3
-                                          : 2;
-                  return SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: cols,
-                      childAspectRatio: 0.95,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (ctx, i) => _AppTile(
-                        service: svc,
-                        app: apps[i],
-                      ),
-                      childCount: apps.length,
-                    ),
-                  );
-                },
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 130,  // Max tile width ~130px
+                  childAspectRatio: 1.0,    // Square tiles
+                  mainAxisSpacing: 6,
+                  crossAxisSpacing: 6,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (ctx, i) => _AppTile(
+                    service: svc,
+                    app: apps[i],
+                  ),
+                  childCount: apps.length,
+                ),
               ),
             ),
 
@@ -235,89 +217,78 @@ class _AppTileState extends State<_AppTile> {
       child: GestureDetector(
         onTap: () => context.go('/app/${svc.id}/${app.id}'),
         child: Tooltip(
-          message: '${app.descriptionAr}\n${app.labelEn} · $chipCount شاشة',
-          waitDuration: const Duration(milliseconds: 600),
+          message: '${app.labelAr} · ${app.descriptionAr}\n$chipCount شاشة · ${app.labelEn}',
+          waitDuration: const Duration(milliseconds: 500),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 140),
+            duration: const Duration(milliseconds: 120),
             curve: Curves.easeOut,
-            transform: _hover
-                ? (Matrix4.identity()..translate(0.0, -2.0, 0.0))
-                : Matrix4.identity(),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: _hover ? svc.color : Colors.grey.shade200,
-                width: _hover ? 1.5 : 1,
-              ),
-              boxShadow: _hover
-                  ? [
-                      BoxShadow(
-                        color: svc.color.withOpacity(0.18),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
+              color: _hover ? svc.color.withOpacity(0.06) : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(6),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Big rounded-square icon — Odoo signature style
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 52,
+                    height: 52,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
                           svc.color,
-                          Color.lerp(svc.color, Colors.black, 0.22)!,
+                          Color.lerp(svc.color, Colors.black, 0.20)!,
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(app.icon, color: Colors.white, size: 22),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    app.labelAr,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A237E),
-                      height: 1.2,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isPlaceholder
-                          ? Colors.orange.withOpacity(0.10)
-                          : svc.color.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(10),
+                      boxShadow: _hover
+                          ? [
+                              BoxShadow(
+                                color: svc.color.withOpacity(0.35),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ]
+                          : [],
                     ),
+                    child: Icon(app.icon, color: Colors.white, size: 26),
+                  ),
+                  const SizedBox(height: 6),
+                  Flexible(
                     child: Text(
-                      isPlaceholder ? 'قريباً' : '$chipCount',
+                      app.labelAr,
                       style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w800,
-                        color: isPlaceholder ? Colors.orange.shade800 : svc.color,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: _hover ? svc.color : const Color(0xFF1A237E),
+                        height: 1.15,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  if (isPlaceholder)
+                    Container(
+                      margin: const EdgeInsets.only(top: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'قريباً',
+                        style: TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.orange.shade800,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
