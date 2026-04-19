@@ -981,6 +981,69 @@ try:
 except Exception as e:
     logging.error(f"ZATCA routes not mounted: {e}", exc_info=True)
 
+# ── AI Guardrails (evaluate + approve/reject AI suggestions)
+try:
+    from app.core.ai_guardrails_routes import router as ai_guardrails_router
+
+    app.include_router(ai_guardrails_router)
+    logging.info("AI Guardrails routes mounted at /ai/guardrails/*")
+except Exception as e:
+    logging.error(f"AI Guardrails routes not mounted: {e}", exc_info=True)
+
+# ── Anomaly Detector (duplicate payments, off-hours, round-number)
+try:
+    from app.core.anomaly_routes import router as anomaly_router
+
+    app.include_router(anomaly_router)
+    logging.info("Anomaly routes mounted at /anomalies/*")
+except Exception as e:
+    logging.error(f"Anomaly routes not mounted: {e}", exc_info=True)
+
+# ── Bank Feeds (connect/sync/reconcile with encrypted token storage)
+try:
+    from app.core.bank_feeds_routes import router as bank_feeds_router
+
+    app.include_router(bank_feeds_router)
+    logging.info("Bank Feeds routes mounted at /bank-feeds/*")
+except Exception as e:
+    logging.error(f"Bank Feeds routes not mounted: {e}", exc_info=True)
+
+# ── AI Bank Reconciliation (propose/auto-match/approve)
+try:
+    from app.core.bank_reconciliation_routes import router as bank_rec_router
+
+    app.include_router(bank_rec_router)
+    logging.info("Bank Reconciliation routes mounted at /bank-rec/*")
+except Exception as e:
+    logging.error(f"Bank Reconciliation routes not mounted: {e}", exc_info=True)
+
+# ── TOTP (authenticator app setup/verify/disable + recovery codes)
+try:
+    from app.phase1.routes.totp_routes import router as totp_router
+
+    app.include_router(totp_router)
+    logging.info("TOTP routes mounted")
+except Exception as e:
+    logging.error(f"TOTP routes not mounted: {e}", exc_info=True)
+
+# ── ZATCA CSID (cert lifecycle: register/revoke/expiry tracking)
+try:
+    from app.core.zatca_csid_routes import router as zatca_csid_router
+
+    app.include_router(zatca_csid_router)
+    logging.info("ZATCA CSID routes mounted at /zatca/csid/*")
+except Exception as e:
+    logging.error(f"ZATCA CSID routes not mounted: {e}", exc_info=True)
+
+# ── ZATCA Retry Queue (failed submissions + dead-letter)
+try:
+    from app.core.zatca_queue_routes import router as zatca_queue_router
+
+    app.include_router(zatca_queue_router)
+    logging.info("ZATCA Queue routes mounted at /zatca/queue/*")
+except Exception as e:
+    logging.error(f"ZATCA Queue routes not mounted: {e}", exc_info=True)
+
 # ── Zakat + VAT calculators (KSA + GCC)
 try:
     from app.core.tax_routes import router as tax_router
