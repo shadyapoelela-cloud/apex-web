@@ -24,13 +24,19 @@ def test_google_rejects_missing_token(client):
 
 
 def test_google_rejects_tokeninfo_non_200(client):
-    """If Google's tokeninfo endpoint returns non-200, we must reject."""
+    """If Google's tokeninfo endpoint returns non-200, we must reject.
+
+    Note: GOOGLE_CLIENT_ID is patched so the route takes the tokeninfo
+    validation path (not the dev bypass that fires when no CLIENT_ID is
+    configured).
+    """
     fake_resp = type("R", (), {"status_code": 400, "json": lambda self: {}})()
-    with patch("requests.get", return_value=fake_resp):
-        resp = client.post(
-            "/auth/social/google",
-            json={"id_token": "bogus", "email": "a@b.com"},
-        )
+    with patch("app.phase1.routes.social_auth_routes.GOOGLE_CLIENT_ID", "test-client"):
+        with patch("requests.get", return_value=fake_resp):
+            resp = client.post(
+                "/auth/social/google",
+                json={"id_token": "bogus", "email": "a@b.com"},
+            )
     assert resp.status_code == 401
 
 
@@ -100,8 +106,13 @@ def test_apple_rejects_missing_token(client):
     assert resp.status_code == 401
 
 
-def test_apple_rejects_malformed_token(client):
-    """A non-JWT string must be rejected."""
+def test_apple_rejects_malformed_token(client, monkeypatch):
+    """A non-JWT string must be rejected by the JWK-validating path.
+
+    Note: APPLE_CLIENT_ID is set so the route takes the JWK validation
+    path (not the dev bypass that fires when no CLIENT_ID is configured).
+    """
+    monkeypatch.setenv("APPLE_CLIENT_ID", "com.test.apex")
     resp = client.post(
         "/auth/social/apple",
         json={"identity_token": "not-a-jwt", "authorization_code": "x"},

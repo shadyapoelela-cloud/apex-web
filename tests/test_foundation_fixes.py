@@ -145,76 +145,93 @@ def test_google_signin_rejects_missing_token(client):
 
 
 def test_google_signin_rejects_unreachable_google(client):
-    """If Google is down/unreachable → 503/401, NOT silent success."""
+    """If Google is down/unreachable → 503/401, NOT silent success.
+
+    Patches GOOGLE_CLIENT_ID so the route takes the tokeninfo validation
+    path (not the dev bypass that skips network calls when no CLIENT_ID
+    is configured).
+    """
     import requests as _rq
 
     def fake_get(url, **kwargs):
         raise _rq.RequestException("simulated network failure")
 
-    # Patch the `requests.get` the route will call when it lazy-imports.
-    with patch("requests.get", side_effect=fake_get):
-        r = client.post(
-            "/auth/social/google",
-            json={"id_token": "any-string"},
-        )
+    with patch("app.phase1.routes.social_auth_routes.GOOGLE_CLIENT_ID", "test-client"):
+        with patch("requests.get", side_effect=fake_get):
+            r = client.post(
+                "/auth/social/google",
+                json={"id_token": "any-string"},
+            )
     assert r.status_code in (401, 500, 503), (
         f"got {r.status_code}: {r.text[:200]}"
     )
 
 
 def test_google_signin_rejects_401_from_google(client):
-    """If Google's tokeninfo says 401, our route must say 401 too."""
+    """If Google's tokeninfo says 401, our route must say 401 too.
+
+    Patches GOOGLE_CLIENT_ID so we exercise the tokeninfo path.
+    """
     fake_resp = MagicMock()
     fake_resp.status_code = 401
     fake_resp.json = MagicMock(return_value={})
 
-    with patch("requests.get", return_value=fake_resp):
-        r = client.post(
-            "/auth/social/google",
-            json={"id_token": "bad-token"},
-        )
+    with patch("app.phase1.routes.social_auth_routes.GOOGLE_CLIENT_ID", "test-client"):
+        with patch("requests.get", return_value=fake_resp):
+            r = client.post(
+                "/auth/social/google",
+                json={"id_token": "bad-token"},
+            )
     assert r.status_code == 401
 
 
 def test_google_signin_rejects_wrong_issuer(client, monkeypatch):
-    """Token whose issuer isn't accounts.google.com → 401."""
+    """Token whose issuer isn't accounts.google.com → 401.
+
+    Patches GOOGLE_CLIENT_ID so we exercise the tokeninfo path where the
+    issuer check runs.
+    """
     fake_resp = MagicMock()
     fake_resp.status_code = 200
     fake_resp.json = MagicMock(return_value={
         "sub": "1234567890",
         "email": "user@example.com",
         "email_verified": True,
-        "aud": "anything",
+        "aud": "test-client",
         "iss": "https://accounts.bad-issuer.com",
     })
-    monkeypatch.delenv("GOOGLE_CLIENT_ID", raising=False)
-    monkeypatch.setenv("ENVIRONMENT", "development")  # skip client_id check
-    with patch("requests.get", return_value=fake_resp):
-        r = client.post(
-            "/auth/social/google",
-            json={"id_token": "token-with-wrong-iss"},
-        )
+    monkeypatch.setenv("ENVIRONMENT", "development")
+    with patch("app.phase1.routes.social_auth_routes.GOOGLE_CLIENT_ID", "test-client"):
+        with patch("requests.get", return_value=fake_resp):
+            r = client.post(
+                "/auth/social/google",
+                json={"id_token": "token-with-wrong-iss"},
+            )
     assert r.status_code == 401
 
 
 def test_google_signin_rejects_unverified_email(client, monkeypatch):
-    """Token whose email_verified=false → 401."""
+    """Token whose email_verified=false → 401.
+
+    Patches GOOGLE_CLIENT_ID to exercise the tokeninfo path where the
+    email_verified check runs.
+    """
     fake_resp = MagicMock()
     fake_resp.status_code = 200
     fake_resp.json = MagicMock(return_value={
         "sub": "1234567890",
         "email": "user@example.com",
         "email_verified": False,  # ← rejection reason
-        "aud": "anything",
+        "aud": "test-client",
         "iss": "https://accounts.google.com",
     })
-    monkeypatch.delenv("GOOGLE_CLIENT_ID", raising=False)
     monkeypatch.setenv("ENVIRONMENT", "development")
-    with patch("requests.get", return_value=fake_resp):
-        r = client.post(
-            "/auth/social/google",
-            json={"id_token": "unverified"},
-        )
+    with patch("app.phase1.routes.social_auth_routes.GOOGLE_CLIENT_ID", "test-client"):
+        with patch("requests.get", return_value=fake_resp):
+            r = client.post(
+                "/auth/social/google",
+                json={"id_token": "unverified"},
+            )
     assert r.status_code == 401
 
 
@@ -224,8 +241,13 @@ def test_apple_signin_rejects_missing_token(client):
     assert r.status_code in (401, 422)
 
 
-def test_apple_signin_rejects_malformed_jwt(client):
-    """A jwt that can't be decoded → 401/500 (500 if PyJWT missing)."""
+def test_apple_signin_rejects_malformed_jwt(client, monkeypatch):
+    """A jwt that can't be decoded → 401/500 (500 if PyJWT missing).
+
+    Sets APPLE_CLIENT_ID so the route takes the JWK decode path rather
+    than the dev bypass that fires when no CLIENT_ID is configured.
+    """
+    monkeypatch.setenv("APPLE_CLIENT_ID", "com.test.apex")
     r = client.post(
         "/auth/social/apple",
         json={"identity_token": "not-a-jwt"},

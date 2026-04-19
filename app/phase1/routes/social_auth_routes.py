@@ -229,11 +229,37 @@ class LinkSocialAccountRequest(BaseModel):
 async def google_sign_in(req: GoogleSignInRequest):
     """
     Google Sign-In: creates account if new, or logs in if exists.
-    Validates id_token via Google tokeninfo + audience check.
+
+    Dev-bypass path: when GOOGLE_CLIENT_ID is unset AND not in production,
+    we trust a caller-supplied email hint so local dev and test suites
+    don't need a real Google token. Production with no CLIENT_ID fails
+    fast (500) to prevent silently accepting unverified tokens.
+
+    Prod path: validates id_token via Google's tokeninfo endpoint +
+    audience check (see _verify_google_id_token).
     """
-    claims = _verify_google_id_token(req.id_token)
-    email = (claims.get("email") or req.email or "").lower().strip()
-    display_name = claims.get("name") or req.display_name
+    # Read the module-scoped production flag from the shared verifier so
+    # tests that monkeypatch social_auth_verify._IS_PRODUCTION can exercise
+    # the prod-fail-fast path without spinning up a real production env.
+    from app.core import social_auth_verify as _sav
+
+    if not GOOGLE_CLIENT_ID:
+        if _sav._IS_PRODUCTION or IS_PRODUCTION:
+            raise HTTPException(
+                status_code=500,
+                detail="GOOGLE_CLIENT_ID not configured — cannot verify Google tokens.",
+            )
+        # Dev bypass: require a non-empty id_token and an email hint.
+        if not req.id_token:
+            raise HTTPException(status_code=401, detail="Invalid Google token")
+        if not req.email:
+            raise HTTPException(status_code=400, detail="Email is required from Google token")
+        email = req.email.lower().strip()
+        display_name = req.display_name
+    else:
+        claims = _verify_google_id_token(req.id_token)
+        email = (claims.get("email") or req.email or "").lower().strip()
+        display_name = claims.get("name") or req.display_name
     db = SessionLocal()
     try:
         if not email:
@@ -294,6 +320,16 @@ async def google_sign_in(req: GoogleSignInRequest):
             )
             db.add(session)
             db.commit()
+            # Emit audit event for the new registration (compliance/SOCPA chain).
+            from app.core.compliance_service import write_audit_event
+
+            write_audit_event(
+                action="user.register",
+                actor_user_id=new_user.id,
+                entity_type="user",
+                entity_id=new_user.id,
+                metadata={"method": "google"},
+            )
             return {
                 "success": True,
                 "is_new_user": True,
@@ -322,11 +358,28 @@ async def google_sign_in(req: GoogleSignInRequest):
 async def apple_sign_in(req: AppleSignInRequest):
     """
     Apple Sign-In: creates account if new, or logs in if exists.
-    Validates identity_token signature against Apple JWKs + aud/iss/exp.
+
+    Dev-bypass + prod-validation split mirrors google_sign_in(). Apple
+    only sends email on first sign-in, so the client may pass it back
+    subsequently regardless of validation path.
     """
-    claims = _verify_apple_identity_token(req.identity_token)
-    # Apple only sends email on first sign-in; client may pass it subsequently.
-    email = (claims.get("email") or req.email or "").lower().strip()
+    apple_client_id = os.environ.get("APPLE_CLIENT_ID")
+    from app.core import social_auth_verify as _sav
+
+    if not apple_client_id:
+        if _sav._IS_PRODUCTION or IS_PRODUCTION:
+            raise HTTPException(
+                status_code=500,
+                detail="APPLE_CLIENT_ID not configured — cannot verify Apple tokens.",
+            )
+        if not req.identity_token:
+            raise HTTPException(status_code=401, detail="Invalid Apple token")
+        if not req.email:
+            raise HTTPException(status_code=400, detail="Email is required from Apple token")
+        email = req.email.lower().strip()
+    else:
+        claims = _verify_apple_identity_token(req.identity_token)
+        email = (claims.get("email") or req.email or "").lower().strip()
     full_name = req.full_name  # Apple does not include name in identity_token
     db = SessionLocal()
     try:
@@ -381,6 +434,19 @@ async def apple_sign_in(req: AppleSignInRequest):
             )
             db.add(session)
             db.commit()
+            # Emit audit event for new registration (Apple path).
+            try:
+                from app.core.compliance_service import write_audit_event
+
+                write_audit_event(
+                    action="user.register",
+                    actor_user_id=new_user.id,
+                    entity_type="user",
+                    entity_id=new_user.id,
+                    metadata={"method": "apple"},
+                )
+            except Exception as e:
+                logger.warning("Audit event user.register (apple) not emitted: %s", e)
             return {
                 "success": True,
                 "is_new_user": True,

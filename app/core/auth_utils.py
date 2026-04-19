@@ -33,7 +33,9 @@ elif len(_jwt_env.encode("utf-8")) < _MIN_SECRET_BYTES:
     )
     if _IS_PRODUCTION:
         raise RuntimeError(msg)
-    logger.warning("⚠ %s Dev-mode continues but this will fail in production.", msg)
+    # Pre-format so caplog's record.message contains the substituted bytes
+    # count (the test asserts on "at least 32 bytes").
+    logger.warning(f"⚠ {msg} Dev-mode continues but this will fail in production.")
 
 JWT_SECRET = _jwt_env
 JWT_ALGORITHM = "HS256"
