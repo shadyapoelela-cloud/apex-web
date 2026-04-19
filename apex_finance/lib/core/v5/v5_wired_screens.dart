@@ -174,6 +174,10 @@ import '../../screens/v4_erp/vendor_onboarding_screen.dart';
 import '../../screens/v5_2/invoices_v52_screen.dart';
 import '../../screens/v5_2/je_builder_v52_screen.dart';
 import '../../screens/v5_2/onboarding_v52_screen.dart';
+import '../../screens/v5_2/customer_360_v52_screen.dart';
+import '../../screens/v5_2/supplier_360_v52_screen.dart';
+import '../../screens/v5_2/crm_v52_screen.dart';
+import '../../screens/v5_2/vat_return_v52_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -234,7 +238,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── 1.5 Purchasing & AP ──────────────────────────────────────────
   'erp/purchasing/ap': (ctx) => const PurchasingApScreen(),
-  'erp/purchasing/suppliers': (ctx) => const Supplier360Screen(),
+  'erp/purchasing/suppliers': (ctx) => const Supplier360V52Screen(),  // V5.2 ObjectPage
   'erp/purchasing/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
   'erp/purchasing/requisitions': (ctx) => const PurchaseRequisitionScreen(),
   'erp/purchasing/procurement-rfq': (ctx) => const ProcurementRfqScreen(),
@@ -277,8 +281,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/projects/milestone-billing': (ctx) => const MilestoneBillingScreen(),
 
   // ── 1.11 CRM & Marketing ─────────────────────────────────────────
-  'erp/crm-marketing/crm': (ctx) => const CrmScreen(),
-  'erp/crm-marketing/customers-360': (ctx) => const Customer360Screen(),
+  'erp/crm-marketing/crm': (ctx) => const CrmV52Screen(),  // V5.2 MultiView
+  'erp/crm-marketing/customers-360': (ctx) => const Customer360V52Screen(),  // V5.2 ObjectPage
   'erp/crm-marketing/pipeline': (ctx) => const SalesPipelineScreen(),
   'erp/crm-marketing/marketing': (ctx) => const MarketingAutomationScreen(),
   'erp/crm-marketing/loyalty': (ctx) => const CustomerLoyaltyScreen(),
@@ -423,7 +427,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // 2.1 Tax Filings
   'compliance/tax/vat': (ctx) => const RealtimeTaxScreen(),
-  'compliance/tax/vat-return': (ctx) => const VatReturnBuilderScreen(),
+  'compliance/tax/vat-return': (ctx) => const VatReturnV52Screen(),  // V5.2 Wizard
   'compliance/tax/wht': (ctx) => const WhtCalculatorV5Screen(),
   'compliance/tax/zakat': (ctx) => const ZakatCalculatorV5Screen(),
   'compliance/tax/uae_ct': (ctx) => const UaeCtScreen(),
