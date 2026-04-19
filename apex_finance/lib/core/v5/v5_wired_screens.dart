@@ -39,6 +39,10 @@ import '../../screens/v4_erp/education_lms_screen.dart';
 import '../../screens/v4_erp/employee_wellness_screen.dart';
 import '../../screens/v4_erp/financial_upload_screen.dart';
 import '../../screens/v4_erp/ma_deal_room_screen.dart';
+import '../../screens/v4_erp/marketplace_client_requests_screen.dart';
+import '../../screens/v4_erp/marketplace_provider_jobs_screen.dart';
+import '../../screens/v4_erp/marketplace_provider_profile_screen.dart';
+import '../../screens/v4_erp/marketplace_provider_ratings_screen.dart';
 import '../../screens/v4_erp/proforma_statements_screen.dart';
 import '../../screens/v4_erp/valuation_models_screen.dart';
 import '../../screens/v4_erp/field_service_screen.dart';
@@ -195,6 +199,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // Wave 27 — Marketplace Billing/Escrow/Payouts
   'marketplace/client/billing': (ctx) => const MarketplaceBillingScreen(),
   'marketplace/provider/payouts': (ctx) => const MarketplaceBillingScreen(),
+  // Wave 135 — Client RFP + Proposals
+  'marketplace/client/requests': (ctx) => const MarketplaceClientRequestsScreen(),
+  // Wave 136 — Provider Profile + Certifications
+  'marketplace/provider/profile': (ctx) => const MarketplaceProviderProfileScreen(),
+  // Wave 137 — Provider Active Jobs
+  'marketplace/provider/jobs': (ctx) => const MarketplaceProviderJobsScreen(),
+  // Wave 138 — Provider Ratings & Reviews
+  'marketplace/provider/ratings': (ctx) => const MarketplaceProviderRatingsScreen(),
 
   // Wave 28 — Eligibility Check (KSA SME/Nomu/Tadawul)
   'compliance/regulatory/eligibility': (ctx) => const EligibilityCheckScreen(),
