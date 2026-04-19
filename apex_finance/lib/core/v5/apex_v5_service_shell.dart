@@ -24,6 +24,8 @@ import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
 import 'cmd_k_palette.dart';
 import 'entity_scope_selector.dart';
+import 'templates/quick_create.dart';
+import 'templates/unified_inbox.dart';
 import 'v5_models.dart';
 
 class ApexV5ServiceShell extends StatelessWidget {
@@ -207,6 +209,9 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           const Spacer(),
+          // Quick Create (+ button) — global create palette
+          const QuickCreateButton(),
+          const SizedBox(width: 10),
           // Entity Scope Selector (Wave 147) — consolidation across entities
           const EntityScopeSelector(),
           const SizedBox(width: 10),
@@ -238,12 +243,35 @@ class _TopBar extends StatelessWidget {
               onPressed: () => _showAppSettings(ctx, service, mainModule),
             ),
           ),
-          // Notifications bell
+          // Unified Inbox (bell icon — replaces notifications)
           Builder(
-            builder: (ctx) => IconButton(
-              tooltip: 'التنبيهات',
-              icon: const Icon(Icons.notifications_outlined),
-              onPressed: () => ctx.go('/app/platform/notifications/center'),
+            builder: (ctx) => Stack(
+              children: [
+                IconButton(
+                  tooltip: 'صندوق الوارد',
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () => UnifiedInbox.show(ctx),
+                ),
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: const Text(
+                      '8',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           // Avatar

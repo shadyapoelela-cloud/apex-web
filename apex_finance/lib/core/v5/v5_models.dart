@@ -106,6 +106,11 @@ class V5Chip {
   /// RBAC capability. Format: `{service}.{mainModule}.{chip}.view`.
   final String? requiredCapability;
 
+  /// 4-phase journey tag (Setup/Capture/Process/Report).
+  /// When set, chips are grouped by phase in the chip row with
+  /// visual dividers and phase headers.
+  final ChipPhase? phase;
+
   const V5Chip({
     required this.id,
     required this.labelAr,
@@ -115,6 +120,7 @@ class V5Chip {
     this.subModule,
     this.dashboardWidgets,
     this.requiredCapability,
+    this.phase,
   });
 
   /// Convenience: build from existing V4SubModule.
@@ -224,3 +230,78 @@ enum V5WidgetKind {
 }
 
 enum V5WidgetSeverity { info, success, warning, critical }
+
+/// The 4-phase journey pattern for chips within an app.
+///
+/// Every app tells a story across 4 phases:
+///   [setup] → [capture] → [process] → [report]
+///
+/// Chips are visually grouped by phase in the chip row, making it
+/// obvious what the user should do first and where the workflow ends.
+enum ChipPhase {
+  /// Setup & configuration (CoA, periods, employees, currencies).
+  setup,
+
+  /// Daily data entry (journals, invoices, claims, orders).
+  capture,
+
+  /// Processing, approvals, reconciliation, close.
+  process,
+
+  /// Final output — statements, dashboards, regulatory reports.
+  report,
+}
+
+extension ChipPhaseX on ChipPhase {
+  String get labelAr {
+    switch (this) {
+      case ChipPhase.setup:
+        return 'الإعداد';
+      case ChipPhase.capture:
+        return 'الإدخال';
+      case ChipPhase.process:
+        return 'المعالجة';
+      case ChipPhase.report:
+        return 'التقارير';
+    }
+  }
+
+  String get labelEn {
+    switch (this) {
+      case ChipPhase.setup:
+        return 'Setup';
+      case ChipPhase.capture:
+        return 'Capture';
+      case ChipPhase.process:
+        return 'Process';
+      case ChipPhase.report:
+        return 'Report';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ChipPhase.setup:
+        return Icons.tune;
+      case ChipPhase.capture:
+        return Icons.edit_note;
+      case ChipPhase.process:
+        return Icons.sync;
+      case ChipPhase.report:
+        return Icons.assessment;
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case ChipPhase.setup:
+        return const Color(0xFF607D8B); // Blue grey
+      case ChipPhase.capture:
+        return const Color(0xFF1565C0); // Blue
+      case ChipPhase.process:
+        return const Color(0xFFD4AF37); // Gold
+      case ChipPhase.report:
+        return const Color(0xFF2E7D5B); // Emerald
+    }
+  }
+}
