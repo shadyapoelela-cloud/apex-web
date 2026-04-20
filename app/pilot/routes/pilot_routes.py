@@ -1271,11 +1271,39 @@ def get_effective_permissions(
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/health")
-def pilot_health():
-    """Pilot module health check."""
-    return {
+def pilot_health(db: Session = Depends(get_db)):
+    """Pilot module health check — الآن مع DB + counts.
+
+    يُستخدم للـ uptime monitoring و dashboards. يُرجع:
+        • حالة الـ DB
+        • عدد tenants/entities/posts (للإحصاء)
+        • النسخة والوقت
+    """
+    checks = {
         "status": "ok",
         "module": "pilot",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+    try:
+        from sqlalchemy import text
+        # Simple query لفحص الاتصال
+        db.execute(text("SELECT 1"))
+        checks["database"] = "ok"
+        # إحصاءات سريعة (cheap queries على الـ indexes)
+        try:
+            checks["stats"] = {
+                "tenants": db.query(Tenant).filter(
+                    Tenant.is_deleted == False  # noqa: E712
+                ).count(),
+                "entities": db.query(Entity).filter(
+                    Entity.is_deleted == False  # noqa: E712
+                ).count(),
+            }
+        except Exception:
+            # الإحصاءات اختيارية — الأهم الـ DB check
+            pass
+    except Exception as e:
+        checks["status"] = "degraded"
+        checks["database"] = f"error: {type(e).__name__}"
+    return checks
