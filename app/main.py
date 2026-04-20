@@ -1256,6 +1256,7 @@ try:
     from app.pilot.routes.pricing_routes import router as pilot_pricing_router
     from app.pilot.routes.pos_routes import router as pilot_pos_router
     from app.pilot.routes.gl_routes import router as pilot_gl_router
+    from app.pilot.routes.compliance_routes import router as pilot_compliance_router
     from app.pilot.models import (  # noqa: F401 — ensure models are registered with metadata
         Tenant, CompanySettings, Entity, Branch,
         Currency, FxRate, Role, Permission, RolePermission,
@@ -1271,6 +1272,10 @@ try:
         PosSession, PosTransaction, PosTransactionLine, PosPayment, CashMovement,
         # Week 3: GL
         GLAccount, FiscalPeriod, JournalEntry, JournalLine, GLPosting,
+        # Week 4: Compliance
+        ZatcaOnboarding, ZatcaInvoiceSubmission,
+        UaeCtFiling, GosiRegistration, GosiContribution,
+        WpsBatch, WpsSifRecord, VatReturn,
     )
     from app.phase1.models.platform_models import Base as PilotBase, engine as pilot_engine
     # Create pilot tables if missing (idempotent)
@@ -1280,6 +1285,7 @@ try:
     app.include_router(pilot_pricing_router)
     app.include_router(pilot_pos_router)
     app.include_router(pilot_gl_router)
+    app.include_router(pilot_compliance_router)
     HAS_PILOT = True
     logging.info("Pilot routes mounted (multi-tenant retail ERP) + tables ensured")
 except Exception as e:

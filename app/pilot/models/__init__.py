@@ -34,6 +34,14 @@ from .gl import (
     JournalLine,
     GLPosting,
 )
+from .compliance import (
+    ZatcaOnboarding, ZatcaInvoiceSubmission,
+    ZatcaEnvironment, ZatcaInvoiceKind, ZatcaSubmissionStatus,
+    UaeCtFiling, UaeCtClassification,
+    GosiRegistration, GosiContribution, GosiEmployeeType,
+    WpsBatch, WpsSifRecord, WpsStatus,
+    VatReturn, VatReturnStatus,
+)
 
 # Backward-compat aliases (used by early route code)
 Role = PilotRole
@@ -117,6 +125,22 @@ __all__ = [
     "JournalEntryStatus",
     "JournalLine",
     "GLPosting",
+    # Compliance
+    "ZatcaOnboarding",
+    "ZatcaInvoiceSubmission",
+    "ZatcaEnvironment",
+    "ZatcaInvoiceKind",
+    "ZatcaSubmissionStatus",
+    "UaeCtFiling",
+    "UaeCtClassification",
+    "GosiRegistration",
+    "GosiContribution",
+    "GosiEmployeeType",
+    "WpsBatch",
+    "WpsSifRecord",
+    "WpsStatus",
+    "VatReturn",
+    "VatReturnStatus",
     # aliases
     "Role",
     "Permission",
