@@ -47,7 +47,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 4, vsync: this);
+    _tab = TabController(length: 5, vsync: this);
     _load();
   }
 
@@ -126,6 +126,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                         Tab(icon: Icon(Icons.domain), text: 'الكيانات'),
                         Tab(icon: Icon(Icons.store), text: 'الفروع'),
                         Tab(icon: Icon(Icons.settings), text: 'إعدادات'),
+                        Tab(icon: Icon(Icons.palette), text: 'الهوية البصرية'),
                       ],
                     ),
                     const Divider(color: _bdr, height: 1),
@@ -135,6 +136,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                         _entitiesTab(),
                         _branchesTab(),
                         _settingsTab(),
+                        _brandingTab(),
                       ]),
                     ),
                   ]),
@@ -897,6 +899,731 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
     } else {
       _showMsg(r.error ?? 'فشل', _err);
     }
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // Tab 5: الهوية البصرية (Branding)
+  // ═════════════════════════════════════════════════════════════
+
+  Widget _brandingTab() {
+    final s = _settings;
+    if (s == null) {
+      return const Center(
+        child: Text('ابذر إعدادات الشركة أولاً من تبويب "إعدادات"',
+            style: TextStyle(color: _ts, fontSize: 13)),
+      );
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _brandingHeader(),
+          const SizedBox(height: 16),
+          _brandingLogoCard(s),
+          const SizedBox(height: 14),
+          _brandingColorsCard(s),
+          const SizedBox(height: 14),
+          _brandingInvoiceCard(s),
+          const SizedBox(height: 14),
+          _brandingPreviewCard(s),
+        ],
+      ),
+    );
+  }
+
+  Widget _brandingHeader() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _gold.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _gold.withValues(alpha: 0.3)),
+      ),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: _gold.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(Icons.palette, color: _gold, size: 22),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text('الهوية البصرية للمستندات',
+                  style: TextStyle(
+                      color: _tp,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800)),
+              SizedBox(height: 2),
+              Text(
+                  'الشعار، الألوان، ورأس/ذيل الفواتير — تنطبق على PO، فواتير البيع والشراء، الإيصالات، القيود',
+                  style: TextStyle(color: _ts, fontSize: 11, height: 1.5)),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _brandingLogoCard(Map<String, dynamic> s) {
+    final logoUrl = (s['logo_url'] ?? '').toString();
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _navy2,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _bdr),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            const Icon(Icons.image, color: _gold, size: 18),
+            const SizedBox(width: 8),
+            const Text('شعار الشركة (Logo)',
+                style: TextStyle(
+                    color: _tp, fontSize: 14, fontWeight: FontWeight.w800)),
+            const Spacer(),
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: _gold,
+                  side: BorderSide(color: _gold.withValues(alpha: 0.4))),
+              onPressed: () => _editBrandField('logo_url',
+                  'رابط شعار الشركة (URL أو data:image/png;base64,...)'),
+              icon: const Icon(Icons.edit, size: 14),
+              label: const Text('تعديل URL'),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          Container(
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: _navy3,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                  color: _bdr,
+                  style: logoUrl.isEmpty
+                      ? BorderStyle.solid
+                      : BorderStyle.solid),
+            ),
+            child: logoUrl.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.image_outlined,
+                            color: _td.withValues(alpha: 0.5), size: 32),
+                        const SizedBox(height: 4),
+                        const Text(
+                            'لا يوجد شعار — أضف URL أو data URI لصورة PNG/JPG/SVG',
+                            style:
+                                TextStyle(color: _td, fontSize: 11)),
+                      ],
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Image.network(
+                      logoUrl,
+                      fit: BoxFit.contain,
+                      errorBuilder: (c, e, s) => Center(
+                        child: Text(
+                            'تعذّر تحميل الشعار من الرابط',
+                            style:
+                                TextStyle(color: _err, fontSize: 11)),
+                      ),
+                    ),
+                  ),
+          ),
+          const SizedBox(height: 10),
+          Row(children: [
+            const Text('موقع الشعار في الفاتورة:',
+                style: TextStyle(color: _ts, fontSize: 12)),
+            const SizedBox(width: 10),
+            ...['right', 'left', 'center'].map((pos) {
+              final sel = s['logo_position'] == pos;
+              return Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: InkWell(
+                  onTap: () => _updateBrandField('logo_position', pos),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: sel ? _gold : _navy3,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: sel ? _gold : _bdr),
+                    ),
+                    child: Text(
+                      pos == 'right'
+                          ? 'يمين'
+                          : pos == 'left'
+                              ? 'يسار'
+                              : 'وسط',
+                      style: TextStyle(
+                          color: sel ? Colors.black : _ts,
+                          fontSize: 11,
+                          fontWeight: sel
+                              ? FontWeight.w700
+                              : FontWeight.w500),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  Widget _brandingColorsCard(Map<String, dynamic> s) {
+    final primary = (s['brand_primary_color'] ?? '#D4AF37').toString();
+    final secondary = (s['brand_secondary_color'] ?? '#0A1628').toString();
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _navy2,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _bdr),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: const [
+            Icon(Icons.palette_outlined, color: _gold, size: 18),
+            SizedBox(width: 8),
+            Text('الألوان',
+                style: TextStyle(
+                    color: _tp, fontSize: 14, fontWeight: FontWeight.w800)),
+          ]),
+          const SizedBox(height: 10),
+          Row(children: [
+            Expanded(
+              child: _colorPickerRow(
+                'اللون الأساسي (Headers، أزرار)',
+                primary,
+                (v) => _updateBrandField('brand_primary_color', v),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _colorPickerRow(
+                'اللون الثانوي (الخلفية)',
+                secondary,
+                (v) => _updateBrandField('brand_secondary_color', v),
+              ),
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  Widget _colorPickerRow(String label, String hex, ValueChanged<String> onSet) {
+    Color parsed;
+    try {
+      parsed = Color(int.parse(hex.replaceFirst('#', '0xFF')));
+    } catch (_) {
+      parsed = _gold;
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        const SizedBox(height: 4),
+        InkWell(
+          onTap: () async {
+            final ctrl = TextEditingController(text: hex);
+            await showDialog(
+              context: context,
+              builder: (_) => Directionality(
+                textDirection: TextDirection.rtl,
+                child: AlertDialog(
+                  backgroundColor: _navy2,
+                  title: Text(label, style: const TextStyle(color: _tp)),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                          'أدخل قيمة Hex (مثال: #D4AF37)',
+                          style: TextStyle(color: _ts, fontSize: 11)),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: ctrl,
+                        style: const TextStyle(
+                            color: _tp,
+                            fontSize: 14,
+                            fontFamily: 'monospace'),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: _navy3,
+                          hintText: '#D4AF37',
+                          hintStyle: const TextStyle(color: _td),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: const BorderSide(color: _bdr)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('إلغاء',
+                            style: TextStyle(color: _ts))),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                          backgroundColor: _gold,
+                          foregroundColor: Colors.black),
+                      onPressed: () {
+                        onSet(ctrl.text.trim());
+                        Navigator.pop(context);
+                      },
+                      child: const Text('حفظ'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+            ctrl.dispose();
+          },
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: _navy3,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: _bdr),
+            ),
+            child: Row(children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: parsed,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: _bdr),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(hex,
+                    style: const TextStyle(
+                        color: _tp,
+                        fontSize: 14,
+                        fontFamily: 'monospace')),
+              ),
+              const Icon(Icons.edit, color: _td, size: 14),
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _brandingInvoiceCard(Map<String, dynamic> s) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _navy2,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _bdr),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: const [
+            Icon(Icons.receipt_long, color: _gold, size: 18),
+            SizedBox(width: 8),
+            Text('رأس وذيل الفاتورة',
+                style: TextStyle(
+                    color: _tp, fontSize: 14, fontWeight: FontWeight.w800)),
+          ]),
+          const SizedBox(height: 12),
+          _textFieldRow(
+            'رأس الفاتورة (HTML/نص — يظهر أعلى كل فاتورة مطبوعة)',
+            (s['invoice_header_html'] ?? '').toString(),
+            (v) => _updateBrandField('invoice_header_html', v),
+            maxLines: 3,
+            placeholder: 'مثال: شركة النور التجارية | سجل تجاري 1010203040',
+          ),
+          const SizedBox(height: 10),
+          _textFieldRow(
+            'ذيل الفاتورة',
+            (s['invoice_footer_html'] ?? '').toString(),
+            (v) => _updateBrandField('invoice_footer_html', v),
+            maxLines: 2,
+            placeholder: 'مثال: شكراً لتعاملكم معنا',
+          ),
+          const SizedBox(height: 10),
+          _textFieldRow(
+            'الشروط والأحكام (عربي)',
+            (s['invoice_terms_ar'] ?? '').toString(),
+            (v) => _updateBrandField('invoice_terms_ar', v),
+            maxLines: 4,
+            placeholder: 'شروط الدفع، سياسة الإرجاع، إلخ',
+          ),
+          const SizedBox(height: 10),
+          Row(children: [
+            Expanded(
+              child: _switchRow(
+                'عرض تفصيل VAT على الفاتورة',
+                s['show_vat_breakdown'] == true,
+                (v) => _updateBrandField('show_vat_breakdown', v),
+              ),
+            ),
+            Expanded(
+              child: _switchRow(
+                'عرض QR ZATCA على الفاتورة',
+                s['show_qr_on_invoice'] == true,
+                (v) => _updateBrandField('show_qr_on_invoice', v),
+              ),
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  Widget _textFieldRow(String label, String value, ValueChanged<String> onSave,
+      {int maxLines = 1, String? placeholder}) {
+    return InkWell(
+      onTap: () async {
+        final ctrl = TextEditingController(text: value);
+        await showDialog(
+          context: context,
+          builder: (_) => Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              backgroundColor: _navy2,
+              title: Text(label,
+                  style: const TextStyle(color: _tp, fontSize: 14)),
+              content: SizedBox(
+                width: 500,
+                child: TextField(
+                  controller: ctrl,
+                  maxLines: maxLines,
+                  style: const TextStyle(color: _tp, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: placeholder,
+                    hintStyle: const TextStyle(color: _td),
+                    filled: true,
+                    fillColor: _navy3,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: _bdr)),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child:
+                        const Text('إلغاء', style: TextStyle(color: _ts))),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                      backgroundColor: _gold, foregroundColor: Colors.black),
+                  onPressed: () {
+                    onSave(ctrl.text);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('حفظ'),
+                ),
+              ],
+            ),
+          ),
+        );
+        ctrl.dispose();
+      },
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: _navy3,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: _bdr),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Expanded(
+                child: Text(label,
+                    style: const TextStyle(color: _td, fontSize: 11)),
+              ),
+              const Icon(Icons.edit, color: _td, size: 12),
+            ]),
+            const SizedBox(height: 4),
+            Text(
+              value.isEmpty ? (placeholder ?? '—') : value,
+              style: TextStyle(
+                color: value.isEmpty ? _td : _tp,
+                fontSize: 12,
+                height: 1.5,
+              ),
+              maxLines: maxLines,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _switchRow(String label, bool value, ValueChanged<bool> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(children: [
+        Checkbox(
+          value: value,
+          onChanged: (v) => onChanged(v ?? false),
+          checkColor: Colors.black,
+          fillColor: WidgetStateProperty.resolveWith<Color?>(
+              (s) => s.contains(WidgetState.selected) ? _gold : _navy3),
+        ),
+        Expanded(
+          child: Text(label, style: const TextStyle(color: _ts, fontSize: 12)),
+        ),
+      ]),
+    );
+  }
+
+  Widget _brandingPreviewCard(Map<String, dynamic> s) {
+    final primary = (s['brand_primary_color'] ?? '#D4AF37').toString();
+    Color primaryColor;
+    try {
+      primaryColor = Color(int.parse(primary.replaceFirst('#', '0xFF')));
+    } catch (_) {
+      primaryColor = _gold;
+    }
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4))
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(color: primaryColor, width: 3)),
+            ),
+            child: Row(children: [
+              if ((s['logo_url'] ?? '').toString().isNotEmpty)
+                Container(
+                  width: 48,
+                  height: 48,
+                  margin: const EdgeInsets.only(left: 12),
+                  child: Image.network(
+                    s['logo_url'],
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) =>
+                        Icon(Icons.image, color: primaryColor),
+                  ),
+                ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(_tenant?['legal_name_ar'] ?? 'الشركة',
+                        style: TextStyle(
+                            color: primaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800)),
+                    if ((s['invoice_header_html'] ?? '').toString().isNotEmpty)
+                      Text(s['invoice_header_html'],
+                          style: const TextStyle(
+                              color: Colors.black54, fontSize: 10)),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('فاتورة ضريبية',
+                      style: TextStyle(
+                          color: primaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800)),
+                  const Text('INV-2026-000001',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 10,
+                          fontFamily: 'monospace')),
+                ],
+              ),
+            ]),
+          ),
+          const SizedBox(height: 12),
+          // Body
+          Container(
+            padding: const EdgeInsets.all(10),
+            color: primaryColor.withValues(alpha: 0.08),
+            child: const Row(children: [
+              Expanded(
+                  child: Text('الوصف',
+                      style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700))),
+              SizedBox(
+                  width: 60,
+                  child: Text('الكمية',
+                      style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700))),
+              SizedBox(
+                  width: 80,
+                  child: Text('الإجمالي',
+                      style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700),
+                      textAlign: TextAlign.end)),
+            ]),
+          ),
+          const SizedBox(height: 4),
+          Row(children: const [
+            Expanded(
+                child: Text('سلعة نموذجية',
+                    style: TextStyle(color: Colors.black87, fontSize: 11))),
+            SizedBox(
+                width: 60,
+                child: Text('2',
+                    style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 11,
+                        fontFamily: 'monospace'))),
+            SizedBox(
+                width: 80,
+                child: Text('100.00',
+                    style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 11,
+                        fontFamily: 'monospace'),
+                    textAlign: TextAlign.end)),
+          ]),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: primaryColor.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Row(children: [
+              const Expanded(
+                  child: Text('الإجمالي النهائي',
+                      style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800))),
+              Text('115.00 SAR',
+                  style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'monospace')),
+            ]),
+          ),
+          if ((s['invoice_footer_html'] ?? '').toString().isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(s['invoice_footer_html'],
+                style: const TextStyle(
+                    color: Colors.black54, fontSize: 10, height: 1.5),
+                textAlign: TextAlign.center),
+          ],
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            alignment: Alignment.center,
+            child: Text('🔍 معاينة الفاتورة المطبوعة',
+                style: TextStyle(
+                    color: primaryColor.withValues(alpha: 0.6),
+                    fontSize: 10)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _updateBrandField(String key, dynamic value) async {
+    if (!PilotSession.hasTenant) return;
+    final r = await _client.updateTenantSettings(
+        PilotSession.tenantId!, {key: value});
+    if (!mounted) return;
+    if (r.success) {
+      // update local state for immediate preview
+      setState(() {
+        if (_settings != null) _settings![key] = value;
+      });
+      _showMsg('تم حفظ $key ✓', _ok);
+    } else {
+      _showMsg(r.error ?? 'فشل الحفظ', _err);
+    }
+  }
+
+  Future<void> _editBrandField(String key, String label) async {
+    final ctrl = TextEditingController(
+        text: (_settings?[key] ?? '').toString());
+    await showDialog(
+      context: context,
+      builder: (_) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: _navy2,
+          title: Text(label, style: const TextStyle(color: _tp, fontSize: 14)),
+          content: SizedBox(
+            width: 500,
+            child: TextField(
+              controller: ctrl,
+              maxLines: 3,
+              style: const TextStyle(
+                  color: _tp, fontSize: 12, fontFamily: 'monospace'),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: _navy3,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: _bdr)),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('إلغاء', style: TextStyle(color: _ts))),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                  backgroundColor: _gold, foregroundColor: Colors.black),
+              onPressed: () {
+                _updateBrandField(key, ctrl.text);
+                Navigator.pop(context);
+              },
+              child: const Text('حفظ'),
+            ),
+          ],
+        ),
+      ),
+    );
+    ctrl.dispose();
   }
 
   // ═════════════════════════════════════════════════════════════

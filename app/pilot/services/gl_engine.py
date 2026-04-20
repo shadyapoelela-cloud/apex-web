@@ -841,3 +841,173 @@ def compute_balance_sheet(db: Session, *, entity_id: str, as_of_date: date) -> d
         "balanced": (assets - (liabilities + total_equity_effective)).quantize(Q2) == Decimal("0.00"),
         "difference": float(assets - (liabilities + total_equity_effective)),
     }
+
+
+def compute_cash_flow(
+    db: Session, *, entity_id: str, start_date: date, end_date: date,
+) -> dict:
+    """قائمة التدفقات النقدية بطريقة غير مباشرة (Indirect Method).
+
+    Net Income
+      + Depreciation & Amortization
+      - Increase in AR / + Decrease in AR
+      - Increase in Inventory / + Decrease
+      + Increase in AP / - Decrease
+    = Cash Flow from Operations
+
+    Investing: purchases/sales of fixed assets
+    Financing: loans, equity issuance, dividends
+
+    For v1 we compute Operating activities from P&L + WC changes.
+    Investing/Financing require account tagging (future).
+    """
+    # 1) Net income من قائمة الدخل
+    income = compute_income_statement(db, entity_id=entity_id,
+                                       start_date=start_date, end_date=end_date)
+    net_income = Decimal(str(income["net_income"]))
+
+    # 2) حساب التغيّر في working capital (AR + Inventory + AP)
+    # نحسب رصيد بداية وآخر الفترة لكل category
+    def _category_balance(cat: str, on_date: date) -> Decimal:
+        tb = compute_trial_balance(db, entity_id=entity_id,
+                                    as_of_date=on_date, include_zero=False)
+        return sum((r["balance"] for r in tb if r["category"] == cat),
+                    Decimal("0"))
+
+    # تغيّر الأصول المتداولة (AR, Inventory) — زيادة = استخدام نقدية
+    # نُحدّد الحسابات بـ subcategory (لو موجودة). v1: نستخدم الـ category الكلية
+    start_date_prev = date(start_date.year, start_date.month, start_date.day)
+    # رصيد يوم قبل البداية
+    from datetime import timedelta
+    start_prev_day = start_date - timedelta(days=1)
+
+    try:
+        ar_change = _category_balance("asset", end_date) - _category_balance("asset", start_prev_day)
+        ap_change = _category_balance("liability", end_date) - _category_balance("liability", start_prev_day)
+    except Exception:
+        ar_change = Decimal("0")
+        ap_change = Decimal("0")
+
+    # دلالة: زيادة أصول = تدفق خارج، زيادة خصوم = تدفق داخل
+    operating_cf = net_income - ar_change + ap_change
+
+    # 3) الفرق في النقدية (من TB — نقارن رصيد النقدية والبنوك)
+    # حسابات النقدية تبدأ بـ 111x (cash) و 112x (banks) حسب SOCPA
+    cash_start = Decimal("0")
+    cash_end = Decimal("0")
+    tb_end = compute_trial_balance(db, entity_id=entity_id,
+                                    as_of_date=end_date, include_zero=False)
+    for r in tb_end:
+        if r["code"].startswith(("111", "112")):
+            cash_end += r["balance"]
+    tb_start = compute_trial_balance(db, entity_id=entity_id,
+                                      as_of_date=start_prev_day, include_zero=False)
+    for r in tb_start:
+        if r["code"].startswith(("111", "112")):
+            cash_start += r["balance"]
+
+    actual_cash_change = cash_end - cash_start
+
+    return {
+        "entity_id": entity_id,
+        "start_date": start_date.isoformat(),
+        "end_date": end_date.isoformat(),
+        "net_income": float(net_income),
+        "working_capital_change": float(-ar_change + ap_change),
+        "ar_change": float(ar_change),
+        "ap_change": float(ap_change),
+        "operating_cf": float(operating_cf),
+        "investing_cf": 0.0,  # v2: سنضيف تصنيف الأصول الثابتة
+        "financing_cf": 0.0,  # v2: سنضيف تصنيف القروض وحقوق الملكية
+        "net_cash_change": float(operating_cf),
+        "cash_beginning": float(cash_start),
+        "cash_ending": float(cash_end),
+        "actual_cash_change": float(actual_cash_change),
+        "variance": float(actual_cash_change - operating_cf),
+    }
+
+
+def compute_account_ledger(
+    db: Session, *, account_id: str, start_date: Optional[date] = None,
+    end_date: Optional[date] = None, limit: int = 500,
+) -> dict:
+    """دفتر الأستاذ لحساب واحد — كل حركاته (postings) بين تاريخين.
+
+    يُرجع:
+        • الحساب (code, name)
+        • رصيد افتتاحي (قبل start_date)
+        • جميع الحركات في الفترة مع running_balance
+        • رصيد ختامي
+    """
+    acc = db.query(GLAccount).filter(GLAccount.id == account_id).first()
+    if not acc:
+        raise ValueError(f"Account {account_id} not found")
+
+    q = db.query(GLPosting).filter(GLPosting.account_id == account_id)
+
+    # رصيد افتتاحي
+    opening_balance = Decimal("0")
+    if start_date:
+        openings = db.query(
+            func.sum(GLPosting.debit_amount).label("d"),
+            func.sum(GLPosting.credit_amount).label("c"),
+        ).filter(
+            GLPosting.account_id == account_id,
+            GLPosting.posting_date < start_date,
+        ).first()
+        d = Decimal(str(openings.d or 0))
+        c = Decimal(str(openings.c or 0))
+        if acc.normal_balance == NormalBalance.debit.value:
+            opening_balance = d - c
+        else:
+            opening_balance = c - d
+        q = q.filter(GLPosting.posting_date >= start_date)
+
+    if end_date:
+        q = q.filter(GLPosting.posting_date <= end_date)
+
+    postings = q.order_by(GLPosting.posting_date, GLPosting.created_at).limit(limit).all()
+
+    # بناء صفوف مع running balance
+    running = opening_balance
+    rows = []
+    for p in postings:
+        d = Decimal(str(p.debit_amount or 0))
+        c = Decimal(str(p.credit_amount or 0))
+        if acc.normal_balance == NormalBalance.debit.value:
+            running += (d - c)
+        else:
+            running += (c - d)
+        # جلب JE number + memo للعرض
+        je = p.journal_entry if p.journal_entry else None
+        rows.append({
+            "id": p.id,
+            "posting_date": p.posting_date.isoformat() if p.posting_date else None,
+            "je_number": je.je_number if je else None,
+            "je_memo_ar": je.memo_ar if je else None,
+            "description": p.description,
+            "reference": p.reference,
+            "partner_name": p.partner_name,
+            "debit": float(d),
+            "credit": float(c),
+            "running_balance": float(running),
+        })
+
+    total_debit = sum((Decimal(str(r["debit"])) for r in rows), Decimal("0"))
+    total_credit = sum((Decimal(str(r["credit"])) for r in rows), Decimal("0"))
+
+    return {
+        "account_id": account_id,
+        "code": acc.code,
+        "name_ar": acc.name_ar,
+        "name_en": acc.name_en,
+        "category": acc.category,
+        "normal_balance": acc.normal_balance,
+        "start_date": start_date.isoformat() if start_date else None,
+        "end_date": end_date.isoformat() if end_date else None,
+        "opening_balance": float(opening_balance),
+        "total_debit": float(total_debit),
+        "total_credit": float(total_credit),
+        "closing_balance": float(running),
+        "rows": rows,
+    }

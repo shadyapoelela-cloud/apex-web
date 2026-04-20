@@ -86,6 +86,18 @@ class CompanySettingsRead(BaseModel):
     ai_confidence_threshold_bp: int
     approval_thresholds: dict[str, Any]
     extras: dict[str, Any]
+    # Branding
+    logo_url: Optional[str] = None
+    logo_position: str = "right"
+    brand_primary_color: str = "#D4AF37"
+    brand_secondary_color: str = "#0A1628"
+    invoice_header_html: Optional[str] = None
+    invoice_footer_html: Optional[str] = None
+    invoice_terms_ar: Optional[str] = None
+    invoice_terms_en: Optional[str] = None
+    signature_url: Optional[str] = None
+    show_vat_breakdown: bool = True
+    show_qr_on_invoice: bool = True
 
 
 class CompanySettingsUpdate(BaseModel):
@@ -109,3 +121,15 @@ class CompanySettingsUpdate(BaseModel):
     ai_confidence_threshold_bp: Optional[int] = Field(None, ge=0, le=10000)
     approval_thresholds: Optional[dict[str, Any]] = None
     extras: Optional[dict[str, Any]] = None
+    # Branding
+    logo_url: Optional[str] = None
+    logo_position: Optional[str] = None
+    brand_primary_color: Optional[str] = None
+    brand_secondary_color: Optional[str] = None
+    invoice_header_html: Optional[str] = None
+    invoice_footer_html: Optional[str] = None
+    invoice_terms_ar: Optional[str] = None
+    invoice_terms_en: Optional[str] = None
+    signature_url: Optional[str] = None
+    show_vat_breakdown: Optional[bool] = None
+    show_qr_on_invoice: Optional[bool] = None
