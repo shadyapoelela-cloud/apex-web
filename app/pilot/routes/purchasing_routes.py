@@ -222,6 +222,8 @@ def issue_po_endpoint(po_id: str, db: Session = Depends(get_db)):
 
 @router.post("/goods-receipts", response_model=GrnDetail, status_code=201)
 def receive_grn(payload: GrnCreate, db: Session = Depends(get_db)):
+    import logging
+    import traceback
     po = db.query(PurchaseOrder).filter(PurchaseOrder.id == payload.po_id).first()
     if not po:
         raise HTTPException(404, "PO not found")
@@ -244,6 +246,20 @@ def receive_grn(payload: GrnCreate, db: Session = Depends(get_db)):
     except ValueError as ex:
         db.rollback()
         raise HTTPException(400, str(ex))
+    except HTTPException:
+        # تمرير HTTPException الصريحة كما هي (404, 400, إلخ)
+        db.rollback()
+        raise
+    except Exception as ex:
+        # أي استثناء آخر نرجّعه كـ 400 مع الرسالة الكاملة بدل 500 صامت
+        # (500 بدون CORS headers يسبب "CORS error" مُضلّل في المتصفح)
+        db.rollback()
+        tb = traceback.format_exc()
+        logging.error(f"receive_grn failed: {ex}\n{tb}")
+        raise HTTPException(
+            400,
+            f"فشل استلام البضاعة: {type(ex).__name__}: {str(ex)[:200]}"
+        )
 
     lines = db.query(GoodsReceiptLine).filter(
         GoodsReceiptLine.grn_id == grn.id
