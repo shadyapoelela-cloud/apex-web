@@ -41,6 +41,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   Map<String, dynamic>? _trialBalance;
   Map<String, dynamic>? _incomeStatement;
   Map<String, dynamic>? _balanceSheet;
+  Map<String, dynamic>? _cashFlow;
   // للـ P&L و BS نحتاج تفاصيل الحسابات من TB (backend لا يُرجعها مع BS/IS)
   List<Map<String, dynamic>> _tbRowsForDetails = [];
   bool _loading = true;
@@ -53,7 +54,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    _tab = TabController(length: 4, vsync: this);
     _tab.addListener(_onTabChange);
     _load();
   }
@@ -124,6 +125,16 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
         } else {
           _error = r.error;
         }
+      } else if (_tab.index == 3) {
+        final r = await _client.cashFlow(
+            eid,
+            _startDate.toIso8601String().substring(0, 10),
+            _endDate.toIso8601String().substring(0, 10));
+        if (r.success && r.data is Map) {
+          _cashFlow = Map<String, dynamic>.from(r.data);
+        } else {
+          _error = r.error;
+        }
       }
       // ignore: avoid_print
       print('[FinReports] _load success, tab=${_tab.index}');
@@ -161,6 +172,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
                 Tab(icon: Icon(Icons.balance, size: 16), text: 'ميزان المراجعة'),
                 Tab(icon: Icon(Icons.trending_up, size: 16), text: 'قائمة الدخل'),
                 Tab(icon: Icon(Icons.account_balance, size: 16), text: 'المركز المالي'),
+                Tab(icon: Icon(Icons.waves, size: 16), text: 'التدفقات النقدية'),
               ],
             ),
           ),
@@ -174,6 +186,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
                         _trialBalanceTab(),
                         _incomeStatementTab(),
                         _balanceSheetTab(),
+                        _cashFlowTab(),
                       ]),
           ),
         ]),
@@ -421,7 +434,10 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
     final debit = asDouble(r['total_debit']);
     final credit = asDouble(r['total_credit']);
     final balance = asDouble(r['balance']);
-    return Container(
+    return InkWell(
+      onTap: () => _showAccountLedger(r),
+      borderRadius: BorderRadius.circular(5),
+      child: Container(
       margin: const EdgeInsets.only(top: 3),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -489,7 +505,26 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
                   fontFamily: 'monospace'),
               textAlign: TextAlign.end),
         ),
+        const SizedBox(width: 6),
+        Icon(Icons.arrow_back_ios, color: _td, size: 10),
       ]),
+    ),  // close Container
+    );  // close InkWell
+  }
+
+  /// Drill-down: اضغط صف TB → افتح Account Ledger كامل.
+  Future<void> _showAccountLedger(Map<String, dynamic> row) async {
+    final accountId = row['account_id']?.toString();
+    if (accountId == null) return;
+    await showDialog(
+      context: context,
+      builder: (_) => _AccountLedgerDialog(
+        accountId: accountId,
+        startDate: _startDate,
+        endDate: _asOfDate,
+        accountCode: row['code']?.toString() ?? '',
+        accountName: row['name_ar']?.toString() ?? '',
+      ),
     );
   }
 
@@ -779,6 +814,200 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   }
 
   // ════════════════════════════════════════════════════════════════════
+  // Tab 4: Cash Flow (Indirect Method)
+  // ════════════════════════════════════════════════════════════════════
+
+  Widget _cashFlowTab() {
+    final cf = _cashFlow;
+    if (cf == null) {
+      return const Center(
+          child: Text('لا توجد بيانات',
+              style: TextStyle(color: _ts, fontSize: 13)));
+    }
+    final netIncome = asDouble(cf['net_income']);
+    final wcChange = asDouble(cf['working_capital_change']);
+    final operatingCF = asDouble(cf['operating_cf']);
+    final cashBegin = asDouble(cf['cash_beginning']);
+    final cashEnd = asDouble(cf['cash_ending']);
+    final variance = asDouble(cf['variance']);
+    final arChange = asDouble(cf['ar_change']);
+    final apChange = asDouble(cf['ap_change']);
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Summary KPIs
+        Row(children: [
+          Expanded(
+              child: _summaryCard('نقدية بداية', cashBegin,
+                  const Color(0xFF6366F1))),
+          const SizedBox(width: 10),
+          Expanded(
+              child: _summaryCard(
+                  'تدفق تشغيلي صافي',
+                  operatingCF,
+                  operatingCF >= 0 ? _ok : _err)),
+          const SizedBox(width: 10),
+          Expanded(
+              child: _summaryCard('نقدية نهاية', cashEnd, _gold)),
+        ]),
+        const SizedBox(height: 16),
+        _sectionHeader('التدفقات من الأنشطة التشغيلية', Icons.sync, _ok),
+        _cfLine('صافي الدخل', netIncome, _indigo),
+        _cfLine(' ± التغيّر في الأصول المتداولة (AR, مخزون)',
+            -arChange, arChange > 0 ? _err : _ok),
+        _cfLine(' ± التغيّر في الخصوم المتداولة (AP)',
+            apChange, apChange > 0 ? _ok : _err),
+        const SizedBox(height: 4),
+        _totalLine('صافي التدفق التشغيلي', operatingCF,
+            operatingCF >= 0 ? _ok : _err),
+        const SizedBox(height: 16),
+        _sectionHeader('التدفقات من الأنشطة الاستثمارية', Icons.home_work, _warn),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: _warn.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: _warn.withValues(alpha: 0.2)),
+          ),
+          child: const Row(children: [
+            Icon(Icons.info_outline, color: _warn, size: 14),
+            SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                'سيُحسب تلقائياً بعد تصنيف الأصول الثابتة في v2 (شراء/بيع معدات وممتلكات)',
+                style: TextStyle(color: _ts, fontSize: 11),
+              ),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 16),
+        _sectionHeader('التدفقات من الأنشطة التمويلية', Icons.account_balance, _indigo),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: _indigo.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: _indigo.withValues(alpha: 0.2)),
+          ),
+          child: const Row(children: [
+            Icon(Icons.info_outline, color: _indigo, size: 14),
+            SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                'سيُحسب تلقائياً بعد تصنيف حسابات القروض والتوزيعات في v2',
+                style: TextStyle(color: _ts, fontSize: 11),
+              ),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 20),
+        // Reconciliation
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: _gold.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: _gold.withValues(alpha: 0.4), width: 2),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('تسوية النقدية',
+                  style: TextStyle(
+                      color: _gold,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800)),
+              const SizedBox(height: 10),
+              _reconciliationRow('نقدية أول الفترة', cashBegin),
+              _reconciliationRow('+ التدفق التشغيلي', operatingCF),
+              _reconciliationRow('= النقدية المتوقعة',
+                  cashBegin + operatingCF, bold: true),
+              const Divider(color: _bdr),
+              _reconciliationRow('النقدية الفعلية (من الميزان)', cashEnd),
+              _reconciliationRow(
+                  'الفارق',
+                  variance,
+                  color: variance.abs() < 0.01 ? _ok : _err,
+                  bold: true),
+              if (variance.abs() > 0.01) ...[
+                const SizedBox(height: 6),
+                Text(
+                  '⚠ الفارق قد يعود لعدم تصنيف أنشطة الاستثمار/التمويل في v2، أو حركات غير نقدية (إهلاك/تعديلات).',
+                  style: TextStyle(color: _warn, fontSize: 11),
+                ),
+              ],
+            ],
+          ),
+        ),
+        // WC details
+        const SizedBox(height: 14),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              color: _navy2,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: _bdr)),
+          child: Column(children: [
+            _reconciliationRow('تغيّر رأس المال العامل', wcChange),
+            _reconciliationRow('تغيّر إجمالي الأصول', arChange),
+            _reconciliationRow('تغيّر إجمالي الخصوم', apChange),
+          ]),
+        ),
+      ],
+    );
+  }
+
+  Widget _cfLine(String label, double value, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(top: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: _navy2.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: _bdr),
+      ),
+      child: Row(children: [
+        Expanded(
+          child: Text(label,
+              style: const TextStyle(color: _tp, fontSize: 12)),
+        ),
+        Text(
+          '${value >= 0 ? "+" : ""}${_fmt(value.abs())}',
+          style: TextStyle(
+              color: color,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'monospace'),
+        ),
+      ]),
+    );
+  }
+
+  Widget _reconciliationRow(String label, double value,
+      {bool bold = false, Color? color}) {
+    final c = color ?? _tp;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(children: [
+        Expanded(
+          child: Text(label,
+              style: TextStyle(
+                  color: bold ? c : _ts,
+                  fontSize: 12,
+                  fontWeight: bold ? FontWeight.w800 : FontWeight.w500)),
+        ),
+        Text(_fmt(value),
+            style: TextStyle(
+                color: c,
+                fontSize: 13,
+                fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
+                fontFamily: 'monospace')),
+      ]),
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════════════
   // Helpers
   // ════════════════════════════════════════════════════════════════════
 
@@ -895,3 +1124,335 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
 
 const _th = TextStyle(
     color: _td, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5);
+
+// ══════════════════════════════════════════════════════════════════════════
+// Account Ledger Dialog — drill-down من TB صف → حركات الحساب التفصيلية
+// ══════════════════════════════════════════════════════════════════════════
+
+class _AccountLedgerDialog extends StatefulWidget {
+  final String accountId;
+  final String accountCode;
+  final String accountName;
+  final DateTime startDate;
+  final DateTime endDate;
+  const _AccountLedgerDialog({
+    required this.accountId,
+    required this.accountCode,
+    required this.accountName,
+    required this.startDate,
+    required this.endDate,
+  });
+  @override
+  State<_AccountLedgerDialog> createState() => _AccountLedgerDialogState();
+}
+
+class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
+  Map<String, dynamic>? _data;
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final r = await pilotClient.accountLedger(
+      widget.accountId,
+      startDate: widget.startDate.toIso8601String().substring(0, 10),
+      endDate: widget.endDate.toIso8601String().substring(0, 10),
+      limit: 1000,
+    );
+    if (!mounted) return;
+    if (r.success && r.data is Map) {
+      setState(() {
+        _data = Map<String, dynamic>.from(r.data);
+        _loading = false;
+      });
+    } else {
+      setState(() {
+        _error = r.error;
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Dialog(
+        backgroundColor: _navy,
+        insetPadding: const EdgeInsets.all(40),
+        child: Container(
+          width: 900,
+          height: 700,
+          decoration: BoxDecoration(
+            border: Border.all(color: _gold.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+              decoration: BoxDecoration(
+                color: _navy2,
+                border: Border(bottom: BorderSide(color: _bdr)),
+              ),
+              child: Row(children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: _gold.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: _gold.withValues(alpha: 0.4)),
+                  ),
+                  child: const Icon(Icons.receipt_long, color: _gold, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: _gold.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(widget.accountCode,
+                            style: const TextStyle(
+                                color: _gold,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                fontFamily: 'monospace')),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(widget.accountName,
+                          style: const TextStyle(
+                              color: _tp,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700)),
+                    ]),
+                    const SizedBox(height: 3),
+                    Text(
+                        'دفتر الأستاذ التفصيلي · من ${widget.startDate.toIso8601String().substring(0, 10)} إلى ${widget.endDate.toIso8601String().substring(0, 10)}',
+                        style: const TextStyle(color: _ts, fontSize: 11)),
+                  ],
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.close, color: _ts),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ]),
+            ),
+            // Body
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator(color: _gold))
+                  : _error != null
+                      ? Center(
+                          child: Text(_error!,
+                              style: const TextStyle(color: _err)))
+                      : _buildLedger(),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLedger() {
+    final d = _data!;
+    final rows = (d['rows'] as List?) ?? [];
+    final opening = asDouble(d['opening_balance']);
+    final closing = asDouble(d['closing_balance']);
+    final totalDebit = asDouble(d['total_debit']);
+    final totalCredit = asDouble(d['total_credit']);
+    return Column(children: [
+      // Summary
+      Container(
+        padding: const EdgeInsets.all(14),
+        color: _navy2.withValues(alpha: 0.5),
+        child: Row(children: [
+          Expanded(child: _kpi('رصيد افتتاحي', opening,
+              const Color(0xFF6366F1))),
+          const SizedBox(width: 10),
+          Expanded(child: _kpi('إجمالي مدين', totalDebit, _ok)),
+          const SizedBox(width: 10),
+          Expanded(child: _kpi('إجمالي دائن', totalCredit, _indigo)),
+          const SizedBox(width: 10),
+          Expanded(child: _kpi('رصيد ختامي', closing, _gold)),
+        ]),
+      ),
+      // Table header
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        color: _navy3,
+        child: Row(children: const [
+          SizedBox(width: 90, child: Text('التاريخ', style: _th)),
+          SizedBox(width: 110, child: Text('رقم القيد', style: _th)),
+          Expanded(flex: 3, child: Text('البيان', style: _th)),
+          SizedBox(
+              width: 120,
+              child: Text('مدين', style: _th, textAlign: TextAlign.end)),
+          SizedBox(
+              width: 120,
+              child: Text('دائن', style: _th, textAlign: TextAlign.end)),
+          SizedBox(
+              width: 130,
+              child: Text('الرصيد الجاري',
+                  style: _th, textAlign: TextAlign.end)),
+        ]),
+      ),
+      // Rows
+      Expanded(
+        child: rows.isEmpty
+            ? const Center(
+                child: Text('لا توجد حركات على هذا الحساب في الفترة',
+                    style: TextStyle(color: _ts, fontSize: 12)),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: rows.length,
+                itemBuilder: (_, i) =>
+                    _ledgerRow(Map<String, dynamic>.from(rows[i])),
+              ),
+      ),
+      // Footer with close button
+      Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: _navy2,
+          border: Border(top: BorderSide(color: _bdr)),
+        ),
+        child: Row(children: [
+          Text('${rows.length} حركة',
+              style: const TextStyle(color: _td, fontSize: 11)),
+          const Spacer(),
+          FilledButton(
+            style: FilledButton.styleFrom(
+                backgroundColor: _gold, foregroundColor: Colors.black),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إغلاق'),
+          ),
+        ]),
+      ),
+    ]);
+  }
+
+  Widget _kpi(String label, double value, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: _td, fontSize: 10)),
+          const SizedBox(height: 3),
+          Text(_fmt(value),
+              style: TextStyle(
+                  color: color,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'monospace')),
+        ],
+      ),
+    );
+  }
+
+  Widget _ledgerRow(Map<String, dynamic> r) {
+    final debit = asDouble(r['debit']);
+    final credit = asDouble(r['credit']);
+    final running = asDouble(r['running_balance']);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: _navy2.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: _bdr),
+      ),
+      child: Row(children: [
+        SizedBox(
+            width: 90,
+            child: Text(
+                (r['posting_date'] ?? '').toString().substring(
+                    0, (r['posting_date'] ?? '').toString().length.clamp(0, 10)),
+                style: const TextStyle(
+                    color: _ts, fontSize: 11, fontFamily: 'monospace'))),
+        SizedBox(
+          width: 110,
+          child: Text(r['je_number'] ?? '—',
+              style: const TextStyle(
+                  color: _gold,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'monospace')),
+        ),
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(r['je_memo_ar'] ?? '',
+                  style: const TextStyle(color: _tp, fontSize: 12),
+                  overflow: TextOverflow.ellipsis),
+              if ((r['description'] ?? '').toString().isNotEmpty &&
+                  r['description'] != r['je_memo_ar'])
+                Text(r['description'],
+                    style: const TextStyle(color: _td, fontSize: 10),
+                    overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 120,
+          child: Text(debit > 0 ? _fmt(debit) : '—',
+              style: TextStyle(
+                  color: debit > 0 ? _ok : _td,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'monospace'),
+              textAlign: TextAlign.end),
+        ),
+        SizedBox(
+          width: 120,
+          child: Text(credit > 0 ? _fmt(credit) : '—',
+              style: TextStyle(
+                  color: credit > 0 ? _indigo : _td,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'monospace'),
+              textAlign: TextAlign.end),
+        ),
+        SizedBox(
+          width: 130,
+          child: Text(_fmt(running),
+              style: TextStyle(
+                  color: running >= 0 ? _gold : _err,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'monospace'),
+              textAlign: TextAlign.end),
+        ),
+      ]),
+    );
+  }
+
+  String _fmt(double v) {
+    if (v == 0) return '—';
+    final s = v.toStringAsFixed(2);
+    final parts = s.split('.');
+    final intP = parts[0]
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},');
+    return '$intP.${parts[1]}';
+  }
+}

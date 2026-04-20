@@ -416,6 +416,23 @@ class PilotClient {
   }
   Future<ApiResult> createAccount(String eid, Map<String, dynamic> body) =>
       _post('/pilot/entities/$eid/accounts', body);
+  Future<ApiResult> updateAccount(String accId, Map<String, dynamic> body) =>
+      _patch('/pilot/accounts/$accId', body);
+  Future<ApiResult> deleteAccount(String accId) =>
+      _delete('/pilot/accounts/$accId');
+  Future<ApiResult> accountLedger(String accId,
+      {String? startDate, String? endDate, int limit = 500}) {
+    final qp = <String, String>{
+      'limit': '$limit',
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+    };
+    final qs = qp.entries.map((e) => '${e.key}=${e.value}').join('&');
+    return _get('/pilot/accounts/$accId/ledger?$qs');
+  }
+  Future<ApiResult> cashFlow(String eid, String startDate, String endDate) =>
+      _get('/pilot/entities/$eid/reports/cash-flow'
+          '?start_date=$startDate&end_date=$endDate');
 
   Future<ApiResult> seedFiscalPeriods(String eid, int year) =>
       _post('/pilot/entities/$eid/fiscal-periods/seed', {'year': year});

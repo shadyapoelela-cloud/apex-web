@@ -27,6 +27,7 @@ from app.pilot.services.gl_engine import (
     seed_default_coa, seed_fiscal_periods,
     build_journal_entry, post_journal_entry, reverse_journal_entry,
     compute_trial_balance, compute_income_statement, compute_balance_sheet,
+    compute_cash_flow, compute_account_ledger,
     auto_post_pos_sale,
 )
 
@@ -100,6 +101,65 @@ def create_account(entity_id: str, payload: GLAccountCreate, db: Session = Depen
     db.commit()
     db.refresh(a)
     return a
+
+
+@router.patch("/accounts/{account_id}", response_model=GLAccountRead)
+def update_account(account_id: str, payload: dict, db: Session = Depends(get_db)):
+    """تعديل حساب — مع حماية: لا يمكن تغيير category/normal_balance
+    إذا كانت هناك postings على الحساب (لتجنب كسر TB)."""
+    acc = db.query(GLAccount).filter(GLAccount.id == account_id).first()
+    if not acc:
+        raise HTTPException(404, "الحساب غير موجود")
+    # فحص postings
+    has_postings = db.query(GLPosting).filter(
+        GLPosting.account_id == account_id
+    ).first() is not None
+    protected = {"category", "normal_balance", "entity_id", "tenant_id", "code"}
+    allowed = {
+        "name_ar", "name_en", "subcategory", "type", "currency",
+        "is_active", "is_control", "require_cost_center",
+        "require_profit_center", "default_vat_code",
+    }
+    for key, value in payload.items():
+        if key not in allowed:
+            if key in protected and has_postings:
+                raise HTTPException(
+                    409,
+                    f"لا يمكن تغيير '{key}' — الحساب فيه حركات محاسبية. "
+                    f"أنشئ حساباً جديداً وحوّل الأرصدة."
+                )
+            if key in protected:
+                continue  # السماح بتعديل category لو لا postings
+        setattr(acc, key, value)
+    db.commit()
+    db.refresh(acc)
+    return acc
+
+
+@router.delete("/accounts/{account_id}", status_code=204)
+def delete_account(account_id: str, db: Session = Depends(get_db)):
+    """حذف حساب — مسموح فقط لو لا توجد postings ولا هو system account."""
+    acc = db.query(GLAccount).filter(GLAccount.id == account_id).first()
+    if not acc:
+        raise HTTPException(404, "الحساب غير موجود")
+    if acc.is_system:
+        raise HTTPException(403, "حسابات النظام محميّة من الحذف. يمكن تعطيلها (is_active=false).")
+    has_postings = db.query(GLPosting).filter(
+        GLPosting.account_id == account_id
+    ).first() is not None
+    if has_postings:
+        raise HTTPException(
+            409,
+            "الحساب فيه حركات محاسبية — لا يمكن حذفه. قم بتعطيله بدلاً من ذلك."
+        )
+    # فحص الأبناء
+    has_children = db.query(GLAccount).filter(
+        GLAccount.parent_account_id == account_id
+    ).first() is not None
+    if has_children:
+        raise HTTPException(409, "الحساب فيه حسابات فرعية — احذفها أولاً.")
+    db.delete(acc)
+    db.commit()
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -330,3 +390,47 @@ def balance_sheet(
     as_of_date = as_of or datetime.now(timezone.utc).date()
     result = compute_balance_sheet(db, entity_id=entity_id, as_of_date=as_of_date)
     return BalanceSheetResponse(**result)
+
+
+@router.get("/entities/{entity_id}/reports/cash-flow")
+def cash_flow(
+    entity_id: str,
+    start_date: _date = Query(...),
+    end_date: _date = Query(...),
+    db: Session = Depends(get_db),
+):
+    """قائمة التدفقات النقدية (طريقة غير مباشرة).
+
+    Net Income + Depreciation ± Working Capital Changes = Operating CF
+    """
+    _entity_or_404(db, entity_id)
+    if end_date < start_date:
+        raise HTTPException(400, "end_date يجب أن يكون ≥ start_date")
+    return compute_cash_flow(
+        db, entity_id=entity_id, start_date=start_date, end_date=end_date
+    )
+
+
+@router.get("/accounts/{account_id}/ledger")
+def account_ledger(
+    account_id: str,
+    start_date: Optional[_date] = Query(None, description="افتراضياً بداية السنة"),
+    end_date: Optional[_date] = Query(None, description="افتراضياً اليوم"),
+    limit: int = Query(500, le=2000),
+    db: Session = Depends(get_db),
+):
+    """دفتر الأستاذ لحساب واحد — تفصيل كل حركاته مع running balance.
+
+    الاستخدام: drill-down من Trial Balance → ضغط على حساب → ترى كل حركاته.
+    """
+    today = datetime.now(timezone.utc).date()
+    sd = start_date or _date(today.year, 1, 1)
+    ed = end_date or today
+    if ed < sd:
+        raise HTTPException(400, "end_date يجب أن يكون ≥ start_date")
+    try:
+        return compute_account_ledger(
+            db, account_id=account_id, start_date=sd, end_date=ed, limit=limit
+        )
+    except ValueError as e:
+        raise HTTPException(404, str(e))
