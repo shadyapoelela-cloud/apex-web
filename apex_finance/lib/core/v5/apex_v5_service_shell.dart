@@ -24,6 +24,7 @@ import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
 import 'cmd_k_palette.dart';
 import 'entity_scope_selector.dart';
+import '../../pilot/bridge/pilot_tenant_chip.dart';
 import 'templates/quick_create.dart';
 import 'templates/unified_inbox.dart';
 import 'v5_models.dart';
@@ -214,6 +215,9 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 10),
           // Entity Scope Selector (Wave 147) — consolidation across entities
           const EntityScopeSelector(),
+          const SizedBox(width: 10),
+          // Pilot Tenant binding (live backend)
+          const PilotTenantChip(),
           const SizedBox(width: 10),
           // Workspace selector
           const ApexV5WorkspaceSelector(),

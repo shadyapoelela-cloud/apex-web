@@ -4,6 +4,8 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/v5/apex_v5_undo_toast.dart';
+import '../../pilot/api/pilot_client.dart';
+import '../../pilot/bridge/pilot_bridge.dart';
 
 class FinancialStatementsScreen extends StatefulWidget {
   const FinancialStatementsScreen({super.key});
@@ -599,6 +601,8 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
 }
 
 /// Inventory Detailed (items + stock)
+/// Inventory Detailed — LIVE backed by Pilot backend.
+/// Reads products + variants + stock totals from /pilot/*.
 class InventoryDetailedScreen extends StatefulWidget {
   const InventoryDetailedScreen({super.key});
   @override
@@ -606,68 +610,147 @@ class InventoryDetailedScreen extends StatefulWidget {
 }
 
 class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
+  List<Map<String, dynamic>> _products = [];
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    PilotBridge.instance.addListener(_reload);
+    _reload();
+  }
+
+  @override
+  void dispose() {
+    PilotBridge.instance.removeListener(_reload);
+    super.dispose();
+  }
+
+  Future<void> _reload() async {
+    final bridge = PilotBridge.instance;
+    if (bridge.tenantId == null) {
+      if (mounted) setState(() => _products = []);
+      return;
+    }
+    setState(() => _loading = true);
+    final r = await pilotClient.listProducts(bridge.tenantId!, limit: 500);
+    if (mounted) {
+      setState(() {
+        _products = r.success ? List<Map<String, dynamic>>.from(r.data) : [];
+        _loading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _sCard('إجمالي الأصناف', '1,847', Icons.inventory, const Color(0xFF2563EB)),
-              const SizedBox(width: 8),
-              _sCard('قيمة المخزون', '920K', Icons.account_balance, const Color(0xFFD4AF37)),
-              const SizedBox(width: 8),
-              _sCard('منخفض المخزون', '23', Icons.warning, const Color(0xFFB91C1C)),
-              const SizedBox(width: 8),
-              _sCard('Turnover', '6.8 x', Icons.refresh, const Color(0xFF059669)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Text('الأصناف', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
-              const Spacer(),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.upload, size: 14), label: const Text('استيراد CSV')),
-              const SizedBox(width: 8),
-              ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.add, size: 14), label: const Text('صنف جديد'), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD4AF37), foregroundColor: Colors.white)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
-            child: Column(
+    final bridge = PilotBridge.instance;
+    if (bridge.tenantId == null) {
+      return Container(
+        color: const Color(0xFFF9FAFB),
+        padding: const EdgeInsets.all(40),
+        alignment: Alignment.center,
+        child: const Text(
+          'يتطلب ربط مستأجر من الباك-إند لعرض المخزون الحقيقي.',
+          style: TextStyle(fontSize: 16, color: Colors.black54),
+          textDirection: TextDirection.rtl,
+        ),
+      );
+    }
+    final totalSkus = _products.fold<int>(
+      0,
+      (s, p) => s + ((p['active_variant_count'] ?? 0) as int),
+    );
+    final totalStock = _products.fold<double>(
+      0,
+      (s, p) => s + (double.tryParse('${p['total_stock_on_hand'] ?? 0}') ?? 0),
+    );
+    final lowStock = _products
+        .where((p) => (double.tryParse('${p['total_stock_on_hand'] ?? 0}') ?? 0) < 10)
+        .length;
+
+    return RefreshIndicator(
+      onRefresh: _reload,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFFF9FAFB), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: const Row(children: [Expanded(child: Text('SKU', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))), Expanded(flex: 2, child: Text('اسم الصنف', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))), Expanded(child: Text('الفئة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))), Expanded(child: Text('المستودع', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))), Expanded(child: Text('الكمية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800), textAlign: TextAlign.center)), Expanded(child: Text('التكلفة/ق', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800), textAlign: TextAlign.center)), Expanded(child: Text('القيمة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800), textAlign: TextAlign.end))])),
-                for (final it in [
-                  ('SKU-001', 'جهاز كمبيوتر محمول Dell', 'إلكترونيات', 'الرياض', 45, 3800.0, 171000.0, false),
-                  ('SKU-002', 'طابعة HP LaserJet', 'مكتبية', 'جدة', 12, 1200.0, 14400.0, false),
-                  ('SKU-003', 'ورق A4 (5000 ورقة)', 'مكتبية', 'الرياض', 8, 85.0, 680.0, true),
-                  ('SKU-004', 'حبر طابعة ملوّن', 'مستهلكات', 'جدة', 3, 180.0, 540.0, true),
-                  ('SKU-005', 'كابل HDMI', 'إلكترونيات', 'الرياض', 120, 35.0, 4200.0, false),
-                  ('SKU-006', 'كرسي مكتب', 'أثاث', 'الرياض', 28, 450.0, 12600.0, false),
-                ])
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: it.$8 ? const Color(0xFFB91C1C).withOpacity(0.04) : null, border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04)))),
-                    child: Row(
-                      children: [
-                        Expanded(child: Row(children: [if (it.$8) const Icon(Icons.warning, color: Color(0xFFB91C1C), size: 12), if (it.$8) const SizedBox(width: 4), Text(it.$1, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54))])),
-                        Expanded(flex: 2, child: Text(it.$2, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
-                        Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black.withOpacity(0.06), borderRadius: BorderRadius.circular(3)), child: Text(it.$3, style: const TextStyle(fontSize: 10)))),
-                        Expanded(child: Text(it.$4, style: const TextStyle(fontSize: 11))),
-                        Expanded(child: Text('${it.$5}', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: it.$8 ? const Color(0xFFB91C1C) : null))),
-                        Expanded(child: Text(it.$6.toStringAsFixed(0), textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
-                        Expanded(child: Text(it.$7.toStringAsFixed(0), textAlign: TextAlign.end, style: const TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
-                      ],
-                    ),
-                  ),
+                _sCard('إجمالي المنتجات', '${_products.length}', Icons.inventory, const Color(0xFF2563EB)),
+                const SizedBox(width: 8),
+                _sCard('إجمالي المتغيّرات (SKUs)', '$totalSkus', Icons.qr_code, const Color(0xFFD4AF37)),
+                const SizedBox(width: 8),
+                _sCard('الكمية الإجمالية', totalStock.toStringAsFixed(0), Icons.layers, const Color(0xFF059669)),
+                const SizedBox(width: 8),
+                _sCard('منخفض المخزون', '$lowStock', Icons.warning, const Color(0xFFB91C1C)),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            const Text('المنتجات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 12),
+            if (_loading) const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
+            if (!_loading && _products.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(24),
+                child: Text('لا توجد منتجات — أنشئها في Pilot Catalog',
+                    style: TextStyle(color: Colors.black54), textDirection: TextDirection.rtl),
+              ),
+            if (_products.isNotEmpty)
+              Container(
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withValues(alpha: 0.08))),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+                      child: const Row(children: [
+                        Expanded(child: Text('الكود', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800), textDirection: TextDirection.rtl)),
+                        Expanded(flex: 3, child: Text('الاسم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800), textDirection: TextDirection.rtl)),
+                        Expanded(child: Text('الحالة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800), textDirection: TextDirection.rtl)),
+                        Expanded(child: Text('المتغيّرات', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800), textAlign: TextAlign.center)),
+                        Expanded(child: Text('المخزون', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800), textAlign: TextAlign.center)),
+                      ]),
+                    ),
+                    for (final p in _products)
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withValues(alpha: 0.04)))),
+                        child: Row(children: [
+                          Expanded(child: Text('${p['code']}', style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54), textDirection: TextDirection.rtl)),
+                          Expanded(flex: 3, child: Text('${p['name_ar'] ?? p['name_en'] ?? ''}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), textDirection: TextDirection.rtl)),
+                          Expanded(child: _statusBadge('${p['status']}')),
+                          Expanded(child: Text('${p['active_variant_count'] ?? 0}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800))),
+                          Expanded(child: Text('${(double.tryParse('${p['total_stock_on_hand'] ?? 0}') ?? 0).toStringAsFixed(0)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                        ]),
+                      ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _statusBadge(String status) {
+    final col = switch (status) {
+      'active' => const Color(0xFF059669),
+      'draft' => const Color(0xFFD97706),
+      'archived' || 'discontinued' => Colors.black54,
+      _ => Colors.black87,
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: col.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(status,
+          style: TextStyle(color: col, fontSize: 11, fontWeight: FontWeight.w600)),
     );
   }
 
@@ -675,9 +758,10 @@ class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withOpacity(0.2))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withValues(alpha: 0.2))),
         child: Row(children: [Icon(icon, size: 18, color: color), const SizedBox(width: 8), Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)), Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54))])]),
       ),
     );
   }
 }
+
