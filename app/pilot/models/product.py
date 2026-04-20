@@ -362,6 +362,17 @@ class ProductVariant(Base):
     reorder_point = Column(Numeric(18, 3), nullable=True)         # alert threshold
     reorder_qty = Column(Numeric(18, 3), nullable=True)           # suggested PO qty
 
+    # Lot/Batch/Expiry tracking — critical للأغذية والأدوية (طلب تقييم 10 جولات)
+    # track_batch=True => StockMovement.batch_number مطلوب + batch_date
+    # track_expiry=True => StockMovement.expiry_date مطلوب + FEFO dispatch
+    # track_serial=True => كل وحدة لها serial_number فريد (للإلكترونيات)
+    # Foundation فقط في v1 — الـ logic الكامل FEFO/FIFO في Batch model v2
+    track_batch = Column(Boolean, nullable=False, default=False)
+    track_expiry = Column(Boolean, nullable=False, default=False)
+    track_serial = Column(Boolean, nullable=False, default=False)
+    shelf_life_days = Column(Integer, nullable=True)  # تحذير قبل انتهاء الصلاحية
+    min_shelf_life_days = Column(Integer, nullable=True)  # رفض الاستلام إذا أقل
+
     # Status — can deactivate one variant (e.g., out-of-fashion) without killing parent
     is_active = Column(Boolean, nullable=False, default=True)
 

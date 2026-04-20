@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
+import '../../widgets/attachments_panel.dart';
 
 const _gold = Color(0xFFD4AF37);
 const _navy = Color(0xFF0A1628);
@@ -1126,6 +1127,13 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
                 _kv('البريد', v['email'] ?? '—'),
                 _kv('شروط الدفع',
                     _kTerms[v['payment_terms']] ?? v['payment_terms'] ?? '—'),
+                const SizedBox(height: 14),
+                // مرفقات المورد — CR, VAT cert, IBAN letter
+                AttachmentsPanel(
+                  parentType: 'vendors',
+                  parentId: v['id'],
+                  title: 'مستندات المورد (CR, VAT, IBAN)',
+                ),
                 const SizedBox(height: 14),
                 const Divider(color: _bdr, height: 1),
                 const SizedBox(height: 14),

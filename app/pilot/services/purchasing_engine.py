@@ -397,6 +397,13 @@ def create_purchase_invoice(
     taxable = Decimal("0")
     vat_total = Decimal("0")
 
+    # 3-way matching tolerance — max 5% سعر + 10% كمية
+    # هذا حماية ضد الاحتيال: فاتورة مورد بسعر أعلى من الـ PO = إنذار
+    # يمكن لـ configuration في CompanySettings تعديل الحدود.
+    PRICE_TOLERANCE_PCT = Decimal("5")
+    QTY_TOLERANCE_PCT = Decimal("10")
+    match_warnings = []
+
     for idx, ln in enumerate(lines_input, start=1):
         qty = Decimal(str(ln.get("qty", 1)))
         unit_cost = Decimal(str(ln["unit_cost"]))
@@ -407,6 +414,43 @@ def create_purchase_invoice(
         vat_rate = Decimal("0") if vat_code in ("zero_rated", "exempt") else Decimal(str(ln.get("vat_rate_pct", 15)))
         line_vat = q2(line_tax * vat_rate / Decimal("100"))
         line_tot = line_tax + line_vat
+
+        # 3-way match: إذا السطر مرتبط بـ PO line، قارن السعر والكمية
+        if ln.get("po_line_id"):
+            pol_check = db.query(PurchaseOrderLine).filter(
+                PurchaseOrderLine.id == ln["po_line_id"]
+            ).first()
+            if pol_check:
+                po_price = pol_check.unit_price or Decimal("0")
+                po_qty = pol_check.qty_ordered or Decimal("0")
+                qty_received = pol_check.qty_received or Decimal("0")
+                qty_already_invoiced = pol_check.qty_invoiced or Decimal("0")
+
+                # فحص السعر
+                if po_price > 0:
+                    price_diff_pct = abs((unit_cost - po_price) / po_price * 100)
+                    if price_diff_pct > PRICE_TOLERANCE_PCT:
+                        match_warnings.append(
+                            f"السطر {idx}: سعر الفاتورة ({unit_cost}) يختلف "
+                            f"عن سعر PO ({po_price}) بنسبة {price_diff_pct:.1f}% "
+                            f"(> {PRICE_TOLERANCE_PCT}% tolerance)"
+                        )
+
+                # فحص الكمية — لا تتجاوز qty_received + tolerance
+                max_invoiceable = qty_received * (1 + QTY_TOLERANCE_PCT / 100)
+                total_invoiced_after = qty_already_invoiced + qty
+                if total_invoiced_after > max_invoiceable and qty_received > 0:
+                    match_warnings.append(
+                        f"السطر {idx}: الكمية ({qty}) + سابقاً مفوتر ({qty_already_invoiced}) "
+                        f"تتجاوز الكمية المستلمة ({qty_received}) + tolerance"
+                    )
+
+                # تحذير إذا لا GRN بعد
+                if qty_received == 0:
+                    match_warnings.append(
+                        f"السطر {idx}: لم يتم استلام PO بعد (qty_received=0). "
+                        f"يُنصح باستلام البضاعة (GRN) قبل تسجيل الفاتورة."
+                    )
 
         il = PurchaseInvoiceLine(
             tenant_id=entity.tenant_id,
@@ -446,7 +490,15 @@ def create_purchase_invoice(
     inv.vat_total = vat_total
     inv.grand_total = taxable + vat_total + shipping
     inv.amount_due = inv.grand_total
+    # حفظ تحذيرات 3-way match في notes للمرجع
+    if match_warnings:
+        warning_text = "⚠ 3-way match warnings:\n" + "\n".join(
+            f"  • {w}" for w in match_warnings
+        )
+        inv.notes = (inv.notes or "") + "\n\n" + warning_text
     db.flush()
+    # نعلّق التحذيرات على الـ invoice object عشان الـ route يقدر يرجعها
+    inv._match_warnings = match_warnings  # type: ignore
     return inv
 
 

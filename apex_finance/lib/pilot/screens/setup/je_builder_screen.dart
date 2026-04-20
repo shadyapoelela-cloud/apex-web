@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
+import '../../widgets/attachments_panel.dart';
 
 const _gold = Color(0xFFD4AF37);
 const _navy = Color(0xFF0A1628);
@@ -1325,6 +1326,13 @@ class _JeDetailDialog extends StatelessWidget {
                         child: _kv('إجمالي الدائن',
                             (data['total_credit'] ?? 0).toString(), mono: true)),
                   ]),
+                ),
+                const SizedBox(height: 14),
+                // مستندات القيد — متطلب SOCPA/ZATCA
+                AttachmentsPanel(
+                  parentType: 'journal_entries',
+                  parentId: data['id']?.toString() ?? '',
+                  title: 'المستندات المصدر (فاتورة، إيصال، ...)',
                 ),
               ],
             ),
