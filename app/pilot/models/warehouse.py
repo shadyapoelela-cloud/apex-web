@@ -203,6 +203,13 @@ class StockMovement(Base):
     # Balance snapshot AFTER this movement (for audit trail)
     balance_after = Column(Numeric(18, 3), nullable=False, default=0)
 
+    # Lot/Batch/Expiry — مطلوب إذا track_batch/expiry/serial على الـ variant
+    batch_number = Column(String(50), nullable=True, index=True)
+    batch_date = Column(DateTime(timezone=True), nullable=True)
+    expiry_date = Column(DateTime(timezone=True), nullable=True, index=True)
+    serial_number = Column(String(100), nullable=True)  # للـ single-unit items
+    supplier_lot_ref = Column(String(100), nullable=True)  # مرجع المورد
+
     # Who/when
     performed_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
     performed_by_user_id = Column(String(36), nullable=True)

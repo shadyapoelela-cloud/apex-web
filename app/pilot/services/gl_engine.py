@@ -927,6 +927,74 @@ def compute_cash_flow(
     }
 
 
+def compute_comparative_report(
+    db: Session, *, entity_id: str, report_type: str,
+    current_start: date, current_end: date,
+    prior_start: Optional[date] = None, prior_end: Optional[date] = None,
+) -> dict:
+    """تقرير مقارن — التقرير الحالي vs فترة سابقة.
+
+    report_type: income_statement | balance_sheet | trial_balance
+
+    إذا prior_start/end غير محدد، يُحسب تلقائياً = نفس الفترة في السنة السابقة.
+    """
+    # Default: نفس الفترة في السنة السابقة
+    if prior_start is None or prior_end is None:
+        prior_start = date(
+            current_start.year - 1, current_start.month, current_start.day
+        )
+        prior_end = date(current_end.year - 1, current_end.month, current_end.day)
+
+    if report_type == "income_statement":
+        current = compute_income_statement(
+            db, entity_id=entity_id,
+            start_date=current_start, end_date=current_end,
+        )
+        prior = compute_income_statement(
+            db, entity_id=entity_id,
+            start_date=prior_start, end_date=prior_end,
+        )
+        # احسب النسب
+        def _variance(c: float, p: float) -> dict:
+            diff = c - p
+            pct = (diff / abs(p) * 100) if p != 0 else (100.0 if c != 0 else 0.0)
+            return {"current": c, "prior": p, "diff": diff, "pct": pct}
+
+        return {
+            "report_type": "income_statement",
+            "current_period": {
+                "start": current_start.isoformat(),
+                "end": current_end.isoformat(),
+            },
+            "prior_period": {
+                "start": prior_start.isoformat(),
+                "end": prior_end.isoformat(),
+            },
+            "revenue": _variance(current["revenue_total"], prior["revenue_total"]),
+            "expenses": _variance(current["expense_total"], prior["expense_total"]),
+            "net_income": _variance(current["net_income"], prior["net_income"]),
+        }
+    elif report_type == "balance_sheet":
+        current = compute_balance_sheet(db, entity_id=entity_id, as_of_date=current_end)
+        prior = compute_balance_sheet(db, entity_id=entity_id, as_of_date=prior_end)
+
+        def _variance(c: float, p: float) -> dict:
+            diff = c - p
+            pct = (diff / abs(p) * 100) if p != 0 else (100.0 if c != 0 else 0.0)
+            return {"current": c, "prior": p, "diff": diff, "pct": pct}
+
+        return {
+            "report_type": "balance_sheet",
+            "current_as_of": current_end.isoformat(),
+            "prior_as_of": prior_end.isoformat(),
+            "assets": _variance(current["assets"], prior["assets"]),
+            "liabilities": _variance(current["liabilities"], prior["liabilities"]),
+            "equity": _variance(current["total_equity"], prior["total_equity"]),
+        }
+    else:
+        raise ValueError(f"Unsupported report_type: {report_type}")
+
+
 def compute_account_ledger(
     db: Session, *, account_id: str, start_date: Optional[date] = None,
     end_date: Optional[date] = None, limit: int = 500,

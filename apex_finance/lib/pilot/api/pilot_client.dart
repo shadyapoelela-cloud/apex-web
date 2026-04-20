@@ -433,6 +433,22 @@ class PilotClient {
   Future<ApiResult> cashFlow(String eid, String startDate, String endDate) =>
       _get('/pilot/entities/$eid/reports/cash-flow'
           '?start_date=$startDate&end_date=$endDate');
+  Future<ApiResult> comparativeReport(String eid,
+      {required String reportType,
+      required String currentStart,
+      required String currentEnd,
+      String? priorStart,
+      String? priorEnd}) {
+    final qp = <String, String>{
+      'report_type': reportType,
+      'current_start': currentStart,
+      'current_end': currentEnd,
+      if (priorStart != null) 'prior_start': priorStart,
+      if (priorEnd != null) 'prior_end': priorEnd,
+    };
+    final qs = qp.entries.map((e) => '${e.key}=${e.value}').join('&');
+    return _get('/pilot/entities/$eid/reports/comparative?$qs');
+  }
 
   Future<ApiResult> seedFiscalPeriods(String eid, int year) =>
       _post('/pilot/entities/$eid/fiscal-periods/seed', {'year': year});
@@ -653,6 +669,23 @@ class PilotClient {
     final qs = qp.entries.map((e) => '${e.key}=${e.value}').join('&');
     return _get('/pilot/entities/$eid/vendor-payments?$qs');
   }
+
+  // ═════════════════════════════════════════════════════════════
+  // 11. ATTACHMENTS — polymorphic ملفات مرفقة بأي كيان
+  // ═════════════════════════════════════════════════════════════
+
+  Future<ApiResult> createAttachment(Map<String, dynamic> body) =>
+      _post('/pilot/attachments', body);
+
+  Future<ApiResult> listAttachments(String parentType, String parentId) =>
+      _get(
+          '/pilot/attachments?parent_type=$parentType&parent_id=$parentId');
+
+  Future<ApiResult> deleteAttachment(String id) =>
+      _delete('/pilot/attachments/$id');
+
+  Future<ApiResult> lockAttachment(String id, String reason) => _post(
+      '/pilot/attachments/$id/lock?reason=${Uri.encodeQueryComponent(reason)}');
 
   // ── Health ─────────────────────────────────────────────────
   Future<ApiResult> health() => _get('/pilot/health');

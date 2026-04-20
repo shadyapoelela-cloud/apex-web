@@ -49,6 +49,7 @@ from .purchasing import (
     PurchaseInvoice, PurchaseInvoiceLine, PurchaseInvoiceStatus,
     VendorPayment, VendorPaymentMethod,
 )
+from .attachment import Attachment, AttachmentKind
 
 # Backward-compat aliases (used by early route code)
 Role = PilotRole
@@ -163,6 +164,9 @@ __all__ = [
     "PurchaseInvoiceStatus",
     "VendorPayment",
     "VendorPaymentMethod",
+    # Attachments
+    "Attachment",
+    "AttachmentKind",
     # aliases
     "Role",
     "Permission",

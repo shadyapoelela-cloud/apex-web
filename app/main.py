@@ -1264,6 +1264,7 @@ try:
     from app.pilot.routes.gl_routes import router as pilot_gl_router
     from app.pilot.routes.compliance_routes import router as pilot_compliance_router
     from app.pilot.routes.purchasing_routes import router as pilot_purchasing_router
+    from app.pilot.routes.attachment_routes import router as pilot_attachment_router
     from app.pilot.models import (  # noqa: F401 — ensure models are registered with metadata
         Tenant, CompanySettings, Entity, Branch,
         Currency, FxRate, Role, Permission, RolePermission,
@@ -1298,6 +1299,7 @@ try:
     app.include_router(pilot_gl_router)
     app.include_router(pilot_compliance_router)
     app.include_router(pilot_purchasing_router)
+    app.include_router(pilot_attachment_router)
     HAS_PILOT = True
     logging.info("Pilot routes mounted (multi-tenant retail ERP) + tables ensured")
 except Exception as e:

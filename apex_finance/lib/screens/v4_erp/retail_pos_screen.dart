@@ -495,6 +495,95 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
   // Payment
   // ═════════════════════════════════════════════════════════════
 
+  /// معالجة مرتجع — يُنشأ PosTransaction بنوع 'return'.
+  /// الباك اند يعكس الحركة: يُعيد المخزون، ينشئ JE عكسي، يصدر إيصال مرتجع.
+  Future<void> _processReturn() async {
+    if (_cart.isEmpty || _activeSession == null) return;
+    // تأكيد قبل معالجة المرتجع
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: _navy2,
+          title: const Row(children: [
+            Icon(Icons.undo, color: _err),
+            SizedBox(width: 8),
+            Text('تأكيد المرتجع', style: TextStyle(color: _tp)),
+          ]),
+          content: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    'هل تريد معالجة مرتجع بقيمة ${_grandTotal.toStringAsFixed(2)} $_currency؟',
+                    style: const TextStyle(color: _tp, fontSize: 14)),
+                const SizedBox(height: 10),
+                const Text(
+                    'سيتم:\n'
+                    '• إعادة الأصناف للمخزون\n'
+                    '• إنشاء قيد يومية عكسي\n'
+                    '• إعادة المبلغ للعميل (نقداً)\n'
+                    '• إصدار إيصال مرتجع',
+                    style: TextStyle(color: _ts, fontSize: 12, height: 1.6)),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('إلغاء', style: TextStyle(color: _ts))),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                  backgroundColor: _err, foregroundColor: Colors.white),
+              onPressed: () => Navigator.pop(context, true),
+              icon: const Icon(Icons.undo),
+              label: const Text('معالجة المرتجع'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true) return;
+
+    final body = {
+      'session_id': _activeSession!['id'],
+      'kind': 'return',
+      'cashier_user_id': 'cashier-web',
+      'lines': _cart
+          .map((l) => {
+                'variant_id': l.variant.id,
+                'qty': l.qty.toString(),
+                if (l.discountPct > 0)
+                  'discount_pct': l.discountPct.toString(),
+              })
+          .toList(),
+      'payments': [
+        {'method': 'cash', 'amount': _grandTotal.toString()},
+      ],
+    };
+
+    final r = await _client.createPosTransaction(body);
+    if (!mounted) return;
+    if (!r.success) {
+      _showMsg(r.error ?? 'فشل المرتجع', _err);
+      return;
+    }
+    final txn = r.data as Map;
+    await _client.postPosToGl(txn['id']);
+
+    setState(() {
+      _lastReceipt = txn['receipt_number'];
+      _cart.clear();
+    });
+    _showMsg(
+        'تم معالجة المرتجع — إيصال ${txn['receipt_number']} ✓',
+        _ok);
+    await _loadProducts();
+  }
+
   Future<void> _checkout() async {
     if (_cart.isEmpty || _activeSession == null) return;
     final payments = await showDialog<List<Map<String, dynamic>>>(
@@ -1017,6 +1106,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
           const SizedBox(height: 12),
           Row(children: [
             Expanded(
+              flex: 2,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
                   backgroundColor: _ok,
@@ -1028,6 +1118,21 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
                 icon: const Icon(Icons.credit_card),
                 label: Text(_activeSession == null ? 'افتح وردية أولاً' : 'الدفع',
                     style: const TextStyle(fontSize: 16)),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: _err,
+                  side: BorderSide(color: _err.withValues(alpha: 0.5)),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                ),
+                onPressed: _cart.isEmpty || _activeSession == null
+                    ? null
+                    : _processReturn,
+                icon: const Icon(Icons.undo),
+                label: const Text('مرتجع', style: TextStyle(fontSize: 14)),
               ),
             ),
           ]),

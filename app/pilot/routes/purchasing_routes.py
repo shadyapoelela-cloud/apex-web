@@ -192,12 +192,53 @@ def get_po(po_id: str, db: Session = Depends(get_db)):
     )
 
 
+def _get_approval_limit(db: Session, tenant_id: str, doc_type: str) -> dict:
+    """جلب حدود الاعتماد من CompanySettings.
+
+    doc_type: "po" | "je" | "payment"
+    يُرجع list من thresholds: [{max, role, level, ...}]
+    """
+    from app.pilot.models import CompanySettings
+    cs = db.query(CompanySettings).filter(
+        CompanySettings.tenant_id == tenant_id
+    ).first()
+    if not cs or not cs.approval_thresholds:
+        return {"thresholds": []}
+    return {"thresholds": cs.approval_thresholds.get(doc_type, [])}
+
+
 @router.post("/purchase-orders/{po_id}/approve", response_model=PoRead)
 def approve_po_endpoint(po_id: str, payload: PoApprove, db: Session = Depends(get_db)):
+    # جلب الـ PO أولاً للتحقق من مستوى الاعتماد المطلوب
+    po_check = db.query(PurchaseOrder).filter(PurchaseOrder.id == po_id).first()
+    if not po_check:
+        raise HTTPException(404, "PO not found")
+    # فحص approval limits — إنذار فقط (لا نمنع، لكن نُسجِّل warning في response)
+    approval_warnings = []
+    limits = _get_approval_limit(db, po_check.tenant_id, "po")["thresholds"]
+    if limits:
+        po_total = float(po_check.grand_total or 0)
+        required_level = None
+        for threshold in limits:
+            max_amt = threshold.get("max")
+            # max = None => unlimited
+            if max_amt is None or po_total <= float(max_amt):
+                required_level = threshold
+                break
+        if required_level:
+            required_role = required_level.get("role", "accountant")
+            approval_warnings.append(
+                f"قيمة الأمر {po_total} — يتطلب اعتماد دور '{required_role}' "
+                f"(level {required_level.get('level', 1)})"
+            )
+
     try:
         po = approve_po(db, po_id, payload.user_id)
         db.commit()
         db.refresh(po)
+        # نعلّق التحذيرات على الـ response object
+        if approval_warnings:
+            po._approval_warnings = approval_warnings  # type: ignore
         return po
     except ValueError as ex:
         db.rollback()
