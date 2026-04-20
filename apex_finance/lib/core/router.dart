@@ -102,6 +102,7 @@ import '../screens/compliance/extras_tools_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'v4/v4_routes.dart';
 import 'v5/v5_routes.dart';
+import '../pilot/screens/pilot_shell_screen.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
@@ -582,6 +583,11 @@ final appRouter = GoRouter(
         token: args['token'] as String?,
       ), s);
     }),
+    // ── Pilot (Multi-tenant Retail ERP) ──
+    GoRoute(
+      path: '/pilot',
+      pageBuilder: (c, s) => _apexPage(const PilotShellScreen(), s),
+    ),
   ],
 );
 
