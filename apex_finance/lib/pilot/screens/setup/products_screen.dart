@@ -1255,19 +1255,29 @@ class _ProductDialogState extends State<_ProductDialog> {
           await pilotClient.createProduct(PilotSession.tenantId!, body);
       if (!mounted) return;
       if (r.success) {
-        // Backend default status is 'draft' — فعّل المنتج فوراً ليظهر للمستخدم
-        // ويكون متاحاً للبيع على نقاط البيع. المستخدم يستطيع إعادته إلى
-        // draft/discontinued لاحقاً من شاشة التعديل.
         final newId = (r.data as Map)['id'];
         if (newId != null) {
+          // 1) تفعيل المنتج (backend default = draft فلا يظهر في active list)
           await pilotClient.updateProduct(newId, {'status': 'active'});
+          // 2) إنشاء متغيّر افتراضي — POS يعرض variants لا products،
+          //    بدون variant المنتج لن يظهر في نقاط البيع إطلاقاً.
+          //    المستخدم يضيف متغيّرات أخرى من شاشة تفاصيل المنتج.
+          final variantBody = <String, dynamic>{
+            'sku': _code.text.trim(),
+            'display_name_ar': _nameAr.text.trim(),
+            if (_nameEn.text.trim().isNotEmpty)
+              'display_name_en': _nameEn.text.trim(),
+            'currency': 'SAR',
+            'track_stock': _stockable,
+          };
+          await pilotClient.createVariant(newId, variantBody);
         }
         setState(() => _loading = false);
         if (!mounted) return;
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             backgroundColor: _ok,
-            content: Text('تم إنشاء الصنف وتفعيله ✓')));
+            content: Text('تم إنشاء الصنف + متغيّر افتراضي ✓ (ظاهر في POS)')));
       } else {
         setState(() => _loading = false);
         setState(() => _error = r.error ?? 'فشل الإنشاء');

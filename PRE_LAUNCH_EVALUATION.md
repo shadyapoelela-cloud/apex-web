@@ -65,14 +65,16 @@
 
 | # | العمل | السبب |
 |---|---|---|
-| A1 | OCR للفواتير الواردة (Claude API موجود!) | Wafeq — توفير 90% وقت |
-| A2 | Recurring JE (إهلاك شهري) | كلهم |
-| A3 | Bulk import فواتير مشتريات (50 فاتورة دفعة) | Wafeq |
-| A4 | WHT automation على المدفوعات | Wafeq/Qoyod |
-| A5 | Customer aging report | كلهم |
-| A6 | Landed cost allocation | NetSuite/Odoo |
-| A7 | Shift handover بين الكاشيرات | Rewaa/Foodics |
-| A8 | Receipt customer email/SMS | كلهم |
+| A1 | **🆕 OCR لفواتير المشتريات الواردة** (Claude API موجود!) — رفع PDF/صورة + استخراج تلقائي لرقم المورد، التاريخ، الأصناف، VAT | Wafeq — توفير 90% وقت. طلب المستخدم 2026-04-20 |
+| A2 | **🆕 توليد Barcode تلقائي (EAN-13)** للأصناف — زر في شاشة المنتج يولّد ويُلصق على الصنف + طباعة ملصقات | طلب المستخدم 2026-04-20. Rewaa يفعلها |
+| A3 | Recurring JE (إهلاك شهري) | كلهم |
+| A4 | Bulk import فواتير مشتريات (50 فاتورة دفعة) | Wafeq |
+| A5 | WHT automation على المدفوعات | Wafeq/Qoyod |
+| A6 | Customer aging report | كلهم |
+| A7 | Landed cost allocation | NetSuite/Odoo |
+| A8 | Shift handover بين الكاشيرات | Rewaa/Foodics |
+| A9 | Receipt customer email/SMS | كلهم |
+| A10 | **🆕 Upload فاتورة كملف أصل** في كل شاشة (PO/PI/JE/Payment) كـ audit trail | طلب المستخدم 2026-04-20 |
 
 ### 🟢 بعد 3 أشهر — ميزات التمييز
 
