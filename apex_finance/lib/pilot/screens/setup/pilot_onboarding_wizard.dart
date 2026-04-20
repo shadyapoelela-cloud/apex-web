@@ -15,6 +15,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../core/theme.dart';
 import '../../api/pilot_client.dart';
@@ -235,6 +236,106 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
         ]),
       );
 
+  /// Slug field with live sanitization + auto-suggest from English name.
+  /// Backend pattern: ^[a-z0-9-]+$ — we enforce it client-side.
+  Widget _slugField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 6),
+        Row(children: [
+          Text('معرِّف مختصر (slug) *',
+              style: TextStyle(color: AC.ts, fontWeight: FontWeight.w500)),
+          const SizedBox(width: 8),
+          Tooltip(
+            message: 'يُستخدم في الروابط والـ API — أحرف إنجليزية صغيرة + أرقام + شرطات فقط',
+            child: Icon(Icons.info_outline, color: AC.td, size: 14),
+          ),
+          const Spacer(),
+          if (_tenantNameEnCtrl.text.trim().isNotEmpty ||
+              _tenantNameArCtrl.text.trim().isNotEmpty)
+            TextButton.icon(
+              style: TextButton.styleFrom(
+                  foregroundColor: AC.gold,
+                  padding: const EdgeInsets.symmetric(horizontal: 8)),
+              onPressed: () {
+                final source = _tenantNameEnCtrl.text.trim().isNotEmpty
+                    ? _tenantNameEnCtrl.text
+                    : _tenantNameArCtrl.text;
+                setState(() => _slugCtrl.text = _suggestSlug(source));
+              },
+              icon: const Icon(Icons.auto_awesome, size: 14),
+              label: const Text('اقتراح تلقائي',
+                  style: TextStyle(fontSize: 11)),
+            ),
+        ]),
+        const SizedBox(height: 4),
+        TextField(
+          controller: _slugCtrl,
+          inputFormatters: [
+            // أجبر lowercase + منع العربية وغيرها
+            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9-]')),
+            TextInputFormatter.withFunction((oldV, newV) =>
+                newV.copyWith(text: newV.text.toLowerCase())),
+            LengthLimitingTextInputFormatter(50),
+          ],
+          style: TextStyle(
+              color: AC.tp, fontSize: 14, fontFamily: 'monospace'),
+          decoration: InputDecoration(
+            hintText: 'advanced-fashion',
+            hintStyle: TextStyle(
+                color: AC.td, fontFamily: 'monospace'),
+            filled: true,
+            fillColor: AC.navy3,
+            prefixIcon: Icon(Icons.link, color: AC.td, size: 16),
+            helperText: 'أحرف إنجليزية صغيرة + أرقام + شرطات فقط (مثال: my-company)',
+            helperStyle: TextStyle(color: AC.td, fontSize: 11),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AC.bdr)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AC.bdr)),
+          ),
+          onChanged: (_) => setState(() {}),
+        ),
+      ],
+    );
+  }
+
+  /// Transliterate Arabic/Unicode to ASCII slug.
+  /// Falls back to "company" if result is empty.
+  String _suggestSlug(String source) {
+    // Arabic → Latin rough transliteration (basic phonetic)
+    const arMap = {
+      'ا': 'a', 'أ': 'a', 'إ': 'i', 'آ': 'aa', 'ء': '',
+      'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h',
+      'خ': 'kh', 'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z',
+      'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't',
+      'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
+      'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h',
+      'و': 'w', 'ي': 'y', 'ى': 'a', 'ة': 'a', 'ؤ': 'w',
+      'ئ': 'y', '٠': '0', '١': '1', '٢': '2', '٣': '3',
+      '٤': '4', '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
+    };
+    var s = source.trim().toLowerCase();
+    final buf = StringBuffer();
+    for (final ch in s.split('')) {
+      if (arMap.containsKey(ch)) {
+        buf.write(arMap[ch]);
+      } else if (RegExp(r'[a-z0-9]').hasMatch(ch)) {
+        buf.write(ch);
+      } else if (ch == ' ' || ch == '_' || ch == '-') {
+        buf.write('-');
+      }
+      // ignore everything else (punctuation, emojis, etc.)
+    }
+    s = buf.toString();
+    // collapse multiple dashes + trim edges
+    s = s.replaceAll(RegExp(r'-+'), '-').replaceAll(RegExp(r'^-|-$'), '');
+    return s.isEmpty ? 'company' : (s.length > 50 ? s.substring(0, 50) : s);
+  }
+
   Widget _currentStepBody() {
     switch (_step) {
       case 0:
@@ -269,7 +370,7 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
             'شركة الأزياء المتطورة'),
         _field(_tenantNameEnCtrl, 'الاسم بالإنجليزية (اختياري)',
             'Advanced Fashion Co.'),
-        _field(_slugCtrl, 'معرِّف مختصر (slug) *', 'advanced-fashion'),
+        _slugField(),
         _countryPicker('الدولة الأساسية', _primaryCountry,
             (v) => setState(() => _primaryCountry = v)),
         _field(_crCtrl, 'رقم السجل التجاري', '1010234567'),
@@ -937,6 +1038,10 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
       if (mounted) setState(() => _step++);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
+    } finally {
+      // CRITICAL: إعادة تفعيل الأزرار حتى لو رمى الـ step خطأ
+      // (كل _doStepN يُعيّن _loading = true قبل استدعاء الـ API)
+      if (mounted) setState(() => _loading = false);
     }
   }
 
