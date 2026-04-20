@@ -207,6 +207,12 @@ import '../../screens/v5_2/closing_cockpit_v52_screen.dart';
 import '../../screens/v5_2/integrations_hub_v52_screen.dart';
 import '../../screens/v5_2/documents_v52_screen.dart';
 import '../../screens/v5_2/advanced_settings_v52_screen.dart';
+import '../../screens/v5_2/workflows_v52_screen.dart';
+import '../../screens/v5_2/anomalies_v52_screen.dart';
+import '../../screens/v5_2/budgets_v52_screen.dart';
+import '../../screens/v5_2/budget_actual_v52_screen.dart';
+import '../../screens/v5_2/scenarios_v52_screen.dart';
+import '../../screens/v5_2/breakeven_v52_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -229,15 +235,15 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/coa-editor': (ctx) => const CoaEditorV52Screen(),  // V5.2 TreeView
   'erp/finance/fixed-assets': (ctx) => const FixedAssetsV52Screen(),  // V5.2
   'erp/finance/statements': (ctx) => const FinancialStatementsFsvV52Screen(),  // V5.2 with FSV Switcher
-  'erp/finance/budgets': (ctx) => const ConnectedPlanningScreen(),
-  'erp/finance/budget-actual': (ctx) => const BudgetVsActualScreen(),
+  'erp/finance/budgets': (ctx) => const BudgetsV52Screen(),  // V5.2
+  'erp/finance/budget-actual': (ctx) => const BudgetActualV52Screen(),  // V5.2
   'erp/finance/budget-planning': (ctx) => const BudgetPlanningV52Screen(),  // V5.2
   'erp/finance/cost-centers': (ctx) => const CostCentersV52Screen(),  // V5.2 Hierarchy
-  'erp/finance/scenarios': (ctx) => const ScenarioPlanningScreen(),
-  'erp/finance/breakeven': (ctx) => const BreakEvenScreen(),
-  'erp/finance/anomalies': (ctx) => const AnomalyDetectorScreen(),
+  'erp/finance/scenarios': (ctx) => const ScenariosV52Screen(),  // V5.2
+  'erp/finance/breakeven': (ctx) => const BreakEvenV52Screen(),  // V5.2
+  'erp/finance/anomalies': (ctx) => const AnomaliesV52Screen(),  // V5.2
   'erp/finance/ai-analyst': (ctx) => const AiAnalystV52Screen(),  // V5.2
-  'erp/finance/workflows': (ctx) => const ApprovalWorkflowsScreen(),
+  'erp/finance/workflows': (ctx) => const WorkflowsV52Screen(),  // V5.2
   'erp/finance/integrations': (ctx) => const IntegrationsHubV52Screen(),  // V5.2 Card Grid
   'erp/finance/documents': (ctx) => const DocumentsV52Screen(),  // V5.2
   'erp/finance/onboarding': (ctx) => const OnboardingV52Screen(),  // V5.2 Wizard
