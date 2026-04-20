@@ -16,6 +16,7 @@ import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 import '../../widgets/attachments_panel.dart';
+import '../../widgets/import_dialog.dart';
 
 const _gold = Color(0xFFD4AF37);
 const _navy = Color(0xFF0A1628);
@@ -117,6 +118,43 @@ class _VendorsScreenState extends State<VendorsScreen> {
     });
   }
 
+  Future<void> _importVendors() async {
+    if (!PilotSession.hasTenant) return;
+    final tid = PilotSession.tenantId!;
+    await showDialog(
+      context: context,
+      builder: (_) => ImportDialog(
+        title: 'استيراد الموردين',
+        mapping: vendorMapping,
+        requiredFields: const ['code', 'legal_name_ar'],
+        onImport: (row) async {
+          final body = <String, dynamic>{
+            'code': row['code'].toString(),
+            'legal_name_ar': row['legal_name_ar'].toString(),
+            if (row['legal_name_en'] != null)
+              'legal_name_en': row['legal_name_en'].toString(),
+            'kind': (row['kind']?.toString() ?? 'goods').toLowerCase(),
+            'country': (row['country']?.toString() ?? 'SA').toUpperCase(),
+            if (row['cr_number'] != null)
+              'cr_number': row['cr_number'].toString(),
+            if (row['vat_number'] != null)
+              'vat_number': row['vat_number'].toString(),
+            if (row['email'] != null) 'email': row['email'].toString(),
+            if (row['phone'] != null) 'phone': row['phone'].toString(),
+            if (row['bank_iban'] != null)
+              'bank_iban': row['bank_iban'].toString(),
+            if (row['contact_name'] != null)
+              'contact_name': row['contact_name'].toString(),
+            'payment_terms':
+                (row['payment_terms']?.toString() ?? 'net_30').toLowerCase(),
+          };
+          return pilotClient.createVendor(tid, body);
+        },
+      ),
+    );
+    _load();
+  }
+
   Future<void> _add() async {
     final res = await showDialog<bool>(
       context: context,
@@ -207,7 +245,16 @@ class _VendorsScreenState extends State<VendorsScreen> {
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('تحديث'),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+              foregroundColor: _ok,
+              side: BorderSide(color: _ok.withValues(alpha: 0.5))),
+          onPressed: _importVendors,
+          icon: const Icon(Icons.upload_file, size: 16),
+          label: const Text('استيراد Excel'),
+        ),
+        const SizedBox(width: 6),
         FilledButton.icon(
           style: FilledButton.styleFrom(
               backgroundColor: _gold, foregroundColor: Colors.black),

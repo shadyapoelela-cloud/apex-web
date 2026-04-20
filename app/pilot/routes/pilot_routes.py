@@ -73,6 +73,7 @@ from app.pilot.schemas.member import (
 )
 from app.phase1.services.auth_service import hash_password
 
+import os
 import secrets
 import string
 import logging
@@ -795,6 +796,71 @@ def invite_member(
             ))
     db.commit()
     db.refresh(user)
+
+    # إرسال بريد دعوة فعلي — يعمل مع أي EMAIL_BACKEND (console/smtp/sendgrid)
+    try:
+        from app.core.email_service import send_email
+        tenant = db.query(Tenant).filter(Tenant.id == tenant_id).first()
+        tenant_name = tenant.legal_name_ar if tenant else 'APEX Pilot'
+        login_url = os.environ.get(
+            'APP_LOGIN_URL',
+            'https://shadyapoelela-cloud.github.io/apex-web/#/login',
+        )
+        subject_ar = f'دعوة للانضمام إلى {tenant_name}'
+        body_html = f'''
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head><meta charset="UTF-8"><title>{subject_ar}</title></head>
+<body style="font-family: Tahoma, Arial; background: #f5f5f5; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px;">
+    <h2 style="color: #D4AF37; border-bottom: 2px solid #D4AF37; padding-bottom: 10px;">
+      مرحباً {payload.display_name} 👋
+    </h2>
+    <p style="color: #333; font-size: 14px; line-height: 1.7;">
+      تمّت دعوتك للانضمام إلى <strong>{tenant_name}</strong> على منصة APEX Pilot
+      — نظام إدارة الأعمال والمحاسبة الذكي.
+    </p>
+    <div style="background: #f9f9f9; border-right: 3px solid #D4AF37; padding: 15px; margin: 20px 0;">
+      <p style="margin: 5px 0;"><strong>بريدك:</strong> {payload.email}</p>
+      <p style="margin: 5px 0;"><strong>كلمة المرور المؤقتة:</strong>
+        <code style="background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-family: monospace;">{temp_pw if created_new else "(استخدم كلمة مرورك الحالية)"}</code>
+      </p>
+    </div>
+    <p style="color: #666; font-size: 13px;">
+      {"⚠ يُرجى تغيير كلمة المرور عند أول تسجيل دخول." if created_new else ""}
+    </p>
+    <p style="text-align: center; margin: 30px 0;">
+      <a href="{login_url}" style="background: #D4AF37; color: black; padding: 12px 30px;
+         border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+        🔓 تسجيل الدخول الآن
+      </a>
+    </p>
+    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+    <p style="color: #999; font-size: 11px; text-align: center;">
+      هذه رسالة تلقائية من APEX Pilot · لا تردّ عليها.
+    </p>
+  </div>
+</body>
+</html>
+'''
+        body_text = (
+            f"مرحباً {payload.display_name},\n\n"
+            f"تمّت دعوتك للانضمام إلى {tenant_name} على APEX Pilot.\n\n"
+            f"البريد: {payload.email}\n"
+            f"كلمة المرور المؤقتة: {temp_pw if created_new else '(استخدم كلمة مرورك الحالية)'}\n\n"
+            f"سجّل دخولك هنا: {login_url}\n\n"
+            f"{'⚠ يُرجى تغيير كلمة المرور عند أول تسجيل دخول.' if created_new else ''}\n"
+        )
+        email_result = send_email(
+            payload.email, subject_ar, body_html, body_text,
+        )
+        logger.info(
+            "Invite email sent to %s (backend=%s, result=%s)",
+            payload.email, email_result.get("backend"), email_result.get("status"),
+        )
+    except Exception as e:
+        # لا نفشل الـ invite لو البريد فشل — الحساب أُنشئ، المستخدم يأخذ الباس يدوياً
+        logger.error("Failed to send invite email to %s: %s", payload.email, e)
 
     return _build_member_detail(db, tenant_id, user)
 
