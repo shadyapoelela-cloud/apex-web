@@ -75,6 +75,9 @@ from app.phase1.services.auth_service import hash_password
 
 import secrets
 import string
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/pilot", tags=["pilot"])
 
