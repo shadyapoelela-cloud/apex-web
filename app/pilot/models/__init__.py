@@ -42,6 +42,13 @@ from .compliance import (
     WpsBatch, WpsSifRecord, WpsStatus,
     VatReturn, VatReturnStatus,
 )
+from .purchasing import (
+    Vendor, VendorKind, PaymentTerms,
+    PurchaseOrder, PurchaseOrderLine, PoStatus,
+    GoodsReceipt, GoodsReceiptLine, GrnStatus,
+    PurchaseInvoice, PurchaseInvoiceLine, PurchaseInvoiceStatus,
+    VendorPayment, VendorPaymentMethod,
+)
 
 # Backward-compat aliases (used by early route code)
 Role = PilotRole
@@ -141,6 +148,21 @@ __all__ = [
     "WpsStatus",
     "VatReturn",
     "VatReturnStatus",
+    # Purchasing
+    "Vendor",
+    "VendorKind",
+    "PaymentTerms",
+    "PurchaseOrder",
+    "PurchaseOrderLine",
+    "PoStatus",
+    "GoodsReceipt",
+    "GoodsReceiptLine",
+    "GrnStatus",
+    "PurchaseInvoice",
+    "PurchaseInvoiceLine",
+    "PurchaseInvoiceStatus",
+    "VendorPayment",
+    "VendorPaymentMethod",
     # aliases
     "Role",
     "Permission",
