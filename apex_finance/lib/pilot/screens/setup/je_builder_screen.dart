@@ -13,6 +13,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -74,11 +75,15 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   }
 
   Future<void> _load() async {
+    // ignore: avoid_print
+    print('[JeBuilder] _load start — hasTenant=${PilotSession.hasTenant}, hasEntity=${PilotSession.hasEntity}, entityId=${PilotSession.entityId}');
+    if (!mounted) return;
     setState(() {
       _loading = true;
       _error = null;
     });
     if (!PilotSession.hasEntity) {
+      if (!mounted) return;
       setState(() {
         _loading = false;
         _error = 'يجب اختيار الكيان من شريط العنوان أولاً.';
@@ -94,14 +99,33 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
             limit: 200),
         _client.listAccounts(eid),
       ]);
-      _entries = results[0].success
-          ? List<Map<String, dynamic>>.from(results[0].data)
-          : [];
-      _accounts = results[1].success
-          ? List<Map<String, dynamic>>.from(results[1].data)
-          : [];
+      // ignore: avoid_print
+      print('[JeBuilder] API results: entries.success=${results[0].success}, accounts.success=${results[1].success}');
+      if (!mounted) return;
+      // Defensive: handle null/non-list data gracefully
+      try {
+        _entries = results[0].success && results[0].data is List
+            ? List<Map<String, dynamic>>.from(results[0].data as List)
+            : [];
+      } catch (e) {
+        // ignore: avoid_print
+        print('[JeBuilder] entries parse error: $e');
+        _entries = [];
+      }
+      try {
+        _accounts = results[1].success && results[1].data is List
+            ? List<Map<String, dynamic>>.from(results[1].data as List)
+            : [];
+      } catch (e) {
+        // ignore: avoid_print
+        print('[JeBuilder] accounts parse error: $e');
+        _accounts = [];
+      }
       setState(() => _loading = false);
-    } catch (e) {
+    } catch (e, st) {
+      // ignore: avoid_print
+      print('[JeBuilder] _load caught exception: $e\n$st');
+      if (!mounted) return;
       setState(() {
         _loading = false;
         _error = '$e';
@@ -280,9 +304,9 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
 
   Widget _header() {
     final totalDebit =
-        _entries.fold(0.0, (t, e) => t + ((e['total_debit'] ?? 0) as num).toDouble());
+        _entries.fold(0.0, (t, e) => t + asDouble(e['total_debit']));
     final totalCredit = _entries.fold(
-        0.0, (t, e) => t + ((e['total_credit'] ?? 0) as num).toDouble());
+        0.0, (t, e) => t + asDouble(e['total_credit']));
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 18, 24, 14),
       decoration: BoxDecoration(
@@ -424,8 +448,8 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   Widget _row(Map<String, dynamic> e) {
     final status = e['status'] ?? 'draft';
     final info = _kStatuses[status] ?? {'ar': status, 'color': _td};
-    final debit = (e['total_debit'] ?? 0).toDouble();
-    final credit = (e['total_credit'] ?? 0).toDouble();
+    final debit = asDouble(e['total_debit']);
+    final credit = asDouble(e['total_credit']);
     return Container(
       margin: const EdgeInsets.only(top: 3),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -601,7 +625,7 @@ class _JeDialogState extends State<_JeDialog> {
   DateTime _date = DateTime.now();
   final _memo = TextEditingController();
   String _kind = 'manual';
-  bool _autoPost = false;
+  bool _autoPost = true;  // ترحيل مباشر كافتراضي — حتى يظهر في التقارير المالية فوراً
   final List<_JeLine> _lines = [_JeLine(), _JeLine()];
   bool _loading = false;
   String? _error;
@@ -938,17 +962,48 @@ class _JeDialogState extends State<_JeDialog> {
                   ]),
                 ),
                 const SizedBox(height: 10),
-                Row(children: [
-                  Checkbox(
-                    value: _autoPost,
-                    onChanged: (v) => setState(() => _autoPost = v ?? false),
-                    checkColor: Colors.black,
-                    fillColor: WidgetStateProperty.resolveWith<Color?>((s) =>
-                        s.contains(WidgetState.selected) ? _gold : _navy3),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _autoPost
+                        ? _ok.withValues(alpha: 0.08)
+                        : _warn.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                        color: (_autoPost ? _ok : _warn).withValues(alpha: 0.3)),
                   ),
-                  const Text('ترحيل مباشر بعد الإنشاء (auto_post)',
-                      style: TextStyle(color: _ts, fontSize: 12)),
-                ]),
+                  child: Row(children: [
+                    Checkbox(
+                      value: _autoPost,
+                      onChanged: (v) => setState(() => _autoPost = v ?? false),
+                      checkColor: Colors.black,
+                      fillColor: WidgetStateProperty.resolveWith<Color?>((s) =>
+                          s.contains(WidgetState.selected) ? _gold : _navy3),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              _autoPost
+                                  ? '✓ ترحيل مباشر إلى GL'
+                                  : '⚠ حفظ كمسودّة فقط',
+                              style: TextStyle(
+                                  color: _autoPost ? _ok : _warn,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 2),
+                          Text(
+                              _autoPost
+                                  ? 'القيد سيظهر فوراً في ميزان المراجعة والتقارير المالية.'
+                                  : 'القيد لن يظهر في التقارير المالية (Trial Balance / P&L / Balance Sheet) حتى تضغط زر الترحيل يدوياً.',
+                              style: const TextStyle(
+                                  color: _ts, fontSize: 11, height: 1.4)),
+                        ],
+                      ),
+                    ),
+                  ]),
+                ),
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Container(
@@ -1199,8 +1254,8 @@ class _JeDetailDialog extends StatelessWidget {
                   ]),
                 ),
                 ...lines.map((l) {
-                  final dr = (l['debit_amount'] ?? 0).toDouble();
-                  final cr = (l['credit_amount'] ?? 0).toDouble();
+                  final dr = asDouble(l['debit_amount']);
+                  final cr = asDouble(l['credit_amount']);
                   return Container(
                     margin: const EdgeInsets.only(top: 3),
                     padding: const EdgeInsets.symmetric(

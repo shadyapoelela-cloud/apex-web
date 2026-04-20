@@ -13,6 +13,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -109,9 +110,9 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
           for (final r in rows) {
             if (r is Map && r['account_id'] != null) {
               _balances[r['account_id']] = {
-                'debit': (r['debit_balance'] ?? 0).toDouble(),
-                'credit': (r['credit_balance'] ?? 0).toDouble(),
-                'net': (r['net_balance'] ?? 0).toDouble(),
+                'debit': asDouble(r['debit_balance']),
+                'credit': asDouble(r['credit_balance']),
+                'net': asDouble(r['net_balance']),
               };
             }
           }

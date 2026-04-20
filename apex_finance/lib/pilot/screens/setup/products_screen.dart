@@ -11,6 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -82,7 +83,7 @@ class _ProductsScreenState extends State<ProductsScreen>
   String _search = '';
   String _catFilter = 'all';
   String _kindFilter = 'all';
-  String _statusFilter = 'active';
+  String _statusFilter = 'all';  // default: show all — draft products should be visible after create
   final _searchCtrl = TextEditingController();
 
   @override
@@ -344,7 +345,7 @@ class _ProductsScreenState extends State<ProductsScreen>
           ..._kStatuses.entries.map((e) =>
               DropdownMenuItem(value: e.key, child: Text(e.value))),
         ], (v) {
-          setState(() => _statusFilter = v ?? 'active');
+          setState(() => _statusFilter = v ?? 'all');
           _load();
         }),
         const Spacer(),
@@ -422,7 +423,7 @@ class _ProductsScreenState extends State<ProductsScreen>
             .firstWhere((b) => b['id'] == p['brand_id'],
                 orElse: () => {'name_ar': '—'})['name_ar'] ??
         '—';
-    final stock = (p['total_stock_on_hand'] ?? 0).toDouble();
+    final stock = asDouble(p['total_stock_on_hand']);
     return InkWell(
       onTap: () => _loadVariants(p['id']),
       borderRadius: BorderRadius.circular(8),
@@ -666,9 +667,9 @@ class _ProductsScreenState extends State<ProductsScreen>
 
   Widget _variantTile(Map<String, dynamic> v) {
     final sel = _selectedVariantId == v['id'];
-    final onHand = (v['total_on_hand'] ?? 0).toDouble();
-    final price = (v['list_price'] ?? 0).toDouble();
-    final cost = (v['standard_cost'] ?? v['default_cost'] ?? 0).toDouble();
+    final onHand = asDouble(v['total_on_hand']);
+    final price = asDouble(v['list_price']);
+    final cost = asDouble(v['standard_cost'] ?? v['default_cost']);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
@@ -1252,13 +1253,33 @@ class _ProductDialogState extends State<_ProductDialog> {
       };
       final r =
           await pilotClient.createProduct(PilotSession.tenantId!, body);
-      setState(() => _loading = false);
       if (!mounted) return;
       if (r.success) {
+        final newId = (r.data as Map)['id'];
+        if (newId != null) {
+          // 1) تفعيل المنتج (backend default = draft فلا يظهر في active list)
+          await pilotClient.updateProduct(newId, {'status': 'active'});
+          // 2) إنشاء متغيّر افتراضي — POS يعرض variants لا products،
+          //    بدون variant المنتج لن يظهر في نقاط البيع إطلاقاً.
+          //    المستخدم يضيف متغيّرات أخرى من شاشة تفاصيل المنتج.
+          final variantBody = <String, dynamic>{
+            'sku': _code.text.trim(),
+            'display_name_ar': _nameAr.text.trim(),
+            if (_nameEn.text.trim().isNotEmpty)
+              'display_name_en': _nameEn.text.trim(),
+            'currency': 'SAR',
+            'track_stock': _stockable,
+          };
+          await pilotClient.createVariant(newId, variantBody);
+        }
+        setState(() => _loading = false);
+        if (!mounted) return;
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            backgroundColor: _ok, content: Text('تم إنشاء الصنف ✓')));
+            backgroundColor: _ok,
+            content: Text('تم إنشاء الصنف + متغيّر افتراضي ✓ (ظاهر في POS)')));
       } else {
+        setState(() => _loading = false);
         setState(() => _error = r.error ?? 'فشل الإنشاء');
       }
     }

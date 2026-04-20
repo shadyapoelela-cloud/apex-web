@@ -11,6 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -336,7 +337,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
       );
 
   Widget _poRow(Map<String, dynamic> p) {
-    final total = (p['grand_total'] ?? 0).toDouble();
+    final total = asDouble(p['grand_total']);
     final status = p['status'] ?? 'draft';
     final info = _kPoStatuses[status] ?? {'ar': status, 'color': _td};
     return Container(
@@ -562,8 +563,8 @@ class _PurchasingScreenState extends State<PurchasingScreen>
       );
 
   Widget _piRow(Map<String, dynamic> p) {
-    final total = (p['grand_total'] ?? 0).toDouble();
-    final due = (p['amount_due'] ?? 0).toDouble();
+    final total = asDouble(p['grand_total']);
+    final due = asDouble(p['amount_due']);
     final status = p['status'] ?? 'draft';
     final info = _kPiStatuses[status] ?? {'ar': status, 'color': _td};
     return Container(
@@ -786,7 +787,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                     ]),
                   ),
                   ..._payments.map((p) {
-                    final amt = (p['amount'] ?? 0).toDouble();
+                    final amt = asDouble(p['amount']);
                     return Container(
                       margin: const EdgeInsets.only(top: 4),
                       padding: const EdgeInsets.symmetric(
@@ -895,7 +896,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                             style:
                                 const TextStyle(color: _tp, fontSize: 13)),
                         subtitle: Text(
-                            'رصيد مستحق: ${_fmt((v['outstanding_balance'] ?? 0).toDouble())}',
+                            'رصيد مستحق: ${_fmt(asDouble(v['outstanding_balance']))}',
                             style:
                                 const TextStyle(color: _td, fontSize: 11)),
                         onTap: () => Navigator.pop(context, v),
@@ -1111,7 +1112,7 @@ class _PoDialogState extends State<_PoDialog> {
       _lines[i].description =
           '${variant['sku']} — ${variant['display_name_ar'] ?? ''}';
       _lines[i].unitPrice =
-          (variant['default_cost'] ?? variant['standard_cost'] ?? 0).toDouble();
+          asDouble(variant['default_cost'] ?? variant['standard_cost']);
     });
   }
 
@@ -1608,7 +1609,7 @@ class _GrnDialogState extends State<_GrnDialog> {
     _qtyCtrls = {
       for (final l in lines)
         l['id'] as String: TextEditingController(
-            text: ((l['qty_ordered'] as num?)?.toDouble() ?? 0).toStringAsFixed(2))
+            text: asDouble(l['qty_ordered']).toStringAsFixed(2))
     };
     _warehouseId = widget.poDetail['destination_warehouse_id'] ??
         (widget.warehouses.isNotEmpty ? widget.warehouses.first['id'] : null);
@@ -1814,8 +1815,8 @@ class _GrnDialogState extends State<_GrnDialog> {
                   ]),
                 ),
                 ...lines.map((l) {
-                  final ordered = (l['qty_ordered'] ?? 0).toDouble();
-                  final received = (l['qty_received'] ?? 0).toDouble();
+                  final ordered = asDouble(l['qty_ordered']);
+                  final received = asDouble(l['qty_received']);
                   final remaining = ordered - received;
                   return Container(
                     margin: const EdgeInsets.only(top: 3),
@@ -1947,6 +1948,9 @@ class _PiDialogState extends State<_PiDialog> {
   final List<_PoLine> _lines = [_PoLine()];
   bool _loading = false;
   String? _error;
+  // ترحيل مباشر للـ GL بعد الإنشاء (بدون زر post منفصل) — افتراضي true
+  // حتى يظهر المستحق للمورد + VAT في القوائم المالية فوراً.
+  bool _autoPost = true;
 
   @override
   void dispose() {
@@ -1997,13 +2001,32 @@ class _PiDialogState extends State<_PiDialog> {
           .toList(),
     };
     final r = await pilotClient.createPurchaseInvoice(body);
-    setState(() => _loading = false);
     if (!mounted) return;
     if (r.success) {
+      final piId = (r.data as Map)['id'];
+      // ترحيل فوري إذا auto_post مُفعَّل — تسجيل JE تلقائياً
+      if (_autoPost && piId != null) {
+        final postR = await pilotClient.postPurchaseInvoice(piId);
+        if (!mounted) return;
+        if (!postR.success) {
+          // الفاتورة أُنشئت لكن الترحيل فشل — نخبر المستخدم بوضوح
+          setState(() {
+            _loading = false;
+            _error = 'أُنشئت الفاتورة لكن فشل الترحيل: ${postR.error}';
+          });
+          return;
+        }
+      }
+      setState(() => _loading = false);
+      if (!mounted) return;
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          backgroundColor: _ok, content: Text('تم إنشاء الفاتورة ✓')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: _ok,
+          content: Text(_autoPost
+              ? 'تم إنشاء الفاتورة وترحيلها إلى GL ✓ (ستظهر في التقارير)'
+              : 'تم إنشاء الفاتورة كمسودّة — اضغط ✓ للترحيل لاحقاً')));
     } else {
+      setState(() => _loading = false);
       setState(() => _error = r.error ?? 'فشل الإنشاء');
     }
   }
@@ -2377,6 +2400,50 @@ class _PiDialogState extends State<_PiDialog> {
                     ),
                   ),
                 ]),
+                const SizedBox(height: 12),
+                // Banner auto_post — مطابق لنمط JE Builder
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _autoPost
+                        ? _ok.withValues(alpha: 0.08)
+                        : _warn.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                        color: (_autoPost ? _ok : _warn).withValues(alpha: 0.3)),
+                  ),
+                  child: Row(children: [
+                    Checkbox(
+                      value: _autoPost,
+                      onChanged: (v) => setState(() => _autoPost = v ?? false),
+                      checkColor: Colors.black,
+                      fillColor: WidgetStateProperty.resolveWith<Color?>((s) =>
+                          s.contains(WidgetState.selected) ? _gold : _navy3),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              _autoPost
+                                  ? '✓ ترحيل مباشر إلى GL'
+                                  : '⚠ حفظ كمسودّة فقط',
+                              style: TextStyle(
+                                  color: _autoPost ? _ok : _warn,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 2),
+                          Text(
+                              _autoPost
+                                  ? 'مدين: مصروفات/مخزون + VAT مدخلات. دائن: ذمم الموردين. تظهر في التقارير فوراً.'
+                                  : 'الفاتورة لن تؤثر على الحسابات حتى تضغط ✓ يدوياً من قائمة الفواتير.',
+                              style: const TextStyle(
+                                  color: _ts, fontSize: 11, height: 1.4)),
+                        ],
+                      ),
+                    ),
+                  ]),
+                ),
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Text(_error!,
@@ -2398,7 +2465,7 @@ class _PiDialogState extends State<_PiDialog> {
                 ? const SizedBox(
                     width: 14, height: 14,
                     child: CircularProgressIndicator(strokeWidth: 2))
-                : const Text('إنشاء'),
+                : Text(_autoPost ? 'إنشاء + ترحيل' : 'إنشاء (مسودّة)'),
           ),
         ],
       ),
@@ -2433,7 +2500,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     super.initState();
     final due = widget.invoice == null
         ? '0'
-        : ((widget.invoice!['amount_due'] ?? 0).toDouble().toStringAsFixed(2));
+        : (asDouble(widget.invoice!['amount_due']).toStringAsFixed(2));
     _amount = TextEditingController(text: due);
   }
 

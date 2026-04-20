@@ -13,6 +13,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -449,8 +450,8 @@ class _VendorsScreenState extends State<VendorsScreen> {
   }
 
   Widget _vendorRow(Map<String, dynamic> v) {
-    final ytd = (v['total_purchases_ytd'] ?? 0).toDouble();
-    final out = (v['outstanding_balance'] ?? 0).toDouble();
+    final ytd = asDouble(v['total_purchases_ytd']);
+    final out = asDouble(v['outstanding_balance']);
     final active = v['is_active'] == true;
     final preferred = v['is_preferred'] == true;
     final onHold = v['on_hold'] == true;
@@ -1165,9 +1166,9 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
   }
 
   Widget _buildLedger(Map<String, dynamic> led) {
-    final inv = (led['total_invoiced'] ?? 0).toDouble();
-    final paid = (led['total_paid'] ?? 0).toDouble();
-    final out = (led['outstanding_balance'] ?? 0).toDouble();
+    final inv = asDouble(led['total_invoiced']);
+    final paid = asDouble(led['total_paid']);
+    final out = asDouble(led['outstanding_balance']);
     final aging = led['aging'] as Map?;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [

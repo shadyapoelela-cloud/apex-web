@@ -12,6 +12,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -438,10 +439,10 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
   }
 
   Widget _stockRow(Map<String, dynamic> s) {
-    final onHand = (s['on_hand'] ?? 0).toDouble();
-    final reserved = (s['reserved'] ?? 0).toDouble();
-    final available = (s['available'] ?? 0).toDouble();
-    final avgCost = (s['weighted_avg_cost'] ?? 0).toDouble();
+    final onHand = asDouble(s['on_hand']);
+    final reserved = asDouble(s['reserved']);
+    final available = asDouble(s['available']);
+    final avgCost = asDouble(s['weighted_avg_cost']);
     return Container(
       margin: const EdgeInsets.only(bottom: 3),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -510,8 +511,8 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
       itemBuilder: (_, i) {
         final m = _movements[i];
         final info = _kReasons[m['reason']] ?? {'ar': m['reason'] ?? '—', 'color': _ts, 'icon': Icons.circle};
-        final qty = (m['qty'] ?? 0).toDouble();
-        final balanceAfter = (m['balance_after'] ?? 0).toDouble();
+        final qty = asDouble(m['qty']);
+        final balanceAfter = asDouble(m['balance_after']);
         final performedAt = (m['performed_at'] ?? '').toString();
         return Container(
           margin: const EdgeInsets.only(bottom: 4),
