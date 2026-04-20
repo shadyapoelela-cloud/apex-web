@@ -574,9 +574,15 @@ _ALLOWED_HEADERS = [
     "X-Client-Version",
 ]
 
+# Always allow localhost/127.0.0.1 on any port for local dev tools
+# (Flutter web-server, IDE preview, curl tests). Safe because browsers enforce
+# same-origin — an attacker cannot spoof a localhost Origin from their site.
+_LOCAL_DEV_REGEX = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
+    allow_origin_regex=_LOCAL_DEV_REGEX,
     allow_credentials=_allow_creds,
     allow_methods=_ALLOWED_METHODS,
     allow_headers=_ALLOWED_HEADERS,
