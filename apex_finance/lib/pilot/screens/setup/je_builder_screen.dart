@@ -601,7 +601,7 @@ class _JeDialogState extends State<_JeDialog> {
   DateTime _date = DateTime.now();
   final _memo = TextEditingController();
   String _kind = 'manual';
-  bool _autoPost = false;
+  bool _autoPost = true;  // ترحيل مباشر كافتراضي — حتى يظهر في التقارير المالية فوراً
   final List<_JeLine> _lines = [_JeLine(), _JeLine()];
   bool _loading = false;
   String? _error;
@@ -938,17 +938,48 @@ class _JeDialogState extends State<_JeDialog> {
                   ]),
                 ),
                 const SizedBox(height: 10),
-                Row(children: [
-                  Checkbox(
-                    value: _autoPost,
-                    onChanged: (v) => setState(() => _autoPost = v ?? false),
-                    checkColor: Colors.black,
-                    fillColor: WidgetStateProperty.resolveWith<Color?>((s) =>
-                        s.contains(WidgetState.selected) ? _gold : _navy3),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _autoPost
+                        ? _ok.withValues(alpha: 0.08)
+                        : _warn.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                        color: (_autoPost ? _ok : _warn).withValues(alpha: 0.3)),
                   ),
-                  const Text('ترحيل مباشر بعد الإنشاء (auto_post)',
-                      style: TextStyle(color: _ts, fontSize: 12)),
-                ]),
+                  child: Row(children: [
+                    Checkbox(
+                      value: _autoPost,
+                      onChanged: (v) => setState(() => _autoPost = v ?? false),
+                      checkColor: Colors.black,
+                      fillColor: WidgetStateProperty.resolveWith<Color?>((s) =>
+                          s.contains(WidgetState.selected) ? _gold : _navy3),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              _autoPost
+                                  ? '✓ ترحيل مباشر إلى GL'
+                                  : '⚠ حفظ كمسودّة فقط',
+                              style: TextStyle(
+                                  color: _autoPost ? _ok : _warn,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 2),
+                          Text(
+                              _autoPost
+                                  ? 'القيد سيظهر فوراً في ميزان المراجعة والتقارير المالية.'
+                                  : 'القيد لن يظهر في التقارير المالية (Trial Balance / P&L / Balance Sheet) حتى تضغط زر الترحيل يدوياً.',
+                              style: const TextStyle(
+                                  color: _ts, fontSize: 11, height: 1.4)),
+                        ],
+                      ),
+                    ),
+                  ]),
+                ),
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Container(

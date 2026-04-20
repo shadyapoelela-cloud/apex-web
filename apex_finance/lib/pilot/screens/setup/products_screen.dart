@@ -82,7 +82,7 @@ class _ProductsScreenState extends State<ProductsScreen>
   String _search = '';
   String _catFilter = 'all';
   String _kindFilter = 'all';
-  String _statusFilter = 'active';
+  String _statusFilter = 'all';  // default: show all — draft products should be visible after create
   final _searchCtrl = TextEditingController();
 
   @override
@@ -344,7 +344,7 @@ class _ProductsScreenState extends State<ProductsScreen>
           ..._kStatuses.entries.map((e) =>
               DropdownMenuItem(value: e.key, child: Text(e.value))),
         ], (v) {
-          setState(() => _statusFilter = v ?? 'active');
+          setState(() => _statusFilter = v ?? 'all');
           _load();
         }),
         const Spacer(),
@@ -1252,13 +1252,23 @@ class _ProductDialogState extends State<_ProductDialog> {
       };
       final r =
           await pilotClient.createProduct(PilotSession.tenantId!, body);
-      setState(() => _loading = false);
       if (!mounted) return;
       if (r.success) {
+        // Backend default status is 'draft' — فعّل المنتج فوراً ليظهر للمستخدم
+        // ويكون متاحاً للبيع على نقاط البيع. المستخدم يستطيع إعادته إلى
+        // draft/discontinued لاحقاً من شاشة التعديل.
+        final newId = (r.data as Map)['id'];
+        if (newId != null) {
+          await pilotClient.updateProduct(newId, {'status': 'active'});
+        }
+        setState(() => _loading = false);
+        if (!mounted) return;
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            backgroundColor: _ok, content: Text('تم إنشاء الصنف ✓')));
+            backgroundColor: _ok,
+            content: Text('تم إنشاء الصنف وتفعيله ✓')));
       } else {
+        setState(() => _loading = false);
         setState(() => _error = r.error ?? 'فشل الإنشاء');
       }
     }
