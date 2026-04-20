@@ -1254,6 +1254,7 @@ try:
     from app.pilot.routes.pilot_routes import router as pilot_router
     from app.pilot.routes.catalog_routes import router as pilot_catalog_router
     from app.pilot.routes.pricing_routes import router as pilot_pricing_router
+    from app.pilot.routes.pos_routes import router as pilot_pos_router
     from app.pilot.models import (  # noqa: F401 — ensure models are registered with metadata
         Tenant, CompanySettings, Entity, Branch,
         Currency, FxRate, Role, Permission, RolePermission,
@@ -1265,6 +1266,8 @@ try:
         Warehouse, StockLevel, StockMovement,
         # Day 5: pricing
         PriceList, PriceListItem, PriceListBranch,
+        # Week 2: POS
+        PosSession, PosTransaction, PosTransactionLine, PosPayment, CashMovement,
     )
     from app.phase1.models.platform_models import Base as PilotBase, engine as pilot_engine
     # Create pilot tables if missing (idempotent)
@@ -1272,6 +1275,7 @@ try:
     app.include_router(pilot_router)
     app.include_router(pilot_catalog_router)
     app.include_router(pilot_pricing_router)
+    app.include_router(pilot_pos_router)
     HAS_PILOT = True
     logging.info("Pilot routes mounted (multi-tenant retail ERP) + tables ensured")
 except Exception as e:

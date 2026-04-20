@@ -20,6 +20,13 @@ from .pricing import (
     PriceList, PriceListItem, PriceListBranch,
     PriceListScope, PriceListKind, PriceListStatus, Season,
 )
+from .pos import (
+    PosSession, PosSessionStatus,
+    PosTransaction, PosTransactionKind, PosTransactionStatus,
+    PosTransactionLine,
+    PosPayment, PaymentMethod,
+    CashMovement, CashMovementKind,
+)
 
 # Backward-compat aliases (used by early route code)
 Role = PilotRole
@@ -80,6 +87,17 @@ __all__ = [
     "PriceListKind",
     "PriceListStatus",
     "Season",
+    # POS
+    "PosSession",
+    "PosSessionStatus",
+    "PosTransaction",
+    "PosTransactionKind",
+    "PosTransactionStatus",
+    "PosTransactionLine",
+    "PosPayment",
+    "PaymentMethod",
+    "CashMovement",
+    "CashMovementKind",
     # aliases
     "Role",
     "Permission",
