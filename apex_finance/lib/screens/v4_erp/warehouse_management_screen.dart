@@ -1,646 +1,376 @@
-/// APEX Wave 104 — Warehouse Management System (WMS).
-/// Route: /app/erp/operations/warehouse
+/// Warehouse Management — شاشة المستودعات الحيّة.
 ///
-/// Multi-warehouse stock, receipts, picks, putaway, transfers.
+/// ذاتية الاكتفاء. تقرأ PilotSession.entityId ثم تعرض كل المستودعات
+/// لجميع فروع هذا الكيان، مع stock levels لكل واحد.
+
 library;
 
 import 'package:flutter/material.dart';
 
+import '../../pilot/api/pilot_client.dart';
+import '../../pilot/session.dart';
+
+const _gold = Color(0xFFD4AF37);
+const _navy = Color(0xFF0A1628);
+const _navy2 = Color(0xFF132339);
+const _navy3 = Color(0xFF1D3150);
+const _bdr = Color(0x33FFFFFF);
+const _tp = Color(0xFFFFFFFF);
+const _ts = Color(0xFFBCC5D3);
+const _td = Color(0xFF6B7A90);
+const _ok = Color(0xFF10B981);
+const _err = Color(0xFFEF4444);
+
 class WarehouseManagementScreen extends StatefulWidget {
   const WarehouseManagementScreen({super.key});
   @override
-  State<WarehouseManagementScreen> createState() => _WarehouseManagementScreenState();
+  State<WarehouseManagementScreen> createState() =>
+      _WarehouseManagementScreenState();
 }
 
-class _WarehouseManagementScreenState extends State<WarehouseManagementScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tab;
+class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
+  final PilotClient _client = pilotClient;
 
-  final _warehouses = const [
-    _Warehouse('WH-01', 'المستودع الرئيسي — الرياض', 'الرياض', 12500, 8200, 72, Color(0xFFD4AF37)),
-    _Warehouse('WH-02', 'مستودع جدة', 'جدة', 6800, 4500, 58, Colors.blue),
-    _Warehouse('WH-03', 'مستودع الدمام', 'الدمام', 4200, 3100, 82, Colors.green),
-    _Warehouse('WH-04', 'مستودع دبي — حرة', 'الإمارات', 3500, 2800, 65, Colors.purple),
-  ];
-
-  final _movements = const [
-    _Movement('MVT-2026-0892', 'استلام بضاعة', 'inbound', 'WH-01', null, 'بولي بروبلين 20 طن', '2026-04-19 08:42', 'completed'),
-    _Movement('MVT-2026-0891', 'تحويل داخلي', 'transfer', 'WH-01', 'WH-02', 'مواد تعبئة 3 طن', '2026-04-19 09:15', 'in-transit'),
-    _Movement('MVT-2026-0890', 'صرف للعميل', 'outbound', 'WH-01', null, 'شحنة SABIC — طلب SO-8942', '2026-04-18 14:20', 'completed'),
-    _Movement('MVT-2026-0889', 'إعادة من عميل', 'return', 'WH-02', null, 'إرجاع RMA-015 — 2 طن', '2026-04-18 11:05', 'inspecting'),
-    _Movement('MVT-2026-0888', 'استلام بضاعة', 'inbound', 'WH-03', null, 'مواد خام من الهند', '2026-04-17 16:30', 'completed'),
-    _Movement('MVT-2026-0887', 'تحويل داخلي', 'transfer', 'WH-01', 'WH-04', 'معدات IT — 12 قطعة', '2026-04-17 10:18', 'completed'),
-    _Movement('MVT-2026-0886', 'صرف للعميل', 'outbound', 'WH-02', null, 'STC — شحنة شهرية', '2026-04-16 09:00', 'completed'),
-    _Movement('MVT-2026-0885', 'فقد/تلف', 'adjustment', 'WH-01', null, 'تلف 50 كرتون أثناء النقل', '2026-04-15 13:45', 'completed'),
-  ];
-
-  final _items = const [
-    _StockItem('SKU-100', 'بولي بروبلين — بلاستيك', 'WH-01', 4800, 'طن', 45000, 1500, 'in-stock'),
-    _StockItem('SKU-101', 'إيثيلين — مادة خام', 'WH-01', 2100, 'طن', 38000, 800, 'in-stock'),
-    _StockItem('SKU-102', 'ميثانول — كيماويات', 'WH-02', 850, 'طن', 52000, 300, 'in-stock'),
-    _StockItem('SKU-103', 'كراتين تعبئة', 'WH-03', 12500, 'كرتون', 120, 3000, 'in-stock'),
-    _StockItem('SKU-104', 'عبوات زجاجية', 'WH-01', 48, 'كرتون', 850, 200, 'low'),
-    _StockItem('SKU-105', 'ملصقات', 'WH-02', 0, 'لفة', 125, 500, 'out-of-stock'),
-    _StockItem('SKU-106', 'أحبار طباعة', 'WH-03', 240, 'لتر', 420, 180, 'in-stock'),
-    _StockItem('SKU-107', 'قطع غيار — محركات', 'WH-04', 85, 'قطعة', 8500, 50, 'in-stock'),
-  ];
+  List<Map<String, dynamic>> _branches = [];
+  final Map<String, List<Map<String, dynamic>>> _warehousesByBranch = {};
+  final Map<String, List<Map<String, dynamic>>> _stockByWarehouse = {};
+  bool _loading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 4, vsync: this);
+    _load();
   }
 
-  @override
-  void dispose() {
-    _tab.dispose();
-    super.dispose();
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    if (!PilotSession.hasEntity) {
+      setState(() {
+        _loading = false;
+        _error = 'لم يتم تحديد الكيان. اذهب لإعدادات الشركة أولاً.';
+      });
+      return;
+    }
+    try {
+      final bR = await _client.listBranches(PilotSession.entityId!);
+      if (!bR.success) throw 'فشل تحميل الفروع';
+      _branches = List<Map<String, dynamic>>.from(bR.data);
+
+      for (final b in _branches) {
+        final wR = await _client.listWarehouses(b['id']);
+        final whs =
+            wR.success ? List<Map<String, dynamic>>.from(wR.data) : <Map<String, dynamic>>[];
+        _warehousesByBranch[b['id']] = whs;
+        for (final w in whs) {
+          final sR = await _client.getWarehouseStock(w['id']);
+          _stockByWarehouse[w['id']] = sR.success
+              ? List<Map<String, dynamic>>.from(sR.data)
+              : <Map<String, dynamic>>[];
+        }
+      }
+      setState(() => _loading = false);
+    } catch (e) {
+      setState(() {
+        _loading = false;
+        _error = '$e';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildHero(),
-        _buildKpis(),
-        TabBar(
-          controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
-          tabs: const [
-            Tab(icon: Icon(Icons.warehouse, size: 16), text: 'المستودعات'),
-            Tab(icon: Icon(Icons.inventory_2, size: 16), text: 'المخزون'),
-            Tab(icon: Icon(Icons.swap_horiz, size: 16), text: 'الحركات'),
-            Tab(icon: Icon(Icons.analytics, size: 16), text: 'تحليلات'),
-          ],
-        ),
-        Expanded(
-          child: TabBarView(
-            controller: _tab,
-            children: [
-              _buildWarehousesTab(),
-              _buildStockTab(),
-              _buildMovementsTab(),
-              _buildAnalyticsTab(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHero() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF5D4037), Color(0xFF795548)]),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.warehouse, color: Colors.white, size: 36),
-          SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('إدارة المستودعات (WMS)',
-                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
-                Text('Warehouse Management — 4 مستودعات · استلام · صرف · تحويلات · تسويات',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKpis() {
-    final totalCapacity = _warehouses.fold(0, (s, w) => s + w.capacity);
-    final totalUsed = _warehouses.fold(0, (s, w) => s + w.used);
-    final lowStock = _items.where((i) => i.status == 'low').length;
-    final outOfStock = _items.where((i) => i.status == 'out-of-stock').length;
-    final totalValue = _items.fold(0.0, (s, i) => s + i.qty * i.unitCost);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          _kpi('المستودعات', '${_warehouses.length}', Colors.blue, Icons.warehouse),
-          _kpi('السعة المستخدمة', '${(totalUsed / totalCapacity * 100).toStringAsFixed(0)}%', const Color(0xFFD4AF37), Icons.inventory_2),
-          _kpi('قيمة المخزون', _fmtM(totalValue), Colors.green, Icons.attach_money),
-          _kpi('منخفض المخزون', '$lowStock', Colors.orange, Icons.warning),
-          _kpi('نافد', '$outOfStock', Colors.red, Icons.error),
-        ],
-      ),
-    );
-  }
-
-  Widget _kpi(String label, String value, Color color, IconData icon) {
-    return Expanded(
+    return Directionality(
+      textDirection: TextDirection.rtl,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
-                  Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
-                ],
-              ),
+        color: _navy,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator(color: _gold))
+            : _error != null
+                ? _errorState()
+                : _content(),
+      ),
+    );
+  }
+
+  Widget _errorState() => Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          padding: const EdgeInsets.all(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.warning, color: _err, size: 56),
+            const SizedBox(height: 16),
+            Text(_error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: _tp, fontSize: 15)),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(backgroundColor: _gold),
+              onPressed: _load,
+              icon: const Icon(Icons.refresh),
+              label: const Text('إعادة المحاولة'),
             ),
+          ]),
+        ),
+      );
+
+  Widget _content() => RefreshIndicator(
+        color: _gold,
+        onRefresh: _load,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _header(),
+            const SizedBox(height: 16),
+            ..._branches.map(_branchCard),
+            const SizedBox(height: 80),
           ],
         ),
-      ),
-    );
+      );
+
+  Widget _header() {
+    final totalWh = _warehousesByBranch.values.fold<int>(0, (s, l) => s + l.length);
+    final totalSkus = _stockByWarehouse.values.fold<int>(
+        0, (s, l) => s + l.length);
+    final totalStock = _stockByWarehouse.values
+        .expand((l) => l)
+        .fold<double>(0,
+            (s, r) => s + (double.tryParse('${r['on_hand']}') ?? 0));
+    return Row(children: [
+      _kpi('الفروع', '${_branches.length}', Icons.store),
+      const SizedBox(width: 10),
+      _kpi('المستودعات', '$totalWh', Icons.warehouse),
+      const SizedBox(width: 10),
+      _kpi('أصناف مختزنة', '$totalSkus', Icons.inventory_2),
+      const SizedBox(width: 10),
+      _kpi('الكمية الإجمالية', totalStock.toStringAsFixed(0), Icons.layers),
+    ]);
   }
 
-  Widget _buildWarehousesTab() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: _warehouses.length,
-      itemBuilder: (ctx, i) {
-        final w = _warehouses[i];
-        final utilization = w.used / w.capacity;
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: w.color.withOpacity(0.3), width: 1.5),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: w.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-                child: Icon(Icons.warehouse, color: w.color, size: 32),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(w.id, style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.black54)),
-                        const SizedBox(width: 10),
-                        Text(w.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Icon(Icons.place, size: 12, color: Colors.black54),
-                        const SizedBox(width: 4),
-                        Text(w.location, style: const TextStyle(fontSize: 12, color: Colors.black54)),
-                        const SizedBox(width: 14),
-                        const Icon(Icons.category, size: 12, color: Colors.black54),
-                        const SizedBox(width: 4),
-                        Text('${w.skuCount} SKU', style: const TextStyle(fontSize: 12, color: Colors.black54)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text('${w.used} / ${w.capacity} m³',
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, fontFamily: 'monospace')),
-                        const Spacer(),
-                        Text('${(utilization * 100).toStringAsFixed(0)}%',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                                color: utilization > 0.9 ? Colors.red : utilization > 0.75 ? Colors.orange : w.color)),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    LinearProgressIndicator(
-                      value: utilization,
-                      backgroundColor: Colors.grey.shade200,
-                      valueColor: AlwaysStoppedAnimation(utilization > 0.9 ? Colors.red : utilization > 0.75 ? Colors.orange : w.color),
-                      minHeight: 10,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildStockTab() {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
-                  children: [
-                    Expanded(child: Text('SKU', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(flex: 3, child: Text('الصنف', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('المستودع', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('الكمية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('الوحدة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('تكلفة الوحدة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(flex: 2, child: Text('القيمة الإجمالية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
-                    Expanded(child: Text('نقطة الطلب', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('الحالة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                  ],
-                ),
-              ),
-              for (final i in _items) _itemRow(i),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _itemRow(_StockItem i) {
-    final statusColor = _stockStatusColor(i.status);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
-      ),
-      child: Row(
-        children: [
-          Expanded(child: Text(i.sku, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w700))),
-          Expanded(flex: 3, child: Text(i.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(left: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-              child: Text(i.warehouse, style: const TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
-            ),
-          ),
-          Expanded(
-            child: Text(_fmt(i.qty.toDouble()),
-                style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'monospace',
-                    fontWeight: FontWeight.w800,
-                    color: i.qty == 0 ? Colors.red : i.qty < i.reorderPoint ? Colors.orange : Colors.black87)),
-          ),
-          Expanded(child: Text(i.unit, style: const TextStyle(fontSize: 11, color: Colors.black54))),
-          Expanded(child: Text(_fmt(i.unitCost.toDouble()), style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
-          Expanded(
-            flex: 2,
-            child: Text(_fmt(i.qty * i.unitCost.toDouble()),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-          ),
-          Expanded(child: Text(_fmt(i.reorderPoint.toDouble()), style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'))),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(left: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
-              child: Text(_stockStatusLabel(i.status),
-                  style: TextStyle(fontSize: 10, color: statusColor, fontWeight: FontWeight.w800),
-                  textAlign: TextAlign.center),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMovementsTab() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: _movements.length,
-      itemBuilder: (ctx, i) {
-        final m = _movements[i];
-        final typeColor = _moveTypeColor(m.type);
-        final statusColor = _moveStatusColor(m.status);
-        return Container(
-          margin: const EdgeInsets.only(bottom: 10),
+  Widget _kpi(String label, String val, IconData icon) => Expanded(
+        child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: _navy2,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: typeColor.withOpacity(0.3)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: typeColor.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
-                child: Icon(_moveIcon(m.type), color: typeColor),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(m.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: typeColor.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-                          child: Text(m.typeLabel,
-                              style: TextStyle(fontSize: 10, color: typeColor, fontWeight: FontWeight.w800)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(m.description, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.blue.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-                          child: Text(m.warehouse,
-                              style: const TextStyle(fontSize: 10, color: Colors.blue, fontFamily: 'monospace', fontWeight: FontWeight.w800)),
-                        ),
-                        if (m.toWarehouse != null) ...[
-                          const Icon(Icons.arrow_forward, size: 12, color: Colors.black45),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-                            child: Text(m.toWarehouse!,
-                                style: const TextStyle(fontSize: 10, color: Colors.green, fontFamily: 'monospace', fontWeight: FontWeight.w800)),
-                          ),
-                        ],
-                      ],
-                    ),
-                    Text(m.timestamp, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-                child: Text(_moveStatusLabel(m.status),
-                    style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w800)),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildAnalyticsTab() {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Row(
-          children: [
-            _statCard('معدل دوران المخزون', '6.4x', '+0.8 YoY', Colors.green, Icons.sync),
-            _statCard('أيام المخزون (DIO)', '57 يوم', '-6 يوم', Colors.blue, Icons.schedule),
-            _statCard('دقة الجرد', '99.3%', 'ممتاز', const Color(0xFFD4AF37), Icons.check_circle),
-            _statCard('المخزون الراكد', '3.8%', '-1.2pp', Colors.orange, Icons.warning),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: _bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
-                children: [
-                  Icon(Icons.insights, color: Color(0xFFD4AF37)),
-                  SizedBox(width: 8),
-                  Text('أهم تحليلات المخزون', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _insight('🔥 أسرع الأصناف حركة', 'بولي بروبلين (SKU-100) — معدل دوران 12x/سنة', Colors.red),
-              _insight('🐢 أبطأ الأصناف', 'قطع غيار المحركات (SKU-107) — دوران 1.2x/سنة', Colors.orange),
-              _insight('⚠️ تنبيه إعادة طلب', '3 أصناف بحاجة إعادة طلب عاجلة', Colors.amber),
-              _insight('🎯 توصية AI', 'نقل 15% من مخزون WH-03 إلى WH-02 لتحسين التوزيع', Colors.blue),
-              _insight('💰 الأعلى قيمة', 'ميثانول (SKU-102) — 44.2M ر.س (43% من إجمالي القيمة)', const Color(0xFFD4AF37)),
+              Row(children: [
+                Icon(icon, color: _gold, size: 18),
+                const SizedBox(width: 6),
+                Text(label, style: const TextStyle(color: _ts, fontSize: 12)),
+              ]),
+              const SizedBox(height: 8),
+              Text(val,
+                  style: const TextStyle(
+                      color: _gold, fontSize: 22, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
-      ],
+      );
+
+  Widget _branchCard(Map<String, dynamic> b) {
+    final warehouses = _warehousesByBranch[b['id']] ?? [];
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _navy2,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _bdr),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.store, color: _gold),
+          const SizedBox(width: 8),
+          Text('${b['code']} — ${b['name_ar'] ?? ''}',
+              style: const TextStyle(
+                  color: _tp, fontWeight: FontWeight.bold, fontSize: 15)),
+          const SizedBox(width: 8),
+          if (b['city'] != null)
+            Text('(${b['city']})', style: const TextStyle(color: _td, fontSize: 12)),
+          const Spacer(),
+          TextButton.icon(
+            icon: const Icon(Icons.add, color: _gold, size: 18),
+            label: const Text('مستودع', style: TextStyle(color: _gold)),
+            onPressed: () => _addWarehouse(b['id']),
+          ),
+        ]),
+        const SizedBox(height: 8),
+        if (warehouses.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(8),
+            child: Text('لا توجد مستودعات في هذا الفرع',
+                style: TextStyle(color: _td, fontSize: 13)),
+          )
+        else
+          ...warehouses.map((w) => _warehouseTile(w)),
+      ]),
     );
   }
 
-  Widget _statCard(String label, String value, String note, Color color, IconData icon) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+  Widget _warehouseTile(Map<String, dynamic> w) {
+    final stock = _stockByWarehouse[w['id']] ?? [];
+    final total = stock.fold<double>(
+        0, (s, r) => s + (double.tryParse('${r['on_hand']}') ?? 0));
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _navy3,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(children: [
+        Icon(Icons.warehouse, color: _gold, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                Text(w['name_ar'] ?? w['code'],
+                    style: const TextStyle(
+                        color: _tp,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14)),
+                const SizedBox(width: 8),
+                if (w['is_default'] == true)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: _gold.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text('افتراضي',
+                        style: TextStyle(color: _gold, fontSize: 10)),
+                  ),
+              ]),
+              Text('${w['code']} • ${w['type']}',
+                  style: const TextStyle(color: _td, fontSize: 11)),
+            ],
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
-            Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
-            Text(note, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('${stock.length} صنف',
+                style: const TextStyle(color: _ts, fontSize: 12)),
+            Text(total.toStringAsFixed(0),
+                style: const TextStyle(
+                    color: _gold, fontWeight: FontWeight.bold, fontSize: 16)),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _insight(String title, String detail, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: color.withOpacity(0.05), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withOpacity(0.2))),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
-                Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black87)),
-              ],
-            ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: (w['status'] == 'active' ? _ok : Colors.grey)
+                .withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(10),
           ),
-        ],
-      ),
+          child: Text(w['status'] ?? '',
+              style: TextStyle(
+                  color: w['status'] == 'active' ? _ok : Colors.grey,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600)),
+        ),
+      ]),
     );
   }
 
-  Color _stockStatusColor(String s) {
-    switch (s) {
-      case 'in-stock':
-        return Colors.green;
-      case 'low':
-        return Colors.orange;
-      case 'out-of-stock':
-        return Colors.red;
-      default:
-        return Colors.grey;
+  Future<void> _addWarehouse(String branchId) async {
+    final codeCtrl = TextEditingController();
+    final nameCtrl = TextEditingController();
+    String type = 'main';
+    bool isDefault = false;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text('مستودع جديد'),
+            content: SizedBox(
+              width: 400,
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                TextField(
+                  controller: codeCtrl,
+                  decoration: const InputDecoration(labelText: 'الكود *'),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(labelText: 'الاسم *'),
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  value: type,
+                  decoration: const InputDecoration(labelText: 'النوع'),
+                  items: const [
+                    DropdownMenuItem(value: 'main', child: Text('رئيسي')),
+                    DropdownMenuItem(
+                        value: 'stockroom', child: Text('مخزن خلفي')),
+                    DropdownMenuItem(
+                        value: 'central_dc', child: Text('مركز توزيع')),
+                    DropdownMenuItem(
+                        value: 'returns', child: Text('مرتجعات')),
+                  ],
+                  onChanged: (v) => setS(() => type = v!),
+                ),
+                CheckboxListTile(
+                  value: isDefault,
+                  title: const Text('افتراضي'),
+                  onChanged: (v) => setS(() => isDefault = v ?? false),
+                ),
+              ]),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('إلغاء')),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: _gold),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('إنشاء'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (ok == true) {
+      final r = await _client.createWarehouse(branchId, {
+        'code': codeCtrl.text.trim(),
+        'name_ar': nameCtrl.text.trim(),
+        'type': type,
+        'is_default': isDefault,
+        'is_sellable_from': true,
+        'is_receivable_to': true,
+      });
+      if (r.success) {
+        await _load();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('تم إنشاء المستودع'),
+                backgroundColor: _ok),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(r.error ?? 'فشل'), backgroundColor: _err),
+          );
+        }
+      }
     }
   }
-
-  String _stockStatusLabel(String s) {
-    switch (s) {
-      case 'in-stock':
-        return 'متوفر';
-      case 'low':
-        return 'منخفض';
-      case 'out-of-stock':
-        return 'نافد';
-      default:
-        return s;
-    }
-  }
-
-  Color _moveTypeColor(String t) {
-    switch (t) {
-      case 'inbound':
-        return Colors.green;
-      case 'outbound':
-        return Colors.orange;
-      case 'transfer':
-        return Colors.blue;
-      case 'return':
-        return Colors.purple;
-      case 'adjustment':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData _moveIcon(String t) {
-    switch (t) {
-      case 'inbound':
-        return Icons.arrow_downward;
-      case 'outbound':
-        return Icons.arrow_upward;
-      case 'transfer':
-        return Icons.swap_horiz;
-      case 'return':
-        return Icons.assignment_return;
-      case 'adjustment':
-        return Icons.edit;
-      default:
-        return Icons.circle;
-    }
-  }
-
-  Color _moveStatusColor(String s) {
-    switch (s) {
-      case 'completed':
-        return Colors.green;
-      case 'in-transit':
-        return Colors.orange;
-      case 'inspecting':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _moveStatusLabel(String s) {
-    switch (s) {
-      case 'completed':
-        return 'مكتمل';
-      case 'in-transit':
-        return 'في الطريق';
-      case 'inspecting':
-        return 'قيد الفحص';
-      default:
-        return s;
-    }
-  }
-
-  String _fmt(double v) {
-    final s = v.toStringAsFixed(0);
-    return s.replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
-  }
-
-  String _fmtM(double v) {
-    if (v.abs() >= 1_000_000) return '${(v / 1_000_000).toStringAsFixed(1)}M ر.س';
-    if (v.abs() >= 1_000) return '${(v / 1_000).toStringAsFixed(0)}K ر.س';
-    return '${v.toStringAsFixed(0)} ر.س';
-  }
-}
-
-class _Warehouse {
-  final String id;
-  final String name;
-  final String location;
-  final int capacity;
-  final int used;
-  final int skuCount;
-  final Color color;
-  const _Warehouse(this.id, this.name, this.location, this.capacity, this.used, this.skuCount, this.color);
-}
-
-class _Movement {
-  final String id;
-  final String typeLabel;
-  final String type;
-  final String warehouse;
-  final String? toWarehouse;
-  final String description;
-  final String timestamp;
-  final String status;
-  const _Movement(this.id, this.typeLabel, this.type, this.warehouse, this.toWarehouse, this.description, this.timestamp, this.status);
-}
-
-class _StockItem {
-  final String sku;
-  final String name;
-  final String warehouse;
-  final int qty;
-  final String unit;
-  final int unitCost;
-  final int reorderPoint;
-  final String status;
-  const _StockItem(this.sku, this.name, this.warehouse, this.qty, this.unit, this.unitCost, this.reorderPoint, this.status);
 }

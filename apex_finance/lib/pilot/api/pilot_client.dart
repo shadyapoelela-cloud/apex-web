@@ -554,6 +554,89 @@ class PilotClient {
   Future<ApiResult> listVatReturns(String eid) =>
       _get('/pilot/entities/$eid/vat-returns');
 
+  // ═════════════════════════════════════════════════════════════
+  // 10. PURCHASING — Vendors / PO / GRN / Purchase Invoices / Payments
+  // ═════════════════════════════════════════════════════════════
+
+  // Vendors
+  Future<ApiResult> listVendors(String tid,
+      {String? kind, bool activeOnly = true, String? search}) {
+    final qp = <String, String>{
+      'active_only': '$activeOnly',
+      if (kind != null) 'kind': kind,
+      if (search != null && search.isNotEmpty) 'search': search,
+    };
+    final qs = qp.entries.map((e) => '${e.key}=${e.value}').join('&');
+    return _get('/pilot/tenants/$tid/vendors?$qs');
+  }
+  Future<ApiResult> createVendor(String tid, Map<String, dynamic> body) =>
+      _post('/pilot/tenants/$tid/vendors', body);
+  Future<ApiResult> getVendor(String vid) => _get('/pilot/vendors/$vid');
+  Future<ApiResult> updateVendor(String vid, Map<String, dynamic> body) =>
+      _patch('/pilot/vendors/$vid', body);
+  Future<ApiResult> vendorLedger(String vid) =>
+      _get('/pilot/vendors/$vid/ledger');
+
+  // Purchase Orders
+  Future<ApiResult> createPurchaseOrder(Map<String, dynamic> body) =>
+      _post('/pilot/purchase-orders', body);
+  Future<ApiResult> listPurchaseOrders(String eid,
+      {String? status, String? vendorId, int limit = 100}) {
+    final qp = <String, String>{
+      'limit': '$limit',
+      if (status != null) 'status': status,
+      if (vendorId != null) 'vendor_id': vendorId,
+    };
+    final qs = qp.entries.map((e) => '${e.key}=${e.value}').join('&');
+    return _get('/pilot/entities/$eid/purchase-orders?$qs');
+  }
+  Future<ApiResult> getPurchaseOrder(String poId) =>
+      _get('/pilot/purchase-orders/$poId');
+  Future<ApiResult> approvePurchaseOrder(String poId, String userId) =>
+      _post('/pilot/purchase-orders/$poId/approve',
+          {'approved_by_user_id': userId});
+  Future<ApiResult> issuePurchaseOrder(String poId) =>
+      _post('/pilot/purchase-orders/$poId/issue');
+
+  // Goods Receipts (GRN)
+  Future<ApiResult> createGoodsReceipt(Map<String, dynamic> body) =>
+      _post('/pilot/goods-receipts', body);
+  Future<ApiResult> listGoodsReceipts(String poId) =>
+      _get('/pilot/purchase-orders/$poId/receipts');
+  Future<ApiResult> getGoodsReceipt(String grnId) =>
+      _get('/pilot/goods-receipts/$grnId');
+
+  // Purchase Invoices
+  Future<ApiResult> createPurchaseInvoice(Map<String, dynamic> body) =>
+      _post('/pilot/purchase-invoices', body);
+  Future<ApiResult> postPurchaseInvoice(String piId) =>
+      _post('/pilot/purchase-invoices/$piId/post');
+  Future<ApiResult> listPurchaseInvoices(String eid,
+      {String? status, String? vendorId, int limit = 100}) {
+    final qp = <String, String>{
+      'limit': '$limit',
+      if (status != null) 'status': status,
+      if (vendorId != null) 'vendor_id': vendorId,
+    };
+    final qs = qp.entries.map((e) => '${e.key}=${e.value}').join('&');
+    return _get('/pilot/entities/$eid/purchase-invoices?$qs');
+  }
+  Future<ApiResult> getPurchaseInvoice(String piId) =>
+      _get('/pilot/purchase-invoices/$piId');
+
+  // Vendor Payments
+  Future<ApiResult> createVendorPayment(Map<String, dynamic> body) =>
+      _post('/pilot/vendor-payments', body);
+  Future<ApiResult> listVendorPayments(String eid,
+      {String? vendorId, int limit = 100}) {
+    final qp = <String, String>{
+      'limit': '$limit',
+      if (vendorId != null) 'vendor_id': vendorId,
+    };
+    final qs = qp.entries.map((e) => '${e.key}=${e.value}').join('&');
+    return _get('/pilot/entities/$eid/vendor-payments?$qs');
+  }
+
   // ── Health ─────────────────────────────────────────────────
   Future<ApiResult> health() => _get('/pilot/health');
 }
