@@ -41,6 +41,8 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   Map<String, dynamic>? _trialBalance;
   Map<String, dynamic>? _incomeStatement;
   Map<String, dynamic>? _balanceSheet;
+  // للـ P&L و BS نحتاج تفاصيل الحسابات من TB (backend لا يُرجعها مع BS/IS)
+  List<Map<String, dynamic>> _tbRowsForDetails = [];
   bool _loading = true;
   String? _error;
 
@@ -86,16 +88,25 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
     }
     final eid = PilotSession.entityId!;
     try {
-      if (_tab.index == 0) {
-        final r = await _client.trialBalance(eid,
-            asOf: _asOfDate.toIso8601String().substring(0, 10),
-            includeZero: false);
-        if (r.success && r.data is Map) {
-          _trialBalance = Map<String, dynamic>.from(r.data);
-        } else {
-          _error = r.error;
+      // نستدعي TB دائماً — مصدر تفاصيل الحسابات لكل التبويبات
+      // (backend BS/IS يُرجعان إجماليات فقط، لا قوائم حسابات)
+      final tbDate = _tab.index == 1
+          ? _endDate.toIso8601String().substring(0, 10)
+          : _asOfDate.toIso8601String().substring(0, 10);
+      final tbR = await _client.trialBalance(eid,
+          asOf: tbDate, includeZero: false);
+      if (tbR.success && tbR.data is Map) {
+        final tbMap = Map<String, dynamic>.from(tbR.data);
+        final rows = tbMap['rows'];
+        _tbRowsForDetails = rows is List
+            ? List<Map<String, dynamic>>.from(rows)
+            : [];
+        if (_tab.index == 0) {
+          _trialBalance = tbMap;
         }
-      } else if (_tab.index == 1) {
+      }
+
+      if (_tab.index == 1) {
         final r = await _client.incomeStatement(
             eid,
             _startDate.toIso8601String().substring(0, 10),
@@ -105,7 +116,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
         } else {
           _error = r.error;
         }
-      } else {
+      } else if (_tab.index == 2) {
         final r = await _client.balanceSheet(eid,
             asOf: _asOfDate.toIso8601String().substring(0, 10));
         if (r.success && r.data is Map) {
@@ -493,13 +504,17 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           child: Text('لا توجد بيانات',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
-    final revenue = asDouble(is_['total_revenue']);
-    final expenses = asDouble(is_['total_expenses']);
+    // Backend IS uses: revenue_total, expense_total, net_income (not total_*)
+    final revenue = asDouble(is_['revenue_total']);
+    final expenses = asDouble(is_['expense_total']);
     final netIncome = is_['net_income'] != null
         ? asDouble(is_['net_income'])
         : (revenue - expenses);
-    final revenueAccts = (is_['revenue_accounts'] as List?) ?? [];
-    final expenseAccts = (is_['expense_accounts'] as List?) ?? [];
+    // تفاصيل الحسابات من TB — backend IS لا يُرجعها
+    final revenueAccts =
+        _tbRowsForDetails.where((r) => r['category'] == 'revenue').toList();
+    final expenseAccts =
+        _tbRowsForDetails.where((r) => r['category'] == 'expense').toList();
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -647,14 +662,23 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           child: Text('لا توجد بيانات',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
-    final assets = asDouble(bs['total_assets']);
-    final liabs = asDouble(bs['total_liabilities']);
+    // Backend BS: assets, liabilities, equity (base), current_earnings, total_equity
+    final assets = asDouble(bs['assets']);
+    final liabs = asDouble(bs['liabilities']);
+    final equityBase = asDouble(bs['equity']);
+    final currentEarnings = asDouble(bs['current_earnings']);
+    // total_equity = equity base + YTD net income (حتى يقفل المحاسب السنة يدوياً)
     final equity = asDouble(bs['total_equity']);
-    final balanced = ((assets - (liabs + equity)).abs() < 0.01);
-
-    final assetAccts = (bs['asset_accounts'] as List?) ?? [];
-    final liabAccts = (bs['liability_accounts'] as List?) ?? [];
-    final equityAccts = (bs['equity_accounts'] as List?) ?? [];
+    // backend يعطي balanced + difference جاهزة — استخدمها بدل الحساب المزدوج
+    final balanced = bs['balanced'] == true ||
+        ((assets - (liabs + equity)).abs() < 0.01);
+    // تفاصيل الحسابات من TB — backend BS لا يُرجعها
+    final assetAccts =
+        _tbRowsForDetails.where((r) => r['category'] == 'asset').toList();
+    final liabAccts =
+        _tbRowsForDetails.where((r) => r['category'] == 'liability').toList();
+    final equityAccts =
+        _tbRowsForDetails.where((r) => r['category'] == 'equity').toList();
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -692,6 +716,27 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           const SizedBox(width: 10),
           Expanded(child: _summaryCard('حقوق الملكية', equity, _indigo)),
         ]),
+        // لو في صافي دخل من السنة الحالية، وضّح للمستخدم
+        if (currentEarnings.abs() > 0.01) ...[
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: _indigo.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: _indigo.withValues(alpha: 0.2)),
+            ),
+            child: Row(children: [
+              Icon(Icons.info_outline, color: _indigo, size: 14),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                    'حقوق الملكية تشمل: رأس مال ${_fmt(equityBase)} + صافي الدخل اليتيم ${_fmt(currentEarnings)} (قبل إقفال السنة)',
+                    style: TextStyle(color: _indigo, fontSize: 11)),
+              ),
+            ]),
+          ),
+        ],
         const SizedBox(height: 16),
         _sectionHeader('الأصول', Icons.account_balance_wallet, _ok),
         ...assetAccts.map((a) => _isRow(Map<String, dynamic>.from(a), _ok)),
