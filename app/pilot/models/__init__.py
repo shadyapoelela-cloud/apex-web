@@ -16,6 +16,10 @@ from .warehouse import (
     Warehouse, WarehouseType, WarehouseStatus,
     StockLevel, StockMovement, MovementReason,
 )
+from .pricing import (
+    PriceList, PriceListItem, PriceListBranch,
+    PriceListScope, PriceListKind, PriceListStatus, Season,
+)
 
 # Backward-compat aliases (used by early route code)
 Role = PilotRole
@@ -68,6 +72,14 @@ __all__ = [
     "StockLevel",
     "StockMovement",
     "MovementReason",
+    # Pricing
+    "PriceList",
+    "PriceListItem",
+    "PriceListBranch",
+    "PriceListScope",
+    "PriceListKind",
+    "PriceListStatus",
+    "Season",
     # aliases
     "Role",
     "Permission",
