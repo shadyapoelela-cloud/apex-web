@@ -68,11 +68,15 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   }
 
   Future<void> _load() async {
+    // ignore: avoid_print
+    print('[FinReports] _load start — hasEntity=${PilotSession.hasEntity}, tabIndex=${_tab.index}');
+    if (!mounted) return;
     setState(() {
       _loading = true;
       _error = null;
     });
     if (!PilotSession.hasEntity) {
+      if (!mounted) return;
       setState(() {
         _loading = false;
         _error = 'يجب اختيار الكيان من شريط العنوان أولاً.';
@@ -109,8 +113,14 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           _error = r.error;
         }
       }
+      // ignore: avoid_print
+      print('[FinReports] _load success, tab=${_tab.index}');
+      if (!mounted) return;
       setState(() => _loading = false);
-    } catch (e) {
+    } catch (e, st) {
+      // ignore: avoid_print
+      print('[FinReports] _load caught exception: $e\n$st');
+      if (!mounted) return;
       setState(() {
         _loading = false;
         _error = '$e';

@@ -74,11 +74,15 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   }
 
   Future<void> _load() async {
+    // ignore: avoid_print
+    print('[JeBuilder] _load start — hasTenant=${PilotSession.hasTenant}, hasEntity=${PilotSession.hasEntity}, entityId=${PilotSession.entityId}');
+    if (!mounted) return;
     setState(() {
       _loading = true;
       _error = null;
     });
     if (!PilotSession.hasEntity) {
+      if (!mounted) return;
       setState(() {
         _loading = false;
         _error = 'يجب اختيار الكيان من شريط العنوان أولاً.';
@@ -94,14 +98,33 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
             limit: 200),
         _client.listAccounts(eid),
       ]);
-      _entries = results[0].success
-          ? List<Map<String, dynamic>>.from(results[0].data)
-          : [];
-      _accounts = results[1].success
-          ? List<Map<String, dynamic>>.from(results[1].data)
-          : [];
+      // ignore: avoid_print
+      print('[JeBuilder] API results: entries.success=${results[0].success}, accounts.success=${results[1].success}');
+      if (!mounted) return;
+      // Defensive: handle null/non-list data gracefully
+      try {
+        _entries = results[0].success && results[0].data is List
+            ? List<Map<String, dynamic>>.from(results[0].data as List)
+            : [];
+      } catch (e) {
+        // ignore: avoid_print
+        print('[JeBuilder] entries parse error: $e');
+        _entries = [];
+      }
+      try {
+        _accounts = results[1].success && results[1].data is List
+            ? List<Map<String, dynamic>>.from(results[1].data as List)
+            : [];
+      } catch (e) {
+        // ignore: avoid_print
+        print('[JeBuilder] accounts parse error: $e');
+        _accounts = [];
+      }
       setState(() => _loading = false);
-    } catch (e) {
+    } catch (e, st) {
+      // ignore: avoid_print
+      print('[JeBuilder] _load caught exception: $e\n$st');
+      if (!mounted) return;
       setState(() {
         _loading = false;
         _error = '$e';
