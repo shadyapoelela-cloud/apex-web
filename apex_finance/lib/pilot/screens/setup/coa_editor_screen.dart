@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
+import '../../widgets/import_dialog.dart';
 
 const _gold = Color(0xFFD4AF37);
 const _navy = Color(0xFF0A1628);
@@ -165,6 +166,31 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
     }
   }
 
+  Future<void> _importExcel() async {
+    if (!PilotSession.hasEntity) return;
+    final eid = PilotSession.entityId!;
+    await showDialog(
+      context: context,
+      builder: (_) => ImportDialog(
+        title: 'استيراد شجرة الحسابات',
+        mapping: coaMapping,
+        requiredFields: const ['code', 'name_ar', 'category', 'normal_balance'],
+        onImport: (row) async {
+          final body = <String, dynamic>{
+            'code': row['code'].toString(),
+            'name_ar': row['name_ar'].toString(),
+            if (row['name_en'] != null) 'name_en': row['name_en'].toString(),
+            'category': row['category'].toString().toLowerCase(),
+            'normal_balance': row['normal_balance'].toString().toLowerCase(),
+            'type': (row['type']?.toString() ?? 'detail').toLowerCase(),
+          };
+          return pilotClient.createAccount(eid, body);
+        },
+      ),
+    );
+    _load();
+  }
+
   Future<void> _addAccount() async {
     if (!PilotSession.hasEntity) return;
     final result = await showDialog<bool>(
@@ -280,7 +306,16 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
             icon: const Icon(Icons.refresh, size: 16),
             label: const Text('تحديث'),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+                foregroundColor: _ok,
+                side: BorderSide(color: _ok.withValues(alpha: 0.5))),
+            onPressed: _importExcel,
+            icon: const Icon(Icons.upload_file, size: 16),
+            label: const Text('استيراد Excel'),
+          ),
+          const SizedBox(width: 6),
           FilledButton.icon(
             style: FilledButton.styleFrom(
                 backgroundColor: _gold, foregroundColor: Colors.black),
