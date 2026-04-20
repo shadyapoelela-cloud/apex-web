@@ -44,7 +44,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query, Header, Path
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_
 
-from app.phase1.models.platform_models import get_db
+from app.phase1.models.platform_models import get_db, User, UserStatus
 from app.pilot.models import (
     Tenant, CompanySettings, TenantStatus, TenantTier,
     Entity, EntityType, EntityStatus,
@@ -66,6 +66,15 @@ from app.pilot.schemas.currency import (
 from app.pilot.schemas.rbac import (
     RoleCreate, RoleRead, RoleUpdate, PermissionRead,
 )
+from app.pilot.schemas.member import (
+    MemberInvite, MemberRead, MemberDetail, MemberUpdate,
+    AccessGrantRead, GrantEntityAccess, GrantBranchAccess, RevokeAccess,
+    EffectivePermission, EffectivePermissionsResponse,
+)
+from app.phase1.services.auth_service import hash_password
+
+import secrets
+import string
 
 router = APIRouter(prefix="/pilot", tags=["pilot"])
 
@@ -563,6 +572,698 @@ def _seed_default_roles(db: Session, tenant_id: str) -> None:
             is_active=True,
         )
         db.add(r)
+
+
+# ═══════════════════════════════════════════════════════════════
+# MEMBERS (users with access to a tenant) — Day 2
+# ═══════════════════════════════════════════════════════════════
+
+def _gen_temp_password(length: int = 16) -> str:
+    """Generate a cryptographically-random temp password for invites.
+
+    Includes upper/lower/digit/symbol so it passes auth_service.validate_password_strength.
+    The invitee must reset it on first login.
+    """
+    alphabet = string.ascii_letters + string.digits + "!@#$%&*"
+    while True:
+        pw = "".join(secrets.choice(alphabet) for _ in range(length))
+        if (any(c.islower() for c in pw)
+                and any(c.isupper() for c in pw)
+                and any(c.isdigit() for c in pw)):
+            return pw
+
+
+def _collect_user_ids_for_tenant(db: Session, tenant_id: str) -> set[str]:
+    """All distinct user_ids with any (active or inactive) grant in this tenant."""
+    ent_ids = db.query(UserEntityAccess.user_id).filter(
+        UserEntityAccess.tenant_id == tenant_id
+    ).distinct().all()
+    br_ids = db.query(UserBranchAccess.user_id).filter(
+        UserBranchAccess.tenant_id == tenant_id
+    ).distinct().all()
+    return {row[0] for row in ent_ids} | {row[0] for row in br_ids}
+
+
+def _member_row(db: Session, tenant_id: str, user: User) -> MemberRead:
+    """Build a MemberRead with aggregated grant counts + primary role."""
+    ent_count = db.query(UserEntityAccess).filter(
+        UserEntityAccess.tenant_id == tenant_id,
+        UserEntityAccess.user_id == user.id,
+        UserEntityAccess.is_active == True,  # noqa: E712
+    ).count()
+    br_count = db.query(UserBranchAccess).filter(
+        UserBranchAccess.tenant_id == tenant_id,
+        UserBranchAccess.user_id == user.id,
+        UserBranchAccess.is_active == True,  # noqa: E712
+    ).count()
+
+    # Primary role = first active grant's role, preferring tenant > entity > branch scope
+    primary_role_code: Optional[str] = None
+    grants = (
+        db.query(UserEntityAccess, PilotRole)
+        .join(PilotRole, PilotRole.id == UserEntityAccess.role_id)
+        .filter(UserEntityAccess.tenant_id == tenant_id,
+                UserEntityAccess.user_id == user.id,
+                UserEntityAccess.is_active == True)  # noqa: E712
+        .all()
+    )
+    if grants:
+        # prefer tenant-scoped, then entity-scoped
+        grants.sort(key=lambda g: {"tenant": 0, "entity": 1, "branch": 2}.get(g[1].scope, 9))
+        primary_role_code = grants[0][1].code
+    else:
+        brgrants = (
+            db.query(UserBranchAccess, PilotRole)
+            .join(PilotRole, PilotRole.id == UserBranchAccess.role_id)
+            .filter(UserBranchAccess.tenant_id == tenant_id,
+                    UserBranchAccess.user_id == user.id,
+                    UserBranchAccess.is_active == True)  # noqa: E712
+            .first()
+        )
+        if brgrants:
+            primary_role_code = brgrants[1].code
+
+    return MemberRead(
+        user_id=user.id,
+        email=user.email,
+        display_name=user.display_name,
+        mobile=user.mobile,
+        language=user.language,
+        status=user.status,
+        last_login_at=user.last_login_at,
+        entity_grants=ent_count,
+        branch_grants=br_count,
+        primary_role_code=primary_role_code,
+    )
+
+
+@router.get("/tenants/{tenant_id}/members", response_model=list[MemberRead])
+def list_members(
+    tenant_id: str,
+    active_only: bool = Query(True),
+    db: Session = Depends(get_db),
+):
+    """List all users who have at least one access grant in this tenant."""
+    _get_tenant_or_404(db, tenant_id)
+    user_ids = _collect_user_ids_for_tenant(db, tenant_id)
+    if not user_ids:
+        return []
+    q = db.query(User).filter(User.id.in_(list(user_ids)))
+    if active_only:
+        q = q.filter(User.is_deleted == False)  # noqa: E712
+    users = q.order_by(User.display_name).all()
+    return [_member_row(db, tenant_id, u) for u in users]
+
+
+@router.post("/tenants/{tenant_id}/members", response_model=MemberDetail, status_code=201)
+def invite_member(
+    tenant_id: str,
+    payload: MemberInvite,
+    db: Session = Depends(get_db),
+):
+    """Invite a user to the tenant.
+
+    - If email already exists in phase1 User table → reuse account.
+    - Otherwise → create a new User with a random temp password.
+      (TODO: email the invite link + require password reset on first login.)
+    - Always creates the initial access grant.
+    """
+    tenant = _get_tenant_or_404(db, tenant_id)
+
+    # Validate role belongs to this tenant
+    role = db.query(PilotRole).filter(
+        PilotRole.id == payload.role_id,
+        PilotRole.tenant_id == tenant_id,
+    ).first()
+    if not role:
+        raise HTTPException(status_code=400, detail="Role not found in this tenant")
+
+    # Validate scope target
+    if payload.scope == "entity":
+        if not payload.entity_id:
+            raise HTTPException(status_code=400, detail="entity_id is required when scope=entity")
+        entity = db.query(Entity).filter(
+            Entity.id == payload.entity_id,
+            Entity.tenant_id == tenant_id,
+            Entity.is_deleted == False,  # noqa: E712
+        ).first()
+        if not entity:
+            raise HTTPException(status_code=400, detail="Entity not found in this tenant")
+    else:  # branch
+        if not payload.branch_id:
+            raise HTTPException(status_code=400, detail="branch_id is required when scope=branch")
+        branch = db.query(Branch).filter(
+            Branch.id == payload.branch_id,
+            Branch.tenant_id == tenant_id,
+            Branch.is_deleted == False,  # noqa: E712
+        ).first()
+        if not branch:
+            raise HTTPException(status_code=400, detail="Branch not found in this tenant")
+
+    # Find or create User
+    email_str = str(payload.email).lower()
+    user = db.query(User).filter(User.email == email_str).first()
+    created_new = False
+    if not user:
+        # Generate username from email local-part + short suffix
+        local = email_str.split("@")[0]
+        base_username = "".join(ch for ch in local if ch.isalnum())[:20] or "user"
+        username = base_username
+        i = 1
+        while db.query(User).filter(User.username == username).first():
+            i += 1
+            username = f"{base_username}{i}"
+
+        temp_pw = _gen_temp_password()
+        user = User(
+            username=username,
+            email=email_str,
+            mobile=payload.mobile,
+            display_name=payload.display_name,
+            password_hash=hash_password(temp_pw),
+            status=UserStatus.pending_verification.value,
+            language=payload.language,
+            timezone="Asia/Riyadh",
+        )
+        db.add(user)
+        db.flush()
+        created_new = True
+        # NOTE: in production, email temp_pw via invite link (not logged).
+
+    # Create initial access grant
+    if payload.scope == "entity":
+        # Idempotency check
+        existing = db.query(UserEntityAccess).filter(
+            UserEntityAccess.user_id == user.id,
+            UserEntityAccess.entity_id == payload.entity_id,
+            UserEntityAccess.role_id == payload.role_id,
+        ).first()
+        if existing:
+            if not existing.is_active:
+                existing.is_active = True
+                existing.revoked_at = None
+                existing.revoke_reason = None
+        else:
+            db.add(UserEntityAccess(
+                tenant_id=tenant_id,
+                user_id=user.id,
+                entity_id=payload.entity_id,
+                role_id=payload.role_id,
+                can_delegate=payload.can_delegate,
+                expires_at=payload.expires_at,
+            ))
+    else:
+        existing = db.query(UserBranchAccess).filter(
+            UserBranchAccess.user_id == user.id,
+            UserBranchAccess.branch_id == payload.branch_id,
+            UserBranchAccess.role_id == payload.role_id,
+        ).first()
+        if existing:
+            if not existing.is_active:
+                existing.is_active = True
+                existing.revoked_at = None
+        else:
+            db.add(UserBranchAccess(
+                tenant_id=tenant_id,
+                user_id=user.id,
+                branch_id=payload.branch_id,
+                role_id=payload.role_id,
+                expires_at=payload.expires_at,
+            ))
+    db.commit()
+    db.refresh(user)
+
+    return _build_member_detail(db, tenant_id, user)
+
+
+def _build_member_detail(db: Session, tenant_id: str, user: User) -> MemberDetail:
+    """Compose a MemberDetail with all grants resolved to labels."""
+    grants: list[AccessGrantRead] = []
+
+    ent_rows = (
+        db.query(UserEntityAccess, Entity, PilotRole)
+        .join(Entity, Entity.id == UserEntityAccess.entity_id)
+        .join(PilotRole, PilotRole.id == UserEntityAccess.role_id)
+        .filter(UserEntityAccess.tenant_id == tenant_id,
+                UserEntityAccess.user_id == user.id)
+        .all()
+    )
+    for ua, entity, role in ent_rows:
+        grants.append(AccessGrantRead(
+            grant_id=ua.id,
+            grant_type="entity",
+            scope_id=entity.id,
+            scope_code=entity.code,
+            scope_label=entity.name_en or entity.name_ar,
+            role_id=role.id,
+            role_code=role.code,
+            role_name_ar=role.name_ar,
+            granted_at=ua.granted_at,
+            expires_at=ua.expires_at,
+            can_delegate=ua.can_delegate,
+            is_active=ua.is_active,
+        ))
+
+    br_rows = (
+        db.query(UserBranchAccess, Branch, PilotRole)
+        .join(Branch, Branch.id == UserBranchAccess.branch_id)
+        .join(PilotRole, PilotRole.id == UserBranchAccess.role_id)
+        .filter(UserBranchAccess.tenant_id == tenant_id,
+                UserBranchAccess.user_id == user.id)
+        .all()
+    )
+    for ba, branch, role in br_rows:
+        grants.append(AccessGrantRead(
+            grant_id=ba.id,
+            grant_type="branch",
+            scope_id=branch.id,
+            scope_code=branch.code,
+            scope_label=branch.name_en or branch.name_ar,
+            role_id=role.id,
+            role_code=role.code,
+            role_name_ar=role.name_ar,
+            granted_at=ba.granted_at,
+            expires_at=ba.expires_at,
+            can_delegate=False,
+            is_active=ba.is_active,
+        ))
+
+    # Sort: active first, then by granted_at desc
+    grants.sort(key=lambda g: (not g.is_active, -g.granted_at.timestamp()))
+
+    return MemberDetail(
+        user_id=user.id,
+        email=user.email,
+        display_name=user.display_name,
+        mobile=user.mobile,
+        language=user.language,
+        status=user.status,
+        last_login_at=user.last_login_at,
+        grants=grants,
+    )
+
+
+@router.get("/tenants/{tenant_id}/members/{user_id}", response_model=MemberDetail)
+def get_member(tenant_id: str, user_id: str, db: Session = Depends(get_db)):
+    """Get a single member with all their access grants resolved."""
+    _get_tenant_or_404(db, tenant_id)
+    # Verify user has at least one grant here (tenant-isolation check)
+    has_grant = (
+        db.query(UserEntityAccess).filter(
+            UserEntityAccess.tenant_id == tenant_id,
+            UserEntityAccess.user_id == user_id,
+        ).first()
+        or db.query(UserBranchAccess).filter(
+            UserBranchAccess.tenant_id == tenant_id,
+            UserBranchAccess.user_id == user_id,
+        ).first()
+    )
+    if not has_grant:
+        raise HTTPException(status_code=404, detail="Member not found in this tenant")
+    user = db.query(User).filter(User.id == user_id, User.is_deleted == False).first()  # noqa: E712
+    if not user:
+        raise HTTPException(status_code=404, detail="User account not found")
+    return _build_member_detail(db, tenant_id, user)
+
+
+@router.patch("/tenants/{tenant_id}/members/{user_id}", response_model=MemberDetail)
+def update_member(
+    tenant_id: str,
+    user_id: str,
+    payload: MemberUpdate,
+    db: Session = Depends(get_db),
+):
+    """Update display_name / mobile / language / status on the phase1 User.
+
+    Only allowed for users who are members of this tenant (isolation).
+    """
+    _get_tenant_or_404(db, tenant_id)
+    if user_id not in _collect_user_ids_for_tenant(db, tenant_id):
+        raise HTTPException(status_code=404, detail="Member not found in this tenant")
+    user = db.query(User).filter(User.id == user_id, User.is_deleted == False).first()  # noqa: E712
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if payload.display_name is not None:
+        user.display_name = payload.display_name
+    if payload.mobile is not None:
+        user.mobile = payload.mobile
+    if payload.language is not None:
+        user.language = payload.language
+    if payload.status is not None:
+        user.status = payload.status
+
+    db.commit()
+    db.refresh(user)
+    return _build_member_detail(db, tenant_id, user)
+
+
+@router.delete("/tenants/{tenant_id}/members/{user_id}", status_code=204)
+def remove_member(
+    tenant_id: str,
+    user_id: str,
+    reason: Optional[str] = Query(None, max_length=500),
+    db: Session = Depends(get_db),
+):
+    """Revoke ALL access grants for a user in this tenant (soft).
+
+    Does NOT delete the phase1 User — they may still belong to other tenants
+    or have a platform-level account. Sets is_active=False on every grant
+    and records revoke_at + reason.
+    """
+    _get_tenant_or_404(db, tenant_id)
+    now = datetime.now(timezone.utc)
+
+    count = 0
+    for grant in db.query(UserEntityAccess).filter(
+        UserEntityAccess.tenant_id == tenant_id,
+        UserEntityAccess.user_id == user_id,
+        UserEntityAccess.is_active == True,  # noqa: E712
+    ).all():
+        grant.is_active = False
+        grant.revoked_at = now
+        grant.revoke_reason = reason
+        count += 1
+    for grant in db.query(UserBranchAccess).filter(
+        UserBranchAccess.tenant_id == tenant_id,
+        UserBranchAccess.user_id == user_id,
+        UserBranchAccess.is_active == True,  # noqa: E712
+    ).all():
+        grant.is_active = False
+        grant.revoked_at = now
+        count += 1
+
+    if count == 0:
+        raise HTTPException(status_code=404, detail="No active grants found for this user in this tenant")
+
+    db.commit()
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# RBAC GRANTS — direct assignment endpoints
+# ═══════════════════════════════════════════════════════════════
+
+@router.post("/tenants/{tenant_id}/members/{user_id}/entity-access", response_model=AccessGrantRead, status_code=201)
+def grant_entity_access(
+    tenant_id: str,
+    user_id: str,
+    payload: GrantEntityAccess,
+    db: Session = Depends(get_db),
+):
+    """Grant a user access to an Entity with a Role (entity-level = all branches in it)."""
+    _get_tenant_or_404(db, tenant_id)
+
+    entity = db.query(Entity).filter(
+        Entity.id == payload.entity_id,
+        Entity.tenant_id == tenant_id,
+        Entity.is_deleted == False,  # noqa: E712
+    ).first()
+    if not entity:
+        raise HTTPException(status_code=400, detail="Entity not found in this tenant")
+
+    role = db.query(PilotRole).filter(
+        PilotRole.id == payload.role_id,
+        PilotRole.tenant_id == tenant_id,
+    ).first()
+    if not role:
+        raise HTTPException(status_code=400, detail="Role not found in this tenant")
+
+    user = db.query(User).filter(User.id == user_id, User.is_deleted == False).first()  # noqa: E712
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Upsert — reactivate if exists
+    existing = db.query(UserEntityAccess).filter(
+        UserEntityAccess.user_id == user_id,
+        UserEntityAccess.entity_id == payload.entity_id,
+        UserEntityAccess.role_id == payload.role_id,
+    ).first()
+    if existing:
+        existing.is_active = True
+        existing.revoked_at = None
+        existing.revoke_reason = None
+        existing.can_delegate = payload.can_delegate
+        existing.expires_at = payload.expires_at
+        grant = existing
+    else:
+        grant = UserEntityAccess(
+            tenant_id=tenant_id,
+            user_id=user_id,
+            entity_id=payload.entity_id,
+            role_id=payload.role_id,
+            can_delegate=payload.can_delegate,
+            expires_at=payload.expires_at,
+        )
+        db.add(grant)
+    db.commit()
+    db.refresh(grant)
+
+    return AccessGrantRead(
+        grant_id=grant.id,
+        grant_type="entity",
+        scope_id=entity.id,
+        scope_code=entity.code,
+        scope_label=entity.name_en or entity.name_ar,
+        role_id=role.id,
+        role_code=role.code,
+        role_name_ar=role.name_ar,
+        granted_at=grant.granted_at,
+        expires_at=grant.expires_at,
+        can_delegate=grant.can_delegate,
+        is_active=grant.is_active,
+    )
+
+
+@router.post("/tenants/{tenant_id}/members/{user_id}/branch-access", response_model=AccessGrantRead, status_code=201)
+def grant_branch_access(
+    tenant_id: str,
+    user_id: str,
+    payload: GrantBranchAccess,
+    db: Session = Depends(get_db),
+):
+    """Grant a user access to a single Branch with a Role."""
+    _get_tenant_or_404(db, tenant_id)
+
+    branch = db.query(Branch).filter(
+        Branch.id == payload.branch_id,
+        Branch.tenant_id == tenant_id,
+        Branch.is_deleted == False,  # noqa: E712
+    ).first()
+    if not branch:
+        raise HTTPException(status_code=400, detail="Branch not found in this tenant")
+
+    role = db.query(PilotRole).filter(
+        PilotRole.id == payload.role_id,
+        PilotRole.tenant_id == tenant_id,
+    ).first()
+    if not role:
+        raise HTTPException(status_code=400, detail="Role not found in this tenant")
+
+    user = db.query(User).filter(User.id == user_id, User.is_deleted == False).first()  # noqa: E712
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    existing = db.query(UserBranchAccess).filter(
+        UserBranchAccess.user_id == user_id,
+        UserBranchAccess.branch_id == payload.branch_id,
+        UserBranchAccess.role_id == payload.role_id,
+    ).first()
+    if existing:
+        existing.is_active = True
+        existing.revoked_at = None
+        existing.expires_at = payload.expires_at
+        grant = existing
+    else:
+        grant = UserBranchAccess(
+            tenant_id=tenant_id,
+            user_id=user_id,
+            branch_id=payload.branch_id,
+            role_id=payload.role_id,
+            expires_at=payload.expires_at,
+        )
+        db.add(grant)
+    db.commit()
+    db.refresh(grant)
+
+    return AccessGrantRead(
+        grant_id=grant.id,
+        grant_type="branch",
+        scope_id=branch.id,
+        scope_code=branch.code,
+        scope_label=branch.name_en or branch.name_ar,
+        role_id=role.id,
+        role_code=role.code,
+        role_name_ar=role.name_ar,
+        granted_at=grant.granted_at,
+        expires_at=grant.expires_at,
+        can_delegate=False,
+        is_active=grant.is_active,
+    )
+
+
+@router.delete("/tenants/{tenant_id}/entity-access/{grant_id}", status_code=204)
+def revoke_entity_access(
+    tenant_id: str,
+    grant_id: str,
+    reason: Optional[str] = Query(None, max_length=500),
+    db: Session = Depends(get_db),
+):
+    """Revoke a specific entity-level access grant (soft)."""
+    _get_tenant_or_404(db, tenant_id)
+    grant = db.query(UserEntityAccess).filter(
+        UserEntityAccess.id == grant_id,
+        UserEntityAccess.tenant_id == tenant_id,
+    ).first()
+    if not grant:
+        raise HTTPException(status_code=404, detail="Entity access grant not found")
+    if not grant.is_active:
+        return None  # idempotent
+    grant.is_active = False
+    grant.revoked_at = datetime.now(timezone.utc)
+    grant.revoke_reason = reason
+    db.commit()
+    return None
+
+
+@router.delete("/tenants/{tenant_id}/branch-access/{grant_id}", status_code=204)
+def revoke_branch_access(
+    tenant_id: str,
+    grant_id: str,
+    db: Session = Depends(get_db),
+):
+    """Revoke a specific branch-level access grant (soft)."""
+    _get_tenant_or_404(db, tenant_id)
+    grant = db.query(UserBranchAccess).filter(
+        UserBranchAccess.id == grant_id,
+        UserBranchAccess.tenant_id == tenant_id,
+    ).first()
+    if not grant:
+        raise HTTPException(status_code=404, detail="Branch access grant not found")
+    if not grant.is_active:
+        return None
+    grant.is_active = False
+    grant.revoked_at = datetime.now(timezone.utc)
+    db.commit()
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# EFFECTIVE PERMISSIONS — resolver
+# ═══════════════════════════════════════════════════════════════
+
+@router.get(
+    "/tenants/{tenant_id}/members/{user_id}/effective-permissions",
+    response_model=EffectivePermissionsResponse,
+)
+def get_effective_permissions(
+    tenant_id: str,
+    user_id: str,
+    db: Session = Depends(get_db),
+):
+    """Resolve the full set of permissions a user effectively holds in this tenant.
+
+    Walks every active, non-expired access grant (both entity and branch),
+    flattens each grant's role → permissions, and de-duplicates while
+    preserving provenance (which grant/role brought which permission).
+
+    Expired grants (expires_at < now) are treated as inactive.
+    """
+    _get_tenant_or_404(db, tenant_id)
+
+    now = datetime.now(timezone.utc)
+    results: list[EffectivePermission] = []
+    seen: set[tuple[str, str]] = set()  # (resource, action) dedup
+    role_codes: set[str] = set()
+    is_tenant_admin = False
+
+    # Entity-scoped grants
+    ent_grants = (
+        db.query(UserEntityAccess, PilotRole)
+        .join(PilotRole, PilotRole.id == UserEntityAccess.role_id)
+        .filter(
+            UserEntityAccess.tenant_id == tenant_id,
+            UserEntityAccess.user_id == user_id,
+            UserEntityAccess.is_active == True,  # noqa: E712
+        )
+        .all()
+    )
+    for ua, role in ent_grants:
+        if ua.expires_at and ua.expires_at < now:
+            continue
+        role_codes.add(role.code)
+        if role.scope == "tenant":
+            is_tenant_admin = True
+        perms = (
+            db.query(PilotPermission)
+            .join(PilotRolePermission, PilotRolePermission.permission_id == PilotPermission.id)
+            .filter(PilotRolePermission.role_id == role.id)
+            .all()
+        )
+        for p in perms:
+            key = (p.resource, p.action)
+            if key in seen:
+                continue
+            seen.add(key)
+            results.append(EffectivePermission(
+                resource=p.resource,
+                action=p.action,
+                category=p.category,
+                risk_level=p.risk_level,
+                via_grant_id=ua.id,
+                via_role_code=role.code,
+                scope_type="entity",
+                scope_id=ua.entity_id,
+            ))
+
+    # Branch-scoped grants
+    br_grants = (
+        db.query(UserBranchAccess, PilotRole)
+        .join(PilotRole, PilotRole.id == UserBranchAccess.role_id)
+        .filter(
+            UserBranchAccess.tenant_id == tenant_id,
+            UserBranchAccess.user_id == user_id,
+            UserBranchAccess.is_active == True,  # noqa: E712
+        )
+        .all()
+    )
+    for ba, role in br_grants:
+        if ba.expires_at and ba.expires_at < now:
+            continue
+        role_codes.add(role.code)
+        perms = (
+            db.query(PilotPermission)
+            .join(PilotRolePermission, PilotRolePermission.permission_id == PilotPermission.id)
+            .filter(PilotRolePermission.role_id == role.id)
+            .all()
+        )
+        for p in perms:
+            key = (p.resource, p.action)
+            if key in seen:
+                continue
+            seen.add(key)
+            results.append(EffectivePermission(
+                resource=p.resource,
+                action=p.action,
+                category=p.category,
+                risk_level=p.risk_level,
+                via_grant_id=ba.id,
+                via_role_code=role.code,
+                scope_type="branch",
+                scope_id=ba.branch_id,
+            ))
+
+    resources = sorted({p.resource for p in results})
+
+    return EffectivePermissionsResponse(
+        user_id=user_id,
+        tenant_id=tenant_id,
+        total=len(results),
+        permissions=results,
+        resources=resources,
+        role_codes=sorted(role_codes),
+        is_tenant_admin=is_tenant_admin,
+    )
 
 
 # ═══════════════════════════════════════════════════════════════
