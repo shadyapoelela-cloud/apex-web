@@ -213,6 +213,7 @@ import '../../screens/v5_2/budgets_v52_screen.dart';
 import '../../screens/v5_2/budget_actual_v52_screen.dart';
 import '../../screens/v5_2/scenarios_v52_screen.dart';
 import '../../screens/v5_2/breakeven_v52_screen.dart';
+import '../../pilot/screens/setup/pilot_onboarding_wizard.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -246,7 +247,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/workflows': (ctx) => const WorkflowsV52Screen(),  // V5.2
   'erp/finance/integrations': (ctx) => const IntegrationsHubV52Screen(),  // V5.2 Card Grid
   'erp/finance/documents': (ctx) => const DocumentsV52Screen(),  // V5.2
-  'erp/finance/onboarding': (ctx) => const OnboardingV52Screen(),  // V5.2 Wizard
+  'erp/finance/onboarding': (ctx) => const PilotOnboardingWizard(),  // LIVE — creates real tenant+entity+branch+CoA
 
   // V5.2 New Finance Chips (Week 1)
   'erp/finance/profit-centers': (ctx) => const ProfitCentersV52Screen(),
