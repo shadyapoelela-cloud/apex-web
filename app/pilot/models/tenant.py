@@ -137,6 +137,19 @@ class CompanySettings(Base):
         ],
     })
 
+    # Branding — شكل المستندات والفواتير
+    logo_url = Column(String(500), nullable=True)  # URL أو data: URI (base64)
+    logo_position = Column(String(20), nullable=False, default="right")  # right|left|center
+    brand_primary_color = Column(String(7), nullable=False, default="#D4AF37")  # hex
+    brand_secondary_color = Column(String(7), nullable=False, default="#0A1628")
+    invoice_header_html = Column(String(2000), nullable=True)  # HTML/نص للعرض في رأس الفاتورة
+    invoice_footer_html = Column(String(2000), nullable=True)  # HTML/نص للعرض في ذيل الفاتورة
+    invoice_terms_ar = Column(String(2000), nullable=True)  # الشروط والأحكام بالعربية
+    invoice_terms_en = Column(String(2000), nullable=True)  # الشروط بالإنجليزية
+    signature_url = Column(String(500), nullable=True)  # توقيع رقمي (صورة)
+    show_vat_breakdown = Column(Boolean, nullable=False, default=True)
+    show_qr_on_invoice = Column(Boolean, nullable=False, default=True)
+
     # Extra settings as JSON for future expansion
     extras = Column(JSON, nullable=False, default=dict)
 

@@ -11,6 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../export_utils.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 
@@ -229,9 +230,221 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('تحديث'),
         ),
+        const SizedBox(width: 6),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+              foregroundColor: _ok,
+              side: BorderSide(color: _ok.withValues(alpha: 0.5))),
+          onPressed: _exportExcel,
+          icon: const Icon(Icons.table_chart, size: 16),
+          label: const Text('Excel'),
+        ),
+        const SizedBox(width: 6),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+              foregroundColor: _err,
+              side: BorderSide(color: _err.withValues(alpha: 0.5))),
+          onPressed: _exportPdf,
+          icon: const Icon(Icons.picture_as_pdf, size: 16),
+          label: const Text('PDF'),
+        ),
       ]),
     );
   }
+
+  // Helper: label للـ tab الحالي
+  String _currentTabLabel() {
+    switch (_tab.index) {
+      case 0:
+        return 'ميزان المراجعة';
+      case 1:
+        return 'قائمة الدخل';
+      case 2:
+        return 'قائمة المركز المالي';
+      case 3:
+        return 'قائمة التدفقات النقدية';
+    }
+    return 'تقرير مالي';
+  }
+
+  /// بناء الـ headers + rows للتصدير حسب التبويب الحالي
+  Map<String, dynamic> _buildExportData() {
+    if (_tab.index == 0 && _trialBalance != null) {
+      final rows = (_trialBalance!['rows'] as List?) ?? [];
+      return {
+        'headers': [
+          'الكود', 'الاسم العربي', 'الاسم الإنجليزي', 'الفئة',
+          'مدين', 'دائن', 'الرصيد'
+        ],
+        'rows': rows.map((r) {
+          final m = Map<String, dynamic>.from(r);
+          return [
+            m['code'] ?? '',
+            m['name_ar'] ?? '',
+            m['name_en'] ?? '',
+            _categoryAr(m['category']),
+            asDouble(m['total_debit']),
+            asDouble(m['total_credit']),
+            asDouble(m['balance']),
+          ];
+        }).toList(),
+        'meta': {
+          'كما في': _asOfDate.toIso8601String().substring(0, 10),
+          'إجمالي مدين':
+              asDouble(_trialBalance!['total_debits']).toStringAsFixed(2),
+          'إجمالي دائن':
+              asDouble(_trialBalance!['total_credits']).toStringAsFixed(2),
+        },
+      };
+    } else if (_tab.index == 1 && _incomeStatement != null) {
+      final rev = _tbRowsForDetails.where((r) => r['category'] == 'revenue');
+      final exp = _tbRowsForDetails.where((r) => r['category'] == 'expense');
+      final allRows = [
+        ['--- الإيرادات ---', '', '', ''],
+        ...rev.map((r) =>
+            [r['code'] ?? '', r['name_ar'] ?? '', 'إيراد', asDouble(r['balance'])]),
+        [
+          'إجمالي الإيرادات', '', '',
+          asDouble(_incomeStatement!['revenue_total'])
+        ],
+        ['', '', '', ''],
+        ['--- المصروفات ---', '', '', ''],
+        ...exp.map((r) =>
+            [r['code'] ?? '', r['name_ar'] ?? '', 'مصروف', asDouble(r['balance'])]),
+        [
+          'إجمالي المصروفات', '', '',
+          asDouble(_incomeStatement!['expense_total'])
+        ],
+        ['', '', '', ''],
+        ['صافي الدخل', '', '', asDouble(_incomeStatement!['net_income'])],
+      ];
+      return {
+        'headers': ['الكود', 'البيان', 'النوع', 'المبلغ'],
+        'rows': allRows,
+        'meta': {
+          'من': _startDate.toIso8601String().substring(0, 10),
+          'إلى': _endDate.toIso8601String().substring(0, 10),
+        },
+      };
+    } else if (_tab.index == 2 && _balanceSheet != null) {
+      final bs = _balanceSheet!;
+      final assets = _tbRowsForDetails.where((r) => r['category'] == 'asset');
+      final liabs = _tbRowsForDetails.where((r) => r['category'] == 'liability');
+      final eq = _tbRowsForDetails.where((r) => r['category'] == 'equity');
+      final allRows = [
+        ['--- الأصول ---', '', ''],
+        ...assets.map((r) =>
+            [r['code'] ?? '', r['name_ar'] ?? '', asDouble(r['balance'])]),
+        ['إجمالي الأصول', '', asDouble(bs['assets'])],
+        ['', '', ''],
+        ['--- الخصوم ---', '', ''],
+        ...liabs.map((r) =>
+            [r['code'] ?? '', r['name_ar'] ?? '', asDouble(r['balance'])]),
+        ['إجمالي الخصوم', '', asDouble(bs['liabilities'])],
+        ['', '', ''],
+        ['--- حقوق الملكية ---', '', ''],
+        ...eq.map((r) =>
+            [r['code'] ?? '', r['name_ar'] ?? '', asDouble(r['balance'])]),
+        [
+          'صافي دخل السنة (غير مقفل)', '',
+          asDouble(bs['current_earnings'])
+        ],
+        ['إجمالي حقوق الملكية', '', asDouble(bs['total_equity'])],
+        ['', '', ''],
+        [
+          'إجمالي الخصوم + حقوق الملكية', '',
+          asDouble(bs['liabilities']) + asDouble(bs['total_equity'])
+        ],
+      ];
+      return {
+        'headers': ['الكود', 'البيان', 'الرصيد'],
+        'rows': allRows,
+        'meta': {
+          'كما في': _asOfDate.toIso8601String().substring(0, 10),
+          'متوازن؟': bs['balanced'] == true ? 'نعم ✓' : 'لا',
+        },
+      };
+    } else if (_tab.index == 3 && _cashFlow != null) {
+      final cf = _cashFlow!;
+      return {
+        'headers': ['البند', 'المبلغ'],
+        'rows': [
+          ['صافي الدخل', asDouble(cf['net_income'])],
+          ['التغيّر في الأصول المتداولة', asDouble(cf['ar_change'])],
+          ['التغيّر في الخصوم المتداولة', asDouble(cf['ap_change'])],
+          ['صافي التدفق التشغيلي', asDouble(cf['operating_cf'])],
+          ['التدفق الاستثماري', asDouble(cf['investing_cf'])],
+          ['التدفق التمويلي', asDouble(cf['financing_cf'])],
+          ['', ''],
+          ['النقدية أول الفترة', asDouble(cf['cash_beginning'])],
+          ['النقدية نهاية الفترة', asDouble(cf['cash_ending'])],
+          ['التغيّر الفعلي', asDouble(cf['actual_cash_change'])],
+          ['الفرق', asDouble(cf['variance'])],
+        ],
+        'meta': {
+          'من': _startDate.toIso8601String().substring(0, 10),
+          'إلى': _endDate.toIso8601String().substring(0, 10),
+        },
+      };
+    }
+    return {'headers': <String>[], 'rows': <List<dynamic>>[], 'meta': {}};
+  }
+
+  void _exportExcel() {
+    final data = _buildExportData();
+    final headers = List<String>.from(data['headers'] as List);
+    final rows = List<List<dynamic>>.from(data['rows'] as List);
+    if (headers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: _warn,
+          content: Text('حمّل التقرير أولاً قبل التصدير')));
+      return;
+    }
+    final filename =
+        '${_currentTabLabel()}_${DateTime.now().toIso8601String().substring(0, 10)}';
+    exportXlsx(
+      headers: headers,
+      rows: rows,
+      filename: filename,
+      sheetName: _currentTabLabel(),
+      title: _currentTabLabel(),
+      meta: Map<String, dynamic>.from(data['meta'] as Map),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: _ok,
+        content: Text('تم تصدير $filename.xlsx ✓')));
+  }
+
+  void _exportPdf() {
+    final data = _buildExportData();
+    final headers = List<String>.from(data['headers'] as List);
+    final rows = List<List<dynamic>>.from(data['rows'] as List);
+    if (headers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: _warn,
+          content: Text('حمّل التقرير أولاً قبل التصدير')));
+      return;
+    }
+    // تحويل الصفوف إلى نصوص للعرض
+    final stringRows = rows
+        .map((r) => r.map((cell) {
+              if (cell == null) return '';
+              if (cell is num) return cell == 0 ? '—' : cell.toStringAsFixed(2);
+              return cell.toString();
+            }).toList())
+        .toList();
+    final meta = Map<String, dynamic>.from(data['meta'] as Map);
+    final metaStr = meta.entries.map((e) => '${e.key}: ${e.value}').join(' · ');
+    printHtmlTable(
+      title: _currentTabLabel(),
+      companyName: 'APEX Pilot',
+      companyMeta: metaStr,
+      headers: headers,
+      rows: stringRows,
+      footer: 'تقرير تلقائي — APEX Pilot ERP',
+    );
+  }
+
 
   Widget _dateControls() {
     return Container(
