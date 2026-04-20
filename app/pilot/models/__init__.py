@@ -27,6 +27,13 @@ from .pos import (
     PosPayment, PaymentMethod,
     CashMovement, CashMovementKind,
 )
+from .gl import (
+    GLAccount, AccountCategory, AccountType, NormalBalance,
+    FiscalPeriod, PeriodStatus,
+    JournalEntry, JournalEntryKind, JournalEntryStatus,
+    JournalLine,
+    GLPosting,
+)
 
 # Backward-compat aliases (used by early route code)
 Role = PilotRole
@@ -98,6 +105,18 @@ __all__ = [
     "PaymentMethod",
     "CashMovement",
     "CashMovementKind",
+    # GL
+    "GLAccount",
+    "AccountCategory",
+    "AccountType",
+    "NormalBalance",
+    "FiscalPeriod",
+    "PeriodStatus",
+    "JournalEntry",
+    "JournalEntryKind",
+    "JournalEntryStatus",
+    "JournalLine",
+    "GLPosting",
     # aliases
     "Role",
     "Permission",
