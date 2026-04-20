@@ -1,7 +1,7 @@
 """محرّك الشراء — إنشاء/اعتماد PO، استلام بضاعة، ترحيل الفاتورة والدفع."""
 
 from datetime import date, datetime, timezone
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -237,9 +237,31 @@ def receive_goods(
         if not pol:
             raise ValueError(f"السطر {idx}: po_line_id غير صالح")
 
-        qty_received = Decimal(str(ln["qty_received"]))
-        qty_accepted = Decimal(str(ln.get("qty_accepted", qty_received)))
-        qty_rejected = Decimal(str(ln.get("qty_rejected", 0)))
+        # تحويل آمن للأعداد — كل حقل في محاولة منفصلة لتحديد الحقل الفاشل
+        def _safe_decimal(value, field_name: str, default: str = "0") -> Decimal:
+            """تحويل أي قيمة إلى Decimal مع رسالة خطأ واضحة على الفشل."""
+            try:
+                if value is None:
+                    return Decimal(default)
+                # Decimal أصلي (من Pydantic) — مرّره كما هو
+                if isinstance(value, Decimal):
+                    return value
+                s = str(value).strip()
+                if not s or s.lower() in ("none", "nan", "null"):
+                    return Decimal(default)
+                return Decimal(s)
+            except (InvalidOperation, ValueError) as e:
+                raise ValueError(
+                    f"السطر {idx}: الحقل '{field_name}' قيمته غير صالحة "
+                    f"(received: {value!r}, type: {type(value).__name__}): {e}"
+                )
+
+        qty_received = _safe_decimal(ln.get("qty_received"), "qty_received")
+        qty_accepted = _safe_decimal(
+            ln.get("qty_accepted") if ln.get("qty_accepted") is not None else qty_received,
+            "qty_accepted",
+        )
+        qty_rejected = _safe_decimal(ln.get("qty_rejected"), "qty_rejected")
         if qty_received > (pol.qty_ordered - pol.qty_received):
             raise ValueError(
                 f"السطر {idx}: qty_received ({qty_received}) يتجاوز المتبقّي "
