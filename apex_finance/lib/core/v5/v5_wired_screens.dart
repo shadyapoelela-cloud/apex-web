@@ -172,17 +172,14 @@ import '../../screens/v4_erp/vendor_onboarding_screen.dart';
 
 // V5.2 Reference Implementations (using unified templates)
 import '../../screens/v5_2/invoices_v52_screen.dart';
-import '../../screens/v5_2/je_builder_v52_screen.dart';
 import '../../screens/v5_2/onboarding_v52_screen.dart';
 import '../../screens/v5_2/customer_360_v52_screen.dart';
-import '../../screens/v5_2/supplier_360_v52_screen.dart';
 import '../../screens/v5_2/crm_v52_screen.dart';
 import '../../screens/v5_2/vat_return_v52_screen.dart';
 import '../../screens/v5_2/sales_pipeline_v52_screen.dart';
 import '../../screens/v5_2/projects_v52_screen.dart';
 import '../../screens/v5_2/audit_planning_v52_screen.dart';
 import '../../screens/v5_2/contract_v52_screen.dart';
-import '../../screens/v5_2/purchasing_ap_v52_screen.dart';
 import '../../screens/v5_2/expense_claims_v52_screen.dart';
 import '../../screens/v5_2/risk_register_v52_screen.dart';
 import '../../screens/v5_2/ma_deal_room_v52_screen.dart';
@@ -199,14 +196,10 @@ import '../../screens/v5_2/internal_orders_v52_screen.dart';
 import '../../screens/v5_2/dimensions_v52_screen.dart';
 import '../../screens/v5_2/recurring_entries_v52_screen.dart';
 import '../../screens/v5_2/ai_reconciliation_v52_screen.dart';
-import '../../screens/v5_2/coa_editor_v52_screen.dart';
 import '../../screens/v5_2/cost_centers_v52_screen.dart';
-import '../../screens/v5_2/universal_gl_v52_screen.dart';
-import '../../screens/v5_2/financial_statements_fsv_v52_screen.dart';
 import '../../screens/v5_2/closing_cockpit_v52_screen.dart';
 import '../../screens/v5_2/integrations_hub_v52_screen.dart';
 import '../../screens/v5_2/documents_v52_screen.dart';
-import '../../screens/v5_2/advanced_settings_v52_screen.dart';
 import '../../screens/v5_2/workflows_v52_screen.dart';
 import '../../screens/v5_2/anomalies_v52_screen.dart';
 import '../../screens/v5_2/budgets_v52_screen.dart';
@@ -214,6 +207,15 @@ import '../../screens/v5_2/budget_actual_v52_screen.dart';
 import '../../screens/v5_2/scenarios_v52_screen.dart';
 import '../../screens/v5_2/breakeven_v52_screen.dart';
 import '../../pilot/screens/setup/pilot_onboarding_wizard.dart';
+import '../../pilot/screens/setup/company_settings_screen.dart';
+import '../../pilot/screens/setup/coa_editor_screen.dart' as pilot_coa;
+import '../../pilot/screens/setup/vendors_screen.dart' as pilot_vendors;
+import '../../pilot/screens/setup/products_screen.dart' as pilot_products;
+import '../../pilot/screens/setup/stock_movements_screen.dart' as pilot_stock;
+import '../../pilot/screens/setup/purchasing_screen.dart' as pilot_purch;
+import '../../pilot/screens/setup/je_builder_screen.dart' as pilot_je;
+import '../../pilot/screens/setup/financial_reports_screen.dart' as pilot_reports;
+import '../../pilot/screens/setup/members_screen.dart' as pilot_members;
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -229,13 +231,16 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // ════════════════════════════════════════════════════════════════════
 
   // ── 1.1 Finance (GL) ─────────────────────────────────────────────
-  'erp/finance/gl': (ctx) => const UniversalGlV52Screen(),  // V5.2 Universal GL
-  'erp/finance/je-builder': (ctx) => const JeBuilderV52Screen(),  // V5.2 ObjectPage
+  'erp/finance/gl': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE — Trial Balance + P&L + Balance Sheet
+  'erp/finance/trial-balance': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
+  'erp/finance/income-statement': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
+  'erp/finance/balance-sheet': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
+  'erp/finance/je-builder': (ctx) => const pilot_je.JeBuilderScreen(),  // LIVE — real JE create + post + reverse
   'erp/finance/period-close': (ctx) => const ClosingCockpitV52Screen(),  // V5.2 with DAG
   'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
-  'erp/finance/coa-editor': (ctx) => const CoaEditorV52Screen(),  // V5.2 TreeView
+  'erp/finance/coa-editor': (ctx) => const pilot_coa.CoaEditorScreen(),  // LIVE — real SOCPA CoA + seed + create
   'erp/finance/fixed-assets': (ctx) => const FixedAssetsV52Screen(),  // V5.2
-  'erp/finance/statements': (ctx) => const FinancialStatementsFsvV52Screen(),  // V5.2 with FSV Switcher
+  'erp/finance/statements': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE — real financial statements
   'erp/finance/budgets': (ctx) => const BudgetsV52Screen(),  // V5.2
   'erp/finance/budget-actual': (ctx) => const BudgetActualV52Screen(),  // V5.2
   'erp/finance/budget-planning': (ctx) => const BudgetPlanningV52Screen(),  // V5.2
@@ -255,7 +260,8 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/dimensions': (ctx) => const DimensionsV52Screen(),
   'erp/finance/recurring-entries': (ctx) => const RecurringEntriesV52Screen(),
   'erp/finance/ai-reconciliation': (ctx) => const AiReconciliationV52Screen(),
-  'erp/finance/advanced-settings': (ctx) => const AdvancedSettingsV52Screen(),
+  'erp/finance/advanced-settings': (ctx) => const CompanySettingsScreen(),  // LIVE — Tenant+Entities+Branches+Settings CRUD
+  'erp/finance/company-settings': (ctx) => const CompanySettingsScreen(),  // LIVE alias
 
   // ── 1.2 Consolidation ────────────────────────────────────────────
   'erp/consolidation/consolidation': (ctx) => const ConsolidationScreen(),
@@ -275,14 +281,17 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/sales/sales-workflow': (ctx) => const SalesWorkflowScreen(),
   'erp/sales/invoices': (ctx) => const InvoicesV52Screen(),  // V5.2 MultiView
   'erp/sales/credit-notes': (ctx) => const CreditNotesScreen(),
-  'erp/sales/price-list': (ctx) => const PriceListScreen(),
   'erp/sales/contracts': (ctx) => const ContractV52Screen(),  // V5.2 ObjectPage
   'erp/sales/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
   'erp/sales/credit': (ctx) => const CreditScoringScreen(),
 
   // ── 1.5 Purchasing & AP ──────────────────────────────────────────
-  'erp/purchasing/ap': (ctx) => const PurchasingApV52Screen(),  // V5.2
-  'erp/purchasing/suppliers': (ctx) => const Supplier360V52Screen(),  // V5.2 ObjectPage
+  'erp/purchasing/ap': (ctx) => const pilot_purch.PurchasingScreen(),  // LIVE — full PO→GRN→PI→Payment flow
+  'erp/purchasing/purchasing': (ctx) => const pilot_purch.PurchasingScreen(),  // LIVE alias
+  'erp/purchasing/purchase-orders': (ctx) => const pilot_purch.PurchasingScreen(),  // LIVE alias
+  'erp/purchasing/invoices': (ctx) => const pilot_purch.PurchasingScreen(),  // LIVE alias
+  'erp/purchasing/payments': (ctx) => const pilot_purch.PurchasingScreen(),  // LIVE alias
+  'erp/purchasing/suppliers': (ctx) => const pilot_vendors.VendorsScreen(),  // LIVE — real CRUD + ledger
   'erp/purchasing/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
   'erp/purchasing/requisitions': (ctx) => const PurchaseRequisitionScreen(),
   'erp/purchasing/procurement-rfq': (ctx) => const ProcurementRfqScreen(),
@@ -300,7 +309,13 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── 1.8 Inventory & Cost ─────────────────────────────────────────
   'erp/inventory/inventory': (ctx) => const InventoryDetailedScreen(),
+  'erp/inventory/products': (ctx) => const pilot_products.ProductsScreen(),  // LIVE — catalog CRUD
+  'erp/inventory/catalog': (ctx) => const pilot_products.ProductsScreen(),  // LIVE alias
+  'erp/sales/price-list': (ctx) => const pilot_products.ProductsScreen(),  // LIVE — replaces mock PriceListScreen
   'erp/inventory/warehouse': (ctx) => const WarehouseManagementScreen(),
+  'erp/inventory/movements': (ctx) => const pilot_stock.StockMovementsScreen(),  // LIVE — stock movements + transfers
+  'erp/inventory/transfers': (ctx) => const pilot_stock.StockMovementsScreen(),  // LIVE alias
+  'erp/inventory/stock-movements': (ctx) => const pilot_stock.StockMovementsScreen(),  // LIVE alias
   'erp/inventory/asset-tracking': (ctx) => const AssetTrackingScreen(),
   'erp/inventory/fleet': (ctx) => const FleetManagementScreen(),
   'erp/inventory/warranty': (ctx) => const WarrantyServiceScreen(),
@@ -591,6 +606,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'platform/ai/copilot': (ctx) => const AiCopilotScreen(),
   'platform/search/results': (ctx) => const GlobalSearchScreen(),
   'platform/admin/settings': (ctx) => const AdminPanelScreen(),
+  'platform/admin/members': (ctx) => const pilot_members.MembersScreen(),  // LIVE — real member/role/permission mgmt
+  'platform/admin/users': (ctx) => const pilot_members.MembersScreen(),  // LIVE alias
+  'platform/admin/permissions': (ctx) => const pilot_members.MembersScreen(),  // LIVE alias
+  'erp/hr/members': (ctx) => const pilot_members.MembersScreen(),  // LIVE — member invitations
   'platform/portal/client': (ctx) => const ClientPortalScreen(),
   'platform/studio/builder': (ctx) => const ApexStudioScreen(),
 
