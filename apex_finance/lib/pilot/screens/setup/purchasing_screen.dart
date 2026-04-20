@@ -11,6 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../export_utils.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 
@@ -412,6 +413,13 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                 onPressed: () => _createGrn(p),
               ),
             IconButton(
+              tooltip: 'طباعة / PDF',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(Icons.print, color: _indigo, size: 16),
+              onPressed: () => _printPo(p['id']),
+            ),
+            IconButton(
               tooltip: 'عرض',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -477,6 +485,90 @@ class _PurchasingScreenState extends State<PurchasingScreen>
       ),
     );
     if (r == true) _load();
+  }
+
+  Future<void> _printPo(String id) async {
+    final r = await _client.getPurchaseOrder(id);
+    if (!r.success || !mounted) return;
+    final po = Map<String, dynamic>.from(r.data);
+    final vendor = _vendors.firstWhere((v) => v['id'] == po['vendor_id'],
+        orElse: () => {'legal_name_ar': '—', 'code': ''});
+    final lines = (po['lines'] as List?) ?? [];
+    final stringRows = lines.map<List<String>>((l) {
+      final ln = Map<String, dynamic>.from(l);
+      return [
+        '${ln['line_number'] ?? ''}',
+        ln['description'] ?? '',
+        asDouble(ln['qty_ordered']).toStringAsFixed(2),
+        asDouble(ln['unit_price']).toStringAsFixed(2),
+        '${asDouble(ln['vat_rate_pct']).toStringAsFixed(0)}%',
+        asDouble(ln['line_total']).toStringAsFixed(2),
+      ];
+    }).toList();
+
+    // Totals row
+    stringRows.add(['', '', '', '', 'المجموع:',
+        asDouble(po['subtotal']).toStringAsFixed(2)]);
+    stringRows.add(['', '', '', '', 'VAT:',
+        asDouble(po['vat_total']).toStringAsFixed(2)]);
+    stringRows.add(['', '', '', '', 'الإجمالي:',
+        asDouble(po['grand_total']).toStringAsFixed(2)]);
+
+    printHtmlTable(
+      title: 'أمر شراء ${po['po_number'] ?? ""}',
+      companyName: 'APEX Pilot',
+      companyMeta:
+          'المورد: ${vendor['legal_name_ar']} · التاريخ: ${po['order_date'] ?? ""} · العملة: ${po['currency'] ?? "SAR"}',
+      headers: ['#', 'الوصف', 'الكمية', 'السعر', 'VAT', 'الإجمالي'],
+      rows: stringRows,
+      footer: 'تاريخ التسليم المتوقع: ${po['expected_delivery_date'] ?? "—"} · '
+          'شروط الدفع: ${po['payment_terms'] ?? "—"}',
+    );
+  }
+
+  Future<void> _printPi(String id) async {
+    final r = await _client.getPurchaseInvoice(id);
+    if (!r.success || !mounted) return;
+    final pi = Map<String, dynamic>.from(r.data);
+    final vendor = _vendors.firstWhere((v) => v['id'] == pi['vendor_id'],
+        orElse: () => {'legal_name_ar': '—'});
+    final lines = (pi['lines'] as List?) ?? [];
+    final stringRows = lines.map<List<String>>((l) {
+      final ln = Map<String, dynamic>.from(l);
+      return [
+        '${ln['line_number'] ?? ''}',
+        ln['description'] ?? '',
+        asDouble(ln['qty']).toStringAsFixed(2),
+        asDouble(ln['unit_cost']).toStringAsFixed(2),
+        '${asDouble(ln['vat_rate_pct']).toStringAsFixed(0)}%',
+        asDouble(ln['line_total']).toStringAsFixed(2),
+      ];
+    }).toList();
+    stringRows.add(['', '', '', '', 'المجموع:',
+        asDouble(pi['subtotal']).toStringAsFixed(2)]);
+    stringRows.add(['', '', '', '', 'VAT:',
+        asDouble(pi['vat_total']).toStringAsFixed(2)]);
+    if (asDouble(pi['shipping']) > 0) {
+      stringRows.add(['', '', '', '', 'شحن:',
+          asDouble(pi['shipping']).toStringAsFixed(2)]);
+    }
+    stringRows.add(['', '', '', '', 'الإجمالي:',
+        asDouble(pi['grand_total']).toStringAsFixed(2)]);
+    stringRows.add(['', '', '', '', 'المدفوع:',
+        asDouble(pi['amount_paid']).toStringAsFixed(2)]);
+    stringRows.add(['', '', '', '', 'المستحق:',
+        asDouble(pi['amount_due']).toStringAsFixed(2)]);
+
+    printHtmlTable(
+      title: 'فاتورة شراء ${pi['invoice_number'] ?? ""}',
+      companyName: 'APEX Pilot',
+      companyMeta:
+          'المورد: ${vendor['legal_name_ar']} · رقم فاتورة المورد: ${pi['vendor_invoice_number'] ?? "—"} · التاريخ: ${pi['invoice_date'] ?? ""}',
+      headers: ['#', 'الوصف', 'الكمية', 'التكلفة', 'VAT', 'الإجمالي'],
+      rows: stringRows,
+      footer:
+          'تاريخ الاستحقاق: ${pi['due_date'] ?? "—"} · الحالة: ${pi['status'] ?? ""}',
+    );
   }
 
   Future<void> _showPoDetail(String id) async {
@@ -639,6 +731,13 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                 icon: const Icon(Icons.payments, color: _gold, size: 16),
                 onPressed: () => _payInvoice(p),
               ),
+            IconButton(
+              tooltip: 'طباعة / PDF',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(Icons.print, color: _indigo, size: 16),
+              onPressed: () => _printPi(p['id']),
+            ),
             IconButton(
               tooltip: 'عرض',
               padding: EdgeInsets.zero,

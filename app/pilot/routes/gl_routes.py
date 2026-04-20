@@ -27,7 +27,7 @@ from app.pilot.services.gl_engine import (
     seed_default_coa, seed_fiscal_periods,
     build_journal_entry, post_journal_entry, reverse_journal_entry,
     compute_trial_balance, compute_income_statement, compute_balance_sheet,
-    compute_cash_flow, compute_account_ledger,
+    compute_cash_flow, compute_account_ledger, compute_comparative_report,
     auto_post_pos_sale,
 )
 
@@ -409,6 +409,30 @@ def cash_flow(
     return compute_cash_flow(
         db, entity_id=entity_id, start_date=start_date, end_date=end_date
     )
+
+
+@router.get("/entities/{entity_id}/reports/comparative")
+def comparative_report(
+    entity_id: str,
+    report_type: str = Query(...,
+        pattern="^(income_statement|balance_sheet)$",
+        description="income_statement | balance_sheet"),
+    current_start: _date = Query(...),
+    current_end: _date = Query(...),
+    prior_start: Optional[_date] = Query(None, description="افتراضياً نفس الفترة من السنة السابقة"),
+    prior_end: Optional[_date] = Query(None),
+    db: Session = Depends(get_db),
+):
+    """تقرير مقارن — الحالي vs سابق (افتراضياً السنة السابقة)."""
+    _entity_or_404(db, entity_id)
+    try:
+        return compute_comparative_report(
+            db, entity_id=entity_id, report_type=report_type,
+            current_start=current_start, current_end=current_end,
+            prior_start=prior_start, prior_end=prior_end,
+        )
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 
 @router.get("/accounts/{account_id}/ledger")
