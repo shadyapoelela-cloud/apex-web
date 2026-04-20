@@ -1948,6 +1948,9 @@ class _PiDialogState extends State<_PiDialog> {
   final List<_PoLine> _lines = [_PoLine()];
   bool _loading = false;
   String? _error;
+  // ترحيل مباشر للـ GL بعد الإنشاء (بدون زر post منفصل) — افتراضي true
+  // حتى يظهر المستحق للمورد + VAT في القوائم المالية فوراً.
+  bool _autoPost = true;
 
   @override
   void dispose() {
@@ -1998,13 +2001,32 @@ class _PiDialogState extends State<_PiDialog> {
           .toList(),
     };
     final r = await pilotClient.createPurchaseInvoice(body);
-    setState(() => _loading = false);
     if (!mounted) return;
     if (r.success) {
+      final piId = (r.data as Map)['id'];
+      // ترحيل فوري إذا auto_post مُفعَّل — تسجيل JE تلقائياً
+      if (_autoPost && piId != null) {
+        final postR = await pilotClient.postPurchaseInvoice(piId);
+        if (!mounted) return;
+        if (!postR.success) {
+          // الفاتورة أُنشئت لكن الترحيل فشل — نخبر المستخدم بوضوح
+          setState(() {
+            _loading = false;
+            _error = 'أُنشئت الفاتورة لكن فشل الترحيل: ${postR.error}';
+          });
+          return;
+        }
+      }
+      setState(() => _loading = false);
+      if (!mounted) return;
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          backgroundColor: _ok, content: Text('تم إنشاء الفاتورة ✓')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: _ok,
+          content: Text(_autoPost
+              ? 'تم إنشاء الفاتورة وترحيلها إلى GL ✓ (ستظهر في التقارير)'
+              : 'تم إنشاء الفاتورة كمسودّة — اضغط ✓ للترحيل لاحقاً')));
     } else {
+      setState(() => _loading = false);
       setState(() => _error = r.error ?? 'فشل الإنشاء');
     }
   }
@@ -2378,6 +2400,50 @@ class _PiDialogState extends State<_PiDialog> {
                     ),
                   ),
                 ]),
+                const SizedBox(height: 12),
+                // Banner auto_post — مطابق لنمط JE Builder
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _autoPost
+                        ? _ok.withValues(alpha: 0.08)
+                        : _warn.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                        color: (_autoPost ? _ok : _warn).withValues(alpha: 0.3)),
+                  ),
+                  child: Row(children: [
+                    Checkbox(
+                      value: _autoPost,
+                      onChanged: (v) => setState(() => _autoPost = v ?? false),
+                      checkColor: Colors.black,
+                      fillColor: WidgetStateProperty.resolveWith<Color?>((s) =>
+                          s.contains(WidgetState.selected) ? _gold : _navy3),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              _autoPost
+                                  ? '✓ ترحيل مباشر إلى GL'
+                                  : '⚠ حفظ كمسودّة فقط',
+                              style: TextStyle(
+                                  color: _autoPost ? _ok : _warn,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 2),
+                          Text(
+                              _autoPost
+                                  ? 'مدين: مصروفات/مخزون + VAT مدخلات. دائن: ذمم الموردين. تظهر في التقارير فوراً.'
+                                  : 'الفاتورة لن تؤثر على الحسابات حتى تضغط ✓ يدوياً من قائمة الفواتير.',
+                              style: const TextStyle(
+                                  color: _ts, fontSize: 11, height: 1.4)),
+                        ],
+                      ),
+                    ),
+                  ]),
+                ),
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Text(_error!,
@@ -2399,7 +2465,7 @@ class _PiDialogState extends State<_PiDialog> {
                 ? const SizedBox(
                     width: 14, height: 14,
                     child: CircularProgressIndicator(strokeWidth: 2))
-                : const Text('إنشاء'),
+                : Text(_autoPost ? 'إنشاء + ترحيل' : 'إنشاء (مسودّة)'),
           ),
         ],
       ),
