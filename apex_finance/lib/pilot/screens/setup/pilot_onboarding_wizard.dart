@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme.dart';
 import '../../api/pilot_client.dart';
-import '../../bridge/pilot_bridge.dart';
+import '../../session.dart';
 
 class PilotOnboardingWizard extends StatefulWidget {
   const PilotOnboardingWizard({super.key});
@@ -961,7 +961,7 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
     });
     if (!r.success) throw r.error ?? 'فشل إنشاء المستأجر';
     _tenantId = (r.data as Map)['id'];
-    await PilotBridge.instance.bindTenant(_tenantId!);
+    PilotSession.tenantId = _tenantId;
     setState(() => _loading = false);
   }
 
@@ -976,7 +976,7 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
       _createdEntityIds[e['code']] = (r.data as Map)['id'];
     }
     // re-bind to refresh bridge's entity list
-    await PilotBridge.instance.bindTenant(_tenantId!);
+    PilotSession.tenantId = _tenantId;
     setState(() => _loading = false);
   }
 
@@ -991,7 +991,7 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
       if (!r.success) throw 'فشل فرع ${b['code']}: ${r.error}';
       _createdBranchIds[b['code']] = (r.data as Map)['id'];
     }
-    await PilotBridge.instance.bindTenant(_tenantId!);
+    PilotSession.tenantId = _tenantId;
     setState(() => _loading = false);
   }
 

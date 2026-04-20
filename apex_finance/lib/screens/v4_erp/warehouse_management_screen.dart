@@ -1,14 +1,25 @@
-/// APEX Warehouse Management — LIVE backed by Pilot backend.
+/// Warehouse Management — شاشة المستودعات الحيّة.
 ///
-/// Reads warehouses + stock levels from /pilot/*.
+/// ذاتية الاكتفاء. تقرأ PilotSession.entityId ثم تعرض كل المستودعات
+/// لجميع فروع هذا الكيان، مع stock levels لكل واحد.
+
 library;
 
 import 'package:flutter/material.dart';
 
-import '../../core/theme.dart';
-import '../../core/v5/entity_scope_selector.dart' as v5scope;
 import '../../pilot/api/pilot_client.dart';
-import '../../pilot/bridge/pilot_bridge.dart';
+import '../../pilot/session.dart';
+
+const _gold = Color(0xFFD4AF37);
+const _navy = Color(0xFF0A1628);
+const _navy2 = Color(0xFF132339);
+const _navy3 = Color(0xFF1D3150);
+const _bdr = Color(0x33FFFFFF);
+const _tp = Color(0xFFFFFFFF);
+const _ts = Color(0xFFBCC5D3);
+const _td = Color(0xFF6B7A90);
+const _ok = Color(0xFF10B981);
+const _err = Color(0xFFEF4444);
 
 class WarehouseManagementScreen extends StatefulWidget {
   const WarehouseManagementScreen({super.key});
@@ -18,186 +29,348 @@ class WarehouseManagementScreen extends StatefulWidget {
 }
 
 class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
-  PilotBridge get _bridge => PilotBridge.instance;
-  PilotClient get _client => pilotClient;
+  final PilotClient _client = pilotClient;
 
-  List<Map<String, dynamic>> _warehouses = [];
-  Map<String, List<Map<String, dynamic>>> _stockByWh = {};
-  bool _loading = false;
+  List<Map<String, dynamic>> _branches = [];
+  final Map<String, List<Map<String, dynamic>>> _warehousesByBranch = {};
+  final Map<String, List<Map<String, dynamic>>> _stockByWarehouse = {};
+  bool _loading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _bridge.addListener(_reload);
-    v5scope.EntityScopeController.instance.addListener(_reload);
-    _reload();
+    _load();
   }
 
-  @override
-  void dispose() {
-    _bridge.removeListener(_reload);
-    v5scope.EntityScopeController.instance.removeListener(_reload);
-    super.dispose();
-  }
-
-  Future<void> _reload() async {
-    if (!_bridge.isBound) {
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    if (!PilotSession.hasEntity) {
       setState(() {
-        _warehouses = [];
-        _stockByWh = {};
+        _loading = false;
+        _error = 'لم يتم تحديد الكيان. اذهب لإعدادات الشركة أولاً.';
       });
       return;
     }
-    setState(() => _loading = true);
-    final branches = _bridge.branchesForCurrentEntity();
-    final allWh = <Map<String, dynamic>>[];
-    for (final b in branches) {
-      final r = await _client.listWarehouses(b['id']);
-      if (r.success) {
-        allWh.addAll(List<Map<String, dynamic>>.from(r.data));
+    try {
+      final bR = await _client.listBranches(PilotSession.entityId!);
+      if (!bR.success) throw 'فشل تحميل الفروع';
+      _branches = List<Map<String, dynamic>>.from(bR.data);
+
+      for (final b in _branches) {
+        final wR = await _client.listWarehouses(b['id']);
+        final whs =
+            wR.success ? List<Map<String, dynamic>>.from(wR.data) : <Map<String, dynamic>>[];
+        _warehousesByBranch[b['id']] = whs;
+        for (final w in whs) {
+          final sR = await _client.getWarehouseStock(w['id']);
+          _stockByWarehouse[w['id']] = sR.success
+              ? List<Map<String, dynamic>>.from(sR.data)
+              : <Map<String, dynamic>>[];
+        }
       }
+      setState(() => _loading = false);
+    } catch (e) {
+      setState(() {
+        _loading = false;
+        _error = '$e';
+      });
     }
-    final stock = <String, List<Map<String, dynamic>>>{};
-    for (final w in allWh) {
-      final r = await _client.getWarehouseStock(w['id']);
-      if (r.success) {
-        stock[w['id']] = List<Map<String, dynamic>>.from(r.data);
-      }
-    }
-    if (!mounted) return;
-    setState(() {
-      _warehouses = allWh;
-      _stockByWh = stock;
-      _loading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_bridge.isBound) {
-      return _empty('ربط مستأجر مطلوب لعرض المستودعات الحقيقية.');
-    }
-    if (_bridge.currentPilotEntity == null) {
-      return _empty('اختر كياناً من شريط العنوان.');
-    }
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
-        color: AC.navy,
-        child: RefreshIndicator(
-          onRefresh: _reload,
-          child: _loading
-              ? const Center(child: CircularProgressIndicator())
-              : _warehouses.isEmpty
-                  ? _empty('لا توجد مستودعات لهذا الكيان.')
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _warehouses.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (_, i) => _warehouseCard(_warehouses[i]),
-                    ),
-        ),
+        color: _navy,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator(color: _gold))
+            : _error != null
+                ? _errorState()
+                : _content(),
       ),
     );
   }
 
-  Widget _empty(String msg) => Container(
-        color: AC.navy,
-        child: Center(
+  Widget _errorState() => Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          padding: const EdgeInsets.all(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.warning, color: _err, size: 56),
+            const SizedBox(height: 16),
+            Text(_error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: _tp, fontSize: 15)),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(backgroundColor: _gold),
+              onPressed: _load,
+              icon: const Icon(Icons.refresh),
+              label: const Text('إعادة المحاولة'),
+            ),
+          ]),
+        ),
+      );
+
+  Widget _content() => RefreshIndicator(
+        color: _gold,
+        onRefresh: _load,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _header(),
+            const SizedBox(height: 16),
+            ..._branches.map(_branchCard),
+            const SizedBox(height: 80),
+          ],
+        ),
+      );
+
+  Widget _header() {
+    final totalWh = _warehousesByBranch.values.fold<int>(0, (s, l) => s + l.length);
+    final totalSkus = _stockByWarehouse.values.fold<int>(
+        0, (s, l) => s + l.length);
+    final totalStock = _stockByWarehouse.values
+        .expand((l) => l)
+        .fold<double>(0,
+            (s, r) => s + (double.tryParse('${r['on_hand']}') ?? 0));
+    return Row(children: [
+      _kpi('الفروع', '${_branches.length}', Icons.store),
+      const SizedBox(width: 10),
+      _kpi('المستودعات', '$totalWh', Icons.warehouse),
+      const SizedBox(width: 10),
+      _kpi('أصناف مختزنة', '$totalSkus', Icons.inventory_2),
+      const SizedBox(width: 10),
+      _kpi('الكمية الإجمالية', totalStock.toStringAsFixed(0), Icons.layers),
+    ]);
+  }
+
+  Widget _kpi(String label, String val, IconData icon) => Expanded(
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: _navy2,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: _bdr),
+          ),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.warehouse_outlined, size: 64, color: AC.td),
-              const SizedBox(height: 12),
-              Text(msg, style: TextStyle(color: AC.ts, fontSize: 15)),
+              Row(children: [
+                Icon(icon, color: _gold, size: 18),
+                const SizedBox(width: 6),
+                Text(label, style: const TextStyle(color: _ts, fontSize: 12)),
+              ]),
+              const SizedBox(height: 8),
+              Text(val,
+                  style: const TextStyle(
+                      color: _gold, fontSize: 22, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
       );
 
-  Widget _warehouseCard(Map<String, dynamic> w) {
-    final stock = _stockByWh[w['id']] ?? [];
-    final totalOnHand = stock.fold<double>(
-      0,
-      (s, lv) => s + (double.tryParse('${lv['on_hand']}') ?? 0),
-    );
-    final branchName = _bridge.branchesForCurrentEntity().firstWhere(
-          (b) => b['id'] == w['branch_id'],
-          orElse: () => <String, dynamic>{'name_ar': '—'},
-        )['name_ar'];
-
+  Widget _branchCard(Map<String, dynamic> b) {
+    final warehouses = _warehousesByBranch[b['id']] ?? [];
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AC.navy2,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AC.bdr),
+        color: _navy2,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _bdr),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Icon(Icons.warehouse, color: AC.gold, size: 28),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(w['name_ar'] ?? w['code'],
-                    style: TextStyle(
-                        color: AC.tp,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
-                Text('$branchName • ${w['code']}',
-                    style: TextStyle(color: AC.ts, fontSize: 12)),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: (w['status'] == 'active' ? AC.ok : AC.warn)
-                  .withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(w['status'] ?? '?',
-                style: TextStyle(
-                    color: w['status'] == 'active' ? AC.ok : AC.warn,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600)),
+          const Icon(Icons.store, color: _gold),
+          const SizedBox(width: 8),
+          Text('${b['code']} — ${b['name_ar'] ?? ''}',
+              style: const TextStyle(
+                  color: _tp, fontWeight: FontWeight.bold, fontSize: 15)),
+          const SizedBox(width: 8),
+          if (b['city'] != null)
+            Text('(${b['city']})', style: const TextStyle(color: _td, fontSize: 12)),
+          const Spacer(),
+          TextButton.icon(
+            icon: const Icon(Icons.add, color: _gold, size: 18),
+            label: const Text('مستودع', style: TextStyle(color: _gold)),
+            onPressed: () => _addWarehouse(b['id']),
           ),
         ]),
-        const SizedBox(height: 12),
-        Row(children: [
-          _metric('النوع', w['type'] ?? '—'),
-          _metric('أصناف مختلفة', '${stock.length}'),
-          _metric('الكمية الإجمالية', totalOnHand.toStringAsFixed(0)),
-          if (w['is_default'] == true)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: AC.gold.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text('⭐ افتراضي',
-                  style: TextStyle(color: AC.gold, fontSize: 11)),
-            ),
-        ]),
+        const SizedBox(height: 8),
+        if (warehouses.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(8),
+            child: Text('لا توجد مستودعات في هذا الفرع',
+                style: TextStyle(color: _td, fontSize: 13)),
+          )
+        else
+          ...warehouses.map((w) => _warehouseTile(w)),
       ]),
     );
   }
 
-  Widget _metric(String k, String v) => Padding(
-        padding: const EdgeInsets.only(left: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _warehouseTile(Map<String, dynamic> w) {
+    final stock = _stockByWarehouse[w['id']] ?? [];
+    final total = stock.fold<double>(
+        0, (s, r) => s + (double.tryParse('${r['on_hand']}') ?? 0));
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _navy3,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(children: [
+        Icon(Icons.warehouse, color: _gold, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                Text(w['name_ar'] ?? w['code'],
+                    style: const TextStyle(
+                        color: _tp,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14)),
+                const SizedBox(width: 8),
+                if (w['is_default'] == true)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: _gold.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text('افتراضي',
+                        style: TextStyle(color: _gold, fontSize: 10)),
+                  ),
+              ]),
+              Text('${w['code']} • ${w['type']}',
+                  style: const TextStyle(color: _td, fontSize: 11)),
+            ],
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(k, style: TextStyle(color: AC.td, fontSize: 11)),
-            const SizedBox(height: 2),
-            Text(v,
-                style: TextStyle(
-                    color: AC.tp,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500)),
+            Text('${stock.length} صنف',
+                style: const TextStyle(color: _ts, fontSize: 12)),
+            Text(total.toStringAsFixed(0),
+                style: const TextStyle(
+                    color: _gold, fontWeight: FontWeight.bold, fontSize: 16)),
           ],
         ),
-      );
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: (w['status'] == 'active' ? _ok : Colors.grey)
+                .withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(w['status'] ?? '',
+              style: TextStyle(
+                  color: w['status'] == 'active' ? _ok : Colors.grey,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600)),
+        ),
+      ]),
+    );
+  }
+
+  Future<void> _addWarehouse(String branchId) async {
+    final codeCtrl = TextEditingController();
+    final nameCtrl = TextEditingController();
+    String type = 'main';
+    bool isDefault = false;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text('مستودع جديد'),
+            content: SizedBox(
+              width: 400,
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                TextField(
+                  controller: codeCtrl,
+                  decoration: const InputDecoration(labelText: 'الكود *'),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(labelText: 'الاسم *'),
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  value: type,
+                  decoration: const InputDecoration(labelText: 'النوع'),
+                  items: const [
+                    DropdownMenuItem(value: 'main', child: Text('رئيسي')),
+                    DropdownMenuItem(
+                        value: 'stockroom', child: Text('مخزن خلفي')),
+                    DropdownMenuItem(
+                        value: 'central_dc', child: Text('مركز توزيع')),
+                    DropdownMenuItem(
+                        value: 'returns', child: Text('مرتجعات')),
+                  ],
+                  onChanged: (v) => setS(() => type = v!),
+                ),
+                CheckboxListTile(
+                  value: isDefault,
+                  title: const Text('افتراضي'),
+                  onChanged: (v) => setS(() => isDefault = v ?? false),
+                ),
+              ]),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('إلغاء')),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: _gold),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('إنشاء'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (ok == true) {
+      final r = await _client.createWarehouse(branchId, {
+        'code': codeCtrl.text.trim(),
+        'name_ar': nameCtrl.text.trim(),
+        'type': type,
+        'is_default': isDefault,
+        'is_sellable_from': true,
+        'is_receivable_to': true,
+      });
+      if (r.success) {
+        await _load();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('تم إنشاء المستودع'),
+                backgroundColor: _ok),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(r.error ?? 'فشل'), backgroundColor: _err),
+          );
+        }
+      }
+    }
+  }
 }

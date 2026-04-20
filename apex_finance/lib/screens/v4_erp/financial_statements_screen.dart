@@ -5,7 +5,7 @@ library;
 import 'package:flutter/material.dart';
 import '../../core/v5/apex_v5_undo_toast.dart';
 import '../../pilot/api/pilot_client.dart';
-import '../../pilot/bridge/pilot_bridge.dart';
+import '../../pilot/session.dart';
 
 class FinancialStatementsScreen extends StatefulWidget {
   const FinancialStatementsScreen({super.key});
@@ -616,24 +616,16 @@ class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
   @override
   void initState() {
     super.initState();
-    PilotBridge.instance.addListener(_reload);
     _reload();
   }
 
-  @override
-  void dispose() {
-    PilotBridge.instance.removeListener(_reload);
-    super.dispose();
-  }
-
   Future<void> _reload() async {
-    final bridge = PilotBridge.instance;
-    if (bridge.tenantId == null) {
+    if (!PilotSession.hasTenant) {
       if (mounted) setState(() => _products = []);
       return;
     }
     setState(() => _loading = true);
-    final r = await pilotClient.listProducts(bridge.tenantId!, limit: 500);
+    final r = await pilotClient.listProducts(PilotSession.tenantId!, limit: 500);
     if (mounted) {
       setState(() {
         _products = r.success ? List<Map<String, dynamic>>.from(r.data) : [];
@@ -644,8 +636,7 @@ class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bridge = PilotBridge.instance;
-    if (bridge.tenantId == null) {
+    if (!PilotSession.hasTenant) {
       return Container(
         color: const Color(0xFFF9FAFB),
         padding: const EdgeInsets.all(40),
