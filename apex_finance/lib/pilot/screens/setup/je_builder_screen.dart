@@ -13,6 +13,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -303,9 +304,9 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
 
   Widget _header() {
     final totalDebit =
-        _entries.fold(0.0, (t, e) => t + ((e['total_debit'] ?? 0) as num).toDouble());
+        _entries.fold(0.0, (t, e) => t + asDouble(e['total_debit']));
     final totalCredit = _entries.fold(
-        0.0, (t, e) => t + ((e['total_credit'] ?? 0) as num).toDouble());
+        0.0, (t, e) => t + asDouble(e['total_credit']));
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 18, 24, 14),
       decoration: BoxDecoration(
@@ -447,8 +448,8 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   Widget _row(Map<String, dynamic> e) {
     final status = e['status'] ?? 'draft';
     final info = _kStatuses[status] ?? {'ar': status, 'color': _td};
-    final debit = (e['total_debit'] ?? 0).toDouble();
-    final credit = (e['total_credit'] ?? 0).toDouble();
+    final debit = asDouble(e['total_debit']);
+    final credit = asDouble(e['total_credit']);
     return Container(
       margin: const EdgeInsets.only(top: 3),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1253,8 +1254,8 @@ class _JeDetailDialog extends StatelessWidget {
                   ]),
                 ),
                 ...lines.map((l) {
-                  final dr = (l['debit_amount'] ?? 0).toDouble();
-                  final cr = (l['credit_amount'] ?? 0).toDouble();
+                  final dr = asDouble(l['debit_amount']);
+                  final cr = asDouble(l['credit_amount']);
                   return Container(
                     margin: const EdgeInsets.only(top: 3),
                     padding: const EdgeInsets.symmetric(

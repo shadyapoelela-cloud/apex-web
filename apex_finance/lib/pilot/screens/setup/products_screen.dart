@@ -11,6 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -422,7 +423,7 @@ class _ProductsScreenState extends State<ProductsScreen>
             .firstWhere((b) => b['id'] == p['brand_id'],
                 orElse: () => {'name_ar': '—'})['name_ar'] ??
         '—';
-    final stock = (p['total_stock_on_hand'] ?? 0).toDouble();
+    final stock = asDouble(p['total_stock_on_hand']);
     return InkWell(
       onTap: () => _loadVariants(p['id']),
       borderRadius: BorderRadius.circular(8),
@@ -666,9 +667,9 @@ class _ProductsScreenState extends State<ProductsScreen>
 
   Widget _variantTile(Map<String, dynamic> v) {
     final sel = _selectedVariantId == v['id'];
-    final onHand = (v['total_on_hand'] ?? 0).toDouble();
-    final price = (v['list_price'] ?? 0).toDouble();
-    final cost = (v['standard_cost'] ?? v['default_cost'] ?? 0).toDouble();
+    final onHand = asDouble(v['total_on_hand']);
+    final price = asDouble(v['list_price']);
+    final cost = asDouble(v['standard_cost'] ?? v['default_cost']);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 6),

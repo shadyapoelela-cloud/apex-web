@@ -11,6 +11,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
+import '../../num_utils.dart';
 import '../../session.dart';
 
 const _gold = Color(0xFFD4AF37);
@@ -327,8 +328,8 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
               style: TextStyle(color: _ts, fontSize: 13)));
     }
     final rows = (tb['rows'] as List?) ?? [];
-    final totalDebit = (tb['total_debits'] ?? 0).toDouble();
-    final totalCredit = (tb['total_credits'] ?? 0).toDouble();
+    final totalDebit = asDouble(tb['total_debits']);
+    final totalCredit = asDouble(tb['total_credits']);
     final balanced = (totalDebit - totalCredit).abs() < 0.01;
 
     return ListView(
@@ -406,9 +407,9 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   }
 
   Widget _tbRow(Map<String, dynamic> r) {
-    final debit = (r['total_debit'] ?? 0).toDouble();
-    final credit = (r['total_credit'] ?? 0).toDouble();
-    final balance = (r['balance'] ?? 0).toDouble();
+    final debit = asDouble(r['total_debit']);
+    final credit = asDouble(r['total_credit']);
+    final balance = asDouble(r['balance']);
     return Container(
       margin: const EdgeInsets.only(top: 3),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -492,9 +493,11 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           child: Text('لا توجد بيانات',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
-    final revenue = (is_['total_revenue'] ?? 0).toDouble();
-    final expenses = (is_['total_expenses'] ?? 0).toDouble();
-    final netIncome = (is_['net_income'] ?? (revenue - expenses)).toDouble();
+    final revenue = asDouble(is_['total_revenue']);
+    final expenses = asDouble(is_['total_expenses']);
+    final netIncome = is_['net_income'] != null
+        ? asDouble(is_['net_income'])
+        : (revenue - expenses);
     final revenueAccts = (is_['revenue_accounts'] as List?) ?? [];
     final expenseAccts = (is_['expense_accounts'] as List?) ?? [];
 
@@ -599,7 +602,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   }
 
   Widget _isRow(Map<String, dynamic> a, Color color) {
-    final bal = (a['balance'] ?? 0).toDouble();
+    final bal = asDouble(a['balance']);
     return Container(
       margin: const EdgeInsets.only(top: 3),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -644,9 +647,9 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           child: Text('لا توجد بيانات',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
-    final assets = (bs['total_assets'] ?? 0).toDouble();
-    final liabs = (bs['total_liabilities'] ?? 0).toDouble();
-    final equity = (bs['total_equity'] ?? 0).toDouble();
+    final assets = asDouble(bs['total_assets']);
+    final liabs = asDouble(bs['total_liabilities']);
+    final equity = asDouble(bs['total_equity']);
     final balanced = ((assets - (liabs + equity)).abs() < 0.01);
 
     final assetAccts = (bs['asset_accounts'] as List?) ?? [];
