@@ -1248,10 +1248,47 @@ except Exception as e:
     logging.error(f"Extras routes not mounted: {e}", exc_info=True)
 
 
+# ── Pilot module: production multi-tenant retail ERP
+HAS_PILOT = False
+try:
+    from app.pilot.routes.pilot_routes import router as pilot_router
+    from app.pilot.models import (  # noqa: F401 — ensure models are registered with metadata
+        Tenant, CompanySettings, Entity, Branch,
+        Currency, FxRate, Role, Permission, RolePermission,
+        UserEntityAccess, UserBranchAccess,
+    )
+    from app.phase1.models.platform_models import Base as PilotBase, engine as pilot_engine
+    # Create pilot tables if missing (idempotent)
+    PilotBase.metadata.create_all(bind=pilot_engine)
+    app.include_router(pilot_router)
+    HAS_PILOT = True
+    logging.info("Pilot routes mounted (multi-tenant retail ERP) + tables ensured")
+except Exception as e:
+    logging.error(f"Pilot routes not mounted: {e}", exc_info=True)
+
+
+@app.post("/admin/pilot/seed-permissions")
+def admin_seed_permissions(x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
+    """Seed the system-wide permissions master list (idempotent). Admin-only."""
+    import os
+    required = os.environ.get("ADMIN_SECRET")
+    if required and x_admin_secret != required:
+        raise HTTPException(status_code=401, detail="admin secret required")
+    if not HAS_PILOT:
+        raise HTTPException(status_code=503, detail="pilot module not loaded")
+    from app.pilot.services.seed import seed_permissions
+    from app.phase1.models.platform_models import SessionLocal
+    db = SessionLocal()
+    try:
+        result = seed_permissions(db)
+        return {"success": True, "result": result}
+    finally:
+        db.close()
+
 
 @app.get("/")
 def root():
-    phases = [P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8, HAS_P9, HAS_P10, HAS_P11]
+    phases = [P1, P2, P3, P4, P5, P6, HAS_P7, HAS_P8, HAS_P9, HAS_P10, HAS_P11, HAS_PILOT]
     return {
         "name": "APEX Financial Platform API",
         "version": "12.0.0",

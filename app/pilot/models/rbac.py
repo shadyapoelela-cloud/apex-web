@@ -39,7 +39,7 @@ class RoleScope(str, enum.Enum):
     branch = "branch"    # one physical branch (e.g., Store Manager, Cashier)
 
 
-class Role(Base):
+class PilotRole(Base):
     """A named collection of permissions."""
     __tablename__ = "pilot_roles"
 
@@ -71,7 +71,7 @@ class Role(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
     updated_at = Column(DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
 
-    permissions = relationship("RolePermission", back_populates="role", cascade="all, delete-orphan")
+    permissions = relationship("PilotRolePermission", back_populates="role", cascade="all, delete-orphan")
 
     __table_args__ = (
         UniqueConstraint("tenant_id", "code", name="uq_pilot_role_tenant_code"),
@@ -79,7 +79,7 @@ class Role(Base):
     )
 
 
-class Permission(Base):
+class PilotPermission(Base):
     """Master list of possible (resource, action) pairs. Seeded, not user-created."""
     __tablename__ = "pilot_permissions"
 
@@ -106,7 +106,7 @@ class Permission(Base):
     )
 
 
-class RolePermission(Base):
+class PilotRolePermission(Base):
     """Join table: which permissions does a role include."""
     __tablename__ = "pilot_role_permissions"
 
@@ -120,8 +120,8 @@ class RolePermission(Base):
 
     created_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
 
-    role = relationship("Role", back_populates="permissions")
-    permission = relationship("Permission")
+    role = relationship("PilotRole", back_populates="permissions")
+    permission = relationship("PilotPermission")
 
     __table_args__ = (
         UniqueConstraint("role_id", "permission_id", name="uq_pilot_role_permission"),

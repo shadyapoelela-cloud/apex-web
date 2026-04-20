@@ -3,7 +3,12 @@
 from .tenant import Tenant, CompanySettings, TenantStatus, TenantTier
 from .entity import Entity, EntityType, EntityStatus, Branch, BranchType, BranchStatus
 from .currency import Currency, FxRate
-from .rbac import Role, Permission, RolePermission, UserEntityAccess, UserBranchAccess
+from .rbac import PilotRole, PilotPermission, PilotRolePermission, UserEntityAccess, UserBranchAccess, RoleScope
+
+# Backward-compat aliases (used by early route code)
+Role = PilotRole
+Permission = PilotPermission
+RolePermission = PilotRolePermission
 
 __all__ = [
     "Tenant",
@@ -18,9 +23,14 @@ __all__ = [
     "BranchStatus",
     "Currency",
     "FxRate",
+    "PilotRole",
+    "PilotPermission",
+    "PilotRolePermission",
+    "UserEntityAccess",
+    "UserBranchAccess",
+    "RoleScope",
+    # aliases
     "Role",
     "Permission",
     "RolePermission",
-    "UserEntityAccess",
-    "UserBranchAccess",
 ]
