@@ -10,6 +10,9 @@
 ///   • عرض تفاصيل القيد مع السطور
 library;
 
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../api/pilot_client.dart';
@@ -612,6 +615,9 @@ class _JeLine {
   double debit = 0;
   double credit = 0;
   String description = '';
+  // AI-generated hints (عندما يكون السطر من استخراج ذكي)
+  String aiHint = '';
+  double aiMatchConfidence = 0;
   _JeLine();
 }
 
@@ -630,6 +636,12 @@ class _JeDialogState extends State<_JeDialog> {
   final List<_JeLine> _lines = [_JeLine(), _JeLine()];
   bool _loading = false;
   String? _error;
+
+  // AI extraction state
+  bool _aiLoading = false;
+  Map<String, dynamic>? _aiResult;   // آخر نتيجة للذكاء الاصطناعي (للعرض)
+  List<String> _aiWarnings = const [];
+  String? _aiSourceFilename;
 
   @override
   void dispose() {
@@ -689,6 +701,146 @@ class _JeDialogState extends State<_JeDialog> {
     if (selected == null) return;
     setState(() => _lines[i].accountId = selected['id']);
   }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // AI — قراءة مستند واستخراج قيد يومية بالذكاء الاصطناعي
+  // ──────────────────────────────────────────────────────────────────────
+
+  Future<void> _readDocumentWithAI() async {
+    if (!PilotSession.hasEntity) {
+      setState(() => _error = 'اختر الكيان أولاً');
+      return;
+    }
+    // 1) اختيار ملف
+    final picked = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'],
+      withData: true,
+    );
+    if (picked == null || picked.files.isEmpty) return;
+    final f = picked.files.first;
+    final bytes = f.bytes;
+    if (bytes == null) {
+      setState(() => _error = 'تعذّر قراءة الملف');
+      return;
+    }
+    // 10MB حد أقصى
+    if (bytes.length > 10 * 1024 * 1024) {
+      setState(() => _error = 'حجم الملف كبير جداً — الحدّ الأقصى 10MB');
+      return;
+    }
+
+    // 2) تحديد media_type
+    final ext = (f.extension ?? '').toLowerCase();
+    final mediaType = switch (ext) {
+      'jpg' || 'jpeg' => 'image/jpeg',
+      'png' => 'image/png',
+      'gif' => 'image/gif',
+      'webp' => 'image/webp',
+      'pdf' => 'application/pdf',
+      _ => 'application/octet-stream',
+    };
+
+    // 3) مناداة الـ API
+    setState(() {
+      _aiLoading = true;
+      _error = null;
+      _aiResult = null;
+      _aiWarnings = const [];
+      _aiSourceFilename = f.name;
+    });
+
+    final b64 = base64Encode(bytes);
+    final r = await pilotClient.extractJeFromDocument(
+      PilotSession.entityId!,
+      fileBase64: b64,
+      mediaType: mediaType,
+      filename: f.name,
+    );
+
+    if (!mounted) return;
+    setState(() => _aiLoading = false);
+
+    if (!r.success) {
+      setState(() => _error = r.error ?? 'فشل استخراج القيد من المستند');
+      return;
+    }
+    final data = r.data as Map<String, dynamic>?;
+    if (data == null || data['success'] != true) {
+      setState(() => _error = (data?['reason'] as String?) ?? 'لم يتم فهم المستند');
+      return;
+    }
+
+    // 4) تعبئة النموذج من الاقتراح
+    _applyAiSuggestion(data);
+
+    // 5) إشعار بالنتيجة
+    final conf = ((data['confidence'] as num?)?.toDouble() ?? 0.0);
+    final docType = data['document_type'] ?? 'unknown';
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: conf >= 0.7 ? _ok : _warn,
+        content: Text(
+          'تم استخراج القيد (${_kDocTypeAr(docType)} — ثقة ${(conf * 100).toStringAsFixed(0)}%). '
+          'راجع السطور قبل الحفظ.',
+        ),
+      ));
+    }
+  }
+
+  void _applyAiSuggestion(Map<String, dynamic> data) {
+    // البيان + التاريخ + النوع
+    final memo = (data['suggested_memo_ar'] as String?)?.trim() ?? '';
+    final dateStr = (data['suggested_date'] as String?) ?? '';
+    final kind = (data['suggested_kind'] as String?)?.trim() ?? 'manual';
+
+    _memo.text = memo;
+    final parsedDate = DateTime.tryParse(dateStr);
+    if (parsedDate != null) _date = parsedDate;
+    if (_kKinds.containsKey(kind)) _kind = kind;
+
+    // السطور — نستبدل القائمة بالكامل
+    final newLines = <_JeLine>[];
+    final aiLines = (data['suggested_lines'] as List?) ?? const [];
+    for (final raw in aiLines) {
+      if (raw is! Map) continue;
+      final ln = _JeLine();
+      final accId = raw['account_id'];
+      if (accId is String && accId.isNotEmpty) ln.accountId = accId;
+      ln.debit = double.tryParse('${raw['debit'] ?? '0'}') ?? 0;
+      ln.credit = double.tryParse('${raw['credit'] ?? '0'}') ?? 0;
+      ln.description = (raw['description'] as String?) ?? '';
+      // نحفظ الـ hint كعنوان مساعد عند عدم وجود تطابق
+      ln.aiHint = (raw['account_hint'] as String?) ?? '';
+      ln.aiMatchConfidence = (raw['match_confidence'] as num?)?.toDouble() ?? 0;
+      newLines.add(ln);
+    }
+    if (newLines.length < 2) {
+      // تأكد من وجود سطرين على الأقل
+      while (newLines.length < 2) {
+        newLines.add(_JeLine());
+      }
+    }
+
+    setState(() {
+      _lines
+        ..clear()
+        ..addAll(newLines);
+      _aiResult = data;
+      _aiWarnings = ((data['warnings'] as List?) ?? const [])
+          .map((w) => w.toString())
+          .toList();
+    });
+  }
+
+  String _kDocTypeAr(dynamic t) => switch (t) {
+        'invoice' => 'فاتورة',
+        'receipt' => 'إيصال',
+        'bank_statement' => 'كشف بنكي',
+        'payment_voucher' => 'سند صرف/قبض',
+        'expense' => 'مصروف',
+        _ => 'مستند',
+      };
 
   Future<void> _submit() async {
     if (_memo.text.trim().isEmpty) {
@@ -763,11 +915,14 @@ class _JeDialogState extends State<_JeDialog> {
         ]),
         content: SizedBox(
           width: 820,
-          height: 560,
+          height: 620,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ── AI: قراءة مستند بالذكاء الاصطناعي ──
+                _buildAiBanner(),
+                const SizedBox(height: 12),
                 Row(children: [
                   Expanded(
                     flex: 2,
@@ -1045,9 +1200,174 @@ class _JeDialogState extends State<_JeDialog> {
     );
   }
 
+  // ─────────────────────────────────────────────────────────────────────
+  // AI Banner — زر قراءة المستند + بطاقة النتيجة + التحذيرات
+  // ─────────────────────────────────────────────────────────────────────
+  Widget _buildAiBanner() {
+    final hasResult = _aiResult != null;
+    final conf = ((_aiResult?['confidence'] as num?)?.toDouble() ?? 0.0);
+    final docType = _aiResult?['document_type'] as String? ?? '';
+    final vendor = (_aiResult?['vendor_or_customer'] as String?)?.trim() ?? '';
+    final docNo = (_aiResult?['document_number'] as String?)?.trim() ?? '';
+    final total = (_aiResult?['total_amount'] as String?) ?? '';
+    final vat = (_aiResult?['vat_amount'] as String?) ?? '';
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            _indigo.withValues(alpha: 0.18),
+            _gold.withValues(alpha: 0.10),
+          ],
+          begin: Alignment.centerRight,
+          end: Alignment.centerLeft,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _gold.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            const Icon(Icons.auto_awesome, color: _gold, size: 18),
+            const SizedBox(width: 6),
+            const Expanded(
+              child: Text(
+                'قراءة مستند بالذكاء الاصطناعي',
+                style: TextStyle(
+                  color: _tp,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: _gold,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              ),
+              onPressed: _aiLoading ? null : _readDocumentWithAI,
+              icon: _aiLoading
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.black,
+                      ),
+                    )
+                  : const Icon(Icons.upload_file, size: 16),
+              label: Text(
+                _aiLoading
+                    ? 'جاري القراءة...'
+                    : hasResult
+                        ? 'إعادة القراءة'
+                        : 'ارفع فاتورة / إيصال / PDF',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 6),
+          Text(
+            hasResult
+                ? 'تم استخراج القيد — راجع السطور والتحذيرات أدناه قبل الحفظ.'
+                : 'ارفع صورة فاتورة أو إيصال أو PDF، وسيقوم الذكاء الاصطناعي '
+                    'بقراءته واقتراح قيد يومية متوازن مع مطابقة الحسابات.',
+            style: const TextStyle(color: _ts, fontSize: 11, height: 1.4),
+          ),
+          if (hasResult) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _navy3,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: _bdr),
+              ),
+              child: Wrap(
+                spacing: 14,
+                runSpacing: 6,
+                children: [
+                  _aiMeta(Icons.description, 'النوع', _kDocTypeAr(docType)),
+                  _aiMeta(
+                    Icons.verified,
+                    'الثقة',
+                    '${(conf * 100).toStringAsFixed(0)}%',
+                    color: conf >= 0.7 ? _ok : (conf >= 0.4 ? _warn : _err),
+                  ),
+                  if (vendor.isNotEmpty)
+                    _aiMeta(Icons.business, 'الطرف', vendor),
+                  if (docNo.isNotEmpty)
+                    _aiMeta(Icons.tag, 'الرقم', docNo),
+                  if (total.isNotEmpty && total != '0.00')
+                    _aiMeta(Icons.payments, 'الإجمالي', total),
+                  if (vat.isNotEmpty && vat != '0.00')
+                    _aiMeta(Icons.receipt_long, 'VAT', vat),
+                  if (_aiSourceFilename != null)
+                    _aiMeta(Icons.attach_file, 'الملف', _aiSourceFilename!),
+                ],
+              ),
+            ),
+          ],
+          if (_aiWarnings.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            ..._aiWarnings.map((w) => Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.warning_amber,
+                          color: _warn, size: 14),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          w,
+                          style: const TextStyle(
+                              color: _warn, fontSize: 11, height: 1.4),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _aiMeta(IconData icon, String label, String value, {Color? color}) {
+    final c = color ?? _tp;
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      Icon(icon, color: _ts, size: 12),
+      const SizedBox(width: 4),
+      Text('$label: ',
+          style: const TextStyle(color: _td, fontSize: 11)),
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 180),
+        child: Text(
+          value,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+              color: c, fontSize: 11, fontWeight: FontWeight.w700),
+        ),
+      ),
+    ]);
+  }
+
   Widget _lineRow(int i, _JeLine l) {
     final acc = widget.accounts.firstWhere((a) => a['id'] == l.accountId,
         orElse: () => {});
+    // لون الحدّ حسب حالة مطابقة AI: أخضر إذا ≥0.7، برتقالي منخفض، أحمر بدون مطابقة
+    final hasAiHint = l.aiHint.isNotEmpty;
+    final aiBorderColor = !hasAiHint
+        ? _bdr
+        : (l.aiMatchConfidence >= 0.7
+            ? _ok.withValues(alpha: 0.5)
+            : (l.aiMatchConfidence >= 0.4
+                ? _warn.withValues(alpha: 0.5)
+                : _err.withValues(alpha: 0.5)));
     return Container(
       margin: const EdgeInsets.only(top: 3),
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
@@ -1069,20 +1389,45 @@ class _JeDialogState extends State<_JeDialog> {
               decoration: BoxDecoration(
                   color: _navy2,
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: _bdr)),
+                  border: Border.all(color: aiBorderColor)),
               child: Row(children: [
-                const Icon(Icons.search, color: _gold, size: 12),
+                Icon(
+                  acc.isEmpty
+                      ? (hasAiHint ? Icons.auto_awesome : Icons.search)
+                      : Icons.check_circle,
+                  color: acc.isEmpty
+                      ? (hasAiHint ? _warn : _gold)
+                      : _ok,
+                  size: 12,
+                ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
-                      acc.isEmpty
-                          ? 'اختر حساباً'
-                          : '${acc['code']} — ${acc['name_ar']}',
-                      style: TextStyle(
-                          color: acc.isEmpty ? _td : _tp,
-                          fontSize: 11,
-                          fontFamily: acc.isEmpty ? null : 'monospace'),
-                      overflow: TextOverflow.ellipsis),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                          acc.isEmpty
+                              ? (hasAiHint
+                                  ? '⚠ ${l.aiHint} — اختر الحساب'
+                                  : 'اختر حساباً')
+                              : '${acc['code']} — ${acc['name_ar']}',
+                          style: TextStyle(
+                              color: acc.isEmpty
+                                  ? (hasAiHint ? _warn : _td)
+                                  : _tp,
+                              fontSize: 11,
+                              fontFamily: acc.isEmpty ? null : 'monospace'),
+                          overflow: TextOverflow.ellipsis),
+                      if (acc.isNotEmpty && hasAiHint)
+                        Text(
+                          'AI: ${l.aiHint} (${(l.aiMatchConfidence * 100).toStringAsFixed(0)}%)',
+                          style: const TextStyle(
+                              color: _td, fontSize: 9),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
                 ),
               ]),
             ),

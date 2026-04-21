@@ -465,6 +465,24 @@ class PilotClient {
 
   Future<ApiResult> createJournalEntry(Map<String, dynamic> body) =>
       _post('/pilot/journal-entries', body);
+
+  /// AI — استخراج قيد يومية من مستند (صورة فاتورة / إيصال / PDF).
+  /// [fileBase64] بدون prefix `data:...,base64,`.
+  /// [mediaType] واحد من: image/jpeg, image/png, image/gif, image/webp, application/pdf.
+  Future<ApiResult> extractJeFromDocument(
+    String entityId, {
+    required String fileBase64,
+    required String mediaType,
+    String? filename,
+  }) =>
+      _post('/pilot/entities/$entityId/ai/extract-je', {
+        'file_base64': fileBase64,
+        'media_type': mediaType,
+        if (filename != null) 'filename': filename,
+      });
+
+  /// AI — فحص حالة الخدمة (هل ANTHROPIC_API_KEY مُعدّ؟).
+  Future<ApiResult> aiHealth() => _get('/pilot/ai/health');
   Future<ApiResult> listJournalEntries(
     String eid, {
     String? status,
