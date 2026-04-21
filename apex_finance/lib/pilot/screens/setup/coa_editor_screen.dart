@@ -122,6 +122,9 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
   String? _editingId; // id of row in inline-edit mode (name_ar)
   final TextEditingController _editCtrl = TextEditingController();
   final FocusNode _editFocus = FocusNode();
+  String? _editingCodeId; // id of row in inline-edit mode (code)
+  final TextEditingController _editCodeCtrl = TextEditingController();
+  final FocusNode _editCodeFocus = FocusNode();
 
   // ── Filters ──────────────────────────────────────────
   String _categoryFilter = 'all'; // all | asset | liability | equity | revenue | expense
@@ -132,6 +135,9 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
   bool _showOnlyMissingVat = false;
   bool _onlySystem = false;
   bool _onlyControl = false;
+  // ── Grouping ─────────────────────────────────────────
+  String _groupBy = 'tree'; // tree | category | type | nature | currency | none
+  final Set<String> _collapsedGroups = {}; // group keys that are collapsed
   final TextEditingController _searchCtrl = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
 
@@ -183,6 +189,8 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
     _searchFocus.dispose();
     _editCtrl.dispose();
     _editFocus.dispose();
+    _editCodeCtrl.dispose();
+    _editCodeFocus.dispose();
     _scrollCtrl.dispose();
     _hScrollCtrl.dispose();
     super.dispose();
@@ -278,11 +286,58 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
   // TREE NAVIGATION
   // ══════════════════════════════════════════════════════════════════════
 
+  // ── Group-by helpers ───────────────────────────────────────────────
+  String _groupKeyOf(Map<String, dynamic> a) {
+    switch (_groupBy) {
+      case 'category':
+        return (a['category'] ?? 'other').toString();
+      case 'type':
+        return (a['type'] ?? 'detail').toString();
+      case 'nature':
+        return (a['normal_balance'] ?? 'debit').toString();
+      case 'currency':
+        return (a['currency'] ?? 'SAR').toString();
+      default:
+        return '';
+    }
+  }
+
+  String _groupLabelOf(String key) {
+    switch (_groupBy) {
+      case 'category':
+        return _kCategories[key] ?? key;
+      case 'type':
+        return key == 'header' ? 'حسابات رئيسية' : 'حسابات فرعية';
+      case 'nature':
+        return key == 'debit' ? 'طبيعة مدينة' : 'طبيعة دائنة';
+      case 'currency':
+        return key;
+      default:
+        return key;
+    }
+  }
+
+  int _groupOrderOf(String key) {
+    if (_groupBy == 'category') {
+      const order = ['asset', 'liability', 'equity', 'revenue', 'expense'];
+      final i = order.indexOf(key);
+      return i < 0 ? 999 : i;
+    }
+    if (_groupBy == 'type') {
+      return key == 'header' ? 0 : 1;
+    }
+    if (_groupBy == 'nature') {
+      return key == 'debit' ? 0 : 1;
+    }
+    return 0;
+  }
+
   List<_TreeRow> _flatten() {
     // يبني قائمة مسطّحة من الشجرة مع الأخذ بعين الاعتبار:
     //   • حالة التوسّع
     //   • الفلاتر
     //   • البحث (مع توسيع الآباء تلقائياً عندما يطابق الابن)
+    //   • التجميع (_groupBy)
     final q = _searchQuery.trim().toLowerCase();
 
     bool matchesFilters(Map<String, dynamic> a) {
@@ -325,6 +380,83 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
     }
 
     final rows = <_TreeRow>[];
+
+    // ── Group-by modes (flat list grouped by a field) ───────────────
+    if (_groupBy != 'tree' && _groupBy != 'none') {
+      final filtered = _accounts.where((a) {
+        if (visibleIds != null && !visibleIds.contains(a['id'])) return false;
+        if (visibleIds == null && !matchesFilters(a)) return false;
+        return true;
+      }).toList();
+      // Group by key
+      final groups = <String, List<Map<String, dynamic>>>{};
+      for (final a in filtered) {
+        groups.putIfAbsent(_groupKeyOf(a), () => []).add(a);
+      }
+      final sortedKeys = groups.keys.toList()
+        ..sort((x, y) {
+          final d = _groupOrderOf(x).compareTo(_groupOrderOf(y));
+          return d != 0 ? d : x.compareTo(y);
+        });
+      for (final key in sortedKeys) {
+        final list = groups[key]!
+          ..sort((a, b) => (a['code'] ?? '')
+              .toString()
+              .compareTo((b['code'] ?? '').toString()));
+        final groupId = '__group_${_groupBy}_$key';
+        final isCollapsed = _collapsedGroups.contains(groupId);
+        rows.add(_TreeRow(
+          id: groupId,
+          account: {
+            'id': groupId,
+            'code': '',
+            'name_ar': '${_groupLabelOf(key)} (${list.length})',
+            'name_en': '',
+            'type': 'header',
+            'category': _groupBy == 'category' ? key : null,
+            'is_group_synthetic': true,
+          },
+          depth: 0,
+          hasChildren: true,
+          isExpanded: !isCollapsed,
+        ));
+        if (!isCollapsed) {
+          for (final a in list) {
+            rows.add(_TreeRow(
+              id: a['id'] as String,
+              account: a,
+              depth: 1,
+              hasChildren: false,
+              isExpanded: false,
+            ));
+          }
+        }
+      }
+      return rows;
+    }
+
+    if (_groupBy == 'none') {
+      // قائمة مسطّحة بالكامل (بدون تجميع)
+      final filtered = _accounts.where((a) {
+        if (visibleIds != null && !visibleIds.contains(a['id'])) return false;
+        if (visibleIds == null && !matchesFilters(a)) return false;
+        return true;
+      }).toList()
+        ..sort((a, b) =>
+            (a['code'] ?? '').toString().compareTo((b['code'] ?? '').toString()));
+      for (final a in filtered) {
+        rows.add(_TreeRow(
+          id: a['id'] as String,
+          account: a,
+          depth: 0,
+          hasChildren: false,
+          isExpanded: false,
+        ));
+      }
+      return rows;
+    }
+
+    // ── Tree mode (default) — hierarchical ──────────────────────────
     final roots = _childrenOf[null] ?? [];
 
     void walk(String id, int depth) {
@@ -358,7 +490,13 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
 
   void _toggleExpand(String id) {
     setState(() {
-      if (_expandedIds.contains(id)) {
+      if (id.startsWith('__group_')) {
+        if (_collapsedGroups.contains(id)) {
+          _collapsedGroups.remove(id);
+        } else {
+          _collapsedGroups.add(id);
+        }
+      } else if (_expandedIds.contains(id)) {
         _expandedIds.remove(id);
       } else {
         _expandedIds.add(id);
@@ -741,6 +879,59 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
     }
   }
 
+  void _startInlineCodeEdit(String id) {
+    final a = _accById[id];
+    if (a == null) return;
+    if (a['is_system'] == true) {
+      _snack('لا يمكن تعديل كود حساب النظام', _warn);
+      return;
+    }
+    _editCodeCtrl.text = (a['code'] ?? '').toString();
+    setState(() {
+      _editingCodeId = id;
+      _editingId = null; // close any name-edit
+    });
+    Future.microtask(() {
+      _editCodeFocus.requestFocus();
+      _editCodeCtrl.selection = TextSelection(
+          baseOffset: 0, extentOffset: _editCodeCtrl.text.length);
+    });
+  }
+
+  Future<void> _commitInlineCodeEdit() async {
+    final id = _editingCodeId;
+    if (id == null) return;
+    final newCode = _editCodeCtrl.text.trim();
+    if (newCode.isEmpty) {
+      setState(() => _editingCodeId = null);
+      return;
+    }
+    final old = (_accById[id]?['code'] ?? '').toString();
+    if (newCode == old) {
+      setState(() => _editingCodeId = null);
+      return;
+    }
+    final clash = _accounts.any(
+        (x) => x['id'] != id && (x['code'] ?? '').toString() == newCode);
+    if (clash) {
+      _snack('الكود "$newCode" مستخدم بالفعل', _err);
+      return;
+    }
+    final r = await _client.updateAccount(id, {'code': newCode});
+    if (!mounted) return;
+    if (r.success) {
+      setState(() {
+        _accById[id]?['code'] = newCode;
+        _editingCodeId = null;
+      });
+      _snack('تم تحديث الكود إلى "$newCode" ✓', _ok);
+      _load();
+    } else {
+      _snack(r.error ?? 'فشل تحديث الكود', _err);
+      setState(() => _editingCodeId = null);
+    }
+  }
+
   // ══════════════════════════════════════════════════════════════════════
   // SMART CODE SUGGESTION
   // ══════════════════════════════════════════════════════════════════════
@@ -972,6 +1163,8 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
           const SizedBox(width: 6),
           _buildFilterButton(_countActiveFilters()),
           const SizedBox(width: 4),
+          _buildGroupByButton(),
+          const SizedBox(width: 4),
           _headerIconBtn(
             icon: Icons.unfold_more,
             tooltip: 'توسّع الكل',
@@ -1104,469 +1297,397 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
     });
   }
 
+  // ══════════════════════════════════════════════════════════════════════
+  // FILTER DROPDOWN MENU (MenuAnchor + SubmenuButton)
+  // ══════════════════════════════════════════════════════════════════════
+
   Widget _buildFilterButton(int activeCount) {
     final hasFilters = activeCount > 0;
     final bg = hasFilters ? _gold : _navy3;
     final fg = hasFilters ? core_theme.AC.bestOn(bg) : _ts;
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: _showFilterMenu,
-        hoverColor: _gold.withValues(alpha: 0.12),
-        splashColor: _gold.withValues(alpha: 0.2),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: hasFilters ? _gold : _bdr.withValues(alpha: 0.9)),
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.filter_list, color: fg, size: 15),
-            const SizedBox(width: 6),
-            Text('فلتر',
-                style: TextStyle(
-                    color: fg,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700)),
-            if (hasFilters) ...[
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                decoration: BoxDecoration(
-                  color: fg.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: Text(
-                  '$activeCount',
-                  style: TextStyle(
-                    color: fg,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ],
-            const SizedBox(width: 4),
-            Icon(Icons.arrow_drop_down, color: fg, size: 16),
-          ]),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showFilterMenu() async {
-    await showDialog<void>(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.3),
-      builder: (dialogCtx) => StatefulBuilder(
-        builder: (ctx, setDialogState) {
-          void apply(VoidCallback fn) {
-            fn();
-            setState(() {});
-            setDialogState(() {});
-          }
-
-          // Build filter icon entries — each shows current state + popup on tap
-          final entries = <_FilterIconEntry>[
-            _FilterIconEntry(
-              icon: Icons.category,
-              label: 'الفئة',
-              activeValue: _categoryFilter == 'all'
-                  ? null
-                  : _kCategories[_categoryFilter],
-              activeColor: _categoryFilter == 'all'
-                  ? null
-                  : _kCategoryColors[_categoryFilter],
-              build: (close) => _popupColumn([
-                _popupItem('الكل', _categoryFilter == 'all', () {
-                  apply(() => _categoryFilter = 'all');
-                  close();
-                }),
-                ..._kCategories.entries.map((e) => _popupItem(
-                      e.value,
-                      _categoryFilter == e.key,
-                      () {
-                        apply(() => _categoryFilter = e.key);
-                        close();
-                      },
-                      color: _kCategoryColors[e.key],
-                    )),
-              ]),
-            ),
-            _FilterIconEntry(
-              icon: Icons.account_tree_outlined,
-              label: 'النوع',
-              activeValue: _typeFilter == 'all'
-                  ? null
-                  : (_typeFilter == 'header' ? 'رئيسي' : 'فرعي'),
-              activeColor: _typeFilter == 'all'
-                  ? null
-                  : (_typeFilter == 'header' ? _warn : core_theme.AC.purple),
-              build: (close) => _popupColumn([
-                _popupItem('الكل', _typeFilter == 'all', () {
-                  apply(() => _typeFilter = 'all');
-                  close();
-                }),
-                _popupItem('رئيسي', _typeFilter == 'header', () {
-                  apply(() => _typeFilter = 'header');
-                  close();
-                }, color: _warn),
-                _popupItem('فرعي', _typeFilter == 'detail', () {
-                  apply(() => _typeFilter = 'detail');
-                  close();
-                }, color: core_theme.AC.purple),
-              ]),
-            ),
-            _FilterIconEntry(
-              icon: Icons.swap_vert,
-              label: 'الطبيعة',
-              activeValue: _normalFilter == 'all'
-                  ? null
-                  : (_normalFilter == 'debit' ? 'مدين' : 'دائن'),
-              activeColor: _normalFilter == 'all'
-                  ? null
-                  : (_normalFilter == 'debit' ? _ok : _err),
-              build: (close) => _popupColumn([
-                _popupItem('الكل', _normalFilter == 'all', () {
-                  apply(() => _normalFilter = 'all');
-                  close();
-                }),
-                _popupItem('مدين', _normalFilter == 'debit', () {
-                  apply(() => _normalFilter = 'debit');
-                  close();
-                }, color: _ok),
-                _popupItem('دائن', _normalFilter == 'credit', () {
-                  apply(() => _normalFilter = 'credit');
-                  close();
-                }, color: _err),
-              ]),
-            ),
-            _FilterIconEntry(
-              icon: Icons.warning_amber,
-              label: 'ZATCA',
-              activeValue: _showOnlyMissingVat ? 'بدون ربط' : null,
-              activeColor: _warn,
-              build: (close) => _popupColumn([
-                _popupItem('الكل', !_showOnlyMissingVat, () {
-                  apply(() => _showOnlyMissingVat = false);
-                  close();
-                }),
-                _popupItem('بدون ربط فقط', _showOnlyMissingVat, () {
-                  apply(() => _showOnlyMissingVat = true);
-                  close();
-                }, color: _warn, icon: Icons.warning_amber),
-              ]),
-            ),
-            _FilterIconEntry(
-              icon: Icons.tune,
-              label: 'الخصائص',
-              activeValue: () {
-                final parts = <String>[];
-                if (_onlyControl) parts.add('تحكم');
-                if (_onlySystem) parts.add('نظام');
-                return parts.isEmpty ? null : parts.join(' • ');
-              }(),
-              activeColor: _onlyControl || _onlySystem ? _warn : null,
-              build: (close) => _popupColumn([
-                _popupCheckItem('حسابات التحكم فقط', _onlyControl,
-                    (v) => apply(() => _onlyControl = v),
-                    color: _warn, icon: Icons.lock),
-                _popupCheckItem('حسابات النظام فقط', _onlySystem,
-                    (v) => apply(() => _onlySystem = v),
-                    color: core_theme.AC.purple, icon: Icons.shield),
-              ]),
-            ),
-            _FilterIconEntry(
-              icon: Icons.visibility,
-              label: 'الحالة',
-              activeValue: _includeInactive ? 'يشمل المؤرشف' : null,
-              activeColor: _td,
-              build: (close) => _popupColumn([
-                _popupItem('مفعّلة فقط', !_includeInactive, () {
-                  apply(() => _includeInactive = false);
-                  _load();
-                  close();
-                }),
-                _popupItem('يشمل المؤرشفة', _includeInactive, () {
-                  apply(() => _includeInactive = true);
-                  _load();
-                  close();
-                }, color: _td, icon: Icons.visibility_off),
-              ]),
-            ),
-            _FilterIconEntry(
-              icon: Icons.view_column,
-              label: 'الأعمدة',
-              activeValue:
-                  '${_visibleColumns.where((c) => c != "select" && c != "actions").length}/${_kAllColumns.where((c) => c != "select" && c != "actions").length}',
-              activeColor: _gold,
-              build: (close) => _popupColumn([
-                for (final c in _kAllColumns
-                    .where((c) => c != 'select' && c != 'actions'))
-                  _popupCheckItem(
-                    _kColumnLabels[c] ?? c,
-                    _visibleColumns.contains(c),
-                    (v) => apply(() {
-                      if (v) {
-                        _visibleColumns.add(c);
-                      } else {
-                        _visibleColumns.remove(c);
-                      }
-                    }),
-                    color: _gold,
-                  ),
-              ]),
-            ),
-          ];
-
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: Dialog(
-              alignment: Alignment.topCenter,
-              insetPadding: const EdgeInsets.only(top: 130, left: 40, right: 40),
-              backgroundColor: Colors.transparent,
-              child: Container(
-                width: 540,
-                decoration: BoxDecoration(
-                  color: _navy2,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _bdr),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 14, 12, 12),
-                      child: Row(children: [
-                        Icon(Icons.filter_list, color: _gold, size: 18),
-                        const SizedBox(width: 8),
-                        Text('فلاتر',
-                            style: TextStyle(
-                                color: _tp,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800)),
-                        const Spacer(),
-                        if (_countActiveFilters() > 0)
-                          TextButton.icon(
-                            onPressed: () => apply(() => _clearAllFilters()),
-                            icon: Icon(Icons.clear_all, size: 14, color: _err),
-                            label: Text('مسح الكل',
-                                style:
-                                    TextStyle(color: _err, fontSize: 12)),
-                          ),
-                        IconButton(
-                          icon: Icon(Icons.close, color: _ts, size: 18),
-                          onPressed: () => Navigator.pop(dialogCtx),
-                        ),
-                      ]),
-                    ),
-                    Divider(color: _bdr, height: 1),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          for (final e in entries) _filterIconButton(e),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _filterIconButton(_FilterIconEntry e) {
-    final hasValue = e.activeValue != null;
-    final c = e.activeColor ?? _gold;
-    final bg = hasValue ? c.withValues(alpha: 0.15) : _navy3.withValues(alpha: 0.5);
-    final fg = hasValue ? c : _ts;
-    final borderC = hasValue ? c : _bdr;
-    return Builder(builder: (ctx) {
-      return Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(10),
-          onTap: () => _showFilterPopup(ctx, e),
-          hoverColor: c.withValues(alpha: 0.10),
-          splashColor: c.withValues(alpha: 0.18),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            width: 110,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                  color: borderC.withValues(alpha: hasValue ? 0.7 : 0.4),
-                  width: hasValue ? 1.5 : 1),
-              boxShadow: hasValue
-                  ? [
-                      BoxShadow(
-                        color: c.withValues(alpha: 0.18),
-                        blurRadius: 6,
-                      )
-                    ]
-                  : null,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: c.withValues(alpha: hasValue ? 0.25 : 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(e.icon, color: fg, size: 18),
-                ),
-                const SizedBox(height: 6),
-                Text(e.label,
-                    style: TextStyle(
-                        color: _tp,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700)),
-                const SizedBox(height: 2),
-                SizedBox(
-                  height: 14,
-                  child: Text(
-                    e.activeValue ?? '—',
-                    style: TextStyle(
-                        color: hasValue ? c : _td,
-                        fontSize: 10,
-                        fontWeight: hasValue
-                            ? FontWeight.w700
-                            : FontWeight.w400),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    });
-  }
-
-  void _showFilterPopup(BuildContext anchorCtx, _FilterIconEntry e) {
-    final box = anchorCtx.findRenderObject() as RenderBox;
-    final overlay =
-        Overlay.of(anchorCtx).context.findRenderObject() as RenderBox;
-    final pos = RelativeRect.fromRect(
-      Rect.fromPoints(
-        box.localToGlobal(Offset(0, box.size.height + 4),
-            ancestor: overlay),
-        box.localToGlobal(box.size.bottomRight(Offset.zero),
-            ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-
-    showMenu<void>(
-      context: anchorCtx,
-      position: pos,
-      color: _navy2,
-      elevation: 10,
-      shape: RoundedRectangleBorder(
+    final menuStyle = MenuStyle(
+      backgroundColor: WidgetStateProperty.all(_navy2),
+      shape: WidgetStateProperty.all(RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         side: BorderSide(color: _bdr),
-      ),
-      items: [
-        PopupMenuItem<void>(
-          enabled: false,
-          padding: EdgeInsets.zero,
-          child: SizedBox(
-            width: 220,
-            child: e.build(() => Navigator.pop(anchorCtx)),
+      )),
+      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 4)),
+    );
+
+    return MenuAnchor(
+      style: menuStyle,
+      alignmentOffset: const Offset(0, 4),
+      builder: (ctx, ctrl, _) {
+        return Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
+            hoverColor: _gold.withValues(alpha: 0.12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: bg,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                    color: hasFilters ? _gold : _bdr.withValues(alpha: 0.9)),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.filter_list, color: fg, size: 15),
+                const SizedBox(width: 6),
+                Text('فلتر',
+                    style: TextStyle(
+                        color: fg,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700)),
+                if (hasFilters) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 5, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: fg.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                    child: Text('$activeCount',
+                        style: TextStyle(
+                            color: fg,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800)),
+                  ),
+                ],
+                const SizedBox(width: 4),
+                Icon(Icons.arrow_drop_down, color: fg, size: 16),
+              ]),
+            ),
           ),
+        );
+      },
+      menuChildren: _buildFilterMenuChildren(menuStyle),
+    );
+  }
+
+  List<Widget> _buildFilterMenuChildren(MenuStyle menuStyle) {
+    final purple = core_theme.AC.purple;
+
+    return [
+      _filterSubmenu(
+        menuStyle: menuStyle,
+        icon: Icons.category,
+        label: 'الفئة',
+        currentLabel: _categoryFilter == 'all'
+            ? null
+            : _kCategories[_categoryFilter],
+        currentColor: _categoryFilter == 'all'
+            ? null
+            : _kCategoryColors[_categoryFilter],
+        choices: [
+          _choiceRadio('الكل', _categoryFilter == 'all',
+              () => setState(() => _categoryFilter = 'all')),
+          for (final e in _kCategories.entries)
+            _choiceRadio(e.value, _categoryFilter == e.key,
+                () => setState(() => _categoryFilter = e.key),
+                color: _kCategoryColors[e.key]),
+        ],
+      ),
+      _filterSubmenu(
+        menuStyle: menuStyle,
+        icon: Icons.account_tree_outlined,
+        label: 'النوع',
+        currentLabel: _typeFilter == 'all'
+            ? null
+            : (_typeFilter == 'header' ? 'رئيسي' : 'فرعي'),
+        currentColor: _typeFilter == 'all'
+            ? null
+            : (_typeFilter == 'header' ? _warn : purple),
+        choices: [
+          _choiceRadio('الكل', _typeFilter == 'all',
+              () => setState(() => _typeFilter = 'all')),
+          _choiceRadio('رئيسي', _typeFilter == 'header',
+              () => setState(() => _typeFilter = 'header'),
+              color: _warn),
+          _choiceRadio('فرعي', _typeFilter == 'detail',
+              () => setState(() => _typeFilter = 'detail'),
+              color: purple),
+        ],
+      ),
+      _filterSubmenu(
+        menuStyle: menuStyle,
+        icon: Icons.swap_vert,
+        label: 'الطبيعة',
+        currentLabel: _normalFilter == 'all'
+            ? null
+            : (_normalFilter == 'debit' ? 'مدين' : 'دائن'),
+        currentColor: _normalFilter == 'all'
+            ? null
+            : (_normalFilter == 'debit' ? _ok : _err),
+        choices: [
+          _choiceRadio('الكل', _normalFilter == 'all',
+              () => setState(() => _normalFilter = 'all')),
+          _choiceRadio('مدين', _normalFilter == 'debit',
+              () => setState(() => _normalFilter = 'debit'),
+              color: _ok),
+          _choiceRadio('دائن', _normalFilter == 'credit',
+              () => setState(() => _normalFilter = 'credit'),
+              color: _err),
+        ],
+      ),
+      _filterSubmenu(
+        menuStyle: menuStyle,
+        icon: Icons.warning_amber,
+        label: 'ZATCA',
+        currentLabel: _showOnlyMissingVat ? 'بدون ربط' : null,
+        currentColor: _warn,
+        choices: [
+          _choiceRadio('الكل', !_showOnlyMissingVat,
+              () => setState(() => _showOnlyMissingVat = false)),
+          _choiceRadio('بدون ربط فقط', _showOnlyMissingVat,
+              () => setState(() => _showOnlyMissingVat = true),
+              color: _warn, icon: Icons.warning_amber),
+        ],
+      ),
+      _filterSubmenu(
+        menuStyle: menuStyle,
+        icon: Icons.tune,
+        label: 'الخصائص',
+        currentLabel: () {
+          final parts = <String>[];
+          if (_onlyControl) parts.add('تحكم');
+          if (_onlySystem) parts.add('نظام');
+          return parts.isEmpty ? null : parts.join(' • ');
+        }(),
+        currentColor: _onlyControl || _onlySystem ? _warn : null,
+        choices: [
+          _choiceCheck('حسابات التحكم فقط', _onlyControl,
+              (v) => setState(() => _onlyControl = v),
+              color: _warn, icon: Icons.lock),
+          _choiceCheck('حسابات النظام فقط', _onlySystem,
+              (v) => setState(() => _onlySystem = v),
+              color: purple, icon: Icons.shield),
+        ],
+      ),
+      _filterSubmenu(
+        menuStyle: menuStyle,
+        icon: Icons.visibility,
+        label: 'الحالة',
+        currentLabel: _includeInactive ? 'يشمل المؤرشف' : null,
+        currentColor: _td,
+        choices: [
+          _choiceRadio('مفعّلة فقط', !_includeInactive, () {
+            setState(() => _includeInactive = false);
+            _load();
+          }),
+          _choiceRadio('يشمل المؤرشفة', _includeInactive, () {
+            setState(() => _includeInactive = true);
+            _load();
+          }, color: _td, icon: Icons.visibility_off),
+        ],
+      ),
+      if (_countActiveFilters() > 0) ...[
+        const PopupMenuDivider(height: 6),
+        MenuItemButton(
+          style: ButtonStyle(
+            padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+          ),
+          leadingIcon: Icon(Icons.clear_all, color: _err, size: 16),
+          onPressed: _clearAllFilters,
+          child: Text('مسح كل الفلاتر',
+              style: TextStyle(
+                  color: _err,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700)),
         ),
       ],
-    );
+    ];
   }
 
-  Widget _popupColumn(List<Widget> children) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
+  SubmenuButton _filterSubmenu({
+    required MenuStyle menuStyle,
+    required IconData icon,
+    required String label,
+    String? currentLabel,
+    Color? currentColor,
+    required List<Widget> choices,
+  }) {
+    final hasValue = currentLabel != null;
+    final c = currentColor ?? _gold;
+    return SubmenuButton(
+      menuStyle: menuStyle,
+      alignmentOffset: const Offset(-8, 0),
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all(
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+        minimumSize: WidgetStateProperty.all(const Size(260, 38)),
       ),
+      leadingIcon: Icon(icon, size: 16, color: hasValue ? c : _ts),
+      trailingIcon: Row(mainAxisSize: MainAxisSize.min, children: [
+        if (hasValue)
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 100),
+            child: Text(currentLabel,
+                style: TextStyle(
+                    color: c,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1),
+          ),
+        const SizedBox(width: 4),
+        Icon(Icons.chevron_left, size: 16, color: _td),
+      ]),
+      menuChildren: choices,
+      child: Text(label,
+          style: TextStyle(
+              color: _tp, fontSize: 12.5, fontWeight: FontWeight.w600)),
     );
   }
 
-  Widget _popupItem(String label, bool selected, VoidCallback onTap,
+  MenuItemButton _choiceRadio(String label, bool selected, VoidCallback onTap,
       {Color? color, IconData? icon}) {
     final c = color ?? _gold;
-    return InkWell(
-      onTap: onTap,
-      hoverColor: c.withValues(alpha: 0.10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-        child: Row(children: [
-          if (icon != null) ...[
-            Icon(icon, color: selected ? c : _ts, size: 14),
-            const SizedBox(width: 8),
-          ],
-          Expanded(
-            child: Text(label,
-                style: TextStyle(
-                    color: selected ? c : _ts,
-                    fontSize: 12.5,
-                    fontWeight:
-                        selected ? FontWeight.w800 : FontWeight.w500)),
-          ),
-          if (selected) Icon(Icons.check, color: c, size: 14),
-        ]),
+    return MenuItemButton(
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all(
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 4)),
+        minimumSize: WidgetStateProperty.all(const Size(220, 34)),
       ),
+      leadingIcon: icon != null
+          ? Icon(icon, size: 14, color: selected ? c : _ts)
+          : Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              size: 14,
+              color: selected ? c : _td),
+      trailingIcon:
+          selected ? Icon(Icons.check, size: 14, color: c) : null,
+      onPressed: onTap,
+      child: Text(label,
+          style: TextStyle(
+              color: selected ? c : _ts,
+              fontSize: 12,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500)),
     );
   }
 
-  Widget _popupCheckItem(String label, bool value, ValueChanged<bool> onChanged,
+  MenuItemButton _choiceCheck(String label, bool value,
+      ValueChanged<bool> onChanged,
       {Color? color, IconData? icon}) {
     final c = color ?? _gold;
-    return InkWell(
-      onTap: () => onChanged(!value),
-      hoverColor: c.withValues(alpha: 0.10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-        child: Row(children: [
-          Icon(
-            value ? Icons.check_box : Icons.check_box_outline_blank,
-            color: value ? c : _ts,
-            size: 16,
-          ),
-          const SizedBox(width: 8),
-          if (icon != null) ...[
-            Icon(icon, color: value ? c : _ts, size: 13),
-            const SizedBox(width: 6),
-          ],
-          Expanded(
-            child: Text(label,
-                style: TextStyle(
-                    color: value ? c : _ts,
-                    fontSize: 12.5,
-                    fontWeight: value ? FontWeight.w700 : FontWeight.w500)),
-          ),
-        ]),
+    return MenuItemButton(
+      closeOnActivate: false, // تعدد الاختيارات
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all(
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 4)),
+        minimumSize: WidgetStateProperty.all(const Size(220, 34)),
       ),
+      leadingIcon: Icon(
+        value ? Icons.check_box : Icons.check_box_outline_blank,
+        size: 15,
+        color: value ? c : _ts,
+      ),
+      trailingIcon: icon != null
+          ? Icon(icon, size: 13, color: value ? c : _td)
+          : null,
+      onPressed: () => onChanged(!value),
+      child: Text(label,
+          style: TextStyle(
+              color: value ? c : _ts,
+              fontSize: 12,
+              fontWeight: value ? FontWeight.w700 : FontWeight.w500)),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // GROUP-BY DROPDOWN
+  // ══════════════════════════════════════════════════════════════════════
+
+  Widget _buildGroupByButton() {
+    const options = <(String, String, IconData)>[
+      ('tree', 'شجرة هرمية', Icons.account_tree),
+      ('category', 'الفئة', Icons.category),
+      ('type', 'النوع', Icons.segment),
+      ('nature', 'الطبيعة', Icons.swap_vert),
+      ('currency', 'العملة', Icons.paid),
+      ('none', 'بلا تجميع (قائمة مسطّحة)', Icons.view_list),
+    ];
+    final current = options.firstWhere(
+      (o) => o.$1 == _groupBy,
+      orElse: () => options[0],
+    );
+    final isNonDefault = _groupBy != 'tree';
+    final bg = isNonDefault ? _gold : _navy3;
+    final fg = isNonDefault ? core_theme.AC.bestOn(bg) : _ts;
+    final menuStyle = MenuStyle(
+      backgroundColor: WidgetStateProperty.all(_navy2),
+      shape: WidgetStateProperty.all(RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: _bdr),
+      )),
+      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 4)),
+    );
+    return MenuAnchor(
+      style: menuStyle,
+      alignmentOffset: const Offset(0, 4),
+      builder: (ctx, ctrl, _) {
+        return Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
+            hoverColor: _gold.withValues(alpha: 0.12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: bg,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                    color: isNonDefault ? _gold : _bdr.withValues(alpha: 0.9)),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(current.$3, color: fg, size: 15),
+                const SizedBox(width: 6),
+                Text('تجميع: ${current.$2}',
+                    style: TextStyle(
+                        color: fg,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700)),
+                const SizedBox(width: 4),
+                Icon(Icons.arrow_drop_down, color: fg, size: 16),
+              ]),
+            ),
+          ),
+        );
+      },
+      menuChildren: [
+        for (final o in options)
+          MenuItemButton(
+            style: ButtonStyle(
+              padding: WidgetStateProperty.all(
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4)),
+              minimumSize: WidgetStateProperty.all(const Size(240, 36)),
+            ),
+            leadingIcon: Icon(o.$3,
+                size: 15, color: _groupBy == o.$1 ? _gold : _ts),
+            trailingIcon: _groupBy == o.$1
+                ? Icon(Icons.check, color: _gold, size: 14)
+                : null,
+            onPressed: () {
+              setState(() {
+                _groupBy = o.$1;
+                _collapsedGroups.clear();
+              });
+            },
+            child: Text(o.$2,
+                style: TextStyle(
+                    color: _groupBy == o.$1 ? _gold : _ts,
+                    fontSize: 12.5,
+                    fontWeight: _groupBy == o.$1
+                        ? FontWeight.w700
+                        : FontWeight.w500)),
+          ),
+      ],
     );
   }
 
@@ -2419,8 +2540,61 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
           SizedBox(width: 120, child: Text('الرصيد', style: _thStyle, textAlign: TextAlign.end)),
         if (_visibleColumns.contains('status'))
           SizedBox(width: 60, child: Text('حالة', style: _thStyle)),
-        if (_visibleColumns.contains('actions')) const SizedBox(width: 40),
+        if (_visibleColumns.contains('actions'))
+          SizedBox(width: 40, child: _columnsToggleButton()),
       ]),
+    );
+  }
+
+  Widget _columnsToggleButton() {
+    final menuStyle = MenuStyle(
+      backgroundColor: WidgetStateProperty.all(_navy2),
+      shape: WidgetStateProperty.all(RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: _bdr),
+      )),
+      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 4)),
+    );
+    return MenuAnchor(
+      style: menuStyle,
+      alignmentOffset: const Offset(0, 4),
+      builder: (ctx, ctrl, _) => Tooltip(
+        message: 'إظهار/إخفاء الأعمدة',
+        child: InkWell(
+          borderRadius: BorderRadius.circular(6),
+          onTap: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
+          hoverColor: _gold.withValues(alpha: 0.12),
+          child: Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            child: Icon(Icons.view_column, size: 16, color: _ts),
+          ),
+        ),
+      ),
+      menuChildren: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: Text('الأعمدة المرئية',
+              style: TextStyle(
+                  color: _td, fontSize: 10, fontWeight: FontWeight.w800)),
+        ),
+        const PopupMenuDivider(height: 4),
+        for (final c in _kAllColumns
+            .where((c) => c != 'select' && c != 'actions'))
+          _choiceCheck(
+            _kColumnLabels[c] ?? c,
+            _visibleColumns.contains(c),
+            (v) => setState(() {
+              if (v) {
+                _visibleColumns.add(c);
+              } else {
+                _visibleColumns.remove(c);
+              }
+            }),
+            color: _gold,
+          ),
+      ],
     );
   }
 
@@ -2530,13 +2704,67 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                       ),
                       const SizedBox(width: 2),
                       Flexible(
-                        child: Text(a['code'] ?? '',
-                            style: TextStyle(
-                                color: isHeader ? catColor : _tp,
-                                fontSize: 13,
-                                fontWeight:
-                                    isHeader ? FontWeight.w800 : FontWeight.w600,
-                                fontFamily: 'monospace')),
+                        child: _editingCodeId == id
+                            ? TextField(
+                                controller: _editCodeCtrl,
+                                focusNode: _editCodeFocus,
+                                style: TextStyle(
+                                    color: _tp,
+                                    fontSize: 13,
+                                    fontFamily: 'monospace'),
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  filled: true,
+                                  fillColor: _navy3,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 6),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide:
+                                          BorderSide(color: _gold, width: 1.5)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide:
+                                          BorderSide(color: _gold, width: 1.5)),
+                                  suffixIcon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.check, color: _ok, size: 16),
+                                        onPressed: _commitInlineCodeEdit,
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(
+                                            minWidth: 22, minHeight: 22),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.close, color: _err, size: 16),
+                                        onPressed: () =>
+                                            setState(() => _editingCodeId = null),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(
+                                            minWidth: 22, minHeight: 22),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                onSubmitted: (_) => _commitInlineCodeEdit(),
+                              )
+                            : GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onDoubleTap: () => _startInlineCodeEdit(id),
+                                child: Tooltip(
+                                  message:
+                                      'انقر مرتين لتعديل الكود (أو استخدم ⋮ → تعديل الكود)',
+                                  child: Text(a['code'] ?? '',
+                                      style: TextStyle(
+                                          color: isHeader ? catColor : _tp,
+                                          fontSize: 13,
+                                          fontWeight: isHeader
+                                              ? FontWeight.w800
+                                              : FontWeight.w600,
+                                          fontFamily: 'monospace')),
+                                ),
+                              ),
                       ),
                     ]),
                   ),
@@ -2688,11 +2916,14 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
               if (_visibleColumns.contains('actions'))
                 SizedBox(
                   width: 40,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                    icon: Icon(Icons.more_vert, color: _ts, size: 16),
-                    onPressed: () => _showContextMenuAtButton(a),
+                  child: Builder(
+                    builder: (btnCtx) => IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints:
+                          const BoxConstraints(minWidth: 28, minHeight: 28),
+                      icon: Icon(Icons.more_vert, color: _ts, size: 16),
+                      onPressed: () => _showContextMenuAtButton(btnCtx, a),
+                    ),
                   ),
                 ),
             ]),
@@ -2879,10 +3110,14 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
 
   void _showContextMenu(Offset pos, Map<String, dynamic> a) {
     final isActive = a['is_active'] == true;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     showMenu<String>(
       context: context,
       color: _navy2,
-      position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
+      position: RelativeRect.fromRect(
+        Rect.fromPoints(pos, pos),
+        Offset.zero & overlay.size,
+      ),
       items: [
         _menuItem('edit', 'تعديل الاسم (E)', Icons.edit, _ts),
         _menuItem('editCode', 'تعديل الكود (C)', Icons.tag, _ts,
@@ -2906,7 +3141,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
           _startInlineEdit(a['id'] as String);
           break;
         case 'editCode':
-          _editAccountCode(a);
+          _startInlineCodeEdit(a['id'] as String);
           break;
         case 'details':
           _showAccountDetail(a);
@@ -2933,145 +3168,13 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
     });
   }
 
-  Future<void> _editAccountCode(Map<String, dynamic> a) async {
-    if (a['is_system'] == true) {
-      _snack('لا يمكن تعديل كود حساب النظام', _warn);
-      return;
-    }
-    final ctrl = TextEditingController(text: (a['code'] ?? '').toString());
-    final focus = FocusNode();
-    String? errorMsg;
-    final result = await showDialog<String>(
-      context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setLocal) => Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            backgroundColor: _navy2,
-            title: Row(children: [
-              Icon(Icons.tag, color: _gold, size: 18),
-              const SizedBox(width: 8),
-              Text('تعديل كود الحساب',
-                  style: TextStyle(color: _tp, fontSize: 15)),
-            ]),
-            content: SizedBox(
-              width: 420,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('الحساب: ${a['name_ar'] ?? ''}',
-                      style: TextStyle(color: _ts, fontSize: 12)),
-                  const SizedBox(height: 4),
-                  Text('الكود الحالي: ${a['code'] ?? ''}',
-                      style: TextStyle(
-                          color: _td,
-                          fontSize: 11,
-                          fontFamily: 'monospace')),
-                  const SizedBox(height: 14),
-                  Text('الكود الجديد *',
-                      style: TextStyle(color: _td, fontSize: 11)),
-                  const SizedBox(height: 4),
-                  TextField(
-                    controller: ctrl,
-                    focusNode: focus,
-                    autofocus: true,
-                    style: TextStyle(
-                        color: _tp, fontSize: 14, fontFamily: 'monospace'),
-                    decoration: InputDecoration(
-                      hintText: 'مثال: 1115',
-                      hintStyle: TextStyle(color: _td),
-                      isDense: true,
-                      filled: true,
-                      fillColor: _navy3,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(color: _bdr)),
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(color: _bdr)),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                    ),
-                    onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
-                  ),
-                  if (errorMsg != null) ...[
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: _err.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                            color: _err.withValues(alpha: 0.4)),
-                      ),
-                      child: Row(children: [
-                        Icon(Icons.error_outline, color: _err, size: 14),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(errorMsg!,
-                              style: TextStyle(color: _err, fontSize: 11)),
-                        ),
-                      ]),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, null),
-                child: Text('إلغاء', style: TextStyle(color: _ts)),
-              ),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                    backgroundColor: _gold, foregroundColor: Colors.black),
-                onPressed: () {
-                  final newCode = ctrl.text.trim();
-                  if (newCode.isEmpty) {
-                    setLocal(() => errorMsg = 'الكود مطلوب');
-                    return;
-                  }
-                  if (newCode == (a['code'] ?? '').toString()) {
-                    Navigator.pop(ctx, null);
-                    return;
-                  }
-                  final clash = _accounts.any((x) =>
-                      x['id'] != a['id'] &&
-                      (x['code'] ?? '').toString() == newCode);
-                  if (clash) {
-                    setLocal(() =>
-                        errorMsg = 'الكود "$newCode" مستخدم بالفعل في حساب آخر');
-                    return;
-                  }
-                  Navigator.pop(ctx, newCode);
-                },
-                child: Text('حفظ'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    ctrl.dispose();
-    focus.dispose();
-    if (result == null || result.isEmpty) return;
-    final r = await _client.updateAccount(a['id'] as String, {'code': result});
-    if (!mounted) return;
-    if (r.success) {
-      setState(() => _accById[a['id']]?['code'] = result);
-      _snack('تم تحديث الكود إلى "$result" ✓', _ok);
-      _load();
-    } else {
-      _snack(r.error ?? 'فشل تحديث الكود', _err);
-    }
-  }
-
-  void _showContextMenuAtButton(Map<String, dynamic> a) {
-    final box = context.findRenderObject() as RenderBox?;
+  void _showContextMenuAtButton(BuildContext btnCtx, Map<String, dynamic> a) {
+    final box = btnCtx.findRenderObject() as RenderBox?;
     if (box == null) return;
-    final pos = box.localToGlobal(Offset.zero) +
-        Offset(box.size.width - 100, box.size.height / 2);
+    // موضع بجانب زر النقاط مباشرة: أسفله بقليل
+    final topLeft = box.localToGlobal(Offset.zero);
+    final pos = Offset(topLeft.dx + box.size.width / 2,
+        topLeft.dy + box.size.height);
     _showContextMenu(pos, a);
   }
 
@@ -3352,20 +3455,6 @@ class _MenuOption {
 }
 
 /// Entry describing one filter icon button + its popup builder.
-class _FilterIconEntry {
-  final IconData icon;
-  final String label;
-  final String? activeValue;
-  final Color? activeColor;
-  final Widget Function(VoidCallback close) build;
-  _FilterIconEntry({
-    required this.icon,
-    required this.label,
-    required this.activeValue,
-    required this.activeColor,
-    required this.build,
-  });
-}
 
 TextStyle get _thStyle => TextStyle(
     color: _td, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5);

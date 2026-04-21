@@ -114,22 +114,26 @@ def update_account(account_id: str, payload: dict, db: Session = Depends(get_db)
     has_postings = db.query(GLPosting).filter(
         GLPosting.account_id == account_id
     ).first() is not None
-    protected = {"category", "normal_balance", "entity_id", "tenant_id", "code"}
+    immutable = {"entity_id", "tenant_id", "id"}
+    protected = {"category", "normal_balance", "code"}
     allowed = {
         "name_ar", "name_en", "subcategory", "type", "currency",
         "is_active", "is_control", "require_cost_center",
         "require_profit_center", "default_vat_code",
     }
     for key, value in payload.items():
-        if key not in allowed:
-            if key in protected and has_postings:
+        if key in immutable:
+            continue  # لا يُسمح أبداً بتعديل هذه
+        if key in protected:
+            if has_postings:
                 raise HTTPException(
                     409,
                     f"لا يمكن تغيير '{key}' — الحساب فيه حركات محاسبية. "
                     f"أنشئ حساباً جديداً وحوّل الأرصدة."
                 )
-            if key in protected:
-                continue  # السماح بتعديل category لو لا postings
+            # لا postings → السماح بالتعديل (مثل code, category, normal_balance)
+        elif key not in allowed:
+            continue  # حقل غير معروف — تجاهل
         setattr(acc, key, value)
     db.commit()
     db.refresh(acc)
