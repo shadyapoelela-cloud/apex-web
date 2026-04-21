@@ -192,3 +192,141 @@ def test_extract_je_rejects_short_base64(client):
         },
     )
     assert r.status_code == 422  # Pydantic validation
+
+
+def test_read_document_rejects_unknown_entity(client):
+    """/read-document يُرفض بسبب entity غير موجود قبل استدعاء Claude."""
+    import io
+
+    r = client.post(
+        "/pilot/entities/does-not-exist/ai/read-document",
+        files={
+            "file": (
+                "receipt.jpg",
+                io.BytesIO(b"x" * 500),
+                "image/jpeg",
+            ),
+        },
+    )
+    assert r.status_code == 404
+
+
+def test_guess_mime_from_extension():
+    """helper: _guess_mime يعرف الامتداد حين يكون content_type فارغ."""
+    from app.pilot.routes.ai_routes import _guess_mime
+
+    class _U:
+        def __init__(self, ct, name):
+            self.content_type = ct
+            self.filename = name
+
+    assert _guess_mime(_U("", "bill.pdf")) == "application/pdf"
+    assert _guess_mime(_U("", "receipt.JPG")) == "image/jpeg"
+    assert _guess_mime(_U("", "photo.webp")) == "image/webp"
+    assert _guess_mime(_U("application/pdf", "x.pdf")) == "application/pdf"
+    assert _guess_mime(_U("image/jpeg", "x.jpeg")) == "image/jpeg"
+    # content_type غير معروف + امتداد غير معروف
+    assert _guess_mime(_U("", "junk.bin")) == "application/octet-stream"
+
+
+def test_shape_for_read_document_success_case():
+    """_shape_for_read_document يُرجِع الشكل المتوقَّع من dazzling UI."""
+    from app.pilot.routes.ai_routes import _shape_for_read_document
+
+    class FakeAcc:
+        def __init__(self, id, code, name_ar):
+            self.id = id
+            self.code = code
+            self.name_ar = name_ar
+            self.entity_id = "e1"
+            self.is_active = True
+
+    class FakeQuery:
+        def __init__(self, rows):
+            self._rows = rows
+
+        def filter(self, *args):
+            return self
+
+        def all(self):
+            return self._rows
+
+    class FakeDb:
+        def __init__(self, rows):
+            self._rows = rows
+
+        def query(self, _model):
+            return FakeQuery(self._rows)
+
+    class FakeEntity:
+        id = "e1"
+
+    raw = {
+        "success": True,
+        "confidence": 0.9,
+        "document_type": "invoice",
+        "suggested_kind": "manual",
+        "suggested_memo_ar": "فاتورة شراء مكتبية",
+        "suggested_date": "2026-04-22",
+        "currency": "SAR",
+        "total_amount": "1150.00",
+        "vat_amount": "150.00",
+        "vendor_or_customer": "مكتبة جرير",
+        "document_number": "INV-42",
+        "suggested_lines": [
+            {
+                "account_id": "a1",
+                "account_hint": "مصروفات مكتبية",
+                "match_confidence": 0.85,
+                "debit": "1000.00",
+                "credit": "0.00",
+                "description": "قيمة الشراء",
+            },
+            {
+                "account_id": None,
+                "account_hint": "ضريبة مدخلة",
+                "match_confidence": 0.0,
+                "debit": "150.00",
+                "credit": "0.00",
+                "description": "VAT 15%",
+            },
+        ],
+        "warnings": ["لم يُعثر على مطابقة لـ 'ضريبة مدخلة'"],
+        "is_balanced": False,
+        "total_debit": "1150.00",
+        "total_credit": "0.00",
+    }
+    db = FakeDb([FakeAcc("a1", "5310", "مصروفات مكتبية")])
+    out = _shape_for_read_document(db, FakeEntity(), raw)
+    assert out["success"] is True
+    d = out["data"]
+    assert d["confidence"] == 0.9
+    assert d["extracted"]["vendor"] == "مكتبة جرير"
+    assert d["extracted"]["date"] == "2026-04-22"
+    assert d["extracted"]["document_number"] == "INV-42"
+    assert d["extracted"]["amount"] == 1150.0
+    assert d["extracted"]["tax_amount"] == 150.0
+    lines = d["proposed_je"]["lines"]
+    assert len(lines) == 2
+    assert lines[0]["account_id"] == "a1"
+    assert lines[0]["account_code"] == "5310"
+    assert lines[0]["account_name_resolved"] == "مصروفات مكتبية"
+    assert lines[0]["debit"] == 1000.0
+    # السطر الثاني: لا مطابقة
+    assert lines[1]["account_id"] is None
+    assert lines[1]["account_code"] is None
+    assert lines[1]["account_name"] == "ضريبة مدخلة"
+    assert "لم يُعثر" in d["warnings"][0]
+
+
+def test_shape_for_read_document_failure_case():
+    """_shape_for_read_document يُرجِع error عند فشل الاستخراج."""
+    from app.pilot.routes.ai_routes import _shape_for_read_document
+
+    class FakeEntity:
+        id = "e1"
+
+    raw = {"success": False, "reason": "الصورة مشوَّشة"}
+    out = _shape_for_read_document(None, FakeEntity(), raw)
+    assert out["success"] is False
+    assert "مشوَّشة" in out["error"]
