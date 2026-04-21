@@ -30,7 +30,6 @@ import 'apex_v5_news_ticker.dart';
 import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
 import 'cmd_k_palette.dart';
-import 'entity_scope_selector.dart';
 import '../../pilot/tenant_chip.dart';
 import 'templates/quick_create.dart';
 import 'templates/unified_inbox.dart';
@@ -193,6 +192,109 @@ class ApexV5ServiceShell extends ConsumerWidget {
 // ──────────────────────────────────────────────────────────────────────
 
 // ══════════════════════════════════════════════════════════════════════════
+// _TB — Top Bar Design Tokens (Batch A: 20 color/size/motion tokens)
+// مصدر واحد للحقيقة لكل ألوان وأبعاد الشريط العلوي — يمنع التناقض.
+// ══════════════════════════════════════════════════════════════════════════
+
+// ignore_for_file: unused_element, unused_field
+class _TB {
+  _TB._();
+  // ── Colors (WCAG AA compliant) ───────────────────────────────────────
+  static Color get bg => core_theme.AC.topBarBg;
+  static Color get fgPrimary => core_theme.AC.topBarFg;
+  static Color get fgSecondary => core_theme.AC.topBarFgDim;
+  static Color get fgMuted => core_theme.AC.topBarFgDim.withValues(alpha: 0.7);
+  static Color get accent => core_theme.AC.topBarAccent;
+  static Color get border => core_theme.AC.topBarBorder;
+  static Color get surfaceElevated => core_theme.AC.navy2;
+  static Color get surfaceRaised => core_theme.AC.navy3;
+  static Color get danger => core_theme.AC.err;
+  static Color get success => core_theme.AC.ok;
+  static Color get warn => core_theme.AC.warn;
+
+  // Hover / active overlays (alpha on white for dark surfaces)
+  static Color get hoverOverlay => Colors.white.withValues(alpha: 0.06);
+  static Color get pressOverlay => Colors.white.withValues(alpha: 0.10);
+  static Color get accentHoverBg => accent.withValues(alpha: 0.10);
+  static Color get accentActiveBg => accent.withValues(alpha: 0.15);
+
+  // ── Sizing scales ─────────────────────────────────────────────────────
+  static const double barHeight = 56;
+  static const double tapTarget = 40; // Buttons (meets touch min when padded)
+  static const double iconSm = 14;
+  static const double iconMd = 18;
+
+  // Spacing scale (4, 6, 8, 10, 12, 16)
+  static const double sp1 = 4;
+  static const double sp2 = 6;
+  static const double sp3 = 8;
+  static const double sp4 = 10;
+  static const double sp5 = 12;
+  static const double sp6 = 16;
+
+  // Border radii (6, 8, 10, 20)
+  static const double rSm = 6;
+  static const double rMd = 8;
+  static const double rLg = 10;
+  static const double rPill = 20;
+  static BorderRadius get brSm => BorderRadius.circular(rSm);
+  static BorderRadius get brMd => BorderRadius.circular(rMd);
+  static BorderRadius get brLg => BorderRadius.circular(rLg);
+
+  // Typography scale (10, 11, 12, 13, 16)
+  static const double fs10 = 10;
+  static const double fs11 = 11;
+  static const double fs12 = 12;
+  static const double fs13 = 13;
+  static const double fs16 = 16;
+
+  // Motion
+  static const Duration motionFast = Duration(milliseconds: 140);
+  static const Duration motionMed = Duration(milliseconds: 180);
+  static const Duration motionSlow = Duration(milliseconds: 240);
+  static const Duration pulseDur = Duration(milliseconds: 1200);
+  static const Duration tooltipWait = Duration(milliseconds: 500);
+
+  // Shadows
+  static List<BoxShadow> get barShadow => [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.08),
+          blurRadius: 4,
+          offset: const Offset(0, 1),
+        ),
+      ];
+  static List<BoxShadow> get menuShadow => [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.28),
+          blurRadius: 16,
+          offset: const Offset(0, 6),
+        ),
+      ];
+
+  // Common text styles
+  static TextStyle get tsNav => TextStyle(
+      fontSize: fs12, fontWeight: FontWeight.w600, color: fgPrimary);
+  static TextStyle get tsMuted =>
+      TextStyle(fontSize: fs11, color: fgSecondary);
+  static TextStyle get tsBadge => const TextStyle(
+      color: Colors.white,
+      fontSize: 9,
+      fontWeight: FontWeight.w800);
+
+  // Common MenuStyle used everywhere
+  static MenuStyle menuStyle() => MenuStyle(
+        backgroundColor: WidgetStateProperty.all(surfaceElevated),
+        shape: WidgetStateProperty.all(RoundedRectangleBorder(
+          borderRadius: brLg,
+          side: BorderSide(color: border),
+        )),
+        padding: WidgetStateProperty.all(
+            const EdgeInsetsDirectional.symmetric(vertical: 4)),
+        elevation: WidgetStateProperty.all(8),
+      );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // TopBar — ٥٠ تحسيناً على شريط العنوان
 //
 // Wave 1 — البنية (#1-10): استخراج مكوّنات (_TopBarIconBtn, _NotifBadge,
@@ -231,18 +333,12 @@ class _TopBarState extends State<_TopBar> {
 
   @override
   Widget build(BuildContext context) {
-    // (#13) Focus indicators + (#35) TextScaler clamp + (#31-33) breakpoints
-    final width = MediaQuery.of(context).size.width;
+    // Breakpoints + TextScaler clamp
+    final width = MediaQuery.sizeOf(context).width;
     final isCompact = width < 720; // sm
     final isMedium = width < 1024; // md
     final scaler = MediaQuery.textScalerOf(context)
         .clamp(minScaleFactor: 0.9, maxScaleFactor: 1.15);
-
-    // (#8,21) Cache theme colors for performance
-    final fg = core_theme.AC.topBarFg;
-    final bg = core_theme.AC.topBarBg;
-    final accent = core_theme.AC.topBarAccent;
-    final border = core_theme.AC.topBarBorder;
 
     return Semantics(
       container: true,
@@ -251,97 +347,81 @@ class _TopBarState extends State<_TopBar> {
       child: MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaler: scaler),
         child: _escapeHandler(
-          child: Container(
-            height: 56,
-            padding: const EdgeInsetsDirectional.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: bg,
-              border: Border(bottom: BorderSide(color: border)),
-              // (#26,38) Subtle shadow for elevation
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: IconTheme.merge(
-              data: IconThemeData(color: fg, size: 18),
-              child: DefaultTextStyle.merge(
-                style: TextStyle(color: fg),
-                child: FocusTraversalGroup(
-                  child: Row(
-                    children: [
-                      // ── Left cluster: service switcher + brand ─────────
-                      ApexV5ServiceSwitcher(
-                          currentServiceId: widget.service.id),
-                      const SizedBox(width: 8),
-                      _BrandLogo(accent: accent, fg: fg),
-                      if (!isCompact) ...[
-                        const SizedBox(width: 12),
-                        _TopBarDivider(color: border),
-                        const SizedBox(width: 12),
-                        Flexible(child: _buildBreadcrumb(fg, accent)),
-                      ] else ...[
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: _CompactBreadcrumb(
-                            parts: _breadcrumbParts(accent),
+          child: RepaintBoundary(
+            child: Container(
+              height: _TB.barHeight,
+              padding:
+                  const EdgeInsetsDirectional.symmetric(horizontal: _TB.sp3),
+              decoration: BoxDecoration(
+                color: _TB.bg,
+                border: Border(bottom: BorderSide(color: _TB.border)),
+                boxShadow: _TB.barShadow,
+              ),
+              child: IconTheme.merge(
+                data: IconThemeData(color: _TB.fgPrimary, size: _TB.iconMd),
+                child: DefaultTextStyle.merge(
+                  style: _TB.tsNav,
+                  child: FocusTraversalGroup(
+                    child: Row(
+                      children: [
+                        // ── Left cluster ─────────────────────────────────
+                        ApexV5ServiceSwitcher(
+                            currentServiceId: widget.service.id),
+                        const SizedBox(width: _TB.sp3),
+                        const _BrandLogo(),
+                        if (!isCompact) ...[
+                          const SizedBox(width: _TB.sp5),
+                          const _TopBarDivider(),
+                          const SizedBox(width: _TB.sp5),
+                          Flexible(child: _buildBreadcrumb()),
+                        ] else ...[
+                          const SizedBox(width: _TB.sp3),
+                          Flexible(
+                            child: _CompactBreadcrumb(
+                                parts: _breadcrumbParts()),
                           ),
-                        ),
+                        ],
+                        const Spacer(),
+                        // ── Right cluster ────────────────────────────────
+                        if (!isCompact) const QuickCreateButton(),
+                        if (!isCompact) const SizedBox(width: _TB.sp3),
+                        // (#A21) زر واحد لاختيار الشركة — TenantChip (live)
+                        const TenantChip(),
+                        if (!isMedium) const SizedBox(width: _TB.sp3),
+                        if (!isMedium) const ApexV5WorkspaceSelector(),
+                        const SizedBox(width: _TB.sp3),
+                        const _CmdKButton(),
+                        const SizedBox(width: _TB.sp1),
+                        if (!isMedium) ...[
+                          _TopBarIconBtn(
+                            icon: Icons.menu_book_outlined,
+                            tooltip: 'قاعدة المعرفة',
+                            semanticLabel: 'فتح قاعدة المعرفة',
+                            onPressed: (ctx) =>
+                                ctx.go('/app/erp/reports-bi/knowledge'),
+                          ),
+                          _TopBarIconBtn(
+                            icon: Icons.settings_outlined,
+                            tooltip: 'إعدادات ${widget.mainModule.labelAr}',
+                            semanticLabel:
+                                'إعدادات تطبيق ${widget.mainModule.labelAr}',
+                            onPressed: (ctx) => _showAppSettings(
+                                ctx, widget.service, widget.mainModule),
+                          ),
+                        ],
+                        const _LangToggleBtn(),
+                        const _ThemeToggleBtn(),
+                        if (!isCompact)
+                          _TopBarIconBtn(
+                            icon: Icons.help_outline,
+                            tooltip: 'مساعدة (Shift+/)',
+                            semanticLabel: 'فتح المساعدة',
+                            onPressed: (ctx) => _showHelp(ctx),
+                          ),
+                        _NotifBellButton(count: _unreadCount),
+                        const _AvatarMenu(online: true),
                       ],
-                      const Spacer(),
-                      // ── Right cluster: actions ─────────────────────────
-                      if (!isCompact) const QuickCreateButton(),
-                      if (!isCompact) const SizedBox(width: 8),
-                      const EntityScopeSelector(),
-                      const SizedBox(width: 8),
-                      const TenantChip(),
-                      const SizedBox(width: 8),
-                      const ApexV5WorkspaceSelector(),
-                      const SizedBox(width: 8),
-                      _CmdKButton(fg: fg, border: border),
-                      const SizedBox(width: 4),
-                      // (#32) Hide knowledge + app-settings on md
-                      if (!isMedium) ...[
-                        _TopBarIconBtn(
-                          icon: Icons.menu_book_outlined,
-                          tooltip: 'قاعدة المعرفة',
-                          semanticLabel: 'فتح قاعدة المعرفة',
-                          onPressed: (ctx) =>
-                              ctx.go('/app/erp/reports-bi/knowledge'),
-                        ),
-                        _TopBarIconBtn(
-                          icon: Icons.settings_outlined,
-                          tooltip: 'إعدادات ${widget.mainModule.labelAr}',
-                          semanticLabel:
-                              'إعدادات تطبيق ${widget.mainModule.labelAr}',
-                          onPressed: (ctx) => _showAppSettings(
-                              ctx, widget.service, widget.mainModule),
-                        ),
-                      ],
-                      // (#47) Language toggle
-                      _LangToggleBtn(fg: fg),
-                      // (#46) Theme toggle
-                      _ThemeToggleBtn(fg: fg),
-                      // (#49) Help button
-                      if (!isCompact)
-                        _TopBarIconBtn(
-                          icon: Icons.help_outline,
-                          tooltip: 'مساعدة (Shift+/)',
-                          semanticLabel: 'فتح المساعدة',
-                          onPressed: (ctx) => _showHelp(ctx),
-                        ),
-                      // ── Notifications bell with badge (#23,37,43,44) ──
-                      _NotifBellButton(
-                        count: _unreadCount,
-                        fg: fg,
-                        bg: bg,
-                      ),
-                      // (#48) Online indicator + (#50) profile popover
-                      _AvatarMenu(accent: accent, online: true),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -365,12 +445,12 @@ class _TopBarState extends State<_TopBar> {
     );
   }
 
-  List<_BreadcrumbPart> _breadcrumbParts(Color accent) => [
+  List<_BreadcrumbPart> _breadcrumbParts() => [
         _BreadcrumbPart(
             label: widget.service.labelAr,
             route: '/app/${widget.service.id}',
             icon: widget.service.icon,
-            color: accent),
+            color: _TB.accent),
         _BreadcrumbPart(
             label: widget.mainModule.labelAr,
             route: '/app/${widget.service.id}/${widget.mainModule.id}',
@@ -381,8 +461,7 @@ class _TopBarState extends State<_TopBar> {
             icon: widget.activeChip.icon),
       ];
 
-  Widget _buildBreadcrumb(Color fg, Color accent) =>
-      _Breadcrumb(parts: _breadcrumbParts(accent));
+  Widget _buildBreadcrumb() => _Breadcrumb(parts: _breadcrumbParts());
 
   // (#49) Context-aware help
   void _showHelp(BuildContext ctx) {
@@ -485,11 +564,9 @@ class _TopBarState extends State<_TopBar> {
 // TopBar — Extracted widgets (Waves 1-5)
 // ══════════════════════════════════════════════════════════════════════════
 
-/// (#3,25,37) Brand logo with hover + ripple + DPI-aware sizing.
+/// Brand logo with hover + gradient + ripple.
 class _BrandLogo extends StatefulWidget {
-  final Color accent;
-  final Color fg;
-  const _BrandLogo({required this.accent, required this.fg});
+  const _BrandLogo();
   @override
   State<_BrandLogo> createState() => _BrandLogoState();
 }
@@ -507,34 +584,32 @@ class _BrandLogoState extends State<_BrandLogo> {
         cursor: SystemMouseCursors.click,
         child: InkWell(
           onTap: () => context.go('/app'),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: _TB.brMd,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
+            duration: _TB.motionMed,
             padding: const EdgeInsetsDirectional.symmetric(
-                horizontal: 6, vertical: 4),
+                horizontal: _TB.sp2, vertical: _TB.sp1),
             decoration: BoxDecoration(
-              color: _hover
-                  ? widget.accent.withValues(alpha: 0.10)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(8),
+              color: _hover ? _TB.accentHoverBg : Colors.transparent,
+              borderRadius: _TB.brMd,
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               AnimatedScale(
                 scale: _hover ? 1.10 : 1.0,
-                duration: const Duration(milliseconds: 180),
-                child: Icon(Icons.bolt, size: 18, color: widget.accent),
+                duration: _TB.motionMed,
+                child: Icon(Icons.bolt, size: _TB.iconMd, color: _TB.accent),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: _TB.sp2),
               ShaderMask(
                 shaderCallback: (r) => LinearGradient(
-                  colors: [widget.accent, widget.accent.withValues(alpha: 0.85)],
+                  colors: [_TB.accent, _TB.accent.withValues(alpha: 0.85)],
                 ).createShader(r),
                 child: Text(
                   'APEX',
                   style: TextStyle(
-                      fontSize: 16,
+                      fontSize: _TB.fs16,
                       fontWeight: FontWeight.w800,
-                      color: widget.fg,
+                      color: _TB.fgPrimary,
                       letterSpacing: 0.5),
                 ),
               ),
@@ -546,29 +621,29 @@ class _BrandLogoState extends State<_BrandLogo> {
   }
 }
 
-/// (#5) Vertical divider used throughout the top bar.
+/// Vertical divider used throughout the top bar.
 class _TopBarDivider extends StatelessWidget {
-  final Color color;
-  const _TopBarDivider({required this.color});
+  const _TopBarDivider();
   @override
   Widget build(BuildContext context) =>
-      Container(height: 24, width: 1, color: color);
+      Container(height: 24, width: 1, color: _TB.border);
 }
 
-/// (#4,11,14,15,21,22,28) Shared icon button — tooltip + semantics +
-/// hover scale + 48×48 min tap target.
+/// Shared icon button — tooltip + semantics + hover + token-based sizing.
 class _TopBarIconBtn extends StatefulWidget {
   final IconData icon;
   final String tooltip;
   final String semanticLabel;
   final void Function(BuildContext) onPressed;
   final Color? color;
+  final bool active;
   const _TopBarIconBtn({
     required this.icon,
     required this.tooltip,
     required this.semanticLabel,
     required this.onPressed,
     this.color,
+    this.active = false,
   });
   @override
   State<_TopBarIconBtn> createState() => _TopBarIconBtnState();
@@ -578,37 +653,39 @@ class _TopBarIconBtnState extends State<_TopBarIconBtn> {
   bool _hover = false;
   @override
   Widget build(BuildContext context) {
+    final activeBg = widget.active ? _TB.accentActiveBg : null;
+    final hoverBg = _hover ? _TB.hoverOverlay : activeBg;
     return Builder(
       builder: (ctx) => Semantics(
         button: true,
         label: widget.semanticLabel,
         child: Tooltip(
           message: widget.tooltip,
-          waitDuration: const Duration(milliseconds: 500),
+          waitDuration: _TB.tooltipWait,
           child: MouseRegion(
             onEnter: (_) => setState(() => _hover = true),
             onExit: (_) => setState(() => _hover = false),
             cursor: SystemMouseCursors.click,
             child: InkWell(
               onTap: () => widget.onPressed(ctx),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: _TB.brMd,
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 140),
-                width: 40,
-                height: 40,
+                duration: _TB.motionFast,
+                width: _TB.tapTarget,
+                height: _TB.tapTarget,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: _hover
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
+                  color: hoverBg ?? Colors.transparent,
+                  borderRadius: _TB.brMd,
                 ),
                 child: AnimatedScale(
                   scale: _hover ? 1.08 : 1.0,
-                  duration: const Duration(milliseconds: 140),
+                  duration: _TB.motionFast,
                   child: Icon(widget.icon,
-                      size: 18,
-                      color: widget.color ?? core_theme.AC.topBarFg),
+                      size: _TB.iconMd,
+                      color: widget.active
+                          ? _TB.accent
+                          : (widget.color ?? _TB.fgPrimary)),
                 ),
               ),
             ),
@@ -619,16 +696,10 @@ class _TopBarIconBtnState extends State<_TopBarIconBtn> {
   }
 }
 
-/// (#2,23,37,43) Notifications bell + animated badge + popover.
+/// Notifications bell + animated badge + popover.
 class _NotifBellButton extends StatefulWidget {
   final int count;
-  final Color fg;
-  final Color bg;
-  const _NotifBellButton({
-    required this.count,
-    required this.fg,
-    required this.bg,
-  });
+  const _NotifBellButton({required this.count});
   @override
   State<_NotifBellButton> createState() => _NotifBellButtonState();
 }
@@ -641,10 +712,9 @@ class _NotifBellButtonState extends State<_NotifBellButton>
   @override
   void initState() {
     super.initState();
-    _pulse = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
+    _pulse =
+        AnimationController(vsync: this, duration: _TB.pulseDur)
+          ..repeat(reverse: true);
   }
 
   @override
@@ -663,31 +733,29 @@ class _NotifBellButtonState extends State<_NotifBellButton>
         label: 'الإشعارات — ${widget.count} غير مقروءة',
         child: Tooltip(
           message: 'صندوق الوارد (${widget.count})',
-          waitDuration: const Duration(milliseconds: 500),
+          waitDuration: _TB.tooltipWait,
           child: MouseRegion(
             onEnter: (_) => setState(() => _hover = true),
             onExit: (_) => setState(() => _hover = false),
             cursor: SystemMouseCursors.click,
             child: InkWell(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: _TB.brMd,
               onTap: () => UnifiedInbox.show(ctx),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 140),
-                width: 40,
-                height: 40,
+                duration: _TB.motionFast,
+                width: _TB.tapTarget,
+                height: _TB.tapTarget,
                 decoration: BoxDecoration(
-                  color: _hover
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
+                  color: _hover ? _TB.hoverOverlay : Colors.transparent,
+                  borderRadius: _TB.brMd,
                 ),
                 child: Stack(alignment: Alignment.center, children: [
                   Icon(Icons.notifications_outlined,
-                      size: 18, color: widget.fg),
+                      size: _TB.iconMd, color: _TB.fgPrimary),
                   if (hasCount)
                     PositionedDirectional(
-                      end: 6,
-                      top: 6,
+                      end: _TB.sp2,
+                      top: _TB.sp2,
                       child: AnimatedBuilder(
                         animation: _pulse,
                         builder: (_, __) => Transform.scale(
@@ -696,16 +764,12 @@ class _NotifBellButtonState extends State<_NotifBellButton>
                             padding: const EdgeInsetsDirectional.symmetric(
                                 horizontal: 5, vertical: 1),
                             decoration: BoxDecoration(
-                              color: core_theme.AC.err,
+                              color: _TB.danger,
                               borderRadius: BorderRadius.circular(9),
-                              border: Border.all(
-                                  color: widget.bg, width: 1.5),
+                              border:
+                                  Border.all(color: _TB.bg, width: 1.5),
                             ),
-                            child: Text(label,
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w800)),
+                            child: Text(label, style: _TB.tsBadge),
                           ),
                         ),
                       ),
@@ -720,42 +784,34 @@ class _NotifBellButtonState extends State<_NotifBellButton>
   }
 }
 
-/// (#10,48,50) Avatar with online dot + profile popover.
+/// Avatar with online dot + profile popover.
 class _AvatarMenu extends StatelessWidget {
-  final Color accent;
   final bool online;
-  const _AvatarMenu({required this.accent, required this.online});
+  const _AvatarMenu({required this.online});
 
   @override
   Widget build(BuildContext context) {
     return MenuAnchor(
-      style: MenuStyle(
-        backgroundColor:
-            WidgetStateProperty.all(core_theme.AC.navy2),
-        shape: WidgetStateProperty.all(RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: core_theme.AC.bdr),
-        )),
-      ),
-      alignmentOffset: const Offset(0, 4),
+      style: _TB.menuStyle(),
+      alignmentOffset: const Offset(0, _TB.sp1),
       builder: (ctx, ctrl, _) => Semantics(
         button: true,
         label: 'قائمة المستخدم',
         child: Tooltip(
           message: 'الحساب والإعدادات',
-          waitDuration: const Duration(milliseconds: 500),
+          waitDuration: _TB.tooltipWait,
           child: InkWell(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(_TB.rPill),
             onTap: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
             child: Padding(
               padding: const EdgeInsetsDirectional.symmetric(
-                  horizontal: 8, vertical: 4),
+                  horizontal: _TB.sp3, vertical: _TB.sp1),
               child: Stack(children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundColor: accent.withValues(alpha: 0.2),
+                  backgroundColor: _TB.accent.withValues(alpha: 0.20),
                   child:
-                      Icon(Icons.person, color: accent, size: 18),
+                      Icon(Icons.person, color: _TB.accent, size: _TB.iconMd),
                 ),
                 if (online)
                   PositionedDirectional(
@@ -765,10 +821,9 @@ class _AvatarMenu extends StatelessWidget {
                       width: 10,
                       height: 10,
                       decoration: BoxDecoration(
-                        color: core_theme.AC.ok,
+                        color: _TB.success,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                            color: core_theme.AC.topBarBg, width: 2),
+                        border: Border.all(color: _TB.bg, width: 2),
                       ),
                     ),
                   ),
@@ -784,34 +839,33 @@ class _AvatarMenu extends StatelessWidget {
             () => context.go('/settings')),
         _menuRow(Icons.history, 'النشاط الأخير', () {}),
         const PopupMenuDivider(height: 8),
-        _menuRow(Icons.logout, 'تسجيل الخروج', () {},
-            color: core_theme.AC.err),
+        _menuRow(Icons.logout, 'تسجيل الخروج', () {}, color: _TB.danger),
       ],
     );
   }
 
   MenuItemButton _menuRow(IconData icon, String label, VoidCallback onTap,
       {Color? color}) {
-    final c = color ?? core_theme.AC.ts;
+    final c = color ?? _TB.fgSecondary;
     return MenuItemButton(
       style: ButtonStyle(
         minimumSize: WidgetStateProperty.all(const Size(200, 36)),
         padding: WidgetStateProperty.all(
-            const EdgeInsetsDirectional.symmetric(horizontal: 12, vertical: 4)),
+            const EdgeInsetsDirectional.symmetric(
+                horizontal: _TB.sp5, vertical: _TB.sp1)),
       ),
       leadingIcon: Icon(icon, size: 15, color: c),
       onPressed: onTap,
       child: Text(label,
           style: TextStyle(
-              color: c, fontSize: 12.5, fontWeight: FontWeight.w600)),
+              color: c, fontSize: _TB.fs12, fontWeight: FontWeight.w600)),
     );
   }
 }
 
-/// (#46) Theme toggle.
+/// Theme toggle (light/dark).
 class _ThemeToggleBtn extends ConsumerWidget {
-  final Color fg;
-  const _ThemeToggleBtn({required this.fg});
+  const _ThemeToggleBtn();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
@@ -819,44 +873,41 @@ class _ThemeToggleBtn extends ConsumerWidget {
     return _TopBarIconBtn(
       icon: isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
       tooltip: isDark ? 'وضع الإضاءة' : 'الوضع الداكن',
-      semanticLabel: isDark ? 'تبديل إلى الوضع الفاتح' : 'تبديل إلى الوضع الداكن',
-      color: fg,
+      semanticLabel:
+          isDark ? 'تبديل إلى الوضع الفاتح' : 'تبديل إلى الوضع الداكن',
       onPressed: (_) =>
           ref.read(appSettingsProvider.notifier).toggleDarkMode(!isDark),
     );
   }
 }
 
-/// (#47) Language toggle AR / EN.
+/// Language toggle AR / EN.
 class _LangToggleBtn extends ConsumerWidget {
-  final Color fg;
-  const _LangToggleBtn({required this.fg});
+  const _LangToggleBtn();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
     final isAr = settings.language == 'ar';
-    return Builder(
-      builder: (ctx) => Semantics(
-        button: true,
-        label: isAr ? 'تبديل إلى الإنجليزية' : 'Switch to Arabic',
-        child: Tooltip(
-          message: isAr ? 'English' : 'العربية',
-          waitDuration: const Duration(milliseconds: 500),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () => ref
-                .read(appSettingsProvider.notifier)
-                .setLanguage(isAr ? 'en' : 'ar'),
-            child: Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              child: Text(isAr ? 'EN' : 'ع',
-                  style: TextStyle(
-                      color: fg,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800)),
-            ),
+    return Semantics(
+      button: true,
+      label: isAr ? 'تبديل إلى الإنجليزية' : 'Switch to Arabic',
+      child: Tooltip(
+        message: isAr ? 'English' : 'العربية',
+        waitDuration: _TB.tooltipWait,
+        child: InkWell(
+          borderRadius: _TB.brMd,
+          onTap: () => ref
+              .read(appSettingsProvider.notifier)
+              .setLanguage(isAr ? 'en' : 'ar'),
+          child: Container(
+            width: _TB.tapTarget,
+            height: _TB.tapTarget,
+            alignment: Alignment.center,
+            child: Text(isAr ? 'EN' : 'ع',
+                style: TextStyle(
+                    color: _TB.fgPrimary,
+                    fontSize: _TB.fs12,
+                    fontWeight: FontWeight.w800)),
           ),
         ),
       ),
@@ -864,11 +915,9 @@ class _LangToggleBtn extends ConsumerWidget {
   }
 }
 
-/// (#45) Cmd+K button — platform-aware shortcut.
+/// Cmd+K button — platform-aware shortcut (⌘K / Ctrl+K).
 class _CmdKButton extends StatelessWidget {
-  final Color fg;
-  final Color border;
-  const _CmdKButton({required this.fg, required this.border});
+  const _CmdKButton();
   @override
   Widget build(BuildContext context) {
     final isMac = defaultTargetPlatform == TargetPlatform.macOS ||
@@ -880,38 +929,39 @@ class _CmdKButton extends StatelessWidget {
         label: 'فتح مستكشف الأوامر ($shortcut)',
         child: Tooltip(
           message: 'بحث / أوامر ($shortcut)',
-          waitDuration: const Duration(milliseconds: 500),
+          waitDuration: _TB.tooltipWait,
           child: InkWell(
             onTap: () => CmdKPalette.show(ctx),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: _TB.brSm,
             child: Container(
               padding: const EdgeInsetsDirectional.symmetric(
-                  horizontal: 10, vertical: 6),
+                  horizontal: _TB.sp4, vertical: _TB.sp2),
               decoration: BoxDecoration(
-                color: core_theme.AC.navy3,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: border),
+                color: _TB.surfaceRaised,
+                borderRadius: _TB.brSm,
+                border: Border.all(color: _TB.border),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.search, size: 14, color: core_theme.AC.ts),
-                const SizedBox(width: 6),
+                Icon(Icons.search,
+                    size: _TB.iconSm, color: _TB.fgSecondary),
+                const SizedBox(width: _TB.sp2),
                 Text('بحث',
                     style: TextStyle(
-                        fontSize: 12, color: core_theme.AC.ts)),
-                const SizedBox(width: 8),
+                        fontSize: _TB.fs12, color: _TB.fgSecondary)),
+                const SizedBox(width: _TB.sp3),
                 Container(
                   padding: const EdgeInsetsDirectional.symmetric(
-                      horizontal: 4, vertical: 1),
+                      horizontal: _TB.sp1, vertical: 1),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.navy2,
+                    color: _TB.surfaceElevated,
                     borderRadius: BorderRadius.circular(3),
-                    border: Border.all(color: border),
+                    border: Border.all(color: _TB.border),
                   ),
                   child: Text(shortcut,
                       style: TextStyle(
-                          fontSize: 10,
+                          fontSize: _TB.fs10,
                           fontWeight: FontWeight.w600,
-                          color: core_theme.AC.ts)),
+                          color: _TB.fgSecondary)),
                 ),
               ]),
             ),
@@ -922,7 +972,7 @@ class _CmdKButton extends StatelessWidget {
   }
 }
 
-/// (#31,40) Compact breadcrumb — dropdown menu for narrow screens.
+/// Compact breadcrumb — dropdown menu for narrow screens.
 class _CompactBreadcrumb extends StatelessWidget {
   final List<_BreadcrumbPart> parts;
   const _CompactBreadcrumb({required this.parts});
@@ -931,35 +981,28 @@ class _CompactBreadcrumb extends StatelessWidget {
     final last = parts.isNotEmpty ? parts.last : null;
     if (last == null) return const SizedBox.shrink();
     return MenuAnchor(
-      style: MenuStyle(
-        backgroundColor:
-            WidgetStateProperty.all(core_theme.AC.navy2),
-        shape: WidgetStateProperty.all(RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: core_theme.AC.bdr),
-        )),
-      ),
-      alignmentOffset: const Offset(0, 4),
+      style: _TB.menuStyle(),
+      alignmentOffset: const Offset(0, _TB.sp1),
       builder: (ctx, ctrl, _) => InkWell(
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: _TB.brSm,
         onTap: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
         child: Padding(
           padding: const EdgeInsetsDirectional.symmetric(
-              horizontal: 6, vertical: 4),
+              horizontal: _TB.sp2, vertical: _TB.sp1),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(last.icon, size: 14, color: core_theme.AC.topBarAccent),
-            const SizedBox(width: 4),
+            Icon(last.icon, size: _TB.iconSm, color: _TB.accent),
+            const SizedBox(width: _TB.sp1),
             Flexible(
               child: Text(last.label,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      fontSize: 12,
+                      fontSize: _TB.fs12,
                       fontWeight: FontWeight.w700,
-                      color: core_theme.AC.topBarFg)),
+                      color: _TB.fgPrimary)),
             ),
             const SizedBox(width: 2),
             Icon(Icons.arrow_drop_down,
-                size: 14, color: core_theme.AC.topBarFgDim),
+                size: _TB.iconSm, color: _TB.fgSecondary),
           ]),
         ),
       ),
@@ -970,18 +1013,17 @@ class _CompactBreadcrumb extends StatelessWidget {
                 ? () => context.go(parts[i].route!)
                 : null,
             leadingIcon: Icon(parts[i].icon,
-                size: 14,
+                size: _TB.iconSm,
                 color: i == parts.length - 1
-                    ? core_theme.AC.topBarAccent
-                    : core_theme.AC.topBarFgDim),
+                    ? _TB.accent
+                    : _TB.fgSecondary),
             trailingIcon: i == parts.length - 1
-                ? Icon(Icons.check,
-                    size: 14, color: core_theme.AC.topBarAccent)
+                ? Icon(Icons.check, size: _TB.iconSm, color: _TB.accent)
                 : null,
             child: Text(parts[i].label,
                 style: TextStyle(
-                    color: core_theme.AC.topBarFg,
-                    fontSize: 12.5,
+                    color: _TB.fgPrimary,
+                    fontSize: _TB.fs12,
                     fontWeight: i == parts.length - 1
                         ? FontWeight.w700
                         : FontWeight.w500)),
@@ -991,7 +1033,7 @@ class _CompactBreadcrumb extends StatelessWidget {
   }
 }
 
-/// (#49) Help row for keyboard shortcuts cheatsheet.
+/// Help row for keyboard shortcuts cheatsheet.
 class _HelpRow extends StatelessWidget {
   final String keys;
   final String desc;
@@ -999,25 +1041,25 @@ class _HelpRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsetsDirectional.symmetric(vertical: 6),
+      padding: const EdgeInsetsDirectional.symmetric(vertical: _TB.sp2),
       child: Row(children: [
         Container(
           padding: const EdgeInsetsDirectional.symmetric(
-              horizontal: 8, vertical: 3),
+              horizontal: _TB.sp3, vertical: 3),
           decoration: BoxDecoration(
-            color: core_theme.AC.navy3,
+            color: _TB.surfaceRaised,
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: core_theme.AC.bdr),
+            border: Border.all(color: _TB.border),
           ),
           child: Text(keys,
               style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: _TB.fs11,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'monospace')),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: _TB.sp5),
         Expanded(
-            child: Text(desc, style: const TextStyle(fontSize: 12))),
+            child: Text(desc, style: const TextStyle(fontSize: _TB.fs12))),
       ]),
     );
   }
@@ -1034,12 +1076,14 @@ class _SettingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: core_theme.AC.gold.withOpacity(0.15),
-        child: Icon(icon, color: core_theme.AC.gold, size: 18),
+        backgroundColor: _TB.accent.withValues(alpha: 0.15),
+        child: Icon(icon, color: _TB.accent, size: _TB.iconMd),
       ),
-      title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-      subtitle: Text(sub, style: const TextStyle(fontSize: 11)),
-      trailing: const Icon(Icons.chevron_left, size: 18),
+      title: Text(title,
+          style: const TextStyle(
+              fontSize: _TB.fs13, fontWeight: FontWeight.w700)),
+      subtitle: Text(sub, style: const TextStyle(fontSize: _TB.fs11)),
+      trailing: const Icon(Icons.chevron_left, size: _TB.iconMd),
       onTap: onTap,
     );
   }
@@ -1071,39 +1115,46 @@ class _Breadcrumb extends StatelessWidget {
     for (int i = 0; i < parts.length; i++) {
       final p = parts[i];
       final isLast = i == parts.length - 1;
+      final color = p.color ?? (isLast ? _TB.accent : _TB.fgSecondary);
       widgets.add(
-        GestureDetector(
-          onTap: p.route != null ? () => context.go(p.route!) : null,
-          child: Row(
-            children: [
-              Icon(p.icon,
-                  size: 14,
-                  color: p.color ??
-                      (isLast
-                          ? core_theme.AC.topBarAccent
-                          : core_theme.AC.topBarFgDim)),
-              const SizedBox(width: 4),
-              Text(
-                p.label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isLast ? FontWeight.w700 : FontWeight.w500,
-                  color: isLast
-                      ? core_theme.AC.topBarFg
-                      : core_theme.AC.topBarFgDim,
-                ),
+        Semantics(
+          button: p.route != null,
+          label: p.label,
+          child: InkWell(
+            borderRadius: _TB.brSm,
+            onTap: p.route != null ? () => context.go(p.route!) : null,
+            hoverColor: _TB.hoverOverlay,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: _TB.sp1, vertical: 2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(p.icon, size: _TB.iconSm, color: color),
+                  const SizedBox(width: _TB.sp1),
+                  Text(
+                    p.label,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: _TB.fs12,
+                      fontWeight:
+                          isLast ? FontWeight.w700 : FontWeight.w500,
+                      color: isLast ? _TB.fgPrimary : _TB.fgSecondary,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       );
       if (!isLast) {
         widgets.add(
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsetsDirectional.symmetric(
+                horizontal: _TB.sp1),
             child: Icon(Icons.chevron_left,
-                size: 14, color: core_theme.AC.topBarFgDim),
-            // RTL: chevron_left = forward
+                size: _TB.iconSm, color: _TB.fgSecondary),
           ),
         );
       }
@@ -1643,13 +1694,13 @@ class _SidebarItemState extends State<_SidebarItem> {
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: widget.isActive
-                    ? color.withOpacity(0.12)
+                    ? color.withValues(alpha: 0.12)
                     : _hover
-                        ? color.withOpacity(0.06)
+                        ? color.withValues(alpha: 0.06)
                         : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
                 border: widget.isActive
-                    ? Border.all(color: color.withOpacity(0.3))
+                    ? Border.all(color: color.withValues(alpha: 0.3))
                     : null,
               ),
               child: Row(
@@ -1736,7 +1787,7 @@ class _ActiveModuleChipsList extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border(
           right: BorderSide(
-              color: serviceColor.withOpacity(0.25), width: 2),
+              color: serviceColor.withValues(alpha: 0.25), width: 2),
         ),
       ),
       child: Column(
@@ -2097,9 +2148,9 @@ class _ChipRowState extends State<_ChipRow> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
             decoration: BoxDecoration(
-              color: phase.color.withOpacity(0.08),
+              color: phase.color.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: phase.color.withOpacity(0.3)),
+              border: Border.all(color: phase.color.withValues(alpha: 0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -2245,9 +2296,9 @@ class _AllChipsMenu extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: core_theme.AC.gold.withOpacity(0.08),
+          color: core_theme.AC.gold.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: core_theme.AC.gold.withOpacity(0.25)),
+          border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.25)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -2306,13 +2357,13 @@ class _ChipItemState extends State<_ChipItem> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? (isDashboard ? color.withOpacity(0.16) : Colors.transparent)
+                ? (isDashboard ? color.withValues(alpha: 0.16) : Colors.transparent)
                 : _hover
-                    ? color.withOpacity(0.06)
+                    ? color.withValues(alpha: 0.06)
                     : Colors.transparent,
             borderRadius: BorderRadius.circular(isDashboard ? 10 : 6),
             border: widget.isActive && isDashboard
-                ? Border.all(color: color.withOpacity(0.4))
+                ? Border.all(color: color.withValues(alpha: 0.4))
                 : null,
           ),
           child: Row(
@@ -2424,9 +2475,9 @@ class _ComingSoonBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: core_theme.AC.warn.withOpacity(0.15),
+              color: core_theme.AC.warn.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: core_theme.AC.warn.withOpacity(0.4)),
+              border: Border.all(color: core_theme.AC.warn.withValues(alpha: 0.4)),
             ),
             child: Text(
               'قيد البناء',
