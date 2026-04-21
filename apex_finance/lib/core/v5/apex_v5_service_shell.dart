@@ -27,7 +27,6 @@ import '../theme.dart' as core_theme;
 import '../../providers/app_providers.dart';
 import 'apex_v5_action_dashboard.dart';
 import 'apex_v5_news_ticker.dart';
-import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
 import 'cmd_k_palette.dart';
 import '../../pilot/tenant_chip.dart';
@@ -77,55 +76,79 @@ class ApexV5ServiceShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(appSettingsProvider); // rebuild on theme/mode switch
-    final isNarrow = MediaQuery.of(context).size.width < 900;
+    final width = MediaQuery.sizeOf(context).width;
+    final isNarrow = width < 900;
+    final isMedium = width < 1280; // نُخفي Quick-Access rail أقل من هذا
 
     return CallbackShortcuts(
       bindings: {
-        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () {
-          CmdKPalette.show(context);
-        },
-        const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () {
-          CmdKPalette.show(context);
-        },
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
+            CmdKPalette.show(context),
+        const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () =>
+            CmdKPalette.show(context),
       },
       child: Focus(
         autofocus: true,
         child: Scaffold(
-          body: Column(
-            children: [
-              // ── Top Bar ──────────────────────────────────────────────
-              _TopBar(service: service, mainModule: mainModule, activeChip: activeChip),
-          const ApexV5NewsTicker(),
-          const Divider(height: 1),
-          // ── Body: Sidebar + Content ──────────────────────────────
-          Expanded(
-            child: Row(
-              children: [
-                if (!isNarrow)
-                  ValueListenableBuilder<bool>(
-                    valueListenable: SidebarPrefs.collapsed,
-                    builder: (_, collapsed, __) => _Sidebar(
-                      service: service,
-                      activeMainId: mainModule.id,
-                      isCollapsed: collapsed,
-                    ),
-                  ),
-                if (!isNarrow) const VerticalDivider(width: 1),
-                // Content column
-                Expanded(
-                  child: Column(
-                    children: [
-                      // الشريط الأفقي للـ chips — معطّل (محتوياته في الـ sidebar).
-                      // على الشاشات الضيقة، استخدم الـ drawer للوصول إلى الـ chips.
-                      Expanded(child: _buildChipBody(context)),
-                    ],
-                  ),
-                ),
-              ],
+          body: Column(children: [
+            // ── Layer 1: System Bar (نظام) — 40px ──────────────────────
+            _SystemBar(unreadCount: _getUnreadCount(ref)),
+            // ── Layer 2: News ticker (تنبيهات) ─────────────────────────
+            const ApexV5NewsTicker(),
+            const Divider(height: 1),
+            // ── Layer 3: Screen Bar (شاشة) — 48px ──────────────────────
+            _ScreenBar(
+              service: service,
+              mainModule: mainModule,
+              activeChip: activeChip,
             ),
-          ),
-        ],
-      ),
+            const Divider(height: 1),
+            // ── Layer 4: Body — 3 columns (يسار: قائمة رئيسية، يمين: وصول سريع) ──
+            Expanded(
+              child: isNarrow
+                  ? Column(children: [Expanded(child: _buildChipBody(context))])
+                  : Stack(children: [
+                      // Base: content + reserved rails
+                      Row(children: [
+                        const SizedBox(width: 64), // reserved for left sidebar
+                        const VerticalDivider(width: 1),
+                        Expanded(
+                          child: Column(children: [
+                            Expanded(child: _buildChipBody(context)),
+                          ]),
+                        ),
+                        if (!isMedium) const VerticalDivider(width: 1),
+                        if (!isMedium) const SizedBox(width: 56), // right rail
+                      ]),
+                      // Left sidebar overlay (expands over content)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: ValueListenableBuilder<bool>(
+                          valueListenable: SidebarPrefs.collapsed,
+                          builder: (_, collapsed, __) => Material(
+                            elevation: collapsed ? 0 : 8,
+                            shadowColor: Colors.black54,
+                            child: _Sidebar(
+                              service: service,
+                              activeMainId: mainModule.id,
+                              isCollapsed: collapsed,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Right quick-access rail (collapsible, visible >= 1280)
+                      if (!isMedium)
+                        const PositionedDirectional(
+                          end: 0,
+                          top: 0,
+                          bottom: 0,
+                          child: _QuickAccessRail(),
+                        ),
+                    ]),
+            ),
+          ]),
           drawer: isNarrow
               ? Drawer(
                   child: _Sidebar(
@@ -139,6 +162,8 @@ class ApexV5ServiceShell extends ConsumerWidget {
       ),
     );
   }
+
+  int _getUnreadCount(WidgetRef ref) => 8; // TODO: wire to real provider
 
   Widget _buildChipBody(BuildContext context) {
     // Dashboard chip — render action dashboard
@@ -313,118 +338,62 @@ class _TB {
 //   platform-aware shortcut (⌘/Ctrl) + quick actions + help link.
 // ══════════════════════════════════════════════════════════════════════════
 
-class _TopBar extends StatefulWidget {
-  final V5Service service;
-  final V5MainModule mainModule;
-  final V5Chip activeChip;
 
-  const _TopBar({
-    required this.service,
-    required this.mainModule,
-    required this.activeChip,
-  });
+// ══════════════════════════════════════════════════════════════════════════
+// Layer 1 — _SystemBar (40px) — branded, system-level tools
+// إلهام: SAP Fiori Shell, Odoo 17, Microsoft 365 app bar
+// يحتوي: Brand + Global search + Theme/Lang + Help + PWA install +
+//        Notifications + Avatar
+// ══════════════════════════════════════════════════════════════════════════
 
-  @override
-  State<_TopBar> createState() => _TopBarState();
-}
-
-class _TopBarState extends State<_TopBar> {
-  final int _unreadCount = 8; // TODO: wire to state/provider (#44)
+class _SystemBar extends StatelessWidget {
+  final int unreadCount;
+  const _SystemBar({required this.unreadCount});
 
   @override
   Widget build(BuildContext context) {
-    // Breakpoints + TextScaler clamp
     final width = MediaQuery.sizeOf(context).width;
-    final isCompact = width < 720; // sm
-    final isMedium = width < 1024; // md
-    final scaler = MediaQuery.textScalerOf(context)
-        .clamp(minScaleFactor: 0.9, maxScaleFactor: 1.15);
-
+    final isCompact = width < 720;
     return Semantics(
       container: true,
-      explicitChildNodes: true,
-      label: 'شريط التنقل العلوي',
-      child: MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaler: scaler),
-        child: _escapeHandler(
-          child: RepaintBoundary(
-            child: Container(
-              height: _TB.barHeight,
-              padding:
-                  const EdgeInsetsDirectional.symmetric(horizontal: _TB.sp3),
-              decoration: BoxDecoration(
-                color: _TB.bg,
-                border: Border(bottom: BorderSide(color: _TB.border)),
-                boxShadow: _TB.barShadow,
-              ),
-              child: IconTheme.merge(
-                data: IconThemeData(color: _TB.fgPrimary, size: _TB.iconMd),
-                child: DefaultTextStyle.merge(
-                  style: _TB.tsNav,
-                  child: FocusTraversalGroup(
-                    child: Row(
-                      children: [
-                        // ── Left cluster ─────────────────────────────────
-                        ApexV5ServiceSwitcher(
-                            currentServiceId: widget.service.id),
-                        const SizedBox(width: _TB.sp3),
-                        const _BrandLogo(),
-                        if (!isCompact) ...[
-                          const SizedBox(width: _TB.sp5),
-                          const _TopBarDivider(),
-                          const SizedBox(width: _TB.sp5),
-                          Flexible(child: _buildBreadcrumb()),
-                        ] else ...[
-                          const SizedBox(width: _TB.sp3),
-                          Flexible(
-                            child: _CompactBreadcrumb(
-                                parts: _breadcrumbParts()),
-                          ),
-                        ],
-                        const Spacer(),
-                        // ── Right cluster ────────────────────────────────
-                        if (!isCompact) const QuickCreateButton(),
-                        if (!isCompact) const SizedBox(width: _TB.sp3),
-                        // (#A21) زر واحد لاختيار الشركة — TenantChip (live)
-                        const TenantChip(),
-                        if (!isMedium) const SizedBox(width: _TB.sp3),
-                        if (!isMedium) const ApexV5WorkspaceSelector(),
-                        const SizedBox(width: _TB.sp3),
-                        const _CmdKButton(),
-                        const SizedBox(width: _TB.sp1),
-                        if (!isMedium) ...[
-                          _TopBarIconBtn(
-                            icon: Icons.menu_book_outlined,
-                            tooltip: 'قاعدة المعرفة',
-                            semanticLabel: 'فتح قاعدة المعرفة',
-                            onPressed: (ctx) =>
-                                ctx.go('/app/erp/reports-bi/knowledge'),
-                          ),
-                          _TopBarIconBtn(
-                            icon: Icons.settings_outlined,
-                            tooltip: 'إعدادات ${widget.mainModule.labelAr}',
-                            semanticLabel:
-                                'إعدادات تطبيق ${widget.mainModule.labelAr}',
-                            onPressed: (ctx) => _showAppSettings(
-                                ctx, widget.service, widget.mainModule),
-                          ),
-                        ],
-                        const _LangToggleBtn(),
-                        const _ThemeToggleBtn(),
-                        if (!isCompact)
-                          _TopBarIconBtn(
-                            icon: Icons.help_outline,
-                            tooltip: 'مساعدة (Shift+/)',
-                            semanticLabel: 'فتح المساعدة',
-                            onPressed: (ctx) => _showHelp(ctx),
-                          ),
-                        _NotifBellButton(count: _unreadCount),
-                        const _AvatarMenu(online: true),
-                      ],
-                    ),
+      label: 'شريط النظام',
+      child: Container(
+        height: 40,
+        padding:
+            const EdgeInsetsDirectional.symmetric(horizontal: _TB.sp3),
+        decoration: BoxDecoration(
+          color: _TB.bg,
+          border: Border(bottom: BorderSide(color: _TB.border)),
+          boxShadow: _TB.barShadow,
+        ),
+        child: IconTheme.merge(
+          data: IconThemeData(color: _TB.fgPrimary, size: _TB.iconMd),
+          child: DefaultTextStyle.merge(
+            style: _TB.tsNav,
+            child: FocusTraversalGroup(
+              child: Row(children: [
+                // App-switcher (9-dots)
+                if (!isCompact)
+                  const _AppSwitcherButton(),
+                const SizedBox(width: _TB.sp3),
+                const _BrandLogo(),
+                const Spacer(),
+                // Right cluster (ends)
+                const _CmdKButton(),
+                const SizedBox(width: _TB.sp1),
+                const _LangToggleBtn(),
+                const _ThemeToggleBtn(),
+                if (!isCompact)
+                  _TopBarIconBtn(
+                    icon: Icons.help_outline,
+                    tooltip: 'المساعدة (Shift+/)',
+                    semanticLabel: 'فتح المساعدة',
+                    onPressed: (ctx) => _showHelpDialog(ctx),
                   ),
-                ),
-              ),
+                const _PwaInstallBtn(),
+                _NotifBellButton(count: unreadCount),
+                const _AvatarMenu(online: true),
+              ]),
             ),
           ),
         ),
@@ -432,46 +401,14 @@ class _TopBarState extends State<_TopBar> {
     );
   }
 
-  // (#19) Escape key closes open dialogs/popovers
-  Widget _escapeHandler({required Widget child}) {
-    return CallbackShortcuts(
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.escape): () {
-          final nav = Navigator.of(context, rootNavigator: true);
-          if (nav.canPop()) nav.pop();
-        },
-      },
-      child: FocusScope(child: child),
-    );
-  }
-
-  List<_BreadcrumbPart> _breadcrumbParts() => [
-        _BreadcrumbPart(
-            label: widget.service.labelAr,
-            route: '/app/${widget.service.id}',
-            icon: widget.service.icon,
-            color: _TB.accent),
-        _BreadcrumbPart(
-            label: widget.mainModule.labelAr,
-            route: '/app/${widget.service.id}/${widget.mainModule.id}',
-            icon: widget.mainModule.icon),
-        _BreadcrumbPart(
-            label: widget.activeChip.labelAr,
-            route: null,
-            icon: widget.activeChip.icon),
-      ];
-
-  Widget _buildBreadcrumb() => _Breadcrumb(parts: _breadcrumbParts());
-
-  // (#49) Context-aware help
-  void _showHelp(BuildContext ctx) {
+  static void _showHelpDialog(BuildContext ctx) {
     showDialog<void>(
       context: ctx,
       builder: (_) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           title: const Text('اختصارات لوحة المفاتيح',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              style: TextStyle(fontSize: _TB.fs16, fontWeight: FontWeight.w800)),
           content: SizedBox(
             width: 420,
             child: Column(
@@ -482,6 +419,7 @@ class _TopBarState extends State<_TopBar> {
                 _HelpRow(keys: 'Esc', desc: 'إغلاق القائمة/الحوار المفتوح'),
                 _HelpRow(keys: 'E', desc: 'تعديل الاسم (في شجرة الحسابات)'),
                 _HelpRow(keys: 'C', desc: 'تعديل الكود'),
+                _HelpRow(keys: '/', desc: 'التركيز على حقل البحث'),
                 _HelpRow(keys: 'Shift+/', desc: 'فتح هذه القائمة'),
               ],
             ),
@@ -495,65 +433,140 @@ class _TopBarState extends State<_TopBar> {
       ),
     );
   }
+}
 
-  void _showAppSettings(BuildContext context, V5Service svc, V5MainModule app) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          title: Row(
-            children: [
-              Icon(app.icon, color: svc.color),
-              const SizedBox(width: 10),
-              Expanded(child: Text('إعدادات ${app.labelAr}', style: const TextStyle(fontSize: 16))),
-            ],
-          ),
-          content: SizedBox(
-            width: 420,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _SettingTile(
-                  icon: Icons.tune,
-                  title: 'تخصيص الشاشات',
-                  sub: 'أظهر/أخفِ الشاشات في هذا التطبيق',
-                  onTap: () {},
-                ),
-                _SettingTile(
-                  icon: Icons.lock_outline,
-                  title: 'الصلاحيات والأدوار',
-                  sub: 'من يستطيع الوصول لهذا التطبيق',
-                  onTap: () {},
-                ),
-                _SettingTile(
-                  icon: Icons.notifications_active_outlined,
-                  title: 'قواعد التنبيه',
-                  sub: 'تنبيهات ذكية مبنية على بيانات التطبيق',
-                  onTap: () {},
-                ),
-                _SettingTile(
-                  icon: Icons.api,
-                  title: 'التكامل مع API',
-                  sub: 'مفاتيح API وWebhooks للتطبيق',
-                  onTap: () {},
-                ),
-                _SettingTile(
-                  icon: Icons.import_export,
-                  title: 'استيراد / تصدير',
-                  sub: 'تصدير البيانات أو استيرادها',
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text('إغلاق'),
-            ),
-          ],
+/// 9-dots app-switcher button.
+class _AppSwitcherButton extends StatelessWidget {
+  const _AppSwitcherButton();
+  @override
+  Widget build(BuildContext context) => _TopBarIconBtn(
+        icon: Icons.apps,
+        tooltip: 'مبدّل التطبيقات',
+        semanticLabel: 'فتح مبدّل التطبيقات',
+        onPressed: (ctx) => ctx.go('/app'),
+      );
+}
+
+/// PWA install button — يظهر فقط حين يكون التطبيق قابلاً للتثبيت.
+class _PwaInstallBtn extends StatefulWidget {
+  const _PwaInstallBtn();
+  @override
+  State<_PwaInstallBtn> createState() => _PwaInstallBtnState();
+}
+
+class _PwaInstallBtnState extends State<_PwaInstallBtn> {
+  bool _canInstall = false;
+  bool _isStandalone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncFromJs();
+    html.window.addEventListener('apex:pwa-changed', _onPwaChanged);
+  }
+
+  @override
+  void dispose() {
+    html.window.removeEventListener('apex:pwa-changed', _onPwaChanged);
+    super.dispose();
+  }
+
+  void _onPwaChanged(html.Event _) => _syncFromJs();
+
+  void _syncFromJs() {
+    try {
+      final pwa = (html.window as dynamic).__APEX_PWA__;
+      if (pwa == null) return;
+      final canInstall = pwa['canInstall'] == true;
+      final isStandalone = pwa['isStandalone'] == true;
+      if (mounted &&
+          (_canInstall != canInstall || _isStandalone != isStandalone)) {
+        setState(() {
+          _canInstall = canInstall;
+          _isStandalone = isStandalone;
+        });
+      }
+    } catch (_) {/* silent */}
+  }
+
+  void _triggerInstall() {
+    try {
+      (html.window as dynamic).__APEX_PWA__.promptInstall();
+    } catch (_) {/* silent */}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isStandalone || !_canInstall) return const SizedBox.shrink();
+    return _TopBarIconBtn(
+      icon: Icons.install_desktop,
+      tooltip: 'تثبيت APEX كتطبيق سطح مكتب',
+      semanticLabel: 'تثبيت التطبيق',
+      color: _TB.accent,
+      onPressed: (_) => _triggerInstall(),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Layer 3 — _ScreenBar (48px) — screen context + actions
+// يحتوي: Breadcrumb + QuickCreate + Company (TenantChip) + Workspace
+// ══════════════════════════════════════════════════════════════════════════
+
+class _ScreenBar extends StatelessWidget {
+  final V5Service service;
+  final V5MainModule mainModule;
+  final V5Chip activeChip;
+
+  const _ScreenBar({
+    required this.service,
+    required this.mainModule,
+    required this.activeChip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final isCompact = width < 720;
+    final parts = [
+      _BreadcrumbPart(
+          label: service.labelAr,
+          route: '/app/${service.id}',
+          icon: service.icon,
+          color: _TB.accent),
+      _BreadcrumbPart(
+          label: mainModule.labelAr,
+          route: '/app/${service.id}/${mainModule.id}',
+          icon: mainModule.icon),
+      _BreadcrumbPart(
+          label: activeChip.labelAr,
+          route: null,
+          icon: activeChip.icon),
+    ];
+    return Container(
+      height: 48,
+      padding:
+          const EdgeInsetsDirectional.symmetric(horizontal: _TB.sp3),
+      decoration: BoxDecoration(
+        color: _TB.surfaceElevated,
+        border: Border(bottom: BorderSide(color: _TB.border)),
+      ),
+      child: IconTheme.merge(
+        data: IconThemeData(color: _TB.fgPrimary, size: _TB.iconMd),
+        child: DefaultTextStyle.merge(
+          style: _TB.tsNav,
+          child: Row(children: [
+            if (isCompact)
+              Flexible(child: _CompactBreadcrumb(parts: parts))
+            else
+              Flexible(child: _Breadcrumb(parts: parts)),
+            const Spacer(),
+            if (!isCompact) const QuickCreateButton(),
+            if (!isCompact) const SizedBox(width: _TB.sp3),
+            const TenantChip(),
+            const SizedBox(width: _TB.sp3),
+            if (width >= 1024) const ApexV5WorkspaceSelector(),
+          ]),
         ),
       ),
     );
@@ -561,7 +574,309 @@ class _TopBarState extends State<_TopBar> {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// TopBar — Extracted widgets (Waves 1-5)
+// Layer 4 (right rail) — _QuickAccessRail
+// اختصارات للشاشات الأكثر استخداماً للمستخدم — تُحفظ في localStorage
+// ══════════════════════════════════════════════════════════════════════════
+
+/// Pinned shortcut entry.
+class _Pin {
+  final String id;
+  final String labelAr;
+  final IconData icon;
+  final String route;
+  const _Pin({
+    required this.id,
+    required this.labelAr,
+    required this.icon,
+    required this.route,
+  });
+}
+
+class QuickAccessPrefs {
+  static const _key = 'apex_quick_access_v1';
+  static final ValueNotifier<List<String>> pinnedIds = ValueNotifier(_load());
+
+  static List<String> _load() {
+    try {
+      final raw = html.window.localStorage[_key];
+      if (raw == null || raw.isEmpty) return _defaultPins;
+      return raw.split(',').where((s) => s.isNotEmpty).toList();
+    } catch (_) {
+      return _defaultPins;
+    }
+  }
+
+  static void setPins(List<String> ids) {
+    pinnedIds.value = List.of(ids);
+    try {
+      html.window.localStorage[_key] = ids.join(',');
+    } catch (_) {/* silent */}
+  }
+
+  static void toggle(String id) {
+    final list = List<String>.of(pinnedIds.value);
+    if (list.contains(id)) {
+      list.remove(id);
+    } else {
+      list.add(id);
+    }
+    setPins(list);
+  }
+
+  static const _defaultPins = [
+    'coa',
+    'je',
+    'tb',
+    'financial_reports',
+    'journal',
+  ];
+}
+
+const _kAllPins = <_Pin>[
+  _Pin(
+      id: 'coa',
+      labelAr: 'شجرة الحسابات',
+      icon: Icons.account_tree,
+      route: '/app/erp/finance/coa-editor'),
+  _Pin(
+      id: 'je',
+      labelAr: 'قيد يومي',
+      icon: Icons.edit_note,
+      route: '/app/erp/finance/je-builder'),
+  _Pin(
+      id: 'tb',
+      labelAr: 'ميزان المراجعة',
+      icon: Icons.table_chart,
+      route: '/app/erp/finance/trial-balance'),
+  _Pin(
+      id: 'financial_reports',
+      labelAr: 'القوائم المالية',
+      icon: Icons.bar_chart,
+      route: '/app/erp/finance/statements'),
+  _Pin(
+      id: 'journal',
+      labelAr: 'دفتر الأستاذ',
+      icon: Icons.menu_book,
+      route: '/app/erp/finance/gl'),
+  _Pin(
+      id: 'vat',
+      labelAr: 'ضريبة القيمة المضافة',
+      icon: Icons.receipt_long,
+      route: '/app/erp/finance/vat'),
+  _Pin(
+      id: 'fixed_assets',
+      labelAr: 'الأصول الثابتة',
+      icon: Icons.apartment,
+      route: '/app/erp/finance/fixed-assets'),
+  _Pin(
+      id: 'budgets',
+      labelAr: 'الموازنات',
+      icon: Icons.savings,
+      route: '/app/erp/finance/budgets'),
+  _Pin(
+      id: 'clients',
+      labelAr: 'العملاء',
+      icon: Icons.groups,
+      route: '/app/erp/sales/customers'),
+  _Pin(
+      id: 'vendors',
+      labelAr: 'الموردون',
+      icon: Icons.local_shipping,
+      route: '/app/erp/purchase/vendors'),
+];
+
+class _QuickAccessRail extends StatefulWidget {
+  const _QuickAccessRail();
+  @override
+  State<_QuickAccessRail> createState() => _QuickAccessRailState();
+}
+
+class _QuickAccessRailState extends State<_QuickAccessRail> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: _TB.motionMed,
+      curve: Curves.easeOutCubic,
+      width: _expanded ? 220 : 56,
+      decoration: BoxDecoration(
+        color: _TB.surfaceElevated,
+        border: Border(
+          // End side = left in LTR, right in RTL → we want separator on CONTENT side.
+          // In RTL شريط على اليمين، الفاصل على شماله (start).
+          left: BorderSide(color: _TB.border),
+          right: BorderSide(color: _TB.border),
+        ),
+      ),
+      child: ValueListenableBuilder<List<String>>(
+        valueListenable: QuickAccessPrefs.pinnedIds,
+        builder: (_, pinIds, __) {
+          final pins = pinIds
+              .map((id) => _kAllPins.firstWhere((p) => p.id == id,
+                  orElse: () => const _Pin(
+                      id: '',
+                      labelAr: '',
+                      icon: Icons.help,
+                      route: '')))
+              .where((p) => p.id.isNotEmpty)
+              .toList();
+          return Column(children: [
+            _toggleButton(),
+            const Divider(height: 1),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                children: [
+                  for (final p in pins) _pinTile(p),
+                  const Divider(height: 16),
+                  _addPinMenu(),
+                ],
+              ),
+            ),
+          ]);
+        },
+      ),
+    );
+  }
+
+  Widget _toggleButton() {
+    return Tooltip(
+      message: _expanded ? 'طي الوصول السريع' : 'توسيع الوصول السريع',
+      waitDuration: _TB.tooltipWait,
+      child: InkWell(
+        onTap: () => setState(() => _expanded = !_expanded),
+        child: Container(
+          height: 44,
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 12),
+          child: Row(
+            mainAxisAlignment: _expanded
+                ? MainAxisAlignment.spaceBetween
+                : MainAxisAlignment.center,
+            children: [
+              Icon(Icons.push_pin_outlined,
+                  size: _TB.iconMd, color: _TB.accent),
+              if (_expanded) ...[
+                const SizedBox(width: _TB.sp2),
+                Expanded(
+                  child: Text('الوصول السريع',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: _TB.fgPrimary,
+                          fontSize: _TB.fs12,
+                          fontWeight: FontWeight.w800)),
+                ),
+                Icon(Icons.chevron_right,
+                    size: _TB.iconSm, color: _TB.fgSecondary),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _pinTile(_Pin p) {
+    return Tooltip(
+      message: _expanded ? '' : p.labelAr,
+      waitDuration: _TB.tooltipWait,
+      child: InkWell(
+        onTap: () => context.go(p.route),
+        onLongPress: () => QuickAccessPrefs.toggle(p.id),
+        child: Container(
+          padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 12, vertical: 10),
+          child: Row(
+            mainAxisAlignment: _expanded
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
+            children: [
+              Icon(p.icon, size: _TB.iconMd, color: _TB.fgPrimary),
+              if (_expanded) ...[
+                const SizedBox(width: _TB.sp3),
+                Expanded(
+                  child: Text(p.labelAr,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(
+                          color: _TB.fgPrimary,
+                          fontSize: _TB.fs12,
+                          fontWeight: FontWeight.w500)),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _addPinMenu() {
+    return MenuAnchor(
+      style: _TB.menuStyle(),
+      alignmentOffset: const Offset(_TB.sp3, 0),
+      builder: (_, ctrl, __) => Tooltip(
+        message: 'إضافة اختصار',
+        waitDuration: _TB.tooltipWait,
+        child: InkWell(
+          onTap: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
+          child: Container(
+            padding: const EdgeInsetsDirectional.symmetric(
+                horizontal: 12, vertical: 10),
+            child: Row(
+              mainAxisAlignment: _expanded
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
+              children: [
+                Icon(Icons.add, size: _TB.iconMd, color: _TB.accent),
+                if (_expanded) ...[
+                  const SizedBox(width: _TB.sp3),
+                  Expanded(
+                    child: Text('إضافة اختصار',
+                        style: TextStyle(
+                            color: _TB.accent,
+                            fontSize: _TB.fs12,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+      menuChildren: [
+        for (final p in _kAllPins)
+          ValueListenableBuilder<List<String>>(
+            valueListenable: QuickAccessPrefs.pinnedIds,
+            builder: (_, pinIds, __) {
+              final pinned = pinIds.contains(p.id);
+              return MenuItemButton(
+                style: ButtonStyle(
+                  minimumSize: WidgetStateProperty.all(const Size(220, 36)),
+                ),
+                leadingIcon: Icon(p.icon,
+                    size: _TB.iconSm,
+                    color: pinned ? _TB.accent : _TB.fgSecondary),
+                trailingIcon: pinned
+                    ? Icon(Icons.check, size: _TB.iconSm, color: _TB.accent)
+                    : null,
+                onPressed: () => QuickAccessPrefs.toggle(p.id),
+                child: Text(p.labelAr,
+                    style: TextStyle(
+                        color: pinned ? _TB.accent : _TB.fgPrimary,
+                        fontWeight:
+                            pinned ? FontWeight.w700 : FontWeight.w500,
+                        fontSize: _TB.fs12)),
+              );
+            },
+          ),
+      ],
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// TopBar — Extracted widgets (reused by SystemBar + ScreenBar)
 // ══════════════════════════════════════════════════════════════════════════
 
 /// Brand logo with hover + gradient + ripple.
