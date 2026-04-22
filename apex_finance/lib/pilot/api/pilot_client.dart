@@ -21,7 +21,10 @@
 ///   if (r.success) { ... }
 
 import 'dart:convert';
+import 'dart:html' as html;
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart' show MediaType;
 import '../../api_service.dart' show ApiResult;
 import '../../core/api_config.dart';
 import '../../core/session.dart';
@@ -136,6 +139,26 @@ class PilotClient {
       _get('/pilot/tenants/$tid/settings');
   Future<ApiResult> updateTenantSettings(String tid, Map<String, dynamic> body) =>
       _patch('/pilot/tenants/$tid/settings', body);
+
+  // Advanced settings — history, export/import, presets, compliance
+  Future<ApiResult> listSettingsHistory(String tid,
+          {String? category, int limit = 50}) =>
+      _get('/pilot/tenants/$tid/settings/history?limit=$limit'
+          '${category != null ? '&category=$category' : ''}');
+  Future<ApiResult> exportSettings(String tid) =>
+      _get('/pilot/tenants/$tid/settings/export');
+  Future<ApiResult> importSettings(String tid, Map<String, dynamic> snapshot) =>
+      _post('/pilot/tenants/$tid/settings/import', snapshot);
+  Future<ApiResult> listPresets() => _get('/pilot/settings/presets');
+  Future<ApiResult> applyPreset(String tid, String presetKey) =>
+      _post('/pilot/tenants/$tid/settings/apply-preset?preset_key=$presetKey',
+          const {});
+  Future<ApiResult> getComplianceScore(String tid) =>
+      _get('/pilot/tenants/$tid/settings/compliance-score');
+  Future<ApiResult> getBenchmarks(String tid) =>
+      _get('/pilot/tenants/$tid/settings/benchmarks');
+  Future<ApiResult> rollbackSettingsChange(String tid, String logId) =>
+      _post('/pilot/tenants/$tid/settings/history/$logId/rollback', const {});
 
   Future<ApiResult> listEntities(String tid) =>
       _get('/pilot/tenants/$tid/entities');
@@ -465,6 +488,77 @@ class PilotClient {
 
   Future<ApiResult> createJournalEntry(Map<String, dynamic> body) =>
       _post('/pilot/journal-entries', body);
+
+  /// Upload a document (PDF or image) to Claude-powered JE extractor.
+  /// Returns a proposed journal entry the user can review + save.
+  Future<ApiResult> aiReadDocument(String entityId, html.File file) async {
+    try {
+      // Read file as bytes via FileReader (web-only)
+      final reader = html.FileReader();
+      reader.readAsArrayBuffer(file);
+      await reader.onLoad.first;
+      final bytes = Uint8List.fromList(
+        (reader.result as List).cast<int>(),
+      );
+      final req = http.MultipartRequest(
+        'POST',
+        Uri.parse('$_base/pilot/entities/$entityId/ai/read-document'),
+      );
+      if (S.token != null) {
+        req.headers['Authorization'] = 'Bearer ${S.token}';
+      }
+      req.files.add(http.MultipartFile.fromBytes(
+        'file',
+        bytes,
+        filename: file.name,
+        contentType: _mediaTypeFor(file.type, file.name),
+      ));
+      final streamed = await req.send().timeout(const Duration(seconds: 90));
+      final r = await http.Response.fromStream(streamed);
+      return _parse(r);
+    } catch (e) {
+      return ApiResult.error('فشل رفع المستند: $e');
+    }
+  }
+
+  // Build MediaType from the browser-provided MIME (or guess from ext)
+  MediaType _mediaTypeFor(String? mime, String name) {
+    if (mime != null && mime.contains('/')) {
+      final parts = mime.split('/');
+      return MediaType(parts[0], parts[1]);
+    }
+    final ext = name.split('.').last.toLowerCase();
+    switch (ext) {
+      case 'pdf':
+        return MediaType('application', 'pdf');
+      case 'png':
+        return MediaType('image', 'png');
+      case 'jpg':
+      case 'jpeg':
+        return MediaType('image', 'jpeg');
+      case 'webp':
+        return MediaType('image', 'webp');
+      default:
+        return MediaType('application', 'octet-stream');
+    }
+  }
+  /// AI — اقتراح بيان (memo) من سطور القيد.
+  /// [lines] كل عنصر يحوي account_id/account_code/account_name/debit/credit.
+  /// يُرجع {"suggested_memo": "...", "confidence": 0.85}.
+  Future<ApiResult> aiSuggestMemo({
+    required List<Map<String, dynamic>> lines,
+    String kind = 'manual',
+    String? reference,
+    String? date,
+  }) =>
+      _post('/pilot/ai/suggest-memo', {
+        'lines': lines,
+        'kind': kind,
+        if (reference != null && reference.isNotEmpty) 'reference': reference,
+        if (date != null) 'date': date,
+        'language': 'ar',
+      });
+
   Future<ApiResult> listJournalEntries(
     String eid, {
     String? status,
