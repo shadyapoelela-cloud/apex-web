@@ -1195,7 +1195,7 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
     final active = _activeFilterCount;
     final has = active > 0;
     final bg = has ? _gold : _navy3;
-    final fg = has ? core_theme.AC.bestOn(bg) : _ts;
+    final fg = has ? core_theme.AC.btnFg : _ts;
     final menuStyle = MenuStyle(
       backgroundColor: WidgetStateProperty.all(_navy2),
       shape: WidgetStateProperty.all(RoundedRectangleBorder(

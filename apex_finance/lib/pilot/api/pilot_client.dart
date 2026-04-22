@@ -489,7 +489,8 @@ class PilotClient {
   Future<ApiResult> createJournalEntry(Map<String, dynamic> body) =>
       _post('/pilot/journal-entries', body);
 
-  /// Upload a document (PDF or image) to Claude-powered JE extractor.
+  /// AI — رفع مستند (PDF/صورة) عبر multipart/form-data.
+  /// Used by _JeAiReader and the inline manual form's AI quick bar.
   /// Returns a proposed journal entry the user can review + save.
   Future<ApiResult> aiReadDocument(String entityId, html.File file) async {
     try {
@@ -542,6 +543,7 @@ class PilotClient {
         return MediaType('application', 'octet-stream');
     }
   }
+
   /// AI — اقتراح بيان (memo) من سطور القيد.
   /// [lines] كل عنصر يحوي account_id/account_code/account_name/debit/credit.
   /// يُرجع {"suggested_memo": "...", "confidence": 0.85}.
@@ -558,6 +560,22 @@ class PilotClient {
         if (date != null) 'date': date,
         'language': 'ar',
       });
+
+  /// AI — استخراج قيد يومية من مستند via JSON+base64 (alternative to multipart).
+  Future<ApiResult> extractJeFromDocument(
+    String entityId, {
+    required String fileBase64,
+    required String mediaType,
+    String? filename,
+  }) =>
+      _post('/pilot/entities/$entityId/ai/extract-je', {
+        'file_base64': fileBase64,
+        'media_type': mediaType,
+        if (filename != null) 'filename': filename,
+      });
+
+  /// AI — فحص حالة الخدمة (هل ANTHROPIC_API_KEY مُعدّ؟).
+  Future<ApiResult> aiHealth() => _get('/pilot/ai/health');
 
   Future<ApiResult> listJournalEntries(
     String eid, {
