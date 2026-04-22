@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CoaEditorV52Screen extends StatefulWidget {
   const CoaEditorV52Screen({super.key});
@@ -11,8 +12,8 @@ class CoaEditorV52Screen extends StatefulWidget {
 }
 
 class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   final Set<String> _expanded = {'1', '11', '12', '13', '2', '21', '22', '3', '4', '41', '5'};
   String? _selectedId;
@@ -120,17 +121,17 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
       color: Colors.white,
       padding: const EdgeInsets.all(16),
       child: Row(children: [
-        const Icon(Icons.account_tree, color: _gold),
+        Icon(Icons.account_tree, color: _gold),
         const SizedBox(width: 8),
-        const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('دليل الحسابات (Chart of Accounts)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
-          Text('SOCPA 2017 · IFRS · 42 حساب نشط', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('SOCPA 2017 · IFRS · 42 حساب نشط', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ])),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.file_upload, size: 16), label: const Text('استيراد من Excel')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.file_upload, size: 16), label: Text('استيراد من Excel')),
         const SizedBox(width: 8),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.file_download, size: 16), label: const Text('تصدير')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.file_download, size: 16), label: Text('تصدير')),
         const SizedBox(width: 8),
-        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.add, size: 16), label: const Text('حساب جديد')),
+        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.add, size: 16), label: Text('حساب جديد')),
       ]),
     );
   }
@@ -156,7 +157,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(t.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: t.color)),
-                Text('$count حساب', style: const TextStyle(fontSize: 9, color: Colors.black54)),
+                Text('$count حساب', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
               ])),
               Text('${(total / 1e6).toStringAsFixed(1)}M', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: t.color)),
             ]),
@@ -220,12 +221,12 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
           // Column headers
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(6)),
-            child: const Row(children: [
-              SizedBox(width: 80, child: Text('الرقم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54))),
-              Expanded(flex: 3, child: Text('الاسم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54))),
-              SizedBox(width: 90, child: Text('النوع', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54))),
-              SizedBox(width: 150, child: Text('الرصيد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54), textAlign: TextAlign.end)),
+            decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(6)),
+            child: Row(children: [
+              SizedBox(width: 80, child: Text('الرقم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ts))),
+              Expanded(flex: 3, child: Text('الاسم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ts))),
+              SizedBox(width: 90, child: Text('النوع', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ts))),
+              SizedBox(width: 150, child: Text('الرصيد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ts), textAlign: TextAlign.end)),
               SizedBox(width: 80, child: SizedBox()),
             ]),
           ),
@@ -251,7 +252,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
             color: selected ? _gold.withOpacity(0.08) : null,
             border: BorderDirectional(
               end: BorderSide(color: selected ? _gold : Colors.transparent, width: 3),
-              bottom: BorderSide(color: Colors.grey.shade100),
+              bottom: BorderSide(color: core_theme.AC.navy3),
             ),
           ),
           child: Row(children: [
@@ -267,7 +268,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
                         _expanded.add(a.id);
                       }
                     }),
-                    child: Icon(isExpanded ? Icons.expand_more : Icons.chevron_left, size: 18, color: Colors.black54),
+                    child: Icon(isExpanded ? Icons.expand_more : Icons.chevron_left, size: 18, color: core_theme.AC.ts),
                   )
                 else const SizedBox(width: 18),
                 const SizedBox(width: 4),
@@ -279,7 +280,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(a.nameAr, style: TextStyle(fontSize: 13, fontWeight: hasChildren ? FontWeight.w800 : FontWeight.w500)),
-                Text(a.nameEn, style: const TextStyle(fontSize: 10, color: Colors.black54, fontStyle: FontStyle.italic)),
+                Text(a.nameEn, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontStyle: FontStyle.italic)),
               ])),
             ])),
             SizedBox(
@@ -298,7 +299,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
                   fontSize: hasChildren ? 13 : 12,
                   fontFamily: 'monospace',
                   fontWeight: hasChildren ? FontWeight.w800 : FontWeight.w500,
-                  color: a.balance >= 0 ? Colors.black87 : Colors.red,
+                  color: a.balance >= 0 ? core_theme.AC.tp : core_theme.AC.err,
                 ),
                 textAlign: TextAlign.end,
               ),
@@ -306,7 +307,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
             SizedBox(
               width: 80,
               child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                IconButton(icon: const Icon(Icons.add, size: 14, color: Colors.green), onPressed: () {}, padding: EdgeInsets.zero, constraints: const BoxConstraints(), tooltip: 'إضافة فرعي'),
+                IconButton(icon: Icon(Icons.add, size: 14, color: core_theme.AC.ok), onPressed: () {}, padding: EdgeInsets.zero, constraints: const BoxConstraints(), tooltip: 'إضافة فرعي'),
                 const SizedBox(width: 6),
                 IconButton(icon: const Icon(Icons.edit, size: 14), onPressed: () {}, padding: EdgeInsets.zero, constraints: const BoxConstraints(), tooltip: 'تعديل'),
                 const SizedBox(width: 6),
@@ -329,22 +330,22 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: a.type.color.withOpacity(0.06), border: Border(bottom: BorderSide(color: Colors.grey.shade200))),
+          decoration: BoxDecoration(color: a.type.color.withOpacity(0.06), border: Border(bottom: BorderSide(color: core_theme.AC.bdr))),
           child: Row(children: [
             Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: a.type.color.withOpacity(0.15), borderRadius: BorderRadius.circular(8)), child: Icon(a.type.icon, color: a.type.color)),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(a.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+              Text(a.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
               Text(a.nameAr, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
-              Text(a.nameEn, style: const TextStyle(fontSize: 11, color: Colors.black54, fontStyle: FontStyle.italic)),
+              Text(a.nameEn, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontStyle: FontStyle.italic)),
             ])),
             IconButton(icon: const Icon(Icons.close), onPressed: () => setState(() => _selectedId = null)),
           ]),
         ),
         Expanded(child: ListView(padding: const EdgeInsets.all(16), children: [
-          _kvBig('الرصيد الحالي', a.balance.toStringAsFixed(2), 'ر.س', a.balance >= 0 ? Colors.green : Colors.red),
+          _kvBig('الرصيد الحالي', a.balance.toStringAsFixed(2), 'ر.س', a.balance >= 0 ? core_theme.AC.ok : core_theme.AC.err),
           const Divider(height: 24),
-          const Text('معلومات الحساب', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
+          Text('معلومات الحساب', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(height: 10),
           _kv('النوع', a.type.labelAr),
           _kv('المستوى', a.isLeaf ? 'ورقة (Leaf)' : 'أصل (Parent)'),
@@ -360,9 +361,9 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
           _kv('مستخدم في التقارير', 'نعم'),
           const SizedBox(height: 20),
           Row(children: [
-            Expanded(child: FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.edit, size: 16), label: const Text('تعديل الحساب'))),
+            Expanded(child: FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.edit, size: 16), label: Text('تعديل الحساب'))),
             const SizedBox(width: 8),
-            Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.visibility, size: 16), label: const Text('عرض القيود'))),
+            Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.visibility, size: 16), label: Text('عرض القيود'))),
           ]),
         ])),
       ]),
@@ -370,7 +371,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
   }
 
   Widget _kv(String k, String v) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
-        SizedBox(width: 120, child: Text(k, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+        SizedBox(width: 120, child: Text(k, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
         Expanded(child: Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
       ]));
 
@@ -402,11 +403,11 @@ extension _AcctTypeX on _AcctType {
         _AcctType.expense => 'مصروف',
       };
   Color get color => switch (this) {
-        _AcctType.asset => Colors.green,
-        _AcctType.liability => Colors.orange,
-        _AcctType.equity => const Color(0xFFD4AF37),
-        _AcctType.revenue => Colors.blue,
-        _AcctType.expense => Colors.red,
+        _AcctType.asset => core_theme.AC.ok,
+        _AcctType.liability => core_theme.AC.warn,
+        _AcctType.equity => core_theme.AC.gold,
+        _AcctType.revenue => core_theme.AC.info,
+        _AcctType.expense => core_theme.AC.err,
       };
   IconData get icon => switch (this) {
         _AcctType.asset => Icons.trending_up,

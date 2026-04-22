@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_realtime_tax.dart';
 import '../../core/v5/apex_v5_undo_toast.dart';
@@ -96,8 +97,8 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF059669)],
+              gradient: LinearGradient(
+                colors: [core_theme.AC.info, core_theme.AC.ok],
               ),
               borderRadius: BorderRadius.circular(14),
             ),
@@ -115,7 +116,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'الأولى عالمياً — حاسبة ضرائب الخليج الفورية',
                         style: TextStyle(
@@ -127,7 +128,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
                       SizedBox(height: 4),
                       Text(
                         'VAT · WHT · Zakat · الطوابع · البلدية · 6 دول · تتحسّب مباشرة أثناء الكتابة',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                       ),
                     ],
                   ),
@@ -138,9 +139,9 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.star, size: 12, color: Colors.amber),
+                      Icon(Icons.star, size: 12, color: core_theme.AC.warn),
                       SizedBox(width: 4),
                       Text(
                         'World-First',
@@ -225,14 +226,14 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.flash_on, size: 16, color: Color(0xFFD97706)),
+              Icon(Icons.flash_on, size: 16, color: core_theme.AC.warn),
               SizedBox(width: 6),
               Text(
                 'جرّب سيناريو جاهز',
@@ -267,12 +268,12 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'تطبيق النتيجة',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
           ),
@@ -291,9 +292,9 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
                     }
                   : null,
               icon: const Icon(Icons.receipt_long, size: 16),
-              label: const Text('تطبيق على فاتورة جديدة'),
+              label: Text('تطبيق على فاتورة جديدة'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD4AF37),
+                backgroundColor: core_theme.AC.gold,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
@@ -312,7 +313,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
                     }
                   : null,
               icon: const Icon(Icons.download, size: 16),
-              label: const Text('تصدير PDF'),
+              label: Text('تصدير PDF'),
             ),
           ),
           const SizedBox(height: 8),
@@ -324,13 +325,13 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
                   context,
                   messageAr: 'Claude يشرح هذا الحساب بالتفصيل...',
                   icon: Icons.auto_awesome,
-                  color: const Color(0xFF7C3AED),
+                  color: core_theme.AC.purple,
                 );
               },
               icon: const Icon(Icons.auto_awesome, size: 16),
-              label: const Text('اطلب شرحاً من الذكاء'),
+              label: Text('اطلب شرحاً من الذكاء'),
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF7C3AED),
+                foregroundColor: core_theme.AC.purple,
               ),
             ),
           ),
@@ -357,14 +358,14 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.emoji_events, size: 18, color: Color(0xFFD97706)),
+              Icon(Icons.emoji_events, size: 18, color: core_theme.AC.warn),
               SizedBox(width: 6),
               Text(
                 'لماذا APEX أفضل من الجميع؟',
@@ -380,10 +381,10 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
             },
             children: [
               TableRow(
-                decoration: BoxDecoration(color: Colors.black.withOpacity(0.04)),
+                decoration: BoxDecoration(color: core_theme.AC.tp.withOpacity(0.04)),
                 children: [
                   const _CompHeader(label: 'الميزة'),
-                  _CompHeader(label: 'APEX', color: const Color(0xFFD4AF37)),
+                  _CompHeader(label: 'APEX', color: core_theme.AC.gold),
                   const _CompHeader(label: 'Avalara'),
                   const _CompHeader(label: 'Vertex'),
                   const _CompHeader(label: 'Wafeq'),
@@ -464,13 +465,13 @@ class _ScenarioRowState extends State<_ScenarioRow> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? const Color(0xFFD4AF37).withOpacity(0.15)
+                ? core_theme.AC.gold.withOpacity(0.15)
                 : _hover
-                    ? Colors.black.withOpacity(0.03)
+                    ? core_theme.AC.tp.withOpacity(0.03)
                     : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             border: widget.isActive
-                ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4))
+                ? Border.all(color: core_theme.AC.gold.withOpacity(0.4))
                 : null,
           ),
           child: Row(
@@ -478,7 +479,7 @@ class _ScenarioRowState extends State<_ScenarioRow> {
               Icon(
                 widget.isActive ? Icons.check_circle : Icons.play_circle_outline,
                 size: 14,
-                color: widget.isActive ? const Color(0xFFD4AF37) : Colors.black54,
+                color: widget.isActive ? core_theme.AC.gold : core_theme.AC.ts,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -492,9 +493,9 @@ class _ScenarioRowState extends State<_ScenarioRow> {
               ),
               Text(
                 '${widget.scenario.amount.toStringAsFixed(0)} ر.س',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
-                  color: Colors.black54,
+                  color: core_theme.AC.ts,
                   fontFamily: 'monospace',
                 ),
               ),
@@ -527,7 +528,7 @@ class _CompHeader extends StatelessWidget {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w800,
-          color: color ?? Colors.black87,
+          color: color ?? core_theme.AC.tp,
         ),
         textAlign: TextAlign.center,
       ),
@@ -547,10 +548,10 @@ class _CompCell extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: highlighted
           ? BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.06),
+              color: core_theme.AC.gold.withOpacity(0.06),
               border: Border(
-                left: BorderSide(color: const Color(0xFFD4AF37).withOpacity(0.2)),
-                right: BorderSide(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                left: BorderSide(color: core_theme.AC.gold.withOpacity(0.2)),
+                right: BorderSide(color: core_theme.AC.gold.withOpacity(0.2)),
               ),
             )
           : null,
@@ -558,8 +559,8 @@ class _CompCell extends StatelessWidget {
         value ? Icons.check : Icons.close,
         size: 16,
         color: value
-            ? (highlighted ? const Color(0xFF059669) : Colors.green)
-            : Colors.black26,
+            ? (highlighted ? core_theme.AC.ok : core_theme.AC.ok)
+            : core_theme.AC.td,
       ),
     );
   }

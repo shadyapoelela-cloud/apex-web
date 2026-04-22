@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class BreakEvenV52Screen extends StatefulWidget {
   const BreakEvenV52Screen({super.key});
@@ -11,8 +12,8 @@ class BreakEvenV52Screen extends StatefulWidget {
 }
 
 class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   // Inputs
   double _fixedCosts = 1800000;
@@ -53,24 +54,24 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
       color: Colors.white,
       padding: const EdgeInsets.all(16),
       child: Row(children: [
-        const Icon(Icons.balance, color: _gold),
+        Icon(Icons.balance, color: _gold),
         const SizedBox(width: 8),
-        const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('نقطة التعادل — Break-Even Analysis', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
-          Text('حاسبة تفاعلية — أدخل البيانات وشاهد النقطة فوراً', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('حاسبة تفاعلية — أدخل البيانات وشاهد النقطة فوراً', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ])),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.bookmark_border, size: 16), label: const Text('حفظ الحساب')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.bookmark_border, size: 16), label: Text('حفظ الحساب')),
         const SizedBox(width: 8),
-        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.download, size: 16), label: const Text('تصدير PDF')),
+        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.download, size: 16), label: Text('تصدير PDF')),
       ]),
     );
   }
 
   Widget _modeSelector() {
-    const modes = [
-      ('units', 'منتج واحد', Icons.inventory_2, Colors.blue),
-      ('multi', 'متعدد المنتجات', Icons.category, Colors.purple),
-      ('revenue', 'بناءً على الإيراد', Icons.trending_up, Colors.green),
+    final modes = [
+      ('units', 'منتج واحد', Icons.inventory_2, core_theme.AC.info),
+      ('multi', 'متعدد المنتجات', Icons.category, core_theme.AC.purple),
+      ('revenue', 'بناءً على الإيراد', Icons.trending_up, core_theme.AC.ok),
     ];
     return Container(
       color: Colors.white,
@@ -81,11 +82,11 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
           onTap: () => setState(() => _mode = m.$1),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(color: selected ? m.$4.withOpacity(0.12) : Colors.grey.shade50, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? m.$4 : Colors.grey.shade300)),
+            decoration: BoxDecoration(color: selected ? m.$4.withOpacity(0.12) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? m.$4 : core_theme.AC.bdr)),
             child: Row(children: [
-              Icon(m.$3, size: 14, color: selected ? m.$4 : Colors.black54),
+              Icon(m.$3, size: 14, color: selected ? m.$4 : core_theme.AC.ts),
               const SizedBox(width: 6),
-              Text(m.$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: selected ? m.$4 : Colors.black87)),
+              Text(m.$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: selected ? m.$4 : core_theme.AC.tp)),
             ]),
           ),
         ));
@@ -98,12 +99,12 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
       color: Colors.white,
       padding: const EdgeInsets.all(16),
       child: ListView(children: [
-        const Text('📝 المدخلات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+        Text('📝 المدخلات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
-        _card('التكاليف الثابتة', 'Fixed Costs', Icons.account_balance, Colors.orange, Column(children: [
+        _card('التكاليف الثابتة', 'Fixed Costs', Icons.account_balance, core_theme.AC.warn, Column(children: [
           _numberField('إجمالي التكاليف الثابتة السنوية', _fixedCosts, 'ر.س', (v) => setState(() => _fixedCosts = v)),
           const SizedBox(height: 6),
-          Text('تشمل: الإيجار، الرواتب الأساسية، الإهلاك، التأمين', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+          Text('تشمل: الإيجار، الرواتب الأساسية، الإهلاك، التأمين', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ])),
         const SizedBox(height: 14),
         _card('السعر والتكلفة المتغيّرة', 'Unit Economics', Icons.attach_money, _gold, Column(children: [
@@ -111,14 +112,14 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
           const SizedBox(height: 10),
           _numberField('التكلفة المتغيّرة للوحدة', _variableCostPerUnit, 'ر.س', (v) => setState(() => _variableCostPerUnit = v)),
           const SizedBox(height: 10),
-          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.green.withOpacity(0.08), borderRadius: BorderRadius.circular(6)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [const Icon(Icons.calculate, size: 14, color: Colors.green), const SizedBox(width: 6), const Text('هامش المساهمة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green)), const Spacer(), Text('${_contributionMargin.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.green))]),
+          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(6)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [Icon(Icons.calculate, size: 14, color: core_theme.AC.ok), const SizedBox(width: 6), Text('هامش المساهمة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok)), const Spacer(), Text('${_contributionMargin.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.ok))]),
             const SizedBox(height: 4),
-            Row(children: [Text('النسبة (CMR)', style: TextStyle(fontSize: 10, color: Colors.green.withOpacity(0.8))), const Spacer(), Text('${(_contributionMarginRatio * 100).toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.green))]),
+            Row(children: [Text('النسبة (CMR)', style: TextStyle(fontSize: 10, color: core_theme.AC.ok.withOpacity(0.8))), const Spacer(), Text('${(_contributionMarginRatio * 100).toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.ok))]),
           ])),
         ])),
         const SizedBox(height: 14),
-        _card('الربح المستهدَف (اختياري)', 'Target Profit', Icons.flag, Colors.blue, Column(children: [
+        _card('الربح المستهدَف (اختياري)', 'Target Profit', Icons.flag, core_theme.AC.info, Column(children: [
           _numberField('الربح الذي تريده بعد التعادل', _targetProfit, 'ر.س', (v) => setState(() => _targetProfit = v)),
         ])),
       ]),
@@ -175,29 +176,29 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
       color: const Color(0xFFF6F6F5),
       padding: const EdgeInsets.all(16),
       child: ListView(children: [
-        const Text('📊 النتائج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+        Text('📊 النتائج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
 
         // Big result — Break-even point
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [_gold.withOpacity(0.12), Colors.green.withOpacity(0.08)]),
+            gradient: LinearGradient(colors: [_gold.withOpacity(0.12), core_theme.AC.ok.withOpacity(0.08)]),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: _gold, width: 2),
           ),
           child: Row(children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withOpacity(0.15), borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.flag, color: _gold, size: 32)),
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withOpacity(0.15), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.flag, color: _gold, size: 32)),
             const SizedBox(width: 16),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('نقطة التعادل (Break-Even Point)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
+              Text('نقطة التعادل (Break-Even Point)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
               const SizedBox(height: 6),
               Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
-                Text('${_breakEvenUnits.toStringAsFixed(0)}', style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: _gold, fontFamily: 'monospace')),
+                Text('${_breakEvenUnits.toStringAsFixed(0)}', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: _gold, fontFamily: 'monospace')),
                 const SizedBox(width: 8),
-                const Text('وحدة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _navy)),
+                Text('وحدة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _navy)),
               ]),
-              Text('= ${(_breakEvenRevenue / 1000).toStringAsFixed(0)}K ر.س إيراد', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black54)),
+              Text('= ${(_breakEvenRevenue / 1000).toStringAsFixed(0)}K ر.س إيراد', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: core_theme.AC.ts)),
             ])),
           ]),
         ),
@@ -207,20 +208,20 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
         // Target profit section
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Colors.blue.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.blue.withOpacity(0.3))),
+          decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.info.withOpacity(0.3))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Row(children: [
-              Icon(Icons.flag, color: Colors.blue),
+            Row(children: [
+              Icon(Icons.flag, color: core_theme.AC.info),
               SizedBox(width: 8),
-              Text('للوصول إلى ربحك المستهدف', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.blue)),
+              Text('للوصول إلى ربحك المستهدف', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
             ]),
             const SizedBox(height: 8),
             Row(children: [
-              Expanded(child: _smallStat('وحدات مطلوبة', '${_targetUnits.toStringAsFixed(0)}', 'وحدة', Colors.blue)),
+              Expanded(child: _smallStat('وحدات مطلوبة', '${_targetUnits.toStringAsFixed(0)}', 'وحدة', core_theme.AC.info)),
               const SizedBox(width: 10),
-              Expanded(child: _smallStat('إيراد مطلوب', '${(_targetRevenue / 1000).toStringAsFixed(0)}K', 'ر.س', Colors.blue)),
+              Expanded(child: _smallStat('إيراد مطلوب', '${(_targetRevenue / 1000).toStringAsFixed(0)}K', 'ر.س', core_theme.AC.info)),
               const SizedBox(width: 10),
-              Expanded(child: _smallStat('هامش الأمان', '${_marginOfSafety.toStringAsFixed(1)}', '%', _marginOfSafety >= 20 ? Colors.green : Colors.orange)),
+              Expanded(child: _smallStat('هامش الأمان', '${_marginOfSafety.toStringAsFixed(1)}', '%', _marginOfSafety >= 20 ? core_theme.AC.ok : core_theme.AC.warn)),
             ]),
           ]),
         ),
@@ -228,14 +229,14 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
         const SizedBox(height: 20),
 
         // Chart-style visualization
-        const Text('📈 الرسم البياني', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
+        Text('📈 الرسم البياني', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 10),
         _chart(),
 
         const SizedBox(height: 20),
 
         // Sensitivity analysis
-        const Text('🔬 تحليل الحساسية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
+        Text('🔬 تحليل الحساسية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 10),
         _sensitivity(),
       ]),
@@ -248,16 +249,16 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
     return Container(
       height: 240,
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
       child: Column(children: [
         Row(children: [
-          _chartLegend(Colors.blue, 'الإيراد'),
+          _chartLegend(core_theme.AC.info, 'الإيراد'),
           const SizedBox(width: 16),
-          _chartLegend(Colors.red, 'التكاليف الكلّية'),
+          _chartLegend(core_theme.AC.err, 'التكاليف الكلّية'),
           const SizedBox(width: 16),
-          _chartLegend(Colors.orange, 'التكاليف الثابتة'),
+          _chartLegend(core_theme.AC.warn, 'التكاليف الثابتة'),
           const Spacer(),
-          Text('الكمية المُباعة', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+          Text('الكمية المُباعة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ]),
         const SizedBox(height: 10),
         Expanded(child: CustomPaint(
@@ -284,7 +285,7 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
 
   Widget _sensitivity() {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
       child: Column(children: [
         Container(padding: const EdgeInsets.all(10), color: _navy, child: const Row(children: [
           Expanded(flex: 2, child: Text('السيناريو', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800))),
@@ -311,15 +312,15 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
       final isFav = change < 0;
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey.shade200))),
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: core_theme.AC.bdr))),
         child: Row(children: [
           Expanded(flex: 2, child: Text(r.$1, style: const TextStyle(fontSize: 12))),
           Expanded(child: Text('${r.$2.toStringAsFixed(0)} وحدة', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, fontFamily: 'monospace'), textAlign: TextAlign.end)),
           Expanded(child: Container(
             margin: const EdgeInsets.only(right: 60),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(color: (isFav ? Colors.green : Colors.red).withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
-            child: Text('${changePct >= 0 ? '+' : ''}${changePct.toStringAsFixed(1)}%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: isFav ? Colors.green : Colors.red), textAlign: TextAlign.center),
+            decoration: BoxDecoration(color: (isFav ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+            child: Text('${changePct >= 0 ? '+' : ''}${changePct.toStringAsFixed(1)}%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: isFav ? core_theme.AC.ok : core_theme.AC.err), textAlign: TextAlign.center),
           )),
         ]),
       );
@@ -358,26 +359,26 @@ class _BreakEvenPainter extends CustomPainter {
     final xScale = size.width / maxUnits;
 
     // Revenue line (blue)
-    final revPaint = Paint()..color = Colors.blue..strokeWidth = 2.5..style = PaintingStyle.stroke;
+    final revPaint = Paint()..color = core_theme.AC.info..strokeWidth = 2.5..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(size.width, size.height), Offset(size.width - (maxUnits * xScale), size.height - (maxRevenue * yScale)), revPaint);
 
     // Total cost line (red)
-    final tcPaint = Paint()..color = Colors.red..strokeWidth = 2.5..style = PaintingStyle.stroke;
+    final tcPaint = Paint()..color = core_theme.AC.err..strokeWidth = 2.5..style = PaintingStyle.stroke;
     final tcAtZero = fixedCosts;
     final tcAtMax = fixedCosts + (variableCostPerUnit * maxUnits);
     canvas.drawLine(Offset(size.width, size.height - (tcAtZero * yScale)), Offset(size.width - (maxUnits * xScale), size.height - (tcAtMax * yScale)), tcPaint);
 
     // Fixed cost line (orange, horizontal)
-    final fcPaint = Paint()..color = Colors.orange..strokeWidth = 2..style = PaintingStyle.stroke;
+    final fcPaint = Paint()..color = core_theme.AC.warn..strokeWidth = 2..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(size.width, size.height - (fixedCosts * yScale)), Offset(0, size.height - (fixedCosts * yScale)), fcPaint);
 
     // Break-even point marker (gold circle)
     final bep = Offset(size.width - (breakEvenUnits * xScale), size.height - ((pricePerUnit * breakEvenUnits) * yScale));
-    canvas.drawCircle(bep, 8, Paint()..color = const Color(0xFFD4AF37));
+    canvas.drawCircle(bep, 8, Paint()..color = core_theme.AC.gold);
     canvas.drawCircle(bep, 8, Paint()..color = Colors.white..strokeWidth = 2..style = PaintingStyle.stroke);
 
     // Axis lines
-    final axisPaint = Paint()..color = Colors.grey.shade400..strokeWidth = 1;
+    final axisPaint = Paint()..color = core_theme.AC.td..strokeWidth = 1;
     canvas.drawLine(Offset(size.width, 0), Offset(size.width, size.height), axisPaint);
     canvas.drawLine(Offset(0, size.height), Offset(size.width, size.height), axisPaint);
   }

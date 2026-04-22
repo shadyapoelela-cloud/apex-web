@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 139 — ZATCA CSID Certificate Manager
 class ZatcaCsidManagerScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _ZatcaCsidManagerScreenState extends State<ZatcaCsidManagerScreen> with Si
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الشهادات النشطة'), Tab(text: 'التسجيل الجديد'), Tab(text: 'تنبيهات الانتهاء'), Tab(text: 'السجل')])),
         Expanded(child: TabBarView(controller: _tc, children: [_activeTab(), _registerTab(), _alertsTab(), _historyTab()])),
       ])),
@@ -32,13 +33,13 @@ class _ZatcaCsidManagerScreenState extends State<ZatcaCsidManagerScreen> with Si
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.vpn_key, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('مدير شهادات ZATCA CSID', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('Cryptographic Stamp ID — تسجيل وإدارة ودورة حياة كاملة', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('Cryptographic Stamp ID — تسجيل وإدارة ودورة حياة كاملة', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -54,7 +55,7 @@ class _ZatcaCsidManagerScreenState extends State<ZatcaCsidManagerScreen> with Si
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -82,19 +83,19 @@ class _ZatcaCsidManagerScreenState extends State<ZatcaCsidManagerScreen> with Si
           _mini('SN', c.serial),
         ]),
         const SizedBox(height: 6),
-        Text('فواتير موقّعة: ${c.invoicesSigned}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('فواتير موقّعة: ${c.invoicesSigned}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
     ));
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
   ]));
 
   Widget _registerTab() => ListView(padding: const EdgeInsets.all(14), children: [
     Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('تسجيل شهادة CSID جديدة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF4A148C))),
+      Text('تسجيل شهادة CSID جديدة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF4A148C))),
       const SizedBox(height: 14),
       _step(1, 'إنشاء CSR', 'Certificate Signing Request بمعلومات البائع'),
       _step(2, 'الحصول على OTP', 'من بوابة ZATCA Fatoora', isActive: true),
@@ -105,7 +106,7 @@ class _ZatcaCsidManagerScreenState extends State<ZatcaCsidManagerScreen> with Si
       ElevatedButton.icon(
         onPressed: () {},
         icon: const Icon(Icons.add_circle),
-        label: const Text('بدء التسجيل'),
+        label: Text('بدء التسجيل'),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF4A148C),
           foregroundColor: Colors.white,
@@ -118,13 +119,13 @@ class _ZatcaCsidManagerScreenState extends State<ZatcaCsidManagerScreen> with Si
   Widget _step(int num, String title, String desc, {bool isActive = false}) => Padding(padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(children: [
       Container(width: 32, height: 32, decoration: BoxDecoration(
-        color: isActive ? const Color(0xFFD4AF37) : Colors.black26, shape: BoxShape.circle),
+        color: isActive ? core_theme.AC.gold : core_theme.AC.td, shape: BoxShape.circle),
         child: Center(child: Text('$num', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))),
       const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13,
-          color: isActive ? const Color(0xFFD4AF37) : Colors.black87)),
-        Text(desc, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          color: isActive ? core_theme.AC.gold : core_theme.AC.tp)),
+        Text(desc, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ])),
     ]));
 
@@ -146,7 +147,7 @@ class _ZatcaCsidManagerScreenState extends State<ZatcaCsidManagerScreen> with Si
       leading: Icon(_historyIcon(h.$2), color: const Color(0xFF1A237E)),
       title: Text(h.$1, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
       subtitle: Text(h.$2, style: const TextStyle(fontSize: 10)),
-      trailing: Text(h.$3, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+      trailing: Text(h.$3, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
     ));
   });
 
@@ -162,13 +163,13 @@ class _ZatcaCsidManagerScreenState extends State<ZatcaCsidManagerScreen> with Si
     if (s.contains('نشطة')) return const Color(0xFF2E7D32);
     if (s.contains('قريب')) return const Color(0xFFE65100);
     if (s.contains('منتهية')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   Color _alertColor(String s) {
     if (s.contains('حرج')) return const Color(0xFFC62828);
     if (s.contains('عالي')) return const Color(0xFFE65100);
-    if (s.contains('متوسط')) return const Color(0xFFD4AF37);
+    if (s.contains('متوسط')) return core_theme.AC.gold;
     return const Color(0xFF1A237E);
   }
 

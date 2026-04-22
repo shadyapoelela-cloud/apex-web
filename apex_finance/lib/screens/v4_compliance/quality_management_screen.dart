@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 107 — Quality Management System (QMS) — ISO 9001
 class QualityManagementScreen extends StatefulWidget {
@@ -26,8 +27,8 @@ class _QualityManagementScreenState extends State<QualityManagementScreen> with 
             Container(color: Colors.white, child: TabBar(
               controller: _tc,
               labelColor: const Color(0xFF4A148C),
-              unselectedLabelColor: Colors.black54,
-              indicatorColor: const Color(0xFFD4AF37),
+              unselectedLabelColor: core_theme.AC.ts,
+              indicatorColor: core_theme.AC.gold,
               indicatorWeight: 3,
               tabs: const [
                 Tab(text: 'عدم المطابقة'),
@@ -49,18 +50,18 @@ class _QualityManagementScreenState extends State<QualityManagementScreen> with 
     padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
           child: const Icon(Icons.verified_user, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('إدارة الجودة QMS', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('نظام إدارة الجودة المتكامل — ISO 9001:2015', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('نظام إدارة الجودة المتكامل — ISO 9001:2015', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
       Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
-        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.verified, color: Color(0xFFD4AF37), size: 16), SizedBox(width: 4),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.verified, color: core_theme.AC.gold, size: 16), SizedBox(width: 4),
           Text('ISO 9001', style: TextStyle(color: Colors.white, fontSize: 12)),
         ])),
     ]),
@@ -79,7 +80,7 @@ class _QualityManagementScreenState extends State<QualityManagementScreen> with 
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 24), const SizedBox(width: 8),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -90,14 +91,14 @@ class _QualityManagementScreenState extends State<QualityManagementScreen> with 
       title: Text(n.id, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(n.description, style: const TextStyle(fontSize: 12)),
-        Text('${n.department} • ${n.date}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('${n.department} • ${n.date}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
           child: Text(n.severity, style: TextStyle(color: c, fontSize: 10, fontWeight: FontWeight.bold))),
         const SizedBox(height: 4),
-        Text(n.status, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(n.status, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -114,19 +115,19 @@ class _QualityManagementScreenState extends State<QualityManagementScreen> with 
             Text(c.id, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             Text(c.title, style: const TextStyle(fontSize: 12)),
           ])),
-          Text('${c.progress}%', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD4AF37))),
+          Text('${c.progress}%', style: TextStyle(fontWeight: FontWeight.bold, color: core_theme.AC.gold)),
         ]),
         const SizedBox(height: 8),
-        Text(c.rootCause, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+        Text(c.rootCause, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
         const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: core_theme.AC.bdr, valueColor: AlwaysStoppedAnimation(core_theme.AC.gold))),
         const SizedBox(height: 6),
         Row(children: [
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: _capaStatusColor(c.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Text(c.status, style: TextStyle(color: _capaStatusColor(c.status), fontSize: 10, fontWeight: FontWeight.bold))),
           const Spacer(),
-          Text('المسؤول: ${c.owner}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('المسؤول: ${c.owner}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ]),
       ]),
     ));
@@ -139,9 +140,9 @@ class _QualityManagementScreenState extends State<QualityManagementScreen> with 
       title: Text(a.title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${a.type} • ${a.auditor}', style: const TextStyle(fontSize: 12)),
-        Text('نتائج: ${a.findings} • نقاط عدم مطابقة: ${a.nonConformities}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('نتائج: ${a.findings} • نقاط عدم مطابقة: ${a.nonConformities}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
-      trailing: Text(a.date, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+      trailing: Text(a.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
     ));
   });
 
@@ -158,7 +159,7 @@ class _QualityManagementScreenState extends State<QualityManagementScreen> with 
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _severityColor(String s) {
@@ -172,7 +173,7 @@ class _QualityManagementScreenState extends State<QualityManagementScreen> with 
     if (s.contains('مكتمل')) return const Color(0xFF2E7D32);
     if (s.contains('قيد')) return const Color(0xFFE65100);
     if (s.contains('جديد')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Ncr> _ncrs = [

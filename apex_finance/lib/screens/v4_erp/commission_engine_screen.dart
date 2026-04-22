@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CommissionEngineScreen extends StatefulWidget {
   const CommissionEngineScreen({super.key});
@@ -25,12 +26,12 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
     _Rep('SR-006', 'أحمد العنزي', 'Junior AE', 180000, 98000, 1, 3),
   ];
 
-  final _tiers = const [
-    _Tier('أقل من 70%', 0, 70, 0, Colors.red),
-    _Tier('عند التحقيق 70-100%', 70, 100, 3, Colors.amber),
-    _Tier('التحقيق الكامل 100-120%', 100, 120, 5, Colors.green),
-    _Tier('متفوّق 120-150%', 120, 150, 8, Colors.teal),
-    _Tier('فوق التوقع > 150%', 150, 1000, 12, Color(0xFFD4AF37)),
+  final _tiers = [
+    _Tier('أقل من 70%', 0, 70, 0, core_theme.AC.err),
+    _Tier('عند التحقيق 70-100%', 70, 100, 3, core_theme.AC.warn),
+    _Tier('التحقيق الكامل 100-120%', 100, 120, 5, core_theme.AC.ok),
+    _Tier('متفوّق 120-150%', 120, 150, 8, core_theme.AC.info),
+    _Tier('فوق التوقع > 150%', 150, 1000, 12, core_theme.AC.gold),
   ];
 
   @override
@@ -52,9 +53,9 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
         _buildHero(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.leaderboard, size: 16), text: 'أداء مندوبي المبيعات'),
             Tab(icon: Icon(Icons.tune, size: 16), text: 'قواعد العمولة'),
@@ -89,14 +90,14 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
         children: [
           const Icon(Icons.emoji_events, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('محرّك العمولات',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('حوافز المبيعات — قواعد متدرّجة · تحقيق الحصص · حسابات تلقائية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -122,7 +123,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+              Text(label, style: TextStyle(color: core_theme.AC.ts, fontSize: 10)),
               Text(value,
                   style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -159,16 +160,16 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                   color: i == 0
                       ? const Color(0xFFFFD700)
                       : i == 1
-                          ? Colors.grey.shade400
+                          ? core_theme.AC.td
                           : i == 2
-                              ? Colors.orange.shade300
-                              : Colors.grey.shade200,
+                              ? core_theme.AC.warn
+                              : core_theme.AC.bdr,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
                   child: Text('${i + 1}',
                       style: TextStyle(
-                          color: i < 3 ? Colors.white : Colors.black87,
+                          color: i < 3 ? Colors.white : core_theme.AC.tp,
                           fontSize: 18,
                           fontWeight: FontWeight.w900)),
                 ),
@@ -182,14 +183,14 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                     Row(
                       children: [
                         Text(r.id,
-                            style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                            style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                         const SizedBox(width: 6),
                         Text(r.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                       ],
                     ),
-                    Text(r.title, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text(r.title, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     Text('${r.deals} صفقة · ${r.activeCustomers} عميل نشط',
-                        style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -201,10 +202,10 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                     Row(
                       children: [
                         Text(_fmtM(r.actual),
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
                         Text(' / ${_fmtM(r.quota)}',
-                            style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                            style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -213,7 +214,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                         Expanded(
                           child: LinearProgressIndicator(
                             value: (pct / 100).clamp(0.0, 2.0),
-                            backgroundColor: Colors.grey.shade200,
+                            backgroundColor: core_theme.AC.bdr,
                             valueColor: AlwaysStoppedAnimation(tier.color),
                             minHeight: 8,
                           ),
@@ -240,11 +241,11 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('العمولة', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text('العمولة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(_fmt(commission),
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                  const Text('ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      style: TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                  Text('ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ],
               ),
             ],
@@ -261,13 +262,13 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -279,7 +280,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
           ),
         ),
         const SizedBox(height: 16),
-        const Text('شرائح العمولة 2026', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+        Text('شرائح العمولة 2026', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
         const SizedBox(height: 12),
         for (final t in _tiers)
           Container(
@@ -312,7 +313,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                       Text(t.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                       Text(
                         'النطاق: ${t.minPct}% — ${t.maxPct >= 1000 ? '∞' : '${t.maxPct}%'} من تحقيق الحصة',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                       ),
                     ],
                   ),
@@ -335,16 +336,16 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFD4AF37).withOpacity(0.08),
+            color: core_theme.AC.gold.withOpacity(0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.25)),
+            border: Border.all(color: core_theme.AC.gold.withOpacity(0.25)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.bolt, color: Color(0xFFD4AF37)),
+                  Icon(Icons.bolt, color: core_theme.AC.gold),
                   SizedBox(width: 8),
                   Text('مكافآت إضافية (Accelerators)',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
@@ -370,7 +371,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
           Text(emoji, style: const TextStyle(fontSize: 18)),
           const SizedBox(width: 10),
           Expanded(child: Text(condition, style: const TextStyle(fontSize: 12))),
-          Text(reward, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+          Text(reward, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
         ],
       ),
     );
@@ -386,19 +387,19 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+            gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
             children: [
               const Icon(Icons.payments, color: Colors.white, size: 32),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('مسير العمولات — أبريل 2026',
-                        style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     Text('${6} مندوب مستحق',
                         style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
                   ],
@@ -407,7 +408,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
               Text(_fmt(totalPayout),
                   style: const TextStyle(
                       color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Text(' ر.س', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(' ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
             ],
           ),
         ),
@@ -416,20 +417,20 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     Expanded(flex: 3, child: Text('المندوب', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 2, child: Text('المبيعات', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('التحقيق', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('الشريحة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(flex: 2, child: Text('العمولة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(flex: 2, child: Text('العمولة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                     SizedBox(width: 120),
                   ],
                 ),
@@ -438,7 +439,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
@@ -448,9 +449,9 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                           children: [
                             CircleAvatar(
                               radius: 12,
-                              backgroundColor: const Color(0xFFD4AF37).withOpacity(0.15),
+                              backgroundColor: core_theme.AC.gold.withOpacity(0.15),
                               child: Text(p.rep.name.substring(0, 1),
-                                  style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 11, fontWeight: FontWeight.w900)),
+                                  style: TextStyle(color: core_theme.AC.gold, fontSize: 11, fontWeight: FontWeight.w900)),
                             ),
                             const SizedBox(width: 8),
                             Expanded(child: Text(p.rep.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
@@ -465,10 +466,10 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                       Expanded(
                         flex: 2,
                         child: Text(_fmt(p.commission),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFFD4AF37),
+                                color: core_theme.AC.gold,
                                 fontFamily: 'monospace')),
                       ),
                       SizedBox(
@@ -481,18 +482,18 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 minimumSize: const Size(0, 28),
                               ),
-                              child: const Text('مراجعة', style: TextStyle(fontSize: 10)),
+                              child: Text('مراجعة', style: TextStyle(fontSize: 10)),
                             ),
                             const SizedBox(width: 6),
                             ElevatedButton(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
+                                backgroundColor: core_theme.AC.ok,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 minimumSize: const Size(0, 28),
                               ),
-                              child: const Text('اعتماد', style: TextStyle(fontSize: 10)),
+                              child: Text('اعتماد', style: TextStyle(fontSize: 10)),
                             ),
                           ],
                         ),

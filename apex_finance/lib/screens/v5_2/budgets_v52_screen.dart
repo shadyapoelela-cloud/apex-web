@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class BudgetsV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class BudgetsV52Screen extends StatefulWidget {
 }
 
 class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _budgets = <_B>[
@@ -43,10 +44,10 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
         SavedView(id: 'depts', labelAr: 'حسب القسم', icon: Icons.pie_chart, defaultViewMode: ViewMode.kanban),
       ],
       filterChips: [
-        FilterChipDef(id: 'draft', labelAr: 'مسودة', color: Colors.grey, count: _cnt(_St.draft), active: _filter == 'draft'),
-        FilterChipDef(id: 'active', labelAr: 'نشطة', color: Colors.green, count: _cnt(_St.active), active: _filter == 'active'),
-        FilterChipDef(id: 'overBudget', labelAr: 'تجاوز', color: Colors.red, count: _cnt(_St.overBudget), active: _filter == 'overBudget'),
-        FilterChipDef(id: 'closed', labelAr: 'مغلقة', color: Colors.blue, count: _cnt(_St.closed), active: _filter == 'closed'),
+        FilterChipDef(id: 'draft', labelAr: 'مسودة', color: core_theme.AC.td, count: _cnt(_St.draft), active: _filter == 'draft'),
+        FilterChipDef(id: 'active', labelAr: 'نشطة', color: core_theme.AC.ok, count: _cnt(_St.active), active: _filter == 'active'),
+        FilterChipDef(id: 'overBudget', labelAr: 'تجاوز', color: core_theme.AC.err, count: _cnt(_St.overBudget), active: _filter == 'overBudget'),
+        FilterChipDef(id: 'closed', labelAr: 'مغلقة', color: core_theme.AC.info, count: _cnt(_St.closed), active: _filter == 'closed'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -74,20 +75,20 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
             Row(children: [
               Container(width: 4, height: 40, color: b.status.color),
               const SizedBox(width: 12),
-              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: _gold.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.pie_chart, color: _gold)),
+              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: _gold.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.pie_chart, color: _gold)),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Text(b.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                  Text(b.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                   const SizedBox(width: 8),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(b.type, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(b.type, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
                 ]),
                 Text(b.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                Text('${b.period} · المسؤول: ${b.owner}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('${b.period} · المسؤول: ${b.owner}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ])),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('الميزانية', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-                Text('${(b.budget / 1e6).toStringAsFixed(2)}M ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+                Text('الميزانية', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+                Text('${(b.budget / 1e6).toStringAsFixed(2)}M ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
               ]),
               const SizedBox(width: 16),
               Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: b.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(b.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: b.status.color))),
@@ -99,10 +100,10 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
                   Row(children: [
                     Text('الفعلي: ${(b.actual / 1e6).toStringAsFixed(2)}M', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                     const Spacer(),
-                    Text('${util.toStringAsFixed(1)}% من الميزانية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: util > 100 ? Colors.red : util > 90 ? Colors.orange : Colors.green)),
+                    Text('${util.toStringAsFixed(1)}% من الميزانية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: util > 100 ? core_theme.AC.err : util > 90 ? core_theme.AC.warn : core_theme.AC.ok)),
                   ]),
                   const SizedBox(height: 4),
-                  ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: (util / 100).clamp(0.0, 1.0), minHeight: 10, backgroundColor: Colors.grey.shade200, color: util > 100 ? Colors.red : util > 90 ? Colors.orange : Colors.green)),
+                  ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: (util / 100).clamp(0.0, 1.0), minHeight: 10, backgroundColor: core_theme.AC.bdr, color: util > 100 ? core_theme.AC.err : util > 90 ? core_theme.AC.warn : core_theme.AC.ok)),
                 ])),
               ]),
             ],
@@ -123,30 +124,30 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
         return Container(
           width: 300,
           margin: const EdgeInsets.only(left: 10),
-          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
-              const Icon(Icons.pie_chart, color: _gold, size: 18),
+              Icon(Icons.pie_chart, color: _gold, size: 18),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(t, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold)),
-                Text('${(total / 1e6).toStringAsFixed(1)}M ر.س', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(t, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold)),
+                Text('${(total / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _gold.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _gold))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _gold.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _gold))),
             ])),
             ...items.map((b) {
               final util = b.budget > 0 ? (b.actual / b.budget * 100) : 0.0;
               return Container(
                 margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(b.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 9, color: Colors.black54)),
+                  Text(b.id, style: TextStyle(fontFamily: 'monospace', fontSize: 9, color: core_theme.AC.ts)),
                   Text(b.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
-                  Text('${(b.budget / 1e6).toStringAsFixed(1)}M ر.س', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
+                  Text('${(b.budget / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
                   const SizedBox(height: 4),
-                  ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: (util / 100).clamp(0.0, 1.0), minHeight: 4, backgroundColor: Colors.grey.shade200, color: util > 100 ? Colors.red : _gold)),
+                  ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: (util / 100).clamp(0.0, 1.0), minHeight: 4, backgroundColor: core_theme.AC.bdr, color: util > 100 ? core_theme.AC.err : _gold)),
                 ]),
               );
             }),
@@ -163,7 +164,7 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('استغلال الموازنات النشطة — الأعلى أولاً', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('استغلال الموازنات النشطة — الأعلى أولاً', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         ...active.map((b) {
           final util = b.budget > 0 ? b.actual / b.budget : 0.0;
@@ -171,11 +172,11 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
             Row(children: [
               SizedBox(width: 240, child: Text(b.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
               Expanded(child: Stack(children: [
-                Container(height: 22, decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(3))),
-                FractionallySizedBox(widthFactor: util.clamp(0.0, 1.0), child: Container(height: 22, decoration: BoxDecoration(color: util > 1.0 ? Colors.red : _gold, borderRadius: BorderRadius.circular(3)))),
+                Container(height: 22, decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(3))),
+                FractionallySizedBox(widthFactor: util.clamp(0.0, 1.0), child: Container(height: 22, decoration: BoxDecoration(color: util > 1.0 ? core_theme.AC.err : _gold, borderRadius: BorderRadius.circular(3)))),
               ])),
               const SizedBox(width: 10),
-              SizedBox(width: 100, child: Text('${(util * 100).toStringAsFixed(1)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: util > 1.0 ? Colors.red : _gold), textAlign: TextAlign.end)),
+              SizedBox(width: 100, child: Text('${(util * 100).toStringAsFixed(1)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: util > 1.0 ? core_theme.AC.err : _gold), textAlign: TextAlign.end)),
             ]),
           ]));
         }),
@@ -194,10 +195,10 @@ extension _StX on _St {
         _St.closed => 'مغلقة',
       };
   Color get color => switch (this) {
-        _St.draft => Colors.grey,
-        _St.active => Colors.green,
-        _St.overBudget => Colors.red,
-        _St.closed => Colors.blue,
+        _St.draft => core_theme.AC.td,
+        _St.active => core_theme.AC.ok,
+        _St.overBudget => core_theme.AC.err,
+        _St.closed => core_theme.AC.info,
       };
 }
 

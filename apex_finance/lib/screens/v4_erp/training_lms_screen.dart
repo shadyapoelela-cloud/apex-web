@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class TrainingLmsScreen extends StatefulWidget {
   const TrainingLmsScreen({super.key});
@@ -59,9 +60,9 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
         _buildMyStats(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.school, size: 16), text: 'تدريبي'),
             Tab(icon: Icon(Icons.library_books, size: 16), text: 'كتالوج الدورات'),
@@ -92,7 +93,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
         gradient: const LinearGradient(colors: [Color(0xFF00695C), Color(0xFF00838F)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.school, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -103,7 +104,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                 Text('الأكاديمية',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('نظام التعلّم والتطوير · 128 دورة · شهادات معتمدة · متابعة الإلزامي',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -117,10 +118,10 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _statCard('ساعات تدريبي السنوية', '42h', 'من 48h المستهدفة', 0.88, Colors.blue),
-          _statCard('دورات مكتملة', '12', 'آخرها: ZATCA Phase 2', null, Colors.green),
-          _statCard('قيد التقدّم', '3', 'نسبة الإنجاز 47%', 0.47, Colors.orange),
-          _statCard('الشهادات النشطة', '8', 'منها 3 معتمدة دولياً', null, const Color(0xFFD4AF37)),
+          _statCard('ساعات تدريبي السنوية', '42h', 'من 48h المستهدفة', 0.88, core_theme.AC.info),
+          _statCard('دورات مكتملة', '12', 'آخرها: ZATCA Phase 2', null, core_theme.AC.ok),
+          _statCard('قيد التقدّم', '3', 'نسبة الإنجاز 47%', 0.47, core_theme.AC.warn),
+          _statCard('الشهادات النشطة', '8', 'منها 3 معتمدة دولياً', null, core_theme.AC.gold),
         ],
       ),
     );
@@ -139,16 +140,16 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             const SizedBox(height: 6),
             Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: color)),
             const SizedBox(height: 4),
-            Text(note, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text(note, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             if (progress != null) ...[
               const SizedBox(height: 6),
               LinearProgressIndicator(
                 value: progress,
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: core_theme.AC.bdr,
                 valueColor: AlwaysStoppedAnimation(color),
                 minHeight: 6,
               ),
@@ -172,7 +173,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: t.completed ? Colors.green.withOpacity(0.3) : Colors.blue.withOpacity(0.3)),
+            border: Border.all(color: t.completed ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.info.withOpacity(0.3)),
           ),
           child: Row(
             children: [
@@ -180,11 +181,11 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: (t.completed ? Colors.green : Colors.blue).withOpacity(0.12),
+                  color: (t.completed ? core_theme.AC.ok : core_theme.AC.info).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(t.completed ? Icons.emoji_events : Icons.play_circle,
-                    color: t.completed ? Colors.green : Colors.blue, size: 26),
+                    color: t.completed ? core_theme.AC.ok : core_theme.AC.info, size: 26),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -194,7 +195,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                   children: [
                     Text(course.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                     Text('${course.category} · ${course.minutes} دقيقة',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -205,9 +206,9 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                   children: [
                     LinearProgressIndicator(
                       value: t.progress / 100,
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: core_theme.AC.bdr,
                       valueColor: AlwaysStoppedAnimation(
-                          t.progress == 100 ? Colors.green : Colors.blue),
+                          t.progress == 100 ? core_theme.AC.ok : core_theme.AC.info),
                       minHeight: 8,
                     ),
                     const SizedBox(height: 4),
@@ -220,20 +221,20 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
               if (t.grade != null) ...[
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: core_theme.AC.ok, borderRadius: BorderRadius.circular(8)),
                   child: Text(t.grade!,
                       style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
                 ),
                 const SizedBox(width: 8),
                 Text(t.completedAt ?? '',
-                    style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
               ] else
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.play_arrow, size: 14),
-                  label: const Text('متابعة', style: TextStyle(fontSize: 11)),
+                  label: Text('متابعة', style: TextStyle(fontSize: 11)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: core_theme.AC.info,
                     foregroundColor: Colors.white,
                   ),
                 ),
@@ -270,7 +271,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,9 +288,9 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
               if (c.mandatory)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.red.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-                  child: const Text('إلزامي',
-                      style: TextStyle(fontSize: 9, color: Colors.red, fontWeight: FontWeight.w800)),
+                  decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                  child: Text('إلزامي',
+                      style: TextStyle(fontSize: 9, color: core_theme.AC.err, fontWeight: FontWeight.w800)),
                 ),
             ],
           ),
@@ -298,10 +299,10 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
           const Spacer(),
           Row(
             children: [
-              const Icon(Icons.schedule, size: 12, color: Colors.black54),
+              Icon(Icons.schedule, size: 12, color: core_theme.AC.ts),
               const SizedBox(width: 3),
               Text('${c.minutes} دقيقة',
-                  style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const Spacer(),
               const Icon(Icons.star, size: 12, color: Color(0xFFFFD700)),
               Text(' ${c.rating}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
@@ -310,19 +311,19 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.people, size: 12, color: Colors.black54),
+              Icon(Icons.people, size: 12, color: core_theme.AC.ts),
               const SizedBox(width: 3),
-              Text('${c.enrolled} مسجّل', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('${c.enrolled} مسجّل', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const Spacer(),
               OutlinedButton(
                 onPressed: () {},
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFD4AF37),
-                  side: const BorderSide(color: Color(0xFFD4AF37)),
+                  foregroundColor: core_theme.AC.gold,
+                  side: BorderSide(color: core_theme.AC.gold),
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   minimumSize: const Size(0, 28),
                 ),
-                child: const Text('التسجيل', style: TextStyle(fontSize: 11)),
+                child: Text('التسجيل', style: TextStyle(fontSize: 11)),
               ),
             ],
           ),
@@ -339,13 +340,13 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.red.shade50,
+            color: core_theme.AC.err,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.red.shade200),
+            border: Border.all(color: core_theme.AC.err),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.warning_amber, color: Colors.red),
+              Icon(Icons.warning_amber, color: core_theme.AC.err),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -364,14 +365,14 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.red.shade200),
+              border: Border.all(color: core_theme.AC.err),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: Colors.red.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
-                  child: const Icon(Icons.priority_high, color: Colors.red),
+                  decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                  child: Icon(Icons.priority_high, color: core_theme.AC.err),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -380,26 +381,26 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                     children: [
                       Text(c.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                       Text('${c.category} · ${c.minutes} دقيقة',
-                          style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     ],
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text('آخر موعد', style: TextStyle(fontSize: 10, color: Colors.black54)),
-                    const Text('2026-05-31',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.red, fontFamily: 'monospace')),
+                    Text('آخر موعد', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+                    Text('2026-05-31',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.err, fontFamily: 'monospace')),
                   ],
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: core_theme.AC.err,
                     foregroundColor: Colors.white,
                   ),
-                  child: const Text('ابدأ الآن'),
+                  child: Text('ابدأ الآن'),
                 ),
               ],
             ),
@@ -436,11 +437,11 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: c.active
-                        ? [const Color(0xFFD4AF37).withOpacity(0.1), const Color(0xFFE6C200).withOpacity(0.05)]
-                        : [Colors.grey.shade100, Colors.grey.shade50],
+                        ? [core_theme.AC.gold.withOpacity(0.1), const Color(0xFFE6C200).withOpacity(0.05)]
+                        : [core_theme.AC.navy3, core_theme.AC.navy3],
                   ),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: c.active ? const Color(0xFFD4AF37) : Colors.grey, width: 1.5),
+                  border: Border.all(color: c.active ? core_theme.AC.gold : core_theme.AC.td, width: 1.5),
                 ),
                 child: Row(
                   children: [
@@ -448,7 +449,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: c.active ? const Color(0xFFD4AF37) : Colors.grey,
+                        color: c.active ? core_theme.AC.gold : core_theme.AC.td,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.workspace_premium, color: Colors.white, size: 32),
@@ -462,25 +463,25 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis),
-                          Text(c.issuer, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                          Text(c.issuer, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                           const SizedBox(height: 4),
                           Row(
                             children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: (c.active ? Colors.green : Colors.red).withOpacity(0.12),
+                                  color: (c.active ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
                                   borderRadius: BorderRadius.circular(3),
                                 ),
                                 child: Text(c.status,
                                     style: TextStyle(
                                         fontSize: 10,
-                                        color: c.active ? Colors.green : Colors.red,
+                                        color: c.active ? core_theme.AC.ok : core_theme.AC.err,
                                         fontWeight: FontWeight.w800)),
                               ),
                               const SizedBox(width: 6),
                               Text('ينتهي ${c.expiresAt}',
-                                  style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                                  style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                             ],
                           ),
                         ],
@@ -498,29 +499,29 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
   Color _catColor(String cat) {
     switch (cat) {
       case 'الامتثال':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'المحاسبة':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'الضرائب':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'التقنية':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'القيادة':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'مهارات شخصية':
-        return Colors.pink;
+        return core_theme.AC.err;
       case 'تقني':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'الحوكمة':
-        return Colors.indigo;
+        return core_theme.AC.purple;
       case 'ابتكار':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'سلامة':
         return Colors.deepOrange;
       case 'الموارد البشرية':
         return Colors.brown;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 }

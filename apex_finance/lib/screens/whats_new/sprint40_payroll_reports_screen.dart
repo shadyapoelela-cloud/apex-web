@@ -14,6 +14,7 @@ import '../../core/apex_report_builder.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Sprint40PayrollReportsScreen extends StatefulWidget {
   const Sprint40PayrollReportsScreen({super.key});
@@ -448,7 +449,7 @@ class _ReportBuilderTabState extends State<_ReportBuilderTab> {
               border: Border.all(color: AC.gold.withValues(alpha: 0.35)),
             ),
             child: Row(children: [
-              const Icon(Icons.drag_indicator, color: Colors.amber, size: 28),
+              Icon(Icons.drag_indicator, color: core_theme.AC.warn, size: 28),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(

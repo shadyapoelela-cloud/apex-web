@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class TravelPerDiemScreen extends StatefulWidget {
   const TravelPerDiemScreen({super.key});
@@ -19,8 +20,8 @@ class TravelPerDiemScreen extends StatefulWidget {
 }
 
 class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   int _tab = 0;
 
@@ -85,16 +86,16 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.flight, color: _gold),
+                  Icon(Icons.flight, color: _gold),
                   const SizedBox(width: 8),
-                  const Text('السفر والإقامة',
+                  Text('السفر والإقامة',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                   const Spacer(),
                   FilledButton.icon(
                     onPressed: () {},
                     style: FilledButton.styleFrom(backgroundColor: _gold),
                     icon: const Icon(Icons.add_location),
-                    label: const Text('طلب رحلة جديدة'),
+                    label: Text('طلب رحلة جديدة'),
                   ),
                 ],
               ),
@@ -104,14 +105,14 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
               color: Colors.white,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Row(
-                children: const [
-                  Expanded(child: _StatCard(icon: Icons.flight_takeoff, label: 'رحلات نشطة', value: '2', color: Colors.blue)),
+                children: [
+                  Expanded(child: _StatCard(icon: Icons.flight_takeoff, label: 'رحلات نشطة', value: '2', color: core_theme.AC.info)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.hourglass_empty, label: 'بانتظار الاعتماد', value: '1', color: Colors.orange)),
+                  Expanded(child: _StatCard(icon: Icons.hourglass_empty, label: 'بانتظار الاعتماد', value: '1', color: core_theme.AC.warn)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.attach_money, label: 'إنفاق السنة', value: '65,400 ر.س', color: Color(0xFFD4AF37))),
+                  Expanded(child: _StatCard(icon: Icons.attach_money, label: 'إنفاق السنة', value: '65,400 ر.س', color: core_theme.AC.gold)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.eco, label: 'بصمة الكربون', value: '2.4 طن', color: Colors.green)),
+                  Expanded(child: _StatCard(icon: Icons.eco, label: 'بصمة الكربون', value: '2.4 طن', color: core_theme.AC.ok)),
                 ],
               ),
             ),
@@ -147,10 +148,10 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
       itemBuilder: (ctx, i) {
         final t = _trips[i];
         final (color, label, icon) = switch (t.status) {
-          _TripStatus.approved => (Colors.green, 'معتمدة', Icons.check_circle),
-          _TripStatus.inProgress => (Colors.blue, 'قيد التنفيذ', Icons.flight),
-          _TripStatus.pending => (Colors.orange, 'بانتظار الاعتماد', Icons.schedule),
-          _TripStatus.completed => (Colors.grey, 'مكتملة', Icons.done_all),
+          _TripStatus.approved => (core_theme.AC.ok, 'معتمدة', Icons.check_circle),
+          _TripStatus.inProgress => (core_theme.AC.info, 'قيد التنفيذ', Icons.flight),
+          _TripStatus.pending => (core_theme.AC.warn, 'بانتظار الاعتماد', Icons.schedule),
+          _TripStatus.completed => (core_theme.AC.td, 'مكتملة', Icons.done_all),
         };
         return Card(
           elevation: 1,
@@ -161,10 +162,10 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD4AF37).withOpacity(0.1),
+                    color: core_theme.AC.gold.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.flight, color: _gold),
+                  child: Icon(Icons.flight, color: _gold),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -174,14 +175,14 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
                       Text(t.destination,
                           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                       Text('${t.employee} · ${t.purpose}',
-                          style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                          style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today, size: 12, color: Colors.black54),
+                          Icon(Icons.calendar_today, size: 12, color: core_theme.AC.ts),
                           const SizedBox(width: 4),
                           Text('${t.startDate} → ${t.endDate}',
-                              style: const TextStyle(fontSize: 11, color: Colors.black87)),
+                              style: TextStyle(fontSize: 11, color: core_theme.AC.tp)),
                         ],
                       ),
                     ],
@@ -191,7 +192,7 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text('${t.total.toStringAsFixed(0)} ر.س',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -232,8 +233,8 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: const Color(0xFFD4AF37).withOpacity(0.15),
-                  child: const Icon(Icons.public, color: _gold),
+                  backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+                  child: Icon(Icons.public, color: _gold),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -243,7 +244,7 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
                       Text(p.city,
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                       Text('${p.country} · ${p.currency}',
-                          style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     ],
                   ),
                 ),
@@ -261,9 +262,9 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text('إجمالي اليوم', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text('إجمالي اليوم', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       Text('${daily.toStringAsFixed(0)} ${p.currency}',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
                     ],
                   ),
                 ),
@@ -277,12 +278,12 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
 
   Widget _buildPoliciesView() {
     final policies = [
-      ('درجة سفر', 'الاقتصادية للرحلات < 6 ساعات', Icons.airline_seat_recline_extra, Colors.blue),
-      ('فئة الفندق', 'حتى 4 نجوم كحد أقصى', Icons.hotel, Colors.orange),
-      ('حجز مسبق', 'قبل 14 يوم من تاريخ الرحلة', Icons.schedule, Colors.purple),
-      ('التأمين الصحي', 'إلزامي لكل رحلة دولية', Icons.health_and_safety, Colors.green),
-      ('مرافقون', 'عائلة على حساب الموظف فقط', Icons.family_restroom, Colors.red),
-      ('استخدام الكيلومترات', 'لا تُصرف للموظف', Icons.flight, Colors.teal),
+      ('درجة سفر', 'الاقتصادية للرحلات < 6 ساعات', Icons.airline_seat_recline_extra, core_theme.AC.info),
+      ('فئة الفندق', 'حتى 4 نجوم كحد أقصى', Icons.hotel, core_theme.AC.warn),
+      ('حجز مسبق', 'قبل 14 يوم من تاريخ الرحلة', Icons.schedule, core_theme.AC.purple),
+      ('التأمين الصحي', 'إلزامي لكل رحلة دولية', Icons.health_and_safety, core_theme.AC.ok),
+      ('مرافقون', 'عائلة على حساب الموظف فقط', Icons.family_restroom, core_theme.AC.err),
+      ('استخدام الكيلومترات', 'لا تُصرف للموظف', Icons.flight, core_theme.AC.info),
     ];
     return ListView.separated(
       padding: const EdgeInsets.all(16),
@@ -353,7 +354,7 @@ class _PD extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
       ],
     );
@@ -413,7 +414,7 @@ class _Tab extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: active ? const Color(0xFFD4AF37) : Colors.transparent,
+              color: active ? core_theme.AC.gold : Colors.transparent,
               width: 3,
             ),
           ),
@@ -423,7 +424,7 @@ class _Tab extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: active ? const Color(0xFFD4AF37) : Colors.black54,
+            color: active ? core_theme.AC.gold : core_theme.AC.ts,
           ),
         ),
       ),

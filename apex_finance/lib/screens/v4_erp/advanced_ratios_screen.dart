@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 134 — Advanced Financial Ratios Dashboard (18+ ratios)
 class AdvancedRatiosScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _AdvancedRatiosScreenState extends State<AdvancedRatiosScreen> with Single
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           isScrollable: true,
           tabs: const [
             Tab(text: 'السيولة'),
@@ -35,7 +36,7 @@ class _AdvancedRatiosScreenState extends State<AdvancedRatiosScreen> with Single
           _ratioList(_liquidity, const Color(0xFF1565C0)),
           _ratioList(_leverage, const Color(0xFFE65100)),
           _ratioList(_profitability, const Color(0xFF2E7D32)),
-          _ratioList(_efficiency, const Color(0xFFD4AF37)),
+          _ratioList(_efficiency, core_theme.AC.gold),
           _ratioList(_valuation, const Color(0xFF4A148C)),
         ])),
       ])),
@@ -45,13 +46,13 @@ class _AdvancedRatiosScreenState extends State<AdvancedRatiosScreen> with Single
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF6A1B9A)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.analytics, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('النسب المالية المتقدمة', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('25 نسبة مالية عبر 5 فئات + مقارنة مرجعية بالقطاع', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('25 نسبة مالية عبر 5 فئات + مقارنة مرجعية بالقطاع', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -59,7 +60,7 @@ class _AdvancedRatiosScreenState extends State<AdvancedRatiosScreen> with Single
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('الصحة المالية', 'A-', Icons.health_and_safety, const Color(0xFF2E7D32))),
     Expanded(child: _kpi('Altman Z', '3.42', Icons.shield, const Color(0xFF1565C0))),
-    Expanded(child: _kpi('نسبة مقارنة', '68% أعلى', Icons.compare_arrows, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('نسبة مقارنة', '68% أعلى', Icons.compare_arrows, core_theme.AC.gold)),
     Expanded(child: _kpi('Red Flags', '2', Icons.flag, const Color(0xFFE65100))),
   ]));
 
@@ -67,7 +68,7 @@ class _AdvancedRatiosScreenState extends State<AdvancedRatiosScreen> with Single
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -87,14 +88,14 @@ class _AdvancedRatiosScreenState extends State<AdvancedRatiosScreen> with Single
               style: TextStyle(color: betterThanPeers ? const Color(0xFF2E7D32) : const Color(0xFFE65100), fontSize: 10, fontWeight: FontWeight.bold))),
         ]),
         const SizedBox(height: 6),
-        Text(r.formula, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+        Text(r.formula, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
         const SizedBox(height: 10),
         Row(children: [
           Expanded(child: _valueBox('الشركة', r.company, accent)),
           const SizedBox(width: 8),
-          Expanded(child: _valueBox('متوسط القطاع', r.peer, Colors.grey.shade700)),
+          Expanded(child: _valueBox('متوسط القطاع', r.peer, core_theme.AC.ts)),
           const SizedBox(width: 8),
-          Expanded(child: _valueBox('المستهدف', r.target, Colors.black87)),
+          Expanded(child: _valueBox('المستهدف', r.target, core_theme.AC.tp)),
         ]),
         const SizedBox(height: 8),
         Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFFFFF8E1), borderRadius: BorderRadius.circular(6)),
@@ -107,7 +108,7 @@ class _AdvancedRatiosScreenState extends State<AdvancedRatiosScreen> with Single
     padding: const EdgeInsets.all(8),
     decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
     child: Column(children: [
-      Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+      Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
     ]),
   );

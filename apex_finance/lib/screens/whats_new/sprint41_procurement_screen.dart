@@ -15,6 +15,7 @@ import '../../core/apex_sticky_toolbar.dart';
 import '../../core/apex_three_way_match.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Sprint41ProcurementScreen extends StatefulWidget {
   const Sprint41ProcurementScreen({super.key});
@@ -153,7 +154,7 @@ class _InventoryTabState extends State<_InventoryTab> {
           border: Border.all(color: AC.gold.withValues(alpha: 0.35)),
         ),
         child: Row(children: [
-          const Icon(Icons.qr_code_scanner, color: Colors.amber, size: 28),
+          Icon(Icons.qr_code_scanner, color: core_theme.AC.warn, size: 28),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -611,7 +612,7 @@ class _NotificationCenterTabState extends State<_NotificationCenterTab> {
   Widget _notifTile(ApexNotification n) {
     final (color, icon) = switch (n.severity) {
       'error' => (AC.err, Icons.error_outline),
-      'warning' => (Colors.amber.shade700, Icons.warning_amber),
+      'warning' => (core_theme.AC.warn, Icons.warning_amber),
       'success' => (AC.ok, Icons.check_circle_outline),
       _ => (AC.gold, Icons.info_outline),
     };

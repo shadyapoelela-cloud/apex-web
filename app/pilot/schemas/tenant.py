@@ -81,6 +81,7 @@ class CompanySettingsRead(BaseModel):
     retention_years: int
     audit_log_reads: bool
     audit_log_writes: bool
+    audit_log_failures: bool
     ai_enabled: bool
     ai_model: str
     ai_confidence_threshold_bp: int
@@ -105,6 +106,7 @@ class CompanySettingsUpdate(BaseModel):
     fiscal_year_start_month: Optional[int] = Field(None, ge=1, le=12)
     fiscal_year_start_day: Optional[int] = Field(None, ge=1, le=31)
     accounting_method: Optional[str] = None
+    period_type: Optional[str] = None
     default_language: Optional[str] = None
     default_calendar: Optional[str] = None
     default_timezone: Optional[str] = None
@@ -116,6 +118,11 @@ class CompanySettingsUpdate(BaseModel):
     default_vat_rate: Optional[int] = Field(None, ge=0, le=100)
     zakat_rate_bp: Optional[int] = Field(None, ge=0, le=10000)
     close_lock_policy: Optional[str] = None
+    lenient_days: Optional[int] = Field(None, ge=0, le=90)
+    retention_years: Optional[int] = Field(None, ge=1, le=30)
+    audit_log_reads: Optional[bool] = None
+    audit_log_writes: Optional[bool] = None
+    audit_log_failures: Optional[bool] = None
     ai_enabled: Optional[bool] = None
     ai_model: Optional[str] = None
     ai_confidence_threshold_bp: Optional[int] = Field(None, ge=0, le=10000)

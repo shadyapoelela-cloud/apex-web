@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class FinancialStatementsFsvV52Screen extends StatefulWidget {
   const FinancialStatementsFsvV52Screen({super.key});
@@ -14,8 +15,8 @@ class FinancialStatementsFsvV52Screen extends StatefulWidget {
 }
 
 class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsvV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   String _fsv = 'ifrs';
   String _statement = 'bs';
@@ -42,36 +43,36 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
       color: Colors.white,
       padding: const EdgeInsets.all(16),
       child: Row(children: [
-        const Icon(Icons.insert_chart, color: _gold),
+        Icon(Icons.insert_chart, color: _gold),
         const SizedBox(width: 8),
-        const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('القوائم المالية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
-          Text('Q1 2026 · 4 إصدارات FSV من نفس الميزان (SAP pattern)', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('Q1 2026 · 4 إصدارات FSV من نفس الميزان (SAP pattern)', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ])),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.compare, size: 16), label: const Text('مقارنة إصدارات')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.compare, size: 16), label: Text('مقارنة إصدارات')),
         const SizedBox(width: 8),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.download, size: 16), label: const Text('تصدير PDF')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.download, size: 16), label: Text('تصدير PDF')),
         const SizedBox(width: 8),
-        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.check_circle, size: 16), label: const Text('تفعيل')),
+        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.check_circle, size: 16), label: Text('تفعيل')),
       ]),
     );
   }
 
   Widget _fsvSelector() {
-    const fsvs = [
-      ('ifrs', 'IFRS', 'المعايير الدولية', '🌍', Colors.blue),
-      ('socpa', 'SOCPA', 'الهيئة السعودية', '🇸🇦', Colors.green),
-      ('mgmt', 'Management', 'إدارية (للمجلس)', '💼', Color(0xFFD4AF37)),
-      ('tax', 'Tax/ZATCA', 'ضريبية', '📋', Colors.purple),
+    final fsvs = [
+      ('ifrs', 'IFRS', 'المعايير الدولية', '🌍', core_theme.AC.info),
+      ('socpa', 'SOCPA', 'الهيئة السعودية', '🇸🇦', core_theme.AC.ok),
+      ('mgmt', 'Management', 'إدارية (للمجلس)', '💼', core_theme.AC.gold),
+      ('tax', 'Tax/ZATCA', 'ضريبية', '📋', core_theme.AC.purple),
     ];
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Text('إصدار القائمة (FSV)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _navy)),
+          Text('إصدار القائمة (FSV)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(width: 8),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _gold.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: const Text('Financial Statement Version', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _gold))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _gold.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text('Financial Statement Version', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _gold))),
         ]),
         const SizedBox(height: 8),
         Row(children: fsvs.map((f) {
@@ -81,16 +82,16 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: selected ? f.$5.withOpacity(0.10) : Colors.grey.shade50,
+                color: selected ? f.$5.withOpacity(0.10) : core_theme.AC.navy3,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: selected ? f.$5 : Colors.grey.shade300, width: selected ? 2 : 1),
+                border: Border.all(color: selected ? f.$5 : core_theme.AC.bdr, width: selected ? 2 : 1),
               ),
               child: Row(children: [
                 Text(f.$4, style: const TextStyle(fontSize: 24)),
                 const SizedBox(width: 10),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(f.$2, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: selected ? _navy : Colors.black87)),
-                  Text(f.$3, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(f.$2, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: selected ? _navy : core_theme.AC.tp)),
+                  Text(f.$3, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ])),
                 if (selected) Icon(Icons.check_circle, color: f.$5, size: 18),
               ]),
@@ -119,9 +120,9 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(border: Border(bottom: BorderSide(color: selected ? _gold : Colors.transparent, width: 3))),
             child: Row(children: [
-              Icon(t.$3, size: 16, color: selected ? _gold : Colors.black54),
+              Icon(t.$3, size: 16, color: selected ? _gold : core_theme.AC.ts),
               const SizedBox(width: 6),
-              Text(t.$2, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: selected ? _navy : Colors.black54)),
+              Text(t.$2, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: selected ? _navy : core_theme.AC.ts)),
             ]),
           ),
         );
@@ -160,13 +161,13 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
   Color _fsvColor() {
     switch (_fsv) {
       case 'ifrs':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'socpa':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'mgmt':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'tax':
-        return Colors.purple;
+        return core_theme.AC.purple;
       default:
         return _navy;
     }
@@ -277,7 +278,7 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
 
   Widget _table(List<String> headers, List<(String, String?, String?, String?, bool, bool)> rows) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
       child: Column(children: [
         Container(padding: const EdgeInsets.all(12), color: _navy, child: Row(children: [
           Expanded(flex: 3, child: Text(headers[0], style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
@@ -293,14 +294,14 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: r.$5 ? 10 : 6),
               decoration: BoxDecoration(
-                color: r.$5 ? Colors.grey.shade100 : (r.$6 ? _gold.withOpacity(0.05) : null),
-                border: r.$6 ? Border(top: BorderSide(color: _gold, width: 1.5), bottom: BorderSide(color: _gold, width: 0.5)) : Border(bottom: BorderSide(color: Colors.grey.shade100)),
+                color: r.$5 ? core_theme.AC.navy3 : (r.$6 ? _gold.withOpacity(0.05) : null),
+                border: r.$6 ? Border(top: BorderSide(color: _gold, width: 1.5), bottom: BorderSide(color: _gold, width: 0.5)) : Border(bottom: BorderSide(color: core_theme.AC.navy3)),
               ),
               child: Row(children: [
-                Expanded(flex: 3, child: Text(r.$1, style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$5 || r.$6 ? FontWeight.w800 : FontWeight.w500, color: r.$5 || r.$6 ? _navy : Colors.black87))),
+                Expanded(flex: 3, child: Text(r.$1, style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$5 || r.$6 ? FontWeight.w800 : FontWeight.w500, color: r.$5 || r.$6 ? _navy : core_theme.AC.tp))),
                 Expanded(child: Text(r.$2 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, fontFamily: 'monospace'), textAlign: TextAlign.end)),
-                Expanded(child: Text(r.$3 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, fontFamily: 'monospace', color: Colors.black54), textAlign: TextAlign.end)),
-                Expanded(child: Text(r.$4 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, color: (r.$4 ?? '').contains('-') ? Colors.red : Colors.green), textAlign: TextAlign.end)),
+                Expanded(child: Text(r.$3 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, fontFamily: 'monospace', color: core_theme.AC.ts), textAlign: TextAlign.end)),
+                Expanded(child: Text(r.$4 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, color: (r.$4 ?? '').contains('-') ? core_theme.AC.err : core_theme.AC.ok), textAlign: TextAlign.end)),
               ]),
             );
           },

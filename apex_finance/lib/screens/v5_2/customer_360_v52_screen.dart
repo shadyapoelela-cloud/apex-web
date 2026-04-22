@@ -2,13 +2,14 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/object_page_template.dart';
 
 class Customer360V52Screen extends StatelessWidget {
   const Customer360V52Screen({super.key});
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +25,21 @@ class Customer360V52Screen extends StatelessWidget {
         ProcessStage(labelAr: 'Loyal'),
       ],
       processCurrentIndex: 3,
-      smartButtons: const [
+      smartButtons: [
         SmartButton(icon: Icons.receipt, labelAr: 'فاتورة', count: 142, color: _gold),
-        SmartButton(icon: Icons.payments, labelAr: 'دفعة', count: 138, color: Colors.green),
+        SmartButton(icon: Icons.payments, labelAr: 'دفعة', count: 138, color: core_theme.AC.ok),
         SmartButton(icon: Icons.work, labelAr: 'مشروع', count: 8, color: _navy),
-        SmartButton(icon: Icons.contact_phone, labelAr: 'تواصل', count: 45, color: Colors.blue),
-        SmartButton(icon: Icons.warning, labelAr: 'شكوى', count: 2, color: Colors.red),
+        SmartButton(icon: Icons.contact_phone, labelAr: 'تواصل', count: 45, color: core_theme.AC.info),
+        SmartButton(icon: Icons.warning, labelAr: 'شكوى', count: 2, color: core_theme.AC.err),
       ],
       primaryActions: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.send, size: 16), label: const Text('إرسال رسالة')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.send, size: 16), label: Text('إرسال رسالة')),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: () {},
           style: FilledButton.styleFrom(backgroundColor: _gold),
           icon: const Icon(Icons.add, size: 16),
-          label: const Text('فاتورة جديدة'),
+          label: Text('فاتورة جديدة'),
         ),
       ],
       tabs: [
@@ -63,14 +64,14 @@ class Customer360V52Screen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
+            children: [
               Expanded(child: _Kpi(label: 'إجمالي التعاملات', value: '8.4M', unit: 'ر.س', color: _gold, icon: Icons.trending_up)),
               SizedBox(width: 10),
-              Expanded(child: _Kpi(label: 'المتبقي', value: '125K', unit: 'ر.س', color: Colors.orange, icon: Icons.pending)),
+              Expanded(child: _Kpi(label: 'المتبقي', value: '125K', unit: 'ر.س', color: core_theme.AC.warn, icon: Icons.pending)),
               SizedBox(width: 10),
-              Expanded(child: _Kpi(label: 'DSO', value: '28', unit: 'يوم', color: Colors.blue, icon: Icons.schedule)),
+              Expanded(child: _Kpi(label: 'DSO', value: '28', unit: 'يوم', color: core_theme.AC.info, icon: Icons.schedule)),
               SizedBox(width: 10),
-              Expanded(child: _Kpi(label: 'درجة الائتمان', value: '872', unit: 'A+', color: Colors.green, icon: Icons.credit_score)),
+              Expanded(child: _Kpi(label: 'درجة الائتمان', value: '872', unit: 'A+', color: core_theme.AC.ok, icon: Icons.credit_score)),
             ],
           ),
           const SizedBox(height: 20),
@@ -108,7 +109,7 @@ class Customer360V52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (ctx, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(
           children: [
             Icon(txns[i].$2 == 'فاتورة' ? Icons.receipt : Icons.payments, color: _gold),
@@ -117,14 +118,14 @@ class Customer360V52Screen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(txns[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                  Text(txns[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                   Text('${txns[i].$2} · ${txns[i].$3}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                 ],
               ),
             ),
-            Text('${txns[i].$4.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+            Text('${txns[i].$4.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(width: 12),
-            Chip(label: Text(txns[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: Colors.green.withOpacity(0.1)),
+            Chip(label: Text(txns[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: core_theme.AC.ok.withOpacity(0.1)),
           ],
         ),
       ),
@@ -143,10 +144,10 @@ class Customer360V52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (ctx, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: contacts[i].$5 ? _gold : Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: contacts[i].$5 ? _gold : core_theme.AC.bdr)),
         child: Row(
           children: [
-            CircleAvatar(backgroundColor: _gold.withOpacity(0.15), child: Text(contacts[i].$1[0], style: const TextStyle(color: _gold, fontWeight: FontWeight.w800))),
+            CircleAvatar(backgroundColor: _gold.withOpacity(0.15), child: Text(contacts[i].$1[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -154,10 +155,10 @@ class Customer360V52Screen extends StatelessWidget {
                 children: [
                   Row(children: [
                     Text(contacts[i].$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                    if (contacts[i].$5) const Padding(padding: EdgeInsets.only(right: 6), child: Icon(Icons.star, color: _gold, size: 14)),
+                    if (contacts[i].$5) Padding(padding: EdgeInsets.only(right: 6), child: Icon(Icons.star, color: _gold, size: 14)),
                   ]),
-                  Text(contacts[i].$2, style: const TextStyle(fontSize: 11, color: Colors.black54)),
-                  Text('${contacts[i].$3} · ${contacts[i].$4}', style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                  Text(contacts[i].$2, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
+                  Text('${contacts[i].$3} · ${contacts[i].$4}', style: TextStyle(fontSize: 10, color: core_theme.AC.tp)),
                 ],
               ),
             ),
@@ -181,53 +182,53 @@ class Customer360V52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (ctx, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.work, color: _gold),
+                Icon(Icons.work, color: _gold),
                 const SizedBox(width: 8),
-                Text(projects[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(projects[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const Spacer(),
-                Chip(label: Text(projects[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: projects[i].$3 == 1.0 ? Colors.green.withOpacity(0.1) : Colors.blue.withOpacity(0.1)),
+                Chip(label: Text(projects[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: projects[i].$3 == 1.0 ? core_theme.AC.ok.withOpacity(0.1) : core_theme.AC.info.withOpacity(0.1)),
               ],
             ),
             const SizedBox(height: 4),
             Text(projects[i].$2, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
             const SizedBox(height: 8),
             Row(children: [
-              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: projects[i].$3, minHeight: 8, backgroundColor: Colors.grey.shade200, color: _gold))),
+              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: projects[i].$3, minHeight: 8, backgroundColor: core_theme.AC.bdr, color: _gold))),
               const SizedBox(width: 10),
               Text('${(projects[i].$3 * 100).toInt()}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
             ]),
             const SizedBox(height: 4),
-            Text('قيمة العقد: ${projects[i].$4.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('قيمة العقد: ${projects[i].$4.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ],
         ),
       ),
     );
   }
 
-  Widget _notes() => const Center(child: Padding(padding: EdgeInsets.all(48), child: Text('لا توجد ملاحظات — أضف واحدة من Chatter', style: TextStyle(color: Colors.black54))));
+  Widget _notes() => Center(child: Padding(padding: EdgeInsets.all(48), child: Text('لا توجد ملاحظات — أضف واحدة من Chatter', style: TextStyle(color: core_theme.AC.ts))));
 
   Widget _card(String title, Widget child) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]),
     );
   }
 
-  Widget _kv(String k, String v) => SizedBox(width: 200, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: const TextStyle(fontSize: 11, color: Colors.black54)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
+  Widget _kv(String k, String v) => SizedBox(width: 200, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
 
   Widget _progRow(String label, double total, double used, String unit) {
     final pct = used / total;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)), const Spacer(), Text('${used.toStringAsFixed(0)} / ${total.toStringAsFixed(0)} $unit', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800))]),
       const SizedBox(height: 4),
-      ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 10, backgroundColor: Colors.grey.shade200, color: pct > 0.8 ? Colors.red : (pct > 0.5 ? Colors.orange : Colors.green))),
+      ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 10, backgroundColor: core_theme.AC.bdr, color: pct > 0.8 ? core_theme.AC.err : (pct > 0.5 ? core_theme.AC.warn : core_theme.AC.ok))),
     ]);
   }
 }

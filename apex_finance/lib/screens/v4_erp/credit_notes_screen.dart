@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 106 — Credit Notes & Refunds
 /// Credit note lifecycle, refund processing, reason analysis
@@ -40,8 +41,8 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
                 child: TabBar(
                   controller: _tc,
                   labelColor: const Color(0xFF4A148C),
-                  unselectedLabelColor: Colors.black54,
-                  indicatorColor: const Color(0xFFD4AF37),
+                  unselectedLabelColor: core_theme.AC.ts,
+                  indicatorColor: core_theme.AC.gold,
                   indicatorWeight: 3,
                   tabs: const [
                     Tab(text: 'إشعارات الدائن'),
@@ -84,13 +85,13 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37),
+              color: core_theme.AC.gold,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.assignment_return, color: Colors.white, size: 32),
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -101,7 +102,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
                 SizedBox(height: 4),
                 Text(
                   'دورة حياة إشعارات الدائن ومعالجة المبالغ المستردة مع ZATCA',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                 ),
               ],
             ),
@@ -109,9 +110,9 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('إصدار إشعار'),
+            label: Text('إصدار إشعار'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
+              backgroundColor: core_theme.AC.gold,
               foregroundColor: Colors.white,
             ),
           ),
@@ -132,7 +133,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
       child: Row(
         children: [
           Expanded(child: _kpi('الإجمالي', '$total', Icons.receipt, const Color(0xFF1A237E))),
-          Expanded(child: _kpi('القيمة', _fmtM(totalAmount), Icons.payments, const Color(0xFFD4AF37))),
+          Expanded(child: _kpi('القيمة', _fmtM(totalAmount), Icons.payments, core_theme.AC.gold)),
           Expanded(child: _kpi('معتمدة', '$approved', Icons.check_circle, const Color(0xFF2E7D32))),
           Expanded(child: _kpi('معلقة', '$pending', Icons.hourglass_bottom, const Color(0xFFE65100))),
         ],
@@ -156,7 +157,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
               ],
             ),
@@ -195,9 +196,9 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(n.id, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                          Text(n.customer, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                          Text(n.customer, style: TextStyle(fontSize: 12, color: core_theme.AC.tp)),
                           Text('ضد الفاتورة: ${n.invoiceRef}',
-                              style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                              style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         ],
                       ),
                     ),
@@ -206,7 +207,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
                       children: [
                         Text(_fmt(n.amount),
                             style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC62828), fontSize: 15)),
-                        Text(n.date, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(n.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ],
@@ -279,7 +280,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(r.customer, style: const TextStyle(fontSize: 12)),
-                Text('${r.method} • ${r.date}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('${r.method} • ${r.date}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
             trailing: Column(
@@ -334,7 +335,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     ),
                     Text('${e.value.$1} إشعار',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                        style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                     const SizedBox(width: 10),
                     Text(_fmt(e.value.$2),
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC62828))),
@@ -346,7 +347,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
                   child: LinearProgressIndicator(
                     value: ratio,
                     minHeight: 8,
-                    backgroundColor: Colors.black12,
+                    backgroundColor: core_theme.AC.bdr,
                     valueColor: const AlwaysStoppedAnimation(Color(0xFFC62828)),
                   ),
                 ),
@@ -383,7 +384,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
           children: [
             Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
             const SizedBox(height: 6),
-            Text(text, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+            Text(text, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
           ],
         ),
       ),
@@ -394,7 +395,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
     if (s.contains('معتمد')) return const Color(0xFF2E7D32);
     if (s.contains('معلق')) return const Color(0xFFE65100);
     if (s.contains('مرفوض')) return const Color(0xFFC62828);
-    if (s.contains('مسودة')) return Colors.black54;
+    if (s.contains('مسودة')) return core_theme.AC.ts;
     return const Color(0xFF1A237E);
   }
 
@@ -402,7 +403,7 @@ class _CreditNotesScreenState extends State<CreditNotesScreen> with SingleTicker
     if (s.contains('مكتمل')) return const Color(0xFF2E7D32);
     if (s.contains('معالجة')) return const Color(0xFFE65100);
     if (s.contains('فشل')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   IconData _refundIcon(String m) {

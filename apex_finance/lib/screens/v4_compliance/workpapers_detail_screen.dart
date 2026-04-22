@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class WorkpapersDetailScreen extends StatefulWidget {
   const WorkpapersDetailScreen({super.key});
@@ -56,15 +57,15 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
             ),
           ),
           _treeFolder('A — التخطيط', expanded: true, children: [
-            _treeFile('A-100', 'خطاب الارتباط', 'مكتمل', const Color(0xFF059669)),
-            _treeFile('A-200', 'الأهمية النسبية', 'مكتمل', const Color(0xFF059669)),
-            _treeFile('A-300', 'تقييم المخاطر', 'مراجعة', const Color(0xFFD97706)),
+            _treeFile('A-100', 'خطاب الارتباط', 'مكتمل', core_theme.AC.ok),
+            _treeFile('A-200', 'الأهمية النسبية', 'مكتمل', core_theme.AC.ok),
+            _treeFile('A-300', 'تقييم المخاطر', 'مراجعة', core_theme.AC.warn),
           ]),
           _treeFolder('B — الفحص', expanded: true, children: [
-            _treeFile('B-100', 'الموجودات — النقدية', 'مكتمل', const Color(0xFF059669)),
-            _treeFile('B-110', 'مطابقة البنك', 'قيد التنفيذ', const Color(0xFF2563EB)),
-            _treeFile('B-200', 'الذمم المدينة', 'مكتمل', const Color(0xFF059669)),
-            _treeFile('B-210', 'تقادم الذمم', 'قيد التنفيذ', const Color(0xFF2563EB)),
+            _treeFile('B-100', 'الموجودات — النقدية', 'مكتمل', core_theme.AC.ok),
+            _treeFile('B-110', 'مطابقة البنك', 'قيد التنفيذ', core_theme.AC.info),
+            _treeFile('B-200', 'الذمم المدينة', 'مكتمل', core_theme.AC.ok),
+            _treeFile('B-210', 'تقادم الذمم', 'قيد التنفيذ', core_theme.AC.info),
             _treeFile('B-300', 'المخزون', 'بحاجة بدء', const Color(0xFF6B7280)),
             _treeFile('B-400', 'الأصول الثابتة', 'بحاجة بدء', const Color(0xFF6B7280)),
           ]),
@@ -113,7 +114,7 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
               Icon(
                 Icons.insert_drive_file,
                 size: 12,
-                color: active ? const Color(0xFF4A148C) : Colors.black54,
+                color: active ? const Color(0xFF4A148C) : core_theme.AC.ts,
               ),
               const SizedBox(width: 6),
               Text(
@@ -122,7 +123,7 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
                   fontSize: 10,
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.w700,
-                  color: active ? const Color(0xFF4A148C) : Colors.black54,
+                  color: active ? const Color(0xFF4A148C) : core_theme.AC.ts,
                 ),
               ),
               const SizedBox(width: 6),
@@ -155,7 +156,7 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+            border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
           ),
           child: Row(
             children: [
@@ -214,9 +215,9 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
                   _bullet('تقييم مخاطر غسل الأموال'),
                 ]),
                 _workpaperSection('المخاطر المُحدَّدة', [
-                  _riskItem('مخاطر الاكتمال', 'متوسطة', const Color(0xFFD97706)),
-                  _riskItem('مخاطر التقييم', 'منخفضة', const Color(0xFF059669)),
-                  _riskItem('مخاطر الغش', 'منخفضة', const Color(0xFF059669)),
+                  _riskItem('مخاطر الاكتمال', 'متوسطة', core_theme.AC.warn),
+                  _riskItem('مخاطر التقييم', 'منخفضة', core_theme.AC.ok),
+                  _riskItem('مخاطر الغش', 'منخفضة', core_theme.AC.ok),
                 ]),
                 _workpaperSection('إجراءات الفحص', [
                   _procItem('الحصول على كشف حساب بنكي من كل حساب نشط', true),
@@ -241,14 +242,14 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF059669).withOpacity(0.06),
+                      color: core_theme.AC.ok.withOpacity(0.06),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: const Color(0xFF059669).withOpacity(0.2)),
+                      border: Border.all(color: core_theme.AC.ok.withOpacity(0.2)),
                     ),
-                    child: const Text(
+                    child: Text(
                       'الأرصدة النقدية والبنكية مؤكّدة · النتائج لا تمنع إبداء الرأي ·\n'
                       'يوصَى بمتابعة النقاط الثلاث في رسالة الإدارة.',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF059669)),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: core_theme.AC.ok),
                     ),
                   ),
                 ]),
@@ -275,14 +276,14 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFF059669).withOpacity(0.12),
+        color: core_theme.AC.ok.withOpacity(0.12),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.check_circle, size: 11, color: Color(0xFF059669)),
+          Icon(Icons.check_circle, size: 11, color: core_theme.AC.ok),
           SizedBox(width: 4),
-          Text('مكتمل', style: TextStyle(fontSize: 11, color: Color(0xFF059669), fontWeight: FontWeight.w700)),
+          Text('مكتمل', style: TextStyle(fontSize: 11, color: core_theme.AC.ok, fontWeight: FontWeight.w700)),
         ],
       ),
     );
@@ -301,7 +302,7 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,7 +319,7 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 120, child: Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 120, child: Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
         ],
       ),
@@ -364,13 +365,13 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
           Icon(
             done ? Icons.check_box : Icons.check_box_outline_blank,
             size: 16,
-            color: done ? const Color(0xFF059669) : Colors.black54,
+            color: done ? core_theme.AC.ok : core_theme.AC.ts,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               proc,
-              style: TextStyle(fontSize: 12, decoration: done ? TextDecoration.lineThrough : null, color: done ? Colors.black54 : Colors.black87),
+              style: TextStyle(fontSize: 12, decoration: done ? TextDecoration.lineThrough : null, color: done ? core_theme.AC.ts : core_theme.AC.tp),
             ),
           ),
         ],
@@ -404,8 +405,8 @@ class _WorkpapersDetailScreenState extends State<WorkpapersDetailScreen> {
     final color = severity == 'عالية'
         ? const Color(0xFFB91C1C)
         : severity == 'متوسطة'
-            ? const Color(0xFFD97706)
-            : const Color(0xFF2563EB);
+            ? core_theme.AC.warn
+            : core_theme.AC.info;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(

@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class SalesPipelineScreen extends StatefulWidget {
   const SalesPipelineScreen({super.key});
@@ -77,21 +78,21 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
               children: [
                 const Icon(Icons.trending_up, color: Colors.white, size: 36),
                 const SizedBox(width: 14),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('أنبوب المبيعات',
                           style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                       Text('10 صفقات · 5 مراحل · توقع قابل للتعديل حسب الاحتمالية',
-                          style: TextStyle(color: Colors.white70, fontSize: 12)),
+                          style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.add, size: 16),
-                  label: const Text('صفقة جديدة'),
+                  label: Text('صفقة جديدة'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF1A237E),
@@ -103,10 +104,10 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-              _heroKpi('إجمالي الأنبوب', _fmtM(total), Colors.blue, Icons.account_balance),
-              _heroKpi('القيمة المرجّحة (توقع)', _fmtM(weighted), const Color(0xFFD4AF37), Icons.analytics),
-              _heroKpi('مربوح YTD', _fmtM(won), Colors.green, Icons.emoji_events),
-              _heroKpi('معدل الربح', '34%', Colors.teal, Icons.trending_up),
+              _heroKpi('إجمالي الأنبوب', _fmtM(total), core_theme.AC.info, Icons.account_balance),
+              _heroKpi('القيمة المرجّحة (توقع)', _fmtM(weighted), core_theme.AC.gold, Icons.analytics),
+              _heroKpi('مربوح YTD', _fmtM(won), core_theme.AC.ok, Icons.emoji_events),
+              _heroKpi('معدل الربح', '34%', core_theme.AC.info, Icons.trending_up),
             ],
           ),
         ],
@@ -132,7 +133,7 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -149,9 +150,9 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: core_theme.AC.navy3,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
@@ -213,28 +214,28 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black12),
-        boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.04), blurRadius: 4)],
+        border: Border.all(color: core_theme.AC.bdr),
+        boxShadow: [BoxShadow(color: core_theme.AC.bdr.withOpacity(0.04), blurRadius: 4)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(d.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+          Text(d.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Text(d.title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withOpacity(0.1),
+              color: core_theme.AC.gold.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.attach_money, size: 12, color: Color(0xFFD4AF37)),
+                Icon(Icons.attach_money, size: 12, color: core_theme.AC.gold),
                 Text(_fmtM(d.amount),
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -248,11 +249,11 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
                     style: TextStyle(color: stageColor, fontSize: 10, fontWeight: FontWeight.w900)),
               ),
               const SizedBox(width: 4),
-              Expanded(child: Text(d.owner, style: const TextStyle(fontSize: 10, color: Colors.black54))),
-              const Icon(Icons.calendar_today, size: 10, color: Colors.black45),
+              Expanded(child: Text(d.owner, style: TextStyle(fontSize: 10, color: core_theme.AC.ts))),
+              Icon(Icons.calendar_today, size: 10, color: core_theme.AC.td),
               const SizedBox(width: 3),
               Text(d.closeDate.substring(5),
-                  style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                  style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
             ],
           ),
           const SizedBox(height: 6),
@@ -261,7 +262,7 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
               Expanded(
                 child: LinearProgressIndicator(
                   value: d.probability,
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: core_theme.AC.bdr,
                   valueColor: AlwaysStoppedAnimation(stageColor),
                   minHeight: 4,
                 ),

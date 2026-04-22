@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme.dart';
+import '../../../core/theme.dart' as core_theme;
 import '../../api/pilot_client.dart';
 import '../../session.dart';
 
@@ -776,7 +777,7 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
                     ],
                   ),
                 ),
-                const Icon(Icons.auto_awesome, color: Colors.amber, size: 16),
+                Icon(Icons.auto_awesome, color: core_theme.AC.warn, size: 16),
                 const SizedBox(width: 4),
                 Text('تلقائي', style: TextStyle(color: AC.gold, fontSize: 11)),
               ]),

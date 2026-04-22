@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class TransferPricingV5Screen extends StatefulWidget {
   const TransferPricingV5Screen({super.key});
@@ -37,9 +38,9 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
         _buildKpiRow(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.groups, size: 16), text: 'المعاملات بين الشركات'),
             Tab(icon: Icon(Icons.analytics, size: 16), text: 'اختبار السعر العادل'),
@@ -70,7 +71,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
         gradient: const LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF3949AB)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.swap_horiz, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -81,7 +82,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                 Text('أسعار التحويل (Transfer Pricing)',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('OECD BEPS Actions 8-10/13 · ZATCA / FTA — مبدأ السعر العادل Arm\'s Length',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -95,10 +96,10 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('معاملات بين الشركات', '34', Colors.blue, Icons.groups),
-          _kpi('قيمة المعاملات', '125M', const Color(0xFFD4AF37), Icons.attach_money),
-          _kpi('مطابق للسعر العادل', '28', Colors.green, Icons.check_circle),
-          _kpi('يحتاج مراجعة', '6', Colors.orange, Icons.warning),
+          _kpi('معاملات بين الشركات', '34', core_theme.AC.info, Icons.groups),
+          _kpi('قيمة المعاملات', '125M', core_theme.AC.gold, Icons.attach_money),
+          _kpi('مطابق للسعر العادل', '28', core_theme.AC.ok, Icons.check_circle),
+          _kpi('يحتاج مراجعة', '6', core_theme.AC.warn, Icons.warning),
         ],
       ),
     );
@@ -122,7 +123,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -154,7 +155,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: (t.armsLength ? Colors.green : Colors.orange).withOpacity(0.3)),
+            border: Border.all(color: (t.armsLength ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,31 +167,31 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.12),
+                      color: core_theme.AC.purple.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(t.method,
-                        style: const TextStyle(fontSize: 11, color: Colors.purple, fontWeight: FontWeight.w800)),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.purple, fontWeight: FontWeight.w800)),
                   ),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: (t.armsLength ? Colors.green : Colors.orange).withOpacity(0.15),
+                      color: (t.armsLength ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(t.armsLength ? Icons.check_circle : Icons.warning,
-                            size: 12, color: t.armsLength ? Colors.green : Colors.orange),
+                            size: 12, color: t.armsLength ? core_theme.AC.ok : core_theme.AC.warn),
                         const SizedBox(width: 4),
                         Text(
                           t.armsLength ? 'مطابق' : 'يحتاج مراجعة',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
-                            color: t.armsLength ? Colors.green : Colors.orange,
+                            color: t.armsLength ? core_theme.AC.ok : core_theme.AC.warn,
                           ),
                         ),
                       ],
@@ -206,29 +207,29 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                   Expanded(
                     child: Row(
                       children: [
-                        const Icon(Icons.north_east, size: 14, color: Colors.blue),
+                        Icon(Icons.north_east, size: 14, color: core_theme.AC.info),
                         const SizedBox(width: 4),
-                        Expanded(child: Text(t.from, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+                        Expanded(child: Text(t.from, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward, size: 14, color: Colors.black38),
+                  Icon(Icons.arrow_forward, size: 14, color: core_theme.AC.td),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: Row(
                         children: [
-                          const Icon(Icons.south_west, size: 14, color: Colors.green),
+                          Icon(Icons.south_west, size: 14, color: core_theme.AC.ok),
                           const SizedBox(width: 4),
-                          Expanded(child: Text(t.to, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+                          Expanded(child: Text(t.to, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
                         ],
                       ),
                     ),
                   ),
                   Text(_fmt(t.amount),
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
                   const SizedBox(width: 4),
-                  const Text('ر.س', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text('ر.س', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ],
               ),
             ],
@@ -245,13 +246,13 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -263,8 +264,8 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
           ),
         ),
         const SizedBox(height: 16),
-        const Text('المعاملة قيد الفحص: RP-2025-003', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-        const Text('ترخيص علامة تجارية — APEX Dubai → APEX Singapore', style: TextStyle(fontSize: 12, color: Colors.black54)),
+        Text('المعاملة قيد الفحص: RP-2025-003', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+        Text('ترخيص علامة تجارية — APEX Dubai → APEX Singapore', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
         const SizedBox(height: 16),
         _benchmarkCard(),
         const SizedBox(height: 16),
@@ -293,13 +294,13 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('دراسة المقارنات (Benchmarking Study)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-          const Text('6 شركات مقارنة من قاعدة بيانات Amadeus/Orbis', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('دراسة المقارنات (Benchmarking Study)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+          Text('6 شركات مقارنة من قاعدة بيانات Amadeus/Orbis', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 16),
           for (final c in comparables)
             Padding(
@@ -307,47 +308,47 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
               child: Row(
                 children: [
                   Expanded(child: Text(c.name, style: const TextStyle(fontSize: 12))),
-                  Expanded(child: Text(c.description, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                  Expanded(child: Text(c.description, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
+                      color: core_theme.AC.info.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text('${c.rate}%',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.blue)),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
                   ),
                 ],
               ),
             ),
           const Divider(height: 24),
-          const Text('النطاق العادل (Arm\'s Length Range)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+          Text('النطاق العادل (Arm\'s Length Range)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
-          _rangeChip('Q1 (25%)', q1, Colors.blue),
-          _rangeChip('الوسيط (Median)', median, const Color(0xFFD4AF37)),
-          _rangeChip('Q3 (75%)', q3, Colors.blue),
+          _rangeChip('Q1 (25%)', q1, core_theme.AC.info),
+          _rangeChip('الوسيط (Median)', median, core_theme.AC.gold),
+          _rangeChip('Q3 (75%)', q3, core_theme.AC.info),
           const Divider(height: 24),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.green.shade50,
+              color: core_theme.AC.ok,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green.shade200),
+              border: Border.all(color: core_theme.AC.ok),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.green),
+                Icon(Icons.check_circle, color: core_theme.AC.ok),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('السعر الفعلي: 4.7%', style: TextStyle(fontWeight: FontWeight.w800)),
-                      Text('داخل النطاق العادل — متوافق', style: TextStyle(fontSize: 11, color: Colors.green)),
+                      Text('داخل النطاق العادل — متوافق', style: TextStyle(fontSize: 11, color: core_theme.AC.ok)),
                     ],
                   ),
                 ),
-                const Text('✓', style: TextStyle(fontSize: 24, color: Colors.green, fontWeight: FontWeight.w900)),
+                Text('✓', style: TextStyle(fontSize: 24, color: core_theme.AC.ok, fontWeight: FontWeight.w900)),
               ],
             ),
           ),
@@ -365,7 +366,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
           Expanded(
             child: LinearProgressIndicator(
               value: value / 10,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: core_theme.AC.bdr,
               valueColor: AlwaysStoppedAnimation(color),
               minHeight: 6,
             ),
@@ -382,18 +383,18 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
+        color: core_theme.AC.ok,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.shade200),
+        border: Border.all(color: core_theme.AC.ok),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.verified, color: Colors.green),
+              Icon(Icons.verified, color: core_theme.AC.ok),
               SizedBox(width: 8),
-              Text('الاستنتاج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.green)),
+              Text('الاستنتاج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.ok)),
             ],
           ),
           SizedBox(height: 8),
@@ -428,7 +429,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
@@ -436,12 +437,12 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: (done ? Colors.green : Colors.orange).withOpacity(0.12),
+                  color: (done ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   done ? Icons.description : Icons.edit_document,
-                  color: done ? Colors.green : Colors.orange,
+                  color: done ? core_theme.AC.ok : core_theme.AC.warn,
                   size: 24,
                 ),
               ),
@@ -451,17 +452,17 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(d.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                    Text(d.description, style: const TextStyle(fontSize: 12, color: Colors.black54, height: 1.4)),
+                    Text(d.description, style: TextStyle(fontSize: 12, color: core_theme.AC.ts, height: 1.4)),
                     Row(
                       children: [
-                        Icon(Icons.description, size: 12, color: Colors.black45),
+                        Icon(Icons.description, size: 12, color: core_theme.AC.td),
                         const SizedBox(width: 4),
-                        Text('${d.pages} صفحة', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text('${d.pages} صفحة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                         if (d.submittedAt != null) ...[
                           const SizedBox(width: 12),
-                          const Icon(Icons.send, size: 12, color: Colors.green),
+                          Icon(Icons.send, size: 12, color: core_theme.AC.ok),
                           const SizedBox(width: 4),
-                          Text('قُدّم ${d.submittedAt}', style: const TextStyle(fontSize: 10, color: Colors.green)),
+                          Text('قُدّم ${d.submittedAt}', style: TextStyle(fontSize: 10, color: core_theme.AC.ok)),
                         ],
                       ],
                     ),
@@ -474,11 +475,11 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: (done ? Colors.green : Colors.orange).withOpacity(0.15),
+                      color: (done ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(d.status,
-                        style: TextStyle(fontSize: 11, color: done ? Colors.green : Colors.orange, fontWeight: FontWeight.w800)),
+                        style: TextStyle(fontSize: 11, color: done ? core_theme.AC.ok : core_theme.AC.warn, fontWeight: FontWeight.w800)),
                   ),
                   const SizedBox(height: 8),
                   IconButton(
@@ -516,13 +517,13 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -538,13 +539,13 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: const Row(
                   children: [
                     Expanded(flex: 2, child: Text('الدولة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -560,7 +561,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
@@ -568,26 +569,26 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                       Expanded(flex: 2, child: Text(c.entity, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600))),
                       Expanded(flex: 2, child: Text(_fmtM(c.revenue), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
                       Expanded(flex: 2, child: Text(_fmtM(c.pbt),
-                          style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Color(0xFFD4AF37), fontWeight: FontWeight.w700))),
+                          style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.gold, fontWeight: FontWeight.w700))),
                       Expanded(child: Text('${c.employees}', style: const TextStyle(fontSize: 12))),
                       Expanded(
                         child: Text('${(c.pbt / c.revenue * 100).toStringAsFixed(1)}%',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.blue)),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.info)),
                       ),
                     ],
                   ),
                 ),
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: Row(
                   children: [
                     const Expanded(flex: 4, child: Text('الإجماليات', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12))),
                     Expanded(flex: 2, child: Text(_fmtM(totalRevenue.toDouble()), style: const TextStyle(fontWeight: FontWeight.w900, fontFamily: 'monospace'))),
-                    Expanded(flex: 2, child: Text(_fmtM(totalPbt.toDouble()), style: const TextStyle(fontWeight: FontWeight.w900, fontFamily: 'monospace', color: Color(0xFFD4AF37)))),
+                    Expanded(flex: 2, child: Text(_fmtM(totalPbt.toDouble()), style: TextStyle(fontWeight: FontWeight.w900, fontFamily: 'monospace', color: core_theme.AC.gold))),
                     Expanded(child: Text('$totalEmp', style: const TextStyle(fontWeight: FontWeight.w900))),
                     Expanded(child: Text('${(totalPbt / totalRevenue * 100).toStringAsFixed(1)}%',
-                        style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.blue))),
+                        style: TextStyle(fontWeight: FontWeight.w900, color: core_theme.AC.info))),
                   ],
                 ),
               ),
@@ -600,7 +601,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
           child: ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.send),
-            label: const Text('تقديم CbCR إلى ZATCA'),
+            label: Text('تقديم CbCR إلى ZATCA'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1A237E),
               foregroundColor: Colors.white,

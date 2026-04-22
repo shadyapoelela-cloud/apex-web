@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class DocumentVaultScreen extends StatefulWidget {
   const DocumentVaultScreen({super.key});
@@ -78,22 +79,22 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
       margin: const EdgeInsets.only(left: 20, top: 20, bottom: 20, right: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(14),
-            color: Colors.grey.shade50,
+            color: core_theme.AC.navy3,
             child: Row(
               children: [
-                const Icon(Icons.folder, color: Color(0xFFD4AF37), size: 18),
+                Icon(Icons.folder, color: core_theme.AC.gold, size: 18),
                 const SizedBox(width: 8),
                 const Expanded(child: Text('المجلدات', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900))),
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(Icons.create_new_folder, size: 18, color: Color(0xFFD4AF37)),
+                  icon: Icon(Icons.create_new_folder, size: 18, color: core_theme.AC.gold),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 ),
@@ -123,10 +124,10 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFD4AF37).withOpacity(0.12) : null,
+          color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
           border: Border(
             right: BorderSide(
-              color: selected ? const Color(0xFFD4AF37) : Colors.transparent,
+              color: selected ? core_theme.AC.gold : Colors.transparent,
               width: 3,
             ),
           ),
@@ -138,16 +139,16 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                    color: selected ? const Color(0xFFD4AF37) : Colors.black87,
+                    color: selected ? core_theme.AC.gold : core_theme.AC.tp,
                   )),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: core_theme.AC.bdr,
                 borderRadius: BorderRadius.circular(3),
               ),
-              child: Text('$count', style: const TextStyle(fontSize: 10, color: Colors.black54, fontWeight: FontWeight.w700)),
+              child: Text('$count', style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -167,14 +168,14 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
         children: [
           const Icon(Icons.folder_shared, color: Colors.white, size: 32),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('خزانة الوثائق',
                     style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
                 Text('إدارة مركزية للوثائق · نسخ · صلاحيات · سجل التعديلات',
-                    style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
               ],
             ),
           ),
@@ -185,9 +186,9 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.cloud_upload, size: 16),
-            label: const Text('رفع جديد'),
+            label: Text('رفع جديد'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
+              backgroundColor: core_theme.AC.gold,
               foregroundColor: Colors.white,
             ),
           ),
@@ -210,7 +211,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 9)),
+              Text(label, style: TextStyle(color: core_theme.AC.ts, fontSize: 9)),
               Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900)),
             ],
           ),
@@ -249,7 +250,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          color: Colors.grey.shade100,
+          color: core_theme.AC.navy3,
           child: const Row(
             children: [
               SizedBox(width: 28),
@@ -268,7 +269,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+              border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
             ),
             child: Row(
               children: [
@@ -293,13 +294,13 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(d.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                      Text(d.id, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                      Text(d.id, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     ],
                   ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text(d.folder, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  child: Text(d.folder, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ),
                 Expanded(child: Text('${d.sizeMb} MB', style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
                 Expanded(
@@ -345,11 +346,11 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: core_theme.AC.info.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text('v${d.versions}',
-                              style: const TextStyle(fontSize: 9, color: Colors.blue, fontWeight: FontWeight.w800)),
+                              style: TextStyle(fontSize: 9, color: core_theme.AC.info, fontWeight: FontWeight.w800)),
                         ),
                     ],
                   ),
@@ -364,15 +365,15 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
   Color _typeColor(String t) {
     switch (t) {
       case 'pdf':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'docx':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'xlsx':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'pptx':
-        return Colors.orange;
+        return core_theme.AC.warn;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -383,14 +384,14 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
       case 'ساري':
       case 'موقّع':
       case 'مُقدَّم':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'مسوّدة':
       case 'قيد المراجعة':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'سرّي':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 }

@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class IntegrationsHubScreen extends StatefulWidget {
   const IntegrationsHubScreen({super.key});
@@ -16,21 +17,21 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
-  final _integrations = const [
+  final _integrations = [
     _Integration('ZATCA E-Invoicing API', 'compliance', 'active', 99.98, 'Real-time', '2024-03-15', Color(0xFF0A5F38)),
-    _Integration('SAMA Open Banking', 'banking', 'active', 99.95, 'Hourly', '2024-06-01', Colors.blue),
-    _Integration('GOSI (التأمينات)', 'government', 'active', 99.90, 'Daily', '2023-11-10', Colors.teal),
-    _Integration('WPS (نظام حماية الأجور)', 'banking', 'active', 99.85, 'Monthly', '2023-08-20', Colors.orange),
-    _Integration('Anthropic Claude API', 'ai', 'active', 99.99, 'On-demand', '2024-09-01', Colors.purple),
-    _Integration('Stripe Payments', 'payments', 'active', 99.92, 'Real-time', '2024-11-05', Colors.pink),
-    _Integration('SendGrid Email', 'comms', 'active', 99.87, 'Real-time', '2024-02-14', Colors.green),
-    _Integration('Twilio SMS/OTP', 'comms', 'active', 99.88, 'Real-time', '2024-04-22', Colors.red),
-    _Integration('Slack Notifications', 'comms', 'active', 100.0, 'Real-time', '2025-01-10', Colors.indigo),
-    _Integration('Microsoft Teams', 'comms', 'degraded', 98.12, 'Real-time', '2025-03-05', Colors.blue),
-    _Integration('Salesforce CRM', 'crm', 'active', 99.80, '15 min', '2024-07-18', Colors.blue),
-    _Integration('HubSpot Marketing', 'crm', 'paused', 0, 'Disabled', '2024-05-03', Colors.orange),
+    _Integration('SAMA Open Banking', 'banking', 'active', 99.95, 'Hourly', '2024-06-01', core_theme.AC.info),
+    _Integration('GOSI (التأمينات)', 'government', 'active', 99.90, 'Daily', '2023-11-10', core_theme.AC.info),
+    _Integration('WPS (نظام حماية الأجور)', 'banking', 'active', 99.85, 'Monthly', '2023-08-20', core_theme.AC.warn),
+    _Integration('Anthropic Claude API', 'ai', 'active', 99.99, 'On-demand', '2024-09-01', core_theme.AC.purple),
+    _Integration('Stripe Payments', 'payments', 'active', 99.92, 'Real-time', '2024-11-05', core_theme.AC.err),
+    _Integration('SendGrid Email', 'comms', 'active', 99.87, 'Real-time', '2024-02-14', core_theme.AC.ok),
+    _Integration('Twilio SMS/OTP', 'comms', 'active', 99.88, 'Real-time', '2024-04-22', core_theme.AC.err),
+    _Integration('Slack Notifications', 'comms', 'active', 100.0, 'Real-time', '2025-01-10', core_theme.AC.purple),
+    _Integration('Microsoft Teams', 'comms', 'degraded', 98.12, 'Real-time', '2025-03-05', core_theme.AC.info),
+    _Integration('Salesforce CRM', 'crm', 'active', 99.80, '15 min', '2024-07-18', core_theme.AC.info),
+    _Integration('HubSpot Marketing', 'crm', 'paused', 0, 'Disabled', '2024-05-03', core_theme.AC.warn),
     _Integration('AWS S3 — Documents', 'storage', 'active', 99.99, 'Real-time', '2023-09-14', Color(0xFFFF9900)),
-    _Integration('DocuSign eSignature', 'docs', 'active', 99.96, 'Real-time', '2024-08-22', Colors.amber),
+    _Integration('DocuSign eSignature', 'docs', 'active', 99.96, 'Real-time', '2024-08-22', core_theme.AC.warn),
   ];
 
   final _apiKeys = const [
@@ -70,9 +71,9 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
         _buildKpis(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.api, size: 16), text: 'التكاملات'),
             Tab(icon: Icon(Icons.vpn_key, size: 16), text: 'مفاتيح API'),
@@ -101,7 +102,7 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
         gradient: const LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF283593)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.hub, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -112,7 +113,7 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
                 Text('مركز التكاملات',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('API Hub · 14 تكامل نشط · 6 webhooks · مفاتيح آمنة · مراقبة وقت التشغيل',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -129,11 +130,11 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('إجمالي التكاملات', '${_integrations.length}', Colors.blue, Icons.hub),
-          _kpi('نشطة', '$active', Colors.green, Icons.check_circle),
-          _kpi('مُخفَّضة الأداء', '$degraded', Colors.orange, Icons.warning),
-          _kpi('متوسط الـ Uptime', '${avgUptime.toStringAsFixed(2)}%', const Color(0xFFD4AF37), Icons.trending_up),
-          _kpi('طلبات API/شهر', '3.3M', Colors.purple, Icons.analytics),
+          _kpi('إجمالي التكاملات', '${_integrations.length}', core_theme.AC.info, Icons.hub),
+          _kpi('نشطة', '$active', core_theme.AC.ok, Icons.check_circle),
+          _kpi('مُخفَّضة الأداء', '$degraded', core_theme.AC.warn, Icons.warning),
+          _kpi('متوسط الـ Uptime', '${avgUptime.toStringAsFixed(2)}%', core_theme.AC.gold, Icons.trending_up),
+          _kpi('طلبات API/شهر', '3.3M', core_theme.AC.purple, Icons.analytics),
         ],
       ),
     );
@@ -157,7 +158,7 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -227,29 +228,29 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
           const Spacer(),
           Row(
             children: [
-              const Icon(Icons.trending_up, size: 12, color: Colors.black54),
+              Icon(Icons.trending_up, size: 12, color: core_theme.AC.ts),
               const SizedBox(width: 3),
               Text('Uptime: ${i.uptime}%',
                   style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      color: i.uptime >= 99.9 ? Colors.green : i.uptime >= 99 ? Colors.orange : Colors.red)),
+                      color: i.uptime >= 99.9 ? core_theme.AC.ok : i.uptime >= 99 ? core_theme.AC.warn : core_theme.AC.err)),
             ],
           ),
           Row(
             children: [
-              const Icon(Icons.schedule, size: 12, color: Colors.black54),
+              Icon(Icons.schedule, size: 12, color: core_theme.AC.ts),
               const SizedBox(width: 3),
               Text('تزامن: ${i.syncFrequency}',
-                  style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ],
           ),
           Row(
             children: [
-              const Icon(Icons.calendar_today, size: 11, color: Colors.black54),
+              Icon(Icons.calendar_today, size: 11, color: core_theme.AC.ts),
               const SizedBox(width: 3),
               Text('منذ ${i.connectedSince}',
-                  style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                  style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
             ],
           ),
         ],
@@ -264,13 +265,13 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.red.shade50,
+            color: core_theme.AC.err,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.red.shade200),
+            border: Border.all(color: core_theme.AC.err),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.warning, color: Colors.red),
+              Icon(Icons.warning, color: core_theme.AC.err),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -287,9 +288,9 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
           child: ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 16),
-            label: const Text('مفتاح جديد'),
+            label: Text('مفتاح جديد'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
+              backgroundColor: core_theme.AC.gold,
               foregroundColor: Colors.white,
             ),
           ),
@@ -299,13 +300,13 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: const Row(
                   children: [
                     Expanded(flex: 2, child: Text('المفتاح', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -330,8 +331,8 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
-        color: k.active ? null : Colors.red.shade50,
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        color: k.active ? null : core_theme.AC.err,
       ),
       child: Row(
         children: [
@@ -339,16 +340,16 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
             flex: 2,
             child: Row(
               children: [
-                const Icon(Icons.vpn_key, size: 14, color: Color(0xFFD4AF37)),
+                Icon(Icons.vpn_key, size: 14, color: core_theme.AC.gold),
                 const SizedBox(width: 6),
                 Text(k.key, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
               ],
             ),
           ),
           Expanded(flex: 2, child: Text(k.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
-          Expanded(child: Text(k.createdAt, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'))),
-          Expanded(flex: 2, child: Text(k.owner, style: const TextStyle(fontSize: 11, color: Colors.black54))),
-          Expanded(child: Text(k.expiresAt, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'))),
+          Expanded(child: Text(k.createdAt, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'))),
+          Expanded(flex: 2, child: Text(k.owner, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
+          Expanded(child: Text(k.expiresAt, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'))),
           Expanded(
             child: Text(_fmt(k.requests.toDouble()),
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
@@ -358,11 +359,11 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (k.active ? Colors.green : Colors.red).withOpacity(0.12),
+                color: (k.active ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(k.active ? 'نشط' : 'ملغى',
-                  style: TextStyle(fontSize: 10, color: k.active ? Colors.green : Colors.red, fontWeight: FontWeight.w800),
+                  style: TextStyle(fontSize: 10, color: k.active ? core_theme.AC.ok : core_theme.AC.err, fontWeight: FontWeight.w800),
                   textAlign: TextAlign.center),
             ),
           ),
@@ -388,17 +389,17 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: (isActive ? Colors.green : Colors.red).withOpacity(0.3), width: 1.5),
+        border: Border.all(color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.3), width: 1.5),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: (isActive ? Colors.green : Colors.red).withOpacity(0.12),
+              color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(Icons.webhook, color: isActive ? Colors.green : Colors.red),
+            child: Icon(Icons.webhook, color: isActive ? core_theme.AC.ok : core_theme.AC.err),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -406,10 +407,10 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(w.event, style: const TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                Text(w.event, style: TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
                 const SizedBox(height: 2),
                 Text(w.url,
-                    style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis),
               ],
@@ -420,7 +421,7 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
             children: [
               Text(_fmt(w.deliveriesToday.toDouble()),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Text('طلبات اليوم', style: TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('طلبات اليوم', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ],
           ),
           const SizedBox(width: 16),
@@ -431,21 +432,21 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
-                      color: w.successRate >= 99 ? Colors.green : w.successRate >= 90 ? Colors.orange : Colors.red)),
-              const Text('معدل النجاح', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      color: w.successRate >= 99 ? core_theme.AC.ok : w.successRate >= 90 ? core_theme.AC.warn : core_theme.AC.err)),
+              Text('معدل النجاح', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ],
           ),
           const SizedBox(width: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: (isActive ? Colors.green : Colors.red).withOpacity(0.15),
+              color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.15),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(isActive ? 'نشط' : 'فاشل',
                 style: TextStyle(
                     fontSize: 11,
-                    color: isActive ? Colors.green : Colors.red,
+                    color: isActive ? core_theme.AC.ok : core_theme.AC.err,
                     fontWeight: FontWeight.w800)),
           ),
         ],
@@ -456,15 +457,15 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
   Color _statusColor(String s) {
     switch (s) {
       case 'active':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'degraded':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'paused':
-        return Colors.grey;
+        return core_theme.AC.td;
       case 'failing':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

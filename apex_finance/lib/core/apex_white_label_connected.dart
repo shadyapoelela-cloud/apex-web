@@ -15,6 +15,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'theme.dart' as core_theme;
 import 'package:http/http.dart' as http;
 
 import 'api_config.dart';
@@ -32,7 +33,7 @@ class ApexWhiteLabelConnected extends StatefulWidget {
 }
 
 class _ApexWhiteLabelConnectedState extends State<ApexWhiteLabelConnected> {
-  WhiteLabelConfig _current = const WhiteLabelConfig();
+  WhiteLabelConfig _current = WhiteLabelConfig();
   WhiteLabelConfig? _saved;      // last persisted copy for diff / revert
   bool _loading = true;
   bool _saving = false;
@@ -80,7 +81,7 @@ class _ApexWhiteLabelConnectedState extends State<ApexWhiteLabelConnected> {
   WhiteLabelConfig _fromJson(Map<String, dynamic> m) {
     return WhiteLabelConfig(
       brandText: m['brand_text'] as String? ?? 'APEX',
-      primary: _parseHex(m['primary_hex'] as String?, const Color(0xFFD4AF37)),
+      primary: _parseHex(m['primary_hex'] as String?, core_theme.AC.gold),
       secondary:
           _parseHex(m['secondary_hex'] as String?, const Color(0xFF2E75B6)),
       darkMode: m['dark_mode'] as bool? ?? true,

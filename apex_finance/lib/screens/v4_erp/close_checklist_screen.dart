@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CloseChecklistScreen extends StatefulWidget {
   const CloseChecklistScreen({super.key});
@@ -62,10 +63,10 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('مكتمل', '$done', Colors.green, Icons.check_circle),
-            _kpi('قيد التنفيذ', '$inProg', Colors.blue, Icons.sync),
-            _kpi('بانتظار', '$pending', Colors.orange, Icons.pending),
-            _kpi('التقدّم العام', '${(progress * 100).toStringAsFixed(0)}%', const Color(0xFFD4AF37), Icons.donut_large),
+            _kpi('مكتمل', '$done', core_theme.AC.ok, Icons.check_circle),
+            _kpi('قيد التنفيذ', '$inProg', core_theme.AC.info, Icons.sync),
+            _kpi('بانتظار', '$pending', core_theme.AC.warn, Icons.pending),
+            _kpi('التقدّم العام', '${(progress * 100).toStringAsFixed(0)}%', core_theme.AC.gold, Icons.donut_large),
           ],
         ),
         const SizedBox(height: 20),
@@ -78,7 +79,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+        gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -87,21 +88,21 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
             children: [
               const Icon(Icons.checklist, color: Colors.white, size: 36),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('قائمة إقفال الفترة',
                         style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                     Text('Month-end close workflow — 22 مهمة · 10 أيام · 8 فرق',
-                        style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                   ],
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('الفترة', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                  Text('الفترة', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                   Text(_period,
                       style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
                 ],
@@ -119,7 +120,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
               children: [
                 Row(
                   children: [
-                    const Text('التقدّم', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                    Text('التقدّم', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
                     const Spacer(),
                     Text('${(progress * 100).toStringAsFixed(0)}%',
                         style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
@@ -161,7 +162,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -187,7 +188,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
 
   Widget _dayBlock(int day, List<_Task> tasks) {
     final allDone = tasks.every((t) => t.status == 'done');
-    final color = allDone ? Colors.green : Colors.blue;
+    final color = allDone ? core_theme.AC.ok : core_theme.AC.info;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -213,10 +214,10 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
               const SizedBox(width: 10),
               Text('${tasks.length} مهام',
-                  style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               const Spacer(),
               Text(tasks.first.dueDate,
-                  style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
             ],
           ),
           const SizedBox(height: 10),
@@ -249,13 +250,13 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
                         Text(t.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                         Row(
                           children: [
-                            const Icon(Icons.group, size: 11, color: Colors.black45),
+                            Icon(Icons.group, size: 11, color: core_theme.AC.td),
                             const SizedBox(width: 3),
-                            Text(t.team, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(t.team, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                             const SizedBox(width: 8),
-                            const Icon(Icons.person, size: 11, color: Colors.black45),
+                            Icon(Icons.person, size: 11, color: core_theme.AC.td),
                             const SizedBox(width: 3),
-                            Text(t.owner, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(t.owner, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                           ],
                         ),
                       ],
@@ -263,7 +264,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
                   ),
                   if (t.completedAt != null) ...[
                     Text('✓ ${t.completedAt}',
-                        style: const TextStyle(fontSize: 10, color: Colors.green, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 10, color: core_theme.AC.ok, fontFamily: 'monospace')),
                     const SizedBox(width: 6),
                   ],
                   Container(
@@ -282,7 +283,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
                   if (t.status != 'done') ...[
                     const SizedBox(width: 6),
                     IconButton(
-                      icon: const Icon(Icons.check_circle_outline, size: 20, color: Colors.green),
+                      icon: Icon(Icons.check_circle_outline, size: 20, color: core_theme.AC.ok),
                       onPressed: () => setState(() => t.status = 'done'),
                       tooltip: 'وضع كمنجز',
                       padding: EdgeInsets.zero,
@@ -300,13 +301,13 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
   Color _statusColor(String s) {
     switch (s) {
       case 'done':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'in-progress':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'pending':
-        return Colors.orange;
+        return core_theme.AC.warn;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -339,25 +340,25 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
   Color _categoryColor(String c) {
     switch (c) {
       case 'revenue':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'expenses':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'cash':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'inventory':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'assets':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'payroll':
-        return Colors.pink;
+        return core_theme.AC.err;
       case 'tax':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'fx':
-        return Colors.indigo;
+        return core_theme.AC.purple;
       case 'review':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

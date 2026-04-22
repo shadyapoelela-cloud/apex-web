@@ -15,6 +15,7 @@ import '../../core/apex_forecast_chart.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Sprint42LongTermScreen extends StatefulWidget {
   const Sprint42LongTermScreen({super.key});
@@ -152,17 +153,17 @@ class _AiCashflowTab extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.purple.withValues(alpha: 0.25), AC.navy2],
+            colors: [core_theme.AC.purple.withValues(alpha: 0.25), AC.navy2],
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
           ),
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-              color: Colors.purple.shade300.withValues(alpha: 0.4)),
+              color: core_theme.AC.purple.withValues(alpha: 0.4)),
         ),
         child: Row(children: [
           Icon(Icons.auto_awesome,
-              color: Colors.purple.shade200, size: 28),
+              color: core_theme.AC.purple, size: 28),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -245,7 +246,7 @@ class _AiCashflowTab extends StatelessWidget {
           children: [
             Row(children: [
               Icon(Icons.lightbulb_outline,
-                  color: Colors.amber, size: 20),
+                  color: core_theme.AC.warn, size: 20),
               const SizedBox(width: 6),
               Text('توصيات AI',
                   style: TextStyle(
@@ -261,7 +262,7 @@ class _AiCashflowTab extends StatelessWidget {
             _insight(
                 'هناك 3 فواتير معلّقة بقيمة 92,000 ر.س أكبر من 60 يوم — المتابعة قد تُقلّل مجال الثقة السفلي بـ 8%',
                 Icons.receipt_long,
-                Colors.amber.shade700),
+                core_theme.AC.warn),
             _insight(
                 'تأجيل استثمار رأسمالي ≥ 80,000 ر.س يرفع Runway من 14.8 إلى 19.2 شهراً',
                 Icons.savings_outlined,
@@ -343,16 +344,16 @@ class _ConsolidationTab extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.teal.withValues(alpha: 0.25), AC.navy2],
+            colors: [core_theme.AC.info.withValues(alpha: 0.25), AC.navy2],
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
           ),
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-              color: Colors.teal.shade300.withValues(alpha: 0.4)),
+              color: core_theme.AC.info.withValues(alpha: 0.4)),
         ),
         child: Row(children: [
-          Icon(Icons.hub, color: Colors.teal.shade200, size: 28),
+          Icon(Icons.hub, color: core_theme.AC.info, size: 28),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -473,8 +474,8 @@ class _ConsolidationTab extends StatelessWidget {
       return _pill('Parent', AC.gold);
     }
     if (c.ownership >= 100) return _pill('Full', AC.ok);
-    if (c.ownership >= 50) return _pill('Full + NCI', Colors.amber.shade700);
-    return _pill('Equity', Colors.blue.shade300);
+    if (c.ownership >= 50) return _pill('Full + NCI', core_theme.AC.warn);
+    return _pill('Equity', core_theme.AC.info);
   }
 
   Widget _pill(String s, Color c) => Container(
@@ -649,17 +650,17 @@ class _ManufacturingTabState extends State<_ManufacturingTab> {
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.orange.withValues(alpha: 0.25), AC.navy2],
+            colors: [core_theme.AC.warn.withValues(alpha: 0.25), AC.navy2],
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
           ),
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-              color: Colors.orange.shade300.withValues(alpha: 0.4)),
+              color: core_theme.AC.warn.withValues(alpha: 0.4)),
         ),
         child: Row(children: [
           Icon(Icons.precision_manufacturing,
-              color: Colors.orange.shade200, size: 28),
+              color: core_theme.AC.warn, size: 28),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(

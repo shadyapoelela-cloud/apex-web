@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'apex_sticky_toolbar.dart';
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 class ApexPreviewPanel extends StatelessWidget {
   final String title;
@@ -61,7 +62,7 @@ class ApexPreviewPanel extends StatelessWidget {
         border: Border(left: BorderSide(color: AC.navy4, width: 1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
+            color: core_theme.AC.tp.withValues(alpha: 0.12),
             blurRadius: 24,
             offset: const Offset(-4, 0),
           ),

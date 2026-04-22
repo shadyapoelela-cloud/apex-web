@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 import '../../screens/v5_showcase/v5_showcase_screen.dart';
@@ -50,12 +51,18 @@ List<RouteBase> v5Routes() => [
         },
       ),
       // Apps Hub — Odoo-style grid of all apps in a service.
+      // Wrapped in a trimmed shell: SystemBar + ScreenBar only.
+      // (News ticker / Sidebar / Quick-Access rail are hidden in hub mode.)
       GoRoute(
         path: '/app/:service/apps',
         builder: (ctx, state) {
           final svc = v5ServiceById(state.pathParameters['service']!);
           if (svc == null) return const _V5NotFound();
-          return AppsHubScreen(service: svc);
+          return ApexV5ServiceShell(
+            service: svc,
+            // mainModule + activeChip left null → Apps Hub mode
+            bodyOverride: AppsHubScreen(service: svc, embedded: true),
+          );
         },
       ),
       GoRoute(
@@ -129,8 +136,8 @@ class V5Launchpad extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFD4AF37), Color(0xFFE6C200)],
+                      gradient: LinearGradient(
+                        colors: [core_theme.AC.gold, Color(0xFFE6C200)],
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -164,8 +171,8 @@ class V5Launchpad extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFD4AF37), Color(0xFF7C3AED)],
+                    gradient: LinearGradient(
+                      colors: [core_theme.AC.gold, Color(0xFF7C3AED)],
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),

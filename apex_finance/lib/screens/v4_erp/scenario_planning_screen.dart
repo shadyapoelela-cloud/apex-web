@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ScenarioPlanningScreen extends StatefulWidget {
   const ScenarioPlanningScreen({super.key});
@@ -59,7 +60,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
         gradient: const LinearGradient(colors: [Color(0xFF283593), Color(0xFF5E35B1)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.insights, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -70,7 +71,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
                 Text('التخطيط بالسيناريوهات (What-If)',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('نمذجة مالية ديناميكية — حرّك المحركات وشاهد أثرها الفوري على الربحية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -82,11 +83,11 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
   Widget _buildScenarioButtons() {
     return Row(
       children: [
-        _scenarioBtn('pessimistic', 'السيناريو المتحفظ', Colors.red, Icons.trending_down),
+        _scenarioBtn('pessimistic', 'السيناريو المتحفظ', core_theme.AC.err, Icons.trending_down),
         const SizedBox(width: 10),
-        _scenarioBtn('base', 'الخط الأساسي', const Color(0xFFD4AF37), Icons.timeline),
+        _scenarioBtn('base', 'الخط الأساسي', core_theme.AC.gold, Icons.timeline),
         const SizedBox(width: 10),
-        _scenarioBtn('optimistic', 'السيناريو المتفائل', Colors.green, Icons.trending_up),
+        _scenarioBtn('optimistic', 'السيناريو المتفائل', core_theme.AC.ok, Icons.trending_up),
         const SizedBox(width: 10),
         _scenarioBtn('stress', 'Stress Test', Colors.deepOrange, Icons.warning),
         const Spacer(),
@@ -104,7 +105,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
             });
           },
           icon: const Icon(Icons.refresh, size: 16),
-          label: const Text('إعادة ضبط'),
+          label: Text('إعادة ضبط'),
         ),
       ],
     );
@@ -186,28 +187,28 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('محركات النموذج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+          Text('محركات النموذج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
-          _driver('نمو الإيرادات (YoY)', _revenueGrowth, -30, 50, Colors.green,
+          _driver('نمو الإيرادات (YoY)', _revenueGrowth, -30, 50, core_theme.AC.ok,
               (v) => setState(() => _revenueGrowth = v)),
-          _driver('زيادة الأسعار', _priceIncrease, -10, 20, Colors.blue,
+          _driver('زيادة الأسعار', _priceIncrease, -10, 20, core_theme.AC.info,
               (v) => setState(() => _priceIncrease = v)),
-          _driver('نمو الحجم (Volume)', _volumeGrowth, -20, 40, Colors.teal,
+          _driver('نمو الحجم (Volume)', _volumeGrowth, -20, 40, core_theme.AC.info,
               (v) => setState(() => _volumeGrowth = v)),
           const Divider(),
-          _driver('تضخم تكلفة المبيعات', _cogsInflation, 0, 25, Colors.orange,
+          _driver('تضخم تكلفة المبيعات', _cogsInflation, 0, 25, core_theme.AC.warn,
               (v) => setState(() => _cogsInflation = v)),
           _driver('تضخم المصروفات التشغيلية', _opexInflation, 0, 20, Colors.deepOrange,
               (v) => setState(() => _opexInflation = v)),
-          _driver('نمو الموظفين', _headcountGrowth, -10, 30, Colors.purple,
+          _driver('نمو الموظفين', _headcountGrowth, -10, 30, core_theme.AC.purple,
               (v) => setState(() => _headcountGrowth = v)),
           const Divider(),
-          _driver('صدمة سعر الصرف', _fxShock, -25, 10, Colors.red,
+          _driver('صدمة سعر الصرف', _fxShock, -25, 10, core_theme.AC.err,
               (v) => setState(() => _fxShock = v)),
         ],
       ),
@@ -270,8 +271,8 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: ebitdaDelta >= 0
-              ? [Colors.green.shade700, Colors.green.shade500]
-              : [Colors.red.shade700, Colors.red.shade500],
+              ? [core_theme.AC.ok, core_theme.AC.ok]
+              : [core_theme.AC.err, core_theme.AC.err],
         ),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -292,7 +293,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
           _plRow('إجمالي الربح', _baseRevenue - _baseCogs, _projGross, highlight: true),
           _plRow('المصروفات التشغيلية', _baseOpex, _projOpex, isCost: true),
           _plRow('الرواتب والمزايا', _baseHeadcount, _projHeadcount, isCost: true),
-          const Divider(color: Colors.white38),
+          Divider(color: core_theme.AC.td),
           _plRow('EBITDA', _baseRevenue - _baseCogs - _baseOpex - _baseHeadcount, _projEbitda, highlight: true, big: true),
           const SizedBox(height: 10),
           Container(
@@ -303,13 +304,13 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
             ),
             child: Row(
               children: [
-                const Text('هامش EBITDA', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                Text('هامش EBITDA', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                 const Spacer(),
                 Text('${_baseMargin.toStringAsFixed(1)}%',
-                    style: const TextStyle(color: Colors.white60, fontSize: 14, fontWeight: FontWeight.w700)),
-                const Padding(
+                    style: TextStyle(color: core_theme.AC.td, fontSize: 14, fontWeight: FontWeight.w700)),
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 6),
-                  child: Icon(Icons.arrow_forward, color: Colors.white70, size: 14),
+                  child: Icon(Icons.arrow_forward, color: core_theme.AC.ts, size: 14),
                 ),
                 Text('${_projMargin.toStringAsFixed(1)}%',
                     style: const TextStyle(color: Color(0xFFFFD700), fontSize: 18, fontWeight: FontWeight.w900)),
@@ -338,9 +339,9 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
           ),
           Expanded(
             child: Text(_fmt(base),
-                style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'monospace')),
+                style: TextStyle(color: core_theme.AC.ts, fontSize: 11, fontFamily: 'monospace')),
           ),
-          const Icon(Icons.arrow_forward, color: Colors.white60, size: 12),
+          Icon(Icons.arrow_forward, color: core_theme.AC.td, size: 12),
           const SizedBox(width: 6),
           Expanded(
             child: Text(_fmt(proj),
@@ -355,7 +356,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
             child: Text(
               '${deltaFavorable ? '+' : ''}${(delta / base * 100).toStringAsFixed(1)}%',
               style: TextStyle(
-                color: deltaFavorable ? const Color(0xFFFFD700) : Colors.red.shade200,
+                color: deltaFavorable ? const Color(0xFFFFD700) : core_theme.AC.err,
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
               ),
@@ -383,7 +384,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,8 +398,8 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
             ],
           ),
           const SizedBox(height: 6),
-          const Text('مدى تأثير كل محرّك على EBITDA عند تحريكه ±5 نقاط',
-              style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('مدى تأثير كل محرّك على EBITDA عند تحريكه ±5 نقاط',
+              style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 14),
           for (final d in drivers)
             Padding(
@@ -412,7 +413,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
                   Expanded(
                     child: Stack(
                       children: [
-                        Container(height: 28, color: Colors.grey.shade100),
+                        Container(height: 28, color: core_theme.AC.navy3),
                         Container(
                           alignment: d.$3 >= 0 ? Alignment.centerRight : Alignment.centerLeft,
                           child: FractionallySizedBox(
@@ -424,7 +425,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
                                 left: d.$3 >= 0 ? MediaQuery.of(context).size.width * 0.15 : 0,
                               ),
                               decoration: BoxDecoration(
-                                color: d.$3 >= 0 ? Colors.green : Colors.red,
+                                color: d.$3 >= 0 ? core_theme.AC.ok : core_theme.AC.err,
                                 borderRadius: BorderRadius.only(
                                   topRight: Radius.circular(d.$3 >= 0 ? 4 : 0),
                                   bottomRight: Radius.circular(d.$3 >= 0 ? 4 : 0),
@@ -451,13 +452,13 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: core_theme.AC.info,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue.shade200),
+              border: Border.all(color: core_theme.AC.info),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.lightbulb, color: Colors.blue, size: 16),
+                Icon(Icons.lightbulb, color: core_theme.AC.info, size: 16),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(

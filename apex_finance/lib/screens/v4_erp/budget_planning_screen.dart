@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 109 — Budget Planning Workflow (Anaplan-killer)
 class BudgetPlanningScreen extends StatefulWidget {
@@ -23,8 +24,8 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
         body: SafeArea(child: Column(children: [
           _hero(), _kpis(),
           Container(color: Colors.white, child: TabBar(
-            controller: _tc, labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-            indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+            controller: _tc, labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+            indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
             tabs: const [
               Tab(text: 'دورات الموازنة'), Tab(text: 'الموازنات القسمية'), Tab(text: 'سير الاعتماد'), Tab(text: 'التحليلات'),
             ],
@@ -41,13 +42,13 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
     padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.account_tree, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('تخطيط الموازنات التعاوني', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('سير عمل Top-Down / Bottom-Up مع التوافق والاعتماد متعدد المستويات', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('سير عمل Top-Down / Bottom-Up مع التوافق والاعتماد متعدد المستويات', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -59,7 +60,7 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
       Expanded(child: _kpi('إجمالي الموازنة', _fmtM(total), Icons.pie_chart, const Color(0xFF1A237E))),
       Expanded(child: _kpi('معتمد', _fmtM(approved), Icons.check_circle, const Color(0xFF2E7D32))),
       Expanded(child: _kpi('قيد المراجعة', '${_depts.where((d)=>d.status.contains('مراجعة')).length}', Icons.rate_review, const Color(0xFFE65100))),
-      Expanded(child: _kpi('دورة 2026', 'Q2', Icons.calendar_today, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('دورة 2026', 'Q2', Icons.calendar_today, core_theme.AC.gold)),
     ]));
   }
 
@@ -67,7 +68,7 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 24), const SizedBox(width: 8),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -81,17 +82,17 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            Text('${c.year} • ${c.method}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text('${c.year} • ${c.method}', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           ])),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: _cycleColor(c.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Text(c.status, style: TextStyle(color: _cycleColor(c.status), fontSize: 10, fontWeight: FontWeight.bold))),
         ]),
         const SizedBox(height: 10),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 8, backgroundColor: Colors.black12, valueColor: AlwaysStoppedAnimation(_cycleColor(c.status)))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 8, backgroundColor: core_theme.AC.bdr, valueColor: AlwaysStoppedAnimation(_cycleColor(c.status)))),
         const SizedBox(height: 6),
         Row(children: [
-          Text('${c.progress}% مكتمل', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('${c.progress}% مكتمل', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const Spacer(),
           Text('المهلة: ${c.deadline}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFC62828))),
         ]),
@@ -108,7 +109,7 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(d.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-          Text('المسؤول: ${d.owner}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('المسؤول: ${d.owner}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Row(children: [
             _miniStat('مُعتمد', _fmtM(d.budget)),
@@ -124,7 +125,7 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
   });
 
   Widget _miniStat(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
   ]));
 
@@ -133,17 +134,17 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
     return Card(margin: const EdgeInsets.only(bottom: 8), child: Padding(padding: const EdgeInsets.all(14),
       child: Row(children: [
         Container(width: 36, height: 36, decoration: BoxDecoration(
-          color: done ? const Color(0xFF2E7D32) : (s.active ? const Color(0xFFD4AF37) : Colors.black26),
+          color: done ? const Color(0xFF2E7D32) : (s.active ? core_theme.AC.gold : core_theme.AC.td),
           shape: BoxShape.circle,
         ), child: Icon(done ? Icons.check : Icons.circle, color: Colors.white, size: 20)),
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(s.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14,
-            color: done ? Colors.black87 : (s.active ? const Color(0xFFD4AF37) : Colors.black45))),
-          Text(s.assignee, style: const TextStyle(fontSize: 12, color: Colors.black54)),
-          Text(s.description, style: const TextStyle(fontSize: 11.5, color: Colors.black87)),
+            color: done ? core_theme.AC.tp : (s.active ? core_theme.AC.gold : core_theme.AC.td))),
+          Text(s.assignee, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
+          Text(s.description, style: TextStyle(fontSize: 11.5, color: core_theme.AC.tp)),
         ])),
-        if (done) Text(s.completedDate, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        if (done) Text(s.completedDate, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -154,19 +155,19 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
     _insight('📊 توزيع الموازنة', 'الرواتب 42% • التسويق 18% • العمليات 22% • أخرى 18%', const Color(0xFF4A148C)),
     _insight('⚠️ التجاوزات', '3 أقسام طلبت زيادة > 20% — تحتاج لجنة الموازنة', const Color(0xFFE65100)),
     _insight('✅ معدل الاعتماد', '87% من الطلبات معتمدة دون تعديل', const Color(0xFF2E7D32)),
-    _insight('🔄 إعادة التخصيص', '5 طلبات إعادة تخصيص خلال الربع', const Color(0xFFD4AF37)),
+    _insight('🔄 إعادة التخصيص', '5 طلبات إعادة تخصيص خلال الربع', core_theme.AC.gold),
   ]);
 
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _cycleColor(String s) {
     if (s.contains('مكتمل')) return const Color(0xFF2E7D32);
-    if (s.contains('جاري')) return const Color(0xFFD4AF37);
+    if (s.contains('جاري')) return core_theme.AC.gold;
     if (s.contains('متأخر')) return const Color(0xFFC62828);
     return const Color(0xFF1A237E);
   }
@@ -175,7 +176,7 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> with Single
     if (s.contains('معتمد')) return const Color(0xFF2E7D32);
     if (s.contains('مراجعة')) return const Color(0xFFE65100);
     if (s.contains('مرفوض')) return const Color(0xFFC62828);
-    if (s.contains('مسودة')) return Colors.black54;
+    if (s.contains('مسودة')) return core_theme.AC.ts;
     return const Color(0xFF1A237E);
   }
 

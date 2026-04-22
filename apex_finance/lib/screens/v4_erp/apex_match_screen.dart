@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ApexMatchScreen extends StatefulWidget {
   const ApexMatchScreen({super.key});
@@ -56,7 +57,7 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
                   child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -67,7 +68,7 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
                       SizedBox(height: 4),
                       Text(
                         'اكتب احتياجك — الذكاء الاصطناعي يختار أفضل 3 مزوّدين',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                       ),
                     ],
                   ),
@@ -78,7 +79,7 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
+                  child: Text(
                     'مثل Toptal للمحاسبة',
                     style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800),
                   ),
@@ -94,19 +95,19 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.black.withOpacity(0.1)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'اكتب احتياجك بلغتك الطبيعية',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'مثال: "مراجع حسابات + خبرة ZATCA + منطقة الرياض + ميزانية محدّدة"',
-                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                  style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -219,9 +220,9 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.verified, color: Color(0xFF059669), size: 18),
+            Icon(Icons.verified, color: core_theme.AC.ok, size: 18),
             const SizedBox(width: 6),
-            const Text(
+            Text(
               'أفضل 3 مطابقات (من 47 مزوّد فحصتهم)',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
             ),
@@ -229,16 +230,16 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: const Color(0xFF059669).withOpacity(0.1),
+                color: core_theme.AC.ok.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.bolt, size: 12, color: Color(0xFF059669)),
+                  Icon(Icons.bolt, size: 12, color: core_theme.AC.ok),
                   SizedBox(width: 4),
                   Text(
                     'البحث استغرق 0.8 ثانية',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF059669)),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.ok),
                   ),
                 ],
               ),
@@ -290,10 +291,10 @@ class _ProviderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final matchColor = provider.match >= 95
-        ? const Color(0xFF059669)
+        ? core_theme.AC.ok
         : provider.match >= 85
-            ? const Color(0xFFD97706)
-            : const Color(0xFF2563EB);
+            ? core_theme.AC.warn
+            : core_theme.AC.info;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -302,8 +303,8 @@ class _ProviderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: rank == 1
-              ? const Color(0xFFD4AF37)
-              : Colors.black.withOpacity(0.1),
+              ? core_theme.AC.gold
+              : core_theme.AC.tp.withOpacity(0.1),
           width: rank == 1 ? 2 : 1,
         ),
       ),
@@ -341,10 +342,10 @@ class _ProviderCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFD4AF37),
+                              color: core_theme.AC.gold,
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
+                            child: Text(
                               '⭐ أفضل مطابقة',
                               style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
                             ),
@@ -359,11 +360,11 @@ class _ProviderCard extends StatelessWidget {
                     ),
                     Text(
                       provider.firm,
-                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                     ),
                     Text(
                       '📍 ${provider.location}',
-                      style: const TextStyle(fontSize: 11, color: Colors.black54),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                     ),
                   ],
                 ),
@@ -414,21 +415,21 @@ class _ProviderCard extends StatelessWidget {
                 icon: Icons.star,
                 label: '${provider.rating}',
                 sub: '${provider.reviews} تقييم',
-                color: const Color(0xFFD97706),
+                color: core_theme.AC.warn,
               ),
               const SizedBox(width: 8),
               _statChip(
                 icon: Icons.event_available,
                 label: provider.availableIn,
                 sub: 'متوفّر',
-                color: const Color(0xFF059669),
+                color: core_theme.AC.ok,
               ),
               const SizedBox(width: 8),
               _statChip(
                 icon: Icons.payments,
                 label: '${provider.priceRange} ر.س',
                 sub: 'السعر',
-                color: const Color(0xFF2563EB),
+                color: core_theme.AC.info,
               ),
             ],
           ),
@@ -485,12 +486,12 @@ class _ProviderCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.06),
+                    color: core_theme.AC.tp.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     s,
-                    style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.tp, fontWeight: FontWeight.w600),
                   ),
                 ),
             ],
@@ -503,13 +504,13 @@ class _ProviderCard extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.visibility, size: 14),
-                label: const Text('عرض الملف'),
+                label: Text('عرض الملف'),
               ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.handshake, size: 14),
-                label: const Text('احجز مباشرة'),
+                label: Text('احجز مباشرة'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: matchColor,
                   foregroundColor: Colors.white,
@@ -552,7 +553,7 @@ class _ProviderCard extends StatelessWidget {
               ),
               Text(
                 sub,
-                style: const TextStyle(fontSize: 9, color: Colors.black54),
+                style: TextStyle(fontSize: 9, color: core_theme.AC.ts),
               ),
             ],
           ),

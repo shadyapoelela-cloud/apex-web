@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class SubscriptionManagementScreen extends StatefulWidget {
   const SubscriptionManagementScreen({super.key});
@@ -16,12 +17,12 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
-  final _plans = const [
-    _Plan('Starter', 299, 'monthly', 45, 'للمنشآت الصغيرة — 5 مستخدمين + وحدات أساسية', Colors.blue),
-    _Plan('Professional', 899, 'monthly', 128, 'للمنشآت المتوسطة — 25 مستخدم + كل الوحدات', Color(0xFFD4AF37)),
-    _Plan('Enterprise', 2499, 'monthly', 62, 'للشركات الكبرى — مستخدمين غير محدود + SLA', Colors.purple),
-    _Plan('Industry Pack — مقاولات', 1499, 'monthly', 24, 'مخصص لقطاع المقاولات', Colors.orange),
-    _Plan('Industry Pack — مطاعم', 799, 'monthly', 38, 'مخصص لقطاع المطاعم والأغذية', Colors.green),
+  final _plans = [
+    _Plan('Starter', 299, 'monthly', 45, 'للمنشآت الصغيرة — 5 مستخدمين + وحدات أساسية', core_theme.AC.info),
+    _Plan('Professional', 899, 'monthly', 128, 'للمنشآت المتوسطة — 25 مستخدم + كل الوحدات', core_theme.AC.gold),
+    _Plan('Enterprise', 2499, 'monthly', 62, 'للشركات الكبرى — مستخدمين غير محدود + SLA', core_theme.AC.purple),
+    _Plan('Industry Pack — مقاولات', 1499, 'monthly', 24, 'مخصص لقطاع المقاولات', core_theme.AC.warn),
+    _Plan('Industry Pack — مطاعم', 799, 'monthly', 38, 'مخصص لقطاع المطاعم والأغذية', core_theme.AC.ok),
   ];
 
   final _subscriptions = const [
@@ -65,9 +66,9 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
         _buildKpiRow(active, atRisk),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.list, size: 16), text: 'الاشتراكات'),
             Tab(icon: Icon(Icons.tag, size: 16), text: 'الباقات'),
@@ -98,7 +99,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
         gradient: const LinearGradient(colors: [Color(0xFF6A1B9A), Color(0xFF8E24AA)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.subscriptions, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -109,7 +110,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                 Text('إدارة الاشتراكات',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Subscription Billing · MRR · ARR · Churn · Cohort Analysis',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -123,12 +124,12 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('الإيرادات الشهرية (MRR)', '${_fmtM(_mrr)} ر.س', '+18% MoM', const Color(0xFFD4AF37), Icons.calendar_month),
-          _kpi('الإيرادات السنوية (ARR)', '${_fmtM(_arr)} ر.س', '+24% YoY', Colors.green, Icons.trending_up),
-          _kpi('اشتراكات نشطة', '$active', '+3 هذا الشهر', Colors.blue, Icons.people),
-          _kpi('Net Retention', '112%', 'نمو من الحاليين', Colors.teal, Icons.repeat),
-          _kpi('Churn Rate', '2.8%', '< 3% المستهدف', Colors.orange, Icons.trending_down),
-          _kpi('في خطر', '$atRisk', 'يحتاج متابعة', Colors.red, Icons.warning),
+          _kpi('الإيرادات الشهرية (MRR)', '${_fmtM(_mrr)} ر.س', '+18% MoM', core_theme.AC.gold, Icons.calendar_month),
+          _kpi('الإيرادات السنوية (ARR)', '${_fmtM(_arr)} ر.س', '+24% YoY', core_theme.AC.ok, Icons.trending_up),
+          _kpi('اشتراكات نشطة', '$active', '+3 هذا الشهر', core_theme.AC.info, Icons.people),
+          _kpi('Net Retention', '112%', 'نمو من الحاليين', core_theme.AC.info, Icons.repeat),
+          _kpi('Churn Rate', '2.8%', '< 3% المستهدف', core_theme.AC.warn, Icons.trending_down),
+          _kpi('في خطر', '$atRisk', 'يحتاج متابعة', core_theme.AC.err, Icons.warning),
         ],
       ),
     );
@@ -152,9 +153,9 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
-                  Text(note, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+                  Text(note, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                 ],
               ),
             ),
@@ -189,7 +190,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(s.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                    Text(s.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                     Text(s.customer, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                     Row(
                       children: [
@@ -216,10 +217,10 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('السعر الشهري', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('السعر الشهري', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     Text(_fmt(s.monthlyPrice.toDouble()),
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                    const Text('ر.س/شهر', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                    Text('ر.س/شهر', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -229,9 +230,9 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('بداية: ${s.startDate}',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     Text('تجديد: ${s.renewalDate}',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                   ],
                 ),
               ),
@@ -246,18 +247,18 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                             style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
-                                color: s.health >= 70 ? Colors.green : s.health >= 40 ? Colors.orange : Colors.red)),
+                                color: s.health >= 70 ? core_theme.AC.ok : s.health >= 40 ? core_theme.AC.warn : core_theme.AC.err)),
                       ],
                     ),
-                    Text('${s.daysActive} يوم نشط', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('${s.daysActive} يوم نشط', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                 )
               else
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                  decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                   child: Text(s.status == 'cancelled' ? 'ملغى' : 'متوقف',
-                      style: const TextStyle(fontSize: 11, color: Colors.black54, fontWeight: FontWeight.w700)),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontWeight: FontWeight.w700)),
                 ),
             ],
           ),
@@ -301,16 +302,16 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
         children: [
           Text(p.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
           const SizedBox(height: 4),
-          Text(p.description, style: const TextStyle(color: Colors.white70, fontSize: 11, height: 1.4)),
+          Text(p.description, style: TextStyle(color: core_theme.AC.ts, fontSize: 11, height: 1.4)),
           const Spacer(),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(_fmt(p.price.toDouble()),
                   style: const TextStyle(color: Color(0xFFFFD700), fontSize: 28, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(bottom: 3, right: 3),
-                child: Text('ر.س/شهر', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                child: Text('ر.س/شهر', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
               ),
             ],
           ),
@@ -357,12 +358,12 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('نمو الإيرادات الشهرية MRR (آخر 7 أشهر)',
+              Text('نمو الإيرادات الشهرية MRR (آخر 7 أشهر)',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 20),
               SizedBox(
@@ -378,15 +379,15 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(_fmtM(m.mrr.toDouble()),
-                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                               const SizedBox(height: 2),
                               Container(
                                 height: (m.mrr / maxMrr) * 140,
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
+                                  gradient: LinearGradient(
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
-                                    colors: [Color(0xFFD4AF37), Color(0xFFE6C200)],
+                                    colors: [core_theme.AC.gold, Color(0xFFE6C200)],
                                   ),
                                   borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                                 ),
@@ -395,7 +396,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                               Text(m.month.split(' ')[0],
                                   style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                               Text('${m.subs}',
-                                  style: const TextStyle(fontSize: 9, color: Colors.black54)),
+                                  style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                             ],
                           ),
                         ),
@@ -425,20 +426,20 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('حركة MRR — أبريل 2026', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+          Text('حركة MRR — أبريل 2026', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 14),
-          _mrrMove('MRR بداية الشهر', 175000, Colors.grey, Icons.timeline),
-          _mrrMove('+ New MRR (اشتراكات جديدة)', 18500, Colors.green, Icons.add_circle),
-          _mrrMove('+ Expansion MRR (ترقيات)', 7800, Colors.blue, Icons.trending_up),
-          _mrrMove('- Contraction MRR (تخفيضات)', -2100, Colors.orange, Icons.trending_down),
-          _mrrMove('- Churned MRR (إلغاءات)', -4700, Colors.red, Icons.remove_circle),
+          _mrrMove('MRR بداية الشهر', 175000, core_theme.AC.td, Icons.timeline),
+          _mrrMove('+ New MRR (اشتراكات جديدة)', 18500, core_theme.AC.ok, Icons.add_circle),
+          _mrrMove('+ Expansion MRR (ترقيات)', 7800, core_theme.AC.info, Icons.trending_up),
+          _mrrMove('- Contraction MRR (تخفيضات)', -2100, core_theme.AC.warn, Icons.trending_down),
+          _mrrMove('- Churned MRR (إلغاءات)', -4700, core_theme.AC.err, Icons.remove_circle),
           const Divider(),
-          _mrrMove('MRR نهاية الشهر', 194500, const Color(0xFFD4AF37), Icons.star, bold: true),
+          _mrrMove('MRR نهاية الشهر', 194500, core_theme.AC.gold, Icons.star, bold: true),
         ],
       ),
     );
@@ -475,12 +476,12 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('أعلى 5 عملاء — MRR', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+          Text('أعلى 5 عملاء — MRR', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 14),
           for (var i = 0; i < top.take(5).length; i++)
             Padding(
@@ -492,14 +493,14 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                     backgroundColor: i == 0
                         ? const Color(0xFFFFD700)
                         : i == 1
-                            ? Colors.grey.shade400
-                            : Colors.orange.shade300,
+                            ? core_theme.AC.td
+                            : core_theme.AC.warn,
                     child: Text('${i + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11)),
                   ),
                   const SizedBox(width: 8),
                   Expanded(child: Text(top[i].customer, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
                   Text('${_fmt(top[i].monthlyPrice.toDouble())} ر.س',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
                 ],
               ),
             ),
@@ -524,13 +525,13 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -547,16 +548,16 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Retention Cohort Table', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+              Text('Retention Cohort Table', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.all(8),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: Row(
                   children: [
                     const SizedBox(width: 100, child: Text('Cohort', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -580,7 +581,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
   Widget _cohortRow(_Cohort c) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5)))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)))),
       child: Row(
         children: [
           SizedBox(width: 100, child: Text(c.period, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
@@ -593,7 +594,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                 decoration: BoxDecoration(
                   color: v == 0
                       ? Colors.transparent
-                      : Color.lerp(Colors.red.shade100, Colors.green.shade300, v / 100),
+                      : Color.lerp(core_theme.AC.err, core_theme.AC.ok, v / 100),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -602,7 +603,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: v == 0 ? Colors.black38 : (v >= 85 ? Colors.green.shade800 : v >= 70 ? Colors.black87 : Colors.red.shade800),
+                    color: v == 0 ? core_theme.AC.td : (v >= 85 ? core_theme.AC.ok : v >= 70 ? core_theme.AC.tp : core_theme.AC.err),
                   ),
                 ),
               ),
@@ -615,15 +616,15 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
   Color _statusColor(String s) {
     switch (s) {
       case 'active':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'at-risk':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'paused':
-        return Colors.amber;
+        return core_theme.AC.warn;
       case 'cancelled':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

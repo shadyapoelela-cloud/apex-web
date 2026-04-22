@@ -34,24 +34,41 @@
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
 
-  <!-- APEX: unregister stale service workers + purge caches on load (fix stale cache issues) -->
+  <!-- APEX: purge caches + register our minimal SW immediately (PWA install prereq) -->
   <script id="apex_sw_cleanup">
     (function() {
+      var OUR_SW = 'apex_sw.js';
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(regs) {
-          for (var r of regs) {
-            r.unregister().then(function(ok) {
-              if (ok) console.log('[APEX] Unregistered stale service worker');
-            });
-          }
-        }).catch(function(e) { console.warn('[APEX] SW cleanup failed:', e); });
+        // 1) نسجّل SW الخاص بنا فوراً — قبل إلغاء القديم حتى لا تنقطع الفترة
+        //    (Chrome يحتاج SW نشطاً ليُشغّل beforeinstallprompt)
+        navigator.serviceWorker.register(OUR_SW).then(function(reg) {
+          console.log('[APEX] Minimal SW registered, scope:', reg.scope);
+        }).catch(function(e) {
+          console.warn('[APEX] SW register failed:', e);
+        });
+        // 2) إلغاء أي service worker قديم ليس لنا (بعد التسجيل)
+        setTimeout(function() {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            for (var r of regs) {
+              var url = r.active && r.active.scriptURL ? r.active.scriptURL : '';
+              if (url && url.indexOf(OUR_SW) === -1) {
+                r.unregister().then(function(ok) {
+                  if (ok) console.log('[APEX] Unregistered stale SW:', url);
+                });
+              }
+            }
+          }).catch(function(e) { console.warn('[APEX] SW cleanup failed:', e); });
+        }, 500);
       }
+      // 3) مسح الكاش القديم (لا علاقة له بـ SW)
       if (window.caches && caches.keys) {
         caches.keys().then(function(keys) {
           for (var k of keys) {
-            caches.delete(k).then(function(ok) {
-              if (ok) console.log('[APEX] Deleted cache:', k);
-            });
+            if (k.indexOf('apex-sw') === -1) {
+              caches.delete(k).then(function(ok) {
+                if (ok) console.log('[APEX] Deleted cache:', k);
+              });
+            }
           }
         }).catch(function(e) { console.warn('[APEX] cache cleanup failed:', e); });
       }
@@ -81,37 +98,79 @@
   <!-- APEX PWA install prompt capture + standalone detection -->
   <script id="apex_pwa_install">
     (function() {
+      var _installEvent = null;
       window.__APEX_PWA__ = {
-        installEvent: null,
         canInstall: false,
         isStandalone: window.matchMedia('(display-mode: standalone)').matches ||
                       window.navigator.standalone === true,
-        promptInstall: function() {
-          if (!this.installEvent) return false;
-          this.installEvent.prompt();
-          this.installEvent.userChoice.then(function(choice) {
-            console.log('[APEX] PWA install choice:', choice.outcome);
-            window.__APEX_PWA__.installEvent = null;
-            window.__APEX_PWA__.canInstall = false;
-            window.dispatchEvent(new Event('apex:pwa-changed'));
-          });
-          return true;
-        }
       };
+
       window.addEventListener('beforeinstallprompt', function(e) {
         e.preventDefault();
-        window.__APEX_PWA__.installEvent = e;
+        _installEvent = e;
         window.__APEX_PWA__.canInstall = true;
         window.dispatchEvent(new Event('apex:pwa-changed'));
-        console.log('[APEX] PWA install prompt ready');
+        console.log('[APEX] PWA install prompt captured');
       });
+
       window.addEventListener('appinstalled', function() {
-        window.__APEX_PWA__.installEvent = null;
+        _installEvent = null;
         window.__APEX_PWA__.canInstall = false;
         window.__APEX_PWA__.isStandalone = true;
         window.dispatchEvent(new Event('apex:pwa-changed'));
         console.log('[APEX] PWA installed');
       });
+
+      // دوال مستوى-window للاستدعاء المباشر من Dart (يتجنّب مشاكل this)
+      window.apexPromptInstall = function() {
+        console.log('[APEX] apexPromptInstall called, have event:', !!_installEvent);
+        if (!_installEvent) return 'no-event';
+        try {
+          _installEvent.prompt();
+          _installEvent.userChoice.then(function(choice) {
+            console.log('[APEX] PWA install choice:', choice.outcome);
+            _installEvent = null;
+            window.__APEX_PWA__.canInstall = false;
+            window.dispatchEvent(new Event('apex:pwa-changed'));
+          });
+          return 'prompted';
+        } catch (err) {
+          console.warn('[APEX] install prompt failed:', err);
+          return 'error';
+        }
+      };
+
+      window.apexCanInstall = function() {
+        return !!_installEvent;
+      };
+
+      window.apexIsStandalone = function() {
+        return window.__APEX_PWA__.isStandalone;
+      };
+
+      // تشخيص: اطبع الحالة في الكونسول للمساعدة
+      window.apexPwaDiagnose = function() {
+        var info = {
+          hasInstallEvent: !!_installEvent,
+          canInstall: window.__APEX_PWA__.canInstall,
+          isStandalone: window.__APEX_PWA__.isStandalone,
+          swSupported: 'serviceWorker' in navigator,
+          protocol: window.location.protocol,
+          manifestLink: !!document.querySelector('link[rel="manifest"]'),
+        };
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            info.swRegistrations = regs.length;
+            info.swUrls = regs.map(function(r) {
+              return r.active ? r.active.scriptURL : '(no active)';
+            });
+            console.log('[APEX PWA Diagnose]', info);
+          });
+        } else {
+          console.log('[APEX PWA Diagnose]', info);
+        }
+        return info;
+      };
     })();
   </script>
 </head>

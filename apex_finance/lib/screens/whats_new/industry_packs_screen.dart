@@ -20,7 +20,7 @@ class IndustryPacksScreen extends StatefulWidget {
 class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
   String _selected = 'fnb_retail';
 
-  static const Map<String, _Pack> _packs = {
+  static final Map<String, _Pack> _packs = {
     'fnb_retail': _Pack(
       id: 'fnb_retail',
       nameAr: 'المطاعم والتجزئة',

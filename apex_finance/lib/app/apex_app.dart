@@ -20,7 +20,7 @@ import '../providers/app_providers.dart';
 
 /// Odoo-style keyboard shortcuts: Alt+1..9 jump directly to a module group.
 /// Kept in one place so the list of anchors stays in sync with the sidebar.
-const Map<int, String> _altModuleShortcuts = {
+final Map<int, String> _altModuleShortcuts = {
   1: '/home',
   2: '/compliance/executive-dashboard',
   3: '/compliance/journal-entries',
@@ -215,7 +215,8 @@ ThemeData _buildTheme(ThemeData base, ColorScheme colorScheme, TextTheme textThe
       shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
       animationDuration: const Duration(milliseconds: 180),
     )),
-    iconTheme: IconThemeData(color: AC.ts, size: 22),
+    iconTheme: IconThemeData(color: AC.ts, size: 20),
+    primaryIconTheme: IconThemeData(color: AC.gold, size: 20),
     cardTheme: CardThemeData(
       color: AC.navy2, elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -237,20 +238,88 @@ ThemeData _buildTheme(ThemeData base, ColorScheme colorScheme, TextTheme textThe
       textStyle: GoogleFonts.tajawal(fontSize: 13, color: AC.tp),
     ),
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: AC.navy2, elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: AC.navy2,
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AC.gold.withValues(alpha: 0.3)),
+      ),
       behavior: SnackBarBehavior.floating,
-      contentTextStyle: GoogleFonts.tajawal(fontSize: 13, color: AC.tp),
+      contentTextStyle: GoogleFonts.tajawal(
+        fontSize: 13,
+        color: AC.tp,
+        fontWeight: FontWeight.w500,
+      ),
+      actionTextColor: AC.gold,
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AC.navy3,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: AC.bdr),
+        ),
+      ),
+      menuStyle: MenuStyle(
+        backgroundColor: WidgetStateProperty.all(AC.navy2),
+        shape: WidgetStateProperty.all(RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: AC.bdr),
+        )),
+      ),
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected)) return AC.gold.withValues(alpha: 0.15);
+          return AC.navy3;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((s) {
+          if (s.contains(WidgetState.selected)) return AC.gold;
+          return AC.ts;
+        }),
+        side: WidgetStateProperty.all(BorderSide(color: AC.bdr)),
+      ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      filled: true, fillColor: AC.navy3,
-      labelStyle: TextStyle(color: AC.ts),
+      filled: true,
+      fillColor: AC.navy3,
+      labelStyle: TextStyle(color: AC.ts, fontWeight: FontWeight.w500),
       hintStyle: TextStyle(color: AC.td),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.gold, width: 1.5)),
-      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.err)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      helperStyle: TextStyle(color: AC.td, fontSize: 11),
+      errorStyle: TextStyle(color: AC.err, fontSize: 11, fontWeight: FontWeight.w600),
+      prefixIconColor: AC.ts,
+      suffixIconColor: AC.ts,
+      iconColor: AC.ts,
+      floatingLabelStyle: TextStyle(color: AC.gold, fontWeight: FontWeight.w600),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AC.bdr),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AC.bdr),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AC.gold, width: 1.5),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3)),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AC.err, width: 1.2),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AC.err, width: 1.5),
+      ),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
     ),
     chipTheme: ChipThemeData(
       backgroundColor: AC.navy3,

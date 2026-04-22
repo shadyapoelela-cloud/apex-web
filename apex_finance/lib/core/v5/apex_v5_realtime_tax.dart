@@ -25,6 +25,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 // ──────────────────────────────────────────────────────────────────────
 // Tax Rules Engine (simplified GCC 2026 rates)
@@ -342,7 +343,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,8 +355,8 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2563EB), Color(0xFF059669)],
+                  gradient: LinearGradient(
+                    colors: [core_theme.AC.info, core_theme.AC.ok],
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -370,12 +371,12 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black.withOpacity(0.9),
+                      color: core_theme.AC.tp.withOpacity(0.9),
                     ),
                   ),
-                  const Text(
+                  Text(
                     'تتحدّث مباشرة أثناء الكتابة · 6 دول · VAT + WHT + Zakat + الطوابع + البلدية',
-                    style: TextStyle(fontSize: 11, color: Colors.black54),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                   ),
                 ],
               ),
@@ -383,19 +384,19 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF059669).withOpacity(0.12),
+                  color: core_theme.AC.ok.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.bolt, size: 12, color: Color(0xFF059669)),
+                    Icon(Icons.bolt, size: 12, color: core_theme.AC.ok),
                     SizedBox(width: 3),
                     Text(
                       'Live',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF059669),
+                        color: core_theme.AC.ok,
                       ),
                     ),
                   ],
@@ -445,7 +446,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
             decoration: BoxDecoration(
               color: const Color(0xFFF9FAFB),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.black.withOpacity(0.05)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.05)),
             ),
             child: Column(
               children: [
@@ -463,7 +464,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
                             : 'VAT (${(_breakdown.vatRate * 100).toStringAsFixed(0)}%)',
                     _breakdown.vatAmount,
                     color: _breakdown.vatExempt || _breakdown.zeroRated
-                        ? Colors.black45
+                        ? core_theme.AC.td
                         : null,
                   ),
                 if (_breakdown.stampDutyAmount > 0)
@@ -481,7 +482,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
                   'الإجمالي',
                   _breakdown.total,
                   bold: true,
-                  color: const Color(0xFF059669),
+                  color: core_theme.AC.ok,
                   big: true,
                 ),
                 if (_breakdown.whtAmount > 0) ...[
@@ -489,13 +490,13 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
                   _breakdownRow(
                     'ضريبة استقطاع (${(_breakdown.whtRate * 100).toStringAsFixed(0)}%)',
                     -_breakdown.whtAmount,
-                    color: const Color(0xFFD97706),
+                    color: core_theme.AC.warn,
                   ),
                   _breakdownRow(
                     'الصافي المستلم',
                     _breakdown.netToReceive,
                     bold: true,
-                    color: const Color(0xFF2563EB),
+                    color: core_theme.AC.info,
                     big: true,
                   ),
                 ],
@@ -516,14 +517,14 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
               children: [
                 if (_breakdown.reverseCharge)
                   _flagBanner('التحاسب العكسي (Reverse Charge) مطبّق', Icons.swap_horiz,
-                      const Color(0xFF7C3AED)),
+                      core_theme.AC.purple),
                 if (_breakdown.zakatApplies)
                   _flagBanner('الزكاة قابلة للتطبيق (2.5% من حقوق الملكية)', Icons.star,
-                      const Color(0xFFD97706)),
+                      core_theme.AC.warn),
                 if (_breakdown.vatExempt)
-                  _flagBanner('معفى من VAT', Icons.check_circle, const Color(0xFF059669)),
+                  _flagBanner('معفى من VAT', Icons.check_circle, core_theme.AC.ok),
                 if (_breakdown.zeroRated)
-                  _flagBanner('VAT بنسبة صفرية', Icons.info, const Color(0xFF2563EB)),
+                  _flagBanner('VAT بنسبة صفرية', Icons.info, core_theme.AC.info),
               ],
             ),
 
@@ -533,23 +534,23 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB).withOpacity(0.04),
+              color: core_theme.AC.info.withOpacity(0.04),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.15)),
+              border: Border.all(color: core_theme.AC.info.withOpacity(0.15)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.psychology, size: 16, color: Color(0xFF2563EB)),
+                    Icon(Icons.psychology, size: 16, color: core_theme.AC.info),
                     SizedBox(width: 6),
                     Text(
                       'لماذا هذا المبلغ؟',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF2563EB),
+                        color: core_theme.AC.info,
                       ),
                     ),
                   ],
@@ -561,11 +562,11 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('• ', style: TextStyle(color: Color(0xFF2563EB))),
+                        Text('• ', style: TextStyle(color: core_theme.AC.info)),
                         Expanded(
                           child: Text(
                             e,
-                            style: const TextStyle(fontSize: 12, color: Colors.black87),
+                            style: TextStyle(fontSize: 12, color: core_theme.AC.tp),
                           ),
                         ),
                       ],
@@ -586,18 +587,18 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'المبلغ',
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black54),
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: core_theme.AC.ts),
         ),
         const SizedBox(height: 4),
         TextField(
           controller: _amountCtl,
           onChanged: (_) => _recalc(),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             prefixText: 'ر.س ',
-            prefixStyle: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
+            prefixStyle: TextStyle(color: core_theme.AC.ts, fontWeight: FontWeight.w600),
             hintText: '10,000.00',
             border: OutlineInputBorder(),
             isDense: true,
@@ -617,9 +618,9 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'الدولة',
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black54),
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: core_theme.AC.ts),
         ),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
@@ -647,9 +648,9 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'نوع البند',
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black54),
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: core_theme.AC.ts),
         ),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
@@ -677,9 +678,9 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'نوع العميل',
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black54),
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: core_theme.AC.ts),
         ),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
@@ -720,14 +721,14 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
             style: TextStyle(
               fontSize: big ? 14 : 13,
               fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-              color: color ?? Colors.black87,
+              color: color ?? core_theme.AC.tp,
             ),
           ),
           Expanded(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 10),
               height: 1,
-              color: Colors.black.withOpacity(0.04),
+              color: core_theme.AC.tp.withOpacity(0.04),
             ),
           ),
           Text(
@@ -735,7 +736,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
             style: TextStyle(
               fontSize: big ? 16 : 13,
               fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
-              color: color ?? Colors.black87,
+              color: color ?? core_theme.AC.tp,
               fontFamily: 'monospace',
             ),
           ),

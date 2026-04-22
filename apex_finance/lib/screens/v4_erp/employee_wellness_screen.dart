@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 129 — Employee Wellness & Engagement
 class EmployeeWellnessScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'استطلاعات النبض'), Tab(text: 'البرامج'), Tab(text: 'الصحة'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_pulseTab(), _programsTab(), _healthTab(), _analyticsTab()])),
       ])),
@@ -35,17 +36,17 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.favorite, color: Color(0xFF004D40), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('صحة وسعادة الموظفين', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('استطلاعات النبض، البرامج الصحية، الدعم النفسي', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('استطلاعات النبض، البرامج الصحية، الدعم النفسي', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
 
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('eNPS', '+42', Icons.sentiment_very_satisfied, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('رضا الوظيفة', '4.6/5', Icons.mood, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('رضا الوظيفة', '4.6/5', Icons.mood, core_theme.AC.gold)),
     Expanded(child: _kpi('Burnout Risk', 'منخفض', Icons.health_and_safety, const Color(0xFF00695C))),
     Expanded(child: _kpi('مشاركة البرامج', '87%', Icons.group_add, const Color(0xFF4A148C))),
   ]));
@@ -54,7 +55,7 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -67,9 +68,9 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
           Text('${p.score}/5', style: TextStyle(fontWeight: FontWeight.bold, color: _scoreColor(p.score), fontSize: 16)),
         ]),
         const SizedBox(height: 4),
-        Text('${p.responses} رد • ${p.responseRate}% معدل المشاركة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('${p.responses} رد • ${p.responseRate}% معدل المشاركة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: score, minHeight: 8, backgroundColor: Colors.black12, valueColor: AlwaysStoppedAnimation(_scoreColor(p.score)))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: score, minHeight: 8, backgroundColor: core_theme.AC.bdr, valueColor: AlwaysStoppedAnimation(_scoreColor(p.score)))),
         if (p.trend != 0) Padding(padding: const EdgeInsets.only(top: 6), child: Row(children: [
           Icon(p.trend > 0 ? Icons.trending_up : Icons.trending_down, size: 14, color: p.trend > 0 ? const Color(0xFF2E7D32) : const Color(0xFFC62828)),
           const SizedBox(width: 4),
@@ -87,11 +88,11 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
       title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(p.description, style: const TextStyle(fontSize: 11)),
-        Text('${p.participants} مشارك • ${p.category}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('${p.participants} مشارك • ${p.category}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
         decoration: BoxDecoration(color: const Color(0xFF2E7D32).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-        child: const Text('نشط', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.bold))),
+        child: Text('نشط', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.bold))),
     ));
   });
 
@@ -105,7 +106,7 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
           Expanded(child: Text(h.metric, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
           Text(h.value, style: TextStyle(fontWeight: FontWeight.bold, color: _healthColor(h.status))),
         ]),
-        Text(h.detail, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(h.detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -113,7 +114,7 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('💚 eNPS', '+42 — يصنف ضمن "ممتاز" (أعلى الصناعة 35%)', const Color(0xFF2E7D32)),
     _insight('🧘 Burnout Risk', '12% من الموظفين في مخاطر — خطة دعم مفعّلة', const Color(0xFFE65100)),
-    _insight('🏃 الأنشطة الرياضية', '68% شاركوا في التحدي الرياضي الشهري', const Color(0xFFD4AF37)),
+    _insight('🏃 الأنشطة الرياضية', '68% شاركوا في التحدي الرياضي الشهري', core_theme.AC.gold),
     _insight('😊 الصحة النفسية', '24 جلسة استشارة نفسية مجانية مستخدمة', const Color(0xFF00695C)),
     _insight('🎓 التطوير المهني', '92% من الموظفين شاركوا في تدريب', const Color(0xFF4A148C)),
     _insight('🏖️ Work-Life Balance', '4.2/5 — تحسن 0.3 بعد سياسة Flexible Hours', const Color(0xFF2E7D32)),
@@ -122,12 +123,12 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _scoreColor(double s) {
     if (s >= 4) return const Color(0xFF2E7D32);
-    if (s >= 3) return const Color(0xFFD4AF37);
+    if (s >= 3) return core_theme.AC.gold;
     if (s >= 2) return const Color(0xFFE65100);
     return const Color(0xFFC62828);
   }
@@ -135,10 +136,10 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
   Color _categoryColor(String c) {
     if (c.contains('جسدية')) return const Color(0xFF2E7D32);
     if (c.contains('نفسية')) return const Color(0xFF00695C);
-    if (c.contains('مالية')) return const Color(0xFFD4AF37);
+    if (c.contains('مالية')) return core_theme.AC.gold;
     if (c.contains('مهنية')) return const Color(0xFF4A148C);
     if (c.contains('اجتماعية')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   IconData _categoryIcon(String c) {
@@ -152,7 +153,7 @@ class _EmployeeWellnessScreenState extends State<EmployeeWellnessScreen> with Si
 
   Color _healthColor(String s) {
     if (s.contains('ممتاز')) return const Color(0xFF2E7D32);
-    if (s.contains('جيد')) return const Color(0xFFD4AF37);
+    if (s.contains('جيد')) return core_theme.AC.gold;
     if (s.contains('تحذير')) return const Color(0xFFE65100);
     return const Color(0xFFC62828);
   }

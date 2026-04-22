@@ -19,6 +19,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
@@ -86,7 +87,7 @@ class ApexV5ShortcutHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? Colors.black54;
+    final c = color ?? core_theme.AC.ts;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       decoration: BoxDecoration(

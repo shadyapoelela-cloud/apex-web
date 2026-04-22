@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -38,7 +39,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
       ),
       child: Row(
         children: [
@@ -62,20 +63,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFFD4AF37).withOpacity(0.15) : null,
+          color: active ? core_theme.AC.gold.withOpacity(0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: core_theme.AC.gold.withOpacity(0.4)) : null,
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFFD4AF37) : Colors.black54),
+            Icon(icon, size: 14, color: active ? core_theme.AC.gold : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                color: active ? const Color(0xFFD4AF37) : Colors.black54,
+                color: active ? core_theme.AC.gold : core_theme.AC.ts,
               ),
             ),
           ],
@@ -87,11 +88,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget _moreMenu() {
     return PopupMenuButton<String>(
       tooltip: 'المزيد',
-      icon: const Row(
+      icon: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('المزيد', style: TextStyle(fontSize: 12, color: Colors.black54)),
-          Icon(Icons.arrow_drop_down, size: 16, color: Colors.black54),
+          Text('المزيد', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
+          Icon(Icons.arrow_drop_down, size: 16, color: core_theme.AC.ts),
         ],
       ),
       itemBuilder: (ctx) => [
@@ -109,7 +110,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       value: v,
       child: Row(
         children: [
-          Icon(icon, size: 14, color: Colors.black54),
+          Icon(icon, size: 14, color: core_theme.AC.ts),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(fontSize: 12)),
         ],
@@ -138,22 +139,22 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('مشاريع نشطة', '8', Icons.work, const Color(0xFF2563EB)),
+            _Stat('مشاريع نشطة', '8', Icons.work, core_theme.AC.info),
             _Stat('متأخرة', '2', Icons.warning, const Color(0xFFB91C1C)),
-            _Stat('قيمة إجمالية', '4.2M', Icons.attach_money, const Color(0xFFD4AF37)),
-            _Stat('فواتير غير مُصدَرة', '680K', Icons.receipt, const Color(0xFFD97706)),
+            _Stat('قيمة إجمالية', '4.2M', Icons.attach_money, core_theme.AC.gold),
+            _Stat('فواتير غير مُصدَرة', '680K', Icons.receipt, core_theme.AC.warn),
           ]),
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text('المشاريع', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              Text('المشاريع', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.add, size: 14),
-                label: const Text('مشروع جديد'),
+                label: Text('مشروع جديد'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD4AF37),
+                  backgroundColor: core_theme.AC.gold,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -204,17 +205,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final color = status == 'جديد'
         ? const Color(0xFF6B7280)
         : status == 'قيد التنفيذ'
-            ? const Color(0xFF2563EB)
+            ? core_theme.AC.info
             : status == 'للمراجعة'
-                ? const Color(0xFFD97706)
-                : const Color(0xFF059669);
+                ? core_theme.AC.warn
+                : core_theme.AC.ok;
 
     return Container(
       width: 300,
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.06)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,19 +265,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('ساعات هذا الأسبوع', '187', Icons.schedule, const Color(0xFF2563EB)),
-            _Stat('قابلة للفوترة', '142', Icons.attach_money, const Color(0xFF059669)),
-            _Stat('داخلية', '45', Icons.business_center, const Color(0xFF7C3AED)),
-            _Stat('معدل الاستغلال', '78%', Icons.trending_up, const Color(0xFFD4AF37)),
+            _Stat('ساعات هذا الأسبوع', '187', Icons.schedule, core_theme.AC.info),
+            _Stat('قابلة للفوترة', '142', Icons.attach_money, core_theme.AC.ok),
+            _Stat('داخلية', '45', Icons.business_center, core_theme.AC.purple),
+            _Stat('معدل الاستغلال', '78%', Icons.trending_up, core_theme.AC.gold),
           ]),
           const SizedBox(height: 16),
-          const Text('سجلّ الساعات — هذا الأسبوع', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('سجلّ الساعات — هذا الأسبوع', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
@@ -300,7 +301,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.06))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06))),
       ),
       child: const Row(
         children: [
@@ -324,7 +325,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         children: [
@@ -340,7 +341,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   width: 6,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: billable ? const Color(0xFF059669) : Colors.black38,
+                    color: billable ? core_theme.AC.ok : core_theme.AC.td,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -357,7 +358,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontFamily: 'monospace',
-                  color: h > 0 ? Colors.black87 : Colors.black26,
+                  color: h > 0 ? core_theme.AC.tp : core_theme.AC.td,
                 ),
               ),
             ),
@@ -369,7 +370,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 fontSize: 13,
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.w800,
-                color: billable ? const Color(0xFF059669) : const Color(0xFF2563EB),
+                color: billable ? core_theme.AC.ok : core_theme.AC.info,
               ),
             ),
           ),
@@ -387,30 +388,30 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('مراحل نشطة', '14', Icons.flag, const Color(0xFF2563EB)),
-            _Stat('معالم قادمة', '6', Icons.event, const Color(0xFFD97706)),
+            _Stat('مراحل نشطة', '14', Icons.flag, core_theme.AC.info),
+            _Stat('معالم قادمة', '6', Icons.event, core_theme.AC.warn),
             _Stat('Critical Path', '3 مهام', Icons.priority_high, const Color(0xFFB91C1C)),
-            _Stat('معدل الإنجاز', '68%', Icons.check_circle, const Color(0xFF059669)),
+            _Stat('معدل الإنجاز', '68%', Icons.check_circle, core_theme.AC.ok),
           ]),
           const SizedBox(height: 16),
-          const Text('مخطط جانت — أبريل 2026', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('مخطط جانت — أبريل 2026', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
                 _ganttHeader(),
-                _ganttBar('تخطيط المشروع ABC', 1, 7, const Color(0xFF059669), 1.0),
-                _ganttBar('تحليل المتطلبات', 3, 12, const Color(0xFF2563EB), 1.0),
-                _ganttBar('التصميم المبدئي', 10, 20, const Color(0xFF2563EB), 0.8),
-                _ganttBar('التنفيذ — المرحلة 1', 15, 28, const Color(0xFFD97706), 0.5),
-                _ganttBar('اختبار القبول', 25, 30, const Color(0xFF7C3AED), 0.0),
-                _ganttBar('التسليم للعميل', 28, 30, const Color(0xFFD4AF37), 0.0),
+                _ganttBar('تخطيط المشروع ABC', 1, 7, core_theme.AC.ok, 1.0),
+                _ganttBar('تحليل المتطلبات', 3, 12, core_theme.AC.info, 1.0),
+                _ganttBar('التصميم المبدئي', 10, 20, core_theme.AC.info, 0.8),
+                _ganttBar('التنفيذ — المرحلة 1', 15, 28, core_theme.AC.warn, 0.5),
+                _ganttBar('اختبار القبول', 25, 30, core_theme.AC.purple, 0.0),
+                _ganttBar('التسليم للعميل', 28, 30, core_theme.AC.gold, 0.0),
               ],
             ),
           ),
@@ -432,7 +433,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   Expanded(
                     child: Text(
                       '$day',
-                      style: const TextStyle(fontSize: 10, color: Colors.black54),
+                      style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
                     ),
                   ),
               ],
@@ -467,7 +468,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     Container(
                       height: 20,
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.04),
+                        color: core_theme.AC.tp.withOpacity(0.04),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
@@ -523,27 +524,27 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('فواتير غير مُصدَرة', '3', Icons.pending, const Color(0xFFD97706)),
-            _Stat('WIP', '380K', Icons.work_outline, const Color(0xFF2563EB)),
-            _Stat('مُصدَرة هذا الشهر', '2.4M', Icons.check_circle, const Color(0xFF059669)),
+            _Stat('فواتير غير مُصدَرة', '3', Icons.pending, core_theme.AC.warn),
+            _Stat('WIP', '380K', Icons.work_outline, core_theme.AC.info),
+            _Stat('مُصدَرة هذا الشهر', '2.4M', Icons.check_circle, core_theme.AC.ok),
             _Stat('متأخرة', '120K', Icons.warning, const Color(0xFFB91C1C)),
           ]),
           const SizedBox(height: 16),
-          const Text('فواتير المشاريع', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('فواتير المشاريع', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
-                _billingRow('مشروع SABIC', 'نصف شهري', 280000, 'قابل للإصدار', const Color(0xFFD97706), actionable: true),
-                _billingRow('مشروع ABC', 'عند المعالم', 125000, 'WIP', const Color(0xFF2563EB)),
-                _billingRow('Al Rajhi Consulting', 'شهري', 87500, 'قابل للإصدار', const Color(0xFFD97706), actionable: true),
-                _billingRow('STC Advisory', 'شهري', 45000, 'مُصدَر', const Color(0xFF059669)),
-                _billingRow('Marriott Review', 'end of project', 180000, 'WIP', const Color(0xFF2563EB)),
+                _billingRow('مشروع SABIC', 'نصف شهري', 280000, 'قابل للإصدار', core_theme.AC.warn, actionable: true),
+                _billingRow('مشروع ABC', 'عند المعالم', 125000, 'WIP', core_theme.AC.info),
+                _billingRow('Al Rajhi Consulting', 'شهري', 87500, 'قابل للإصدار', core_theme.AC.warn, actionable: true),
+                _billingRow('STC Advisory', 'شهري', 45000, 'مُصدَر', core_theme.AC.ok),
+                _billingRow('Marriott Review', 'end of project', 180000, 'WIP', core_theme.AC.info),
               ],
             ),
           ),
@@ -556,11 +557,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         children: [
-          const Icon(Icons.work, size: 16, color: Colors.black54),
+          Icon(Icons.work, size: 16, color: core_theme.AC.ts),
           const SizedBox(width: 10),
           Expanded(
             flex: 2,
@@ -568,7 +569,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(project, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                Text('دورة الفوترة: $freq', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('دورة الفوترة: $freq', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -596,9 +597,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 );
               },
               icon: const Icon(Icons.receipt, size: 12),
-              label: const Text('إصدار فاتورة'),
+              label: Text('إصدار فاتورة'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD4AF37),
+                backgroundColor: core_theme.AC.gold,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 textStyle: const TextStyle(fontSize: 11),
@@ -630,7 +631,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(s.value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: s.color)),
-                        Text(s.label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text(s.label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
@@ -704,22 +705,22 @@ class _ProjectCard extends StatelessWidget {
     final color = project.priority == 'HIGH'
         ? const Color(0xFFB91C1C)
         : project.priority == 'MEDIUM'
-            ? const Color(0xFFD97706)
-            : const Color(0xFF2563EB);
+            ? core_theme.AC.warn
+            : core_theme.AC.info;
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(project.id, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+              Text(project.id, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
@@ -741,7 +742,7 @@ class _ProjectCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          Text(project.client, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(project.client, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const Spacer(),
           Text(
             '${project.budget.toStringAsFixed(0)} ر.س',
@@ -755,14 +756,14 @@ class _ProjectCard extends StatelessWidget {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: project.progress,
-            backgroundColor: Colors.black.withOpacity(0.06),
+            backgroundColor: core_theme.AC.tp.withOpacity(0.06),
             valueColor: AlwaysStoppedAnimation(color),
             minHeight: 5,
           ),
           const SizedBox(height: 4),
           Text(
             '${(project.progress * 100).toInt()}% مكتمل',
-            style: const TextStyle(fontSize: 10, color: Colors.black54),
+            style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
           ),
         ],
       ),
@@ -782,15 +783,15 @@ class _TaskCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 3, offset: const Offset(0, 1)),
+          BoxShadow(color: core_theme.AC.tp.withOpacity(0.03), blurRadius: 3, offset: const Offset(0, 1)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(task.id, style: const TextStyle(fontSize: 9, color: Colors.black54, fontFamily: 'monospace')),
+          Text(task.id, style: TextStyle(fontSize: 9, color: core_theme.AC.ts, fontFamily: 'monospace')),
           const SizedBox(height: 2),
           Text(task.title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
@@ -798,18 +799,18 @@ class _TaskCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 9,
-                backgroundColor: const Color(0xFFD4AF37).withOpacity(0.2),
+                backgroundColor: core_theme.AC.gold.withOpacity(0.2),
                 child: Text(
                   task.assignee.substring(0, 1),
-                  style: const TextStyle(fontSize: 10, color: Color(0xFFD4AF37), fontWeight: FontWeight.w800),
+                  style: TextStyle(fontSize: 10, color: core_theme.AC.gold, fontWeight: FontWeight.w800),
                 ),
               ),
               const SizedBox(width: 4),
-              Text(task.assignee, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text(task.assignee, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const Spacer(),
               Text(
                 task.project,
-                style: const TextStyle(fontSize: 9, color: Colors.black45, fontFamily: 'monospace'),
+                style: TextStyle(fontSize: 9, color: core_theme.AC.td, fontFamily: 'monospace'),
               ),
             ],
           ),

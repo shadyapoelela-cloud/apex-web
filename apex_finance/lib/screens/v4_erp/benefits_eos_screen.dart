@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class BenefitsEosScreen extends StatefulWidget {
   const BenefitsEosScreen({super.key});
@@ -47,9 +48,9 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
         _buildHero(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.medical_services, size: 16), text: 'التأمين الطبي'),
             Tab(icon: Icon(Icons.account_balance_wallet, size: 16), text: 'مكافأة نهاية الخدمة'),
@@ -84,14 +85,14 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
         children: [
           const Icon(Icons.health_and_safety, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('المزايا ونهاية الخدمة',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('تأمين طبي، مكافأة نهاية الخدمة، صندوق ادخار، قروض — وفق نظام العمل السعودي',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -144,14 +145,14 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: const Color(0xFFD4AF37).withOpacity(0.15),
+            backgroundColor: core_theme.AC.gold.withOpacity(0.15),
             radius: 22,
-            child: const Icon(Icons.person, color: Color(0xFFD4AF37)),
+            child: Icon(Icons.person, color: core_theme.AC.gold),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -160,16 +161,16 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
               children: [
                 Text(_emp.name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                 Text('${_emp.id} · ${_emp.title} · ${_emp.nationality} · انضم ${_emp.joinDate}',
-                    style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text('الراتب الأساسي', style: TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('الراتب الأساسي', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               Text('${_fmt(_emp.salary.toDouble())} ر.س',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
             ],
           ),
         ],
@@ -183,14 +184,14 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.medical_services, color: Colors.red, size: 20),
+              Icon(Icons.medical_services, color: core_theme.AC.err, size: 20),
               SizedBox(width: 8),
               Text('البوليصة الطبية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -206,13 +207,13 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.green.shade50,
+              color: core_theme.AC.ok,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green.shade200),
+              border: Border.all(color: core_theme.AC.ok),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 16),
+                Icon(Icons.check_circle, color: core_theme.AC.ok, size: 16),
                 SizedBox(width: 6),
                 Expanded(child: Text('البوليصة سارية — 258 يوم متبقي', style: TextStyle(fontSize: 11))),
               ],
@@ -235,16 +236,16 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.family_restroom, color: Colors.blue, size: 20),
+              Icon(Icons.family_restroom, color: core_theme.AC.info, size: 20),
               const SizedBox(width: 8),
-              const Text('المعالون (${4})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+              Text('المعالون (${4})', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const Spacer(),
               IconButton(
                 onPressed: () {},
@@ -261,7 +262,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: core_theme.AC.navy3,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -269,25 +270,25 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.12),
+                      color: core_theme.AC.info.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(d.relation,
-                        style: const TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.w800)),
+                        style: TextStyle(fontSize: 10, color: core_theme.AC.info, fontWeight: FontWeight.w800)),
                   ),
                   const SizedBox(width: 8),
                   Expanded(child: Text(d.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
                   Text('${DateTime.now().year - int.parse(d.birthYear)} سنة',
-                      style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD4AF37).withOpacity(0.15),
+                      color: core_theme.AC.gold.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(d.class_,
-                        style: const TextStyle(fontSize: 10, color: Color(0xFFD4AF37), fontWeight: FontWeight.w800)),
+                        style: TextStyle(fontSize: 10, color: core_theme.AC.gold, fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -309,40 +310,40 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('سجل المطالبات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+          Text('سجل المطالبات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 10),
           for (final c in claims)
             Container(
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: core_theme.AC.navy3,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  Text(c.date, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                  Text(c.date, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                   const SizedBox(width: 10),
                   Expanded(child: Text(c.provider, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
-                  Expanded(child: Text(c.type, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                  Expanded(child: Text(c.type, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
                   Text('${_fmt(c.amount.toDouble())} ر.س',
                       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
                   const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: (c.status == 'موافق' ? Colors.green : Colors.orange).withOpacity(0.15),
+                      color: (c.status == 'موافق' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(c.status,
                         style: TextStyle(
                           fontSize: 10,
-                          color: c.status == 'موافق' ? Colors.green : Colors.orange,
+                          color: c.status == 'موافق' ? core_theme.AC.ok : core_theme.AC.warn,
                           fontWeight: FontWeight.w800,
                         )),
                   ),
@@ -391,12 +392,12 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('المكافأة المستحقة',
-                        style: TextStyle(color: Colors.white70, fontSize: 13)),
+                    Text('المكافأة المستحقة',
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
                     Text(_fmt(accrued),
                         style: const TextStyle(color: Color(0xFFFFD700), fontSize: 28, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-                    const Text('ر.س · إذا انتهت الخدمة اليوم (انتهاء عقد)',
-                        style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    Text('ر.س · إذا انتهت الخدمة اليوم (انتهاء عقد)',
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                   ],
                 ),
               ),
@@ -409,12 +410,12 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('تفاصيل الحساب', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+              Text('تفاصيل الحساب', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 12),
               _kv('تاريخ الانضمام', _emp.joinDate),
               _kv('سنوات الخدمة', '${yearsOfService.toStringAsFixed(2)} سنة'),
@@ -434,29 +435,29 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.gavel, color: Colors.blue),
+                  Icon(Icons.gavel, color: core_theme.AC.info),
                   SizedBox(width: 8),
                   Text('أحكام نظام العمل السعودي — مادة 84 و85',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.blue)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
                 ],
               ),
               const SizedBox(height: 10),
-              const Text('• للخمس سنوات الأولى: نصف راتب شهر عن كل سنة',
+              Text('• للخمس سنوات الأولى: نصف راتب شهر عن كل سنة',
                   style: TextStyle(fontSize: 12, height: 1.7)),
-              const Text('• ما زاد على خمس سنوات: راتب شهر كامل عن كل سنة',
+              Text('• ما زاد على خمس سنوات: راتب شهر كامل عن كل سنة',
                   style: TextStyle(fontSize: 12, height: 1.7)),
-              const Text('• في حالة الاستقالة: 2 > س ≥ 5 → الثلث، 5 > س ≥ 10 → الثلثان، 10+ → الكامل',
+              Text('• في حالة الاستقالة: 2 > س ≥ 5 → الثلث، 5 > س ≥ 10 → الثلثان، 10+ → الكامل',
                   style: TextStyle(fontSize: 12, height: 1.7)),
-              const Text('• تُحتسب على الراتب الأخير قبل انتهاء العقد',
+              Text('• تُحتسب على الراتب الأخير قبل انتهاء العقد',
                   style: TextStyle(fontSize: 12, height: 1.7)),
             ],
           ),
@@ -473,9 +474,9 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
         const SizedBox(height: 16),
         Row(
           children: [
-            _pfStat('مساهمة الموظف (6%)', _emp.salary * 0.06 * 12, Colors.blue, Icons.person),
-            _pfStat('مساهمة الشركة (9%)', _emp.salary * 0.09 * 12, Colors.green, Icons.business),
-            _pfStat('الرصيد التراكمي', 324580, const Color(0xFFD4AF37), Icons.savings),
+            _pfStat('مساهمة الموظف (6%)', _emp.salary * 0.06 * 12, core_theme.AC.info, Icons.person),
+            _pfStat('مساهمة الشركة (9%)', _emp.salary * 0.09 * 12, core_theme.AC.ok, Icons.business),
+            _pfStat('الرصيد التراكمي', 324580, core_theme.AC.gold, Icons.savings),
           ],
         ),
         const SizedBox(height: 20),
@@ -484,12 +485,12 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('الاستثمارات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+              Text('الاستثمارات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 12),
               _invRow('محفظة الأسهم السعودية', 40, 144000, 8.2),
               _invRow('صندوق السيولة الإسلامي', 30, 108000, 3.1),
@@ -499,9 +500,9 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('إجمالي العائد السنوي', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
+                  Text('إجمالي العائد السنوي', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                   Text('+ ${_fmt(324580 * 0.057)} ر.س (5.7%)',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.green, fontFamily: 'monospace')),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: core_theme.AC.ok, fontFamily: 'monospace')),
                 ],
               ),
             ],
@@ -528,13 +529,13 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
               children: [
                 Icon(icon, color: color, size: 18),
                 const SizedBox(width: 6),
-                Expanded(child: Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                Expanded(child: Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
               ],
             ),
             const SizedBox(height: 8),
             Text(_fmt(value),
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color, fontFamily: 'monospace')),
-            const Text('ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ],
         ),
       ),
@@ -552,7 +553,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                Text('$pct% من المحفظة', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('$pct% من المحفظة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -565,11 +566,11 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.12),
+                color: core_theme.AC.ok.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text('+${ytd.toStringAsFixed(1)}%',
-                  style: const TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.w800)),
+                  style: TextStyle(fontSize: 11, color: core_theme.AC.ok, fontWeight: FontWeight.w800)),
             ),
           ),
         ],
@@ -594,7 +595,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -605,7 +606,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
                     const SizedBox(width: 10),
                     Text(l.type, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                     const Spacer(),
-                    Text(l.remaining, style: const TextStyle(fontSize: 11, color: Colors.orange, fontWeight: FontWeight.w700)),
+                    Text(l.remaining, style: TextStyle(fontSize: 11, color: core_theme.AC.warn, fontWeight: FontWeight.w700)),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -620,8 +621,8 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
                 const SizedBox(height: 10),
                 LinearProgressIndicator(
                   value: (l.amount - l.remaining_amount) / l.amount,
-                  backgroundColor: Colors.grey.shade200,
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)),
+                  backgroundColor: core_theme.AC.bdr,
+                  valueColor: AlwaysStoppedAnimation(core_theme.AC.gold),
                   minHeight: 6,
                 ),
               ],
@@ -633,11 +634,11 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
           child: OutlinedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('تقديم طلب سلفة أو قرض جديد'),
+            label: Text('تقديم طلب سلفة أو قرض جديد'),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              side: const BorderSide(color: Color(0xFFD4AF37)),
-              foregroundColor: const Color(0xFFD4AF37),
+              side: BorderSide(color: core_theme.AC.gold),
+              foregroundColor: core_theme.AC.gold,
             ),
           ),
         ),
@@ -650,7 +651,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, fontFamily: 'monospace')),
         ],
       ),
@@ -662,7 +663,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 180, child: Text(k, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 180, child: Text(k, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Expanded(child: Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
         ],
       ),

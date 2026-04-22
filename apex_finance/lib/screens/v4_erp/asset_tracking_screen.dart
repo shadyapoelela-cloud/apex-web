@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 108 — Asset Tracking / Barcode & RFID
 class AssetTrackingScreen extends StatefulWidget {
@@ -23,8 +24,8 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
         body: SafeArea(child: Column(children: [
           _hero(), _kpis(),
           Container(color: Colors.white, child: TabBar(
-            controller: _tc, labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-            indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+            controller: _tc, labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+            indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
             tabs: const [
               Tab(text: 'الأصول'), Tab(text: 'المسح والتتبع'), Tab(text: 'الصيانة'), Tab(text: 'التحليلات'),
             ],
@@ -41,18 +42,18 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
     padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('تتبع الأصول — Barcode & RFID', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('تتبع لحظي لدورة حياة الأصول باستخدام الباركود وRFID', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('تتبع لحظي لدورة حياة الأصول باستخدام الباركود وRFID', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
       Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
-        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.nfc, color: Color(0xFFD4AF37), size: 16), SizedBox(width: 4),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.nfc, color: core_theme.AC.gold, size: 16), SizedBox(width: 4),
           Text('RFID Enabled', style: TextStyle(color: Colors.white, fontSize: 12)),
         ])),
     ]),
@@ -66,7 +67,7 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
       Expanded(child: _kpi('إجمالي الأصول', '$total', Icons.devices, const Color(0xFF1A237E))),
       Expanded(child: _kpi('نشط', '$active', Icons.check_circle, const Color(0xFF2E7D32))),
       Expanded(child: _kpi('قيد الصيانة', '$maint', Icons.build, const Color(0xFFE65100))),
-      Expanded(child: _kpi('مسح اليوم', '148', Icons.qr_code_2, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('مسح اليوم', '148', Icons.qr_code_2, core_theme.AC.gold)),
     ]));
   }
 
@@ -74,7 +75,7 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 24), const SizedBox(width: 8),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -88,10 +89,10 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(a.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           Text('${a.barcode} • ${a.category}', style: const TextStyle(fontSize: 12)),
-          Text('📍 ${a.location}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('📍 ${a.location}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ])),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Text('${a.value.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD4AF37))),
+          Text('${a.value.toStringAsFixed(0)} ر.س', style: TextStyle(fontWeight: FontWeight.bold, color: core_theme.AC.gold)),
           const SizedBox(height: 4),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: _statusColor(a.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
@@ -109,9 +110,9 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
       title: Text(s.assetName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${s.action} • ${s.type}', style: const TextStyle(fontSize: 12)),
-        Text('بواسطة: ${s.user} • ${s.location}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('بواسطة: ${s.user} • ${s.location}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
-      trailing: Text(s.time, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+      trailing: Text(s.time, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
     ));
   });
 
@@ -122,11 +123,11 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
       title: Text(m.asset, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(m.workOrder, style: const TextStyle(fontSize: 12)),
-        Text('الفني: ${m.technician} • ${m.type}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('الفني: ${m.technician} • ${m.type}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text(m.scheduledDate, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-        Text(m.status, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(m.status, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -136,7 +137,7 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
     _insight('🔧 الصيانة الوقائية', '94% تنفيذ — توفير 1.2M ر.س سنوياً', const Color(0xFF1A237E)),
     _insight('📍 دقة الموقع', '99.2% دقة تتبع مع RFID', const Color(0xFF4A148C)),
     _insight('⚠️ تنبيه', '5 أصول لم تُمسح منذ 90 يوم — قد تكون مفقودة', const Color(0xFFC62828)),
-    _insight('💰 قيمة المحفظة', '18.7M ر.س إجمالي قيمة الأصول المتتبعة', const Color(0xFFD4AF37)),
+    _insight('💰 قيمة المحفظة', '18.7M ر.س إجمالي قيمة الأصول المتتبعة', core_theme.AC.gold),
     _insight('📊 عمر الأصول', 'متوسط 3.4 سنة — 22% تحتاج تجديد', const Color(0xFFE65100)),
   ]);
 
@@ -144,7 +145,7 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   IconData _assetIcon(String c) {
@@ -161,7 +162,7 @@ class _AssetTrackingScreenState extends State<AssetTrackingScreen> with SingleTi
     if (s.contains('صيانة')) return const Color(0xFFE65100);
     if (s.contains('مفقود')) return const Color(0xFFC62828);
     if (s.contains('مخزن')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Asset> _assets = [

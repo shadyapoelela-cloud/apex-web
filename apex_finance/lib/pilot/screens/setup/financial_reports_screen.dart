@@ -9,24 +9,25 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../core/theme.dart' as core_theme;
 
 import '../../api/pilot_client.dart';
 import '../../export_utils.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
-const _indigo = Color(0xFF6366F1);
+Color get _gold => core_theme.AC.gold;
+Color get _navy => core_theme.AC.navy;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+Color get _warn => core_theme.AC.warn;
+final _indigo = core_theme.AC.purple;
 
 class FinancialReportsScreen extends StatefulWidget {
   const FinancialReportsScreen({super.key});
@@ -180,7 +181,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           _dateControls(),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator(color: _gold))
+                ? Center(child: CircularProgressIndicator(color: _gold))
                 : _error != null
                     ? _errorView()
                     : TabBarView(controller: _tab, children: [
@@ -208,12 +209,12 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: _gold.withValues(alpha: 0.4)),
           ),
-          child: const Icon(Icons.assessment, color: _gold, size: 22),
+          child: Icon(Icons.assessment, color: _gold, size: 22),
         ),
         const SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text('التقارير المالية',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.w800)),
@@ -225,7 +226,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
         const Spacer(),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+              foregroundColor: _tp, side: BorderSide(color: _bdr)),
           onPressed: _load,
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('تحديث'),
@@ -395,7 +396,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
     final headers = List<String>.from(data['headers'] as List);
     final rows = List<List<dynamic>>.from(data['rows'] as List);
     if (headers.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _warn,
           content: Text('حمّل التقرير أولاً قبل التصدير')));
       return;
@@ -420,7 +421,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
     final headers = List<String>.from(data['headers'] as List);
     final rows = List<List<dynamic>>.from(data['rows'] as List);
     if (headers.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _warn,
           content: Text('حمّل التقرير أولاً قبل التصدير')));
       return;
@@ -452,14 +453,14 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
       color: _navy2.withValues(alpha: 0.5),
       child: Row(children: [
         if (_tab.index == 1) ...[
-          const Text('من:', style: TextStyle(color: _td, fontSize: 12)),
+          Text('من:', style: TextStyle(color: _td, fontSize: 12)),
           const SizedBox(width: 6),
           _datePill(_startDate, (d) {
             setState(() => _startDate = d);
             _load();
           }),
           const SizedBox(width: 10),
-          const Text('إلى:', style: TextStyle(color: _td, fontSize: 12)),
+          Text('إلى:', style: TextStyle(color: _td, fontSize: 12)),
           const SizedBox(width: 6),
           _datePill(_endDate, (d) {
             setState(() => _endDate = d);
@@ -484,7 +485,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             _load();
           }),
         ] else ...[
-          const Text('كما في:', style: TextStyle(color: _td, fontSize: 12)),
+          Text('كما في:', style: TextStyle(color: _td, fontSize: 12)),
           const SizedBox(width: 6),
           _datePill(_asOfDate, (d) {
             setState(() => _asOfDate = d);
@@ -525,11 +526,11 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: _bdr)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.calendar_today, color: _gold, size: 12),
+          Icon(Icons.calendar_today, color: _gold, size: 12),
           const SizedBox(width: 4),
           Text(
               '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp, fontSize: 11, fontFamily: 'monospace')),
         ]),
       ),
@@ -547,7 +548,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: _gold.withValues(alpha: 0.3))),
         child: Text(label,
-            style: const TextStyle(
+            style: TextStyle(
                 color: _gold, fontSize: 11, fontWeight: FontWeight.w700)),
       ),
     );
@@ -560,7 +561,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   Widget _trialBalanceTab() {
     final tb = _trialBalance;
     if (tb == null) {
-      return const Center(
+      return Center(
           child: Text('لا توجد بيانات',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
@@ -599,13 +600,13 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text('مدين: ${_fmt(totalDebit)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _ok,
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                         fontFamily: 'monospace')),
                 Text('دائن: ${_fmt(totalCredit)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _indigo,
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
@@ -622,7 +623,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: _bdr),
           ),
-          child: Row(children: const [
+          child: Row(children: [
             SizedBox(width: 90, child: Text('الكود', style: _th)),
             Expanded(flex: 3, child: Text('اسم الحساب', style: _th)),
             SizedBox(width: 90, child: Text('الفئة', style: _th)),
@@ -662,7 +663,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
         SizedBox(
           width: 90,
           child: Text(r['code'] ?? '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _gold,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -674,11 +675,11 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(r['name_ar'] ?? '',
-                  style: const TextStyle(color: _tp, fontSize: 12),
+                  style: TextStyle(color: _tp, fontSize: 12),
                   overflow: TextOverflow.ellipsis),
               if ((r['name_en'] ?? '').toString().isNotEmpty)
                 Text(r['name_en'],
-                    style: const TextStyle(color: _td, fontSize: 10),
+                    style: TextStyle(color: _td, fontSize: 10),
                     overflow: TextOverflow.ellipsis),
             ],
           ),
@@ -686,7 +687,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
         SizedBox(
           width: 90,
           child: Text(_categoryAr(r['category']),
-              style: const TextStyle(color: _ts, fontSize: 11)),
+              style: TextStyle(color: _ts, fontSize: 11)),
         ),
         SizedBox(
           width: 140,
@@ -748,7 +749,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   Widget _incomeStatementTab() {
     final is_ = _incomeStatement;
     if (is_ == null) {
-      return const Center(
+      return Center(
           child: Text('لا توجد بيانات',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
@@ -792,14 +793,14 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             border: Border.all(color: _ok.withValues(alpha: 0.4)),
           ),
           child: Row(children: [
-            const Text('إجمالي الإيرادات',
+            Text('إجمالي الإيرادات',
                 style: TextStyle(
                     color: _ok,
                     fontSize: 13,
                     fontWeight: FontWeight.w800)),
             const Spacer(),
             Text(_fmt(revenue),
-                style: const TextStyle(
+                style: TextStyle(
                     color: _ok,
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
@@ -819,14 +820,14 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             border: Border.all(color: _err.withValues(alpha: 0.4)),
           ),
           child: Row(children: [
-            const Text('إجمالي المصروفات',
+            Text('إجمالي المصروفات',
                 style: TextStyle(
                     color: _err,
                     fontSize: 13,
                     fontWeight: FontWeight.w800)),
             const Spacer(),
             Text(_fmt(expenses),
-                style: const TextStyle(
+                style: TextStyle(
                     color: _err,
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
@@ -847,7 +848,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
                 color: netIncome >= 0 ? _gold : _err, size: 28),
             const SizedBox(width: 12),
             Text(netIncome >= 0 ? 'صافي الربح' : 'صافي الخسارة',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _tp,
                     fontSize: 18,
                     fontWeight: FontWeight.w800)),
@@ -886,7 +887,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
         ),
         Expanded(
           child: Text(a['name_ar'] ?? '',
-              style: const TextStyle(color: _tp, fontSize: 12),
+              style: TextStyle(color: _tp, fontSize: 12),
               overflow: TextOverflow.ellipsis),
         ),
         Text(_fmt(bal.abs()),
@@ -906,7 +907,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   Widget _balanceSheetTab() {
     final bs = _balanceSheet;
     if (bs == null) {
-      return const Center(
+      return Center(
           child: Text('لا توجد بيانات',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
@@ -1006,16 +1007,16 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             border: Border.all(color: _gold.withValues(alpha: 0.5), width: 2),
           ),
           child: Row(children: [
-            const Icon(Icons.account_balance, color: _gold, size: 24),
+            Icon(Icons.account_balance, color: _gold, size: 24),
             const SizedBox(width: 10),
-            const Text('إجمالي الخصوم + حقوق الملكية',
+            Text('إجمالي الخصوم + حقوق الملكية',
                 style: TextStyle(
                     color: _tp,
                     fontSize: 15,
                     fontWeight: FontWeight.w800)),
             const Spacer(),
             Text(_fmt(liabs + equity),
-                style: const TextStyle(
+                style: TextStyle(
                     color: _gold,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
@@ -1033,7 +1034,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   Widget _cashFlowTab() {
     final cf = _cashFlow;
     if (cf == null) {
-      return const Center(
+      return Center(
           child: Text('لا توجد بيانات',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
@@ -1053,7 +1054,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
         Row(children: [
           Expanded(
               child: _summaryCard('نقدية بداية', cashBegin,
-                  const Color(0xFF6366F1))),
+                  core_theme.AC.purple)),
           const SizedBox(width: 10),
           Expanded(
               child: _summaryCard(
@@ -1083,7 +1084,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: _warn.withValues(alpha: 0.2)),
           ),
-          child: const Row(children: [
+          child: Row(children: [
             Icon(Icons.info_outline, color: _warn, size: 14),
             SizedBox(width: 6),
             Expanded(
@@ -1103,7 +1104,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: _indigo.withValues(alpha: 0.2)),
           ),
-          child: const Row(children: [
+          child: Row(children: [
             Icon(Icons.info_outline, color: _indigo, size: 14),
             SizedBox(width: 6),
             Expanded(
@@ -1126,7 +1127,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('تسوية النقدية',
+              Text('تسوية النقدية',
                   style: TextStyle(
                       color: _gold,
                       fontSize: 15,
@@ -1136,7 +1137,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
               _reconciliationRow('+ التدفق التشغيلي', operatingCF),
               _reconciliationRow('= النقدية المتوقعة',
                   cashBegin + operatingCF, bold: true),
-              const Divider(color: _bdr),
+              Divider(color: _bdr),
               _reconciliationRow('النقدية الفعلية (من الميزان)', cashEnd),
               _reconciliationRow(
                   'الفارق',
@@ -1183,7 +1184,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
       child: Row(children: [
         Expanded(
           child: Text(label,
-              style: const TextStyle(color: _tp, fontSize: 12)),
+              style: TextStyle(color: _tp, fontSize: 12)),
         ),
         Text(
           '${value >= 0 ? "+" : ""}${_fmt(value.abs())}',
@@ -1235,7 +1236,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+          Text(label, style: TextStyle(color: _td, fontSize: 11)),
           const SizedBox(height: 6),
           Text(_fmt(value),
               style: TextStyle(
@@ -1295,13 +1296,13 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
 
   Widget _errorView() => Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.error_outline, color: _err, size: 48),
+          Icon(Icons.error_outline, color: _err, size: 48),
           const SizedBox(height: 12),
-          Text(_error!, style: const TextStyle(color: _ts)),
+          Text(_error!, style: TextStyle(color: _ts)),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-                foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+                foregroundColor: _tp, side: BorderSide(color: _bdr)),
             onPressed: _load,
             icon: const Icon(Icons.refresh, size: 16),
             label: const Text('إعادة المحاولة'),
@@ -1335,7 +1336,7 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   }
 }
 
-const _th = TextStyle(
+TextStyle get _th => TextStyle(
     color: _td, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5);
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1421,7 +1422,7 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: _gold.withValues(alpha: 0.4)),
                   ),
-                  child: const Icon(Icons.receipt_long, color: _gold, size: 18),
+                  child: Icon(Icons.receipt_long, color: _gold, size: 18),
                 ),
                 const SizedBox(width: 12),
                 Column(
@@ -1436,7 +1437,7 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(widget.accountCode,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: _gold,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,
@@ -1444,7 +1445,7 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
                       ),
                       const SizedBox(width: 8),
                       Text(widget.accountName,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _tp,
                               fontSize: 15,
                               fontWeight: FontWeight.w700)),
@@ -1452,12 +1453,12 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
                     const SizedBox(height: 3),
                     Text(
                         'دفتر الأستاذ التفصيلي · من ${widget.startDate.toIso8601String().substring(0, 10)} إلى ${widget.endDate.toIso8601String().substring(0, 10)}',
-                        style: const TextStyle(color: _ts, fontSize: 11)),
+                        style: TextStyle(color: _ts, fontSize: 11)),
                   ],
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.close, color: _ts),
+                  icon: Icon(Icons.close, color: _ts),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
@@ -1465,11 +1466,11 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
             // Body
             Expanded(
               child: _loading
-                  ? const Center(child: CircularProgressIndicator(color: _gold))
+                  ? Center(child: CircularProgressIndicator(color: _gold))
                   : _error != null
                       ? Center(
                           child: Text(_error!,
-                              style: const TextStyle(color: _err)))
+                              style: TextStyle(color: _err)))
                       : _buildLedger(),
             ),
           ]),
@@ -1492,7 +1493,7 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
         color: _navy2.withValues(alpha: 0.5),
         child: Row(children: [
           Expanded(child: _kpi('رصيد افتتاحي', opening,
-              const Color(0xFF6366F1))),
+              core_theme.AC.purple)),
           const SizedBox(width: 10),
           Expanded(child: _kpi('إجمالي مدين', totalDebit, _ok)),
           const SizedBox(width: 10),
@@ -1505,7 +1506,7 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         color: _navy3,
-        child: Row(children: const [
+        child: Row(children: [
           SizedBox(width: 90, child: Text('التاريخ', style: _th)),
           SizedBox(width: 110, child: Text('رقم القيد', style: _th)),
           Expanded(flex: 3, child: Text('البيان', style: _th)),
@@ -1524,7 +1525,7 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
       // Rows
       Expanded(
         child: rows.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text('لا توجد حركات على هذا الحساب في الفترة',
                     style: TextStyle(color: _ts, fontSize: 12)),
               )
@@ -1544,11 +1545,11 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
         ),
         child: Row(children: [
           Text('${rows.length} حركة',
-              style: const TextStyle(color: _td, fontSize: 11)),
+              style: TextStyle(color: _td, fontSize: 11)),
           const Spacer(),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: () => Navigator.pop(context),
             child: const Text('إغلاق'),
           ),
@@ -1568,7 +1569,7 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: _td, fontSize: 10)),
+          Text(label, style: TextStyle(color: _td, fontSize: 10)),
           const SizedBox(height: 3),
           Text(_fmt(value),
               style: TextStyle(
@@ -1599,12 +1600,12 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
             child: Text(
                 (r['posting_date'] ?? '').toString().substring(
                     0, (r['posting_date'] ?? '').toString().length.clamp(0, 10)),
-                style: const TextStyle(
+                style: TextStyle(
                     color: _ts, fontSize: 11, fontFamily: 'monospace'))),
         SizedBox(
           width: 110,
           child: Text(r['je_number'] ?? '—',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _gold,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -1616,12 +1617,12 @@ class _AccountLedgerDialogState extends State<_AccountLedgerDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(r['je_memo_ar'] ?? '',
-                  style: const TextStyle(color: _tp, fontSize: 12),
+                  style: TextStyle(color: _tp, fontSize: 12),
                   overflow: TextOverflow.ellipsis),
               if ((r['description'] ?? '').toString().isNotEmpty &&
                   r['description'] != r['je_memo_ar'])
                 Text(r['description'],
-                    style: const TextStyle(color: _td, fontSize: 10),
+                    style: TextStyle(color: _td, fontSize: 10),
                     overflow: TextOverflow.ellipsis),
             ],
           ),

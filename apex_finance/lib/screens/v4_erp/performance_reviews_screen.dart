@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class PerformanceReviewsScreen extends StatefulWidget {
   const PerformanceReviewsScreen({super.key});
@@ -17,15 +18,15 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
   late final TabController _tab;
   String _selectedEmp = 'EMP-002';
 
-  final _employees = const [
-    _EmpReview('EMP-001', 'أحمد محمد العتيبي', 'CFO', 4.8, 5, 'exceeds', '2025', Colors.green),
-    _EmpReview('EMP-002', 'سارة الدوسري', 'مدير مراجعة داخلية', 4.6, 5, 'exceeds', '2025', Colors.green),
-    _EmpReview('EMP-003', 'محمد القحطاني', 'مدير مشاريع', 4.2, 4, 'meets', '2025', Colors.blue),
-    _EmpReview('EMP-004', 'نورة الغامدي', 'محللة ضرائب', 4.5, 4, 'meets', '2025', Colors.blue),
-    _EmpReview('EMP-005', 'فهد الشمري', 'محاسب', 3.2, 3, 'needs-improvement', '2025', Colors.orange),
-    _EmpReview('EMP-006', 'لينا البكري', 'مدير HR', 4.7, 5, 'exceeds', '2025', Colors.green),
-    _EmpReview('EMP-007', 'راشد العنزي', 'مدير تقنية', 4.4, 4, 'meets', '2025', Colors.blue),
-    _EmpReview('EMP-008', 'ياسر العنزي', 'مسؤول مشتريات', 3.8, 4, 'meets', '2025', Colors.blue),
+  final _employees = [
+    _EmpReview('EMP-001', 'أحمد محمد العتيبي', 'CFO', 4.8, 5, 'exceeds', '2025', core_theme.AC.ok),
+    _EmpReview('EMP-002', 'سارة الدوسري', 'مدير مراجعة داخلية', 4.6, 5, 'exceeds', '2025', core_theme.AC.ok),
+    _EmpReview('EMP-003', 'محمد القحطاني', 'مدير مشاريع', 4.2, 4, 'meets', '2025', core_theme.AC.info),
+    _EmpReview('EMP-004', 'نورة الغامدي', 'محللة ضرائب', 4.5, 4, 'meets', '2025', core_theme.AC.info),
+    _EmpReview('EMP-005', 'فهد الشمري', 'محاسب', 3.2, 3, 'needs-improvement', '2025', core_theme.AC.warn),
+    _EmpReview('EMP-006', 'لينا البكري', 'مدير HR', 4.7, 5, 'exceeds', '2025', core_theme.AC.ok),
+    _EmpReview('EMP-007', 'راشد العنزي', 'مدير تقنية', 4.4, 4, 'meets', '2025', core_theme.AC.info),
+    _EmpReview('EMP-008', 'ياسر العنزي', 'مسؤول مشتريات', 3.8, 4, 'meets', '2025', core_theme.AC.info),
   ];
 
   @override
@@ -53,9 +54,9 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
               _buildHero(),
               TabBar(
                 controller: _tab,
-                labelColor: const Color(0xFFD4AF37),
-                unselectedLabelColor: Colors.black54,
-                indicatorColor: const Color(0xFFD4AF37),
+                labelColor: core_theme.AC.gold,
+                unselectedLabelColor: core_theme.AC.ts,
+                indicatorColor: core_theme.AC.gold,
                 tabs: const [
                   Tab(icon: Icon(Icons.star, size: 16), text: 'التقييم الشامل'),
                   Tab(icon: Icon(Icons.flag, size: 16), text: 'الأهداف'),
@@ -86,17 +87,17 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
       margin: const EdgeInsets.only(left: 20, top: 20, bottom: 20, right: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(14),
-            color: Colors.grey.shade50,
-            child: const Row(
+            color: core_theme.AC.navy3,
+            child: Row(
               children: [
-                Icon(Icons.people, color: Color(0xFFD4AF37), size: 18),
+                Icon(Icons.people, color: core_theme.AC.gold, size: 18),
                 SizedBox(width: 8),
                 Text('الموظفون', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               ],
@@ -113,11 +114,11 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: selected ? const Color(0xFFD4AF37).withOpacity(0.12) : null,
+                      color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
                       border: Border(
-                        bottom: BorderSide(color: Colors.black12.withOpacity(0.5)),
+                        bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
                         right: BorderSide(
-                          color: selected ? const Color(0xFFD4AF37) : Colors.transparent,
+                          color: selected ? core_theme.AC.gold : Colors.transparent,
                           width: 3,
                         ),
                       ),
@@ -136,7 +137,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(e.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-                              Text(e.title, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                              Text(e.title, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                             ],
                           ),
                         ),
@@ -193,7 +194,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
               children: [
                 Text(e.name, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('${e.title} · ${e.id} · تقييم ${e.cycleYear}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -238,12 +239,12 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('تقييم الكفاءات الأساسية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+              Text('تقييم الكفاءات الأساسية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
               for (final c in competencies)
                 Padding(
@@ -266,11 +267,11 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                             ),
                           const SizedBox(width: 8),
                           Text(c.rating.toStringAsFixed(1),
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(c.comment, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.5)),
+                      Text(c.comment, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.5)),
                     ],
                   ),
                 ),
@@ -282,13 +283,13 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
   }
 
   Widget _buildGoalsTab() {
-    final goals = const [
-      _Goal('أتمتة 80% من إقرارات VAT', 85, 80, 'completed', Colors.green),
-      _Goal('تطوير 3 أعضاء فريق إلى ترقيات', 3, 3, 'completed', Colors.green),
-      _Goal('اعتماد شهادة CMA قبل Q3', 100, 100, 'completed', Colors.green),
-      _Goal('تقليل زمن إقفال الشهر إلى 5 أيام', 7, 5, 'partial', Colors.orange),
-      _Goal('تنفيذ 5 مشاريع تحسين عمليات', 4, 5, 'partial', Colors.orange),
-      _Goal('حضور 48 ساعة تدريبية', 42, 48, 'partial', Colors.orange),
+    final goals = [
+      _Goal('أتمتة 80% من إقرارات VAT', 85, 80, 'completed', core_theme.AC.ok),
+      _Goal('تطوير 3 أعضاء فريق إلى ترقيات', 3, 3, 'completed', core_theme.AC.ok),
+      _Goal('اعتماد شهادة CMA قبل Q3', 100, 100, 'completed', core_theme.AC.ok),
+      _Goal('تقليل زمن إقفال الشهر إلى 5 أيام', 7, 5, 'partial', core_theme.AC.warn),
+      _Goal('تنفيذ 5 مشاريع تحسين عمليات', 4, 5, 'partial', core_theme.AC.warn),
+      _Goal('حضور 48 ساعة تدريبية', 42, 48, 'partial', core_theme.AC.warn),
     ];
     return ListView.builder(
       padding: const EdgeInsets.only(left: 10, top: 16, right: 20, bottom: 20),
@@ -328,7 +329,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                   Expanded(
                     child: LinearProgressIndicator(
                       value: pct,
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: core_theme.AC.bdr,
                       valueColor: AlwaysStoppedAnimation(g.color),
                       minHeight: 10,
                     ),
@@ -368,15 +369,15 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFD4AF37).withOpacity(0.12),
+                backgroundColor: core_theme.AC.gold.withOpacity(0.12),
                 child: Text(r.name.substring(0, 1),
-                    style: const TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w900)),
+                    style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w900)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -385,7 +386,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(r.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                    Text(r.relationship, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text(r.relationship, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     const SizedBox(height: 6),
                     Text(r.comment,
                         style: const TextStyle(fontSize: 12, height: 1.6, fontStyle: FontStyle.italic)),
@@ -410,7 +411,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                     ],
                   ),
                   Text(r.rating.toStringAsFixed(1),
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
                 ],
               ),
             ],
@@ -426,7 +427,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
       children: [
         _section(
           '✨ نقاط القوة',
-          Colors.green,
+          core_theme.AC.ok,
           const [
             'خبرة تقنية عميقة ومعرفة متنوعة',
             'مهارات قيادية قوية وقدرة على الإلهام',
@@ -438,7 +439,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
         const SizedBox(height: 12),
         _section(
           '🎯 مجالات التطوير',
-          Colors.orange,
+          core_theme.AC.warn,
           const [
             'التفويض للفريق — تقليل التفاصيل الدقيقة',
             'استراتيجية بعيدة المدى (5+ سنوات)',
@@ -450,16 +451,16 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFD4AF37).withOpacity(0.08),
+            color: core_theme.AC.gold.withOpacity(0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+            border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.trending_up, color: Color(0xFFD4AF37)),
+                  Icon(Icons.trending_up, color: core_theme.AC.gold),
                   SizedBox(width: 8),
                   Text('خطة التطوير الفردية — 2026',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
@@ -472,17 +473,17 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
               _devItem('تعيين ممتد', 'قيادة مشروع تحوّل رقمي عابر للإدارات', 'Q3-Q4 2026'),
               _devItem('مؤتمر صناعي', 'حضور 2 مؤتمر دولي في المجال المالي', '2026'),
               const SizedBox(height: 10),
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.celebration, color: Colors.pink),
+                  Icon(Icons.celebration, color: core_theme.AC.err),
                   SizedBox(width: 8),
                   Text('المسار الوظيفي المقترح',
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                 ],
               ),
               const SizedBox(height: 8),
-              const Text('الترشيح للترقية إلى "Senior Director" خلال 2026-Q4 بناءً على الأداء الاستثنائي وخطة التطوير.',
-                  style: TextStyle(fontSize: 12, height: 1.6, color: Colors.black87)),
+              Text('الترشيح للترقية إلى "Senior Director" خلال 2026-Q4 بناءً على الأداء الاستثنائي وخطة التطوير.',
+                  style: TextStyle(fontSize: 12, height: 1.6, color: core_theme.AC.tp)),
             ],
           ),
         ),
@@ -529,13 +530,13 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: const Color(0xFFD4AF37).withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
             child: Text(category,
-                style: const TextStyle(fontSize: 11, color: Color(0xFFD4AF37), fontWeight: FontWeight.w800)),
+                style: TextStyle(fontSize: 11, color: core_theme.AC.gold, fontWeight: FontWeight.w800)),
           ),
           const SizedBox(width: 10),
           Expanded(child: Text(detail, style: const TextStyle(fontSize: 12))),
-          Text(timeline, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+          Text(timeline, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
         ],
       ),
     );

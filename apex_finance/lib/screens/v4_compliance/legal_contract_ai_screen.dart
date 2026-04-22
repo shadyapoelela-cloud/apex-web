@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 126 — Legal Contract AI Review
 class LegalContractAiScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _LegalContractAiScreenState extends State<LegalContractAiScreen> with Sing
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'العقود'), Tab(text: 'المخاطر المكتشفة'), Tab(text: 'القوالب'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_contractsTab(), _risksTab(), _templatesTab(), _analyticsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _LegalContractAiScreenState extends State<LegalContractAiScreen> with Sing
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.gavel, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('المراجعة القانونية AI', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('مراجعة العقود بالذكاء الاصطناعي — NLP عربي/إنجليزي', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('مراجعة العقود بالذكاء الاصطناعي — NLP عربي/إنجليزي', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -47,14 +48,14 @@ class _LegalContractAiScreenState extends State<LegalContractAiScreen> with Sing
     Expanded(child: _kpi('عقود مراجعة', '${_contracts.length}', Icons.description, const Color(0xFF4A148C))),
     Expanded(child: _kpi('مخاطر حرجة', '${_risks.where((r)=>r.severity.contains('حرج')).length}', Icons.warning, const Color(0xFFC62828))),
     Expanded(child: _kpi('زمن مراجعة', '12 دقيقة', Icons.speed, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('دقة AI', '96%', Icons.verified, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('دقة AI', '96%', Icons.verified, core_theme.AC.gold)),
   ]));
 
   Widget _kpi(String l, String v, IconData i, Color c) => Container(margin: const EdgeInsets.symmetric(horizontal: 4),
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -68,11 +69,11 @@ class _LegalContractAiScreenState extends State<LegalContractAiScreen> with Sing
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(c.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            Text('${c.type} • ${c.counterparty}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${c.type} • ${c.counterparty}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('${c.riskScore}/100', style: TextStyle(fontWeight: FontWeight.bold, color: _scoreColor(c.riskScore))),
-            Text(c.status, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text(c.status, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ]),
         ]),
         const SizedBox(height: 10),
@@ -86,7 +87,7 @@ class _LegalContractAiScreenState extends State<LegalContractAiScreen> with Sing
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
   ]));
 
@@ -104,7 +105,7 @@ class _LegalContractAiScreenState extends State<LegalContractAiScreen> with Sing
             child: Text(r.severity, style: TextStyle(color: _severity(r.severity), fontSize: 9, fontWeight: FontWeight.bold))),
         ]),
         const SizedBox(height: 6),
-        Text('في: ${r.contract}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('في: ${r.contract}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 6),
         Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFFFFF8E1), borderRadius: BorderRadius.circular(6)),
           child: Text('توصية AI: ${r.recommendation}', style: const TextStyle(fontSize: 11))),
@@ -120,13 +121,13 @@ class _LegalContractAiScreenState extends State<LegalContractAiScreen> with Sing
       subtitle: Text('${t.category} • استُخدم ${t.usage} مرة', style: const TextStyle(fontSize: 11)),
       trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
         decoration: BoxDecoration(color: const Color(0xFF2E7D32).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-        child: const Text('معتمد', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.bold))),
+        child: Text('معتمد', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.bold))),
     ));
   });
 
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('🤖 توفير الوقت', '12 دقيقة لمراجعة العقد بدلاً من 4 ساعات يدوياً', const Color(0xFF2E7D32)),
-    _insight('🎯 دقة الاكتشاف', '96% للبنود القانونية المخاطرة', const Color(0xFFD4AF37)),
+    _insight('🎯 دقة الاكتشاف', '96% للبنود القانونية المخاطرة', core_theme.AC.gold),
     _insight('💰 توفير قانوني', 'وفّرت 48K ر.س رسوم محاماة هذا الشهر', const Color(0xFF4A148C)),
     _insight('⚠️ المخاطر الشائعة', 'Indemnification 34% • Limitation of Liability 28% • IP 18%', const Color(0xFFE65100)),
     _insight('🌐 لغات مدعومة', 'عربي + إنجليزي + إماراتي-كويتي (عقود محلية)', const Color(0xFF1A237E)),
@@ -136,20 +137,20 @@ class _LegalContractAiScreenState extends State<LegalContractAiScreen> with Sing
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _scoreColor(int s) {
     if (s >= 75) return const Color(0xFFC62828);
     if (s >= 50) return const Color(0xFFE65100);
-    if (s >= 25) return const Color(0xFFD4AF37);
+    if (s >= 25) return core_theme.AC.gold;
     return const Color(0xFF2E7D32);
   }
 
   Color _severity(String s) {
     if (s.contains('حرج')) return const Color(0xFFC62828);
     if (s.contains('عالي')) return const Color(0xFFE65100);
-    if (s.contains('متوسط')) return const Color(0xFFD4AF37);
+    if (s.contains('متوسط')) return core_theme.AC.gold;
     return const Color(0xFF2E7D32);
   }
 

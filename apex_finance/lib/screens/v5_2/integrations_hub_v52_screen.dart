@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class IntegrationsHubV52Screen extends StatefulWidget {
   const IntegrationsHubV52Screen({super.key});
@@ -11,8 +12,8 @@ class IntegrationsHubV52Screen extends StatefulWidget {
 }
 
 class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   String _category = 'all';
   String _search = '';
@@ -80,15 +81,15 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
       color: Colors.white,
       padding: const EdgeInsets.all(16),
       child: Row(children: [
-        const Icon(Icons.hub, color: _gold),
+        Icon(Icons.hub, color: _gold),
         const SizedBox(width: 8),
-        const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('مركز التكاملات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
-          Text('اربط APEX بـ 30+ نظام — بنوك، ZATCA، GOSI، متاجر إلكترونية، AI', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('اربط APEX بـ 30+ نظام — بنوك، ZATCA، GOSI، متاجر إلكترونية، AI', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ])),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.api, size: 16), label: const Text('REST API Docs')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.api, size: 16), label: Text('REST API Docs')),
         const SizedBox(width: 8),
-        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.add, size: 16), label: const Text('تكامل مخصّص')),
+        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.add, size: 16), label: Text('تكامل مخصّص')),
       ]),
     );
   }
@@ -101,11 +102,11 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       child: Row(children: [
-        Expanded(child: _statCard('متصل', '$connected', Colors.green, Icons.check_circle)),
+        Expanded(child: _statCard('متصل', '$connected', core_theme.AC.ok, Icons.check_circle)),
         const SizedBox(width: 10),
-        Expanded(child: _statCard('خطأ', '$errors', Colors.red, Icons.error)),
+        Expanded(child: _statCard('خطأ', '$errors', core_theme.AC.err, Icons.error)),
         const SizedBox(width: 10),
-        Expanded(child: _statCard('متاح', '$available', Colors.blue, Icons.cloud_download)),
+        Expanded(child: _statCard('متاح', '$available', core_theme.AC.info, Icons.cloud_download)),
         const SizedBox(width: 10),
         Expanded(child: _statCard('المكالمات اليومية', '142K', _gold, Icons.sync_alt)),
         const SizedBox(width: 10),
@@ -130,17 +131,17 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
   }
 
   Widget _searchAndCategories() {
-    const cats = [
+    final cats = [
       ('all', 'الكل', Icons.apps, _navy),
-      ('banking', 'البنوك والحكومة', Icons.account_balance, Colors.blue),
-      ('payment', 'مدفوعات', Icons.credit_card, Colors.green),
-      ('ecommerce', 'متاجر إلكترونية', Icons.shopping_bag, Colors.purple),
-      ('pos', 'نقاط بيع', Icons.point_of_sale, Colors.orange),
-      ('logistics', 'لوجستيات', Icons.local_shipping, Colors.teal),
-      ('productivity', 'إنتاجية', Icons.work, Color(0xFFD4AF37)),
-      ('crm', 'CRM', Icons.people, Colors.indigo),
-      ('ai', 'ذكاء اصطناعي', Icons.smart_toy, Colors.pink),
-      ('custom', 'مخصّص', Icons.code, Colors.grey),
+      ('banking', 'البنوك والحكومة', Icons.account_balance, core_theme.AC.info),
+      ('payment', 'مدفوعات', Icons.credit_card, core_theme.AC.ok),
+      ('ecommerce', 'متاجر إلكترونية', Icons.shopping_bag, core_theme.AC.purple),
+      ('pos', 'نقاط بيع', Icons.point_of_sale, core_theme.AC.warn),
+      ('logistics', 'لوجستيات', Icons.local_shipping, core_theme.AC.info),
+      ('productivity', 'إنتاجية', Icons.work, core_theme.AC.gold),
+      ('crm', 'CRM', Icons.people, core_theme.AC.purple),
+      ('ai', 'ذكاء اصطناعي', Icons.smart_toy, core_theme.AC.err),
+      ('custom', 'مخصّص', Icons.code, core_theme.AC.td),
       ('government', 'حكومي', Icons.flag, Color(0xFF4A148C)),
     ];
     return Container(
@@ -167,11 +168,11 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
             onTap: () => setState(() => _category = c.$1),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(color: selected ? c.$4.withOpacity(0.12) : Colors.grey.shade50, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? c.$4 : Colors.grey.shade300)),
+              decoration: BoxDecoration(color: selected ? c.$4.withOpacity(0.12) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? c.$4 : core_theme.AC.bdr)),
               child: Row(children: [
-                Icon(c.$3, size: 14, color: selected ? c.$4 : Colors.black54),
+                Icon(c.$3, size: 14, color: selected ? c.$4 : core_theme.AC.ts),
                 const SizedBox(width: 6),
-                Text(c.$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: selected ? c.$4 : Colors.black87)),
+                Text(c.$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: selected ? c.$4 : core_theme.AC.tp)),
               ]),
             ),
           ));
@@ -183,10 +184,10 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
   Widget _grid() {
     final items = _filtered;
     if (items.isEmpty) {
-      return const Center(child: Padding(padding: EdgeInsets.all(32), child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.search_off, size: 64, color: Colors.black26),
+      return Center(child: Padding(padding: EdgeInsets.all(32), child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(Icons.search_off, size: 64, color: core_theme.AC.td),
         SizedBox(height: 12),
-        Text('لا توجد تكاملات تطابق البحث', style: TextStyle(color: Colors.black54)),
+        Text('لا توجد تكاملات تطابق البحث', style: TextStyle(color: core_theme.AC.ts)),
       ])));
     }
     return GridView.builder(
@@ -211,7 +212,7 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: i.status.color.withOpacity(0.3)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 4, offset: const Offset(0, 1))],
+          boxShadow: [BoxShadow(color: core_theme.AC.tp.withOpacity(0.03), blurRadius: 4, offset: const Offset(0, 1))],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
@@ -219,7 +220,7 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(i.nameAr, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
-              Text(i.vendor, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text(i.vendor, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ])),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -228,21 +229,21 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
             ),
           ]),
           const SizedBox(height: 8),
-          Text(i.description, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(i.description, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
           const Spacer(),
           Row(children: [
             if (i.lastSync != null) ...[
-              const Icon(Icons.sync, size: 11, color: Colors.black54),
+              Icon(Icons.sync, size: 11, color: core_theme.AC.ts),
               const SizedBox(width: 3),
-              Text(i.lastSync == 'realtime' ? 'آني (Realtime)' : 'آخر مزامنة ${i.lastSync}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text(i.lastSync == 'realtime' ? 'آني (Realtime)' : 'آخر مزامنة ${i.lastSync}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ],
             const Spacer(),
             if (i.status == _Status.available)
-              OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2), minimumSize: Size.zero), child: const Text('تفعيل', style: TextStyle(fontSize: 11)))
+              OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2), minimumSize: Size.zero), child: Text('تفعيل', style: TextStyle(fontSize: 11)))
             else if (i.status == _Status.error)
-              FilledButton(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: Colors.red, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2), minimumSize: Size.zero), child: const Text('إصلاح', style: TextStyle(fontSize: 11)))
+              FilledButton(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: core_theme.AC.err, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2), minimumSize: Size.zero), child: Text('إصلاح', style: TextStyle(fontSize: 11)))
             else
-              TextButton(onPressed: () {}, style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2), minimumSize: Size.zero), child: const Text('إدارة', style: TextStyle(fontSize: 11))),
+              TextButton(onPressed: () {}, style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2), minimumSize: Size.zero), child: Text('إدارة', style: TextStyle(fontSize: 11))),
           ]),
         ]),
       ),
@@ -259,9 +260,9 @@ extension _StatusX on _Status {
         _Status.available => 'متاح',
       };
   Color get color => switch (this) {
-        _Status.connected => Colors.green,
-        _Status.error => Colors.red,
-        _Status.available => Colors.blue,
+        _Status.connected => core_theme.AC.ok,
+        _Status.error => core_theme.AC.err,
+        _Status.available => core_theme.AC.info,
       };
   IconData get icon => switch (this) {
         _Status.connected => Icons.check_circle,

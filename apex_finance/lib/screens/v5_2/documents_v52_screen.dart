@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class DocumentsV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class DocumentsV52Screen extends StatefulWidget {
 }
 
 class _DocumentsV52ScreenState extends State<DocumentsV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _docs = <_Doc>[
@@ -49,11 +50,11 @@ class _DocumentsV52ScreenState extends State<DocumentsV52Screen> {
         SavedView(id: 'contracts', labelAr: 'عقود', icon: Icons.gavel, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'statements', labelAr: 'قوائم مالية', icon: Icons.insert_chart, color: Colors.blue, count: _cnt(_Cat.statements), active: _filter == 'statements'),
-        FilterChipDef(id: 'contracts', labelAr: 'عقود', icon: Icons.gavel, color: Colors.purple, count: _cnt(_Cat.contracts), active: _filter == 'contracts'),
+        FilterChipDef(id: 'statements', labelAr: 'قوائم مالية', icon: Icons.insert_chart, color: core_theme.AC.info, count: _cnt(_Cat.statements), active: _filter == 'statements'),
+        FilterChipDef(id: 'contracts', labelAr: 'عقود', icon: Icons.gavel, color: core_theme.AC.purple, count: _cnt(_Cat.contracts), active: _filter == 'contracts'),
         FilterChipDef(id: 'tax', labelAr: 'ضرائب', icon: Icons.receipt_long, color: _gold, count: _cnt(_Cat.tax), active: _filter == 'tax'),
-        FilterChipDef(id: 'audit', labelAr: 'مراجعة', icon: Icons.fact_check, color: Colors.indigo, count: _cnt(_Cat.audit), active: _filter == 'audit'),
-        FilterChipDef(id: 'certifications', labelAr: 'شهادات', icon: Icons.verified, color: Colors.green, count: _cnt(_Cat.certifications), active: _filter == 'certifications'),
+        FilterChipDef(id: 'audit', labelAr: 'مراجعة', icon: Icons.fact_check, color: core_theme.AC.purple, count: _cnt(_Cat.audit), active: _filter == 'audit'),
+        FilterChipDef(id: 'certifications', labelAr: 'شهادات', icon: Icons.verified, color: core_theme.AC.ok, count: _cnt(_Cat.certifications), active: _filter == 'certifications'),
         FilterChipDef(id: 'corporate', labelAr: 'شؤون الشركة', icon: Icons.business, color: _navy, count: _cnt(_Cat.corporate), active: _filter == 'corporate'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
@@ -82,16 +83,16 @@ class _DocumentsV52ScreenState extends State<DocumentsV52Screen> {
             leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: d.type.color.withOpacity(0.15), borderRadius: BorderRadius.circular(8)), child: Icon(d.type.icon, color: d.type.color)),
             title: Row(children: [
               Expanded(child: Text(d.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              if (d.signed) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.verified, size: 10, color: Colors.green), SizedBox(width: 2), Text('موقّع', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Colors.green))])),
+              if (d.signed) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.verified, size: 10, color: core_theme.AC.ok), SizedBox(width: 2), Text('موقّع', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: core_theme.AC.ok))])),
             ]),
             subtitle: Row(children: [
-              Text(d.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+              Text(d.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
               Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: d.category.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(d.category.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: d.category.color))),
               const SizedBox(width: 8),
-              Text('${d.sizeMB >= 1 ? d.sizeMB.toStringAsFixed(1) + ' MB' : (d.sizeMB * 1000).toStringAsFixed(0) + ' KB'}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('${d.sizeMB >= 1 ? d.sizeMB.toStringAsFixed(1) + ' MB' : (d.sizeMB * 1000).toStringAsFixed(0) + ' KB'}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
-              Text('${d.uploader} · ${d.date}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('${d.uploader} · ${d.date}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ]),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               IconButton(icon: const Icon(Icons.visibility, size: 18), onPressed: () {}, tooltip: 'معاينة'),
@@ -117,29 +118,29 @@ class _DocumentsV52ScreenState extends State<DocumentsV52Screen> {
         return Container(
           width: 280,
           margin: const EdgeInsets.only(left: 10),
-          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(c.icon, color: c.color, size: 18),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(c.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: c.color)),
-                Text('${totalSize.toStringAsFixed(1)} MB', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('${totalSize.toStringAsFixed(1)} MB', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
               Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: c.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.color))),
             ])),
             ...items.take(4).map((d) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
               child: Row(children: [
                 Icon(d.type.icon, color: d.type.color, size: 16),
                 const SizedBox(width: 8),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(d.name, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  Text(d.date, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+                  Text(d.date, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                 ])),
-                if (d.signed) const Icon(Icons.verified, size: 10, color: Colors.green),
+                if (d.signed) Icon(Icons.verified, size: 10, color: core_theme.AC.ok),
               ]),
             )),
             if (items.length > 4)
@@ -159,7 +160,7 @@ class _DocumentsV52ScreenState extends State<DocumentsV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('توزيع الوثائق حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توزيع الوثائق حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         ...byCat.entries.map((e) {
           final pct = e.value / max;
@@ -167,7 +168,7 @@ class _DocumentsV52ScreenState extends State<DocumentsV52Screen> {
             Icon(e.key.icon, color: e.key.color, size: 16),
             const SizedBox(width: 8),
             SizedBox(width: 140, child: Text(e.key.labelAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-            Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: pct, minHeight: 22, backgroundColor: Colors.grey.shade100, color: e.key.color))),
+            Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: pct, minHeight: 22, backgroundColor: core_theme.AC.navy3, color: e.key.color))),
             const SizedBox(width: 10),
             SizedBox(width: 80, child: Text('${e.value} وثيقة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: e.key.color), textAlign: TextAlign.end)),
           ]));
@@ -193,15 +194,15 @@ extension _CatX on _Cat {
         _Cat.projects => 'مشاريع',
       };
   Color get color => switch (this) {
-        _Cat.statements => Colors.blue,
-        _Cat.contracts => Colors.purple,
-        _Cat.tax => const Color(0xFFD4AF37),
-        _Cat.audit => Colors.indigo,
-        _Cat.certifications => Colors.green,
+        _Cat.statements => core_theme.AC.info,
+        _Cat.contracts => core_theme.AC.purple,
+        _Cat.tax => core_theme.AC.gold,
+        _Cat.audit => core_theme.AC.purple,
+        _Cat.certifications => core_theme.AC.ok,
         _Cat.corporate => const Color(0xFF1A237E),
-        _Cat.policies => Colors.teal,
-        _Cat.invoices => Colors.orange,
-        _Cat.projects => Colors.pink,
+        _Cat.policies => core_theme.AC.info,
+        _Cat.invoices => core_theme.AC.warn,
+        _Cat.projects => core_theme.AC.err,
       };
   IconData get icon => switch (this) {
         _Cat.statements => Icons.insert_chart,
@@ -227,10 +228,10 @@ extension _FTX on String {
 
 extension _FileTypeX on _FileType {
   Color get color => switch (this) {
-        _FileType.pdf => Colors.red,
-        _FileType.docx => Colors.blue,
-        _FileType.xlsx => Colors.green,
-        _FileType.pptx => Colors.orange,
+        _FileType.pdf => core_theme.AC.err,
+        _FileType.docx => core_theme.AC.info,
+        _FileType.xlsx => core_theme.AC.ok,
+        _FileType.pptx => core_theme.AC.warn,
       };
   IconData get icon => switch (this) {
         _FileType.pdf => Icons.picture_as_pdf,

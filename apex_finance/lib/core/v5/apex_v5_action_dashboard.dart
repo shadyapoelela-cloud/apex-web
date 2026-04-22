@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 import 'v5_models.dart';
@@ -62,7 +63,7 @@ class ApexV5ActionDashboard extends StatelessWidget {
             Text(
               subtitleAr!,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.black54,
+                    color: core_theme.AC.ts,
                   ),
             ),
           ],
@@ -140,13 +141,13 @@ class ApexV5ActionDashboard extends StatelessWidget {
 Color _severityColor(V5WidgetSeverity s) {
   switch (s) {
     case V5WidgetSeverity.critical:
-      return const Color(0xFFDC2626);
+      return core_theme.AC.err;
     case V5WidgetSeverity.warning:
-      return const Color(0xFFD97706);
+      return core_theme.AC.warn;
     case V5WidgetSeverity.success:
-      return const Color(0xFF059669);
+      return core_theme.AC.ok;
     case V5WidgetSeverity.info:
-      return const Color(0xFF2563EB);
+      return core_theme.AC.info;
   }
 }
 
@@ -210,7 +211,7 @@ class _ActionListCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   mockDetail,
-                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                  style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                 ),
               ],
             ),
@@ -292,7 +293,7 @@ class _KpiCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black.withOpacity(0.08)),
+            border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,9 +305,9 @@ class _KpiCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       widget.labelAr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Colors.black54,
+                        color: core_theme.AC.ts,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -331,9 +332,9 @@ class _KpiCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       unit,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Colors.black45,
+                        color: core_theme.AC.td,
                       ),
                     ),
                   ],
@@ -373,7 +374,7 @@ class _ChartCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

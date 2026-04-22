@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_draft_with_ai.dart';
 
@@ -43,7 +44,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
       ),
       child: Row(
         children: [
@@ -70,14 +71,14 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFF4A148C) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFF4A148C) : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                color: active ? const Color(0xFF4A148C) : Colors.black54,
+                color: active ? const Color(0xFF4A148C) : core_theme.AC.ts,
               ),
             ),
           ],
@@ -115,10 +116,10 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                 const SizedBox(height: 8),
                 Column(
                   children: [
-                    _opinionOption('unqualified', 'رأي نظيف (Unqualified)', 'القوائم المالية تعرض بصورة عادلة', const Color(0xFF059669)),
-                    _opinionOption('qualified', 'رأي متحفّظ (Qualified)', 'باستثناء التحفّظات المحدّدة', const Color(0xFFD97706)),
+                    _opinionOption('unqualified', 'رأي نظيف (Unqualified)', 'القوائم المالية تعرض بصورة عادلة', core_theme.AC.ok),
+                    _opinionOption('qualified', 'رأي متحفّظ (Qualified)', 'باستثناء التحفّظات المحدّدة', core_theme.AC.warn),
                     _opinionOption('adverse', 'رأي معاكس (Adverse)', 'القوائم مضلّلة بشكل جوهري', const Color(0xFFB91C1C)),
-                    _opinionOption('disclaimer', 'الامتناع عن الرأي (Disclaimer)', 'لم نتمكّن من الحصول على أدلة كافية', Colors.black54),
+                    _opinionOption('disclaimer', 'الامتناع عن الرأي (Disclaimer)', 'لم نتمكّن من الحصول على أدلة كافية', core_theme.AC.ts),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -152,7 +153,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.black.withOpacity(0.08)),
+                    border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
                   ),
                   child: Column(
                     children: [
@@ -204,7 +205,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.black.withOpacity(0.15)),
+                    border: Border.all(color: core_theme.AC.tp.withOpacity(0.15)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,14 +241,14 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                         style: TextStyle(fontSize: 12, height: 1.6),
                       ),
                       const SizedBox(height: 20),
-                      const Row(
+                      Row(
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('د. عبدالله السالم', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                              Text('الشريك المسؤول', style: TextStyle(fontSize: 11, color: Colors.black54)),
-                              Text('ترخيص SOCPA #4821', style: TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                              Text('الشريك المسؤول', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
+                              Text('ترخيص SOCPA #4821', style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                             ],
                           ),
                           Spacer(),
@@ -255,8 +256,8 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text('مكتب السالم وشركاؤه', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                              Text('الرياض، المملكة العربية السعودية', style: TextStyle(fontSize: 11, color: Colors.black54)),
-                              Text('2026-04-30', style: TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                              Text('الرياض، المملكة العربية السعودية', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
+                              Text('2026-04-30', style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                             ],
                           ),
                         ],
@@ -282,7 +283,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
         decoration: BoxDecoration(
           color: active ? color.withOpacity(0.08) : Colors.white,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: active ? color : Colors.black.withOpacity(0.08), width: active ? 2 : 1),
+          border: Border.all(color: active ? color : core_theme.AC.tp.withOpacity(0.08), width: active ? 2 : 1),
         ),
         child: Row(
           children: [
@@ -296,8 +297,8 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: active ? color : Colors.black87)),
-                  Text(desc, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: active ? color : core_theme.AC.tp)),
+                  Text(desc, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ],
               ),
             ),
@@ -331,7 +332,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          Text(scope, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(scope, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ],
       ),
     );
@@ -345,9 +346,9 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
         children: [
           const Text('رسالة الإدارة — Management Letter', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'التوصيات للإدارة حول الضوابط الداخلية والعمليات',
-            style: TextStyle(fontSize: 12, color: Colors.black54),
+            style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
           ),
           const SizedBox(height: 16),
           // Findings
@@ -365,7 +366,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             'كل الموظفين يملكون صلاحية عرض الرواتب — خرق للخصوصية.',
             'نوصي بتطبيق RBAC على مستوى الحقل لحماية بيانات الرواتب',
             'متوسطة',
-            const Color(0xFFD97706),
+            core_theme.AC.warn,
           ),
           _mlFinding(
             'ML-003',
@@ -373,7 +374,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             'الصرف من الصندوق بدون حدود أو مستندات موحّدة.',
             'نوصي بوضع سياسة مفصّلة وحدود يومية لكل موظف',
             'منخفضة',
-            const Color(0xFF2563EB),
+            core_theme.AC.info,
           ),
           const SizedBox(height: 16),
           // AI Draft button
@@ -421,24 +422,24 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
           const SizedBox(height: 8),
           Text(issue, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          Text('الملاحظة: $detail', style: const TextStyle(fontSize: 12, color: Colors.black87)),
+          Text('الملاحظة: $detail', style: TextStyle(fontSize: 12, color: core_theme.AC.tp)),
           const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF059669).withOpacity(0.06),
+              color: core_theme.AC.ok.withOpacity(0.06),
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: const Color(0xFF059669).withOpacity(0.2)),
+              border: Border.all(color: core_theme.AC.ok.withOpacity(0.2)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.lightbulb, size: 14, color: Color(0xFF059669)),
+                Icon(Icons.lightbulb, size: 14, color: core_theme.AC.ok),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     'التوصية: $recommendation',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF059669), fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 12, color: core_theme.AC.ok, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -462,7 +463,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             'د. عبدالله السالم',
             'مكتمل ✓',
             '2026-04-25',
-            const Color(0xFF059669),
+            core_theme.AC.ok,
             'راجعت جميع أوراق العمل وأوافق على الخلاصة.',
           ),
           _qcSection(
@@ -470,7 +471,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             'د. محمد الخالدي',
             'مكتمل ✓',
             '2026-04-28',
-            const Color(0xFF059669),
+            core_theme.AC.ok,
             'توصياتي في الرسالة المرفقة. أوافق على الرأي النظيف.',
           ),
           _qcSection(
@@ -478,7 +479,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             'د. فاطمة الحربي — شريك مستقل',
             'قيد التنفيذ',
             'متوقّع 2026-05-02',
-            const Color(0xFFD97706),
+            core_theme.AC.warn,
             'قيد المراجعة — لم تظهر ملاحظات بعد.',
           ),
           _qcSection(
@@ -540,7 +541,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(level, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                    Text(reviewer, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text(reviewer, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -552,7 +553,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                     decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
                     child: Text(status, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700)),
                   ),
-                  Text(date, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(date, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ],
               ),
             ],
@@ -562,7 +563,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.03),
+                color: core_theme.AC.tp.withOpacity(0.03),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(notes, style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic)),
@@ -594,7 +595,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black.withOpacity(0.08)),
+                border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
               ),
               child: Row(
                 children: [
@@ -605,7 +606,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(item.client, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                        Text('${item.opinion} · ${item.date}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text('${item.opinion} · ${item.date}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),

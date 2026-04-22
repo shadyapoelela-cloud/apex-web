@@ -23,6 +23,7 @@ import 'package:go_router/go_router.dart';
 
 import '../design_tokens.dart';
 import '../theme.dart';
+import '../theme.dart' as core_theme;
 import 'v4_groups.dart';
 
 // ── Session-scoped recent list ────────────────────────────────────────
@@ -143,7 +144,7 @@ Future<void> showApexCommandPalette(BuildContext context) async {
     context: context,
     barrierDismissible: true,
     barrierLabel: 'إغلاق',
-    barrierColor: Colors.black.withValues(alpha: 0.6),
+    barrierColor: core_theme.AC.tp.withValues(alpha: 0.6),
     transitionDuration: AppDuration.fast,
     pageBuilder: (_, __, ___) => const _CommandPaletteModal(),
     transitionBuilder: (_, anim, __, child) => FadeTransition(
@@ -275,7 +276,7 @@ class _CommandPaletteModalState extends State<_CommandPaletteModal> {
               border: Border.all(color: AC.navy3, width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.45),
+                  color: core_theme.AC.tp.withValues(alpha: 0.45),
                   blurRadius: 36,
                   offset: const Offset(0, 12),
                 ),

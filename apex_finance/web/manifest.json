@@ -1,12 +1,15 @@
 {
-    "name": "apex_finance",
-    "short_name": "apex_finance",
+    "name": "APEX — منصة المحاسبة والعمليات",
+    "short_name": "APEX",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#0A1628",
+    "theme_color": "#0A1628",
+    "description": "منصة APEX المالية — شجرة الحسابات، القيود، التقارير، والتكامل مع ZATCA",
+    "orientation": "any",
+    "lang": "ar",
+    "dir": "rtl",
+    "categories": ["business", "finance", "productivity"],
     "prefer_related_applications": false,
     "icons": [
         {

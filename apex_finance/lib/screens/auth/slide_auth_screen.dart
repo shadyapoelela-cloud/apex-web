@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/ui_components.dart';
 
 class SlideAuthScreen extends StatefulWidget {
@@ -95,7 +96,7 @@ class _SAS extends State<SlideAuthScreen> {
           Container(width: 420, padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
             decoration: BoxDecoration(color: AC.navy2, borderRadius: BorderRadius.circular(24),
               border: Border.all(color: AC.gold.withAlpha(38)),
-              boxShadow: [BoxShadow(color: Colors.black.withAlpha(77), blurRadius: 30, offset: Offset(0, 10))]),
+              boxShadow: [BoxShadow(color: core_theme.AC.tp.withAlpha(77), blurRadius: 30, offset: Offset(0, 10))]),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Container(padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(12)),

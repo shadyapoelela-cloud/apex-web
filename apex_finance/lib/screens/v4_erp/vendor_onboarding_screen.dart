@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class VendorOnboardingScreen extends StatefulWidget {
   const VendorOnboardingScreen({super.key});
@@ -48,14 +49,14 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
         children: [
           const Icon(Icons.person_add, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('معالج إدخال مورد جديد',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('6 خطوات — تسجيل كامل مع فحوصات الامتثال التلقائية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -75,7 +76,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.black12)),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr)),
       ),
       child: Row(
         children: [
@@ -85,7 +86,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
               Container(
                 width: 30,
                 height: 2,
-                color: i < _currentStep ? const Color(0xFF009688) : Colors.black12,
+                color: i < _currentStep ? const Color(0xFF009688) : core_theme.AC.bdr,
               ),
           ],
         ],
@@ -97,7 +98,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
     final s = _steps[i];
     final isActive = i == _currentStep;
     final isDone = i < _currentStep;
-    final color = isDone ? Colors.green : isActive ? const Color(0xFF009688) : Colors.grey.shade400;
+    final color = isDone ? core_theme.AC.ok : isActive ? const Color(0xFF009688) : core_theme.AC.td;
     return InkWell(
       onTap: () => setState(() => _currentStep = i),
       child: Row(
@@ -106,7 +107,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: isDone ? Colors.green : isActive ? const Color(0xFF009688) : Colors.grey.shade200,
+              color: isDone ? core_theme.AC.ok : isActive ? const Color(0xFF009688) : core_theme.AC.bdr,
               shape: BoxShape.circle,
               border: isActive ? Border.all(color: const Color(0xFF009688), width: 3) : null,
             ),
@@ -115,7 +116,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
                   ? const Icon(Icons.check, color: Colors.white, size: 18)
                   : Text(s.number,
                       style: TextStyle(
-                          color: isActive ? Colors.white : Colors.black54,
+                          color: isActive ? Colors.white : core_theme.AC.ts,
                           fontWeight: FontWeight.w900)),
             ),
           ),
@@ -128,9 +129,9 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: isActive ? FontWeight.w900 : FontWeight.w500,
-                        color: isActive ? const Color(0xFF009688) : Colors.black87)),
+                        color: isActive ? const Color(0xFF009688) : core_theme.AC.tp)),
                 Text(s.description,
-                    style: const TextStyle(fontSize: 10, color: Colors.black54),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis),
               ],
@@ -192,13 +193,13 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.auto_awesome, color: Colors.blue, size: 18),
+              Icon(Icons.auto_awesome, color: core_theme.AC.info, size: 18),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -282,13 +283,13 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.amber.shade50,
+            color: core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.amber.shade200),
+            border: Border.all(color: core_theme.AC.warn),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.warning_amber, color: Colors.amber),
+              Icon(Icons.warning_amber, color: core_theme.AC.warn),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -320,13 +321,13 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.cloud_upload, color: Colors.blue),
+              Icon(Icons.cloud_upload, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -350,7 +351,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: (d.uploaded ? Colors.green : Colors.orange).withOpacity(0.3)),
+        border: Border.all(color: (d.uploaded ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -358,11 +359,11 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: (d.uploaded ? Colors.green : Colors.orange).withOpacity(0.12),
+              color: (d.uploaded ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(d.uploaded ? Icons.check : Icons.upload,
-                color: d.uploaded ? Colors.green : Colors.orange),
+                color: d.uploaded ? core_theme.AC.ok : core_theme.AC.warn),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -372,24 +373,24 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
                 Text(d.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                 if (d.uploaded)
                   Text('منتهي: ${d.expiresAt}',
-                      style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'))
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'))
                 else
-                  const Text('لم يتم الرفع بعد', style: TextStyle(fontSize: 11, color: Colors.orange)),
+                  Text('لم يتم الرفع بعد', style: TextStyle(fontSize: 11, color: core_theme.AC.warn)),
               ],
             ),
           ),
           if (d.uploaded)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
-              child: const Text('مرفوع',
-                  style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.w800)),
+              decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+              child: Text('مرفوع',
+                  style: TextStyle(color: core_theme.AC.ok, fontSize: 10, fontWeight: FontWeight.w800)),
             )
           else
             OutlinedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.upload, size: 14),
-              label: const Text('رفع', style: TextStyle(fontSize: 11)),
+              label: Text('رفع', style: TextStyle(fontSize: 11)),
             ),
         ],
       ),
@@ -415,19 +416,19 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [Colors.green.shade600, Colors.green.shade400]),
+            gradient: LinearGradient(colors: [core_theme.AC.ok, core_theme.AC.ok]),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
               const Icon(Icons.verified, color: Colors.white, size: 32),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('نتيجة الفحص العامة',
-                        style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     Text('مؤهّل — موافقة مع متابعة سنوية',
                         style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
                   ],
@@ -447,15 +448,15 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Row(
               children: [
                 Icon(c.passed ? Icons.check_circle : Icons.error,
-                    color: c.passed ? Colors.green : Colors.red, size: 20),
+                    color: c.passed ? core_theme.AC.ok : core_theme.AC.err, size: 20),
                 const SizedBox(width: 10),
                 Expanded(child: Text(c.name, style: const TextStyle(fontSize: 12))),
-                Text(c.result, style: TextStyle(fontSize: 11, color: c.passed ? Colors.green : Colors.red, fontWeight: FontWeight.w700)),
+                Text(c.result, style: TextStyle(fontSize: 11, color: c.passed ? core_theme.AC.ok : core_theme.AC.err, fontWeight: FontWeight.w700)),
               ],
             ),
           ),
@@ -473,12 +474,12 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('ملخّص البيانات المُدخَلة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+              Text('ملخّص البيانات المُدخَلة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 12),
               _summaryRow('الاسم', 'ABC للتوريدات المحدودة'),
               _summaryRow('السجل', '1010234567'),
@@ -510,13 +511,13 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFD4AF37).withOpacity(0.08),
+            color: core_theme.AC.gold.withOpacity(0.08),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.25)),
+            border: Border.all(color: core_theme.AC.gold.withOpacity(0.25)),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.approval, color: Color(0xFFD4AF37)),
+              Icon(Icons.approval, color: core_theme.AC.gold),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -558,7 +559,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 150, child: Text(k, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 150, child: Text(k, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Expanded(child: Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
         ],
       ),
@@ -570,7 +571,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.black12)),
+        border: Border(top: BorderSide(color: core_theme.AC.bdr)),
       ),
       child: Row(
         children: [
@@ -578,17 +579,17 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
             OutlinedButton.icon(
               onPressed: () => setState(() => _currentStep--),
               icon: const Icon(Icons.arrow_back, size: 16),
-              label: const Text('السابق'),
+              label: Text('السابق'),
             ),
           const Spacer(),
           Text('الخطوة ${_currentStep + 1} من ${_steps.length}',
-              style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           const SizedBox(width: 20),
           if (_currentStep < _steps.length - 1)
             ElevatedButton.icon(
               onPressed: () => setState(() => _currentStep++),
               icon: const Icon(Icons.arrow_forward, size: 16),
-              label: const Text('التالي'),
+              label: Text('التالي'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF009688),
                 foregroundColor: Colors.white,
@@ -599,16 +600,16 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
             ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('تمّ إرسال الطلب — سيتم تفعيل المورد بعد الاعتماد'),
-                    backgroundColor: Colors.green,
+                    backgroundColor: core_theme.AC.ok,
                   ),
                 );
               },
               icon: const Icon(Icons.send, size: 16),
-              label: const Text('إرسال للاعتماد'),
+              label: Text('إرسال للاعتماد'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD4AF37),
+                backgroundColor: core_theme.AC.gold,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),

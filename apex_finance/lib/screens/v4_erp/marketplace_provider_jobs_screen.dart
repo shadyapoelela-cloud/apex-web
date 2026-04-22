@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 137 — Marketplace Provider Jobs
 class MarketplaceProviderJobsScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'المهام النشطة'), Tab(text: 'دعوات العروض'), Tab(text: 'الملفات المنجزة'), Tab(text: 'الأرشيف')])),
         Expanded(child: TabBarView(controller: _tc, children: [_activeTab(), _invitesTab(), _completedTab(), _archiveTab()])),
       ])),
@@ -32,13 +33,13 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF004D40), Color(0xFF00695C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.work, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('مهامي كمزوّد خدمة', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('إدارة المشاريع النشطة + تتبع الوقت والإنجاز', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('إدارة المشاريع النشطة + تتبع الوقت والإنجاز', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -48,7 +49,7 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
     return Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
       Expanded(child: _kpi('مهام نشطة', '${_active.length}', Icons.work_outline, const Color(0xFF00695C))),
       Expanded(child: _kpi('دعوات جديدة', '${_invites.length}', Icons.mail, const Color(0xFFE65100))),
-      Expanded(child: _kpi('قيمة النشط', '${(activeRev/1000).toStringAsFixed(0)}K', Icons.payments, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('قيمة النشط', '${(activeRev/1000).toStringAsFixed(0)}K', Icons.payments, core_theme.AC.gold)),
       Expanded(child: _kpi('إيراد الشهر', '145K', Icons.trending_up, const Color(0xFF2E7D32))),
     ]));
   }
@@ -57,7 +58,7 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -71,7 +72,7 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(j.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text('${j.client} • ${j.id}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${j.client} • ${j.id}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Text('${j.value.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
         ]),
@@ -84,20 +85,20 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
         ]),
         const SizedBox(height: 10),
         ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-          value: progress, minHeight: 8, backgroundColor: Colors.black12,
-          valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)))),
+          value: progress, minHeight: 8, backgroundColor: core_theme.AC.bdr,
+          valueColor: AlwaysStoppedAnimation(core_theme.AC.gold))),
         const SizedBox(height: 4),
         Row(children: [
           Text('${j.progress}% مكتمل', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
           const Spacer(),
-          Text(j.nextMilestone, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(j.nextMilestone, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ]),
       ]),
     ));
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
   ]));
 
@@ -111,19 +112,19 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(inv.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            Text('${inv.client} • ميزانية: ${inv.budget}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${inv.client} • ميزانية: ${inv.budget}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
         ]),
         const SizedBox(height: 8),
         Text(inv.description, style: const TextStyle(fontSize: 12)),
         const SizedBox(height: 10),
         Row(children: [
-          OutlinedButton(onPressed: () {}, child: const Text('رفض')),
+          OutlinedButton(onPressed: () {}, child: Text('رفض')),
           const SizedBox(width: 8),
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32), foregroundColor: Colors.white),
-            child: const Text('تقديم عرض'),
+            child: Text('تقديم عرض'),
           ),
         ]),
       ]),
@@ -140,7 +141,7 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text('${c.value.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
         Row(children: [
-          const Icon(Icons.star, color: Color(0xFFD4AF37), size: 12),
+          Icon(Icons.star, color: core_theme.AC.gold, size: 12),
           Text(' ${c.rating}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
         ]),
       ]),
@@ -149,8 +150,8 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
 
   Widget _archiveTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('📂 إجمالي المشاريع المنجزة', '248 مشروع منذ 2021', const Color(0xFF2E7D32)),
-    _insight('💰 إجمالي الإيرادات', '12.4M ر.س إجمالية', const Color(0xFFD4AF37)),
-    _insight('⭐ متوسط التقييم', '4.8/5 (عبر 248 مشروع)', const Color(0xFFD4AF37)),
+    _insight('💰 إجمالي الإيرادات', '12.4M ر.س إجمالية', core_theme.AC.gold),
+    _insight('⭐ متوسط التقييم', '4.8/5 (عبر 248 مشروع)', core_theme.AC.gold),
     _insight('🏆 أكبر مشروع', '580K ر.س (ZATCA Phase 2 كامل)', const Color(0xFF4A148C)),
     _insight('📈 معدل النمو السنوي', '+38% YoY في عدد المشاريع', const Color(0xFF2E7D32)),
     _insight('🎯 Repeat Clients', '72% من العملاء عادوا لمشاريع أخرى', const Color(0xFF1A237E)),
@@ -160,7 +161,7 @@ class _MarketplaceProviderJobsScreenState extends State<MarketplaceProviderJobsS
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   static const List<_Job> _active = [

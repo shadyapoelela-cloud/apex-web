@@ -9,22 +9,23 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../core/theme.dart' as core_theme;
 
 import '../../api/pilot_client.dart';
 import '../../session.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
-const _indigo = Color(0xFF6366F1);
+Color get _gold => core_theme.AC.gold;
+Color get _navy => core_theme.AC.navy;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+Color get _warn => core_theme.AC.warn;
+final _indigo = core_theme.AC.purple;
 
 class MembersScreen extends StatefulWidget {
   const MembersScreen({super.key});
@@ -110,7 +111,7 @@ class _MembersScreenState extends State<MembersScreen>
 
   Future<void> _inviteMember() async {
     if (_roles.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _warn, content: Text('أنشئ دوراً أولاً')));
       return;
     }
@@ -165,7 +166,7 @@ class _MembersScreenState extends State<MembersScreen>
           ),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator(color: _gold))
+                ? Center(child: CircularProgressIndicator(color: _gold))
                 : _error != null
                     ? _errorView()
                     : TabBarView(controller: _tab, children: [
@@ -192,12 +193,12 @@ class _MembersScreenState extends State<MembersScreen>
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: _gold.withValues(alpha: 0.4)),
           ),
-          child: const Icon(Icons.admin_panel_settings, color: _gold, size: 22),
+          child: Icon(Icons.admin_panel_settings, color: _gold, size: 22),
         ),
         const SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text('الأعضاء والصلاحيات',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.w800)),
@@ -209,7 +210,7 @@ class _MembersScreenState extends State<MembersScreen>
         const Spacer(),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+              foregroundColor: _tp, side: BorderSide(color: _bdr)),
           onPressed: _load,
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('تحديث'),
@@ -220,13 +221,13 @@ class _MembersScreenState extends State<MembersScreen>
 
   Widget _errorView() => Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.error_outline, color: _err, size: 48),
+          Icon(Icons.error_outline, color: _err, size: 48),
           const SizedBox(height: 12),
-          Text(_error!, style: const TextStyle(color: _ts)),
+          Text(_error!, style: TextStyle(color: _ts)),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-                foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+                foregroundColor: _tp, side: BorderSide(color: _bdr)),
             onPressed: _load,
             icon: const Icon(Icons.refresh, size: 16),
             label: const Text('إعادة المحاولة'),
@@ -246,11 +247,11 @@ class _MembersScreenState extends State<MembersScreen>
         child: Row(children: [
           Text(
               'إجمالي: ${_members.length} · نشط: ${_members.where((m) => m['status'] == 'active').length}',
-              style: const TextStyle(color: _ts, fontSize: 12)),
+              style: TextStyle(color: _ts, fontSize: 12)),
           const Spacer(),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _inviteMember,
             icon: const Icon(Icons.person_add, size: 16),
             label: const Text('دعوة عضو'),
@@ -264,15 +265,15 @@ class _MembersScreenState extends State<MembersScreen>
                   Icon(Icons.people_outline,
                       color: _gold.withValues(alpha: 0.4), size: 72),
                   const SizedBox(height: 14),
-                  const Text('لا يوجد أعضاء بعد',
+                  Text('لا يوجد أعضاء بعد',
                       style: TextStyle(color: _tp, fontSize: 16)),
                   const SizedBox(height: 6),
-                  const Text('ادعُ أعضاء فريقك للعمل على الشركة',
+                  Text('ادعُ أعضاء فريقك للعمل على الشركة',
                       style: TextStyle(color: _ts, fontSize: 12)),
                   const SizedBox(height: 18),
                   FilledButton.icon(
                     style: FilledButton.styleFrom(
-                        backgroundColor: _gold, foregroundColor: Colors.black),
+                        backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
                     onPressed: _inviteMember,
                     icon: const Icon(Icons.person_add, size: 14),
                     label: const Text('دعوة أول عضو'),
@@ -311,7 +312,7 @@ class _MembersScreenState extends State<MembersScreen>
                 (m['display_name'] ?? '?').toString().isNotEmpty
                     ? (m['display_name'] as String)[0].toUpperCase()
                     : '?',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _gold,
                     fontSize: 18,
                     fontWeight: FontWeight.w800)),
@@ -323,17 +324,17 @@ class _MembersScreenState extends State<MembersScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(m['display_name'] ?? '',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: _tp,
                       fontSize: 14,
                       fontWeight: FontWeight.w700)),
               const SizedBox(height: 2),
               Text(m['email'] ?? '',
-                  style: const TextStyle(color: _ts, fontSize: 11)),
+                  style: TextStyle(color: _ts, fontSize: 11)),
               if ((m['mobile'] ?? '').toString().isNotEmpty) ...[
                 const SizedBox(height: 1),
                 Text(m['mobile'],
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _td,
                         fontSize: 10,
                         fontFamily: 'monospace')),
@@ -354,7 +355,7 @@ class _MembersScreenState extends State<MembersScreen>
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(color: _indigo.withValues(alpha: 0.4))),
                   child: Text(m['primary_role_code'],
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _indigo,
                           fontSize: 10,
                           fontWeight: FontWeight.w700)),
@@ -382,15 +383,15 @@ class _MembersScreenState extends State<MembersScreen>
             ]),
             const SizedBox(height: 4),
             Row(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.business, color: _td, size: 11),
+              Icon(Icons.business, color: _td, size: 11),
               const SizedBox(width: 2),
               Text('${m['entity_grants'] ?? 0}',
-                  style: const TextStyle(color: _ts, fontSize: 10)),
+                  style: TextStyle(color: _ts, fontSize: 10)),
               const SizedBox(width: 8),
-              const Icon(Icons.store, color: _td, size: 11),
+              Icon(Icons.store, color: _td, size: 11),
               const SizedBox(width: 2),
               Text('${m['branch_grants'] ?? 0}',
-                  style: const TextStyle(color: _ts, fontSize: 10)),
+                  style: TextStyle(color: _ts, fontSize: 10)),
             ]),
           ],
         ),
@@ -409,11 +410,11 @@ class _MembersScreenState extends State<MembersScreen>
         color: _navy2.withValues(alpha: 0.5),
         child: Row(children: [
           Text('${_roles.length} دور',
-              style: const TextStyle(color: _ts, fontSize: 12)),
+              style: TextStyle(color: _ts, fontSize: 12)),
           const Spacer(),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _createRole,
             icon: const Icon(Icons.add, size: 16),
             label: const Text('دور جديد'),
@@ -422,7 +423,7 @@ class _MembersScreenState extends State<MembersScreen>
       ),
       Expanded(
         child: _roles.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text('لا توجد أدوار بعد',
                     style: TextStyle(color: _ts, fontSize: 13)))
             : GridView.builder(
@@ -468,7 +469,7 @@ class _MembersScreenState extends State<MembersScreen>
                                         fontWeight: FontWeight.w800),
                                     overflow: TextOverflow.ellipsis),
                                 Text(r['code'] ?? '',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         color: _td,
                                         fontSize: 10,
                                         fontFamily: 'monospace')),
@@ -476,13 +477,13 @@ class _MembersScreenState extends State<MembersScreen>
                             ),
                           ),
                           if (r['is_system'] == true)
-                            const Icon(Icons.shield,
+                            Icon(Icons.shield,
                                 color: _warn, size: 14),
                         ]),
                         const SizedBox(height: 8),
                         if ((r['description_ar'] ?? '').toString().isNotEmpty)
                           Text(r['description_ar'],
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _ts, fontSize: 11),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis),
@@ -503,10 +504,10 @@ class _MembersScreenState extends State<MembersScreen>
                           ),
                           const Spacer(),
                           if (r['is_active'] == true)
-                            const Icon(Icons.check_circle,
+                            Icon(Icons.check_circle,
                                 color: _ok, size: 12)
                           else
-                            const Icon(Icons.cancel, color: _err, size: 12),
+                            Icon(Icons.cancel, color: _err, size: 12),
                         ]),
                       ],
                     ),
@@ -561,11 +562,11 @@ class _MembersScreenState extends State<MembersScreen>
                   decoration: BoxDecoration(
                       color: _gold.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(5)),
-                  child: const Icon(Icons.folder, color: _gold, size: 14),
+                  child: Icon(Icons.folder, color: _gold, size: 14),
                 ),
                 const SizedBox(width: 8),
                 Text(e.key,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _gold,
                         fontSize: 14,
                         fontWeight: FontWeight.w800)),
@@ -577,7 +578,7 @@ class _MembersScreenState extends State<MembersScreen>
                       color: _gold.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(10)),
                   child: Text('${perms.length}',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _gold,
                           fontSize: 10,
                           fontWeight: FontWeight.w800)),
@@ -604,19 +605,19 @@ class _MembersScreenState extends State<MembersScreen>
                       children: [
                         Row(mainAxisSize: MainAxisSize.min, children: [
                           Text(p['code'] ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _gold,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
                                   fontFamily: 'monospace')),
                           if (critical) ...[
                             const SizedBox(width: 4),
-                            const Icon(Icons.warning, color: _err, size: 10),
+                            Icon(Icons.warning, color: _err, size: 10),
                           ],
                         ]),
                         Text(p['description_ar'] ?? '',
                             style:
-                                const TextStyle(color: _ts, fontSize: 10)),
+                                TextStyle(color: _ts, fontSize: 10)),
                       ],
                     ),
                   );
@@ -712,7 +713,7 @@ class _InviteDialogState extends State<_InviteDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم إرسال الدعوة ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل الدعوة');
@@ -725,7 +726,7 @@ class _InviteDialogState extends State<_InviteDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.person_add, color: _gold),
           SizedBox(width: 8),
           Text('دعوة عضو جديد', style: TextStyle(color: _tp)),
@@ -804,7 +805,7 @@ class _InviteDialogState extends State<_InviteDialog> {
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Text(_error!,
-                      style: const TextStyle(color: _err, fontSize: 12)),
+                      style: TextStyle(color: _err, fontSize: 12)),
                 ],
               ],
             ),
@@ -813,10 +814,10 @@ class _InviteDialogState extends State<_InviteDialog> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -834,7 +835,7 @@ class _InviteDialogState extends State<_InviteDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
@@ -848,10 +849,10 @@ class _InviteDialogState extends State<_InviteDialog> {
             fillColor: _navy3,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
@@ -865,7 +866,7 @@ class _InviteDialogState extends State<_InviteDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -878,8 +879,8 @@ class _InviteDialogState extends State<_InviteDialog> {
               value: value,
               isExpanded: true,
               dropdownColor: _navy2,
-              style: const TextStyle(color: _tp, fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down, color: _ts),
+              style: TextStyle(color: _tp, fontSize: 12),
+              icon: Icon(Icons.arrow_drop_down, color: _ts),
               items: items,
               onChanged: onChanged,
             ),
@@ -941,7 +942,7 @@ class _RoleDialogState extends State<_RoleDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم إنشاء الدور ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل الإنشاء');
@@ -960,7 +961,7 @@ class _RoleDialogState extends State<_RoleDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.badge, color: _gold),
           SizedBox(width: 8),
           Text('دور جديد', style: TextStyle(color: _tp)),
@@ -1000,7 +1001,7 @@ class _RoleDialogState extends State<_RoleDialog> {
                 ]),
                 const SizedBox(height: 14),
                 Row(children: [
-                  const Text('الصلاحيات',
+                  Text('الصلاحيات',
                       style: TextStyle(
                           color: _tp,
                           fontSize: 13,
@@ -1014,7 +1015,7 @@ class _RoleDialogState extends State<_RoleDialog> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Text(
                         '${_selectedPerms.length} / ${widget.permissions.length}',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: _gold,
                             fontSize: 10,
                             fontWeight: FontWeight.w800)),
@@ -1040,7 +1041,7 @@ class _RoleDialogState extends State<_RoleDialog> {
                         children: [
                           Row(children: [
                             Text(e.key,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: _gold,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700)),
@@ -1119,7 +1120,7 @@ class _RoleDialogState extends State<_RoleDialog> {
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Text(_error!,
-                      style: const TextStyle(color: _err, fontSize: 12)),
+                      style: TextStyle(color: _err, fontSize: 12)),
                 ],
               ],
             ),
@@ -1128,10 +1129,10 @@ class _RoleDialogState extends State<_RoleDialog> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -1149,7 +1150,7 @@ class _RoleDialogState extends State<_RoleDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
@@ -1163,10 +1164,10 @@ class _RoleDialogState extends State<_RoleDialog> {
             fillColor: _navy3,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
@@ -1180,7 +1181,7 @@ class _RoleDialogState extends State<_RoleDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1193,8 +1194,8 @@ class _RoleDialogState extends State<_RoleDialog> {
               value: value,
               isExpanded: true,
               dropdownColor: _navy2,
-              style: const TextStyle(color: _tp, fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down, color: _ts),
+              style: TextStyle(color: _tp, fontSize: 12),
+              icon: Icon(Icons.arrow_drop_down, color: _ts),
               items: items,
               onChanged: onChanged,
             ),

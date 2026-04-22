@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class RiskRegisterScreen extends StatefulWidget {
   const RiskRegisterScreen({super.key});
@@ -16,22 +17,22 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
   String _viewMode = 'list';
   String _categoryFilter = 'all';
 
-  final _risks = const [
-    _Risk('RSK-001', 'تعرّض لأسعار العملات الأجنبية', 'financial', 4, 4, 'treating', 'تحوّط 65% + مراقبة أسبوعية', 'أحمد العتيبي', Colors.red),
-    _Risk('RSK-002', 'هجوم سيبراني يستهدف بيانات العملاء', 'cyber', 3, 5, 'treating', 'SOC 24/7 + Penetration Testing ربعي + Cyber Insurance', 'راشد العنزي', Colors.red),
-    _Risk('RSK-003', 'تغيّر تنظيمي في أنظمة ZATCA', 'regulatory', 3, 3, 'accepting', 'فريق امتثال متابع للتحديثات + مستشار ضريبي', 'محمد القحطاني', Colors.orange),
-    _Risk('RSK-004', 'تركّز في عميل رئيسي واحد', 'strategic', 3, 4, 'treating', 'خطة تنويع العملاء Q1-Q4 — هدف أقل من 15%', 'سارة الدوسري', Colors.orange),
-    _Risk('RSK-005', 'فقدان موظف مفتاح', 'operational', 3, 3, 'treating', 'خطط التعاقب، شراكات مع 3 بدائل، مكافآت احتفاظ', 'لينا البكري', Colors.orange),
-    _Risk('RSK-006', 'انقطاع خدمة نظام SAP', 'operational', 2, 4, 'treating', 'DR Site في AWS + RTO 4 ساعات + Hot Standby', 'راشد العنزي', Colors.orange),
-    _Risk('RSK-007', 'عدم الالتزام بشروط العقود مع العملاء', 'operational', 2, 3, 'treating', 'SLA Monitoring + Penalty Clauses', 'محمد القحطاني', Colors.amber),
-    _Risk('RSK-008', 'تأخر المدفوعات من العملاء > 90 يوم', 'financial', 3, 3, 'treating', 'Credit Scoring + Automated Follow-up + Collection Agency', 'نورة الغامدي', Colors.amber),
-    _Risk('RSK-009', 'تغيّر في السياسة الضريبية (VAT/CT)', 'regulatory', 2, 3, 'monitoring', 'متابعة بيانات ZATCA + تحديث السياسات', 'راشد العنزي', Colors.amber),
-    _Risk('RSK-010', 'فقدان بيانات حساسة بسبب خطأ بشري', 'operational', 2, 4, 'treating', 'DLP + Training + Access Controls', 'راشد العنزي', Colors.orange),
-    _Risk('RSK-011', 'احتيال مالي داخلي', 'fraud', 1, 5, 'treating', 'SoD + Automated Controls + Whistleblower Hotline', 'محمد القحطاني', Colors.orange),
-    _Risk('RSK-012', 'تقلّب أسعار المواد الخام', 'financial', 3, 2, 'accepting', 'عقود طويلة الأجل + مخزون استراتيجي', 'فهد الشمري', Colors.amber),
-    _Risk('RSK-013', 'انخفاض رضا العملاء وفقدانهم', 'strategic', 2, 3, 'treating', 'NPS شهري + فريق Customer Success مخصّص', 'سارة الدوسري', Colors.amber),
-    _Risk('RSK-014', 'عدم الالتزام بمعايير الأمن السيبراني NCA', 'regulatory', 2, 4, 'treating', 'برنامج امتثال ECC كامل + مراجعة سنوية', 'راشد العنزي', Colors.orange),
-    _Risk('RSK-015', 'كارثة طبيعية (زلزال/فيضان)', 'operational', 1, 4, 'accepting', 'تأمين شامل + DR Site', 'لينا البكري', Colors.green),
+  final _risks = [
+    _Risk('RSK-001', 'تعرّض لأسعار العملات الأجنبية', 'financial', 4, 4, 'treating', 'تحوّط 65% + مراقبة أسبوعية', 'أحمد العتيبي', core_theme.AC.err),
+    _Risk('RSK-002', 'هجوم سيبراني يستهدف بيانات العملاء', 'cyber', 3, 5, 'treating', 'SOC 24/7 + Penetration Testing ربعي + Cyber Insurance', 'راشد العنزي', core_theme.AC.err),
+    _Risk('RSK-003', 'تغيّر تنظيمي في أنظمة ZATCA', 'regulatory', 3, 3, 'accepting', 'فريق امتثال متابع للتحديثات + مستشار ضريبي', 'محمد القحطاني', core_theme.AC.warn),
+    _Risk('RSK-004', 'تركّز في عميل رئيسي واحد', 'strategic', 3, 4, 'treating', 'خطة تنويع العملاء Q1-Q4 — هدف أقل من 15%', 'سارة الدوسري', core_theme.AC.warn),
+    _Risk('RSK-005', 'فقدان موظف مفتاح', 'operational', 3, 3, 'treating', 'خطط التعاقب، شراكات مع 3 بدائل، مكافآت احتفاظ', 'لينا البكري', core_theme.AC.warn),
+    _Risk('RSK-006', 'انقطاع خدمة نظام SAP', 'operational', 2, 4, 'treating', 'DR Site في AWS + RTO 4 ساعات + Hot Standby', 'راشد العنزي', core_theme.AC.warn),
+    _Risk('RSK-007', 'عدم الالتزام بشروط العقود مع العملاء', 'operational', 2, 3, 'treating', 'SLA Monitoring + Penalty Clauses', 'محمد القحطاني', core_theme.AC.warn),
+    _Risk('RSK-008', 'تأخر المدفوعات من العملاء > 90 يوم', 'financial', 3, 3, 'treating', 'Credit Scoring + Automated Follow-up + Collection Agency', 'نورة الغامدي', core_theme.AC.warn),
+    _Risk('RSK-009', 'تغيّر في السياسة الضريبية (VAT/CT)', 'regulatory', 2, 3, 'monitoring', 'متابعة بيانات ZATCA + تحديث السياسات', 'راشد العنزي', core_theme.AC.warn),
+    _Risk('RSK-010', 'فقدان بيانات حساسة بسبب خطأ بشري', 'operational', 2, 4, 'treating', 'DLP + Training + Access Controls', 'راشد العنزي', core_theme.AC.warn),
+    _Risk('RSK-011', 'احتيال مالي داخلي', 'fraud', 1, 5, 'treating', 'SoD + Automated Controls + Whistleblower Hotline', 'محمد القحطاني', core_theme.AC.warn),
+    _Risk('RSK-012', 'تقلّب أسعار المواد الخام', 'financial', 3, 2, 'accepting', 'عقود طويلة الأجل + مخزون استراتيجي', 'فهد الشمري', core_theme.AC.warn),
+    _Risk('RSK-013', 'انخفاض رضا العملاء وفقدانهم', 'strategic', 2, 3, 'treating', 'NPS شهري + فريق Customer Success مخصّص', 'سارة الدوسري', core_theme.AC.warn),
+    _Risk('RSK-014', 'عدم الالتزام بمعايير الأمن السيبراني NCA', 'regulatory', 2, 4, 'treating', 'برنامج امتثال ECC كامل + مراجعة سنوية', 'راشد العنزي', core_theme.AC.warn),
+    _Risk('RSK-015', 'كارثة طبيعية (زلزال/فيضان)', 'operational', 1, 4, 'accepting', 'تأمين شامل + DR Site', 'لينا البكري', core_theme.AC.ok),
   ];
 
   List<_Risk> get _filtered {
@@ -53,11 +54,11 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('مخاطر مسجّلة', '${_risks.length}', Colors.blue, Icons.security),
-            _kpi('حرجة', '$critical', Colors.red, Icons.error),
-            _kpi('عالية', '$high', Colors.orange, Icons.warning),
-            _kpi('متوسطة', '$medium', Colors.amber, Icons.info),
-            _kpi('منخفضة', '$low', Colors.green, Icons.check_circle),
+            _kpi('مخاطر مسجّلة', '${_risks.length}', core_theme.AC.info, Icons.security),
+            _kpi('حرجة', '$critical', core_theme.AC.err, Icons.error),
+            _kpi('عالية', '$high', core_theme.AC.warn, Icons.warning),
+            _kpi('متوسطة', '$medium', core_theme.AC.warn, Icons.info),
+            _kpi('منخفضة', '$low', core_theme.AC.ok, Icons.check_circle),
           ],
         ),
         const SizedBox(height: 16),
@@ -91,7 +92,7 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
         gradient: const LinearGradient(colors: [Color(0xFFB71C1C), Color(0xFFD32F2F)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.shield, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -102,7 +103,7 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
                 Text('سجل المخاطر المؤسسية',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Enterprise Risk Management · COSO ERM · ISO 31000 · خريطة حرارية + خطط معالجة',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -129,7 +130,7 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -148,19 +149,19 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? Colors.red.shade700 : Colors.white,
+          color: selected ? core_theme.AC.err : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: selected ? Colors.red.shade700 : Colors.black26),
+          border: Border.all(color: selected ? core_theme.AC.err : core_theme.AC.td),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: selected ? Colors.white : Colors.black54),
+            Icon(icon, size: 14, color: selected ? Colors.white : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(label,
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: selected ? Colors.white : Colors.black87)),
+                    color: selected ? Colors.white : core_theme.AC.tp)),
           ],
         ),
       ),
@@ -173,17 +174,17 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black26),
+        border: Border.all(color: core_theme.AC.td),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$label: ', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text('$label: ', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           DropdownButton<String>(
             value: value,
             underline: const SizedBox(),
             isDense: true,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black87),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.tp),
             items: opts.map((o) => DropdownMenuItem(value: o.id, child: Text(o.label))).toList(),
             onChanged: (v) => onChanged(v ?? 'all'),
           ),
@@ -202,7 +203,7 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
 
   Widget _riskCard(_Risk r) {
     final score = r.likelihood * r.impact;
-    final scoreColor = score >= 12 ? Colors.red : score >= 8 ? Colors.orange : score >= 4 ? Colors.amber : Colors.green;
+    final scoreColor = score >= 12 ? core_theme.AC.err : score >= 8 ? core_theme.AC.warn : score >= 4 ? core_theme.AC.warn : core_theme.AC.ok;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
@@ -225,7 +226,7 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
                     children: [
                       Text('$score',
                           style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
-                      const Text('خطر', style: TextStyle(color: Colors.white70, fontSize: 9)),
+                      Text('خطر', style: TextStyle(color: core_theme.AC.ts, fontSize: 9)),
                     ],
                   ),
                 ),
@@ -237,7 +238,7 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(r.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                        Text(r.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -258,9 +259,9 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
                     Text(r.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                     Row(
                       children: [
-                        const Icon(Icons.person, size: 11, color: Colors.black54),
+                        Icon(Icons.person, size: 11, color: core_theme.AC.ts),
                         const SizedBox(width: 3),
-                        Text('صاحب المخاطرة: ${r.owner}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text('صاحب المخاطرة: ${r.owner}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ],
@@ -278,12 +279,12 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: core_theme.AC.info, borderRadius: BorderRadius.circular(8)),
             child: Row(
               children: [
-                const Icon(Icons.bolt, size: 14, color: Colors.blue),
+                Icon(Icons.bolt, size: 14, color: core_theme.AC.info),
                 const SizedBox(width: 6),
-                const Text('خطة المعالجة: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.blue)),
+                Text('خطة المعالجة: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
                 Expanded(child: Text(r.treatment, style: const TextStyle(fontSize: 11, height: 1.5))),
               ],
             ),
@@ -294,10 +295,10 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
   }
 
   Widget _scoreBox(String label, int value) {
-    final color = value >= 4 ? Colors.red : value >= 3 ? Colors.orange : value >= 2 ? Colors.amber : Colors.green;
+    final color = value >= 4 ? core_theme.AC.err : value >= 3 ? core_theme.AC.warn : value >= 2 ? core_theme.AC.warn : core_theme.AC.ok;
     return Row(
       children: [
-        SizedBox(width: 40, child: Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54))),
+        SizedBox(width: 40, child: Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts))),
         Container(
           width: 28,
           height: 22,
@@ -317,13 +318,13 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
-          const Text('خريطة المخاطر (5×5 Heatmap)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-          const Text('الأثر → (الأعلى أسوأ) × الاحتمال ↑',
-              style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('خريطة المخاطر (5×5 Heatmap)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+          Text('الأثر → (الأعلى أسوأ) × الاحتمال ↑',
+              style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 16),
           // 5x5 grid
           for (var likelihood = 5; likelihood >= 1; likelihood--)
@@ -361,10 +362,10 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
           Wrap(
             spacing: 20,
             children: [
-              _legend(Colors.red, 'حرج (≥12)'),
-              _legend(Colors.orange, 'عالٍ (8-11)'),
-              _legend(Colors.amber, 'متوسط (4-7)'),
-              _legend(Colors.green, 'منخفض (<4)'),
+              _legend(core_theme.AC.err, 'حرج (≥12)'),
+              _legend(core_theme.AC.warn, 'عالٍ (8-11)'),
+              _legend(core_theme.AC.warn, 'متوسط (4-7)'),
+              _legend(core_theme.AC.ok, 'منخفض (<4)'),
             ],
           ),
         ],
@@ -376,12 +377,12 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
     final score = likelihood * impact;
     final risksInCell = _risks.where((r) => r.likelihood == likelihood && r.impact == impact).toList();
     final cellColor = score >= 12
-        ? Colors.red
+        ? core_theme.AC.err
         : score >= 8
-            ? Colors.orange
+            ? core_theme.AC.warn
             : score >= 4
-                ? Colors.amber
-                : Colors.green;
+                ? core_theme.AC.warn
+                : core_theme.AC.ok;
     return Container(
       height: 60,
       margin: const EdgeInsets.all(2),
@@ -422,19 +423,19 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
   Color _catColor(String c) {
     switch (c) {
       case 'financial':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'operational':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'strategic':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'regulatory':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'cyber':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'fraud':
         return Colors.deepOrange;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -460,15 +461,15 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
   Color _strategyColor(String s) {
     switch (s) {
       case 'treating':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'accepting':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'monitoring':
-        return Colors.amber;
+        return core_theme.AC.warn;
       case 'transferring':
-        return Colors.purple;
+        return core_theme.AC.purple;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

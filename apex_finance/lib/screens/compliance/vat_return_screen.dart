@@ -31,7 +31,7 @@ class _VatReturnScreenState extends State<VatReturnScreen> {
   final _priorCreditC = TextEditingController();
   String _jurisdiction = 'SA';
 
-  static const Map<String, String> _jurisdictions = {
+  static final Map<String, String> _jurisdictions = {
     'SA': 'السعودية — 15%',
     'AE': 'الإمارات — 5%',
     'BH': 'البحرين — 10%',

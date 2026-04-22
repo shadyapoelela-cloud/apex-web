@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 enum IntegrationStatus { available, connected, pending, failed }
 
@@ -195,7 +196,7 @@ class ApexIntegrationCard extends StatelessWidget {
         ),
       IntegrationStatus.pending => Text('بانتظار الموافقة',
           style: TextStyle(
-              color: Colors.amber.shade600,
+              color: core_theme.AC.warn,
               fontSize: AppFontSize.xs,
               fontWeight: FontWeight.w600)),
       IntegrationStatus.failed => FilledButton(
@@ -214,7 +215,7 @@ class ApexIntegrationCard extends StatelessWidget {
     final (color, label, icon) = switch (s) {
       IntegrationStatus.connected => (AC.ok, 'متصل', Icons.check_circle),
       IntegrationStatus.pending =>
-        (Colors.amber.shade700, 'معلّق', Icons.hourglass_bottom),
+        (core_theme.AC.warn, 'معلّق', Icons.hourglass_bottom),
       IntegrationStatus.failed => (AC.err, 'فشل', Icons.error),
       IntegrationStatus.available =>
         (AC.ts, 'متاح', Icons.download),

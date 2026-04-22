@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 import 'v4_groups_data.dart';
 
@@ -352,7 +353,7 @@ const _erpModuleGroup = V4ModuleGroup(
   labelAr: 'نظام ERP',
   labelEn: 'ERP System',
   icon: Icons.apps,
-  color: Color(0xFFD97706), // amber-600
+  color: const Color(0xFFD97706), // amber-600 (data-only const)
   descriptionAr: 'العمود الفقري التشغيلي — محاسبة، مبيعات، مشتريات، مخزون.',
   subModules: [
     _erpDashboard,
@@ -378,7 +379,7 @@ const _auditGroup = V4ModuleGroup(
   labelAr: 'التدقيق والمراجعة',
   labelEn: 'Audit & Review',
   icon: Icons.fact_check_outlined,
-  color: Color(0xFF2563EB), // blue-600
+  color: const Color(0xFF2563EB), // blue-600 (data-only const)
   descriptionAr: 'دورة ارتباط تدقيق كاملة بمعايير CaseWare: تخطيط، مخاطر، أوراق عمل.',
   subModules: auditSubModules,
 );
@@ -418,7 +419,7 @@ const _complianceGroup = V4ModuleGroup(
   labelAr: 'الامتثال والأهلية',
   labelEn: 'Eligibility & Compliance',
   icon: Icons.policy_outlined,
-  color: Color(0xFF059669), // emerald-600
+  color: const Color(0xFF059669), // emerald-600 (data-only const)
   descriptionAr: 'مركز الحوكمة — ZATCA، GOSI، WPS، AML، إفصاحات مجلس.',
   subModules: complianceSubModules,
 );

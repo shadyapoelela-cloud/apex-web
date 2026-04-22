@@ -2,13 +2,14 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/object_page_template.dart';
 
 class PeriodCloseV52Screen extends StatelessWidget {
   const PeriodCloseV52Screen({super.key});
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
       titleAr: 'إقفال الفترة — أبريل 2026',
       subtitleAr: 'عمليات الإقفال الشهري · 18 من 26 مهمة مكتملة · متبقي 3 أيام',
       statusLabelAr: 'قيد الإقفال',
-      statusColor: Colors.orange,
+      statusColor: core_theme.AC.warn,
       processStages: const [
         ProcessStage(labelAr: 'Pre-Close'),
         ProcessStage(labelAr: 'Accruals'),
@@ -25,21 +26,21 @@ class PeriodCloseV52Screen extends StatelessWidget {
         ProcessStage(labelAr: 'Reports'),
       ],
       processCurrentIndex: 2,
-      smartButtons: const [
+      smartButtons: [
         SmartButton(icon: Icons.checklist, labelAr: 'مهمة', count: 26, color: _gold),
-        SmartButton(icon: Icons.check_circle, labelAr: 'مكتملة', count: 18, color: Colors.green),
-        SmartButton(icon: Icons.pending, labelAr: 'قيد التنفيذ', count: 5, color: Colors.orange),
-        SmartButton(icon: Icons.error, labelAr: 'متأخرة', count: 3, color: Colors.red),
+        SmartButton(icon: Icons.check_circle, labelAr: 'مكتملة', count: 18, color: core_theme.AC.ok),
+        SmartButton(icon: Icons.pending, labelAr: 'قيد التنفيذ', count: 5, color: core_theme.AC.warn),
+        SmartButton(icon: Icons.error, labelAr: 'متأخرة', count: 3, color: core_theme.AC.err),
         SmartButton(icon: Icons.edit_note, labelAr: 'قيد تسوية', count: 12, color: _navy),
       ],
       primaryActions: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.share, size: 16), label: const Text('مشاركة التقدّم')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.share, size: 16), label: Text('مشاركة التقدّم')),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: () {},
           style: FilledButton.styleFrom(backgroundColor: _gold),
           icon: const Icon(Icons.lock, size: 16),
-          label: const Text('إقفال الفترة'),
+          label: Text('إقفال الفترة'),
         ),
       ],
       tabs: [
@@ -71,28 +72,28 @@ class PeriodCloseV52Screen extends StatelessWidget {
         ])),
         const SizedBox(height: 16),
         _card('إحصائيات الإقفال', Row(children: [
-          Expanded(child: _stat('مكتمل', '18', Colors.green, Icons.check_circle)),
+          Expanded(child: _stat('مكتمل', '18', core_theme.AC.ok, Icons.check_circle)),
           const SizedBox(width: 10),
-          Expanded(child: _stat('قيد التنفيذ', '5', Colors.orange, Icons.pending)),
+          Expanded(child: _stat('قيد التنفيذ', '5', core_theme.AC.warn, Icons.pending)),
           const SizedBox(width: 10),
-          Expanded(child: _stat('متأخّر', '3', Colors.red, Icons.warning)),
+          Expanded(child: _stat('متأخّر', '3', core_theme.AC.err, Icons.warning)),
           const SizedBox(width: 10),
-          Expanded(child: _stat('لم يبدأ', '0', Colors.grey, Icons.schedule)),
+          Expanded(child: _stat('لم يبدأ', '0', core_theme.AC.td, Icons.schedule)),
         ])),
         const SizedBox(height: 16),
         _card('تقدّم الإقفال العام', Column(children: [
-          Row(children: [const Text('النسبة العامة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)), const Spacer(), const Text('69%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _gold))]),
+          Row(children: [Text('النسبة العامة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)), const Spacer(), Text('69%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _gold))]),
           const SizedBox(height: 8),
-          ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: 0.69, minHeight: 16, backgroundColor: Colors.grey.shade200, color: _gold)),
+          ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: 0.69, minHeight: 16, backgroundColor: core_theme.AC.bdr, color: _gold)),
           const SizedBox(height: 12),
-          const Row(children: [
-            Icon(Icons.schedule, size: 14, color: Colors.black54),
+          Row(children: [
+            Icon(Icons.schedule, size: 14, color: core_theme.AC.ts),
             SizedBox(width: 6),
-            Text('الوقت المتبقي: 3 أيام 8 ساعات', style: TextStyle(fontSize: 12, color: Colors.black54)),
+            Text('الوقت المتبقي: 3 أيام 8 ساعات', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
             Spacer(),
-            Icon(Icons.verified, size: 14, color: Colors.green),
+            Icon(Icons.verified, size: 14, color: core_theme.AC.ok),
             SizedBox(width: 6),
-            Text('على المسار الصحيح', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.green)),
+            Text('على المسار الصحيح', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.ok)),
           ]),
         ])),
       ]),
@@ -102,15 +103,15 @@ class PeriodCloseV52Screen extends StatelessWidget {
   Widget _timelineRow(String title, bool done, String date, String note) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade200))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.bdr))),
       child: Row(children: [
-        Icon(done ? Icons.check_circle : Icons.radio_button_unchecked, color: done ? Colors.green : Colors.grey, size: 22),
+        Icon(done ? Icons.check_circle : Icons.radio_button_unchecked, color: done ? core_theme.AC.ok : core_theme.AC.td, size: 22),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: done ? Colors.black87 : Colors.black54)),
-          Text('$date · $note', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: done ? core_theme.AC.tp : core_theme.AC.ts)),
+          Text('$date · $note', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ])),
-        if (done) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: const Text('✓ مكتمل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.green))),
+        if (done) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text('✓ مكتمل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
       ]),
     );
   }
@@ -136,14 +137,14 @@ class PeriodCloseV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 4),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(children: [
           Checkbox(value: tasks[i].$4, onChanged: (_) {}, activeColor: _gold, visualDensity: VisualDensity.compact),
-          SizedBox(width: 40, child: Text(tasks[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54))),
-          Expanded(flex: 3, child: Text(tasks[i].$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, decoration: tasks[i].$4 ? TextDecoration.lineThrough : null, color: tasks[i].$4 ? Colors.black54 : Colors.black87))),
-          Text(tasks[i].$3, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          SizedBox(width: 40, child: Text(tasks[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts))),
+          Expanded(flex: 3, child: Text(tasks[i].$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, decoration: tasks[i].$4 ? TextDecoration.lineThrough : null, color: tasks[i].$4 ? core_theme.AC.ts : core_theme.AC.tp))),
+          Text(tasks[i].$3, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(width: 10),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(8)), child: Text(tasks[i].$5, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(8)), child: Text(tasks[i].$5, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
         ]),
       ),
     );
@@ -164,17 +165,17 @@ class PeriodCloseV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: jes[i].$4 ? Colors.green.withOpacity(0.3) : Colors.orange.withOpacity(0.3))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: jes[i].$4 ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.warn.withOpacity(0.3))),
         child: Row(children: [
-          Icon(jes[i].$4 ? Icons.check_circle : Icons.pending, color: jes[i].$4 ? Colors.green : Colors.orange),
+          Icon(jes[i].$4 ? Icons.check_circle : Icons.pending, color: jes[i].$4 ? core_theme.AC.ok : core_theme.AC.warn),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(jes[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+            Text(jes[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
             Text(jes[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
           ])),
-          Text('${jes[i].$3.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _gold)),
+          Text('${jes[i].$3.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _gold)),
           const SizedBox(width: 12),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (jes[i].$4 ? Colors.green : Colors.orange).withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(jes[i].$4 ? 'مرحّل' : 'قيد الاعتماد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: jes[i].$4 ? Colors.green : Colors.orange))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (jes[i].$4 ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(jes[i].$4 ? 'مرحّل' : 'قيد الاعتماد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: jes[i].$4 ? core_theme.AC.ok : core_theme.AC.warn))),
         ]),
       ),
     );
@@ -194,7 +195,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
         child: Column(children: [
           Container(padding: const EdgeInsets.all(10), color: _navy, child: const Row(children: [
             Expanded(flex: 2, child: Text('الحساب', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
@@ -205,13 +206,13 @@ class PeriodCloseV52Screen extends StatelessWidget {
           ])),
           ...recs.map((r) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey.shade200))),
+                decoration: BoxDecoration(border: Border(top: BorderSide(color: core_theme.AC.bdr))),
                 child: Row(children: [
                   Expanded(flex: 2, child: Text(r.$1, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
                   Expanded(child: Text(r.$2.toStringAsFixed(0), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
                   Expanded(child: Text(r.$3.toStringAsFixed(0), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
-                  Expanded(child: Text(r.$4 == 0 ? '0' : r.$4.toString(), style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: r.$4 == 0 ? Colors.green : Colors.red), textAlign: TextAlign.end)),
-                  SizedBox(width: 100, child: Align(alignment: Alignment.centerLeft, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: (r.$5 ? Colors.green : Colors.orange).withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(r.$5 ? '✓ مطابق' : 'تسوية', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: r.$5 ? Colors.green : Colors.orange))))),
+                  Expanded(child: Text(r.$4 == 0 ? '0' : r.$4.toString(), style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: r.$4 == 0 ? core_theme.AC.ok : core_theme.AC.err), textAlign: TextAlign.end)),
+                  SizedBox(width: 100, child: Align(alignment: Alignment.centerLeft, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: (r.$5 ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(r.$5 ? '✓ مطابق' : 'تسوية', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: r.$5 ? core_theme.AC.ok : core_theme.AC.warn))))),
                 ]),
               )),
         ]),
@@ -234,16 +235,16 @@ class PeriodCloseV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(children: [
           Icon(reports[i].$4, color: _navy),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(reports[i].$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-            Text(reports[i].$2, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(reports[i].$2, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
-          if (reports[i].$3) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: const Text('جاهز', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green)))
-          else OutlinedButton(onPressed: () {}, child: const Text('توليد', style: TextStyle(fontSize: 11))),
+          if (reports[i].$3) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text('جاهز', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok)))
+          else OutlinedButton(onPressed: () {}, child: Text('توليد', style: TextStyle(fontSize: 11))),
           const SizedBox(width: 8),
           IconButton(icon: const Icon(Icons.download, size: 18), onPressed: () {}),
         ]),
@@ -251,7 +252,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
     );
   }
 
-  Widget _card(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]));
+  Widget _card(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]));
 
   Widget _stat(String label, String value, Color color, IconData icon) => Container(
         padding: const EdgeInsets.all(12),

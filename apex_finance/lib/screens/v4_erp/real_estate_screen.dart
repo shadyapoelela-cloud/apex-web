@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 112 — Real Estate Property Management
 /// Properties, tenants, leases, maintenance
@@ -22,8 +23,8 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'العقارات'), Tab(text: 'المستأجرون'), Tab(text: 'عقود الإيجار'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_propertiesTab(), _tenantsTab(), _leasesTab(), _analyticsTab()])),
       ])),
@@ -33,13 +34,13 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.apartment, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('إدارة الأملاك العقارية', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('العقارات، المستأجرون، عقود الإيجار، الصيانة', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('العقارات، المستأجرون، عقود الإيجار، الصيانة', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -51,7 +52,7 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
     return Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
       Expanded(child: _kpi('العقارات', '${_properties.length}', Icons.apartment, const Color(0xFF1A237E))),
       Expanded(child: _kpi('معدل الإشغال', '${((occupied/totalUnits)*100).toStringAsFixed(0)}%', Icons.people, const Color(0xFF2E7D32))),
-      Expanded(child: _kpi('الإيراد الشهري', _fmtM(monthlyRev), Icons.payments, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('الإيراد الشهري', _fmtM(monthlyRev), Icons.payments, core_theme.AC.gold)),
       Expanded(child: _kpi('عقود نشطة', '${_leases.where((l)=>l.status.contains('نشط')).length}', Icons.description, const Color(0xFF4A148C))),
     ]));
   }
@@ -60,7 +61,7 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -74,9 +75,9 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            Text('${p.type} • ${p.location}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text('${p.type} • ${p.location}', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           ])),
-          Text(_fmtM(p.value), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD4AF37))),
+          Text(_fmtM(p.value), style: TextStyle(fontWeight: FontWeight.bold, color: core_theme.AC.gold)),
         ]),
         const SizedBox(height: 10),
         Row(children: [
@@ -86,13 +87,13 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
           _mini('إشغال', '${(occupancy * 100).toStringAsFixed(0)}%'),
         ]),
         const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: occupancy, minHeight: 6, backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFF2E7D32)))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: occupancy, minHeight: 6, backgroundColor: core_theme.AC.bdr, valueColor: const AlwaysStoppedAnimation(Color(0xFF2E7D32)))),
       ]),
     ));
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
   ]));
 
@@ -104,7 +105,7 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
       title: Text(t.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${t.unit} • ${t.property}', style: const TextStyle(fontSize: 12)),
-        Text('عقد ينتهي: ${t.leaseEnd}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('عقد ينتهي: ${t.leaseEnd}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -125,7 +126,7 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(l.id, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           Text('${l.tenant} → ${l.unit}', style: const TextStyle(fontSize: 11)),
-          Text('${l.startDate} → ${l.endDate}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text('${l.startDate} → ${l.endDate}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ])),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text('${l.monthlyRent.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32), fontSize: 12)),
@@ -140,7 +141,7 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('🏢 محفظة عقارية', '7 عقارات متنوعة (سكني، تجاري، إداري)', const Color(0xFF1A237E)),
     _insight('📈 معدل الإشغال', '84% — أعلى من متوسط السوق (78%)', const Color(0xFF2E7D32)),
-    _insight('💰 عائد الاستثمار', 'ROI 8.2% سنوي على المحفظة', const Color(0xFFD4AF37)),
+    _insight('💰 عائد الاستثمار', 'ROI 8.2% سنوي على المحفظة', core_theme.AC.gold),
     _insight('🔧 طلبات الصيانة', '12 طلب نشط — متوسط حل 3.2 يوم', const Color(0xFFE65100)),
     _insight('📅 تجديدات قادمة', '8 عقود تنتهي خلال 90 يوم', const Color(0xFF4A148C)),
     _insight('⚠️ متأخرات', '2.4% من الإيجارات متأخرة — أقل من الصناعة (5%)', const Color(0xFFC62828)),
@@ -149,7 +150,7 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   IconData _typeIcon(String t) {
@@ -164,12 +165,12 @@ class _RealEstateScreenState extends State<RealEstateScreen> with SingleTickerPr
     if (s.contains('منتظم')) return const Color(0xFF2E7D32);
     if (s.contains('متأخر')) return const Color(0xFFC62828);
     if (s.contains('جزئي')) return const Color(0xFFE65100);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   Color _leaseColor(String s) {
     if (s.contains('نشط')) return const Color(0xFF2E7D32);
-    if (s.contains('منتهي')) return Colors.black54;
+    if (s.contains('منتهي')) return core_theme.AC.ts;
     if (s.contains('ينتهي')) return const Color(0xFFE65100);
     return const Color(0xFF1A237E);
   }

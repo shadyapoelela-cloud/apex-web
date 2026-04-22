@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class LeaveManagementScreen extends StatefulWidget {
   const LeaveManagementScreen({super.key});
@@ -53,9 +54,9 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
         _buildStatsRow(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.pending, size: 16), text: 'طلبات معلّقة'),
             Tab(icon: Icon(Icons.bar_chart, size: 16), text: 'أرصدة الإجازات'),
@@ -88,21 +89,21 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
         children: [
           const Icon(Icons.event_available, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('إدارة الإجازات',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('طلبات، اعتمادات، أرصدة — موافقة نظام العمل السعودي',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 16),
-            label: const Text('طلب إجازة'),
+            label: Text('طلب إجازة'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF00695C),
@@ -122,10 +123,10 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _stat('قيد الاعتماد', '$pending', Colors.orange, Icons.schedule),
-          _stat('معتمدة', '$approved', Colors.green, Icons.check_circle),
-          _stat('مرفوضة', '$rejected', Colors.red, Icons.cancel),
-          _stat('إجمالي الأيام', '$total يوم', Colors.blue, Icons.today),
+          _stat('قيد الاعتماد', '$pending', core_theme.AC.warn, Icons.schedule),
+          _stat('معتمدة', '$approved', core_theme.AC.ok, Icons.check_circle),
+          _stat('مرفوضة', '$rejected', core_theme.AC.err, Icons.cancel),
+          _stat('إجمالي الأيام', '$total يوم', core_theme.AC.info, Icons.today),
         ],
       ),
     );
@@ -149,7 +150,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -173,7 +174,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,10 +204,10 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
                     ),
                     const SizedBox(height: 4),
                     Text('${l.fromDate} → ${l.toDate} (${l.days} ${l.days == 1 ? 'يوم' : 'أيام'})',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     const SizedBox(height: 4),
                     Text(l.reason, style: const TextStyle(fontSize: 12)),
-                    Text(l.id, style: const TextStyle(fontSize: 10, color: Colors.black45, fontFamily: 'monospace')),
+                    Text(l.id, style: TextStyle(fontSize: 10, color: core_theme.AC.td, fontFamily: 'monospace')),
                   ],
                 ),
               ),
@@ -231,16 +232,16 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
                             setState(() => l.status = 'معتمدة');
                           },
                           icon: const Icon(Icons.check, size: 14),
-                          label: const Text('اعتماد', style: TextStyle(fontSize: 11)),
-                          style: TextButton.styleFrom(foregroundColor: Colors.green),
+                          label: Text('اعتماد', style: TextStyle(fontSize: 11)),
+                          style: TextButton.styleFrom(foregroundColor: core_theme.AC.ok),
                         ),
                         TextButton.icon(
                           onPressed: () {
                             setState(() => l.status = 'مرفوضة');
                           },
                           icon: const Icon(Icons.close, size: 14),
-                          label: const Text('رفض', style: TextStyle(fontSize: 11)),
-                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          label: Text('رفض', style: TextStyle(fontSize: 11)),
+                          style: TextButton.styleFrom(foregroundColor: core_theme.AC.err),
                         ),
                       ],
                     ),
@@ -260,7 +261,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
       children: [
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
@@ -268,16 +269,16 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     Expanded(flex: 2, child: Text('الموظف', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('السنوية المستحقة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('المستخدمة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('المتبقية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(child: Text('المتبقية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                     Expanded(child: Text('مرضية مستحقة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('مستخدمة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('المتبقية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.blue))),
+                    Expanded(child: Text('المتبقية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.info))),
                   ],
                 ),
               ),
@@ -285,7 +286,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
@@ -295,21 +296,21 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(b.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                            Text(b.id, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(b.id, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                           ],
                         ),
                       ),
                       Expanded(child: Text('${b.annualEntitled} يوم', style: const TextStyle(fontSize: 12))),
-                      Expanded(child: Text('${b.annualUsed} يوم', style: const TextStyle(fontSize: 12, color: Colors.orange))),
+                      Expanded(child: Text('${b.annualUsed} يوم', style: TextStyle(fontSize: 12, color: core_theme.AC.warn))),
                       Expanded(
                         child: Text('${b.annualRemaining} يوم',
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                       ),
                       Expanded(child: Text('${b.sickEntitled} يوم', style: const TextStyle(fontSize: 12))),
-                      Expanded(child: Text('${b.sickUsed} يوم', style: const TextStyle(fontSize: 12, color: Colors.orange))),
+                      Expanded(child: Text('${b.sickUsed} يوم', style: TextStyle(fontSize: 12, color: core_theme.AC.warn))),
                       Expanded(
                         child: Text('${b.sickRemaining} يوم',
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.blue)),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
                       ),
                     ],
                   ),
@@ -321,13 +322,13 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.blue, size: 18),
+              Icon(Icons.info_outline, color: core_theme.AC.info, size: 18),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -347,14 +348,14 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('أبريل 2026', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+        Text('أبريل 2026', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
@@ -377,14 +378,14 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
           ),
         ),
         const SizedBox(height: 16),
-        const Text('المفتاح', style: TextStyle(fontWeight: FontWeight.w800)),
+        Text('المفتاح', style: TextStyle(fontWeight: FontWeight.w800)),
         const SizedBox(height: 8),
         Wrap(spacing: 12, children: [
-          _legend('سنوية', const Color(0xFFD4AF37)),
-          _legend('مرضية', Colors.blue),
-          _legend('اضطرارية', Colors.purple),
-          _legend('أمومة', Colors.pink),
-          _legend('عطلة رسمية', Colors.green),
+          _legend('سنوية', core_theme.AC.gold),
+          _legend('مرضية', core_theme.AC.info),
+          _legend('اضطرارية', core_theme.AC.purple),
+          _legend('أمومة', core_theme.AC.err),
+          _legend('عطلة رسمية', core_theme.AC.ok),
         ]),
       ],
     );
@@ -397,11 +398,11 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
     // simulate some leaves on specific days
     Color? bg;
     if (day == 16) {
-      bg = Colors.purple.shade100;
+      bg = core_theme.AC.purple;
     } else if (day >= 18 && day <= 20) {
-      bg = Colors.blue.shade100;
+      bg = core_theme.AC.info;
     } else if (dayOfWeek == 5 || dayOfWeek == 6) {
-      bg = Colors.green.shade50;
+      bg = core_theme.AC.ok;
     }
     return Container(
       height: 50,
@@ -410,7 +411,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Text('$day', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
     );
@@ -430,30 +431,30 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
   Color _statusColor(String s) {
     switch (s) {
       case 'معتمدة':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'قيد الاعتماد':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'مرفوضة':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
   Color _typeColor(String t) {
     switch (t) {
       case 'سنوية':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'مرضية':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'اضطرارية':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'أمومة':
-        return Colors.pink;
+        return core_theme.AC.err;
       case 'بدون راتب':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.teal;
+        return core_theme.AC.info;
     }
   }
 

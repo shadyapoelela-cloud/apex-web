@@ -85,7 +85,7 @@ class _WhtScreenState extends State<WhtScreen>
 // Helpers shared
 // ═══════════════════════════════════════════════════════════════
 
-const Map<String, String> _categoryAr = {
+final Map<String, String> _categoryAr = {
   'management_fees': 'أتعاب إدارية',
   'royalties': 'إتاوات',
   'international_telecom': 'اتصالات دولية',

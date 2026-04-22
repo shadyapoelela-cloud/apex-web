@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 135 — Marketplace Client Requests (RFP)
 class MarketplaceClientRequestsScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'طلباتي'), Tab(text: 'عروض مُقدّمة'), Tab(text: 'طلب جديد'), Tab(text: 'السجل')])),
         Expanded(child: TabBarView(controller: _tc, children: [_requestsTab(), _proposalsTab(), _newRequestTab(), _historyTab()])),
       ])),
@@ -32,13 +33,13 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFFE65100), Color(0xFFBF360C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.request_page, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('طلبات الخدمات (RFP)', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('قدّم طلب خدمة، قارن العروض، اختر المزوّد المناسب', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('قدّم طلب خدمة، قارن العروض، اختر المزوّد المناسب', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -47,14 +48,14 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
     Expanded(child: _kpi('طلبات نشطة', '${_requests.where((r)=>r.status.contains('نشط')).length}', Icons.work_outline, const Color(0xFFBF360C))),
     Expanded(child: _kpi('عروض واردة', '${_proposals.length}', Icons.inbox, const Color(0xFF1A237E))),
     Expanded(child: _kpi('مكتمل', '${_requests.where((r)=>r.status.contains('مكتمل')).length}', Icons.check_circle, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('إجمالي الإنفاق', '148K ر.س', Icons.payments, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('إجمالي الإنفاق', '148K ر.س', Icons.payments, core_theme.AC.gold)),
   ]));
 
   Widget _kpi(String l, String v, IconData i, Color c) => Container(margin: const EdgeInsets.symmetric(horizontal: 4),
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -68,7 +69,7 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(r.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text('${r.category} • ${r.id}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${r.category} • ${r.id}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
             decoration: BoxDecoration(color: _statusColor(r.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
@@ -81,13 +82,13 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
           _mini('عروض', '${r.proposalsCount}'),
         ]),
         const SizedBox(height: 8),
-        Text(r.description, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+        Text(r.description, style: TextStyle(fontSize: 12, color: core_theme.AC.tp)),
       ]),
     ));
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
   ]));
 
@@ -101,11 +102,11 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(p.provider, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            Text(p.requestTitle, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(p.requestTitle, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Row(children: [const Icon(Icons.star, color: Color(0xFFD4AF37), size: 14), Text(' ${p.rating}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))]),
-            Text('${p.reviews} تقييم', style: const TextStyle(fontSize: 9, color: Colors.black54)),
+            Row(children: [Icon(Icons.star, color: core_theme.AC.gold, size: 14), Text(' ${p.rating}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))]),
+            Text('${p.reviews} تقييم', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
           ]),
         ]),
         const SizedBox(height: 10),
@@ -118,12 +119,12 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
         Text(p.proposal, style: const TextStyle(fontSize: 12)),
         const SizedBox(height: 8),
         Row(children: [
-          OutlinedButton(onPressed: () {}, child: const Text('تفاصيل أكثر')),
+          OutlinedButton(onPressed: () {}, child: Text('تفاصيل أكثر')),
           const SizedBox(width: 8),
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32), foregroundColor: Colors.white),
-            child: const Text('قبول العرض'),
+            child: Text('قبول العرض'),
           ),
         ]),
       ]),
@@ -132,7 +133,7 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
 
   Widget _newRequestTab() => ListView(padding: const EdgeInsets.all(14), children: [
     Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('إنشاء طلب خدمة جديد', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFFBF360C))),
+      Text('إنشاء طلب خدمة جديد', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFFBF360C))),
       const SizedBox(height: 14),
       _field('عنوان الطلب', 'مثال: مراجعة ضريبية للسنة المالية 2025'),
       _field('الفئة', 'اختر: محاسبة / ضرائب / مراجعة / استشارات'),
@@ -144,7 +145,7 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
       ElevatedButton.icon(
         onPressed: () {},
         icon: const Icon(Icons.send),
-        label: const Text('نشر الطلب'),
+        label: Text('نشر الطلب'),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFBF360C),
           foregroundColor: Colors.white,
@@ -159,8 +160,8 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
       Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
       const SizedBox(height: 4),
       Container(padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: const Color(0xFFF5F5F7), borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.black12)),
-        child: Text(hint, style: const TextStyle(color: Colors.black45, fontSize: 11))),
+        decoration: BoxDecoration(color: const Color(0xFFF5F5F7), borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
+        child: Text(hint, style: TextStyle(color: core_theme.AC.td, fontSize: 11))),
     ]));
 
   Widget _historyTab() => ListView.builder(padding: const EdgeInsets.all(12), itemCount: _history.length, itemBuilder: (_, i) {
@@ -169,16 +170,16 @@ class _MarketplaceClientRequestsScreenState extends State<MarketplaceClientReque
       leading: Icon(Icons.history, color: _statusColor(h.$3)),
       title: Text(h.$1, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
       subtitle: Text('${h.$2} • ${h.$3}', style: const TextStyle(fontSize: 10)),
-      trailing: Text(h.$4, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+      trailing: Text(h.$4, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
     ));
   });
 
   Color _statusColor(String s) {
     if (s.contains('مكتمل')) return const Color(0xFF2E7D32);
-    if (s.contains('نشط')) return const Color(0xFFD4AF37);
+    if (s.contains('نشط')) return core_theme.AC.gold;
     if (s.contains('مراجعة')) return const Color(0xFFE65100);
     if (s.contains('ملغى')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Request> _requests = [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 117 — Recurring Subscription Billing (Stripe-like)
 class SubscriptionBillingScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الاشتراكات'), Tab(text: 'الخطط'), Tab(text: 'دفعات فاشلة'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_subsTab(), _plansTab(), _dunningTab(), _analyticsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.autorenew, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('فوترة الاشتراكات المتكررة', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('MRR، ARR، Churn، Dunning — Stripe-class billing', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('MRR، ARR، Churn، Dunning — Stripe-class billing', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -47,7 +48,7 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
     final mrr = _subs.where((s)=>s.status.contains('نشط')).fold<double>(0, (s, sub) => s + sub.monthlyAmount);
     return Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
       Expanded(child: _kpi('MRR', '${(mrr/1000).toStringAsFixed(0)}K', Icons.calendar_month, const Color(0xFF2E7D32))),
-      Expanded(child: _kpi('ARR', '${(mrr*12/1000000).toStringAsFixed(1)}M', Icons.trending_up, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('ARR', '${(mrr*12/1000000).toStringAsFixed(1)}M', Icons.trending_up, core_theme.AC.gold)),
       Expanded(child: _kpi('اشتراكات', '${_subs.length}', Icons.people, const Color(0xFF4A148C))),
       Expanded(child: _kpi('Churn', '2.8%', Icons.trending_down, const Color(0xFFC62828))),
     ]));
@@ -57,7 +58,7 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -68,7 +69,7 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
       title: Text(s.customer, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${s.plan} • منذ ${s.startedDate}', style: const TextStyle(fontSize: 11)),
-        Text('تجديد: ${s.nextBilling}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('تجديد: ${s.nextBilling}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text('${s.monthlyAmount.toStringAsFixed(0)} ر.س/شهر', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32), fontSize: 11)),
@@ -89,11 +90,11 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            Text('${p.subscribers} مشترك', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${p.subscribers} مشترك', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('${p.price.toStringAsFixed(0)}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: _planColor(p.tier))),
-            Text('ر.س/${p.cycle}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('ر.س/${p.cycle}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ]),
         ]),
         const SizedBox(height: 10),
@@ -116,11 +117,11 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(f.customer, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           Text('السبب: ${f.reason}', style: const TextStyle(fontSize: 11)),
-          Text('محاولة ${f.attempts}/4 • ${f.lastAttempt}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text('محاولة ${f.attempts}/4 • ${f.lastAttempt}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ])),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text('${f.amount.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC62828))),
-          Text(f.nextRetry, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(f.nextRetry, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ]),
       ]),
     ));
@@ -128,7 +129,7 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
 
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('💎 MRR', '428K ر.س شهرياً — نمو 12% MoM', const Color(0xFF2E7D32)),
-    _insight('📈 ARR', '5.14M ر.س سنوياً متوقع', const Color(0xFFD4AF37)),
+    _insight('📈 ARR', '5.14M ر.س سنوياً متوقع', core_theme.AC.gold),
     _insight('📉 Churn Rate', '2.8% شهرياً — أقل من معدل SaaS (5%)', const Color(0xFF1A237E)),
     _insight('🎯 LTV', 'متوسط 42,000 ر.س لكل عميل', const Color(0xFF4A148C)),
     _insight('💳 Dunning Success', '76% استرداد دفعات فاشلة', const Color(0xFF2E7D32)),
@@ -138,22 +139,22 @@ class _SubscriptionBillingScreenState extends State<SubscriptionBillingScreen> w
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _statusColor(String s) {
     if (s.contains('نشط')) return const Color(0xFF2E7D32);
     if (s.contains('ملغى')) return const Color(0xFFC62828);
     if (s.contains('معلق')) return const Color(0xFFE65100);
-    if (s.contains('تجربة')) return const Color(0xFFD4AF37);
-    return Colors.black54;
+    if (s.contains('تجربة')) return core_theme.AC.gold;
+    return core_theme.AC.ts;
   }
 
   Color _planColor(String t) {
     if (t.contains('Enterprise')) return const Color(0xFF4A148C);
-    if (t.contains('Pro')) return const Color(0xFFD4AF37);
+    if (t.contains('Pro')) return core_theme.AC.gold;
     if (t.contains('Starter')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   IconData _planIcon(String t) {

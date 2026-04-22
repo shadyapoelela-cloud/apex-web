@@ -17,6 +17,7 @@ import '../../core/apex_semantic_field.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Sprint35FoundationScreen extends StatefulWidget {
   const Sprint35FoundationScreen({super.key});
@@ -104,7 +105,7 @@ class _Sprint35FoundationScreenState extends State<Sprint35FoundationScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.bolt, color: Colors.amber, size: 32),
+            Icon(Icons.bolt, color: core_theme.AC.warn, size: 32),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(

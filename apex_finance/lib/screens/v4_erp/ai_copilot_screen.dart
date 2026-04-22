@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class AiCopilotScreen extends StatefulWidget {
   const AiCopilotScreen({super.key});
@@ -129,10 +130,10 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF1A237E), Color(0xFF311B92), Color(0xFFD4AF37)],
+          colors: [Color(0xFF1A237E), Color(0xFF311B92), core_theme.AC.gold],
         ),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -141,24 +142,24 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-            child: const Icon(Icons.auto_awesome, color: Color(0xFFD4AF37), size: 28),
+            child: Icon(Icons.auto_awesome, color: core_theme.AC.gold, size: 28),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('APEX Copilot',
                     style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
                 Text('مساعد ذكي مُدرَّب على بياناتك — يجيب عن الأسئلة ويُنفّذ المهام الروتينية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Colors.green.shade500,
+              color: core_theme.AC.ok,
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Row(
@@ -180,17 +181,17 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
       margin: const EdgeInsets.only(left: 20, bottom: 20, right: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(14),
-            color: Colors.grey.shade50,
-            child: const Row(
+            color: core_theme.AC.navy3,
+            child: Row(
               children: [
-                Icon(Icons.lightbulb, color: Color(0xFFD4AF37), size: 16),
+                Icon(Icons.lightbulb, color: core_theme.AC.gold, size: 16),
                 SizedBox(width: 6),
                 Text('اقتراحات شائعة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
               ],
@@ -207,9 +208,9 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                   margin: const EdgeInsets.only(bottom: 6),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD4AF37).withOpacity(0.05),
+                    color: core_theme.AC.gold.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                    border: Border.all(color: core_theme.AC.gold.withOpacity(0.2)),
                   ),
                   child: Text(_suggestions[i], style: const TextStyle(fontSize: 12, height: 1.4)),
                 ),
@@ -219,17 +220,17 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.purple.shade50,
+              color: core_theme.AC.purple,
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(11)),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.privacy_tip, color: Colors.purple, size: 14),
+                    Icon(Icons.privacy_tip, color: core_theme.AC.purple, size: 14),
                     SizedBox(width: 6),
-                    Text('الخصوصية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.purple)),
+                    Text('الخصوصية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.purple)),
                   ],
                 ),
                 SizedBox(height: 4),
@@ -248,7 +249,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
       margin: const EdgeInsets.only(left: 10, bottom: 20, right: 20),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -264,9 +265,9 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: core_theme.AC.navy3,
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(11)),
-              border: Border(top: BorderSide(color: Colors.black12)),
+              border: Border(top: BorderSide(color: core_theme.AC.bdr)),
             ),
             child: Row(
               children: [
@@ -301,9 +302,9 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                 ElevatedButton.icon(
                   onPressed: () => _send(_msgCtl.text),
                   icon: const Icon(Icons.send, size: 16),
-                  label: const Text('إرسال'),
+                  label: Text('إرسال'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4AF37),
+                    backgroundColor: core_theme.AC.gold,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),
@@ -322,13 +323,13 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.blue.shade50,
+          color: core_theme.AC.info,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.blue.shade200),
+          border: Border.all(color: core_theme.AC.info),
         ),
         child: Row(
           children: [
-            const Icon(Icons.info_outline, color: Colors.blue, size: 18),
+            Icon(Icons.info_outline, color: core_theme.AC.info, size: 18),
             const SizedBox(width: 8),
             Expanded(child: Text(m.content, style: const TextStyle(fontSize: 12, height: 1.5))),
           ],
@@ -351,20 +352,20 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                   if (!isUser) ...[
                     CircleAvatar(
                       radius: 14,
-                      backgroundColor: const Color(0xFFD4AF37).withOpacity(0.15),
-                      child: const Icon(Icons.auto_awesome, color: Color(0xFFD4AF37), size: 14),
+                      backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+                      child: Icon(Icons.auto_awesome, color: core_theme.AC.gold, size: 14),
                     ),
                     const SizedBox(width: 8),
-                    const Text('Copilot',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                    Text('Copilot',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                   ],
                   if (isUser) ...[
-                    const Text('أنت', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.blue)),
+                    Text('أنت', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
                     const SizedBox(width: 8),
                     CircleAvatar(
                       radius: 14,
-                      backgroundColor: Colors.blue.withOpacity(0.15),
-                      child: const Icon(Icons.person, color: Colors.blue, size: 14),
+                      backgroundColor: core_theme.AC.info.withOpacity(0.15),
+                      child: Icon(Icons.person, color: core_theme.AC.info, size: 14),
                     ),
                   ],
                 ],
@@ -373,7 +374,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: isUser ? Colors.blue.shade50 : const Color(0xFFD4AF37).withOpacity(0.08),
+                  color: isUser ? core_theme.AC.info : core_theme.AC.gold.withOpacity(0.08),
                   borderRadius: BorderRadius.only(
                     topRight: const Radius.circular(14),
                     topLeft: const Radius.circular(14),
@@ -381,7 +382,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                     bottomLeft: Radius.circular(isUser ? 2 : 14),
                   ),
                   border: Border.all(
-                    color: isUser ? Colors.blue.withOpacity(0.2) : const Color(0xFFD4AF37).withOpacity(0.2),
+                    color: isUser ? core_theme.AC.info.withOpacity(0.2) : core_theme.AC.gold.withOpacity(0.2),
                   ),
                 ),
                 child: SelectableText(
@@ -394,22 +395,22 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                 Wrap(
                   spacing: 6,
                   children: [
-                    const Text('المصادر:', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('المصادر:', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     for (final s in m.sources!)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: core_theme.AC.bdr,
                           borderRadius: BorderRadius.circular(3),
                         ),
-                        child: Text(s, style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                        child: Text(s, style: TextStyle(fontSize: 10, color: core_theme.AC.tp)),
                       ),
                   ],
                 ),
               ],
               const SizedBox(height: 3),
               Text('${m.timestamp.hour.toString().padLeft(2, '0')}:${m.timestamp.minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(fontSize: 10, color: Colors.black45, fontFamily: 'monospace')),
+                  style: TextStyle(fontSize: 10, color: core_theme.AC.td, fontFamily: 'monospace')),
             ],
           ),
         ),

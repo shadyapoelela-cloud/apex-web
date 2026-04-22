@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -31,7 +32,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
       child: Row(
         children: [
           _tabBtn(0, 'الفواتير', Icons.receipt),
@@ -58,9 +59,9 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFFE65100) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFFE65100) : core_theme.AC.ts),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFFE65100) : Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFFE65100) : core_theme.AC.ts)),
           ],
         ),
       ),
@@ -85,19 +86,19 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('فواتير نشطة', '8', Icons.receipt, const Color(0xFF2563EB)),
-            _Stat('مدفوعة', '147K ر.س', Icons.check_circle, const Color(0xFF059669)),
-            _Stat('في الضمان', '85K ر.س', Icons.lock, const Color(0xFFD97706)),
-            _Stat('هذا الربع', '285K ر.س', Icons.trending_up, const Color(0xFFD4AF37)),
+            _Stat('فواتير نشطة', '8', Icons.receipt, core_theme.AC.info),
+            _Stat('مدفوعة', '147K ر.س', Icons.check_circle, core_theme.AC.ok),
+            _Stat('في الضمان', '85K ر.س', Icons.lock, core_theme.AC.warn),
+            _Stat('هذا الربع', '285K ر.س', Icons.trending_up, core_theme.AC.gold),
           ]),
           const SizedBox(height: 16),
-          const Text('فواتير الخدمات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('فواتير الخدمات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final inv in [
-            _MInvoice('INV-MK-045', 'د. عبدالله السالم', 'مراجعة SABIC 2026', 45000, 'في الضمان', const Color(0xFFD97706)),
-            _MInvoice('INV-MK-044', 'شركة الدليل', 'استشارة ضريبية', 12500, 'مدفوعة', const Color(0xFF059669)),
-            _MInvoice('INV-MK-043', 'مكتب الثقة', 'مراجعة ABC Trading', 28000, 'في الضمان', const Color(0xFFD97706)),
-            _MInvoice('INV-MK-042', 'د. سارة الحارثي', 'دراسة جدوى', 65000, 'مدفوعة', const Color(0xFF059669)),
+            _MInvoice('INV-MK-045', 'د. عبدالله السالم', 'مراجعة SABIC 2026', 45000, 'في الضمان', core_theme.AC.warn),
+            _MInvoice('INV-MK-044', 'شركة الدليل', 'استشارة ضريبية', 12500, 'مدفوعة', core_theme.AC.ok),
+            _MInvoice('INV-MK-043', 'مكتب الثقة', 'مراجعة ABC Trading', 28000, 'في الضمان', core_theme.AC.warn),
+            _MInvoice('INV-MK-042', 'د. سارة الحارثي', 'دراسة جدوى', 65000, 'مدفوعة', core_theme.AC.ok),
             _MInvoice('INV-MK-041', 'مكتب النخبة', 'تقييم أصول', 18500, 'متأخرة', const Color(0xFFB91C1C)),
           ])
             _invoiceRow(inv),
@@ -110,7 +111,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Row(
         children: [
           const Icon(Icons.receipt, color: Color(0xFFE65100), size: 20),
@@ -120,9 +121,9 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(inv.id, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                Text(inv.id, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                 Text(inv.provider, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(inv.service, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(inv.service, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -147,10 +148,10 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFFE65100), Color(0xFF7C3AED)]),
+              gradient: LinearGradient(colors: [Color(0xFFE65100), core_theme.AC.purple]),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.lock, color: Colors.white, size: 28),
                 SizedBox(width: 16),
@@ -160,7 +161,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                     children: [
                       Text('الضمان (Escrow)', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
                       SizedBox(height: 4),
-                      Text('المبالغ محتفظة بها لحين تسليم الخدمة — يضمن الحقوق لكلا الطرفين', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('المبالغ محتفظة بها لحين تسليم الخدمة — يضمن الحقوق لكلا الطرفين', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -169,13 +170,13 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
           ),
           const SizedBox(height: 16),
           _statsRow([
-            _Stat('في الضمان الآن', '85K ر.س', Icons.lock, const Color(0xFFD97706)),
-            _Stat('محرَّر هذا الشهر', '127K ر.س', Icons.lock_open, const Color(0xFF059669)),
+            _Stat('في الضمان الآن', '85K ر.س', Icons.lock, core_theme.AC.warn),
+            _Stat('محرَّر هذا الشهر', '127K ر.س', Icons.lock_open, core_theme.AC.ok),
             _Stat('نزاعات نشطة', '1', Icons.warning, const Color(0xFFB91C1C)),
-            _Stat('رسوم المنصّة', '8.5K ر.س', Icons.percent, const Color(0xFF2563EB)),
+            _Stat('رسوم المنصّة', '8.5K ر.س', Icons.percent, core_theme.AC.info),
           ]),
           const SizedBox(height: 16),
-          const Text('معاملات الضمان', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('معاملات الضمان', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final e in [
             _Escrow('ESC-045', 'د. عبدالله السالم', 'مراجعة SABIC 2026', 45000, 2, 3, 'في الضمان'),
@@ -193,7 +194,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -201,17 +202,17 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: (ready ? const Color(0xFF059669) : const Color(0xFFD97706)).withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
-                child: Icon(ready ? Icons.lock_open : Icons.lock, color: ready ? const Color(0xFF059669) : const Color(0xFFD97706), size: 18),
+                decoration: BoxDecoration(color: (ready ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+                child: Icon(ready ? Icons.lock_open : Icons.lock, color: ready ? core_theme.AC.ok : core_theme.AC.warn, size: 18),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(e.id, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                    Text(e.id, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     Text(e.provider, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                    Text(e.service, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text(e.service, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -231,19 +232,19 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                       height: 28,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: done ? const Color(0xFF059669) : Colors.black.withOpacity(0.08),
+                        color: done ? core_theme.AC.ok : core_theme.AC.tp.withOpacity(0.08),
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         done ? '✓' : '${i + 1}',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: done ? Colors.white : Colors.black54),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: done ? Colors.white : core_theme.AC.ts),
                       ),
                     ),
                     if (i < e.totalMilestones - 1)
                       Expanded(
                         child: Container(
                           height: 2,
-                          color: done ? const Color(0xFF059669) : Colors.black.withOpacity(0.08),
+                          color: done ? core_theme.AC.ok : core_theme.AC.tp.withOpacity(0.08),
                         ),
                       ),
                   ],
@@ -254,7 +255,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
           const SizedBox(height: 6),
           Text(
             'معلم ${e.currentMilestone} من ${e.totalMilestones}',
-            style: const TextStyle(fontSize: 11, color: Colors.black54),
+            style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
           ),
           if (ready) ...[
             const SizedBox(height: 10),
@@ -270,15 +271,15 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                       );
                     },
                     icon: const Icon(Icons.lock_open, size: 14),
-                    label: const Text('حرّر الدفعة'),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF059669), foregroundColor: Colors.white),
+                    label: Text('حرّر الدفعة'),
+                    style: ElevatedButton.styleFrom(backgroundColor: core_theme.AC.ok, foregroundColor: Colors.white),
                   ),
                 ),
                 const SizedBox(width: 8),
                 OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.warning, size: 14),
-                  label: const Text('افتح نزاع'),
+                  label: Text('افتح نزاع'),
                   style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFB91C1C), side: const BorderSide(color: Color(0xFFB91C1C))),
                 ),
               ],
@@ -295,7 +296,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('طرق الدفع المدعومة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('طرق الدفع المدعومة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -308,12 +309,12 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                 crossAxisSpacing: 12,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _payMethod('مدى (Mada)', Icons.credit_card, const Color(0xFF059669), '2.0%', active: true),
-                  _payMethod('Apple Pay', Icons.apple, Colors.black, '2.0%', active: true),
-                  _payMethod('STC Pay', Icons.phone_android, const Color(0xFF7C3AED), '1.5%', active: true),
-                  _payMethod('Tabby (BNPL)', Icons.event_note, const Color(0xFF2563EB), '5.0%', active: false),
+                  _payMethod('مدى (Mada)', Icons.credit_card, core_theme.AC.ok, '2.0%', active: true),
+                  _payMethod('Apple Pay', Icons.apple, core_theme.AC.tp, '2.0%', active: true),
+                  _payMethod('STC Pay', Icons.phone_android, core_theme.AC.purple, '1.5%', active: true),
+                  _payMethod('Tabby (BNPL)', Icons.event_note, core_theme.AC.info, '5.0%', active: false),
                   _payMethod('Visa / Mastercard', Icons.credit_card, const Color(0xFF1565C0), '2.9%', active: true),
-                  _payMethod('Bank Transfer', Icons.account_balance, const Color(0xFFD4AF37), '0%', active: true),
+                  _payMethod('Bank Transfer', Icons.account_balance, core_theme.AC.gold, '0%', active: true),
                 ],
               );
             },
@@ -329,7 +330,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: active ? color.withOpacity(0.4) : Colors.black.withOpacity(0.08), width: active ? 2 : 1),
+        border: Border.all(color: active ? color.withOpacity(0.4) : core_theme.AC.tp.withOpacity(0.08), width: active ? 2 : 1),
       ),
       child: Row(
         children: [
@@ -344,7 +345,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text('رسوم: $fee', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('رسوم: $fee', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -360,7 +361,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('النزاعات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('النزاعات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(14),
@@ -378,24 +379,24 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                const Text('العميل: شركة XYZ للتجارة', style: TextStyle(fontSize: 13)),
-                const Text('المزوّد: مكتب النخبة للاستشارات', style: TextStyle(fontSize: 13)),
-                const Text('المبلغ المتنازع: 18,500 ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
+                Text('العميل: شركة XYZ للتجارة', style: TextStyle(fontSize: 13)),
+                Text('المزوّد: مكتب النخبة للاستشارات', style: TextStyle(fontSize: 13)),
+                Text('المبلغ المتنازع: 18,500 ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'السبب: العميل يدّعي أن التسليم ناقص — 2 تقارير فقط من أصل 3 متفق عليها.',
-                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, color: core_theme.AC.tp),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    TextButton.icon(onPressed: () {}, icon: const Icon(Icons.visibility, size: 14), label: const Text('عرض الأدلّة')),
+                    TextButton.icon(onPressed: () {}, icon: const Icon(Icons.visibility, size: 14), label: Text('عرض الأدلّة')),
                     const Spacer(),
                     ElevatedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.auto_awesome, size: 14),
-                      label: const Text('اطلب وساطة APEX'),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF7C3AED), foregroundColor: Colors.white),
+                      label: Text('اطلب وساطة APEX'),
+                      style: ElevatedButton.styleFrom(backgroundColor: core_theme.AC.purple, foregroundColor: Colors.white),
                     ),
                   ],
                 ),
@@ -413,11 +414,11 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('كشوف الحساب — الضرائب والرسوم', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('كشوف الحساب — الضرائب والرسوم', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 _statementRow('إجمالي المعاملات', '285,000 ر.س'),
@@ -425,7 +426,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                 _statementRow('VAT على الرسوم (15%)', '-1,283 ر.س'),
                 _statementRow('رسوم معالجة الدفع (2.5%)', '-7,125 ر.س'),
                 const Divider(),
-                _statementRow('صافي المستلم', '268,042 ر.س', bold: true, color: const Color(0xFF059669)),
+                _statementRow('صافي المستلم', '268,042 ر.س', bold: true, color: core_theme.AC.ok),
               ],
             ),
           ),
@@ -433,12 +434,12 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
           Row(
             children: [
               const Spacer(),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.download, size: 14), label: const Text('تحميل PDF')),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.download, size: 14), label: Text('تحميل PDF')),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.description, size: 14),
-                label: const Text('شهادة ضريبية'),
+                label: Text('شهادة ضريبية'),
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE65100), foregroundColor: Colors.white),
               ),
             ],
@@ -478,7 +479,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(s.value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: s.color)),
-                        Text(s.label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text(s.label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
@@ -532,7 +533,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
         Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'تصنيف SME', Icons.business),
@@ -562,9 +563,9 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFF2E7D5B) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFF2E7D5B) : core_theme.AC.ts),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF2E7D5B) : Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF2E7D5B) : core_theme.AC.ts)),
           ],
         ),
       ),
@@ -590,18 +591,18 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF2E7D5B), Color(0xFF059669)]), borderRadius: BorderRadius.circular(14)),
+            decoration: BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF2E7D5B), core_theme.AC.ok]), borderRadius: BorderRadius.circular(14)),
             child: Row(
               children: [
-                Container(width: 80, height: 80, alignment: Alignment.center, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)), child: const Text('M', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Color(0xFF2E7D5B)))),
+                Container(width: 80, height: 80, alignment: Alignment.center, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)), child: Text('M', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Color(0xFF2E7D5B)))),
                 const SizedBox(width: 20),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('تصنيف منشأة متوسطة', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
                       SizedBox(height: 4),
-                      Text('العمالة: 52 — الإيرادات: 15.5M ر.س', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('العمالة: 52 — الإيرادات: 15.5M ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -609,7 +610,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('معايير منشآت (الهيئة العامة للمنشآت الصغيرة والمتوسطة)', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('معايير منشآت (الهيئة العامة للمنشآت الصغيرة والمتوسطة)', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final c in [
             _Criteria('متناهية الصغر', '1-5 موظفين', 'إيرادات ≤ 3M ر.س', false),
@@ -621,15 +622,15 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: const Color(0xFF059669).withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF059669).withOpacity(0.3))),
-            child: const Column(
+            decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.check_circle, color: Color(0xFF059669), size: 20),
+                    Icon(Icons.check_circle, color: core_theme.AC.ok, size: 20),
                     SizedBox(width: 8),
-                    Text('المزايا المتاحة لك', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF059669))),
+                    Text('المزايا المتاحة لك', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
                   ],
                 ),
                 SizedBox(height: 8),
@@ -651,17 +652,17 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: c.active ? const Color(0xFF059669).withOpacity(0.08) : Colors.white,
+        color: c.active ? core_theme.AC.ok.withOpacity(0.08) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: c.active ? const Color(0xFF059669) : Colors.black.withOpacity(0.08), width: c.active ? 2 : 1),
+        border: Border.all(color: c.active ? core_theme.AC.ok : core_theme.AC.tp.withOpacity(0.08), width: c.active ? 2 : 1),
       ),
       child: Row(
         children: [
-          Icon(c.active ? Icons.check_circle : Icons.circle_outlined, color: c.active ? const Color(0xFF059669) : Colors.black38, size: 20),
+          Icon(c.active ? Icons.check_circle : Icons.circle_outlined, color: c.active ? core_theme.AC.ok : core_theme.AC.td, size: 20),
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
-            child: Text(c.category, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: c.active ? const Color(0xFF059669) : Colors.black87)),
+            child: Text(c.category, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: c.active ? core_theme.AC.ok : core_theme.AC.tp)),
           ),
           Expanded(child: Text(c.employees, style: const TextStyle(fontSize: 11))),
           Expanded(child: Text(c.revenue, style: const TextStyle(fontSize: 11))),
@@ -678,8 +679,8 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF1565C0), Color(0xFF7C3AED)]), borderRadius: BorderRadius.circular(14)),
-            child: const Row(
+            decoration: BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1565C0), core_theme.AC.purple]), borderRadius: BorderRadius.circular(14)),
+            child: Row(
               children: [
                 Icon(Icons.trending_up, color: Colors.white, size: 28),
                 SizedBox(width: 16),
@@ -688,7 +689,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('الإدراج في السوق المالية', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                      Text('Nomu (للشركات الناشئة) · Tadawul (السوق الرئيسي)', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('Nomu (للشركات الناشئة) · Tadawul (السوق الرئيسي)', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -698,7 +699,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _marketCard('Nomu — السوق الموازي', 'للشركات الناشئة والمتوسطة', '10M ر.س رأس مال', '3 سنوات عمر', 'مؤهّل ✓', const Color(0xFF059669), eligible: true)),
+              Expanded(child: _marketCard('Nomu — السوق الموازي', 'للشركات الناشئة والمتوسطة', '10M ر.س رأس مال', '3 سنوات عمر', 'مؤهّل ✓', core_theme.AC.ok, eligible: true)),
               const SizedBox(width: 12),
               Expanded(child: _marketCard('Tadawul — السوق الرئيسي', 'للشركات الكبيرة المستقرّة', '300M ر.س رأس مال', '5 سنوات عمر', 'غير مؤهّل', const Color(0xFFB91C1C), eligible: false)),
             ],
@@ -706,15 +707,15 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: const Color(0xFF059669).withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF059669).withOpacity(0.3))),
-            child: const Column(
+            decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.lightbulb, color: Color(0xFF059669), size: 20),
+                    Icon(Icons.lightbulb, color: core_theme.AC.ok, size: 20),
                     SizedBox(width: 8),
-                    Text('التوصية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF059669))),
+                    Text('التوصية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
                   ],
                 ),
                 SizedBox(height: 6),
@@ -754,7 +755,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          Text(desc, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(desc, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 8),
           _reqRow('رأس المال', capital, eligible),
           _reqRow('عمر الشركة', age, eligible),
@@ -768,9 +769,9 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Icon(met ? Icons.check_circle : Icons.cancel, size: 12, color: met ? const Color(0xFF059669) : const Color(0xFFB91C1C)),
+          Icon(met ? Icons.check_circle : Icons.cancel, size: 12, color: met ? core_theme.AC.ok : const Color(0xFFB91C1C)),
           const SizedBox(width: 6),
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           const Spacer(),
           Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
         ],
@@ -795,16 +796,16 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.construction, size: 56, color: Colors.black26),
+          Icon(Icons.construction, size: 56, color: core_theme.AC.td),
           const SizedBox(height: 12),
           Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          Text(desc, style: const TextStyle(fontSize: 12, color: Colors.black54), textAlign: TextAlign.center),
+          Text(desc, style: TextStyle(fontSize: 12, color: core_theme.AC.ts), textAlign: TextAlign.center),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(color: const Color(0xFFD97706).withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-            child: const Text('Wave 29+ — قريباً', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF92400E))),
+            decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+            child: Text('Wave 29+ — قريباً', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF92400E))),
           ),
         ],
       ),

@@ -16,6 +16,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_find_and_recode.dart';
 import '../../core/v5/apex_v5_undo_toast.dart';
@@ -64,7 +65,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
       ),
       child: Row(
         children: [
@@ -88,20 +89,20 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFFD4AF37).withOpacity(0.15) : null,
+          color: active ? core_theme.AC.gold.withOpacity(0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: core_theme.AC.gold.withOpacity(0.4)) : null,
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFFD4AF37) : Colors.black54),
+            Icon(icon, size: 14, color: active ? core_theme.AC.gold : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                color: active ? const Color(0xFFD4AF37) : Colors.black54,
+                color: active ? core_theme.AC.gold : core_theme.AC.ts,
               ),
             ),
           ],
@@ -113,11 +114,11 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
   Widget _moreMenu() {
     return PopupMenuButton<String>(
       tooltip: 'المزيد',
-      icon: const Row(
+      icon: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('المزيد', style: TextStyle(fontSize: 12, color: Colors.black54)),
-          Icon(Icons.arrow_drop_down, size: 16, color: Colors.black54),
+          Text('المزيد', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
+          Icon(Icons.arrow_drop_down, size: 16, color: core_theme.AC.ts),
         ],
       ),
       itemBuilder: (ctx) => [
@@ -135,7 +136,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
       value: v,
       child: Row(
         children: [
-          Icon(icon, size: 14, color: Colors.black54),
+          Icon(icon, size: 14, color: core_theme.AC.ts),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(fontSize: 12)),
         ],
@@ -164,15 +165,15 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('إجمالي الموظفين', '87', Icons.people, const Color(0xFF2563EB)),
-            _Stat('نشط', '82', Icons.check_circle, const Color(0xFF059669)),
-            _Stat('إجازة', '3', Icons.flight, const Color(0xFFD97706)),
-            _Stat('تحت التجربة', '5', Icons.access_time, const Color(0xFF7C3AED)),
+            _Stat('إجمالي الموظفين', '87', Icons.people, core_theme.AC.info),
+            _Stat('نشط', '82', Icons.check_circle, core_theme.AC.ok),
+            _Stat('إجازة', '3', Icons.flight, core_theme.AC.warn),
+            _Stat('تحت التجربة', '5', Icons.access_time, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text('قائمة الموظفين', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              Text('قائمة الموظفين', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               const Spacer(),
               SizedBox(
                 width: 200,
@@ -191,9 +192,9 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.person_add, size: 14),
-                label: const Text('تعيين جديد'),
+                label: Text('تعيين جديد'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD4AF37),
+                  backgroundColor: core_theme.AC.gold,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -248,7 +249,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
       child: Column(
         children: [
           // CEO
-          _orgNode('أحمد السالم', 'الرئيس التنفيذي', const Color(0xFFD4AF37), large: true),
+          _orgNode('أحمد السالم', 'الرئيس التنفيذي', core_theme.AC.gold, large: true),
           _connector(),
           // CFO row
           Wrap(
@@ -258,41 +259,41 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
             children: [
               Column(
                 children: [
-                  _orgNode('سارة محمود', 'المدير المالي', const Color(0xFF2563EB)),
+                  _orgNode('سارة محمود', 'المدير المالي', core_theme.AC.info),
                   _connector(),
                   Row(
                     children: [
-                      _orgNode('خالد', 'محاسب أول', const Color(0xFF2563EB), small: true),
+                      _orgNode('خالد', 'محاسب أول', core_theme.AC.info, small: true),
                       const SizedBox(width: 8),
-                      _orgNode('ليلى', 'محاسب', const Color(0xFF2563EB), small: true),
+                      _orgNode('ليلى', 'محاسب', core_theme.AC.info, small: true),
                       const SizedBox(width: 8),
-                      _orgNode('يوسف', 'محاسب', const Color(0xFF2563EB), small: true),
+                      _orgNode('يوسف', 'محاسب', core_theme.AC.info, small: true),
                     ],
                   ),
                 ],
               ),
               Column(
                 children: [
-                  _orgNode('محمد الراشد', 'مدير العمليات', const Color(0xFF059669)),
+                  _orgNode('محمد الراشد', 'مدير العمليات', core_theme.AC.ok),
                   _connector(),
                   Row(
                     children: [
-                      _orgNode('فاطمة', 'مسؤول مخزون', const Color(0xFF059669), small: true),
+                      _orgNode('فاطمة', 'مسؤول مخزون', core_theme.AC.ok, small: true),
                       const SizedBox(width: 8),
-                      _orgNode('عبدالله', 'مشرف مستودع', const Color(0xFF059669), small: true),
+                      _orgNode('عبدالله', 'مشرف مستودع', core_theme.AC.ok, small: true),
                     ],
                   ),
                 ],
               ),
               Column(
                 children: [
-                  _orgNode('نورا القحطاني', 'مدير الموارد البشرية', const Color(0xFF7C3AED)),
+                  _orgNode('نورا القحطاني', 'مدير الموارد البشرية', core_theme.AC.purple),
                   _connector(),
                   Row(
                     children: [
-                      _orgNode('حمد', 'HR Specialist', const Color(0xFF7C3AED), small: true),
+                      _orgNode('حمد', 'HR Specialist', core_theme.AC.purple, small: true),
                       const SizedBox(width: 8),
-                      _orgNode('منى', 'Payroll', const Color(0xFF7C3AED), small: true),
+                      _orgNode('منى', 'Payroll', core_theme.AC.purple, small: true),
                     ],
                   ),
                 ],
@@ -338,7 +339,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
           ),
           Text(
             title,
-            style: TextStyle(fontSize: titleSize, color: Colors.black54),
+            style: TextStyle(fontSize: titleSize, color: core_theme.AC.ts),
           ),
         ],
       ),
@@ -348,7 +349,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
   Widget _connector() => Container(
         width: 2,
         height: 20,
-        color: Colors.black.withOpacity(0.2),
+        color: core_theme.AC.tp.withOpacity(0.2),
       );
 
   // ── Tab 3: Contracts ──────────────────────────────────────────────
@@ -360,27 +361,27 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('عقود نشطة', '82', Icons.description, const Color(0xFF059669)),
-            _Stat('تنتهي خلال 60 يوم', '7', Icons.warning, const Color(0xFFD97706)),
-            _Stat('معلّقة', '3', Icons.hourglass_empty, const Color(0xFF2563EB)),
-            _Stat('مجدّدة هذا الشهر', '2', Icons.refresh, const Color(0xFF7C3AED)),
+            _Stat('عقود نشطة', '82', Icons.description, core_theme.AC.ok),
+            _Stat('تنتهي خلال 60 يوم', '7', Icons.warning, core_theme.AC.warn),
+            _Stat('معلّقة', '3', Icons.hourglass_empty, core_theme.AC.info),
+            _Stat('مجدّدة هذا الشهر', '2', Icons.refresh, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
-          const Text('العقود', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('العقود', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
-                _contractRow('أحمد السالم', 'CEO', '2020-06-01 → 2027-06-01', 'مفتوح المدة', const Color(0xFF059669)),
-                _contractRow('سارة محمود', 'CFO', '2021-03-15 → 2026-03-15', 'ينتهي خلال 60 يوم', const Color(0xFFD97706)),
+                _contractRow('أحمد السالم', 'CEO', '2020-06-01 → 2027-06-01', 'مفتوح المدة', core_theme.AC.ok),
+                _contractRow('سارة محمود', 'CFO', '2021-03-15 → 2026-03-15', 'ينتهي خلال 60 يوم', core_theme.AC.warn),
                 _contractRow('خالد أحمد', 'محاسب أول', '2022-09-01 → 2025-09-01', 'منتهي — للتجديد', const Color(0xFFB91C1C)),
-                _contractRow('فاطمة علي', 'مسؤول مخزون', '2024-01-15 → مفتوح', 'مفتوح المدة', const Color(0xFF059669)),
-                _contractRow('محمد الراشد', 'مدير العمليات', '2023-05-01 → 2028-05-01', 'نشط', const Color(0xFF059669)),
+                _contractRow('فاطمة علي', 'مسؤول مخزون', '2024-01-15 → مفتوح', 'مفتوح المدة', core_theme.AC.ok),
+                _contractRow('محمد الراشد', 'مدير العمليات', '2023-05-01 → 2028-05-01', 'نشط', core_theme.AC.ok),
               ],
             ),
           ),
@@ -393,11 +394,11 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         children: [
-          const Icon(Icons.description, size: 16, color: Colors.black54),
+          Icon(Icons.description, size: 16, color: core_theme.AC.ts),
           const SizedBox(width: 10),
           Expanded(
             flex: 2,
@@ -405,7 +406,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                Text(role, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(role, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -413,7 +414,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
             flex: 2,
             child: Text(
               period,
-              style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'),
+              style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'),
             ),
           ),
           Container(
@@ -446,13 +447,13 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('طلبات معلّقة', '4', Icons.pending, const Color(0xFFD97706)),
-            _Stat('معتمد هذا الشهر', '12', Icons.check_circle, const Color(0xFF059669)),
-            _Stat('في إجازة الآن', '3', Icons.flight, const Color(0xFF2563EB)),
-            _Stat('متوسط الرصيد', '18 يوم', Icons.event, const Color(0xFF7C3AED)),
+            _Stat('طلبات معلّقة', '4', Icons.pending, core_theme.AC.warn),
+            _Stat('معتمد هذا الشهر', '12', Icons.check_circle, core_theme.AC.ok),
+            _Stat('في إجازة الآن', '3', Icons.flight, core_theme.AC.info),
+            _Stat('متوسط الرصيد', '18 يوم', Icons.event, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
-          const Text('طلبات الإجازات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('طلبات الإجازات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final r in requests)
             Container(
@@ -461,16 +462,16 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black.withOpacity(0.08)),
+                border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: const Color(0xFFD4AF37).withOpacity(0.2),
+                    backgroundColor: core_theme.AC.gold.withOpacity(0.2),
                     child: Text(
                       r.employee.substring(0, 1),
-                      style: const TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w800),
+                      style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w800),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -497,14 +498,14 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                         ),
                         Text(
                           '${r.days} أيام · ${r.startDate} إلى ${r.endDate}',
-                          style: const TextStyle(fontSize: 11, color: Colors.black54),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                         ),
                         if (r.reason != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 2),
                             child: Text(
                               r.reason!,
-                              style: const TextStyle(fontSize: 11, color: Colors.black54, fontStyle: FontStyle.italic),
+                              style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontStyle: FontStyle.italic),
                             ),
                           ),
                       ],
@@ -514,7 +515,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                     OutlinedButton.icon(
                       onPressed: () => _onLeaveReject(r.employee),
                       icon: const Icon(Icons.close, size: 14),
-                      label: const Text('رفض'),
+                      label: Text('رفض'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFFB91C1C),
                         side: const BorderSide(color: Color(0xFFB91C1C)),
@@ -524,9 +525,9 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                     ElevatedButton.icon(
                       onPressed: () => _onLeaveApprove(r.employee),
                       icon: const Icon(Icons.check, size: 14),
-                      label: const Text('اعتماد'),
+                      label: Text('اعتماد'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059669),
+                        backgroundColor: core_theme.AC.ok,
                         foregroundColor: Colors.white,
                       ),
                     ),
@@ -535,7 +536,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: r.status == 'approved'
-                            ? const Color(0xFF059669).withOpacity(0.12)
+                            ? core_theme.AC.ok.withOpacity(0.12)
                             : const Color(0xFFB91C1C).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -543,7 +544,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                         r.status == 'approved' ? 'معتمد ✓' : 'مرفوض',
                         style: TextStyle(
                           fontSize: 11,
-                          color: r.status == 'approved' ? const Color(0xFF059669) : const Color(0xFFB91C1C),
+                          color: r.status == 'approved' ? core_theme.AC.ok : const Color(0xFFB91C1C),
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -557,11 +558,11 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
   }
 
   Color _leaveColor(String type) {
-    if (type == 'سنوية') return const Color(0xFF2563EB);
+    if (type == 'سنوية') return core_theme.AC.info;
     if (type == 'مرضية') return const Color(0xFFB91C1C);
-    if (type == 'طارئة') return const Color(0xFFD97706);
+    if (type == 'طارئة') return core_theme.AC.warn;
     if (type == 'أمومة') return const Color(0xFFEC4899);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   // ── Tab 5: Benefits ───────────────────────────────────────────────
@@ -573,13 +574,13 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('GOSI الإجمالي', '142K', Icons.health_and_safety, const Color(0xFF2563EB)),
-            _Stat('EOSB متراكم', '680K', Icons.savings, const Color(0xFFD4AF37)),
-            _Stat('تأمين طبي', '87 موظف', Icons.medical_services, const Color(0xFF059669)),
-            _Stat('WPS هذا الشهر', 'جاهز ✓', Icons.check_circle, const Color(0xFF059669)),
+            _Stat('GOSI الإجمالي', '142K', Icons.health_and_safety, core_theme.AC.info),
+            _Stat('EOSB متراكم', '680K', Icons.savings, core_theme.AC.gold),
+            _Stat('تأمين طبي', '87 موظف', Icons.medical_services, core_theme.AC.ok),
+            _Stat('WPS هذا الشهر', 'جاهز ✓', Icons.check_circle, core_theme.AC.ok),
           ]),
           const SizedBox(height: 16),
-          const Text('ملخص المزايا', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('ملخص المزايا', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -592,11 +593,11 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                 crossAxisSpacing: 12,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _benefitCard('GOSI (التأمينات الاجتماعية)', 'مساهمة الشركة 11% + 10% الموظف', '142K ر.س/شهر', Icons.health_and_safety, const Color(0xFF2563EB)),
-                  _benefitCard('EOSB (مكافأة نهاية الخدمة)', 'نصف شهر لكل سنة أوّل 5 + شهر كامل بعدها', '680K ر.س متراكم', Icons.savings, const Color(0xFFD4AF37)),
-                  _benefitCard('WPS (نظام حماية الأجور)', 'ملف SIF جاهز — يُسلَّم شهرياً لـ Mudad', 'جاهز ✓', Icons.shield, const Color(0xFF059669)),
-                  _benefitCard('التأمين الطبي', '87 موظف · شركة BUPA · درجة A', '320K ر.س/سنة', Icons.medical_services, const Color(0xFF7C3AED)),
-                  _benefitCard('بدل النقل', 'حسب مستوى الوظيفة', '450-1,500 ر.س', Icons.directions_car, const Color(0xFFD97706)),
+                  _benefitCard('GOSI (التأمينات الاجتماعية)', 'مساهمة الشركة 11% + 10% الموظف', '142K ر.س/شهر', Icons.health_and_safety, core_theme.AC.info),
+                  _benefitCard('EOSB (مكافأة نهاية الخدمة)', 'نصف شهر لكل سنة أوّل 5 + شهر كامل بعدها', '680K ر.س متراكم', Icons.savings, core_theme.AC.gold),
+                  _benefitCard('WPS (نظام حماية الأجور)', 'ملف SIF جاهز — يُسلَّم شهرياً لـ Mudad', 'جاهز ✓', Icons.shield, core_theme.AC.ok),
+                  _benefitCard('التأمين الطبي', '87 موظف · شركة BUPA · درجة A', '320K ر.س/سنة', Icons.medical_services, core_theme.AC.purple),
+                  _benefitCard('بدل النقل', 'حسب مستوى الوظيفة', '450-1,500 ر.س', Icons.directions_car, core_theme.AC.warn),
                   _benefitCard('بدل السكن', '25% من الراتب الأساسي', 'محسوب تلقائياً', Icons.home, const Color(0xFFEC4899)),
                 ],
               );
@@ -613,7 +614,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Row(
         children: [
@@ -635,7 +636,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                 const SizedBox(height: 2),
                 Text(
                   desc,
-                  style: const TextStyle(fontSize: 11, color: Colors.black54),
+                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 6),
@@ -684,7 +685,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(s.value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: s.color)),
-                        Text(s.label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text(s.label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
@@ -813,20 +814,20 @@ class _EmployeeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = employee.status == 'active'
-        ? const Color(0xFF059669)
+        ? core_theme.AC.ok
         : employee.status == 'on_leave'
-            ? const Color(0xFFD97706)
-            : Colors.black54;
+            ? core_theme.AC.warn
+            : core_theme.AC.ts;
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xFFD4AF37).withOpacity(0.05) : Colors.white,
+        color: selected ? core_theme.AC.gold.withOpacity(0.05) : Colors.white,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: selected
-              ? const Color(0xFFD4AF37)
-              : Colors.black.withOpacity(0.08),
+              ? core_theme.AC.gold
+              : core_theme.AC.tp.withOpacity(0.08),
           width: selected ? 2 : 1,
         ),
       ),
@@ -835,11 +836,11 @@ class _EmployeeCard extends StatelessWidget {
           Checkbox(value: selected, onChanged: (v) => onToggle(v ?? false)),
           CircleAvatar(
             radius: 22,
-            backgroundColor: const Color(0xFFD4AF37).withOpacity(0.2),
+            backgroundColor: core_theme.AC.gold.withOpacity(0.2),
             child: Text(
               employee.name.substring(0, 1),
-              style: const TextStyle(
-                color: Color(0xFFD4AF37),
+              style: TextStyle(
+                color: core_theme.AC.gold,
                 fontWeight: FontWeight.w800,
                 fontSize: 16,
               ),
@@ -867,25 +868,25 @@ class _EmployeeCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                Text(employee.role, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(employee.role, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.06),
+                        color: core_theme.AC.tp.withOpacity(0.06),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(
                         employee.dept,
-                        style: const TextStyle(fontSize: 9, color: Colors.black54),
+                        style: TextStyle(fontSize: 9, color: core_theme.AC.ts),
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       employee.id,
-                      style: const TextStyle(fontSize: 9, color: Colors.black38, fontFamily: 'monospace'),
+                      style: TextStyle(fontSize: 9, color: core_theme.AC.td, fontFamily: 'monospace'),
                     ),
                   ],
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/apex_app_bar.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import 'package:go_router/go_router.dart';
@@ -339,7 +340,7 @@ class _ClientCreateS extends State<ClientCreateScreen> {
           if (_err != null)
             Padding(
               padding: const EdgeInsets.all(12),
-              child: Text(_err!, style: const TextStyle(color: Colors.redAccent), textAlign: TextAlign.center),
+              child: Text(_err!, style: TextStyle(color: core_theme.AC.err), textAlign: TextAlign.center),
             ),
           Padding(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 8),

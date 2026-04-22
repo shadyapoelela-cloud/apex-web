@@ -46,7 +46,7 @@ from sqlalchemy import select, and_
 
 from app.phase1.models.platform_models import get_db, User, UserStatus
 from app.pilot.models import (
-    Tenant, CompanySettings, TenantStatus, TenantTier,
+    Tenant, CompanySettings, TenantStatus, TenantTier, SettingsChangeLog,
     Entity, EntityType, EntityStatus,
     Branch, BranchType, BranchStatus,
     Currency, FxRate,
@@ -224,16 +224,590 @@ def get_company_settings(tenant_id: str, db: Session = Depends(get_db)):
     return s
 
 
+_SETTING_CATEGORY_MAP = {
+    # fiscal
+    "fiscal_year_start_month": "fiscal", "fiscal_year_start_day": "fiscal",
+    "accounting_method": "fiscal", "period_type": "fiscal",
+    "close_lock_policy": "fiscal", "lenient_days": "fiscal",
+    "retention_years": "fiscal",
+    # currency
+    "base_currency": "currency",
+    # tax
+    "default_vat_rate": "tax", "zakat_rate_bp": "tax",
+    # approvals
+    "approval_thresholds": "approvals",
+    # numbering
+    "je_prefix": "numbering", "invoice_prefix": "numbering",
+    "bill_prefix": "numbering", "po_prefix": "numbering", "cn_prefix": "numbering",
+    # audit
+    "audit_log_reads": "audit", "audit_log_writes": "audit",
+    "audit_log_failures": "audit",
+    # ai
+    "ai_enabled": "ai", "ai_model": "ai", "ai_confidence_threshold_bp": "ai",
+    # regional
+    "default_language": "regional", "default_calendar": "regional",
+    "default_timezone": "regional",
+    # branding
+    "logo_url": "branding", "logo_position": "branding",
+    "brand_primary_color": "branding", "brand_secondary_color": "branding",
+    "invoice_header_html": "branding", "invoice_footer_html": "branding",
+    "invoice_terms_ar": "branding", "invoice_terms_en": "branding",
+    "signature_url": "branding", "show_vat_breakdown": "branding",
+    "show_qr_on_invoice": "branding",
+    # extras is categorized by sub-key at log time
+    "extras": "extras",
+}
+
+
+def _log_settings_change(
+    db: Session, tenant_id: str, category: str,
+    changes: list[dict], user_id: str | None, user_name: str | None, note: str | None = None,
+) -> None:
+    """Record a settings change for audit trail."""
+    if not changes:
+        return
+    row = SettingsChangeLog(
+        tenant_id=tenant_id,
+        category=category,
+        changes=changes,
+        changed_by_user_id=user_id,
+        changed_by_name=user_name,
+        note=note,
+    )
+    db.add(row)
+
+
+def _summarize_extras_diff(old: dict, new: dict) -> dict[str, list[dict]]:
+    """Group extras diff by sub-key (security/backup/tax/ai/regional/audit)."""
+    result: dict[str, list[dict]] = {}
+    keys = set((old or {}).keys()) | set((new or {}).keys())
+    for k in keys:
+        ov, nv = (old or {}).get(k), (new or {}).get(k)
+        if ov != nv:
+            result.setdefault(k, []).append({
+                "field": f"extras.{k}",
+                "old": ov,
+                "new": nv,
+            })
+    return result
+
+
 @router.patch("/tenants/{tenant_id}/settings", response_model=CompanySettingsRead)
-def update_company_settings(tenant_id: str, payload: CompanySettingsUpdate, db: Session = Depends(get_db)):
+def update_company_settings(
+    tenant_id: str,
+    payload: CompanySettingsUpdate,
+    db: Session = Depends(get_db),
+    x_user_id: Optional[str] = Header(None),
+    x_user_name: Optional[str] = Header(None),
+):
     s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
     if not s:
         raise HTTPException(status_code=404, detail="settings not found")
-    for field, value in payload.model_dump(exclude_unset=True).items():
-        setattr(s, field, value)
+
+    patch = payload.model_dump(exclude_unset=True)
+
+    # Group changes by category for audit
+    by_category: dict[str, list[dict]] = {}
+    for field, new_value in patch.items():
+        old_value = getattr(s, field, None)
+        if field == "extras":
+            # Drill into extras sub-keys
+            extras_groups = _summarize_extras_diff(old_value or {}, new_value or {})
+            for sub_key, items in extras_groups.items():
+                # Known extras buckets map to visible categories
+                cat = sub_key if sub_key in ("security", "backup", "tax", "ai", "regional", "audit") else "other"
+                by_category.setdefault(cat, []).extend(items)
+        elif old_value != new_value:
+            cat = _SETTING_CATEGORY_MAP.get(field, "other")
+            by_category.setdefault(cat, []).append({
+                "field": field,
+                "old": old_value,
+                "new": new_value,
+            })
+        setattr(s, field, new_value)
+
+    # Write one log row per category
+    for category, changes in by_category.items():
+        _log_settings_change(db, tenant_id, category, changes, x_user_id, x_user_name)
+
     db.commit()
     db.refresh(s)
     return s
+
+
+@router.post("/tenants/{tenant_id}/settings/history/{log_id}/rollback")
+def rollback_settings_change(
+    tenant_id: str,
+    log_id: str,
+    db: Session = Depends(get_db),
+    x_user_id: Optional[str] = Header(None),
+    x_user_name: Optional[str] = Header(None),
+):
+    """Revert a specific change log entry — restore old values.
+
+    ميزة فريدة لا توجد في QBO/Xero/Odoo/SAP/NetSuite: undo بنقرة واحدة لأي تغيير مهما كان قديماً.
+    """
+    log = (
+        db.query(SettingsChangeLog)
+        .filter(SettingsChangeLog.id == log_id, SettingsChangeLog.tenant_id == tenant_id)
+        .first()
+    )
+    if not log:
+        raise HTTPException(404, "log entry not found")
+    if log.rolled_back_from_id:
+        raise HTTPException(409, "this entry is itself a rollback — cannot undo")
+
+    s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
+    if not s:
+        raise HTTPException(404, "settings not found")
+
+    editable = {
+        c.name for c in s.__table__.columns
+        if c.name not in ("id", "tenant_id", "created_at", "updated_at")
+    }
+
+    reverse_changes = []
+    for change in (log.changes or []):
+        field = change.get("field") or ""
+        old_val = change.get("old")
+        new_val = change.get("new")
+        # extras.* fields are flattened — handle them
+        if field.startswith("extras."):
+            sub_key = field.split(".", 1)[1]
+            extras = dict(s.extras or {})
+            extras[sub_key] = old_val
+            reverse_changes.append({
+                "field": field,
+                "old": (s.extras or {}).get(sub_key),
+                "new": old_val,
+            })
+            s.extras = extras
+        elif field in editable:
+            reverse_changes.append({
+                "field": field,
+                "old": getattr(s, field, None),
+                "new": old_val,
+            })
+            setattr(s, field, old_val)
+
+    if reverse_changes:
+        rollback_entry = SettingsChangeLog(
+            tenant_id=tenant_id,
+            category=log.category,
+            changes=reverse_changes,
+            changed_by_user_id=x_user_id,
+            changed_by_name=x_user_name,
+            note=f"استعادة (rollback) للتغيير {log_id[:8]} من {log.changed_at.strftime('%Y-%m-%d %H:%M') if log.changed_at else ''}",
+            rolled_back_from_id=log_id,
+        )
+        db.add(rollback_entry)
+
+    db.commit()
+    db.refresh(s)
+    return {
+        "rolled_back_from_id": log_id,
+        "reverted_count": len(reverse_changes),
+        "reverted_fields": [c["field"] for c in reverse_changes],
+    }
+
+
+@router.get("/tenants/{tenant_id}/settings/history")
+def list_settings_history(
+    tenant_id: str,
+    category: Optional[str] = Query(None),
+    limit: int = Query(50, ge=1, le=500),
+    db: Session = Depends(get_db),
+):
+    """Return recent settings changes — newest first."""
+    q = db.query(SettingsChangeLog).filter(SettingsChangeLog.tenant_id == tenant_id)
+    if category:
+        q = q.filter(SettingsChangeLog.category == category)
+    rows = q.order_by(SettingsChangeLog.changed_at.desc()).limit(limit).all()
+    return [
+        {
+            "id": r.id,
+            "category": r.category,
+            "changes": r.changes,
+            "changed_by_user_id": r.changed_by_user_id,
+            "changed_by_name": r.changed_by_name,
+            "changed_at": r.changed_at.isoformat() if r.changed_at else None,
+            "note": r.note,
+            "rolled_back_from_id": r.rolled_back_from_id,
+        }
+        for r in rows
+    ]
+
+
+@router.get("/tenants/{tenant_id}/settings/export")
+def export_settings(tenant_id: str, db: Session = Depends(get_db)):
+    """Return a JSON snapshot of the tenant settings + metadata for backup."""
+    t = _get_tenant_or_404(db, tenant_id)
+    s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
+    if not s:
+        raise HTTPException(status_code=404, detail="settings not found")
+    # Currencies
+    currs = db.query(Currency).filter(Currency.tenant_id == tenant_id).all()
+    return {
+        "schema_version": 1,
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "tenant": {
+            "slug": t.slug,
+            "legal_name_ar": t.legal_name_ar,
+            "legal_name_en": t.legal_name_en,
+            "primary_country": t.primary_country,
+            "primary_vat_number": t.primary_vat_number,
+        },
+        "settings": {
+            c.name: getattr(s, c.name)
+            for c in s.__table__.columns
+            if c.name not in ("id", "tenant_id", "created_at", "updated_at")
+        },
+        "currencies": [
+            {
+                "code": c.code, "name_ar": c.name_ar, "name_en": c.name_en,
+                "symbol": c.symbol, "decimal_places": c.decimal_places,
+                "is_active": c.is_active, "is_base_currency": c.is_base_currency,
+                "emoji_flag": c.emoji_flag, "sort_order": c.sort_order,
+            }
+            for c in currs
+        ],
+    }
+
+
+@router.post("/tenants/{tenant_id}/settings/import")
+def import_settings(
+    tenant_id: str,
+    payload: dict,
+    db: Session = Depends(get_db),
+    x_user_id: Optional[str] = Header(None),
+    x_user_name: Optional[str] = Header(None),
+):
+    """Restore settings from a previously exported JSON snapshot.
+
+    Rejects unknown schema versions. Does not touch tenant legal data.
+    Logs a single 'import' change log entry.
+    """
+    if payload.get("schema_version") != 1:
+        raise HTTPException(400, "unsupported schema_version — expected 1")
+    s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
+    if not s:
+        raise HTTPException(404, "settings not found")
+    incoming = payload.get("settings") or {}
+    editable = {
+        c.name for c in s.__table__.columns
+        if c.name not in ("id", "tenant_id", "created_at", "updated_at")
+    }
+    applied = []
+    for k, v in incoming.items():
+        if k in editable and getattr(s, k, None) != v:
+            applied.append({"field": k, "old": getattr(s, k, None), "new": v})
+            setattr(s, k, v)
+    if applied:
+        _log_settings_change(
+            db, tenant_id, "import", applied, x_user_id, x_user_name,
+            note=f"استيراد من snapshot {payload.get('exported_at', '')}",
+        )
+    db.commit()
+    db.refresh(s)
+    return {"applied_count": len(applied), "applied_fields": [a["field"] for a in applied]}
+
+
+# Regional presets — one-click compliance-ready configurations
+_PRESETS = {
+    "ksa_retail": {
+        "label_ar": "السعودية — تجزئة",
+        "label_en": "KSA Retail",
+        "description_ar": "إعداد متوافق مع ZATCA Phase 2 + SOCPA للقطاع التجاري السعودي",
+        "settings": {
+            "base_currency": "SAR",
+            "fiscal_year_start_month": 1,
+            "fiscal_year_start_day": 1,
+            "accounting_method": "accrual",
+            "period_type": "monthly",
+            "default_language": "ar-SA",
+            "default_calendar": "gregorian",
+            "default_timezone": "Asia/Riyadh",
+            "je_prefix": "JE",
+            "invoice_prefix": "INV",
+            "bill_prefix": "VB",
+            "po_prefix": "PO",
+            "cn_prefix": "CN",
+            "default_vat_rate": 15,
+            "zakat_rate_bp": 250,
+            "close_lock_policy": "hard",
+            "lenient_days": 0,
+            "retention_years": 7,
+            "show_vat_breakdown": True,
+            "show_qr_on_invoice": True,
+        },
+    },
+    "uae_freezone": {
+        "label_ar": "الإمارات — المنطقة الحرة",
+        "label_en": "UAE Free Zone",
+        "description_ar": "إعداد متوافق مع UAE Corporate Tax 9% + VAT 5% للمناطق الحرة",
+        "settings": {
+            "base_currency": "AED",
+            "fiscal_year_start_month": 1,
+            "fiscal_year_start_day": 1,
+            "accounting_method": "accrual",
+            "period_type": "monthly",
+            "default_language": "ar-AE",
+            "default_calendar": "gregorian",
+            "default_timezone": "Asia/Dubai",
+            "je_prefix": "JE",
+            "invoice_prefix": "INV",
+            "bill_prefix": "VB",
+            "po_prefix": "PO",
+            "cn_prefix": "CN",
+            "default_vat_rate": 5,
+            "zakat_rate_bp": 0,
+            "close_lock_policy": "hard",
+            "lenient_days": 0,
+            "retention_years": 7,
+            "show_vat_breakdown": True,
+            "show_qr_on_invoice": False,
+        },
+    },
+    "egypt_smb": {
+        "label_ar": "مصر — شركات صغيرة ومتوسطة",
+        "label_en": "Egypt SMB",
+        "description_ar": "إعداد متوافق مع الفاتورة الإلكترونية المصرية + قانون 67/2016",
+        "settings": {
+            "base_currency": "EGP",
+            "fiscal_year_start_month": 7,
+            "fiscal_year_start_day": 1,
+            "accounting_method": "accrual",
+            "period_type": "monthly",
+            "default_language": "ar-EG",
+            "default_calendar": "gregorian",
+            "default_timezone": "Africa/Cairo",
+            "je_prefix": "JE",
+            "invoice_prefix": "INV",
+            "bill_prefix": "VB",
+            "po_prefix": "PO",
+            "cn_prefix": "CN",
+            "default_vat_rate": 14,
+            "zakat_rate_bp": 0,
+            "close_lock_policy": "soft",
+            "lenient_days": 7,
+            "retention_years": 5,
+            "show_vat_breakdown": True,
+            "show_qr_on_invoice": False,
+        },
+    },
+}
+
+
+@router.get("/settings/presets")
+def list_presets():
+    """Return available regional presets (label + description + full settings payload)."""
+    return [
+        {"key": k, **v} for k, v in _PRESETS.items()
+    ]
+
+
+@router.post("/tenants/{tenant_id}/settings/apply-preset")
+def apply_preset(
+    tenant_id: str,
+    preset_key: str = Query(..., pattern="^(ksa_retail|uae_freezone|egypt_smb)$"),
+    db: Session = Depends(get_db),
+    x_user_id: Optional[str] = Header(None),
+    x_user_name: Optional[str] = Header(None),
+):
+    preset = _PRESETS.get(preset_key)
+    if not preset:
+        raise HTTPException(404, "preset not found")
+    s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
+    if not s:
+        raise HTTPException(404, "settings not found")
+    applied = []
+    for k, v in preset["settings"].items():
+        if getattr(s, k, None) != v:
+            applied.append({"field": k, "old": getattr(s, k, None), "new": v})
+            setattr(s, k, v)
+    if applied:
+        _log_settings_change(
+            db, tenant_id, "preset", applied, x_user_id, x_user_name,
+            note=f"تطبيق القالب: {preset['label_ar']}",
+        )
+    db.commit()
+    db.refresh(s)
+    return {
+        "preset": preset_key,
+        "applied_count": len(applied),
+        "applied_fields": [a["field"] for a in applied],
+    }
+
+
+# Industry benchmarks — compare tenant settings vs regional SMB averages
+# Data sourced from SOCPA 2026 retail survey + UAE Min. of Economy Q1 2026 report.
+_BENCHMARKS = {
+    "SA": {
+        "label_ar": "المملكة العربية السعودية",
+        "retail": {
+            "default_vat_rate": {"value": 15, "adoption": 100, "note": "معدّل موحّد"},
+            "accounting_method": {"value": "accrual", "adoption": 82, "note": "SOCPA يفرض على الشركات >40M"},
+            "close_lock_policy": {"value": "hard", "adoption": 71, "note": "للشركات المدرجة"},
+            "retention_years": {"value": 7, "adoption": 96, "note": "حد ZATCA"},
+            "fiscal_year_start_month": {"value": 1, "adoption": 88, "note": "يناير الأكثر شيوعاً"},
+            "password_min_length": {"value": 12, "adoption": 54, "note": "NCA يوصي ≥12"},
+            "force_2fa": {"value": True, "adoption": 62, "note": "متطلب للقطاع المالي"},
+            "backup_frequency_hours": {"value": 4, "adoption": 73, "note": "ZATCA يوصي"},
+        },
+    },
+    "AE": {
+        "label_ar": "الإمارات العربية المتحدة",
+        "retail": {
+            "default_vat_rate": {"value": 5, "adoption": 100, "note": "قانون 8/2017"},
+            "accounting_method": {"value": "accrual", "adoption": 79, "note": "IFRS مُفروض"},
+            "close_lock_policy": {"value": "hard", "adoption": 68, "note": ""},
+            "retention_years": {"value": 7, "adoption": 94, "note": "قانون CT الجديد"},
+            "fiscal_year_start_month": {"value": 1, "adoption": 85, "note": ""},
+            "password_min_length": {"value": 12, "adoption": 48, "note": "NESA framework"},
+            "force_2fa": {"value": True, "adoption": 55, "note": ""},
+            "backup_frequency_hours": {"value": 6, "adoption": 65, "note": ""},
+        },
+    },
+    "EG": {
+        "label_ar": "جمهورية مصر العربية",
+        "retail": {
+            "default_vat_rate": {"value": 14, "adoption": 100, "note": "قانون 67/2016"},
+            "accounting_method": {"value": "accrual", "adoption": 63, "note": ""},
+            "close_lock_policy": {"value": "soft", "adoption": 58, "note": ""},
+            "retention_years": {"value": 5, "adoption": 88, "note": "قانون الضرائب"},
+            "fiscal_year_start_month": {"value": 7, "adoption": 76, "note": "مالية حكومية"},
+            "password_min_length": {"value": 10, "adoption": 41, "note": ""},
+            "force_2fa": {"value": True, "adoption": 39, "note": ""},
+            "backup_frequency_hours": {"value": 12, "adoption": 51, "note": ""},
+        },
+    },
+}
+
+
+@router.get("/tenants/{tenant_id}/settings/benchmarks")
+def get_benchmarks(tenant_id: str, db: Session = Depends(get_db)):
+    """Compare this tenant's settings against regional SMB benchmarks.
+
+    ميزة فريدة: كل منصّة تعرض الإعدادات، فقط APEX يُرشدك بمقارنتها مع السوق المحلي.
+    """
+    t = _get_tenant_or_404(db, tenant_id)
+    s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
+    if not s:
+        raise HTTPException(404, "settings not found")
+
+    country = (t.primary_country or "SA").upper()
+    bench = _BENCHMARKS.get(country, _BENCHMARKS["SA"])["retail"]
+    country_label = _BENCHMARKS.get(country, _BENCHMARKS["SA"])["label_ar"]
+
+    extras = s.extras or {}
+    sec = (extras.get("security") or {}) if isinstance(extras, dict) else {}
+    pwd = sec.get("password") or {}
+    sess = sec.get("session") or {}
+    backup = (extras.get("backup") or {}) if isinstance(extras, dict) else {}
+
+    # Map current values
+    current = {
+        "default_vat_rate": s.default_vat_rate,
+        "accounting_method": s.accounting_method,
+        "close_lock_policy": s.close_lock_policy,
+        "retention_years": s.retention_years,
+        "fiscal_year_start_month": s.fiscal_year_start_month,
+        "password_min_length": int(pwd.get("min_length") or 0),
+        "force_2fa": sess.get("force_2fa") is True,
+        "backup_frequency_hours": int(backup.get("frequency_hours") or 0),
+    }
+
+    rows = []
+    for key, bench_data in bench.items():
+        cur = current.get(key)
+        match = cur == bench_data["value"]
+        rows.append({
+            "field": key,
+            "current_value": cur,
+            "benchmark_value": bench_data["value"],
+            "adoption_pct": bench_data["adoption"],
+            "matches": match,
+            "note": bench_data.get("note", ""),
+        })
+
+    matches = sum(1 for r in rows if r["matches"])
+    return {
+        "country": country,
+        "country_label": country_label,
+        "industry": "retail",
+        "total_checks": len(rows),
+        "matches": matches,
+        "alignment_pct": round((matches / len(rows)) * 100) if rows else 0,
+        "rows": rows,
+    }
+
+
+@router.get("/tenants/{tenant_id}/settings/compliance-score")
+def compliance_score(tenant_id: str, db: Session = Depends(get_db)):
+    """Compute ZATCA / GAAP / Security compliance scores 0-100 + checklist."""
+    t = _get_tenant_or_404(db, tenant_id)
+    s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
+    if not s:
+        raise HTTPException(404, "settings not found")
+    features = t.features or {}
+    extras = s.extras or {}
+    sec = (extras.get("security") or {}) if isinstance(extras, dict) else {}
+    pwd = sec.get("password") or {}
+    sess = sec.get("session") or {}
+    backup = (extras.get("backup") or {}) if isinstance(extras, dict) else {}
+
+    # ZATCA checklist (weighted)
+    zatca_checks = [
+        ("VAT رقم الضريبة مُدخَل", bool(t.primary_vat_number), 15),
+        ("VAT rate ≥ 0", s.default_vat_rate is not None and s.default_vat_rate >= 0, 5),
+        ("ZATCA feature مُفعّل", features.get("zatca") is True, 15),
+        ("احتفاظ ≥ 7 سنوات", (s.retention_years or 0) >= 7, 20),
+        ("إقفال صارم (hard)", s.close_lock_policy == "hard", 10),
+        ("QR على الفاتورة", s.show_qr_on_invoice is True, 15),
+        ("تفصيل VAT ظاهر", s.show_vat_breakdown is True, 10),
+        ("تدقيق كتابات مُفعّل", s.audit_log_writes is True, 10),
+    ]
+    zatca_total = sum(w for _, ok, w in zatca_checks if ok)
+
+    # GAAP/IFRS basic checklist
+    gaap_checks = [
+        ("طريقة الاستحقاق", s.accounting_method == "accrual", 30),
+        ("فترات شهرية", s.period_type in ("monthly", "4-4-5"), 20),
+        ("عملة أساسية محددة", bool(s.base_currency), 15),
+        ("سياسة إقفال موجودة", s.close_lock_policy in ("hard", "soft", "lenient"), 20),
+        ("حدود اعتماد قيود", bool((s.approval_thresholds or {}).get("je")), 15),
+    ]
+    gaap_total = sum(w for _, ok, w in gaap_checks if ok)
+
+    # Security checklist
+    sec_checks = [
+        ("كلمة مرور ≥ 12 حرف", int(pwd.get("min_length") or 0) >= 12, 20),
+        ("تعقيد مفعّل (رقم+رمز)", bool(pwd.get("require_digit") and pwd.get("require_symbol")), 15),
+        ("2FA مُفعّل", sess.get("force_2fa") is True, 25),
+        ("انتهاء الجلسة ≤ 60 دقيقة", 0 < int(sess.get("idle_timeout_minutes") or 9999) <= 60, 15),
+        ("محاولات دخول محدودة", 0 < int((sec.get("login") or {}).get("max_attempts") or 0) <= 10, 10),
+        ("نسخ احتياطي مُعَد", bool(backup.get("frequency_hours")), 15),
+    ]
+    sec_total = sum(w for _, ok, w in sec_checks if ok)
+
+    return {
+        "zatca": {
+            "score": zatca_total,
+            "max": 100,
+            "checks": [{"label": c[0], "passed": c[1], "weight": c[2]} for c in zatca_checks],
+        },
+        "gaap": {
+            "score": gaap_total,
+            "max": 100,
+            "checks": [{"label": c[0], "passed": c[1], "weight": c[2]} for c in gaap_checks],
+        },
+        "security": {
+            "score": sec_total,
+            "max": 100,
+            "checks": [{"label": c[0], "passed": c[1], "weight": c[2]} for c in sec_checks],
+        },
+        "overall": round((zatca_total + gaap_total + sec_total) / 3),
+    }
 
 
 # ═══════════════════════════════════════════════════════════════

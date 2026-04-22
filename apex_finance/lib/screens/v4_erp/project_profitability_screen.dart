@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ProjectProfitabilityScreen extends StatefulWidget {
   const ProjectProfitabilityScreen({super.key});
@@ -55,17 +56,17 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('عدد المشاريع النشطة', '${_projects.length}', Colors.blue, Icons.work),
-            _kpi('إجمالي الإيرادات', _fmtM(totalRevenue), const Color(0xFFD4AF37), Icons.attach_money),
-            _kpi('إجمالي التكلفة', _fmtM(totalCost), Colors.orange, Icons.trending_down),
-            _kpi('صافي الربح', _fmtM(totalMargin), Colors.green, Icons.savings),
-            _kpi('هامش الربح', '${(totalMargin / totalRevenue * 100).toStringAsFixed(1)}%', Colors.teal, Icons.donut_large),
+            _kpi('عدد المشاريع النشطة', '${_projects.length}', core_theme.AC.info, Icons.work),
+            _kpi('إجمالي الإيرادات', _fmtM(totalRevenue), core_theme.AC.gold, Icons.attach_money),
+            _kpi('إجمالي التكلفة', _fmtM(totalCost), core_theme.AC.warn, Icons.trending_down),
+            _kpi('صافي الربح', _fmtM(totalMargin), core_theme.AC.ok, Icons.savings),
+            _kpi('هامش الربح', '${(totalMargin / totalRevenue * 100).toStringAsFixed(1)}%', core_theme.AC.info, Icons.donut_large),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            const Text('ترتيب حسب:', style: TextStyle(fontSize: 12, color: Colors.black54)),
+            Text('ترتيب حسب:', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
             const SizedBox(width: 10),
             _sortChip('margin', 'الهامش'),
             const SizedBox(width: 6),
@@ -87,7 +88,7 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
         gradient: const LinearGradient(colors: [Color(0xFF006064), Color(0xFF00838F)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.analytics, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -98,7 +99,7 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
                 Text('ربحية المشاريع',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('P&L على مستوى كل مشروع · تتبع الإيرادات، التكلفة، الهامش، وWIP',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -125,7 +126,7 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -146,13 +147,13 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF00838F) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: selected ? const Color(0xFF00838F) : Colors.black26),
+          border: Border.all(color: selected ? const Color(0xFF00838F) : core_theme.AC.td),
         ),
         child: Text(label,
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: selected ? Colors.white : Colors.black87,
+              color: selected ? Colors.white : core_theme.AC.tp,
             )),
       ),
     );
@@ -160,7 +161,7 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
 
   Widget _projectCard(_Project p) {
     final statusColor = _statusColor(p.status);
-    final marginColor = p.marginPct >= 40 ? Colors.green : p.marginPct >= 20 ? Colors.orange : Colors.red;
+    final marginColor = p.marginPct >= 40 ? core_theme.AC.ok : p.marginPct >= 20 ? core_theme.AC.warn : core_theme.AC.err;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -198,9 +199,9 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
           const SizedBox(height: 12),
           Row(
             children: [
-              _pl('الإيرادات', p.revenue, const Color(0xFFD4AF37), Icons.trending_up),
-              _pl('التكلفة', p.cost, Colors.orange, Icons.trending_down),
-              _pl('الهامش', p.margin, Colors.green, Icons.account_balance_wallet),
+              _pl('الإيرادات', p.revenue, core_theme.AC.gold, Icons.trending_up),
+              _pl('التكلفة', p.cost, core_theme.AC.warn, Icons.trending_down),
+              _pl('الهامش', p.margin, core_theme.AC.ok, Icons.account_balance_wallet),
               _plPct('هامش %', p.marginPct, marginColor),
               _plDate('البداية', p.startDate),
               _plDate('النهاية', p.endDate),
@@ -209,13 +210,13 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
           const SizedBox(height: 12),
           Row(
             children: [
-              const Text('الإنجاز', style: TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('الإنجاز', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
               Expanded(
                 child: LinearProgressIndicator(
                   value: p.progress / 100,
-                  backgroundColor: Colors.grey.shade200,
-                  valueColor: AlwaysStoppedAnimation(p.progress >= 80 ? Colors.green : p.progress >= 40 ? Colors.blue : Colors.orange),
+                  backgroundColor: core_theme.AC.bdr,
+                  valueColor: AlwaysStoppedAnimation(p.progress >= 80 ? core_theme.AC.ok : p.progress >= 40 ? core_theme.AC.info : core_theme.AC.warn),
                   minHeight: 8,
                 ),
               ),
@@ -229,18 +230,18 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.amber.shade50,
+                color: core_theme.AC.warn,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.amber.shade200),
+                border: Border.all(color: core_theme.AC.warn),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber, color: Colors.amber, size: 16),
+                  Icon(Icons.warning_amber, color: core_theme.AC.warn, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'الإنجاز الفعلي (${p.progress}%) أقل من المتوقّع (${_expectedProgress(p)}%) بناءً على المدة الزمنية',
-                      style: const TextStyle(fontSize: 11, color: Colors.black87),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.tp),
                     ),
                   ),
                 ],
@@ -277,7 +278,7 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
               children: [
                 Icon(icon, size: 12, color: color),
                 const SizedBox(width: 4),
-                Text(label, style: TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
             const SizedBox(height: 2),
@@ -302,7 +303,7 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             const SizedBox(height: 2),
             Text('${value.toStringAsFixed(1)}%',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
@@ -318,13 +319,13 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: core_theme.AC.navy3,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             const SizedBox(height: 2),
             Text(date, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
           ],
@@ -336,13 +337,13 @@ class _ProjectProfitabilityScreenState extends State<ProjectProfitabilityScreen>
   Color _statusColor(String s) {
     switch (s) {
       case 'on-track':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'risky':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'delayed':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

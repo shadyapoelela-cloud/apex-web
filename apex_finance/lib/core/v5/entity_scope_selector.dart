@@ -20,6 +20,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 // ──────────────────────────────────────────────────────────────────────
 // Data model — entity tree
@@ -242,9 +243,9 @@ class _EntityScopeSelectorState extends State<EntityScopeSelector> {
     // Auto-adapt to dark/light background using Theme brightness.
     final brightness = Theme.of(context).brightness;
     final isDark = brightness == Brightness.dark;
-    final baseForeground = isDark ? Colors.white : Colors.black87;
-    final baseSubtle = isDark ? Colors.white.withOpacity(0.15) : Colors.black.withOpacity(0.04);
-    final baseBorder = isDark ? Colors.white.withOpacity(0.3) : Colors.black.withOpacity(0.12);
+    final baseForeground = isDark ? Colors.white : core_theme.AC.tp;
+    final baseSubtle = isDark ? Colors.white.withOpacity(0.15) : core_theme.AC.tp.withOpacity(0.04);
+    final baseBorder = isDark ? Colors.white.withOpacity(0.3) : core_theme.AC.tp.withOpacity(0.12);
 
     return InkWell(
       onTap: () => _openPopover(context),
@@ -253,11 +254,11 @@ class _EntityScopeSelectorState extends State<EntityScopeSelector> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: consolidated
-              ? const Color(0xFFD4AF37).withOpacity(0.12)
+              ? core_theme.AC.gold.withOpacity(0.12)
               : baseSubtle,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: consolidated ? const Color(0xFFD4AF37) : baseBorder,
+            color: consolidated ? core_theme.AC.gold : baseBorder,
             width: 1,
           ),
         ),
@@ -288,16 +289,16 @@ class _EntityScopeSelectorState extends State<EntityScopeSelector> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.15),
+                  color: core_theme.AC.warn.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Colors.orange.withOpacity(0.4)),
+                  border: Border.all(color: core_theme.AC.warn.withOpacity(0.4)),
                 ),
                 child: Text(
                   'FX→${ctrl.reportingCurrency}',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    color: Colors.orange.shade800,
+                    color: core_theme.AC.warn,
                   ),
                 ),
               ),
@@ -321,7 +322,7 @@ class _EntityScopeSelectorState extends State<EntityScopeSelector> {
 
     showDialog<void>(
       context: context,
-      barrierColor: Colors.black26,
+      barrierColor: core_theme.AC.td,
       builder: (ctx) {
         return Stack(
           children: [
@@ -370,7 +371,7 @@ class _ScopePopoverState extends State<_ScopePopover> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -400,7 +401,7 @@ class _ScopePopoverState extends State<_ScopePopover> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white70, size: 18),
+                      icon: Icon(Icons.close, color: core_theme.AC.ts, size: 18),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       onPressed: () => Navigator.of(context).pop(),
@@ -474,9 +475,9 @@ class _ScopePopoverState extends State<_ScopePopover> {
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                   child: Row(
                     children: [
-                      const Icon(Icons.currency_exchange, size: 16, color: Colors.black54),
+                      Icon(Icons.currency_exchange, size: 16, color: core_theme.AC.ts),
                       const SizedBox(width: 8),
-                      const Text('عملة التقرير:', style: TextStyle(fontSize: 12, color: Colors.black87)),
+                      Text('عملة التقرير:', style: TextStyle(fontSize: 12, color: core_theme.AC.tp)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: DropdownButton<String>(
@@ -512,7 +513,7 @@ class _ScopePopoverState extends State<_ScopePopover> {
                     Expanded(
                       child: FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFFD4AF37),
+                          backgroundColor: core_theme.AC.gold,
                         ),
                         onPressed: () {
                           final ctrl = EntityScopeController.instance;
@@ -578,7 +579,7 @@ class _ScopePopoverState extends State<_ScopePopover> {
           top: 8,
           bottom: 8,
         ),
-        color: selected ? const Color(0xFFD4AF37).withOpacity(0.08) : null,
+        color: selected ? core_theme.AC.gold.withOpacity(0.08) : null,
         child: Row(
           children: [
             SizedBox(
@@ -624,7 +625,7 @@ class _ScopePopoverState extends State<_ScopePopover> {
                   ),
                   Text(
                     '${e.labelEn} · ${e.currency} · ${e.country}',
-                    style: const TextStyle(fontSize: 10, color: Colors.black54),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -675,9 +676,9 @@ class _ScopePopoverState extends State<_ScopePopover> {
       case EntityKind.associate:
         return const Color(0xFF2E7D5B);
       case EntityKind.jointVenture:
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case EntityKind.branch:
-        return Colors.black54;
+        return core_theme.AC.ts;
     }
   }
 
@@ -718,9 +719,9 @@ class _ModeButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFFD4AF37).withOpacity(0.12) : Colors.grey.shade50,
+          color: active ? core_theme.AC.gold.withOpacity(0.12) : core_theme.AC.navy3,
           border: Border.all(
-            color: active ? const Color(0xFFD4AF37) : Colors.grey.shade300,
+            color: active ? core_theme.AC.gold : core_theme.AC.bdr,
             width: active ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(8),
@@ -730,7 +731,7 @@ class _ModeButton extends StatelessWidget {
             Icon(
               icon,
               size: 20,
-              color: active ? const Color(0xFFD4AF37) : Colors.black54,
+              color: active ? core_theme.AC.gold : core_theme.AC.ts,
             ),
             const SizedBox(height: 4),
             Text(
@@ -738,7 +739,7 @@ class _ModeButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
-                color: active ? const Color(0xFFD4AF37) : Colors.black87,
+                color: active ? core_theme.AC.gold : core_theme.AC.tp,
               ),
               textAlign: TextAlign.center,
             ),

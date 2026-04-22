@@ -24,6 +24,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../theme.dart' as core_theme;
 
 /// A tab in an Object Page (right content pane).
 class ObjectPageTab {
@@ -131,8 +132,8 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
   int _tabIndex = 0;
   bool _chatterOpen = true;
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   @override
   Widget build(BuildContext context) {
@@ -187,11 +188,11 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(widget.titleAr,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                 if (widget.subtitleAr != null)
                   Text(widget.subtitleAr!,
-                      style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                      style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -258,14 +259,14 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
                 width: 40,
                 height: 2,
                 margin: const EdgeInsets.symmetric(horizontal: 6),
-                color: (i ~/ 2) < widget.processCurrentIndex ? _gold : Colors.grey.shade300,
+                color: (i ~/ 2) < widget.processCurrentIndex ? _gold : core_theme.AC.bdr,
               );
             }
             final stageIdx = i ~/ 2;
             final stage = stages[stageIdx];
             final isActive = stageIdx == widget.processCurrentIndex;
             final isPast = stageIdx < widget.processCurrentIndex;
-            final color = isActive || isPast ? _gold : Colors.grey.shade400;
+            final color = isActive || isPast ? _gold : core_theme.AC.td;
 
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -274,13 +275,13 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: isActive ? _gold : (isPast ? _gold.withOpacity(0.15) : Colors.grey.shade100),
+                    color: isActive ? _gold : (isPast ? _gold.withOpacity(0.15) : core_theme.AC.navy3),
                     shape: BoxShape.circle,
                     border: Border.all(color: color, width: 2),
                   ),
                   child: Center(
                     child: isPast
-                        ? const Icon(Icons.check, size: 14, color: _gold)
+                        ? Icon(Icons.check, size: 14, color: _gold)
                         : Text('${stageIdx + 1}',
                             style: TextStyle(
                                 color: isActive ? Colors.white : color,
@@ -294,7 +295,7 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
-                    color: isActive || isPast ? _navy : Colors.black54,
+                    color: isActive || isPast ? _navy : core_theme.AC.ts,
                   ),
                 ),
               ],
@@ -377,7 +378,7 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
               child: Row(
                 children: [
                   Icon(tab.icon,
-                      size: 16, color: active ? _gold : Colors.black54),
+                      size: 16, color: active ? _gold : core_theme.AC.ts),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -385,7 +386,7 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: active ? FontWeight.w800 : FontWeight.w500,
-                        color: active ? _navy : Colors.black87,
+                        color: active ? _navy : core_theme.AC.tp,
                       ),
                     ),
                   ),
@@ -416,9 +417,9 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             decoration: BoxDecoration(
               color: _navy.withOpacity(0.04),
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+              border: Border(bottom: BorderSide(color: core_theme.AC.bdr)),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.chat, color: _navy, size: 16),
                 SizedBox(width: 8),
@@ -438,8 +439,8 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              border: Border(top: BorderSide(color: Colors.grey.shade200)),
+              color: core_theme.AC.navy3,
+              border: Border(top: BorderSide(color: core_theme.AC.bdr)),
             ),
             child: Row(
               children: [
@@ -460,7 +461,7 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: BorderSide(color: core_theme.AC.bdr),
                       ),
                       isDense: true,
                     ),
@@ -468,7 +469,7 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
                 ),
                 const SizedBox(width: 6),
                 IconButton(
-                  icon: const Icon(Icons.send, size: 18, color: _gold),
+                  icon: Icon(Icons.send, size: 18, color: _gold),
                   onPressed: () {},
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -489,10 +490,10 @@ class _ChatterItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, icon) = switch (entry.kind) {
-      ChatterKind.message => (Colors.blue.shade700, Icons.chat),
-      ChatterKind.activity => (Colors.orange.shade700, Icons.event_note),
-      ChatterKind.logNote => (Colors.grey.shade600, Icons.note),
-      ChatterKind.statusChange => (Colors.green.shade700, Icons.trending_up),
+      ChatterKind.message => (core_theme.AC.info, Icons.chat),
+      ChatterKind.activity => (core_theme.AC.warn, Icons.event_note),
+      ChatterKind.logNote => (core_theme.AC.ts, Icons.note),
+      ChatterKind.statusChange => (core_theme.AC.ok, Icons.trending_up),
     };
     final diff = DateTime.now().difference(entry.timestamp);
     final timeAgo = diff.inDays > 0
@@ -521,7 +522,7 @@ class _ChatterItem extends StatelessWidget {
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   ),
                   Text('قبل $timeAgo',
-                      style: const TextStyle(fontSize: 10, color: Colors.black45)),
+                      style: TextStyle(fontSize: 10, color: core_theme.AC.td)),
                 ],
               ),
               const SizedBox(height: 2),

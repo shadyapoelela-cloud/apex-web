@@ -2,14 +2,15 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/object_page_template.dart';
 
 class MaDealRoomV52Screen extends StatelessWidget {
   const MaDealRoomV52Screen({super.key});
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
-  static const _purple = Color(0xFF4A148C);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
+  static final _purple = Color(0xFF4A148C);
 
   @override
   Widget build(BuildContext context) {
@@ -26,21 +27,21 @@ class MaDealRoomV52Screen extends StatelessWidget {
         ProcessStage(labelAr: 'Closing'),
       ],
       processCurrentIndex: 2,
-      smartButtons: const [
+      smartButtons: [
         SmartButton(icon: Icons.folder, labelAr: 'وثيقة', count: 142, color: _gold),
         SmartButton(icon: Icons.group, labelAr: 'استشاري', count: 8, color: _navy),
-        SmartButton(icon: Icons.warning_amber, labelAr: 'ملاحظة Red Flag', count: 3, color: Colors.red),
-        SmartButton(icon: Icons.chat, labelAr: 'سؤال Q&A', count: 26, color: Colors.blue),
-        SmartButton(icon: Icons.trending_up, labelAr: 'نموذج تقييم', count: 4, color: Colors.green),
+        SmartButton(icon: Icons.warning_amber, labelAr: 'ملاحظة Red Flag', count: 3, color: core_theme.AC.err),
+        SmartButton(icon: Icons.chat, labelAr: 'سؤال Q&A', count: 26, color: core_theme.AC.info),
+        SmartButton(icon: Icons.trending_up, labelAr: 'نموذج تقييم', count: 4, color: core_theme.AC.ok),
       ],
       primaryActions: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.pause, size: 16), label: const Text('تعليق الصفقة')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.pause, size: 16), label: Text('تعليق الصفقة')),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: () {},
           style: FilledButton.styleFrom(backgroundColor: _purple),
           icon: const Icon(Icons.arrow_forward, size: 16),
-          label: const Text('الانتقال للتفاوض'),
+          label: Text('الانتقال للتفاوض'),
         ),
       ],
       tabs: [
@@ -63,10 +64,10 @@ class MaDealRoomV52Screen extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: const [
+        Row(children: [
           Expanded(child: _Kpi(label: 'القيمة المعروضة', value: '48', unit: 'M ر.س', color: _gold, icon: Icons.handshake)),
           SizedBox(width: 10),
-          Expanded(child: _Kpi(label: 'القيمة العادلة (DCF)', value: '52', unit: 'M ر.س', color: Colors.green, icon: Icons.trending_up)),
+          Expanded(child: _Kpi(label: 'القيمة العادلة (DCF)', value: '52', unit: 'M ر.س', color: core_theme.AC.ok, icon: Icons.trending_up)),
           SizedBox(width: 10),
           Expanded(child: _Kpi(label: 'EBITDA Multiple', value: '6.4', unit: 'x', color: _navy, icon: Icons.calculate)),
           SizedBox(width: 10),
@@ -89,8 +90,8 @@ class MaDealRoomV52Screen extends StatelessWidget {
         _card('الفريق المشارك', Column(children: [
           _personRow('د. محمد الراجحي', 'رئيس فريق الصفقة', _navy),
           _personRow('أحمد العمري', 'محلل مالي أول', _gold),
-          _personRow('McKinsey & Co.', 'مستشار استراتيجي', Colors.blue),
-          _personRow('Ernst & Young', 'مدقق مالي', Colors.green),
+          _personRow('McKinsey & Co.', 'مستشار استراتيجي', core_theme.AC.info),
+          _personRow('Ernst & Young', 'مدقق مالي', core_theme.AC.ok),
           _personRow('مكتب المحاماة المتحد', 'مستشار قانوني', _purple),
         ])),
       ]),
@@ -101,10 +102,10 @@ class MaDealRoomV52Screen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('القوائم المالية للسنوات الثلاث الماضية', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('القوائم المالية للسنوات الثلاث الماضية', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         Container(
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(children: [
             _finRow('البند', '2023', '2024', '2025', isHeader: true),
             _finRow('الإيرادات', '12.4M', '15.2M', '18.5M'),
@@ -113,32 +114,32 @@ class MaDealRoomV52Screen extends StatelessWidget {
             _finRow('مصروفات تشغيلية', '(1.2M)', '(1.4M)', '(1.4M)'),
             _finRow('EBITDA', '4.4M', '5.7M', '7.5M', bold: true),
             _finRow('الإهلاك', '(0.8M)', '(0.9M)', '(1.0M)'),
-            _finRow('صافي الربح', '3.6M', '4.8M', '6.5M', bold: true, color: Colors.green),
+            _finRow('صافي الربح', '3.6M', '4.8M', '6.5M', bold: true, color: core_theme.AC.ok),
           ]),
         ),
         const SizedBox(height: 20),
-        const Text('مؤشرات الأداء الرئيسية (KPIs)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+        Text('مؤشرات الأداء الرئيسية (KPIs)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 10),
-        Row(children: const [
-          Expanded(child: _Kpi(label: 'نمو الإيرادات (CAGR)', value: '22', unit: '%', color: Colors.green, icon: Icons.trending_up)),
+        Row(children: [
+          Expanded(child: _Kpi(label: 'نمو الإيرادات (CAGR)', value: '22', unit: '%', color: core_theme.AC.ok, icon: Icons.trending_up)),
           SizedBox(width: 10),
           Expanded(child: _Kpi(label: 'هامش EBITDA', value: '40.5', unit: '%', color: _gold, icon: Icons.bar_chart)),
           SizedBox(width: 10),
-          Expanded(child: _Kpi(label: 'معدل الاحتفاظ', value: '96', unit: '%', color: Colors.blue, icon: Icons.favorite)),
+          Expanded(child: _Kpi(label: 'معدل الاحتفاظ', value: '96', unit: '%', color: core_theme.AC.info, icon: Icons.favorite)),
         ]),
       ]),
     );
   }
 
   Widget _dd() {
-    const areas = [
-      ('الفحص المالي (Financial DD)', 0.85, 'EY', Colors.green),
-      ('الفحص القانوني (Legal DD)', 0.72, 'المستشار القانوني', Colors.blue),
+    final areas = [
+      ('الفحص المالي (Financial DD)', 0.85, 'EY', core_theme.AC.ok),
+      ('الفحص القانوني (Legal DD)', 0.72, 'المستشار القانوني', core_theme.AC.info),
       ('الفحص التجاري (Commercial DD)', 0.60, 'McKinsey', _gold),
-      ('الفحص التقني (Tech DD)', 0.45, 'فريق داخلي', Colors.orange),
-      ('الفحص الضريبي (Tax DD)', 0.90, 'EY Tax', Colors.green),
-      ('فحص الموارد البشرية (HR DD)', 0.55, 'الفريق الداخلي', Colors.orange),
-      ('الفحص التنظيمي (Regulatory DD)', 0.80, 'المستشار القانوني', Colors.blue),
+      ('الفحص التقني (Tech DD)', 0.45, 'فريق داخلي', core_theme.AC.warn),
+      ('الفحص الضريبي (Tax DD)', 0.90, 'EY Tax', core_theme.AC.ok),
+      ('فحص الموارد البشرية (HR DD)', 0.55, 'الفريق الداخلي', core_theme.AC.warn),
+      ('الفحص التنظيمي (Regulatory DD)', 0.80, 'المستشار القانوني', core_theme.AC.info),
     ];
     return ListView.separated(
       padding: const EdgeInsets.all(24),
@@ -146,30 +147,30 @@ class MaDealRoomV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Expanded(child: Text(areas[i].$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
             Text('${(areas[i].$2 * 100).toInt()}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: areas[i].$4)),
           ]),
           const SizedBox(height: 6),
-          ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: areas[i].$2, minHeight: 8, backgroundColor: Colors.grey.shade200, color: areas[i].$4)),
+          ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: areas[i].$2, minHeight: 8, backgroundColor: core_theme.AC.bdr, color: areas[i].$4)),
           const SizedBox(height: 6),
-          Text('المنفذ: ${areas[i].$3}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('المنفذ: ${areas[i].$3}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ]),
       ),
     );
   }
 
   Widget _vdr() {
-    const folders = [
-      ('01. العقود والاتفاقيات', 48, Icons.gavel, Colors.blue),
+    final folders = [
+      ('01. العقود والاتفاقيات', 48, Icons.gavel, core_theme.AC.info),
       ('02. القوائم المالية', 22, Icons.attach_money, _gold),
       ('03. الشؤون القانونية', 18, Icons.description, _purple),
-      ('04. الموارد البشرية', 15, Icons.people, Colors.orange),
-      ('05. العمليات التشغيلية', 12, Icons.factory, Colors.teal),
-      ('06. التقنية والـ IT', 14, Icons.computer, Colors.indigo),
-      ('07. العملاء والمبيعات', 13, Icons.handshake, Colors.green),
+      ('04. الموارد البشرية', 15, Icons.people, core_theme.AC.warn),
+      ('05. العمليات التشغيلية', 12, Icons.factory, core_theme.AC.info),
+      ('06. التقنية والـ IT', 14, Icons.computer, core_theme.AC.purple),
+      ('07. العملاء والمبيعات', 13, Icons.handshake, core_theme.AC.ok),
     ];
     return ListView.separated(
       padding: const EdgeInsets.all(24),
@@ -177,14 +178,14 @@ class MaDealRoomV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(children: [
           Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: folders[i].$4.withOpacity(0.15), borderRadius: BorderRadius.circular(6)), child: Icon(folders[i].$3, color: folders[i].$4)),
           const SizedBox(width: 12),
           Expanded(child: Text(folders[i].$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)), child: Text('${folders[i].$2} ملف', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10)), child: Text('${folders[i].$2} ملف', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))),
           const SizedBox(width: 8),
-          const Icon(Icons.chevron_left, size: 18, color: Colors.black54),
+          Icon(Icons.chevron_left, size: 18, color: core_theme.AC.ts),
         ]),
       ),
     );
@@ -206,22 +207,22 @@ class MaDealRoomV52Screen extends StatelessWidget {
         final q = questions[i];
         return Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: q.$4 ? Colors.green.withOpacity(0.3) : Colors.orange.withOpacity(0.3))),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: q.$4 ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.warn.withOpacity(0.3))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(10)), child: Text(q.$1, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _navy))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(10)), child: Text(q.$1, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _navy))),
               const Spacer(),
-              if (q.$4) const Row(children: [Icon(Icons.check_circle, color: Colors.green, size: 16), SizedBox(width: 4), Text('مُجاب', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green))])
-              else const Row(children: [Icon(Icons.pending, color: Colors.orange, size: 16), SizedBox(width: 4), Text('قيد الإجابة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.orange))]),
+              if (q.$4) Row(children: [Icon(Icons.check_circle, color: core_theme.AC.ok, size: 16), SizedBox(width: 4), Text('مُجاب', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok))])
+              else Row(children: [Icon(Icons.pending, color: core_theme.AC.warn, size: 16), SizedBox(width: 4), Text('قيد الإجابة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.warn))]),
             ]),
             const SizedBox(height: 8),
             Text(q.$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
             if (q.$5 != null) ...[
               const SizedBox(height: 6),
-              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.green.withOpacity(0.05), borderRadius: BorderRadius.circular(6)), child: Text('الجواب: ${q.$5}', style: const TextStyle(fontSize: 12, color: Colors.black87))),
+              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.05), borderRadius: BorderRadius.circular(6)), child: Text('الجواب: ${q.$5}', style: TextStyle(fontSize: 12, color: core_theme.AC.tp))),
             ],
             const SizedBox(height: 4),
-            Text('مُوجّهة إلى: ${q.$3}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('مُوجّهة إلى: ${q.$3}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ]),
         );
       },
@@ -229,10 +230,10 @@ class MaDealRoomV52Screen extends StatelessWidget {
   }
 
   Widget _redFlags() {
-    const flags = [
-      ('RF-003', 'نسبة الديون إلى حقوق الملكية 3.2x أعلى من المتوسط', 'عالية', Colors.red),
-      ('RF-002', 'عقد مع أكبر عميل ينتهي في 6 أشهر', 'متوسطة', Colors.orange),
-      ('RF-001', 'نزاع قضائي معلّق بقيمة 2M ر.س', 'متوسطة', Colors.orange),
+    final flags = [
+      ('RF-003', 'نسبة الديون إلى حقوق الملكية 3.2x أعلى من المتوسط', 'عالية', core_theme.AC.err),
+      ('RF-002', 'عقد مع أكبر عميل ينتهي في 6 أشهر', 'متوسطة', core_theme.AC.warn),
+      ('RF-001', 'نزاع قضائي معلّق بقيمة 2M ر.س', 'متوسطة', core_theme.AC.warn),
     ];
     return ListView.separated(
       padding: const EdgeInsets.all(24),
@@ -258,20 +259,20 @@ class MaDealRoomV52Screen extends StatelessWidget {
     );
   }
 
-  Widget _card(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]));
+  Widget _card(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]));
 
-  Widget _kv(String k, String v) => SizedBox(width: 220, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: const TextStyle(fontSize: 11, color: Colors.black54)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
+  Widget _kv(String k, String v) => SizedBox(width: 220, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
 
   Widget _personRow(String name, String role, Color color) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
         CircleAvatar(radius: 12, backgroundColor: color.withOpacity(0.15), child: Text(name[0], style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800))),
         const SizedBox(width: 10),
         Expanded(child: Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
-        Text(role, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(role, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]));
 
   Widget _finRow(String label, String y1, String y2, String y3, {bool isHeader = false, bool bold = false, Color? color}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(color: isHeader ? Colors.grey.shade50 : null, border: Border(top: BorderSide(color: Colors.grey.shade200))),
+        decoration: BoxDecoration(color: isHeader ? core_theme.AC.navy3 : null, border: Border(top: BorderSide(color: core_theme.AC.bdr))),
         child: Row(children: [
           Expanded(flex: 2, child: Text(label, style: TextStyle(fontSize: 12, fontWeight: isHeader || bold ? FontWeight.w800 : FontWeight.w500, color: color))),
           Expanded(child: Text(y1, style: TextStyle(fontSize: 12, fontWeight: isHeader || bold ? FontWeight.w800 : FontWeight.w500, color: color), textAlign: TextAlign.end)),

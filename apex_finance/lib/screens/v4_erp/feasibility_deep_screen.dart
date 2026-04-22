@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -33,7 +34,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
       ),
       child: Row(
         children: [
@@ -61,14 +62,14 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFF1565C0) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFF1565C0) : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                color: active ? const Color(0xFF1565C0) : Colors.black54,
+                color: active ? const Color(0xFF1565C0) : core_theme.AC.ts,
               ),
             ),
           ],
@@ -97,10 +98,10 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFF1565C0), Color(0xFF7C3AED)]),
+              gradient: LinearGradient(colors: [Color(0xFF1565C0), core_theme.AC.purple]),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.public, color: Colors.white, size: 28),
                 SizedBox(width: 16),
@@ -110,7 +111,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
                     children: [
                       Text('تحليل السوق — TAM / SAM / SOM', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
                       SizedBox(height: 4),
-                      Text('حجم السوق الإجمالي · القابل للعنونة · المستهدف', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('حجم السوق الإجمالي · القابل للعنونة · المستهدف', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -128,17 +129,17 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
                 alignment: Alignment.center,
                 children: [
                   _circle(480, const Color(0xFF1565C0).withOpacity(0.12), const Color(0xFF1565C0)),
-                  _circle(320, const Color(0xFF7C3AED).withOpacity(0.18), const Color(0xFF7C3AED)),
-                  _circle(160, const Color(0xFF059669).withOpacity(0.25), const Color(0xFF059669)),
+                  _circle(320, core_theme.AC.purple.withOpacity(0.18), core_theme.AC.purple),
+                  _circle(160, core_theme.AC.ok.withOpacity(0.25), core_theme.AC.ok),
                   Positioned(
                     top: 20,
                     child: _circleLabel('TAM', '12 مليار ر.س', 'الإمارات + السعودية', const Color(0xFF1565C0)),
                   ),
                   Positioned(
                     top: 120,
-                    child: _circleLabel('SAM', '3.8 مليار ر.س', 'SMB في KSA', const Color(0xFF7C3AED)),
+                    child: _circleLabel('SAM', '3.8 مليار ر.س', 'SMB في KSA', core_theme.AC.purple),
                   ),
-                  _circleLabel('SOM', '420 مليون ر.س', 'استهدافنا خلال 3 سنوات', const Color(0xFF059669), center: true),
+                  _circleLabel('SOM', '420 مليون ر.س', 'استهدافنا خلال 3 سنوات', core_theme.AC.ok, center: true),
                 ],
               ),
             ),
@@ -150,15 +151,15 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
                 _tamRow('TAM', 'Total Addressable Market', 'كل شركات المحاسبة في الخليج', '12,000M ر.س', const Color(0xFF1565C0)),
-                _tamRow('SAM', 'Serviceable Addressable Market', 'SMBs في KSA بميزانية >50K/yr', '3,800M ر.س', const Color(0xFF7C3AED)),
-                _tamRow('SOM', 'Serviceable Obtainable Market', 'حصّتنا المستهدفة بعد 3 سنوات', '420M ر.س (11%)', const Color(0xFF059669)),
+                _tamRow('SAM', 'Serviceable Addressable Market', 'SMBs في KSA بميزانية >50K/yr', '3,800M ر.س', core_theme.AC.purple),
+                _tamRow('SOM', 'Serviceable Obtainable Market', 'حصّتنا المستهدفة بعد 3 سنوات', '420M ر.س (11%)', core_theme.AC.ok),
                 const Divider(),
-                _tamRow('CAGR', 'معدل النمو السنوي المركّب', 'السوق ينمو 18% سنوياً', '18%', const Color(0xFFD4AF37)),
+                _tamRow('CAGR', 'معدل النمو السنوي المركّب', 'السوق ينمو 18% سنوياً', '18%', core_theme.AC.gold),
               ],
             ),
           ),
@@ -188,7 +189,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
         children: [
           Text(label, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.w900)),
           Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, fontFamily: 'monospace')),
-          Text(desc, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(desc, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ],
       ),
     );
@@ -210,7 +211,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(full, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                Text(desc, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(desc, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -226,7 +227,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('تحليل المنافسين', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('تحليل المنافسين', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -255,7 +256,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
   }
 
   Widget _compCard(String name, String type, String region, String strength, String goodAt, String weakness, {bool self = false}) {
-    final color = self ? const Color(0xFFD4AF37) : const Color(0xFF1565C0);
+    final color = self ? core_theme.AC.gold : const Color(0xFF1565C0);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -270,23 +271,23 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
             children: [
               Text(name, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
               const Spacer(),
-              if (self) const Icon(Icons.star, color: Color(0xFFD4AF37), size: 18),
+              if (self) Icon(Icons.star, color: core_theme.AC.gold, size: 18),
             ],
           ),
           const SizedBox(height: 4),
-          Text(type, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(type, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 8),
           _compMeta('المنطقة', region),
           _compMeta('القوة', strength),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: const Color(0xFF059669).withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
             child: Row(
               children: [
-                const Icon(Icons.add_circle, size: 11, color: Color(0xFF059669)),
+                Icon(Icons.add_circle, size: 11, color: core_theme.AC.ok),
                 const SizedBox(width: 4),
-                Expanded(child: Text(goodAt, style: const TextStyle(fontSize: 10, color: Color(0xFF059669)))),
+                Expanded(child: Text(goodAt, style: TextStyle(fontSize: 10, color: core_theme.AC.ok))),
               ],
             ),
           ),
@@ -312,7 +313,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          SizedBox(width: 70, child: Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54))),
+          SizedBox(width: 70, child: Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts))),
           Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
         ],
       ),
@@ -325,11 +326,11 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('نموذج توقّع الطلب — 5 سنوات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('نموذج توقّع الطلب — 5 سنوات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 _demandHeader(),
@@ -345,10 +346,10 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFF059669), Color(0xFF1565C0)]),
+              gradient: LinearGradient(colors: [core_theme.AC.ok, Color(0xFF1565C0)]),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.trending_up, color: Colors.white, size: 22),
                 SizedBox(width: 10),
@@ -357,7 +358,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('CAGR 5-Year: 83%', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
-                      Text('نمو متسارع — 11× خلال 5 سنوات', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('نمو متسارع — 11× خلال 5 سنوات', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -372,7 +373,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
   Widget _demandHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.06)))),
+      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06)))),
       child: const Row(
         children: [
           Expanded(child: Text('السنة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
@@ -387,13 +388,13 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
   Widget _demandRow(String year, int customers, double revenue, String driver) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04)))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04)))),
       child: Row(
         children: [
           Expanded(child: Text(year, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
           Expanded(child: Text('$customers', style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
-          Expanded(flex: 2, child: Text('${(revenue / 1000000).toStringAsFixed(0)}M', style: const TextStyle(fontSize: 14, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: Color(0xFF059669)))),
-          Expanded(flex: 2, child: Text(driver, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+          Expanded(flex: 2, child: Text('${(revenue / 1000000).toStringAsFixed(0)}M', style: TextStyle(fontSize: 14, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
+          Expanded(flex: 2, child: Text(driver, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
         ],
       ),
     );
@@ -401,11 +402,11 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
 
   Widget _buildPestel() {
     final factors = [
-      _Factor('P', 'سياسي (Political)', 'دعم حكومي للتحوّل الرقمي', 'positive', const Color(0xFF2563EB)),
-      _Factor('E', 'اقتصادي (Economic)', 'تنوّع الاقتصاد السعودي (رؤية 2030)', 'positive', const Color(0xFF059669)),
-      _Factor('S', 'اجتماعي (Social)', 'ارتفاع نسبة الشباب والسعودة', 'positive', const Color(0xFFD4AF37)),
-      _Factor('T', 'تكنولوجي (Technological)', 'بنية تحتية رقمية متقدّمة', 'positive', const Color(0xFF7C3AED)),
-      _Factor('E', 'بيئي (Environmental)', 'توجّه نحو ESG والاستدامة', 'neutral', const Color(0xFFD97706)),
+      _Factor('P', 'سياسي (Political)', 'دعم حكومي للتحوّل الرقمي', 'positive', core_theme.AC.info),
+      _Factor('E', 'اقتصادي (Economic)', 'تنوّع الاقتصاد السعودي (رؤية 2030)', 'positive', core_theme.AC.ok),
+      _Factor('S', 'اجتماعي (Social)', 'ارتفاع نسبة الشباب والسعودة', 'positive', core_theme.AC.gold),
+      _Factor('T', 'تكنولوجي (Technological)', 'بنية تحتية رقمية متقدّمة', 'positive', core_theme.AC.purple),
+      _Factor('E', 'بيئي (Environmental)', 'توجّه نحو ESG والاستدامة', 'neutral', core_theme.AC.warn),
       _Factor('L', 'قانوني (Legal)', 'ZATCA + جديد FTA — تغييرات متسارعة', 'opportunity', const Color(0xFFB91C1C)),
     ];
 
@@ -414,7 +415,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('PESTEL Analysis', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('PESTEL Analysis', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final f in factors)
             Container(
@@ -436,7 +437,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(f.category, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                        Text(f.factor, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                        Text(f.factor, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
@@ -462,19 +463,19 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('قوى بورتر الخمس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('قوى بورتر الخمس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final force in [
-            _Force('تهديد الداخلين الجدد', 'متوسط', 0.5, 'حواجز دخول معتدلة · رؤوس أموال متوفّرة', const Color(0xFFD97706)),
+            _Force('تهديد الداخلين الجدد', 'متوسط', 0.5, 'حواجز دخول معتدلة · رؤوس أموال متوفّرة', core_theme.AC.warn),
             _Force('قوة المشترين', 'عالية', 0.8, 'عملاء يقارنون بين عدة خيارات · حساسية للسعر', const Color(0xFFB91C1C)),
-            _Force('قوة الموردين', 'منخفضة', 0.2, 'مزوّدو الـ cloud متنافسون · قليلة الاحتكار', const Color(0xFF059669)),
-            _Force('تهديد البدائل', 'متوسط', 0.5, 'Excel + المحاسب التقليدي لا يزالان بديلاً', const Color(0xFFD97706)),
+            _Force('قوة الموردين', 'منخفضة', 0.2, 'مزوّدو الـ cloud متنافسون · قليلة الاحتكار', core_theme.AC.ok),
+            _Force('تهديد البدائل', 'متوسط', 0.5, 'Excel + المحاسب التقليدي لا يزالان بديلاً', core_theme.AC.warn),
             _Force('كثافة المنافسة', 'عالية', 0.9, '5+ منصّات إقليمية نشطة + عالميين', const Color(0xFFB91C1C)),
           ])
             Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -490,9 +491,9 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  LinearProgressIndicator(value: force.value, backgroundColor: Colors.black.withOpacity(0.06), valueColor: AlwaysStoppedAnimation(force.color), minHeight: 6),
+                  LinearProgressIndicator(value: force.value, backgroundColor: core_theme.AC.tp.withOpacity(0.06), valueColor: AlwaysStoppedAnimation(force.color), minHeight: 6),
                   const SizedBox(height: 6),
-                  Text(force.note, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(force.note, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ],
               ),
             ),
@@ -552,7 +553,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+            border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
           ),
           child: Row(
             children: [
@@ -583,9 +584,9 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFF1565C0) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFF1565C0) : core_theme.AC.ts),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF1565C0) : Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF1565C0) : core_theme.AC.ts)),
           ],
         ),
       ),
@@ -609,7 +610,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('اختر القطاع للمقارنة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('اختر القطاع للمقارنة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -645,15 +646,15 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
       decoration: BoxDecoration(
         color: selected ? const Color(0xFF1565C0).withOpacity(0.08) : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: selected ? const Color(0xFF1565C0) : Colors.black.withOpacity(0.08), width: selected ? 2 : 1),
+        border: Border.all(color: selected ? const Color(0xFF1565C0) : core_theme.AC.tp.withOpacity(0.08), width: selected ? 2 : 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 24, color: selected ? const Color(0xFF1565C0) : Colors.black54),
+          Icon(icon, size: 24, color: selected ? const Color(0xFF1565C0) : core_theme.AC.ts),
           const SizedBox(height: 8),
           Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-          Text('$count شركة متاحة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('$count شركة متاحة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const Spacer(),
           if (selected)
             const Row(
@@ -676,12 +677,12 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
         children: [
           Row(
             children: [
-              const Text('مجموعة النظراء — التجزئة السعودية', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              Text('مجموعة النظراء — التجزئة السعودية', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.add, size: 14),
-                label: const Text('إضافة نظير'),
+                label: Text('إضافة نظير'),
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1565C0), foregroundColor: Colors.white),
               ),
             ],
@@ -705,13 +706,13 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: p.self ? const Color(0xFFD4AF37).withOpacity(0.08) : Colors.white,
+        color: p.self ? core_theme.AC.gold.withOpacity(0.08) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: p.self ? const Color(0xFFD4AF37) : Colors.black.withOpacity(0.08), width: p.self ? 2 : 1),
+        border: Border.all(color: p.self ? core_theme.AC.gold : core_theme.AC.tp.withOpacity(0.08), width: p.self ? 2 : 1),
       ),
       child: Row(
         children: [
-          if (p.self) const Icon(Icons.star, color: Color(0xFFD4AF37), size: 18),
+          if (p.self) Icon(Icons.star, color: core_theme.AC.gold, size: 18),
           if (p.self) const SizedBox(width: 8),
           Expanded(
             flex: 2,
@@ -719,7 +720,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(p.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(p.brand, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(p.brand, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -727,7 +728,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('الإيرادات', style: TextStyle(fontSize: 9, color: Colors.black54)),
+                Text('الإيرادات', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                 Text('${p.revenue}M', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, fontFamily: 'monospace')),
               ],
             ),
@@ -736,8 +737,8 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('هامش Gross', style: TextStyle(fontSize: 9, color: Colors.black54)),
-                Text('${p.grossMargin}%', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF059669), fontFamily: 'monospace')),
+                Text('هامش Gross', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
+                Text('${p.grossMargin}%', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.ok, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -745,7 +746,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('EBITDA %', style: TextStyle(fontSize: 9, color: Colors.black54)),
+                Text('EBITDA %', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                 Text('${p.ebitda}%', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF1565C0), fontFamily: 'monospace')),
               ],
             ),
@@ -761,7 +762,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('المقارنة المرجعية — Quartile', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('المقارنة المرجعية — Quartile', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final m in [
             _Metric('هامش إجمالي الربح', 13.1, 9.8, 11.8, 14.2, '%'),
@@ -781,7 +782,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -791,7 +792,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
               const Spacer(),
               Text(
                 '${m.value} ${m.unit}',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: isBetter ? const Color(0xFF059669) : const Color(0xFFD97706), fontFamily: 'monospace'),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: isBetter ? core_theme.AC.ok : core_theme.AC.warn, fontFamily: 'monospace'),
               ),
             ],
           ),
@@ -799,13 +800,13 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           // Quartile bar
           Stack(
             children: [
-              Container(height: 12, decoration: BoxDecoration(color: Colors.black.withOpacity(0.05), borderRadius: BorderRadius.circular(6))),
+              Container(height: 12, decoration: BoxDecoration(color: core_theme.AC.tp.withOpacity(0.05), borderRadius: BorderRadius.circular(6))),
               Row(
                 children: [
                   Expanded(child: Container(height: 12, color: const Color(0xFFB91C1C).withOpacity(0.3))),
-                  Expanded(child: Container(height: 12, color: const Color(0xFFD97706).withOpacity(0.3))),
-                  Expanded(child: Container(height: 12, color: const Color(0xFF059669).withOpacity(0.3))),
-                  Expanded(child: Container(height: 12, color: const Color(0xFF2563EB).withOpacity(0.3))),
+                  Expanded(child: Container(height: 12, color: core_theme.AC.warn.withOpacity(0.3))),
+                  Expanded(child: Container(height: 12, color: core_theme.AC.ok.withOpacity(0.3))),
+                  Expanded(child: Container(height: 12, color: core_theme.AC.info.withOpacity(0.3))),
                 ],
               ),
               // Marker
@@ -814,7 +815,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
                 child: Container(
                   width: 3,
                   height: 16,
-                  color: Colors.black87,
+                  color: core_theme.AC.tp,
                 ),
               ),
             ],
@@ -822,11 +823,11 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           const SizedBox(height: 6),
           Row(
             children: [
-              Text('Q1: ${m.q1}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('Q1: ${m.q1}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const Spacer(),
-              Text('Median: ${m.q2}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('Median: ${m.q2}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const Spacer(),
-              Text('Q3: ${m.q3}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('Q3: ${m.q3}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ],
           ),
         ],
@@ -849,10 +850,10 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFF059669), Color(0xFF1565C0)]),
+              gradient: LinearGradient(colors: [core_theme.AC.ok, Color(0xFF1565C0)]),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.psychology, color: Colors.white, size: 28),
                 SizedBox(width: 16),
@@ -861,7 +862,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Altman Z-Score', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                      Text('نموذج التنبّؤ بالإفلاس', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('نموذج التنبّؤ بالإفلاس', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -869,14 +870,14 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text('3.42', style: TextStyle(color: Colors.white, fontSize: 42, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-                    Text('آمنة ✓', style: TextStyle(color: Colors.greenAccent, fontSize: 13, fontWeight: FontWeight.w800)),
+                    Text('آمنة ✓', style: TextStyle(color: core_theme.AC.ok, fontSize: 13, fontWeight: FontWeight.w800)),
                   ],
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-          const Text('مكوّنات Z-Score', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('مكوّنات Z-Score', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           _zFactor('X1', 'رأس المال العامل / إجمالي الأصول', 0.18, 0.85),
           _zFactor('X2', 'الأرباح المحتجزة / إجمالي الأصول', 0.22, 0.75),
@@ -886,14 +887,14 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('التفسير', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                Text('التفسير', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
-                _zRange('Z > 2.99', 'آمن — احتمال الإفلاس منخفض', const Color(0xFF059669), active: true),
-                _zRange('1.81 < Z < 2.99', 'منطقة رمادية — يحتاج تحليل أعمق', const Color(0xFFD97706)),
+                _zRange('Z > 2.99', 'آمن — احتمال الإفلاس منخفض', core_theme.AC.ok, active: true),
+                _zRange('1.81 < Z < 2.99', 'منطقة رمادية — يحتاج تحليل أعمق', core_theme.AC.warn),
                 _zRange('Z < 1.81', 'خطر عالي على الاستمرارية', const Color(0xFFB91C1C)),
               ],
             ),
@@ -907,7 +908,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Row(
         children: [
           Container(
@@ -923,12 +924,12 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
               children: [
                 Text(desc, style: const TextStyle(fontSize: 12)),
                 const SizedBox(height: 4),
-                LinearProgressIndicator(value: progress, backgroundColor: Colors.black.withOpacity(0.06), valueColor: const AlwaysStoppedAnimation(Color(0xFF1565C0)), minHeight: 4),
+                LinearProgressIndicator(value: progress, backgroundColor: core_theme.AC.tp.withOpacity(0.06), valueColor: const AlwaysStoppedAnimation(Color(0xFF1565C0)), minHeight: 4),
               ],
             ),
           ),
           const SizedBox(width: 12),
-          Text('× ${weight.toStringAsFixed(2)}', style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+          Text('× ${weight.toStringAsFixed(2)}', style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
         ],
       ),
     );
@@ -964,7 +965,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFF059669), Color(0xFFD4AF37)]),
+              gradient: LinearGradient(colors: [core_theme.AC.ok, core_theme.AC.gold]),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -974,16 +975,16 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
                   height: 80,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                  child: const Text('A', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Color(0xFF059669))),
+                  child: Text('A', style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: core_theme.AC.ok)),
                 ),
                 const SizedBox(width: 20),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('تصنيف ائتماني ممتاز', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
                       SizedBox(height: 4),
-                      Text('احتمال التخلّف عن السداد < 2% خلال 12 شهر', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('احتمال التخلّف عن السداد < 2% خلال 12 شهر', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -991,15 +992,15 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('مقياس التصنيف', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('مقياس التصنيف', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final r in [
-            _Rating('AAA', 'ممتاز جداً', '<0.01%', const Color(0xFF059669)),
-            _Rating('AA', 'ممتاز', '<0.05%', const Color(0xFF059669)),
-            _Rating('A', 'جيد جداً', '<0.10%', const Color(0xFF059669), active: true),
+            _Rating('AAA', 'ممتاز جداً', '<0.01%', core_theme.AC.ok),
+            _Rating('AA', 'ممتاز', '<0.05%', core_theme.AC.ok),
+            _Rating('A', 'جيد جداً', '<0.10%', core_theme.AC.ok, active: true),
             _Rating('BBB', 'جيد', '<0.50%', const Color(0xFF1565C0)),
-            _Rating('BB', 'مقبول — مضاربي', '<2.00%', const Color(0xFFD97706)),
-            _Rating('B', 'ضعيف', '<5.00%', const Color(0xFFD97706)),
+            _Rating('BB', 'مقبول — مضاربي', '<2.00%', core_theme.AC.warn),
+            _Rating('B', 'ضعيف', '<5.00%', core_theme.AC.warn),
             _Rating('CCC', 'ضعيف جداً', '<15.00%', const Color(0xFFB91C1C)),
             _Rating('D', 'متعثّر', '100%', const Color(0xFFB91C1C)),
           ])
@@ -1016,7 +1017,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
       decoration: BoxDecoration(
         color: r.active ? r.color.withOpacity(0.1) : Colors.white,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: r.active ? r.color : Colors.black.withOpacity(0.08), width: r.active ? 2 : 1),
+        border: Border.all(color: r.active ? r.color : core_theme.AC.tp.withOpacity(0.08), width: r.active ? 2 : 1),
       ),
       child: Row(
         children: [
@@ -1029,7 +1030,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(child: Text(r.desc, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
-          Text('PD: ${r.pd}', style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+          Text('PD: ${r.pd}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
           if (r.active) ...[
             const SizedBox(width: 8),
             Icon(Icons.check_circle, color: r.color, size: 16),

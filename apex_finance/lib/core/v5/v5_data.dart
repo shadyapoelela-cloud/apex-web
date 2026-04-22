@@ -20,6 +20,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 import '../v4/v4_groups.dart';
 import 'v5_models.dart';
@@ -462,7 +463,7 @@ List<V5Service> v5Services = [
     labelAr: 'المحاسبة والعمليات',
     labelEn: 'ERP',
     icon: Icons.business_center,
-    color: const Color(0xFFD4AF37), // Gold
+    color: Color(0xFFD4AF37), // Gold
     descriptionAr: 'العمليات اليومية — 16 تطبيق متخصص',
     mainModules: [
       // 1.1 Finance (GL) — #1 in Middle East target

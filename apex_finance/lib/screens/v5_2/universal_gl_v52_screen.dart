@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class UniversalGlV52Screen extends StatefulWidget {
@@ -14,8 +15,8 @@ class UniversalGlV52Screen extends StatefulWidget {
 }
 
 class _UniversalGlV52ScreenState extends State<UniversalGlV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _dim = 'account';
 
   static const _lines = <_Line>[
@@ -54,9 +55,9 @@ class _UniversalGlV52ScreenState extends State<UniversalGlV52Screen> {
       ],
       filterChips: [
         FilterChipDef(id: 'account', labelAr: 'حسب الحساب', icon: Icons.account_tree, color: _gold, active: _dim == 'account'),
-        FilterChipDef(id: 'profit', labelAr: 'حسب مركز الربحية', icon: Icons.donut_small, color: Colors.blue, active: _dim == 'profit'),
-        FilterChipDef(id: 'cost', labelAr: 'حسب مركز التكلفة', icon: Icons.pie_chart, color: Colors.orange, active: _dim == 'cost'),
-        FilterChipDef(id: 'dim', labelAr: 'حسب الأبعاد', icon: Icons.view_in_ar, color: Colors.purple, active: _dim == 'dim'),
+        FilterChipDef(id: 'profit', labelAr: 'حسب مركز الربحية', icon: Icons.donut_small, color: core_theme.AC.info, active: _dim == 'profit'),
+        FilterChipDef(id: 'cost', labelAr: 'حسب مركز التكلفة', icon: Icons.pie_chart, color: core_theme.AC.warn, active: _dim == 'cost'),
+        FilterChipDef(id: 'dim', labelAr: 'حسب الأبعاد', icon: Icons.view_in_ar, color: core_theme.AC.purple, active: _dim == 'dim'),
       ],
       onFilterToggle: (id) => setState(() => _dim = id),
       onCreateNew: () {},
@@ -89,27 +90,27 @@ class _UniversalGlV52ScreenState extends State<UniversalGlV52Screen> {
       Expanded(child: ListView.separated(
         padding: EdgeInsets.zero,
         itemCount: _lines.length,
-        separatorBuilder: (_, __) => Container(height: 1, color: Colors.grey.shade200),
+        separatorBuilder: (_, __) => Container(height: 1, color: core_theme.AC.bdr),
         itemBuilder: (_, i) {
           final l = _lines[i];
           return InkWell(
             onTap: () {},
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              color: i % 2 == 0 ? Colors.white : Colors.grey.shade50,
+              color: i % 2 == 0 ? Colors.white : core_theme.AC.navy3,
               child: Row(children: [
                 SizedBox(width: 90, child: Text(l.date, style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
-                SizedBox(width: 110, child: Text(l.jeId, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.blue, decoration: TextDecoration.underline))),
+                SizedBox(width: 110, child: Text(l.jeId, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.info, decoration: TextDecoration.underline))),
                 SizedBox(width: 160, child: Row(children: [
-                  Text(l.accountId, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                  Text(l.accountId, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                   const SizedBox(width: 6),
                   Expanded(child: Text(l.accountName, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 ])),
                 Expanded(child: Text(l.description, style: const TextStyle(fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                SizedBox(width: 90, child: Text(l.profitCenter ?? '—', style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.blue.shade700))),
-                SizedBox(width: 90, child: Text(l.costCenter ?? '—', style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.orange.shade700))),
-                SizedBox(width: 110, child: Text(l.debit > 0 ? l.debit.toStringAsFixed(0) : '—', style: TextStyle(fontSize: 12, fontWeight: l.debit > 0 ? FontWeight.w800 : FontWeight.w400, color: l.debit > 0 ? Colors.green : Colors.black38, fontFamily: 'monospace'), textAlign: TextAlign.end)),
-                SizedBox(width: 110, child: Text(l.credit > 0 ? l.credit.toStringAsFixed(0) : '—', style: TextStyle(fontSize: 12, fontWeight: l.credit > 0 ? FontWeight.w800 : FontWeight.w400, color: l.credit > 0 ? _gold : Colors.black38, fontFamily: 'monospace'), textAlign: TextAlign.end)),
+                SizedBox(width: 90, child: Text(l.profitCenter ?? '—', style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.info))),
+                SizedBox(width: 90, child: Text(l.costCenter ?? '—', style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.warn))),
+                SizedBox(width: 110, child: Text(l.debit > 0 ? l.debit.toStringAsFixed(0) : '—', style: TextStyle(fontSize: 12, fontWeight: l.debit > 0 ? FontWeight.w800 : FontWeight.w400, color: l.debit > 0 ? core_theme.AC.ok : core_theme.AC.td, fontFamily: 'monospace'), textAlign: TextAlign.end)),
+                SizedBox(width: 110, child: Text(l.credit > 0 ? l.credit.toStringAsFixed(0) : '—', style: TextStyle(fontSize: 12, fontWeight: l.credit > 0 ? FontWeight.w800 : FontWeight.w400, color: l.credit > 0 ? _gold : core_theme.AC.td, fontFamily: 'monospace'), textAlign: TextAlign.end)),
               ]),
             ),
           );
@@ -119,15 +120,15 @@ class _UniversalGlV52ScreenState extends State<UniversalGlV52Screen> {
         padding: const EdgeInsets.all(12),
         color: _gold.withOpacity(0.08),
         child: Row(children: [
-          const Text('الإجماليات:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
+          Text('الإجماليات:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
           const Spacer(),
-          Text('مدين: ${_lines.fold<double>(0, (s, l) => s + l.debit).toStringAsFixed(0)}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.green, fontFamily: 'monospace')),
+          Text('مدين: ${_lines.fold<double>(0, (s, l) => s + l.debit).toStringAsFixed(0)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.ok, fontFamily: 'monospace')),
           const SizedBox(width: 16),
-          Text('دائن: ${_lines.fold<double>(0, (s, l) => s + l.credit).toStringAsFixed(0)}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold, fontFamily: 'monospace')),
+          Text('دائن: ${_lines.fold<double>(0, (s, l) => s + l.credit).toStringAsFixed(0)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold, fontFamily: 'monospace')),
           const SizedBox(width: 16),
-          const Icon(Icons.check_circle, color: Colors.green, size: 16),
+          Icon(Icons.check_circle, color: core_theme.AC.ok, size: 16),
           const SizedBox(width: 4),
-          const Text('متوازن', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.green)),
+          Text('متوازن', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
         ]),
       ),
     ]);
@@ -155,25 +156,25 @@ class _UniversalGlV52ScreenState extends State<UniversalGlV52Screen> {
         final totalC = lines.fold<double>(0, (s, l) => s + l.credit);
         final net = totalD - totalC;
         return Container(
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(children: [
             Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withOpacity(0.06), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
-              const Icon(Icons.folder, color: _gold, size: 18),
+              Icon(Icons.folder, color: _gold, size: 18),
               const SizedBox(width: 8),
-              Expanded(child: Text(key, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy))),
-              Text('${lines.length} بند', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Expanded(child: Text(key, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy))),
+              Text('${lines.length} بند', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               const SizedBox(width: 16),
-              Text('صافي: ${net.toStringAsFixed(0)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: net >= 0 ? Colors.green : Colors.red)),
+              Text('صافي: ${net.toStringAsFixed(0)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: net >= 0 ? core_theme.AC.ok : core_theme.AC.err)),
             ])),
             ...lines.map((l) => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey.shade200))),
+                  decoration: BoxDecoration(border: Border(top: BorderSide(color: core_theme.AC.bdr))),
                   child: Row(children: [
                     SizedBox(width: 90, child: Text(l.date, style: const TextStyle(fontSize: 11))),
-                    SizedBox(width: 110, child: Text(l.jeId, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.blue))),
+                    SizedBox(width: 110, child: Text(l.jeId, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.info))),
                     Expanded(child: Text(l.description, style: const TextStyle(fontSize: 11))),
-                    SizedBox(width: 100, child: Text(l.debit > 0 ? l.debit.toStringAsFixed(0) : '—', style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: l.debit > 0 ? Colors.green : Colors.black38), textAlign: TextAlign.end)),
-                    SizedBox(width: 100, child: Text(l.credit > 0 ? l.credit.toStringAsFixed(0) : '—', style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: l.credit > 0 ? _gold : Colors.black38), textAlign: TextAlign.end)),
+                    SizedBox(width: 100, child: Text(l.debit > 0 ? l.debit.toStringAsFixed(0) : '—', style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: l.debit > 0 ? core_theme.AC.ok : core_theme.AC.td), textAlign: TextAlign.end)),
+                    SizedBox(width: 100, child: Text(l.credit > 0 ? l.credit.toStringAsFixed(0) : '—', style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: l.credit > 0 ? _gold : core_theme.AC.td), textAlign: TextAlign.end)),
                   ]),
                 )),
           ]),
@@ -193,15 +194,15 @@ class _UniversalGlV52ScreenState extends State<UniversalGlV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('حركة الحسابات — الأكثر نشاطاً', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('حركة الحسابات — الأكثر نشاطاً', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         Expanded(child: ListView(children: sorted.map((e) {
           final pct = e.value / max;
           return Padding(padding: const EdgeInsets.only(bottom: 12), child: Row(children: [
             SizedBox(width: 120, child: Text(e.key, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w800))),
-            Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: Colors.grey.shade100, color: _gold))),
+            Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: core_theme.AC.navy3, color: _gold))),
             const SizedBox(width: 10),
-            SizedBox(width: 140, child: Text('${(e.value / 1000).toStringAsFixed(0)}K ر.س', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold), textAlign: TextAlign.end)),
+            SizedBox(width: 140, child: Text('${(e.value / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold), textAlign: TextAlign.end)),
           ]));
         }).toList())),
       ]),

@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -33,8 +34,8 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF059669), Color(0xFF2563EB)],
+              gradient: LinearGradient(
+                colors: [core_theme.AC.ok, core_theme.AC.info],
               ),
               borderRadius: BorderRadius.circular(14),
             ),
@@ -49,7 +50,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                   child: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -60,7 +61,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                       SizedBox(height: 4),
                       Text(
                         'صوّر أو ارفع · يستخرج البيانات في 3 ثواني · يستبدل Expensify',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                       ),
                     ],
                   ),
@@ -93,17 +94,17 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF059669).withOpacity(0.3), width: 2),
+        border: Border.all(color: core_theme.AC.ok.withOpacity(0.3), width: 2),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF059669).withOpacity(0.08),
+              color: core_theme.AC.ok.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.receipt_long, size: 48, color: Color(0xFF059669)),
+            child: Icon(Icons.receipt_long, size: 48, color: core_theme.AC.ok),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -121,7 +122,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                     : const Icon(Icons.camera_alt, size: 16),
                 label: Text(_extracting ? 'يستخرج...' : 'التقط صورة'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF059669),
+                  backgroundColor: core_theme.AC.ok,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 ),
@@ -140,7 +141,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
           const SizedBox(height: 12),
           Text(
             'يدعم: JPG · PNG · PDF · HEIC · حتى 10MB',
-            style: TextStyle(fontSize: 11, color: Colors.black54),
+            style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
           ),
           const SizedBox(height: 16),
           // Features grid
@@ -200,7 +201,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.black.withOpacity(0.1)),
+            border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
           ),
           child: Column(
             children: [
@@ -208,7 +209,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF059669).withOpacity(0.06),
+                  color: core_theme.AC.ok.withOpacity(0.06),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
                 ),
                 child: Row(
@@ -216,13 +217,13 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF059669).withOpacity(0.15),
+                        color: core_theme.AC.ok.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.check_circle, color: Color(0xFF059669), size: 22),
+                      child: Icon(Icons.check_circle, color: core_theme.AC.ok, size: 22),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -232,7 +233,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                           ),
                           Text(
                             'استغرق 2.3 ثانية · كل الحقول مستخرجة',
-                            style: TextStyle(fontSize: 11, color: Colors.black54),
+                            style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                           ),
                         ],
                       ),
@@ -240,7 +241,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF059669),
+                        color: core_theme.AC.ok,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
@@ -279,9 +280,9 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.02),
+                  color: core_theme.AC.tp.withOpacity(0.02),
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
-                  border: Border(top: BorderSide(color: Colors.black.withOpacity(0.06))),
+                  border: Border(top: BorderSide(color: core_theme.AC.tp.withOpacity(0.06))),
                 ),
                 child: Row(
                   children: [
@@ -311,7 +312,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                       icon: const Icon(Icons.check, size: 14),
                       label: const Text('احفظ كطلب مصروف'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059669),
+                        backgroundColor: core_theme.AC.ok,
                         foregroundColor: Colors.white,
                       ),
                     ),
@@ -329,17 +330,17 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
     return Container(
       height: 280,
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.04),
+        color: core_theme.AC.tp.withOpacity(0.04),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Stack(
         children: [
-          const Center(
+          Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.receipt_long, size: 64, color: Colors.black26),
+                Icon(Icons.receipt_long, size: 64, color: core_theme.AC.td),
                 SizedBox(height: 8),
                 Text(
                   'ABC Cafe\n───────────\nقهوة أمريكانو   18.00\nكرواسون        22.00\nعصير برتقال     15.00\nشاي بالحليب    21.09\n───────────\nالمجموع: 76.09\nVAT 15%: 11.41\n═══════════\nالإجمالي: 87.50',
@@ -347,7 +348,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                   style: TextStyle(
                     fontFamily: 'monospace',
                     fontSize: 11,
-                    color: Colors.black54,
+                    color: core_theme.AC.ts,
                   ),
                 ),
               ],
@@ -360,13 +361,13 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
               decoration: BoxDecoration(
-                color: const Color(0xFF059669).withOpacity(0.2),
-                border: Border.all(color: const Color(0xFF059669), width: 2),
+                color: core_theme.AC.ok.withOpacity(0.2),
+                border: Border.all(color: core_theme.AC.ok, width: 2),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Text(
+              child: Text(
                 'ABC Cafe',
-                style: TextStyle(fontSize: 9, color: Color(0xFF059669), fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 9, color: core_theme.AC.ok, fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -379,7 +380,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
     return Column(
       children: [
         _field('المورد', r.vendor, Icons.store),
-        _field('المبلغ الإجمالي', '${r.amount.toStringAsFixed(2)} ${r.currency}', Icons.payments, color: const Color(0xFF059669)),
+        _field('المبلغ الإجمالي', '${r.amount.toStringAsFixed(2)} ${r.currency}', Icons.payments, color: core_theme.AC.ok),
         _field('VAT (15%)', '${r.vat.toStringAsFixed(2)} ${r.currency}', Icons.percent),
         _field('التاريخ', r.date, Icons.event),
         _field(
@@ -389,12 +390,12 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB).withOpacity(0.12),
+              color: core_theme.AC.info.withOpacity(0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               '${(r.categoryConfidence * 100).toInt()}%',
-              style: const TextStyle(fontSize: 10, color: Color(0xFF2563EB), fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 10, color: core_theme.AC.info, fontWeight: FontWeight.w700),
             ),
           ),
         ),
@@ -403,15 +404,15 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
         const SizedBox(height: 8),
         if (r.items.isNotEmpty) ...[
           const Divider(),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
-                Icon(Icons.list, size: 12, color: Colors.black54),
+                Icon(Icons.list, size: 12, color: core_theme.AC.ts),
                 SizedBox(width: 6),
                 Text(
                   'البنود المستخرجة',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black54),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.ts),
                 ),
               ],
             ),
@@ -421,7 +422,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: Row(
                 children: [
-                  const Text('• ', style: TextStyle(color: Colors.black54)),
+                  Text('• ', style: TextStyle(color: core_theme.AC.ts)),
                   Expanded(
                     child: Text(item.label, style: const TextStyle(fontSize: 11)),
                   ),
@@ -442,11 +443,11 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, size: 13, color: Colors.black45),
+          Icon(icon, size: 13, color: core_theme.AC.td),
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(fontSize: 11, color: Colors.black54),
+            style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
           ),
           const Spacer(),
           Text(
@@ -511,14 +512,14 @@ class _FeatureChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF059669).withOpacity(0.06),
+        color: core_theme.AC.ok.withOpacity(0.06),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 14, color: const Color(0xFF059669)),
+          Icon(icon, size: 14, color: core_theme.AC.ok),
           const SizedBox(width: 6),
-          Text(text, style: const TextStyle(fontSize: 11, color: Colors.black87)),
+          Text(text, style: TextStyle(fontSize: 11, color: core_theme.AC.tp)),
         ],
       ),
     );

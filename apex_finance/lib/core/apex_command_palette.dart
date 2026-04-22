@@ -27,6 +27,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 enum ApexCommandKind { action, navigation, search }
 
@@ -239,7 +240,7 @@ class _ApexCommandPaletteState extends State<ApexCommandPalette>
         Positioned.fill(
           child: GestureDetector(
             onTap: () => Navigator.of(context).pop(),
-            child: Container(color: Colors.black.withValues(alpha: 0.5)),
+            child: Container(color: core_theme.AC.tp.withValues(alpha: 0.5)),
           ),
         ),
         Align(
@@ -261,7 +262,7 @@ class _ApexCommandPaletteState extends State<ApexCommandPalette>
                     border: Border.all(color: AC.navy4),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.4),
+                        color: core_theme.AC.tp.withValues(alpha: 0.4),
                         blurRadius: 32,
                         offset: const Offset(0, 8),
                       ),

@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class PriceListScreen extends StatefulWidget {
   const PriceListScreen({super.key});
@@ -59,9 +60,9 @@ class _PriceListScreenState extends State<PriceListScreen>
         _buildKpis(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.list, size: 16), text: 'المنتجات والأسعار'),
             Tab(icon: Icon(Icons.discount, size: 16), text: 'قواعد الخصومات'),
@@ -94,21 +95,21 @@ class _PriceListScreenState extends State<PriceListScreen>
         children: [
           const Icon(Icons.inventory_2, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('قائمة الأسعار والكتالوج',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Price List Management — مستويات السعر · خصومات · عملات · موافقات',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 16),
-            label: const Text('منتج جديد'),
+            label: Text('منتج جديد'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF006064),
@@ -126,11 +127,11 @@ class _PriceListScreenState extends State<PriceListScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('إجمالي المنتجات', '${_products.length}', Colors.blue, Icons.inventory_2),
-          _kpi('نشطة', '$active', Colors.green, Icons.check_circle),
-          _kpi('متكرّرة', '$recurring', Colors.purple, Icons.repeat),
-          _kpi('متوسط السعر', '58K ر.س', const Color(0xFFD4AF37), Icons.attach_money),
-          _kpi('هامش الربح المتوسط', '42%', Colors.teal, Icons.trending_up),
+          _kpi('إجمالي المنتجات', '${_products.length}', core_theme.AC.info, Icons.inventory_2),
+          _kpi('نشطة', '$active', core_theme.AC.ok, Icons.check_circle),
+          _kpi('متكرّرة', '$recurring', core_theme.AC.purple, Icons.repeat),
+          _kpi('متوسط السعر', '58K ر.س', core_theme.AC.gold, Icons.attach_money),
+          _kpi('هامش الربح المتوسط', '42%', core_theme.AC.info, Icons.trending_up),
         ],
       ),
     );
@@ -154,7 +155,7 @@ class _PriceListScreenState extends State<PriceListScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -186,22 +187,22 @@ class _PriceListScreenState extends State<PriceListScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     Expanded(child: Text('SKU', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 3, child: Text('المنتج', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('الفئة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('Silver', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.grey))),
-                    Expanded(child: Text('Gold', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(child: Text('Silver', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.td))),
+                    Expanded(child: Text('Gold', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                     Expanded(child: Text('Platinum', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF455A64)))),
-                    Expanded(child: Text('Retail', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.blue))),
+                    Expanded(child: Text('Retail', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.info))),
                     Expanded(child: Text('الحالة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                   ],
                 ),
@@ -222,26 +223,26 @@ class _PriceListScreenState extends State<PriceListScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFD4AF37) : Colors.white,
+          color: selected ? core_theme.AC.gold : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: selected ? const Color(0xFFD4AF37) : Colors.black26),
+          border: Border.all(color: selected ? core_theme.AC.gold : core_theme.AC.td),
         ),
         child: Text(label,
             style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : Colors.black87)),
+                color: selected ? Colors.white : core_theme.AC.tp)),
       ),
     );
   }
 
   Widget _productRow(_Product p) {
-    final statusColor = p.status == 'active' ? Colors.green : p.status == 'planned' ? Colors.blue : Colors.grey;
+    final statusColor = p.status == 'active' ? core_theme.AC.ok : p.status == 'planned' ? core_theme.AC.info : core_theme.AC.td;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
-        color: p.status != 'active' ? Colors.grey.shade50 : null,
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        color: p.status != 'active' ? core_theme.AC.navy3 : null,
       ),
       child: Row(
         children: [
@@ -252,7 +253,7 @@ class _PriceListScreenState extends State<PriceListScreen>
               children: [
                 Expanded(child: Text(p.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
                 if (p.recurring)
-                  const Icon(Icons.repeat, size: 14, color: Colors.purple),
+                  Icon(Icons.repeat, size: 14, color: core_theme.AC.purple),
               ],
             ),
           ),
@@ -266,10 +267,10 @@ class _PriceListScreenState extends State<PriceListScreen>
                   textAlign: TextAlign.center),
             ),
           ),
-          Expanded(child: Text(_fmt(p.silverPrice.toDouble()), style: const TextStyle(fontSize: 11, color: Colors.grey, fontFamily: 'monospace'))),
-          Expanded(child: Text(_fmt(p.goldPrice.toDouble()), style: const TextStyle(fontSize: 12, color: Color(0xFFD4AF37), fontWeight: FontWeight.w800, fontFamily: 'monospace'))),
+          Expanded(child: Text(_fmt(p.silverPrice.toDouble()), style: TextStyle(fontSize: 11, color: core_theme.AC.td, fontFamily: 'monospace'))),
+          Expanded(child: Text(_fmt(p.goldPrice.toDouble()), style: TextStyle(fontSize: 12, color: core_theme.AC.gold, fontWeight: FontWeight.w800, fontFamily: 'monospace'))),
           Expanded(child: Text(_fmt(p.platinumPrice.toDouble()), style: const TextStyle(fontSize: 11, color: Color(0xFF455A64), fontFamily: 'monospace'))),
-          Expanded(child: Text(_fmt(p.retailPrice.toDouble()), style: const TextStyle(fontSize: 11, color: Colors.blue, fontFamily: 'monospace'))),
+          Expanded(child: Text(_fmt(p.retailPrice.toDouble()), style: TextStyle(fontSize: 11, color: core_theme.AC.info, fontFamily: 'monospace'))),
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(left: 4),
@@ -286,14 +287,14 @@ class _PriceListScreenState extends State<PriceListScreen>
   }
 
   Widget _buildDiscountsTab() {
-    final rules = const [
-      _Discount('خصم الحجم', 'volume', '> 1,000,000 ر.س فاتورة واحدة', 10, 'تلقائي', Colors.blue),
-      _Discount('خصم الولاء Platinum', 'loyalty', 'عميل > 5 سنوات', 15, 'تلقائي', Color(0xFFD4AF37)),
-      _Discount('خصم الدفع المبكر', 'early-payment', 'دفع خلال 10 أيام', 2, 'تلقائي', Colors.green),
-      _Discount('خصم موسمي — العيد', 'seasonal', 'العيدين فقط', 8, 'مؤقت', Colors.purple),
-      _Discount('خصم اشتراك سنوي', 'annual', 'اشتراك سنوي مقدّم', 17, 'تلقائي', Colors.teal),
-      _Discount('خصم جهة حكومية', 'government', 'جهات حكومية معتمدة', 5, 'يدوي', Colors.red),
-      _Discount('خصم حجم صفقة استراتيجي', 'strategic', '> 5M ر.س', 20, 'اعتماد مدير المبيعات', Colors.orange),
+    final rules = [
+      _Discount('خصم الحجم', 'volume', '> 1,000,000 ر.س فاتورة واحدة', 10, 'تلقائي', core_theme.AC.info),
+      _Discount('خصم الولاء Platinum', 'loyalty', 'عميل > 5 سنوات', 15, 'تلقائي', core_theme.AC.gold),
+      _Discount('خصم الدفع المبكر', 'early-payment', 'دفع خلال 10 أيام', 2, 'تلقائي', core_theme.AC.ok),
+      _Discount('خصم موسمي — العيد', 'seasonal', 'العيدين فقط', 8, 'مؤقت', core_theme.AC.purple),
+      _Discount('خصم اشتراك سنوي', 'annual', 'اشتراك سنوي مقدّم', 17, 'تلقائي', core_theme.AC.info),
+      _Discount('خصم جهة حكومية', 'government', 'جهات حكومية معتمدة', 5, 'يدوي', core_theme.AC.err),
+      _Discount('خصم حجم صفقة استراتيجي', 'strategic', '> 5M ر.س', 20, 'اعتماد مدير المبيعات', core_theme.AC.warn),
     ];
     return ListView.builder(
       padding: const EdgeInsets.all(20),
@@ -322,14 +323,14 @@ class _PriceListScreenState extends State<PriceListScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(d.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                    Text(d.condition, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                    Text(d.condition, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                     Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                           child: Text(d.application,
-                              style: const TextStyle(fontSize: 10, color: Colors.black87, fontWeight: FontWeight.w700)),
+                              style: TextStyle(fontSize: 10, color: core_theme.AC.tp, fontWeight: FontWeight.w700)),
                         ),
                       ],
                     ),
@@ -350,12 +351,12 @@ class _PriceListScreenState extends State<PriceListScreen>
   }
 
   Widget _buildHistoryTab() {
-    final changes = const [
-      _PriceChange('2026-04-15', 'SKU-002', 'زيادة 5% بسبب تحديث المعايير', 176000, 185000, Colors.green),
-      _PriceChange('2026-04-01', 'SKU-005', 'خصم ترويجي Q2 — 10%', 2499, 2249, Colors.orange),
-      _PriceChange('2026-03-12', 'SKU-008', 'تعديل حسب سعر الخام', 1980, 2050, Colors.green),
-      _PriceChange('2026-02-28', 'SKU-001', 'تحديث سعر سنوي', 92000, 95000, Colors.green),
-      _PriceChange('2026-02-10', 'SKU-014', 'تخفيض قبل الإيقاف', 1500, 1200, Colors.red),
+    final changes = [
+      _PriceChange('2026-04-15', 'SKU-002', 'زيادة 5% بسبب تحديث المعايير', 176000, 185000, core_theme.AC.ok),
+      _PriceChange('2026-04-01', 'SKU-005', 'خصم ترويجي Q2 — 10%', 2499, 2249, core_theme.AC.warn),
+      _PriceChange('2026-03-12', 'SKU-008', 'تعديل حسب سعر الخام', 1980, 2050, core_theme.AC.ok),
+      _PriceChange('2026-02-28', 'SKU-001', 'تحديث سعر سنوي', 92000, 95000, core_theme.AC.ok),
+      _PriceChange('2026-02-10', 'SKU-014', 'تخفيض قبل الإيقاف', 1500, 1200, core_theme.AC.err),
     ];
     return ListView.builder(
       padding: const EdgeInsets.all(20),
@@ -369,24 +370,24 @@ class _PriceListScreenState extends State<PriceListScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
               Icon(up ? Icons.arrow_upward : Icons.arrow_downward, color: c.color, size: 18),
               const SizedBox(width: 10),
-              Text(c.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+              Text(c.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
               const SizedBox(width: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: Colors.blue.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(c.sku,
-                    style: const TextStyle(fontSize: 11, color: Colors.blue, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.info, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
               ),
               const SizedBox(width: 10),
               Expanded(child: Text(c.reason, style: const TextStyle(fontSize: 12))),
               Text(_fmt(c.oldPrice.toDouble()),
-                  style: const TextStyle(fontSize: 12, color: Colors.black54, fontFamily: 'monospace', decoration: TextDecoration.lineThrough)),
+                  style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontFamily: 'monospace', decoration: TextDecoration.lineThrough)),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 6),
                 child: Icon(Icons.arrow_forward, size: 14),
@@ -405,17 +406,17 @@ class _PriceListScreenState extends State<PriceListScreen>
       case 'audit':
         return const Color(0xFF4A148C);
       case 'advisory':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'erp':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'saas':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'training':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'supply':
-        return Colors.orange;
+        return core_theme.AC.warn;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

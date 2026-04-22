@@ -157,3 +157,34 @@ class CompanySettings(Base):
     updated_at = Column(DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
 
     tenant = relationship("Tenant", back_populates="company_settings")
+
+
+class SettingsChangeLog(Base):
+    """سجل التغييرات على إعدادات الشركة — لتتبّع من غيّر ماذا ومتى.
+
+    يميّز APEX عن QBO/Xero/SAP: كل تغيير يُسجّل بـ diff قابل للقراءة,
+    مع إمكانية الاستعادة (rollback) لأي تعديل.
+    """
+    __tablename__ = "pilot_settings_change_log"
+
+    id = Column(String(36), primary_key=True, default=gen_uuid)
+    tenant_id = Column(String(36), ForeignKey("pilot_tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+
+    # Category (fiscal / currency / tax / approvals / numbering / security / audit / ai / backup / regional / branding / tenant)
+    category = Column(String(32), nullable=False, index=True)
+
+    # List of {field, old_value, new_value} — JSON
+    changes = Column(JSON, nullable=False, default=list)
+
+    # Who + when
+    changed_by_user_id = Column(String(36), nullable=True, index=True)
+    changed_by_name = Column(String(100), nullable=True)
+    changed_at = Column(DateTime(timezone=True), nullable=False, default=utcnow, index=True)
+
+    # Optional comment / rollback reference
+    note = Column(Text, nullable=True)
+    rolled_back_from_id = Column(String(36), nullable=True)
+
+    __table_args__ = (
+        Index("ix_pilot_settings_log_tenant_cat_time", "tenant_id", "category", "changed_at"),
+    )

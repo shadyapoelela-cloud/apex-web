@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class BankGuaranteesScreen extends StatefulWidget {
   const BankGuaranteesScreen({super.key});
@@ -56,17 +57,17 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             children: [
-              _kpi('إجمالي الصادرة', _fmtM(outValue), Colors.orange, Icons.arrow_upward),
-              _kpi('إجمالي الواردة', _fmtM(inValue), Colors.green, Icons.arrow_downward),
-              _kpi('قرب الانتهاء', '$expiring', Colors.red, Icons.warning),
-              _kpi('معدل الاستخدام', '42%', Colors.blue, Icons.donut_large),
+              _kpi('إجمالي الصادرة', _fmtM(outValue), core_theme.AC.warn, Icons.arrow_upward),
+              _kpi('إجمالي الواردة', _fmtM(inValue), core_theme.AC.ok, Icons.arrow_downward),
+              _kpi('قرب الانتهاء', '$expiring', core_theme.AC.err, Icons.warning),
+              _kpi('معدل الاستخدام', '42%', core_theme.AC.info, Icons.donut_large),
             ],
           ),
         ),
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF006064),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF006064),
           tabs: const [
             Tab(icon: Icon(Icons.arrow_upward, size: 16), text: 'صادرة (ضدّنا)'),
@@ -96,7 +97,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
         gradient: const LinearGradient(colors: [Color(0xFF004D40), Color(0xFF006064)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.verified_user, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -107,7 +108,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
                 Text('الضمانات البنكية والاعتمادات',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('L/Gs · L/Cs · Performance Bonds · Advance Payment Guarantees · Bid Bonds',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -134,7 +135,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -204,8 +205,8 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(_fmt(instr.amount),
-                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                      const Text('ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                      Text('ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     ],
                   ),
                 ],
@@ -213,7 +214,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(8)),
                 child: Row(
                   children: [
                     Expanded(child: _dl('المستفيد/المقابل', instr.counterparty)),
@@ -224,7 +225,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
                       child: _dl(
                         'الأيام المتبقية',
                         daysLeft < 0 ? 'منتهي' : '$daysLeft يوم',
-                        color: daysLeft < 30 ? Colors.red : daysLeft < 90 ? Colors.orange : Colors.green,
+                        color: daysLeft < 30 ? core_theme.AC.err : daysLeft < 90 ? core_theme.AC.warn : core_theme.AC.ok,
                       ),
                     ),
                   ],
@@ -235,21 +236,21 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
+                    color: core_theme.AC.warn,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.shade200),
+                    border: Border.all(color: core_theme.AC.warn),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.warning_amber, color: Colors.orange, size: 16),
+                      Icon(Icons.warning_amber, color: core_theme.AC.warn, size: 16),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           'الضمان ينتهي خلال $daysLeft يوم — ابدأ إجراءات التجديد أو الإلغاء',
-                          style: const TextStyle(fontSize: 11, color: Colors.orange),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.warn),
                         ),
                       ),
-                      TextButton(onPressed: () {}, child: const Text('إجراء', style: TextStyle(fontSize: 11))),
+                      TextButton(onPressed: () {}, child: Text('إجراء', style: TextStyle(fontSize: 11))),
                     ],
                   ),
                 ),
@@ -265,9 +266,9 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(value,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color ?? Colors.black87)),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color ?? core_theme.AC.tp)),
       ],
     );
   }
@@ -287,7 +288,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+            gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
@@ -300,16 +301,16 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
               ),
               Text(_fmt(totalLimit.toDouble()),
                   style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Text(' ر.س', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(' ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
             ],
           ),
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('مُستخدم', _fmtM(totalUsed.toDouble()), Colors.orange, Icons.pie_chart),
-            _kpi('متاح', _fmtM((totalLimit - totalUsed).toDouble()), Colors.green, Icons.check_circle),
-            _kpi('نسبة الاستخدام', '${(totalUsed / totalLimit * 100).toStringAsFixed(0)}%', Colors.blue, Icons.donut_large),
+            _kpi('مُستخدم', _fmtM(totalUsed.toDouble()), core_theme.AC.warn, Icons.pie_chart),
+            _kpi('متاح', _fmtM((totalLimit - totalUsed).toDouble()), core_theme.AC.ok, Icons.check_circle),
+            _kpi('نسبة الاستخدام', '${(totalUsed / totalLimit * 100).toStringAsFixed(0)}%', core_theme.AC.info, Icons.donut_large),
           ],
         ),
         const SizedBox(height: 16),
@@ -320,26 +321,26 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
 
   Widget _bankRow(_BankLimit b) {
     final pct = b.used / b.totalLimit;
-    final color = pct > 0.8 ? Colors.red : pct > 0.5 ? Colors.orange : Colors.green;
+    final color = pct > 0.8 ? core_theme.AC.err : pct > 0.5 ? core_theme.AC.warn : core_theme.AC.ok;
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.account_balance, size: 18, color: Color(0xFFD4AF37)),
+              Icon(Icons.account_balance, size: 18, color: core_theme.AC.gold),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(b.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
               ),
-              Text('${b.instrumentCount} أداة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('${b.instrumentCount} أداة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ],
           ),
           const SizedBox(height: 10),
@@ -349,7 +350,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
               const SizedBox(width: 20),
               _dl('مُستخدم', '${_fmt(b.used.toDouble())} ر.س', color: color),
               const SizedBox(width: 20),
-              _dl('متاح', '${_fmt((b.totalLimit - b.used).toDouble())} ر.س', color: Colors.green),
+              _dl('متاح', '${_fmt((b.totalLimit - b.used).toDouble())} ر.س', color: core_theme.AC.ok),
               const Spacer(),
               Text('${(pct * 100).toStringAsFixed(0)}%',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
@@ -358,7 +359,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: pct,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: core_theme.AC.bdr,
             valueColor: AlwaysStoppedAnimation(color),
             minHeight: 8,
           ),
@@ -370,30 +371,30 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
   Color _statusColor(String s) {
     switch (s) {
       case 'active':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'expiring':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'expired':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
   _TypeInfo _typeInfo(String type) {
     switch (type) {
       case 'performance':
-        return const _TypeInfo('ضمان حسن تنفيذ', Icons.verified, Colors.blue);
+        return _TypeInfo('ضمان حسن تنفيذ', Icons.verified, core_theme.AC.info);
       case 'advance':
-        return const _TypeInfo('ضمان دفعة مقدمة', Icons.payments, Colors.purple);
+        return _TypeInfo('ضمان دفعة مقدمة', Icons.payments, core_theme.AC.purple);
       case 'bid':
-        return const _TypeInfo('ضمان ابتدائي', Icons.gavel, Colors.orange);
+        return _TypeInfo('ضمان ابتدائي', Icons.gavel, core_theme.AC.warn);
       case 'maintenance':
-        return const _TypeInfo('ضمان صيانة', Icons.build, Colors.teal);
+        return _TypeInfo('ضمان صيانة', Icons.build, core_theme.AC.info);
       case 'lc':
-        return const _TypeInfo('اعتماد مستندي', Icons.description, Color(0xFFD4AF37));
+        return _TypeInfo('اعتماد مستندي', Icons.description, core_theme.AC.gold);
       default:
-        return const _TypeInfo('أخرى', Icons.category, Colors.grey);
+        return _TypeInfo('أخرى', Icons.category, core_theme.AC.td);
     }
   }
 
@@ -434,5 +435,5 @@ class _TypeInfo {
   final String label;
   final IconData icon;
   final Color color;
-  const _TypeInfo(this.label, this.icon, this.color);
+  _TypeInfo(this.label, this.icon, this.color);
 }

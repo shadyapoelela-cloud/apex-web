@@ -11,6 +11,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../theme.dart' as core_theme;
+
 class QuickCreateAction {
   final String labelAr;
   final String sublabelAr;
@@ -29,6 +31,10 @@ class QuickCreateAction {
   });
 }
 
+// Fallback colors for quick-create actions (Navy-Gold signature).
+// These are compile-time constants because the action list is const.
+// The main "إنشاء" button itself pulls live colors from theme
+// (see QuickCreateButton.build — gradient uses AC.gold/goldLight).
 const _goldC = Color(0xFFD4AF37);
 const _navyC = Color(0xFF1A237E);
 
@@ -136,40 +142,47 @@ class QuickCreateButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Use topBarAccent (brighter primaryLight of dark variant) so the button
+    // pops against the medium-dark branded header regardless of palette.
+    final primary = core_theme.AC.topBarAccent;
+    final primaryDark = core_theme.AC.gold;
+    final onPrimary = _bestContrastOn(primary);
     return PopupMenuButton<QuickCreateAction>(
       tooltip: 'إنشاء سريع',
       offset: const Offset(0, 42),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [_goldC, Color(0xFFB8860B)],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [primary, primaryDark],
           ),
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: _goldC.withOpacity(0.3),
-              blurRadius: 6,
+              color: primary.withValues(alpha: 0.35),
+              blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add, size: 16, color: Colors.white),
-            SizedBox(width: 4),
+            Icon(Icons.add, size: 16, color: onPrimary),
+            const SizedBox(width: 4),
             Text(
               'إنشاء',
               style: TextStyle(
-                color: Colors.white,
+                color: onPrimary,
                 fontWeight: FontWeight.w800,
                 fontSize: 12,
               ),
             ),
-            SizedBox(width: 2),
-            Icon(Icons.arrow_drop_down, size: 16, color: Colors.white),
+            const SizedBox(width: 2),
+            Icon(Icons.arrow_drop_down, size: 16, color: onPrimary),
           ],
         ),
       ),
@@ -259,4 +272,11 @@ class _QuickCreateItem extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Pick black or white depending on background luminance — WCAG-style.
+Color _bestContrastOn(Color bg) {
+  final luma =
+      (0.299 * bg.r * 255 + 0.587 * bg.g * 255 + 0.114 * bg.b * 255);
+  return luma > 140 ? const Color(0xFF0A1628) : const Color(0xFFFFFFFF);
 }

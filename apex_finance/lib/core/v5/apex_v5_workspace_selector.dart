@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 import 'v5_data.dart';
@@ -79,9 +80,9 @@ class _ApexV5WorkspaceSelectorState extends State<ApexV5WorkspaceSelector> {
                       ),
                       Text(
                         '${w.shortcuts.length} اختصارات',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: Colors.black54,
+                          color: core_theme.AC.ts,
                         ),
                       ),
                     ],
@@ -161,7 +162,7 @@ class ApexV5WorkspaceHome extends StatelessWidget {
                     Text(
                       workspace.descriptionAr,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.black54,
+                            color: core_theme.AC.ts,
                           ),
                     ),
                   ],
@@ -232,7 +233,7 @@ class _ShortcutCardState extends State<_ShortcutCard> {
           decoration: BoxDecoration(
             color: _hover
                 ? widget.color.withOpacity(0.08)
-                : Colors.black.withOpacity(0.03),
+                : core_theme.AC.tp.withOpacity(0.03),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: widget.color.withOpacity(_hover ? 0.3 : 0.1),
@@ -267,9 +268,9 @@ class _ShortcutCardState extends State<_ShortcutCard> {
                     const SizedBox(height: 2),
                     Text(
                       widget.shortcut.route,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
-                        color: Colors.black38,
+                        color: core_theme.AC.td,
                         fontFamily: 'monospace',
                       ),
                       maxLines: 1,
@@ -279,7 +280,7 @@ class _ShortcutCardState extends State<_ShortcutCard> {
                 ),
               ),
               Icon(Icons.arrow_back_ios, // RTL: pointing left = forward
-                  size: 14, color: Colors.black38),
+                  size: 14, color: core_theme.AC.td),
             ],
           ),
         ),

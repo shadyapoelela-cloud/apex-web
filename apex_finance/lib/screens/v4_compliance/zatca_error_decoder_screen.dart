@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 140 — ZATCA Error Decoder + Arabic translations
 class ZatcaErrorDecoderScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _ZatcaErrorDecoderScreenState extends State<ZatcaErrorDecoderScreen> with 
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الأخطاء الشائعة'), Tab(text: 'أخطائي الأخيرة'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_commonTab(), _myErrorsTab(), _analyticsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _ZatcaErrorDecoderScreenState extends State<ZatcaErrorDecoderScreen> with 
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFFC62828), Color(0xFFB71C1C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.bug_report, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('مفكّك أخطاء ZATCA', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('ترجمة عربية + شرح + حل لكل رمز خطأ من ZATCA', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('ترجمة عربية + شرح + حل لكل رمز خطأ من ZATCA', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -54,7 +55,7 @@ class _ZatcaErrorDecoderScreenState extends State<ZatcaErrorDecoderScreen> with 
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -68,7 +69,7 @@ class _ZatcaErrorDecoderScreenState extends State<ZatcaErrorDecoderScreen> with 
         const SizedBox(width: 8),
         Expanded(child: Text(e.titleAr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
       ]),
-      subtitle: Text(e.category, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+      subtitle: Text(e.category, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       children: [
         Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _section('📜 الرسالة الأصلية (EN)', e.messageEn),
@@ -105,7 +106,7 @@ class _ZatcaErrorDecoderScreenState extends State<ZatcaErrorDecoderScreen> with 
     _insight('🏆 أكثر الأخطاء تكراراً', 'KSA-IN-BR-51 (VAT rounding) — 28 حالة هذا الشهر', const Color(0xFFC62828)),
     _insight('⚡ زمن الحل المتوسط', '4 دقائق — أسرع من متوسط القطاع (25 دقيقة)', const Color(0xFF2E7D32)),
     _insight('📊 توزيع الأخطاء', 'Validation 52% • Cryptography 22% • Network 18% • أخرى 8%', const Color(0xFF1A237E)),
-    _insight('🎯 معدل النجاح الآلي', '94% من الأخطاء تحل تلقائياً عبر AI fix', const Color(0xFFD4AF37)),
+    _insight('🎯 معدل النجاح الآلي', '94% من الأخطاء تحل تلقائياً عبر AI fix', core_theme.AC.gold),
     _insight('📉 اتجاه الشهر', '-32% انخفاض في الأخطاء بعد تفعيل Auto-Fix', const Color(0xFF2E7D32)),
     _insight('✅ الأخطاء الحرجة', '0 أخطاء حرجة غير محلولة حالياً', const Color(0xFF4A148C)),
   ]);
@@ -114,13 +115,13 @@ class _ZatcaErrorDecoderScreenState extends State<ZatcaErrorDecoderScreen> with 
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _severityColor(String s) {
     if (s.contains('حرج')) return const Color(0xFFC62828);
     if (s.contains('عالي')) return const Color(0xFFE65100);
-    if (s.contains('متوسط')) return const Color(0xFFD4AF37);
+    if (s.contains('متوسط')) return core_theme.AC.gold;
     return const Color(0xFF1A237E);
   }
 
@@ -128,7 +129,7 @@ class _ZatcaErrorDecoderScreenState extends State<ZatcaErrorDecoderScreen> with 
     if (s.contains('محلول')) return const Color(0xFF2E7D32);
     if (s.contains('معلق')) return const Color(0xFFE65100);
     if (s.contains('فشل')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_ErrCode> _errors = [

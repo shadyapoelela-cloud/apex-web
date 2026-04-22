@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class BreakEvenScreen extends StatefulWidget {
   const BreakEvenScreen({super.key});
@@ -60,7 +61,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
         gradient: const LinearGradient(colors: [Color(0xFF006064), Color(0xFF00838F)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.balance, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -71,7 +72,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
                 Text('تحليل نقطة التعادل',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Break-Even Analysis · احتساب الوحدات والإيرادات اللازمة لتغطية التكاليف',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -86,12 +87,12 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('المدخلات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+          Text('المدخلات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
           _numField('سعر الوحدة', _pricePerUnit, 'ر.س', (v) => setState(() => _pricePerUnit = v)),
           _numField('التكلفة المتغيرة للوحدة', _variableCostPerUnit, 'ر.س',
@@ -105,13 +106,13 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: core_theme.AC.info,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue.shade200),
+              border: Border.all(color: core_theme.AC.info),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info, color: Colors.blue, size: 16),
+                Icon(Icons.info, color: core_theme.AC.info, size: 16),
                 SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -133,7 +134,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           TextField(
             controller: TextEditingController(text: value.toStringAsFixed(0)),
@@ -160,7 +161,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [Colors.teal.shade700, Colors.teal.shade500]),
+            gradient: LinearGradient(colors: [core_theme.AC.info, core_theme.AC.info]),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Column(
@@ -195,16 +196,16 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: profitable ? Colors.green.shade50 : Colors.red.shade50,
+            color: profitable ? core_theme.AC.ok : core_theme.AC.err,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: profitable ? Colors.green.shade300 : Colors.red.shade300, width: 2),
+            border: Border.all(color: profitable ? core_theme.AC.ok : core_theme.AC.err, width: 2),
           ),
           child: Column(
             children: [
               Row(
                 children: [
                   Icon(profitable ? Icons.check_circle : Icons.error,
-                      color: profitable ? Colors.green : Colors.red, size: 28),
+                      color: profitable ? core_theme.AC.ok : core_theme.AC.err, size: 28),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -212,7 +213,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
-                          color: profitable ? Colors.green.shade700 : Colors.red.shade700),
+                          color: profitable ? core_theme.AC.ok : core_theme.AC.err),
                     ),
                   ),
                 ],
@@ -220,13 +221,13 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _kpi('الربح المتوقّع', _fmt(_expectedProfit), profitable ? Colors.green : Colors.red)),
-                  Expanded(child: _kpi('هامش الأمان', '${_marginOfSafety.toStringAsFixed(1)}%', Colors.teal)),
+                  Expanded(child: _kpi('الربح المتوقّع', _fmt(_expectedProfit), profitable ? core_theme.AC.ok : core_theme.AC.err)),
+                  Expanded(child: _kpi('هامش الأمان', '${_marginOfSafety.toStringAsFixed(1)}%', core_theme.AC.info)),
                   Expanded(
                     child: _kpi(
                       'فوق التعادل',
                       _fmt(_expectedUnitsMonthly - _breakEvenUnits) + ' وحدة',
-                      profitable ? Colors.green : Colors.red,
+                      profitable ? core_theme.AC.ok : core_theme.AC.err,
                     ),
                   ),
                 ],
@@ -245,10 +246,10 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+          Text(label, style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
           const SizedBox(height: 4),
           Text(value, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-          Text(unit, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+          Text(unit, style: TextStyle(color: core_theme.AC.ts, fontSize: 10)),
         ],
       ),
     );
@@ -257,7 +258,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
   Widget _kpi(String label, String value, Color color) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 4),
         Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
       ],
@@ -271,12 +272,12 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('المخطط البياني (Break-Even Chart)',
+          Text('المخطط البياني (Break-Even Chart)',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
           SizedBox(
@@ -297,10 +298,10 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
           Wrap(
             spacing: 20,
             children: [
-              _legend('إيرادات', Colors.green),
-              _legend('إجمالي التكاليف', Colors.red),
-              _legend('تكاليف ثابتة', Colors.orange),
-              _legend('نقطة التعادل', Colors.blue),
+              _legend('إيرادات', core_theme.AC.ok),
+              _legend('إجمالي التكاليف', core_theme.AC.err),
+              _legend('تكاليف ثابتة', core_theme.AC.warn),
+              _legend('نقطة التعادل', core_theme.AC.info),
             ],
           ),
         ],
@@ -332,16 +333,16 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('تحليل التعادل حسب المنتج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+          Text('تحليل التعادل حسب المنتج', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(10),
-            color: Colors.grey.shade100,
+            color: core_theme.AC.navy3,
             child: const Row(
               children: [
                 Expanded(flex: 3, child: Text('المنتج / الخدمة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -366,16 +367,16 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
       ),
       child: Row(
         children: [
           Expanded(flex: 3, child: Text(p.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
           Expanded(child: Text(_fmt(p.price.toDouble()), style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
-          Expanded(child: Text(_fmt(p.cost.toDouble()), style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.orange))),
+          Expanded(child: Text(_fmt(p.cost.toDouble()), style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.warn))),
           Expanded(
             child: Text(_fmt(margin.toDouble()),
-                style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Color(0xFFD4AF37), fontWeight: FontWeight.w800)),
+                style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.gold, fontWeight: FontWeight.w800)),
           ),
           Expanded(child: Text('${p.breakEvenUnits} وحدة', style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
           Expanded(child: Text('${p.actualUnits} وحدة', style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
@@ -383,14 +384,14 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (profitable ? Colors.green : Colors.red).withOpacity(0.12),
+                color: (profitable ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(
                 profitable ? '✓ مربح' : '× خسارة',
                 style: TextStyle(
                   fontSize: 10,
-                  color: profitable ? Colors.green : Colors.red,
+                  color: profitable ? core_theme.AC.ok : core_theme.AC.err,
                   fontWeight: FontWeight.w800,
                 ),
                 textAlign: TextAlign.center,
@@ -440,20 +441,20 @@ class _BreakEvenPainter extends CustomPainter {
 
     // Axes
     final axis = Paint()
-      ..color = Colors.black26
+      ..color = core_theme.AC.td
       ..strokeWidth = 1;
     canvas.drawLine(Offset(0, size.height), Offset(size.width, size.height), axis);
     canvas.drawLine(const Offset(0, 0), Offset(0, size.height), axis);
 
     // Fixed costs (horizontal line)
     final fcPaint = Paint()
-      ..color = Colors.orange
+      ..color = core_theme.AC.warn
       ..strokeWidth = 2;
     canvas.drawLine(Offset(0, yFor(fixedCosts)), Offset(size.width, yFor(fixedCosts)), fcPaint);
 
     // Total costs (diagonal from fixedCosts)
     final tcPaint = Paint()
-      ..color = Colors.red
+      ..color = core_theme.AC.err
       ..strokeWidth = 2.5;
     canvas.drawLine(
       Offset(0, yFor(fixedCosts)),
@@ -463,22 +464,22 @@ class _BreakEvenPainter extends CustomPainter {
 
     // Revenue line
     final revPaint = Paint()
-      ..color = Colors.green
+      ..color = core_theme.AC.ok
       ..strokeWidth = 2.5;
     canvas.drawLine(Offset(0, yFor(0)), Offset(size.width, yFor(maxRevenue)), revPaint);
 
     // Break-even marker
     final beXY = Offset(xFor(breakEvenUnits), yFor(breakEvenUnits * pricePerUnit));
-    final bePaint = Paint()..color = Colors.blue;
+    final bePaint = Paint()..color = core_theme.AC.info;
     canvas.drawCircle(beXY, 7, bePaint);
     canvas.drawLine(beXY, Offset(beXY.dx, size.height),
         Paint()
-          ..color = Colors.blue.withOpacity(0.3)
+          ..color = core_theme.AC.info.withOpacity(0.3)
           ..strokeWidth = 1.5);
 
     // Expected units marker
     final expXY = Offset(xFor(expectedUnits), yFor(expectedUnits * pricePerUnit));
-    final expPaint = Paint()..color = const Color(0xFFD4AF37);
+    final expPaint = Paint()..color = core_theme.AC.gold;
     canvas.drawCircle(expXY, 7, expPaint);
   }
 

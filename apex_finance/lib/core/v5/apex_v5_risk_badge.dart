@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 /// Computed risk score (0-100) with factors that contributed to it.
 class V5RiskScore {
@@ -124,9 +125,9 @@ class ApexV5RiskBadge extends StatelessWidget {
 
   Color _color() {
     switch (riskScore.level) {
-      case V5RiskLevel.minimal: return const Color(0xFF059669);
-      case V5RiskLevel.low: return const Color(0xFF2563EB);
-      case V5RiskLevel.medium: return const Color(0xFFD97706);
+      case V5RiskLevel.minimal: return core_theme.AC.ok;
+      case V5RiskLevel.low: return core_theme.AC.info;
+      case V5RiskLevel.medium: return core_theme.AC.warn;
       case V5RiskLevel.high: return const Color(0xFFB91C1C);
     }
   }
@@ -244,7 +245,7 @@ class ApexV5RiskBadge extends StatelessWidget {
                 // Score visualization
                 LinearProgressIndicator(
                   value: riskScore.score / 100,
-                  backgroundColor: Colors.black.withOpacity(0.06),
+                  backgroundColor: core_theme.AC.tp.withOpacity(0.06),
                   valueColor: AlwaysStoppedAnimation(_color()),
                   minHeight: 8,
                 ),
@@ -255,9 +256,9 @@ class ApexV5RiskBadge extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 if (riskScore.factors.isEmpty)
-                  const Text(
+                  Text(
                     'لا توجد عوامل خطر ملحوظة',
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                    style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                   )
                 else
                   for (final f in riskScore.factors)
@@ -268,7 +269,7 @@ class ApexV5RiskBadge extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: const Color(0xFFF9FAFB),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: Colors.black.withOpacity(0.05)),
+                          border: Border.all(color: core_theme.AC.tp.withOpacity(0.05)),
                         ),
                         child: Row(
                           children: [
@@ -303,18 +304,18 @@ class ApexV5RiskBadge extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2563EB).withOpacity(0.06),
+                    color: core_theme.AC.info.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.2)),
+                    border: Border.all(color: core_theme.AC.info.withOpacity(0.2)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.info_outline, size: 14, color: Color(0xFF2563EB)),
+                      Icon(Icons.info_outline, size: 14, color: core_theme.AC.info),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'هذا تقييم تلقائي مبني على قواعد ثابتة. في الإنتاج — ML model يتعلم من قرارات الفريق.',
-                          style: TextStyle(fontSize: 11, color: Color(0xFF2563EB)),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.info),
                         ),
                       ),
                     ],

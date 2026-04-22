@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/apex_v5_undo_toast.dart';
 import '../../pilot/api/pilot_client.dart';
 import '../../pilot/session.dart';
@@ -24,7 +25,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
         Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'قائمة الدخل', Icons.trending_up),
@@ -60,9 +61,9 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
         decoration: BoxDecoration(color: active ? const Color(0xFF1565C0).withOpacity(0.15) : null, borderRadius: BorderRadius.circular(6), border: active ? Border.all(color: const Color(0xFF1565C0).withOpacity(0.4)) : null),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFF1565C0) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFF1565C0) : core_theme.AC.ts),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF1565C0) : Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF1565C0) : core_theme.AC.ts)),
           ],
         ),
       ),
@@ -89,7 +90,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 _fsTitle('شركة الرياض للتجارة · Q1 2026'),
@@ -103,7 +104,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                 _fsLine('  تكلفة الخدمات', -534_000, true, sub: true),
                 _fsLine('إجمالي التكلفة', -2_844_000, true, bold: true, border: true),
                 const SizedBox(height: 4),
-                _fsLine('إجمالي الربح (Gross Profit)', 1_896_000, false, bold: true, highlight: const Color(0xFF059669)),
+                _fsLine('إجمالي الربح (Gross Profit)', 1_896_000, false, bold: true, highlight: core_theme.AC.ok),
                 _fsLine('نسبة إجمالي الربح', 40.0, false, bold: true, pct: true),
                 const SizedBox(height: 16),
                 _fsLine('المصروفات التشغيلية', null, false),
@@ -121,7 +122,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                 _fsLine('الزكاة (2.5%)', -21_050, true, sub: true),
                 _fsLine('VAT على المبيعات', 0, false, sub: true),
                 const SizedBox(height: 8),
-                _fsLine('صافي الدخل', 820_950, false, bold: true, big: true, highlight: const Color(0xFF059669)),
+                _fsLine('صافي الدخل', 820_950, false, bold: true, big: true, highlight: core_theme.AC.ok),
                 _fsLine('هامش صافي الدخل', 17.3, false, pct: true, bold: true),
               ],
             ),
@@ -147,7 +148,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
                   child: Column(
                     children: [
                       _fsTitle('الموجودات (Assets)'),
@@ -164,7 +165,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                       _fsLine('  استثمارات طويلة الأجل', 1_200_000, false, sub: true),
                       _fsLine('مجموع الموجودات غير المتداولة', 4_390_000, false, bold: true, border: true),
                       const SizedBox(height: 8),
-                      _fsLine('مجموع الموجودات', 8_485_000, false, bold: true, big: true, highlight: const Color(0xFF059669)),
+                      _fsLine('مجموع الموجودات', 8_485_000, false, bold: true, big: true, highlight: core_theme.AC.ok),
                     ],
                   ),
                 ),
@@ -173,7 +174,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
                   child: Column(
                     children: [
                       _fsTitle('المطلوبات وحقوق الملكية'),
@@ -197,9 +198,9 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                       _fsLine('  الأرباح المبقاة', 1_282_000, false, sub: true),
                       _fsLine('مجموع حقوق الملكية', 4_962_000, false, bold: true, border: true),
                       const SizedBox(height: 8),
-                      _fsLine('مجموع المطلوبات + الملكية', 8_485_000, false, bold: true, big: true, highlight: const Color(0xFF059669)),
+                      _fsLine('مجموع المطلوبات + الملكية', 8_485_000, false, bold: true, big: true, highlight: core_theme.AC.ok),
                       const SizedBox(height: 4),
-                      Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFF059669).withOpacity(0.1), borderRadius: BorderRadius.circular(4)), child: const Row(children: [Icon(Icons.check_circle, color: Color(0xFF059669), size: 14), SizedBox(width: 6), Text('متوازن ✓', style: TextStyle(color: Color(0xFF059669), fontWeight: FontWeight.w800, fontSize: 12))])),
+                      Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.1), borderRadius: BorderRadius.circular(4)), child: Row(children: [Icon(Icons.check_circle, color: core_theme.AC.ok, size: 14), SizedBox(width: 6), Text('متوازن ✓', style: TextStyle(color: core_theme.AC.ok, fontWeight: FontWeight.w800, fontSize: 12))])),
                     ],
                   ),
                 ),
@@ -223,7 +224,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 _fsTitle('النشاط التشغيلي (Operating)'),
@@ -232,12 +233,12 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                 _fsLine('  التغيّر في الذمم المدينة', -135_000, true, sub: true),
                 _fsLine('  التغيّر في المخزون', -45_000, true, sub: true),
                 _fsLine('  التغيّر في الذمم الدائنة', 85_000, false, sub: true),
-                _fsLine('صافي النقد من التشغيل', 807_950, false, bold: true, border: true, highlight: const Color(0xFF059669)),
+                _fsLine('صافي النقد من التشغيل', 807_950, false, bold: true, border: true, highlight: core_theme.AC.ok),
                 const SizedBox(height: 16),
                 _fsTitle('النشاط الاستثماري (Investing)'),
                 _fsLine('  شراء أصول ثابتة', -285_000, true, sub: true),
                 _fsLine('  بيع استثمارات', 120_000, false, sub: true),
-                _fsLine('صافي النقد من الاستثمار', -165_000, true, bold: true, border: true, highlight: const Color(0xFFD97706)),
+                _fsLine('صافي النقد من الاستثمار', -165_000, true, bold: true, border: true, highlight: core_theme.AC.warn),
                 const SizedBox(height: 16),
                 _fsTitle('النشاط التمويلي (Financing)'),
                 _fsLine('  سداد قروض', -80_000, true, sub: true),
@@ -246,7 +247,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                 const SizedBox(height: 16),
                 _fsLine('صافي الزيادة في النقد', 362_950, false, bold: true, big: true),
                 _fsLine('النقد في بداية الفترة', 877_050, false),
-                _fsLine('النقد في نهاية الفترة', 1_240_000, false, bold: true, big: true, highlight: const Color(0xFF059669)),
+                _fsLine('النقد في نهاية الفترة', 1_240_000, false, bold: true, big: true, highlight: core_theme.AC.ok),
               ],
             ),
           ),
@@ -267,7 +268,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 _equityHeader(),
@@ -275,7 +276,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                 _equityRow('صافي الدخل', '—', '—', '820,950', '820,950'),
                 _equityRow('توزيعات أرباح', '—', '—', '(200,000)', '(200,000)'),
                 _equityRow('تخصيص احتياطي نظامي', '—', '82,000', '(82,000)', '—'),
-                Container(padding: const EdgeInsets.all(10), color: const Color(0xFF059669).withOpacity(0.06), child: _equityRow('الرصيد في 31 مارس 2026', '3,000,000', '762,000', '1,200,000', '4,962,000', bold: true)),
+                Container(padding: const EdgeInsets.all(10), color: core_theme.AC.ok.withOpacity(0.06), child: _equityRow('الرصيد في 31 مارس 2026', '3,000,000', '762,000', '1,200,000', '4,962,000', bold: true)),
               ],
             ),
           ),
@@ -289,7 +290,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
   Widget _header(String title, String sub) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF1565C0), Color(0xFF7C3AED)]), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1565C0), core_theme.AC.purple]), borderRadius: BorderRadius.circular(12)),
       child: Row(
         children: [
           const Icon(Icons.assessment, color: Colors.white, size: 28),
@@ -299,7 +300,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                Text('$sub · الفترة: $_period', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                Text('$sub · الفترة: $_period', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -320,10 +321,10 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
   Widget _fsLine(String label, double? value, bool negative, {bool sub = false, bool bold = false, bool border = false, bool big = false, bool pct = false, Color? highlight}) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      decoration: border ? BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.1)))) : null,
+      decoration: border ? BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.1)))) : null,
       child: Row(
         children: [
-          Text(label, style: TextStyle(fontSize: big ? 14 : sub ? 12 : 13, fontWeight: bold ? FontWeight.w900 : FontWeight.w500, color: highlight ?? (sub ? Colors.black54 : Colors.black87))),
+          Text(label, style: TextStyle(fontSize: big ? 14 : sub ? 12 : 13, fontWeight: bold ? FontWeight.w900 : FontWeight.w500, color: highlight ?? (sub ? core_theme.AC.ts : core_theme.AC.tp))),
           const Spacer(),
           if (value != null)
             Container(
@@ -331,7 +332,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
               decoration: highlight != null ? BoxDecoration(color: highlight.withOpacity(0.1), borderRadius: BorderRadius.circular(3)) : null,
               child: Text(
                 pct ? '${value.toStringAsFixed(1)}%' : '${negative ? '(' : ''}${value.abs().toStringAsFixed(0)}${negative ? ')' : ''}',
-                style: TextStyle(fontSize: big ? 15 : 13, fontWeight: bold ? FontWeight.w900 : FontWeight.w700, color: highlight ?? Colors.black87, fontFamily: 'monospace'),
+                style: TextStyle(fontSize: big ? 15 : 13, fontWeight: bold ? FontWeight.w900 : FontWeight.w700, color: highlight ?? core_theme.AC.tp, fontFamily: 'monospace'),
               ),
             ),
         ],
@@ -342,7 +343,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
   Widget _equityHeader() {
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
       child: const Row(
         children: [
           Expanded(flex: 3, child: Text('البند', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -364,7 +365,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
           Expanded(child: Text(a, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
           Expanded(child: Text(b, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
           Expanded(child: Text(c, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
-          Expanded(child: Text(total, textAlign: TextAlign.end, style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: bold ? FontWeight.w900 : FontWeight.w700, color: bold ? const Color(0xFF059669) : Colors.black87))),
+          Expanded(child: Text(total, textAlign: TextAlign.end, style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: bold ? FontWeight.w900 : FontWeight.w700, color: bold ? core_theme.AC.ok : core_theme.AC.tp))),
         ],
       ),
     );
@@ -373,18 +374,18 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
   Widget _actions() {
     return Row(
       children: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.compare_arrows, size: 14), label: const Text('مقارنة فترات')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.compare_arrows, size: 14), label: Text('مقارنة فترات')),
         const SizedBox(width: 8),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.picture_as_pdf, size: 14), label: const Text('PDF')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.picture_as_pdf, size: 14), label: Text('PDF')),
         const SizedBox(width: 8),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.table_chart, size: 14), label: const Text('Excel')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.table_chart, size: 14), label: Text('Excel')),
         const Spacer(),
         ElevatedButton.icon(
           onPressed: () {
             ApexV5UndoToast.show(context, messageAr: 'تم اعتماد القوائم المالية Q1 2026', onUndo: () {});
           },
           icon: const Icon(Icons.verified, size: 14),
-          label: const Text('اعتماد نهائي'),
+          label: Text('اعتماد نهائي'),
           style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1565C0), foregroundColor: Colors.white),
         ),
       ],
@@ -422,15 +423,15 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
           Padding(
             padding: const EdgeInsets.all(8),
             child: Row(
-              children: const [
-                Icon(Icons.account_tree, size: 18, color: Color(0xFFD4AF37)),
+              children: [
+                Icon(Icons.account_tree, size: 18, color: core_theme.AC.gold),
                 SizedBox(width: 6),
                 Text('شجرة الحسابات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                 Spacer(),
               ],
             ),
           ),
-          _group('1000', 'الموجودات (Assets)', const Color(0xFF059669), [
+          _group('1000', 'الموجودات (Assets)', core_theme.AC.ok, [
             _leaf('1100', 'النقدية وما في حكمها', 1_240_000),
             _leaf('1110', 'الصندوق', 28_000),
             _leaf('1120', 'البنوك', 1_212_000),
@@ -443,16 +444,16 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
             _leaf('2200', 'قروض قصيرة الأجل', 320_000),
             _leaf('2300', 'VAT مستحقة', 68_000),
           ]),
-          _group('3000', 'حقوق الملكية (Equity)', const Color(0xFFD4AF37), [
+          _group('3000', 'حقوق الملكية (Equity)', core_theme.AC.gold, [
             _leaf('3100', 'رأس المال', 3_000_000),
             _leaf('3200', 'الاحتياطيات', 762_000),
             _leaf('3300', 'الأرباح المبقاة', 1_200_000),
           ]),
-          _group('4000', 'الإيرادات (Revenue)', const Color(0xFF2563EB), [
+          _group('4000', 'الإيرادات (Revenue)', core_theme.AC.info, [
             _leaf('4100', 'إيرادات المبيعات', 3_850_000),
             _leaf('4200', 'إيرادات الخدمات', 890_000),
           ]),
-          _group('5000', 'المصروفات (Expenses)', const Color(0xFF7C3AED), [
+          _group('5000', 'المصروفات (Expenses)', core_theme.AC.purple, [
             _leaf('5100', 'تكلفة البضاعة المباعة', 2_310_000),
             _leaf('5200', 'الرواتب والأجور', 440_000),
             _leaf('5300', 'مصروفات تسويقية', 285_000),
@@ -481,10 +482,10 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(color: active ? const Color(0xFFD4AF37).withOpacity(0.15) : null, borderRadius: BorderRadius.circular(4)),
+        decoration: BoxDecoration(color: active ? core_theme.AC.gold.withOpacity(0.15) : null, borderRadius: BorderRadius.circular(4)),
         child: Row(
           children: [
-            Text(code, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+            Text(code, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
             const SizedBox(width: 6),
             Expanded(child: Text(name, style: const TextStyle(fontSize: 12))),
             Text('${(balance / 1000).toStringAsFixed(0)}K', style: const TextStyle(fontSize: 10, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
@@ -499,20 +500,20 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
           child: Row(
             children: [
-              const Icon(Icons.account_balance, color: Color(0xFFD4AF37), size: 22),
+              Icon(Icons.account_balance, color: core_theme.AC.gold, size: 22),
               const SizedBox(width: 10),
               Text('$_selected — النقدية وما في حكمها', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
               const Spacer(),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.add, size: 14), label: const Text('حساب فرعي')),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.add, size: 14), label: Text('حساب فرعي')),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.save, size: 14),
-                label: const Text('حفظ'),
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD4AF37), foregroundColor: Colors.white),
+                label: Text('حفظ'),
+                style: ElevatedButton.styleFrom(backgroundColor: core_theme.AC.gold, foregroundColor: Colors.white),
               ),
             ],
           ),
@@ -525,7 +526,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
                   child: Column(
                     children: [
                       _field('رقم الحساب', '1100'),
@@ -542,10 +543,10 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text('آخر الحركات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                Text('آخر الحركات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
                 Container(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
                   child: Column(
                     children: [
                       for (final m in [
@@ -556,17 +557,17 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                       ])
                         Container(
                           padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04)))),
+                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04)))),
                           child: Row(
                             children: [
-                              Text(m.$1, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                              Text(m.$1, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                               const SizedBox(width: 12),
                               Text(m.$2, style: const TextStyle(fontSize: 11, fontFamily: 'monospace')),
                               const SizedBox(width: 12),
                               Expanded(child: Text(m.$3, style: const TextStyle(fontSize: 12))),
-                              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: (m.$5 == 'مدين' ? const Color(0xFF059669) : const Color(0xFFB91C1C)).withOpacity(0.12), borderRadius: BorderRadius.circular(3)), child: Text(m.$5, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: m.$5 == 'مدين' ? const Color(0xFF059669) : const Color(0xFFB91C1C)))),
+                              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: (m.$5 == 'مدين' ? core_theme.AC.ok : const Color(0xFFB91C1C)).withOpacity(0.12), borderRadius: BorderRadius.circular(3)), child: Text(m.$5, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: m.$5 == 'مدين' ? core_theme.AC.ok : const Color(0xFFB91C1C)))),
                               const SizedBox(width: 12),
-                              Text('${m.$4 > 0 ? '+' : ''}${m.$4.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: m.$4 > 0 ? const Color(0xFF059669) : const Color(0xFFB91C1C))),
+                              Text('${m.$4 > 0 ? '+' : ''}${m.$4.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: m.$4 > 0 ? core_theme.AC.ok : const Color(0xFFB91C1C))),
                             ],
                           ),
                         ),
@@ -586,12 +587,12 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          SizedBox(width: 160, child: Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 160, child: Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: highlight ? const Color(0xFFD4AF37).withOpacity(0.1) : null, border: Border.all(color: Colors.black.withOpacity(0.1)), borderRadius: BorderRadius.circular(4)),
-              child: Text(value, style: TextStyle(fontSize: 12, fontWeight: highlight ? FontWeight.w900 : FontWeight.w500, color: highlight ? const Color(0xFFD4AF37) : Colors.black87, fontFamily: highlight ? 'monospace' : null)),
+              decoration: BoxDecoration(color: highlight ? core_theme.AC.gold.withOpacity(0.1) : null, border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)), borderRadius: BorderRadius.circular(4)),
+              child: Text(value, style: TextStyle(fontSize: 12, fontWeight: highlight ? FontWeight.w900 : FontWeight.w500, color: highlight ? core_theme.AC.gold : core_theme.AC.tp, fontFamily: highlight ? 'monospace' : null)),
             ),
           ),
         ],
@@ -641,9 +642,9 @@ class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
         color: const Color(0xFFF9FAFB),
         padding: const EdgeInsets.all(40),
         alignment: Alignment.center,
-        child: const Text(
+        child: Text(
           'يتطلب ربط مستأجر من الباك-إند لعرض المخزون الحقيقي.',
-          style: TextStyle(fontSize: 16, color: Colors.black54),
+          style: TextStyle(fontSize: 16, color: core_theme.AC.ts),
           textDirection: TextDirection.rtl,
         ),
       );
@@ -670,28 +671,28 @@ class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
           children: [
             Row(
               children: [
-                _sCard('إجمالي المنتجات', '${_products.length}', Icons.inventory, const Color(0xFF2563EB)),
+                _sCard('إجمالي المنتجات', '${_products.length}', Icons.inventory, core_theme.AC.info),
                 const SizedBox(width: 8),
-                _sCard('إجمالي المتغيّرات (SKUs)', '$totalSkus', Icons.qr_code, const Color(0xFFD4AF37)),
+                _sCard('إجمالي المتغيّرات (SKUs)', '$totalSkus', Icons.qr_code, core_theme.AC.gold),
                 const SizedBox(width: 8),
-                _sCard('الكمية الإجمالية', totalStock.toStringAsFixed(0), Icons.layers, const Color(0xFF059669)),
+                _sCard('الكمية الإجمالية', totalStock.toStringAsFixed(0), Icons.layers, core_theme.AC.ok),
                 const SizedBox(width: 8),
                 _sCard('منخفض المخزون', '$lowStock', Icons.warning, const Color(0xFFB91C1C)),
               ],
             ),
             const SizedBox(height: 16),
-            const Text('المنتجات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+            Text('المنتجات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
             const SizedBox(height: 12),
             if (_loading) const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
             if (!_loading && _products.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(24),
                 child: Text('لا توجد منتجات — أنشئها في Pilot Catalog',
-                    style: TextStyle(color: Colors.black54), textDirection: TextDirection.rtl),
+                    style: TextStyle(color: core_theme.AC.ts), textDirection: TextDirection.rtl),
               ),
             if (_products.isNotEmpty)
               Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withValues(alpha: 0.08))),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
                 child: Column(
                   children: [
                     Container(
@@ -708,13 +709,13 @@ class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
                     for (final p in _products)
                       Container(
                         padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withValues(alpha: 0.04)))),
+                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04)))),
                         child: Row(children: [
-                          Expanded(child: Text('${p['code']}', style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54), textDirection: TextDirection.rtl)),
+                          Expanded(child: Text('${p['code']}', style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts), textDirection: TextDirection.rtl)),
                           Expanded(flex: 3, child: Text('${p['name_ar'] ?? p['name_en'] ?? ''}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), textDirection: TextDirection.rtl)),
                           Expanded(child: _statusBadge('${p['status']}')),
                           Expanded(child: Text('${p['active_variant_count'] ?? 0}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800))),
-                          Expanded(child: Text('${(double.tryParse('${p['total_stock_on_hand'] ?? 0}') ?? 0).toStringAsFixed(0)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                          Expanded(child: Text('${(double.tryParse('${p['total_stock_on_hand'] ?? 0}') ?? 0).toStringAsFixed(0)}', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                         ]),
                       ),
                   ],
@@ -729,10 +730,10 @@ class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
 
   Widget _statusBadge(String status) {
     final col = switch (status) {
-      'active' => const Color(0xFF059669),
-      'draft' => const Color(0xFFD97706),
-      'archived' || 'discontinued' => Colors.black54,
-      _ => Colors.black87,
+      'active' => core_theme.AC.ok,
+      'draft' => core_theme.AC.warn,
+      'archived' || 'discontinued' => core_theme.AC.ts,
+      _ => core_theme.AC.tp,
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -750,7 +751,7 @@ class _InventoryDetailedScreenState extends State<InventoryDetailedScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withValues(alpha: 0.2))),
-        child: Row(children: [Icon(icon, size: 18, color: color), const SizedBox(width: 8), Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)), Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54))])]),
+        child: Row(children: [Icon(icon, size: 18, color: color), const SizedBox(width: 8), Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)), Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts))])]),
       ),
     );
   }

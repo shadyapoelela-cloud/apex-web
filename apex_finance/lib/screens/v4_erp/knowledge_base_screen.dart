@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class KnowledgeBaseScreen extends StatefulWidget {
   const KnowledgeBaseScreen({super.key});
@@ -17,14 +18,14 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
   String _selectedCategory = 'all';
   _Article? _selectedArticle;
 
-  final _categories = const [
-    _Category('all', 'الكل', Icons.apps, Colors.grey, 84),
-    _Category('finance', 'المحاسبة والمالية', Icons.account_balance, Color(0xFFD4AF37), 24),
-    _Category('tax', 'الضرائب', Icons.percent, Colors.green, 18),
-    _Category('hr', 'الموارد البشرية', Icons.people, Colors.teal, 14),
+  final _categories = [
+    _Category('all', 'الكل', Icons.apps, core_theme.AC.td, 84),
+    _Category('finance', 'المحاسبة والمالية', Icons.account_balance, core_theme.AC.gold, 24),
+    _Category('tax', 'الضرائب', Icons.percent, core_theme.AC.ok, 18),
+    _Category('hr', 'الموارد البشرية', Icons.people, core_theme.AC.info, 14),
     _Category('audit', 'المراجعة', Icons.fact_check, Color(0xFF4A148C), 11),
-    _Category('it', 'التقنية', Icons.computer, Colors.blue, 9),
-    _Category('compliance', 'الامتثال', Icons.shield, Colors.red, 8),
+    _Category('it', 'التقنية', Icons.computer, core_theme.AC.info, 9),
+    _Category('compliance', 'الامتثال', Icons.shield, core_theme.AC.err, 8),
   ];
 
   final _articles = const [
@@ -208,14 +209,14 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
       margin: const EdgeInsets.only(left: 20, top: 20, bottom: 20, right: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(14),
-            color: const Color(0xFFD4AF37),
+            color: core_theme.AC.gold,
             child: const Row(
               children: [
                 Icon(Icons.menu_book, color: Colors.white, size: 20),
@@ -233,10 +234,10 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
               children: [
                 for (final c in _categories) _categoryTile(c),
                 const Divider(),
-                _quickLink(Icons.star, 'المفضلة', Colors.amber),
-                _quickLink(Icons.access_time, 'المقالات الأخيرة', Colors.blue),
-                _quickLink(Icons.trending_up, 'الأكثر قراءة', Colors.green),
-                _quickLink(Icons.edit, 'كتابة مقال', Color(0xFFD4AF37)),
+                _quickLink(Icons.star, 'المفضلة', core_theme.AC.warn),
+                _quickLink(Icons.access_time, 'المقالات الأخيرة', core_theme.AC.info),
+                _quickLink(Icons.trending_up, 'الأكثر قراءة', core_theme.AC.ok),
+                _quickLink(Icons.edit, 'كتابة مقال', core_theme.AC.gold),
               ],
             ),
           ),
@@ -269,7 +270,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                      color: selected ? c.color : Colors.black87)),
+                      color: selected ? c.color : core_theme.AC.tp)),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
@@ -324,7 +325,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
         gradient: const LinearGradient(colors: [Color(0xFF6A1B9A), Color(0xFF8E24AA)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.auto_stories, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -335,7 +336,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                 Text('قاعدة المعرفة',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('84 مقال · 7 فئات · بحث ذكي عبر النصّ الكامل',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -372,7 +373,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.black12),
+          border: Border.all(color: core_theme.AC.bdr),
         ),
         child: Row(
           children: [
@@ -389,7 +390,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                 children: [
                   Row(
                     children: [
-                      Text(a.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                      Text(a.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -400,7 +401,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                       const SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                        decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                         child: Text(a.kind, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                       ),
                     ],
@@ -409,17 +410,17 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                   Text(a.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                   Row(
                     children: [
-                      const Icon(Icons.person, size: 11, color: Colors.black45),
+                      Icon(Icons.person, size: 11, color: core_theme.AC.td),
                       const SizedBox(width: 3),
-                      Text(a.author, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                      Text(a.author, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       const SizedBox(width: 10),
-                      const Icon(Icons.calendar_today, size: 11, color: Colors.black45),
+                      Icon(Icons.calendar_today, size: 11, color: core_theme.AC.td),
                       const SizedBox(width: 3),
-                      Text(a.updatedAt, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                      Text(a.updatedAt, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                       const SizedBox(width: 10),
-                      const Icon(Icons.remove_red_eye, size: 11, color: Colors.black45),
+                      Icon(Icons.remove_red_eye, size: 11, color: core_theme.AC.td),
                       const SizedBox(width: 3),
-                      Text('${a.views} قراءة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                      Text('${a.views} قراءة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     ],
                   ),
                 ],
@@ -431,11 +432,11 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                   children: [
                     const Icon(Icons.star, color: Color(0xFFFFD700), size: 14),
                     Text(a.rating.toStringAsFixed(1),
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
                   ],
                 ),
                 const SizedBox(height: 4),
-                const Icon(Icons.arrow_forward, color: Colors.black45, size: 18),
+                Icon(Icons.arrow_forward, color: core_theme.AC.td, size: 18),
               ],
             ),
           ],
@@ -453,7 +454,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: ListView(
         children: [
@@ -462,7 +463,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
               TextButton.icon(
                 onPressed: () => setState(() => _selectedArticle = null),
                 icon: const Icon(Icons.arrow_back, size: 14),
-                label: const Text('رجوع'),
+                label: Text('رجوع'),
               ),
               const Spacer(),
               IconButton(onPressed: () {}, icon: const Icon(Icons.share, size: 18)),
@@ -479,7 +480,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                 child: Text(cat.name, style: TextStyle(fontSize: 11, color: cat.color, fontWeight: FontWeight.w800)),
               ),
               const SizedBox(width: 8),
-              Text(a.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+              Text(a.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
             ],
           ),
           const SizedBox(height: 10),
@@ -487,17 +488,17 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.person, size: 13, color: Colors.black45),
+              Icon(Icons.person, size: 13, color: core_theme.AC.td),
               const SizedBox(width: 4),
-              Text(a.author, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              Text(a.author, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
               const SizedBox(width: 10),
-              const Icon(Icons.calendar_today, size: 13, color: Colors.black45),
+              Icon(Icons.calendar_today, size: 13, color: core_theme.AC.td),
               const SizedBox(width: 4),
               Text('آخر تحديث ${a.updatedAt}',
-                  style: const TextStyle(fontSize: 12, color: Colors.black54, fontFamily: 'monospace')),
+                  style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontFamily: 'monospace')),
               const SizedBox(width: 10),
               const Icon(Icons.star, size: 14, color: Color(0xFFFFD700)),
-              Text(' ${a.rating}/5 · ${a.views} قراءة', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              Text(' ${a.rating}/5 · ${a.views} قراءة', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
             ],
           ),
           const Divider(height: 32),
@@ -509,13 +510,13 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: core_theme.AC.info,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.blue.shade200),
+              border: Border.all(color: core_theme.AC.info),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info, color: Colors.blue),
+                Icon(Icons.info, color: core_theme.AC.info),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -532,9 +533,9 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.thumb_up, size: 14),
-                label: const Text('مفيد'),
+                label: Text('مفيد'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: core_theme.AC.ok,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -542,13 +543,13 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.thumb_down, size: 14),
-                label: const Text('غير مفيد'),
+                label: Text('غير مفيد'),
               ),
               const Spacer(),
               TextButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.flag, size: 14),
-                label: const Text('الإبلاغ عن مشكلة', style: TextStyle(fontSize: 11)),
+                label: Text('الإبلاغ عن مشكلة', style: TextStyle(fontSize: 11)),
               ),
             ],
           ),

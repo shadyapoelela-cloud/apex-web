@@ -15,6 +15,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 import 'package:flutter/services.dart';
 
 class ApexV5UndoToast {
@@ -60,7 +61,7 @@ class ApexV5UndoToast {
         action: onUndo != null
             ? SnackBarAction(
                 label: 'تراجع',
-                textColor: Colors.amberAccent,
+                textColor: core_theme.AC.warn,
                 onPressed: () {
                   _currentUndo = null;
                   onUndo();
@@ -118,10 +119,10 @@ class ApexV5UndoShortcutListener extends StatelessWidget {
     if (!invoked) {
       // Optional: show subtle "nothing to undo" feedback
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           duration: Duration(seconds: 2),
           content: Text('لا توجد عملية قابلة للتراجع'),
-          backgroundColor: Colors.black54,
+          backgroundColor: core_theme.AC.ts,
           behavior: SnackBarBehavior.floating,
         ),
       );

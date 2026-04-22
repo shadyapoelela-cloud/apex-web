@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../core/theme.dart' as core_theme;
 
 import 'api/pilot_client.dart';
 import 'session.dart';
@@ -65,32 +66,32 @@ class _TenantChipState extends State<TenantChip> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: bound
-              ? const Color(0xFFD4AF37).withValues(alpha: 0.12)
-              : Colors.black.withValues(alpha: 0.04),
+              ? core_theme.AC.gold.withValues(alpha: 0.12)
+              : core_theme.AC.tp.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: bound
-                ? const Color(0xFFD4AF37).withValues(alpha: 0.4)
-                : Colors.black.withValues(alpha: 0.12),
+                ? core_theme.AC.gold.withValues(alpha: 0.4)
+                : core_theme.AC.tp.withValues(alpha: 0.12),
           ),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Icon(
             bound ? Icons.cloud_done : Icons.cloud_off,
             size: 14,
-            color: bound ? const Color(0xFF059669) : Colors.black54,
+            color: bound ? core_theme.AC.ok : core_theme.AC.ts,
           ),
           const SizedBox(width: 5),
           Text(label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: bound ? Colors.black87 : Colors.black54,
+                color: bound ? core_theme.AC.tp : core_theme.AC.ts,
               )),
           const SizedBox(width: 3),
           Icon(Icons.arrow_drop_down,
               size: 16,
-              color: bound ? Colors.black87 : Colors.black54),
+              color: bound ? core_theme.AC.tp : core_theme.AC.ts),
         ]),
       ),
     );
@@ -143,7 +144,7 @@ class _PickerDialogState extends State<_PickerDialog> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.red,
+            backgroundColor: core_theme.AC.err,
             content: Text(r.error ?? 'فشل تحميل المستأجر')));
       }
     }
@@ -170,8 +171,8 @@ class _PickerDialogState extends State<_PickerDialog> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: AlertDialog(
-        title: Row(children: const [
-          Icon(Icons.link, color: Color(0xFFD4AF37)),
+        title: Row(children: [
+          Icon(Icons.link, color: core_theme.AC.gold),
           SizedBox(width: 8),
           Text('اختيار الشركة'),
         ]),
@@ -181,8 +182,8 @@ class _PickerDialogState extends State<_PickerDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Tenant ID:',
-                  style: TextStyle(fontSize: 12, color: Colors.black54)),
+              Text('Tenant ID:',
+                  style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
               const SizedBox(height: 6),
               Row(children: [
                 Expanded(
@@ -198,8 +199,8 @@ class _PickerDialogState extends State<_PickerDialog> {
                 const SizedBox(width: 8),
                 FilledButton(
                   style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFD4AF37),
-                      foregroundColor: Colors.black),
+                      backgroundColor: core_theme.AC.gold,
+                      foregroundColor: core_theme.AC.tp),
                   onPressed: _loading ? null : _bindTenant,
                   child: _loading
                       ? const SizedBox(
@@ -211,8 +212,8 @@ class _PickerDialogState extends State<_PickerDialog> {
               ]),
               if (_entities.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                const Text('الكيان:',
-                    style: TextStyle(fontSize: 12, color: Colors.black54)),
+                Text('الكيان:',
+                    style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
@@ -236,8 +237,8 @@ class _PickerDialogState extends State<_PickerDialog> {
               ],
               if (_branches.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                const Text('الفرع:',
-                    style: TextStyle(fontSize: 12, color: Colors.black54)),
+                Text('الفرع:',
+                    style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
@@ -267,12 +268,12 @@ class _PickerDialogState extends State<_PickerDialog> {
                 widget.onChanged();
                 Navigator.pop(context);
               },
-              child: const Text('مسح', style: TextStyle(color: Colors.red)),
+              child: Text('مسح', style: TextStyle(color: core_theme.AC.err)),
             ),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFD4AF37),
-                foregroundColor: Colors.black),
+                backgroundColor: core_theme.AC.gold,
+                foregroundColor: core_theme.AC.tp),
             onPressed: () => Navigator.pop(context),
             child: const Text('تم'),
           ),

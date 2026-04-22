@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 133 — Financial Statements Upload + OCR
 class FinancialUploadScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'رفع ملفات'), Tab(text: 'قوالب جاهزة'), Tab(text: 'نتائج OCR'), Tab(text: 'السجل')])),
         Expanded(child: TabBarView(controller: _tc, children: [_uploadTab(), _templatesTab(), _ocrTab(), _historyTab()])),
       ])),
@@ -32,13 +33,13 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF2E7D32), Color(0xFF1B5E20)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.cloud_upload, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('رفع القوائم المالية + OCR', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('قراءة ذكية لـ PDF/Excel/صور — AI يستخرج البيانات تلقائياً', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('قراءة ذكية لـ PDF/Excel/صور — AI يستخرج البيانات تلقائياً', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -46,7 +47,7 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('ملفات مرفوعة', '${_files.length}', Icons.folder, const Color(0xFF1B5E20))),
     Expanded(child: _kpi('دقة OCR', '96.8%', Icons.verified, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('قوالب', '${_templates.length}', Icons.description, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('قوالب', '${_templates.length}', Icons.description, core_theme.AC.gold)),
     Expanded(child: _kpi('معالجة تلقائية', '89%', Icons.auto_awesome, const Color(0xFF4A148C))),
   ]));
 
@@ -54,7 +55,7 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -68,15 +69,15 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
       child: Column(children: [
         const Icon(Icons.cloud_upload, color: Color(0xFF2E7D32), size: 64),
         const SizedBox(height: 12),
-        const Text('اسحب ملفاتك هنا أو اضغط للاختيار',
+        Text('اسحب ملفاتك هنا أو اضغط للاختيار',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         const SizedBox(height: 6),
-        const Text('PDF • Excel • Word • صور JPG/PNG', style: TextStyle(color: Colors.black54, fontSize: 12)),
+        Text('PDF • Excel • Word • صور JPG/PNG', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
         const SizedBox(height: 12),
         ElevatedButton.icon(
           onPressed: () {},
           icon: const Icon(Icons.folder_open),
-          label: const Text('اختر ملفاً'),
+          label: Text('اختر ملفاً'),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF2E7D32),
             foregroundColor: Colors.white,
@@ -86,11 +87,11 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
       ]),
     )),
     const SizedBox(height: 14),
-    const Text('📤 ملفات قيد المعالجة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+    Text('📤 ملفات قيد المعالجة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
     const SizedBox(height: 8),
     ..._files.where((f) => f.status.contains('معالجة')).map((f) => _fileCard(f)),
     const SizedBox(height: 14),
-    const Text('✅ ملفات مكتملة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+    Text('✅ ملفات مكتملة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
     const SizedBox(height: 8),
     ..._files.where((f) => f.status.contains('مكتمل')).map((f) => _fileCard(f)),
   ]);
@@ -104,14 +105,14 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
       Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
         decoration: BoxDecoration(color: _statusColor(f.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
         child: Text(f.status, style: TextStyle(color: _statusColor(f.status), fontSize: 10, fontWeight: FontWeight.bold))),
-      Text('${f.confidence}%', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+      Text('${f.confidence}%', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
     ]),
   ));
 
   Widget _templatesTab() => ListView.builder(padding: const EdgeInsets.all(12), itemCount: _templates.length, itemBuilder: (_, i) {
     final t = _templates[i];
     return Card(margin: const EdgeInsets.only(bottom: 8), child: ListTile(
-      leading: const CircleAvatar(backgroundColor: Color(0xFFD4AF37), child: Icon(Icons.description, color: Colors.white)),
+      leading: CircleAvatar(backgroundColor: core_theme.AC.gold, child: Icon(Icons.description, color: Colors.white)),
       title: Text(t.name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(t.description, style: const TextStyle(fontSize: 11)),
       trailing: ElevatedButton.icon(
@@ -152,7 +153,7 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
       leading: Icon(Icons.history, color: _statusColor(h.$3)),
       title: Text(h.$1, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
       subtitle: Text('${h.$2} • ${h.$3}', style: const TextStyle(fontSize: 10)),
-      trailing: Text(h.$4, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+      trailing: Text(h.$4, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
     ));
   });
 
@@ -160,12 +161,12 @@ class _FinancialUploadScreenState extends State<FinancialUploadScreen> with Sing
     if (s.contains('مكتمل')) return const Color(0xFF2E7D32);
     if (s.contains('معالجة')) return const Color(0xFFE65100);
     if (s.contains('فشل')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   Color _confColor(int c) {
     if (c >= 90) return const Color(0xFF2E7D32);
-    if (c >= 75) return const Color(0xFFD4AF37);
+    if (c >= 75) return core_theme.AC.gold;
     return const Color(0xFFC62828);
   }
 

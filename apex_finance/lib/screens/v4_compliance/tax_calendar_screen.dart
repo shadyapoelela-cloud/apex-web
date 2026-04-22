@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class TaxCalendarScreen extends StatefulWidget {
   const TaxCalendarScreen({super.key});
@@ -49,10 +50,10 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('متأخر', '$overdue', Colors.red, Icons.error),
-            _kpi('عاجل', '$urgent', Colors.orange, Icons.warning),
-            _kpi('اليوم', '$today', Colors.blue, Icons.today),
-            _kpi('إجمالي المستحق', _fmtM(totalAmount), const Color(0xFFD4AF37), Icons.payments),
+            _kpi('متأخر', '$overdue', core_theme.AC.err, Icons.error),
+            _kpi('عاجل', '$urgent', core_theme.AC.warn, Icons.warning),
+            _kpi('اليوم', '$today', core_theme.AC.info, Icons.today),
+            _kpi('إجمالي المستحق', _fmtM(totalAmount), core_theme.AC.gold, Icons.payments),
           ],
         ),
         const SizedBox(height: 16),
@@ -70,7 +71,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
         gradient: const LinearGradient(colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.calendar_month, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -81,7 +82,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
                 Text('رزنامة الالتزامات الضريبية',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('كل مواعيد الإقرارات والدفعات — مربوطة بـ ZATCA / GOSI / WPS / UAE FTA',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -108,7 +109,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -125,20 +126,20 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
       runSpacing: 8,
       children: [
         _filterChip('all', 'الكل', Icons.apps),
-        _filterChip('overdue', 'متأخر', Icons.error, Colors.red),
-        _filterChip('today', 'اليوم', Icons.today, Colors.blue),
-        _filterChip('urgent', 'عاجل (< 7 أيام)', Icons.warning, Colors.orange),
-        _filterChip('VAT', 'VAT', Icons.percent, Colors.green),
-        _filterChip('WHT', 'WHT', Icons.money_off, Colors.purple),
-        _filterChip('GOSI', 'GOSI / WPS', Icons.shield, Colors.teal),
-        _filterChip('ZAKAT', 'الزكاة', Icons.star, Colors.amber),
+        _filterChip('overdue', 'متأخر', Icons.error, core_theme.AC.err),
+        _filterChip('today', 'اليوم', Icons.today, core_theme.AC.info),
+        _filterChip('urgent', 'عاجل (< 7 أيام)', Icons.warning, core_theme.AC.warn),
+        _filterChip('VAT', 'VAT', Icons.percent, core_theme.AC.ok),
+        _filterChip('WHT', 'WHT', Icons.money_off, core_theme.AC.purple),
+        _filterChip('GOSI', 'GOSI / WPS', Icons.shield, core_theme.AC.info),
+        _filterChip('ZAKAT', 'الزكاة', Icons.star, core_theme.AC.warn),
       ],
     );
   }
 
   Widget _filterChip(String id, String label, IconData icon, [Color? color]) {
     final selected = _filter == id;
-    final c = color ?? const Color(0xFFD4AF37);
+    final c = color ?? core_theme.AC.gold;
     return InkWell(
       onTap: () => setState(() => _filter = id),
       borderRadius: BorderRadius.circular(20),
@@ -172,7 +173,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
@@ -194,7 +195,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: isLast ? Colors.transparent : Colors.black12),
+                bottom: BorderSide(color: isLast ? Colors.transparent : core_theme.AC.bdr),
                 right: BorderSide(color: statusColor, width: 3),
               ),
             ),
@@ -204,7 +205,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
                 Text(d.dueDate.substring(5),
                     style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800)),
                 Text(d.dueDate.substring(0, 4),
-                    style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 const SizedBox(height: 4),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -224,7 +225,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: isLast ? Colors.transparent : Colors.black12)),
+                border: Border(bottom: BorderSide(color: isLast ? Colors.transparent : core_theme.AC.bdr)),
               ),
               child: Row(
                 children: [
@@ -245,18 +246,18 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
                         Text(d.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                         Row(
                           children: [
-                            Icon(_frequencyIcon(d.frequency), size: 11, color: Colors.black54),
+                            Icon(_frequencyIcon(d.frequency), size: 11, color: core_theme.AC.ts),
                             const SizedBox(width: 4),
                             Text(_frequencyLabel(d.frequency),
-                                style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                                style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                             const SizedBox(width: 10),
-                            Icon(Icons.business, size: 11, color: Colors.black54),
+                            Icon(Icons.business, size: 11, color: core_theme.AC.ts),
                             const SizedBox(width: 4),
-                            Text(d.authority, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(d.authority, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                             const SizedBox(width: 10),
-                            Icon(Icons.task_alt, size: 11, color: Colors.black54),
+                            Icon(Icons.task_alt, size: 11, color: core_theme.AC.ts),
                             const SizedBox(width: 4),
-                            Text(d.action, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(d.action, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                           ],
                         ),
                       ],
@@ -264,14 +265,14 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
                   ),
                   if (d.amount > 0) ...[
                     Text(_fmt(d.amount),
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                    const Text(' ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                    Text(' ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                   const SizedBox(width: 10),
                   OutlinedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.arrow_forward, size: 14),
-                    label: const Text('تنفيذ', style: TextStyle(fontSize: 11)),
+                    label: Text('تنفيذ', style: TextStyle(fontSize: 11)),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: statusColor,
                       side: BorderSide(color: statusColor),
@@ -291,41 +292,41 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
   Color _statusColor(String status) {
     switch (status) {
       case 'overdue':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'urgent':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'today':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'upcoming':
-        return Colors.amber.shade700;
+        return core_theme.AC.warn;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
   Color _typeColor(String type) {
     switch (type) {
       case 'VAT':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'WHT':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'GOSI':
       case 'WPS':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'ZATCA E-INV':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'CT':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'ZAKAT':
-        return Colors.amber.shade800;
+        return core_theme.AC.warn;
       case 'TP':
-        return Colors.indigo;
+        return core_theme.AC.purple;
       case 'CBCR':
-        return Colors.deepPurple;
+        return core_theme.AC.purple;
       case 'ESR':
-        return Colors.cyan;
+        return core_theme.AC.info;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

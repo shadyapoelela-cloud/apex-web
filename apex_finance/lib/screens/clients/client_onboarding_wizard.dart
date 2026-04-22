@@ -44,7 +44,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
     {'code': 'OM', 'name_ar': 'عُمان',     'currency': 'OMR'},
     {'code': 'EG', 'name_ar': 'مصر',      'currency': 'EGP'},
   ];
-  static const List<String> _currencies = ['SAR', 'AED', 'KWD', 'BHD', 'QAR', 'OMR', 'EGP', 'USD', 'EUR'];
+  static final List<String> _currencies = ['SAR', 'AED', 'KWD', 'BHD', 'QAR', 'OMR', 'EGP', 'USD', 'EUR'];
 
   @override void dispose() {
     _nameArC.dispose(); _nameEnC.dispose(); _crC.dispose();

@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 enum ReportFieldKind { dimension, measure }
 enum AggFn { sum, avg, count, min, max }
@@ -218,7 +219,7 @@ class _ApexReportBuilderState extends State<ApexReportBuilder> {
 
   Widget _catalogueChip(ReportField f) {
     final color =
-        f.kind == ReportFieldKind.measure ? AC.gold : Colors.blue.shade300;
+        f.kind == ReportFieldKind.measure ? AC.gold : core_theme.AC.info;
     return Draggable<ReportField>(
       data: f,
       feedback: Material(
@@ -254,13 +255,13 @@ class _ApexReportBuilderState extends State<ApexReportBuilder> {
               accept: (f) => f.kind == ReportFieldKind.dimension,
               onAccept: (f) => _addDim(f.id, true),
               onRemove: _removeDim,
-              accent: Colors.blue.shade300),
+              accent: core_theme.AC.info),
           const SizedBox(height: AppSpacing.sm),
           _dropZone('أعمدة (Columns)', _def.columnFieldIds,
               accept: (f) => f.kind == ReportFieldKind.dimension,
               onAccept: (f) => _addDim(f.id, false),
               onRemove: _removeDim,
-              accent: Colors.purple.shade300),
+              accent: core_theme.AC.purple),
           const SizedBox(height: AppSpacing.sm),
           _measureZone(),
           const SizedBox(height: AppSpacing.sm),

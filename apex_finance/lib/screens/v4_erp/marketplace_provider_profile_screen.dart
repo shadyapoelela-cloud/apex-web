@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 136 — Marketplace Provider Profile
 class MarketplaceProviderProfileScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _MarketplaceProviderProfileScreenState extends State<MarketplaceProviderPr
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الملف التعريفي'), Tab(text: 'الشهادات'), Tab(text: 'المهارات والخدمات'), Tab(text: 'الفريق')])),
         Expanded(child: TabBarView(controller: _tc, children: [_profileTab(), _certsTab(), _skillsTab(), _teamTab()])),
       ])),
@@ -32,22 +33,22 @@ class _MarketplaceProviderProfileScreenState extends State<MarketplaceProviderPr
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      const CircleAvatar(radius: 30, backgroundColor: Color(0xFFD4AF37),
+      CircleAvatar(radius: 30, backgroundColor: core_theme.AC.gold,
         child: Text('أ ر', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold))),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('مكتب الراجحي للاستشارات', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
         Row(children: [
-          Icon(Icons.verified, color: Color(0xFFD4AF37), size: 16),
+          Icon(Icons.verified, color: core_theme.AC.gold, size: 16),
           SizedBox(width: 4),
-          Text('موثّق ★ Premium • محاسبة وضرائب', style: TextStyle(color: Colors.white70, fontSize: 13)),
+          Text('موثّق ★ Premium • محاسبة وضرائب', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
         ]),
       ])),
       Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        const Text('4.9', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-        Row(children: List.generate(5, (i) => const Icon(Icons.star, color: Color(0xFFD4AF37), size: 14))),
-        const Text('128 تقييم', style: TextStyle(color: Colors.white70, fontSize: 10)),
+        Text('4.9', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+        Row(children: List.generate(5, (i) => Icon(Icons.star, color: core_theme.AC.gold, size: 14))),
+        Text('128 تقييم', style: TextStyle(color: core_theme.AC.ts, fontSize: 10)),
       ]),
     ]),
   );
@@ -55,7 +56,7 @@ class _MarketplaceProviderProfileScreenState extends State<MarketplaceProviderPr
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('مشاريع منجزة', '248', Icons.task_alt, const Color(0xFF2E7D32))),
     Expanded(child: _kpi('عملاء متكررون', '72%', Icons.repeat, const Color(0xFF4A148C))),
-    Expanded(child: _kpi('زمن الرد', '1.2 ساعة', Icons.speed, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('زمن الرد', '1.2 ساعة', Icons.speed, core_theme.AC.gold)),
     Expanded(child: _kpi('معدل الإتمام', '98%', Icons.check_circle, const Color(0xFF1A237E))),
   ]));
 
@@ -63,15 +64,15 @@ class _MarketplaceProviderProfileScreenState extends State<MarketplaceProviderPr
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
   Widget _profileTab() => ListView(padding: const EdgeInsets.all(14), children: [
     Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('نبذة تعريفية', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4A148C))),
+      Text('نبذة تعريفية', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4A148C))),
       const SizedBox(height: 8),
-      const Text('مكتب محاسبة وضرائب مرخّص من SOCPA منذ 2008. خدمنا أكثر من 500 شركة في المملكة عبر قطاعات متعددة. متخصصون في الفوترة الإلكترونية (ZATCA)، مراجعة الزكاة، ضريبة القيمة المضافة، وتطبيق IFRS.',
+      Text('مكتب محاسبة وضرائب مرخّص من SOCPA منذ 2008. خدمنا أكثر من 500 شركة في المملكة عبر قطاعات متعددة. متخصصون في الفوترة الإلكترونية (ZATCA)، مراجعة الزكاة، ضريبة القيمة المضافة، وتطبيق IFRS.',
         style: TextStyle(fontSize: 13, height: 1.6)),
     ]))),
     const SizedBox(height: 10),
@@ -87,17 +88,17 @@ class _MarketplaceProviderProfileScreenState extends State<MarketplaceProviderPr
 
   Widget _infoRow(String label, String value) => Card(margin: const EdgeInsets.only(bottom: 6),
     child: ListTile(dense: true, title: Text(label, style: const TextStyle(fontSize: 12)),
-      subtitle: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87))));
+      subtitle: Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: core_theme.AC.tp))));
 
   Widget _certsTab() => ListView.builder(padding: const EdgeInsets.all(12), itemCount: _certs.length, itemBuilder: (_, i) {
     final c = _certs[i];
     return Card(margin: const EdgeInsets.only(bottom: 8), child: ListTile(
-      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFFD4AF37).withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
-        child: Icon(_certIcon(c.type), color: const Color(0xFFD4AF37))),
+      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+        child: Icon(_certIcon(c.type), color: core_theme.AC.gold)),
       title: Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(c.issuer, style: const TextStyle(fontSize: 11)),
-        Text('رقم: ${c.number} • ${c.year}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('رقم: ${c.number} • ${c.year}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: const Icon(Icons.verified, color: Color(0xFF2E7D32)),
     ));
@@ -118,14 +119,14 @@ class _MarketplaceProviderProfileScreenState extends State<MarketplaceProviderPr
           Icon(s.icon, color: const Color(0xFF4A148C)),
           const SizedBox(width: 10),
           Expanded(child: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
-          Text('${s.projects} مشروع', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('${s.projects} مشروع', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ]),
         const SizedBox(height: 8),
         ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-          value: s.level / 100, minHeight: 8, backgroundColor: Colors.black12,
-          valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)))),
+          value: s.level / 100, minHeight: 8, backgroundColor: core_theme.AC.bdr,
+          valueColor: AlwaysStoppedAnimation(core_theme.AC.gold))),
         const SizedBox(height: 4),
-        Text('${s.level}% خبرة • ${s.description}', style: const TextStyle(fontSize: 11, color: Colors.black87)),
+        Text('${s.level}% خبرة • ${s.description}', style: TextStyle(fontSize: 11, color: core_theme.AC.tp)),
       ]),
     ));
   });
@@ -137,7 +138,7 @@ class _MarketplaceProviderProfileScreenState extends State<MarketplaceProviderPr
         child: Text(t.name.substring(0, 1), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
       title: Text(t.name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text('${t.role} • ${t.certs}', style: const TextStyle(fontSize: 11)),
-      trailing: Text('${t.years} سنة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+      trailing: Text('${t.years} سنة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
     ));
   });
 

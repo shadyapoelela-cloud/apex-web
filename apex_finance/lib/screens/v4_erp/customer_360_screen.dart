@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Customer360Screen extends StatefulWidget {
   const Customer360Screen({super.key});
@@ -52,9 +53,9 @@ class _Customer360ScreenState extends State<Customer360Screen>
               _buildKpiRow(),
               TabBar(
                 controller: _tab,
-                labelColor: const Color(0xFFD4AF37),
-                unselectedLabelColor: Colors.black54,
-                indicatorColor: const Color(0xFFD4AF37),
+                labelColor: core_theme.AC.gold,
+                unselectedLabelColor: core_theme.AC.ts,
+                indicatorColor: core_theme.AC.gold,
                 tabs: const [
                   Tab(icon: Icon(Icons.timeline, size: 16), text: 'النشاط'),
                   Tab(icon: Icon(Icons.receipt_long, size: 16), text: 'المبيعات والفواتير'),
@@ -85,17 +86,17 @@ class _Customer360ScreenState extends State<Customer360Screen>
       margin: const EdgeInsets.only(left: 20, top: 20, bottom: 20, right: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            color: Colors.grey.shade50,
-            child: const Row(
+            color: core_theme.AC.navy3,
+            child: Row(
               children: [
-                Icon(Icons.groups, color: Color(0xFFD4AF37), size: 16),
+                Icon(Icons.groups, color: core_theme.AC.gold, size: 16),
                 SizedBox(width: 6),
                 Text('العملاء', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               ],
@@ -112,11 +113,11 @@ class _Customer360ScreenState extends State<Customer360Screen>
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: selected ? const Color(0xFFD4AF37).withOpacity(0.12) : null,
+                      color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
                       border: Border(
-                        bottom: BorderSide(color: Colors.black12.withOpacity(0.5)),
+                        bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
                         right: BorderSide(
-                          color: selected ? const Color(0xFFD4AF37) : Colors.transparent,
+                          color: selected ? core_theme.AC.gold : Colors.transparent,
                           width: 3,
                         ),
                       ),
@@ -141,14 +142,14 @@ class _Customer360ScreenState extends State<Customer360Screen>
                                   overflow: TextOverflow.ellipsis),
                               Row(
                                 children: [
-                                  Text(c.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                                  Text(c.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                                   const SizedBox(width: 6),
-                                  Text('• ${c.country}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                                  Text('• ${c.country}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                                 ],
                               ),
                               const SizedBox(height: 2),
                               Text('${_fmtM(c.ytdRevenue.toDouble())} · ${c.invoiceCount} فاتورة',
-                                  style: const TextStyle(fontSize: 10, color: Color(0xFFD4AF37), fontWeight: FontWeight.w700)),
+                                  style: TextStyle(fontSize: 10, color: core_theme.AC.gold, fontWeight: FontWeight.w700)),
                             ],
                           ),
                         ),
@@ -207,15 +208,15 @@ class _Customer360ScreenState extends State<Customer360Screen>
                   ],
                 ),
                 Text('${_selected.id} · ${_selected.country} · ${_selected.industry}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace')),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12, fontFamily: 'monospace')),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text('عميل منذ', style: TextStyle(color: Colors.white70, fontSize: 10)),
-              const Text('2019',
+              Text('عميل منذ', style: TextStyle(color: core_theme.AC.ts, fontSize: 10)),
+              Text('2019',
                   style: TextStyle(color: Color(0xFFFFD700), fontSize: 20, fontWeight: FontWeight.w900)),
             ],
           ),
@@ -229,10 +230,10 @@ class _Customer360ScreenState extends State<Customer360Screen>
       padding: const EdgeInsets.only(left: 10, top: 12, right: 20),
       child: Row(
         children: [
-          _kpi('الإيرادات YTD', _fmt(_selected.ytdRevenue.toDouble()), const Color(0xFFD4AF37), Icons.trending_up),
-          _kpi('عدد الفواتير', '${_selected.invoiceCount}', Colors.blue, Icons.receipt),
-          _kpi('متأخرات', '85,000', Colors.orange, Icons.warning_amber),
-          _kpi('NPS', '82', Colors.green, Icons.thumb_up),
+          _kpi('الإيرادات YTD', _fmt(_selected.ytdRevenue.toDouble()), core_theme.AC.gold, Icons.trending_up),
+          _kpi('عدد الفواتير', '${_selected.invoiceCount}', core_theme.AC.info, Icons.receipt),
+          _kpi('متأخرات', '85,000', core_theme.AC.warn, Icons.warning_amber),
+          _kpi('NPS', '82', core_theme.AC.ok, Icons.thumb_up),
         ],
       ),
     );
@@ -256,7 +257,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -293,7 +294,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Row(
         children: [
@@ -314,17 +315,17 @@ class _Customer360ScreenState extends State<Customer360Screen>
                   children: [
                     Text(a.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                     const Spacer(),
-                    Text(a.date, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                    Text(a.date, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(a.detail, style: const TextStyle(fontSize: 12, height: 1.5, color: Colors.black87)),
+                Text(a.detail, style: TextStyle(fontSize: 12, height: 1.5, color: core_theme.AC.tp)),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.person, size: 11, color: Colors.black54),
+                    Icon(Icons.person, size: 11, color: core_theme.AC.ts),
                     const SizedBox(width: 4),
-                    Text(a.by, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text(a.by, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                 ),
               ],
@@ -351,19 +352,19 @@ class _Customer360ScreenState extends State<Customer360Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     Expanded(flex: 2, child: Text('رقم الفاتورة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('التاريخ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 3, child: Text('الوصف', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(flex: 2, child: Text('المبلغ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(flex: 2, child: Text('المبلغ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                     Expanded(child: Text('الحالة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                   ],
                 ),
@@ -372,7 +373,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
@@ -381,12 +382,12 @@ class _Customer360ScreenState extends State<Customer360Screen>
                         child: Text(inv.number,
                             style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
                       ),
-                      Expanded(child: Text(inv.date, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54))),
+                      Expanded(child: Text(inv.date, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts))),
                       Expanded(flex: 3, child: Text(inv.description, style: const TextStyle(fontSize: 12))),
                       Expanded(
                         flex: 2,
                         child: Text(_fmt(inv.amount.toDouble()),
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.gold, fontFamily: 'monospace')),
                       ),
                       Expanded(
                         child: Container(
@@ -421,27 +422,27 @@ class _Customer360ScreenState extends State<Customer360Screen>
       children: [
         Row(
           children: [
-            _arBucket('حالية', 0, 420000, Colors.green),
-            _arBucket('1-30 يوم', 1, 280000, Colors.blue),
-            _arBucket('31-60 يوم', 2, 125000, Colors.amber),
-            _arBucket('61-90 يوم', 3, 60000, Colors.orange),
-            _arBucket('> 90 يوم', 4, 25000, Colors.red),
+            _arBucket('حالية', 0, 420000, core_theme.AC.ok),
+            _arBucket('1-30 يوم', 1, 280000, core_theme.AC.info),
+            _arBucket('31-60 يوم', 2, 125000, core_theme.AC.warn),
+            _arBucket('61-90 يوم', 3, 60000, core_theme.AC.warn),
+            _arBucket('> 90 يوم', 4, 25000, core_theme.AC.err),
           ],
         ),
         const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.orange.shade50,
+            color: core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.orange.shade200),
+            border: Border.all(color: core_theme.AC.warn),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.schedule, color: Colors.orange),
+                  Icon(Icons.schedule, color: core_theme.AC.warn),
                   SizedBox(width: 8),
                   Text('DSO — متوسط فترة التحصيل', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
                 ],
@@ -449,20 +450,20 @@ class _Customer360ScreenState extends State<Customer360Screen>
               const SizedBox(height: 10),
               Row(
                 children: [
-                  const Text('الحالي:', style: TextStyle(fontSize: 12)),
+                  Text('الحالي:', style: TextStyle(fontSize: 12)),
                   const SizedBox(width: 10),
                   Text('32 يوم',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.orange.shade700)),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: core_theme.AC.warn)),
                   const SizedBox(width: 20),
-                  const Text('الشروط المتفق عليها:', style: TextStyle(fontSize: 12)),
+                  Text('الشروط المتفق عليها:', style: TextStyle(fontSize: 12)),
                   const SizedBox(width: 10),
-                  const Text('45 يوم',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.green)),
+                  Text('45 يوم',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
                 ],
               ),
               const SizedBox(height: 8),
-              const Text('أداء التحصيل ممتاز — أسرع من المتفق عليه بـ 13 يوم',
-                  style: TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('أداء التحصيل ممتاز — أسرع من المتفق عليه بـ 13 يوم',
+                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ],
           ),
         ),
@@ -472,12 +473,12 @@ class _Customer360ScreenState extends State<Customer360Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('الفواتير المتأخرة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
+              Text('الفواتير المتأخرة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
               const SizedBox(height: 10),
               _overdueRow('INV-2026-0398', '85,000', 45),
               _overdueRow('INV-2025-2814', '60,000', 72),
@@ -506,7 +507,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
             const SizedBox(height: 8),
             Text(_fmt(value),
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color, fontFamily: 'monospace')),
-            const Text('ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ],
         ),
       ),
@@ -514,7 +515,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
   }
 
   Widget _overdueRow(String inv, String amount, int days) {
-    final severity = days > 90 ? Colors.red : days > 60 ? Colors.orange : Colors.amber;
+    final severity = days > 90 ? core_theme.AC.err : days > 60 ? core_theme.AC.warn : core_theme.AC.warn;
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(10),
@@ -548,7 +549,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
               minimumSize: const Size(40, 26),
             ),
-            child: const Text('متابعة', style: TextStyle(fontSize: 11)),
+            child: Text('متابعة', style: TextStyle(fontSize: 11)),
           ),
         ],
       ),
@@ -562,29 +563,29 @@ class _Customer360ScreenState extends State<Customer360Screen>
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [Colors.green.shade600, Colors.green.shade400]),
+            gradient: LinearGradient(colors: [core_theme.AC.ok, core_theme.AC.ok]),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
             children: [
               const Icon(Icons.sentiment_very_satisfied, color: Colors.white, size: 40),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('علاقة صحيّة ومتنامية',
                         style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
                     Text('نمو 24% في الإيرادات، NPS 82، تحصيل أسرع من المتفق عليه',
-                        style: TextStyle(color: Colors.white70, fontSize: 11)),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                   ],
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
-                child: const Text('A+',
-                    style: TextStyle(color: Colors.green, fontSize: 32, fontWeight: FontWeight.w900)),
+                child: Text('A+',
+                    style: TextStyle(color: core_theme.AC.ok, fontSize: 32, fontWeight: FontWeight.w900)),
               ),
             ],
           ),
@@ -597,7 +598,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
               child: _healthCard(
                 'مؤشرات إيجابية',
                 Icons.trending_up,
-                Colors.green,
+                core_theme.AC.ok,
                 const [
                   'نمو 24% سنوياً في قيمة العقود',
                   'تحصيل أسرع من الشروط المتفق عليها (32 يوم مقابل 45)',
@@ -613,7 +614,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
               child: _healthCard(
                 'مؤشرات تحذيرية',
                 Icons.warning_amber,
-                Colors.orange,
+                core_theme.AC.warn,
                 const [
                   '3 فواتير متأخرة بإجمالي 170,000 ر.س',
                   'انخفاض نسبي في عروض الأسعار الجديدة (آخر 30 يوم)',
@@ -630,14 +631,14 @@ class _Customer360ScreenState extends State<Customer360Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.lightbulb, color: Color(0xFFD4AF37)),
+                  Icon(Icons.lightbulb, color: core_theme.AC.gold),
                   SizedBox(width: 8),
                   Text('توصيات AI للاحتفاظ بالعميل',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
@@ -700,27 +701,27 @@ class _Customer360ScreenState extends State<Customer360Screen>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFFD4AF37).withOpacity(0.08),
+        color: core_theme.AC.gold.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.25)),
+        border: Border.all(color: core_theme.AC.gold.withOpacity(0.25)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.auto_awesome, color: Color(0xFFD4AF37), size: 16),
+          Icon(Icons.auto_awesome, color: core_theme.AC.gold, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-                Text(reason, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.4)),
+                Text(reason, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.4)),
               ],
             ),
           ),
           TextButton(
             onPressed: () {},
-            child: const Text('تنفيذ', style: TextStyle(fontSize: 11)),
+            child: Text('تنفيذ', style: TextStyle(fontSize: 11)),
           ),
         ],
       ),
@@ -730,13 +731,13 @@ class _Customer360ScreenState extends State<Customer360Screen>
   Color _segmentColor(String segment) {
     switch (segment) {
       case 'strategic':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'enterprise':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'government':
-        return Colors.teal;
+        return core_theme.AC.info;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -775,32 +776,32 @@ class _Customer360ScreenState extends State<Customer360Screen>
   Color _actColor(String type) {
     switch (type) {
       case 'meeting':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'email':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'invoice':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'call':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'payment':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'proposal':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
   Color _invStatusColor(String status) {
     switch (status) {
       case 'مدفوع':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'قيد التحصيل':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'متأخر':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

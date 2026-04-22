@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 141 — Unified Tax Filing Center
 class TaxFilingCenterScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _TaxFilingCenterScreenState extends State<TaxFilingCenterScreen> with Sing
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الإقرارات المستحقة'), Tab(text: 'تحت المعالجة'), Tab(text: 'المقدّمة'), Tab(text: 'السجل')])),
         Expanded(child: TabBarView(controller: _tc, children: [_dueTab(), _inProgressTab(), _submittedTab(), _historyTab()])),
       ])),
@@ -32,13 +33,13 @@ class _TaxFilingCenterScreenState extends State<TaxFilingCenterScreen> with Sing
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF004D40), Color(0xFF00695C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.assignment, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('مركز الإقرارات الضريبية الموحّد', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('VAT + Zakat + WHT + Excise + Corporate Tax — كل ما تحتاجه', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('VAT + Zakat + WHT + Excise + Corporate Tax — كل ما تحتاجه', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -48,7 +49,7 @@ class _TaxFilingCenterScreenState extends State<TaxFilingCenterScreen> with Sing
     final processing = _fillings.where((f)=>f.status.contains('معالجة')).length;
     return Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
       Expanded(child: _kpi('مستحقة', '$due', Icons.schedule, const Color(0xFFE65100))),
-      Expanded(child: _kpi('قيد المعالجة', '$processing', Icons.hourglass_bottom, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('قيد المعالجة', '$processing', Icons.hourglass_bottom, core_theme.AC.gold)),
       Expanded(child: _kpi('مُقدّمة', '${_fillings.length - due - processing}', Icons.check_circle, const Color(0xFF2E7D32))),
       Expanded(child: _kpi('إجمالي مدفوع 2026', '2.8M', Icons.payments, const Color(0xFF4A148C))),
     ]));
@@ -58,7 +59,7 @@ class _TaxFilingCenterScreenState extends State<TaxFilingCenterScreen> with Sing
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -91,7 +92,7 @@ class _TaxFilingCenterScreenState extends State<TaxFilingCenterScreen> with Sing
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(f.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-          Text('${f.type} • ${f.period}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('${f.type} • ${f.period}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ])),
         Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(color: _statusColor(f.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
@@ -116,7 +117,7 @@ class _TaxFilingCenterScreenState extends State<TaxFilingCenterScreen> with Sing
   ));
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
   ]));
 
@@ -134,9 +135,9 @@ class _TaxFilingCenterScreenState extends State<TaxFilingCenterScreen> with Sing
     if (t.contains('VAT')) return const Color(0xFF1A237E);
     if (t.contains('Zakat')) return const Color(0xFF2E7D32);
     if (t.contains('WHT')) return const Color(0xFFE65100);
-    if (t.contains('Excise')) return const Color(0xFFD4AF37);
+    if (t.contains('Excise')) return core_theme.AC.gold;
     if (t.contains('Corporate')) return const Color(0xFF4A148C);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   IconData _typeIcon(String t) {
@@ -150,10 +151,10 @@ class _TaxFilingCenterScreenState extends State<TaxFilingCenterScreen> with Sing
 
   Color _statusColor(String s) {
     if (s.contains('مُقدّم')) return const Color(0xFF2E7D32);
-    if (s.contains('معالجة')) return const Color(0xFFD4AF37);
+    if (s.contains('معالجة')) return core_theme.AC.gold;
     if (s.contains('مستحق')) return const Color(0xFFE65100);
     if (s.contains('متأخر')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Filing> _fillings = [

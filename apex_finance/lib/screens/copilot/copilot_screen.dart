@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/ui_components.dart';
 
 class CopilotScreen extends StatefulWidget {
@@ -781,7 +782,7 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
     decoration: BoxDecoration(
       color: AC.navy2,
       border: Border(top: BorderSide(color: AC.bdr, width: 0.5)),
-      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: Offset(0, -3))],
+      boxShadow: [BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.1), blurRadius: 10, offset: Offset(0, -3))],
     ),
     child: SafeArea(
       top: false,

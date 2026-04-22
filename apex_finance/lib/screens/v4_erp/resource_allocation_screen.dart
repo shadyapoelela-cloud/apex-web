@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ResourceAllocationScreen extends StatefulWidget {
   const ResourceAllocationScreen({super.key});
@@ -19,8 +20,8 @@ class ResourceAllocationScreen extends StatefulWidget {
 }
 
 class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   static const _people = <_Person>[
     _Person(name: 'أحمد محمد', role: 'مهندس كبير', capacity: 40, allocated: 38, skills: ['Flutter', 'Dart', 'Firebase']),
@@ -57,22 +58,22 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.group_work, color: _gold),
+                  Icon(Icons.group_work, color: _gold),
                   const SizedBox(width: 8),
-                  const Text('تخصيص الموارد',
+                  Text('تخصيص الموارد',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                   const Spacer(),
                   OutlinedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.event),
-                    label: const Text('الأسبوع الحالي W16'),
+                    label: Text('الأسبوع الحالي W16'),
                   ),
                   const SizedBox(width: 8),
                   FilledButton.icon(
                     onPressed: () {},
                     style: FilledButton.styleFrom(backgroundColor: _gold),
                     icon: const Icon(Icons.assignment_ind),
-                    label: const Text('تخصيص جديد'),
+                    label: Text('تخصيص جديد'),
                   ),
                 ],
               ),
@@ -82,14 +83,14 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
               color: Colors.white,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Row(
-                children: const [
-                  Expanded(child: _StatCard(icon: Icons.group, label: 'الموارد النشطة', value: '8', color: Colors.blue)),
+                children: [
+                  Expanded(child: _StatCard(icon: Icons.group, label: 'الموارد النشطة', value: '8', color: core_theme.AC.info)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.analytics, label: 'الاستغلال المتوسط', value: '90%', color: Color(0xFFD4AF37))),
+                  Expanded(child: _StatCard(icon: Icons.analytics, label: 'الاستغلال المتوسط', value: '90%', color: core_theme.AC.gold)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.warning, label: 'فائض تحميل', value: '2', color: Colors.red)),
+                  Expanded(child: _StatCard(icon: Icons.warning, label: 'فائض تحميل', value: '2', color: core_theme.AC.err)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.event_available, label: 'سعة متاحة', value: '40 ساعة', color: Colors.green)),
+                  Expanded(child: _StatCard(icon: Icons.event_available, label: 'سعة متاحة', value: '40 ساعة', color: core_theme.AC.ok)),
                 ],
               ),
             ),
@@ -109,12 +110,12 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                         final pct = (p.allocated / p.capacity * 100).clamp(0, 200);
                         final over = pct > 100;
                         final (barColor, labelColor, statusText) = over
-                            ? (Colors.red, Colors.red, 'زيادة تحميل')
+                            ? (core_theme.AC.err, core_theme.AC.err, 'زيادة تحميل')
                             : pct > 95
-                                ? (Colors.orange, Colors.orange, 'مكتمل')
+                                ? (core_theme.AC.warn, core_theme.AC.warn, 'مكتمل')
                                 : pct > 75
-                                    ? (Colors.green, Colors.green, 'متوازن')
-                                    : (Colors.blue, Colors.blue, 'سعة متاحة');
+                                    ? (core_theme.AC.ok, core_theme.AC.ok, 'متوازن')
+                                    : (core_theme.AC.info, core_theme.AC.info, 'سعة متاحة');
                         return Card(
                           elevation: 1,
                           child: Padding(
@@ -124,7 +125,7 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                                 CircleAvatar(
                                   backgroundColor: _navy.withOpacity(0.1),
                                   child: Text(p.name.substring(0, 1),
-                                      style: const TextStyle(color: _navy, fontWeight: FontWeight.w800)),
+                                      style: TextStyle(color: _navy, fontWeight: FontWeight.w800)),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -135,7 +136,7 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                                       Text(p.name,
                                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                                       Text(p.role,
-                                          style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                                     ],
                                   ),
                                 ),
@@ -164,7 +165,7 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                                           child: LinearProgressIndicator(
                                             value: (pct / 100).clamp(0, 1.0).toDouble(),
                                             minHeight: 8,
-                                            backgroundColor: Colors.grey.shade200,
+                                            backgroundColor: core_theme.AC.bdr,
                                             color: barColor,
                                           ),
                                         ),
@@ -189,7 +190,7 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                                     label: Text(s, style: const TextStyle(fontSize: 10)),
                                     padding: const EdgeInsets.symmetric(horizontal: 6),
                                     visualDensity: VisualDensity.compact,
-                                    backgroundColor: Colors.grey.shade100,
+                                    backgroundColor: core_theme.AC.navy3,
                                   )).toList(),
                                 ),
                               ],
@@ -205,12 +206,12 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border(right: BorderSide(color: Colors.grey.shade200)),
+                      border: Border(right: BorderSide(color: core_theme.AC.bdr)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('تخصيصات الأسبوع',
+                        Text('تخصيصات الأسبوع',
                             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                         const SizedBox(height: 12),
                         Expanded(
@@ -222,9 +223,9 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                               return Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade50,
+                                  color: core_theme.AC.navy3,
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.grey.shade200),
+                                  border: Border.all(color: core_theme.AC.bdr),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,13 +235,13 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                                     const SizedBox(height: 2),
                                     Row(
                                       children: [
-                                        const Icon(Icons.person, size: 12, color: Colors.black54),
+                                        Icon(Icons.person, size: 12, color: core_theme.AC.ts),
                                         const SizedBox(width: 4),
                                         Text(a.person,
-                                            style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                                            style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                                         const Spacer(),
                                         Text('${a.hours} س',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                                 fontSize: 12, fontWeight: FontWeight.w700, color: _gold)),
                                       ],
                                     ),

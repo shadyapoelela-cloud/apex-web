@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 import '../../core/apex_sticky_toolbar.dart';
@@ -56,7 +57,7 @@ class ApexMapScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              const Icon(Icons.map, color: Colors.amber, size: 32),
+              Icon(Icons.map, color: core_theme.AC.warn, size: 32),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text('خريطة منصة APEX الكاملة',
@@ -174,7 +175,7 @@ class ApexMapScreen extends StatelessWidget {
       title: 'شاشات الـ Sprint الجديدة',
       subtitle: '10 شاشات ديمو بُنيت في هذه الجلسة',
       icon: Icons.auto_awesome,
-      accent: const Color(0xFFD4AF37),
+      accent: core_theme.AC.gold,
       items: const [
         _Item(
             title: 'Sprint 35-36: الأساس',

@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CustomerLoyaltyScreen extends StatefulWidget {
   const CustomerLoyaltyScreen({super.key});
@@ -16,32 +17,32 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
-  final _tiers = const [
+  final _tiers = [
     _Tier('البلاتيني', 'Platinum', 10_000_000, 82, 15, Color(0xFF455A64), '🏆'),
-    _Tier('الذهبي', 'Gold', 3_000_000, 245, 10, Color(0xFFD4AF37), '🥇'),
+    _Tier('الذهبي', 'Gold', 3_000_000, 245, 10, core_theme.AC.gold, '🥇'),
     _Tier('الفضي', 'Silver', 500_000, 680, 6, Color(0xFF9E9E9E), '🥈'),
     _Tier('البرونزي', 'Bronze', 0, 1_850, 3, Color(0xFFCD7F32), '🥉'),
   ];
 
-  final _topCustomers = const [
+  final _topCustomers = [
     _LoyalCust('CUS-0089', 'سابك', 18_500_000, 285_000, 'Platinum', 145_000, Color(0xFF455A64)),
     _LoyalCust('CUS-0145', 'أرامكو السعودية', 24_500_000, 245_000, 'Platinum', 98_000, Color(0xFF455A64)),
     _LoyalCust('CUS-0213', 'شركة الاتصالات السعودية', 14_500_000, 185_000, 'Platinum', 62_000, Color(0xFF455A64)),
-    _LoyalCust('CUS-0178', 'مجموعة بن لادن السعودية', 8_200_000, 125_000, 'Gold', 48_000, Color(0xFFD4AF37)),
-    _LoyalCust('CUS-0298', 'دبي القابضة', 5_600_000, 98_000, 'Gold', 32_000, Color(0xFFD4AF37)),
-    _LoyalCust('CUS-0342', 'معهد الإدارة العامة', 1_800_000, 45_000, 'Gold', 12_000, Color(0xFFD4AF37)),
+    _LoyalCust('CUS-0178', 'مجموعة بن لادن السعودية', 8_200_000, 125_000, 'Gold', 48_000, core_theme.AC.gold),
+    _LoyalCust('CUS-0298', 'دبي القابضة', 5_600_000, 98_000, 'Gold', 32_000, core_theme.AC.gold),
+    _LoyalCust('CUS-0342', 'معهد الإدارة العامة', 1_800_000, 45_000, 'Gold', 12_000, core_theme.AC.gold),
     _LoyalCust('CUS-0412', 'مركز التدريب الوطني', 680_000, 22_000, 'Silver', 8_500, Color(0xFF9E9E9E)),
   ];
 
-  final _rewards = const [
-    _Reward('خصم 5% على الفاتورة التالية', 'discount', 1_000, 842, true, Colors.green),
-    _Reward('ترقية خدمة مجانية لـ 3 أشهر', 'upgrade', 5_000, 128, true, Colors.blue),
-    _Reward('استشارة مجانية 4 ساعات', 'consultation', 2_500, 245, true, Colors.purple),
-    _Reward('دعوة حدث VIP سنوي', 'event', 15_000, 45, true, Color(0xFFD4AF37)),
-    _Reward('اشتراك شهري مجاني', 'subscription', 3_000, 168, true, Colors.teal),
-    _Reward('كتيب أداء مخصّص', 'whitepaper', 500, 1_240, true, Colors.orange),
-    _Reward('دعوة منتدى القمّة الخليجية', 'event', 25_000, 8, true, Colors.red),
-    _Reward('Apple iPad Pro 2026', 'gift', 50_000, 2, false, Colors.indigo),
+  final _rewards = [
+    _Reward('خصم 5% على الفاتورة التالية', 'discount', 1_000, 842, true, core_theme.AC.ok),
+    _Reward('ترقية خدمة مجانية لـ 3 أشهر', 'upgrade', 5_000, 128, true, core_theme.AC.info),
+    _Reward('استشارة مجانية 4 ساعات', 'consultation', 2_500, 245, true, core_theme.AC.purple),
+    _Reward('دعوة حدث VIP سنوي', 'event', 15_000, 45, true, core_theme.AC.gold),
+    _Reward('اشتراك شهري مجاني', 'subscription', 3_000, 168, true, core_theme.AC.info),
+    _Reward('كتيب أداء مخصّص', 'whitepaper', 500, 1_240, true, core_theme.AC.warn),
+    _Reward('دعوة منتدى القمّة الخليجية', 'event', 25_000, 8, true, core_theme.AC.err),
+    _Reward('Apple iPad Pro 2026', 'gift', 50_000, 2, false, core_theme.AC.purple),
   ];
 
   @override
@@ -64,9 +65,9 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
         _buildKpis(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.emoji_events, size: 16), text: 'المستويات'),
             Tab(icon: Icon(Icons.stars, size: 16), text: 'العملاء الأعلى'),
@@ -94,10 +95,10 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFD4AF37), Color(0xFFE6C200), Color(0xFFFFD700)],
+          colors: [core_theme.AC.gold, Color(0xFFE6C200), Color(0xFFFFD700)],
         ),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -119,10 +120,10 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-            child: const Column(
+            child: Column(
               children: [
-                Text('WAVE 100', style: TextStyle(color: Color(0xFFD4AF37), fontSize: 16, fontWeight: FontWeight.w900)),
-                Text('🎊 MILESTONE', style: TextStyle(color: Colors.black54, fontSize: 10, fontWeight: FontWeight.w700)),
+                Text('WAVE 100', style: TextStyle(color: core_theme.AC.gold, fontSize: 16, fontWeight: FontWeight.w900)),
+                Text('🎊 MILESTONE', style: TextStyle(color: core_theme.AC.ts, fontSize: 10, fontWeight: FontWeight.w700)),
               ],
             ),
           ),
@@ -137,11 +138,11 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('إجمالي الأعضاء', '$totalMembers', Colors.blue, Icons.people),
-          _kpi('نقاط مصدرة YTD', '4.2M', const Color(0xFFD4AF37), Icons.stars),
-          _kpi('نقاط مستبدلة', '1.8M (43%)', Colors.purple, Icons.redeem),
-          _kpi('معدل التفاعل', '68%', Colors.green, Icons.trending_up),
-          _kpi('Net Retention', '+24%', Colors.teal, Icons.repeat),
+          _kpi('إجمالي الأعضاء', '$totalMembers', core_theme.AC.info, Icons.people),
+          _kpi('نقاط مصدرة YTD', '4.2M', core_theme.AC.gold, Icons.stars),
+          _kpi('نقاط مستبدلة', '1.8M (43%)', core_theme.AC.purple, Icons.redeem),
+          _kpi('معدل التفاعل', '68%', core_theme.AC.ok, Icons.trending_up),
+          _kpi('Net Retention', '+24%', core_theme.AC.info, Icons.repeat),
         ],
       ),
     );
@@ -165,7 +166,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -207,7 +208,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(t.name, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
-                Text(t.nameEn, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                Text(t.nameEn, style: TextStyle(color: core_theme.AC.ts, fontSize: 14)),
                 const SizedBox(height: 8),
                 Text('الحد الأدنى: ${_fmtM(t.minSpend.toDouble())} ر.س/سنة',
                     style: const TextStyle(color: Colors.white, fontSize: 12)),
@@ -218,7 +219,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
             children: [
               Text('${t.memberCount}',
                   style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)),
-              const Text('عضو', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              Text('عضو', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
             ],
           ),
           const SizedBox(width: 20),
@@ -232,7 +233,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
               children: [
                 Text('${t.pointsMultiplier}%',
                     style: const TextStyle(color: Color(0xFFFFD700), fontSize: 20, fontWeight: FontWeight.w900)),
-                const Text('نقاط إضافية', style: TextStyle(color: Colors.white70, fontSize: 10)),
+                Text('نقاط إضافية', style: TextStyle(color: core_theme.AC.ts, fontSize: 10)),
               ],
             ),
           ),
@@ -259,10 +260,10 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: i < 3 ? const Color(0xFFFFD700) : Colors.grey.shade300,
+                backgroundColor: i < 3 ? const Color(0xFFFFD700) : core_theme.AC.bdr,
                 child: Text('${i + 1}',
                     style: TextStyle(
-                        color: i < 3 ? Colors.white : Colors.black87, fontWeight: FontWeight.w900, fontSize: 14)),
+                        color: i < 3 ? Colors.white : core_theme.AC.tp, fontWeight: FontWeight.w900, fontSize: 14)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -271,7 +272,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(c.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                    Text(c.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                    Text(c.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -280,9 +281,9 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('إجمالي الإنفاق', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('إجمالي الإنفاق', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     Text(_fmtM(c.totalSpend),
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.gold, fontFamily: 'monospace')),
                   ],
                 ),
               ),
@@ -290,9 +291,9 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('النقاط', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('النقاط', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     Text(_fmt(c.totalPoints.toDouble()),
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.blue, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.info, fontFamily: 'monospace')),
                   ],
                 ),
               ),
@@ -300,9 +301,9 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('متاح', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('متاح', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     Text(_fmt(c.availablePoints.toDouble()),
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.green, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: core_theme.AC.ok, fontFamily: 'monospace')),
                   ],
                 ),
               ),
@@ -361,8 +362,8 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
               if (!r.available)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.red.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-                  child: const Text('نفد', style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.w800)),
+                  decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                  child: Text('نفد', style: TextStyle(color: core_theme.AC.err, fontSize: 10, fontWeight: FontWeight.w800)),
                 ),
             ],
           ),
@@ -371,10 +372,10 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
           const Spacer(),
           Row(
             children: [
-              const Icon(Icons.stars, color: Color(0xFFD4AF37), size: 16),
+              Icon(Icons.stars, color: core_theme.AC.gold, size: 16),
               const SizedBox(width: 4),
               Text('${_fmt(r.pointsCost.toDouble())} نقطة',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
             ],
           ),
           const SizedBox(height: 4),
@@ -382,10 +383,10 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
             children: [
               Expanded(
                 child: Text('استُبدل ${r.redeemed}× هذا الربع',
-                    style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ),
               if (r.available)
-                const Icon(Icons.arrow_forward, size: 14, color: Colors.blue),
+                Icon(Icons.arrow_forward, size: 14, color: core_theme.AC.info),
             ],
           ),
         ],
@@ -412,14 +413,14 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('نمو النقاط المكتسبة vs المستبدلة (آخر 7 أشهر)',
+              Text('نمو النقاط المكتسبة vs المستبدلة (آخر 7 أشهر)',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-              const Text('(بالآلاف)', style: TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('(بالآلاف)', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               const SizedBox(height: 20),
               SizedBox(
                 height: 200,
@@ -434,7 +435,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text('${m.redemptionRate}%',
-                                  style: const TextStyle(fontSize: 9, color: Colors.black54, fontWeight: FontWeight.w700)),
+                                  style: TextStyle(fontSize: 9, color: core_theme.AC.ts, fontWeight: FontWeight.w700)),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
@@ -442,7 +443,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
                                     child: Container(
                                       height: (m.pointsEarned / maxPoints) * 140,
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFD4AF37),
+                                        color: core_theme.AC.gold,
                                         borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                                       ),
                                       child: Center(
@@ -456,7 +457,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
                                     child: Container(
                                       height: (m.pointsRedeemed / maxPoints) * 140,
                                       decoration: BoxDecoration(
-                                        color: Colors.purple,
+                                        color: core_theme.AC.purple,
                                         borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                                       ),
                                       child: Center(
@@ -477,14 +478,14 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
                 ),
               ),
               const SizedBox(height: 16),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _Legend(Color(0xFFD4AF37), 'النقاط المكتسبة'),
+                  _Legend(core_theme.AC.gold, 'النقاط المكتسبة'),
                   SizedBox(width: 20),
-                  _Legend(Colors.purple, 'النقاط المستبدلة'),
+                  _Legend(core_theme.AC.purple, 'النقاط المستبدلة'),
                   SizedBox(width: 20),
-                  Text('نسبة الاستبدال ↑', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text('نسبة الاستبدال ↑', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ],
               ),
             ],
@@ -494,7 +495,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+            gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
             borderRadius: BorderRadius.circular(14),
           ),
           child: const Row(

@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class VatReturnBuilderScreen extends StatefulWidget {
   const VatReturnBuilderScreen({super.key});
@@ -59,9 +60,9 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
         _buildHero(),
         TabBar(
           controller: _tab,
-          labelColor: Colors.green.shade800,
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: Colors.green,
+          labelColor: core_theme.AC.ok,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.ok,
           tabs: const [
             Tab(icon: Icon(Icons.edit_note, size: 16), text: 'بيانات الإقرار'),
             Tab(icon: Icon(Icons.preview, size: 16), text: 'معاينة'),
@@ -87,21 +88,21 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [Colors.green.shade800, Colors.green.shade600]),
+        gradient: LinearGradient(colors: [core_theme.AC.ok, core_theme.AC.ok]),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
           const Icon(Icons.percent, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('إقرار ضريبة القيمة المضافة',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('VAT Return · ZATCA format · 15% · فوترة إلكترونية Phase 2',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -113,7 +114,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
             ),
             child: DropdownButton<String>(
               value: _period,
-              dropdownColor: Colors.green.shade800,
+              dropdownColor: core_theme.AC.ok,
               underline: const SizedBox(),
               style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
               iconEnabledColor: Colors.white,
@@ -141,7 +142,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
               child: _section(
                 'المبيعات ومخرجات الضريبة',
                 Icons.trending_up,
-                Colors.green,
+                core_theme.AC.ok,
                 [
                   _input('1', 'مبيعات محلية خاضعة للمعدل القياسي 15%', _salesStandard, 'total'),
                   _input('2', 'مبيعات خاضعة للمعدل الصفري', _salesZero, 'info'),
@@ -149,7 +150,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
                   _input('4', 'صادرات خارج دول الخليج', _exports, 'info'),
                   _input('5', 'تعديلات على ضريبة المخرجات', _adjustmentsOut, 'total'),
                   const Divider(),
-                  _summaryRow('إجمالي ضريبة المخرجات (Output VAT)', _outputVat, Colors.green),
+                  _summaryRow('إجمالي ضريبة المخرجات (Output VAT)', _outputVat, core_theme.AC.ok),
                 ],
               ),
             ),
@@ -158,14 +159,14 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
               child: _section(
                 'المشتريات ومدخلات الضريبة',
                 Icons.trending_down,
-                Colors.blue,
+                core_theme.AC.info,
                 [
                   _input('6', 'مشتريات محلية خاضعة 15%', _purchasesStandard, 'total'),
                   _input('7', 'واردات (Reverse Charge)', _purchasesImport, 'total'),
                   _input('8', 'تعديلات على ضريبة المدخلات', _adjustmentsIn, 'total'),
                   const SizedBox(height: 20),
                   const Divider(),
-                  _summaryRow('إجمالي ضريبة المدخلات (Input VAT)', _inputVat, Colors.blue),
+                  _summaryRow('إجمالي ضريبة المدخلات (Input VAT)', _inputVat, core_theme.AC.info),
                 ],
               ),
             ),
@@ -177,8 +178,8 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: _netVat >= 0
-                  ? [Colors.orange.shade700, Colors.orange.shade500]
-                  : [Colors.green.shade700, Colors.green.shade500],
+                  ? [core_theme.AC.warn, core_theme.AC.warn]
+                  : [core_theme.AC.ok, core_theme.AC.ok],
             ),
             borderRadius: BorderRadius.circular(14),
           ),
@@ -191,18 +192,18 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(_netVat >= 0 ? 'ضريبة مستحقة الدفع إلى ZATCA' : 'ضريبة مستردة من ZATCA',
-                        style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     Text(_fmt(_netVat.abs()),
                         style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-                    const Text('ر.س', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    Text('ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 14)),
                   ],
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('تاريخ الاستحقاق', style: TextStyle(color: Colors.white70, fontSize: 11)),
-                  const Text('2026-05-31',
+                  Text('تاريخ الاستحقاق', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
+                  Text('2026-05-31',
                       style: TextStyle(color: Color(0xFFFFD700), fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
                   const SizedBox(height: 4),
                   Container(
@@ -211,8 +212,8 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text('متبقي 42 يوم',
-                        style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.w800)),
+                    child: Text('متبقي 42 يوم',
+                        style: TextStyle(color: core_theme.AC.warn, fontSize: 10, fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -234,7 +235,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
             width: 32,
             padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: core_theme.AC.bdr,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(code,
@@ -243,7 +244,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(label, style: const TextStyle(fontSize: 11, color: Colors.black87, height: 1.4)),
+            child: Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.tp, height: 1.4)),
           ),
           const SizedBox(width: 8),
           SizedBox(
@@ -316,13 +317,13 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: core_theme.AC.info,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.blue.shade200),
+        border: Border.all(color: core_theme.AC.info),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.auto_awesome, color: Colors.blue),
+          Icon(Icons.auto_awesome, color: core_theme.AC.info),
           SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -344,21 +345,21 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
-            boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8)],
+            border: Border.all(color: core_theme.AC.bdr),
+            boxShadow: [BoxShadow(color: core_theme.AC.bdr.withOpacity(0.05), blurRadius: 8)],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Center(
+              Center(
                 child: Column(
                   children: [
                     Text('المملكة العربية السعودية',
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                     Text('هيئة الزكاة والضريبة والجمارك',
-                        style: TextStyle(fontSize: 13, color: Colors.black54)),
+                        style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
                     Text('Zakat, Tax and Customs Authority',
-                        style: TextStyle(fontSize: 11, color: Colors.black54)),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     SizedBox(height: 12),
                     Text('إقرار ضريبة القيمة المضافة (VAT Return)',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0A5F38))),
@@ -379,8 +380,8 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
                 ],
               ),
               const Divider(height: 32),
-              const Text('القسم الأول: ضريبة المخرجات',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.green)),
+              Text('القسم الأول: ضريبة المخرجات',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: core_theme.AC.ok)),
               const SizedBox(height: 10),
               _previewRow('1', 'مبيعات محلية خاضعة 15%', _val(_salesStandard), _val(_salesStandard) * 0.15),
               _previewRow('2', 'مبيعات خاضعة للمعدل الصفري', _val(_salesZero), 0),
@@ -388,35 +389,35 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
               _previewRow('4', 'صادرات', _val(_exports), 0),
               _previewRow('5', 'تعديلات', _val(_adjustmentsOut), _val(_adjustmentsOut)),
               const Divider(),
-              _previewTotalRow('إجمالي ضريبة المخرجات', _outputVat, Colors.green),
+              _previewTotalRow('إجمالي ضريبة المخرجات', _outputVat, core_theme.AC.ok),
               const SizedBox(height: 20),
-              const Text('القسم الثاني: ضريبة المدخلات',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.blue)),
+              Text('القسم الثاني: ضريبة المدخلات',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: core_theme.AC.info)),
               const SizedBox(height: 10),
               _previewRow('6', 'مشتريات محلية خاضعة 15%', _val(_purchasesStandard), _val(_purchasesStandard) * 0.15),
               _previewRow('7', 'واردات (Reverse Charge)', _val(_purchasesImport), _val(_purchasesImport) * 0.15),
               _previewRow('8', 'تعديلات', _val(_adjustmentsIn), _val(_adjustmentsIn)),
               const Divider(),
-              _previewTotalRow('إجمالي ضريبة المدخلات', _inputVat, Colors.blue),
+              _previewTotalRow('إجمالي ضريبة المدخلات', _inputVat, core_theme.AC.info),
               const Divider(height: 32),
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade50,
+                  color: core_theme.AC.ok,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.shade300, width: 2),
+                  border: Border.all(color: core_theme.AC.ok, width: 2),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('صافي الضريبة المستحقة / المستردة',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.green)),
+                    Text('صافي الضريبة المستحقة / المستردة',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.ok)),
                     Text(_fmt(_netVat),
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'monospace',
-                          color: _netVat >= 0 ? Colors.orange : Colors.green,
+                          color: _netVat >= 0 ? core_theme.AC.warn : core_theme.AC.ok,
                         )),
                   ],
                 ),
@@ -433,7 +434,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 30, child: Text(code, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54))),
+          SizedBox(width: 30, child: Text(code, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts))),
           Expanded(child: Text(label, style: const TextStyle(fontSize: 12))),
           SizedBox(
             width: 120,
@@ -443,7 +444,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
           SizedBox(
             width: 120,
             child: Text(_fmt(vat), textAlign: TextAlign.right,
-                style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
           ),
         ],
       ),
@@ -470,7 +471,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(k, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(k, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
         ],
       ),
@@ -491,13 +492,13 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.security, color: Colors.blue),
+              Icon(Icons.security, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -516,14 +517,14 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('جاري التقديم إلى ZATCA — المبلغ: ${_fmt(_netVat.abs())} ر.س'),
-                  backgroundColor: Colors.green,
+                  backgroundColor: core_theme.AC.ok,
                 ),
               );
             },
             icon: const Icon(Icons.cloud_upload),
             label: Text('تقديم الإقرار إلى ZATCA (${_fmt(_netVat.abs())} ر.س)'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade700,
+              backgroundColor: core_theme.AC.ok,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -538,17 +539,17 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: done ? Colors.green.shade50 : Colors.grey.shade50,
+        color: done ? core_theme.AC.ok : core_theme.AC.navy3,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: done ? Colors.green.shade200 : Colors.black12),
+        border: Border.all(color: done ? core_theme.AC.ok : core_theme.AC.bdr),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: done ? Colors.green : Colors.grey.shade300,
+            backgroundColor: done ? core_theme.AC.ok : core_theme.AC.bdr,
             child: done
                 ? const Icon(Icons.check, color: Colors.white)
-                : Text('$num', style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w700)),
+                : Text('$num', style: TextStyle(color: core_theme.AC.ts, fontWeight: FontWeight.w700)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -556,7 +557,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),

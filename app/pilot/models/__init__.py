@@ -1,6 +1,6 @@
 """Pilot models package."""
 
-from .tenant import Tenant, CompanySettings, TenantStatus, TenantTier
+from .tenant import Tenant, CompanySettings, TenantStatus, TenantTier, SettingsChangeLog
 from .entity import Entity, EntityType, EntityStatus, Branch, BranchType, BranchStatus
 from .currency import Currency, FxRate
 from .rbac import PilotRole, PilotPermission, PilotRolePermission, UserEntityAccess, UserBranchAccess, RoleScope
@@ -62,6 +62,7 @@ __all__ = [
     "CompanySettings",
     "TenantStatus",
     "TenantTier",
+    "SettingsChangeLog",
     "Entity",
     "EntityType",
     "EntityStatus",

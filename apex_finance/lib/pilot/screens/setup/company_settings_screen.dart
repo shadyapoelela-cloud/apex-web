@@ -11,20 +11,24 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/pilot_client.dart';
 import '../../session.dart';
+import '../../../core/theme.dart' as core_theme;
+import '../../../providers/app_providers.dart';
+import 'advanced_settings_view.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
+// Live theme colors — update automatically on Dark/Light toggle + palette switch
+Color get _gold => core_theme.AC.gold;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+Color get _tp => core_theme.AC.tp;
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
 
 class CompanySettingsScreen extends StatefulWidget {
   const CompanySettingsScreen({super.key});
@@ -47,7 +51,8 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 5, vsync: this);
+    // افتح مباشرة على تبويب "إعدادات" (index 3) ليرى المستخدم المزايا الجديدة
+    _tab = TabController(length: 5, vsync: this, initialIndex: 3);
     _load();
   }
 
@@ -57,19 +62,38 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
     super.dispose();
   }
 
+  List<Map<String, dynamic>> _availableTenants = [];
+
   Future<void> _load() async {
     setState(() {
       _loading = true;
       _error = null;
     });
 
+    // Auto-bind: if no tenant in session, fetch admin list and auto-pick
+    // the first one (dev convenience). Stores choice in localStorage.
     if (!PilotSession.hasTenant) {
-      setState(() {
-        _loading = false;
-        _error =
-            'لم يتم إعداد الشركة بعد. اذهب إلى "رحلة الإعداد" من شريط العنوان.';
-      });
-      return;
+      final listR = await _client.listTenants('apex-admin-dev');
+      if (listR.success && (listR.data as List).isNotEmpty) {
+        _availableTenants = List<Map<String, dynamic>>.from(listR.data);
+        if (_availableTenants.length == 1) {
+          PilotSession.tenantId = _availableTenants.first['id'] as String;
+        } else {
+          // Multiple tenants — show picker
+          setState(() {
+            _loading = false;
+            _error = 'اختر شركة للمتابعة';
+          });
+          return;
+        }
+      } else {
+        setState(() {
+          _loading = false;
+          _error =
+              'لم يتم إعداد أي شركة بعد. انتقل إلى "رحلة الإعداد" لإنشاء شركة جديدة.';
+        });
+        return;
+      }
     }
 
     try {
@@ -106,12 +130,20 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Wrap in Consumer so this screen rebuilds when user switches theme/mode.
+    return Consumer(builder: (ctx, ref, _) {
+      ref.watch(appSettingsProvider); // force rebuild on theme changes
+      return _buildBody();
+    });
+  }
+
+  Widget _buildBody() {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
-        color: _navy,
+        color: core_theme.AC.navy,
         child: _loading
-            ? const Center(child: CircularProgressIndicator(color: _gold))
+            ? Center(child: CircularProgressIndicator(color: _gold))
             : _error != null
                 ? _errorState()
                 : Column(children: [
@@ -121,15 +153,40 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                       labelColor: _gold,
                       unselectedLabelColor: _ts,
                       indicatorColor: _gold,
-                      tabs: const [
-                        Tab(icon: Icon(Icons.business), text: 'الشركة الأم'),
-                        Tab(icon: Icon(Icons.domain), text: 'الكيانات'),
-                        Tab(icon: Icon(Icons.store), text: 'الفروع'),
-                        Tab(icon: Icon(Icons.settings), text: 'إعدادات'),
-                        Tab(icon: Icon(Icons.palette), text: 'الهوية البصرية'),
+                      tabs: [
+                        const Tab(icon: Icon(Icons.business), text: 'الشركة الأم'),
+                        const Tab(icon: Icon(Icons.domain), text: 'الكيانات'),
+                        const Tab(icon: Icon(Icons.store), text: 'الفروع'),
+                        Tab(
+                          icon: Stack(clipBehavior: Clip.none, children: [
+                            const Icon(Icons.settings_applications),
+                            Positioned(
+                              right: -8,
+                              top: -4,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: _gold,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'جديد',
+                                  style: TextStyle(
+                                    color: core_theme.AC.tp,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]),
+                          text: 'إعدادات متقدّمة',
+                        ),
+                        const Tab(icon: Icon(Icons.palette), text: 'الهوية البصرية'),
                       ],
                     ),
-                    const Divider(color: _bdr, height: 1),
+                    Divider(color: _bdr, height: 1),
                     Expanded(
                       child: TabBarView(controller: _tab, children: [
                         _tenantTab(),
@@ -146,21 +203,65 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
 
   Widget _errorState() => Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 500),
+          constraints: const BoxConstraints(maxWidth: 600),
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.warning, color: _err, size: 64),
-            const SizedBox(height: 12),
+            Icon(Icons.business, color: _gold, size: 64),
+            SizedBox(height: 16),
             Text(_error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: _tp, fontSize: 15)),
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              style: FilledButton.styleFrom(backgroundColor: _gold),
-              onPressed: _load,
-              icon: const Icon(Icons.refresh),
-              label: const Text('إعادة المحاولة'),
-            ),
+                style: TextStyle(
+                    color: _tp, fontSize: 18, fontWeight: FontWeight.w700)),
+            SizedBox(height: 24),
+            if (_availableTenants.isNotEmpty) ...[
+              Text('الشركات المتاحة:',
+                  style: TextStyle(color: _ts, fontSize: 13)),
+              const SizedBox(height: 12),
+              ..._availableTenants.map((t) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: _navy2,
+                          foregroundColor: _tp,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          alignment: AlignmentDirectional.centerStart,
+                        ),
+                        onPressed: () {
+                          PilotSession.tenantId = t['id'] as String;
+                          _load();
+                        },
+                        icon: Icon(Icons.arrow_forward, color: _gold),
+                        label: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(t['legal_name_ar']?.toString() ?? t['slug'] ?? '',
+                                style: TextStyle(
+                                    color: _tp,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700)),
+                            SizedBox(height: 2),
+                            Text(
+                                '${t['slug']} · ${t['primary_country']} · ${t['status']}',
+                                style: TextStyle(
+                                    color: _ts,
+                                    fontSize: 11,
+                                    fontFamily: 'monospace')),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )),
+            ] else
+              FilledButton.icon(
+                style: FilledButton.styleFrom(backgroundColor: _gold),
+                onPressed: _load,
+                icon: const Icon(Icons.refresh),
+                label: Text('إعادة المحاولة'),
+              ),
           ]),
         ),
       );
@@ -192,28 +293,28 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(t['legal_name_ar'] ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: _tp,
                             fontSize: 24,
                             fontWeight: FontWeight.bold)),
                     Text(t['slug'] ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: _td, fontSize: 13, fontFamily: 'monospace')),
                   ],
                 ),
               ),
               _badge(t['status'] ?? '', _colorFor(t['status'])),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               _badge(t['tier'] ?? '', _gold),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(side: BorderSide(color: _gold)),
-                icon: const Icon(Icons.edit, color: _gold),
-                label: const Text('تعديل', style: TextStyle(color: _gold)),
+                icon: Icon(Icons.edit, color: _gold),
+                label: Text('تعديل', style: TextStyle(color: _gold)),
                 onPressed: _editTenant,
               ),
             ]),
-            const Divider(color: _bdr, height: 32),
+            Divider(color: _bdr, height: 32),
             _info('الاسم بالإنجليزية', t['legal_name_en']),
             _info('الاسم التجاري', t['trade_name']),
             _info('السجل التجاري', t['primary_cr_number']),
@@ -223,9 +324,9 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
             _info('الهاتف', t['primary_phone']),
             if (t['trial_ends_at'] != null)
               _info('نهاية التجربة', t['trial_ends_at'].toString().substring(0, 10)),
-            const Divider(color: _bdr, height: 32),
+            Divider(color: _bdr, height: 32),
             Text('معرّفات Pilot',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _ts, fontSize: 14, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             _info('Tenant ID', t['id'], mono: true),
@@ -259,7 +360,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
       child: Row(children: [
         SizedBox(
             width: 160,
-            child: Text(k, style: const TextStyle(color: _ts, fontSize: 13))),
+            child: Text(k, style: TextStyle(color: _ts, fontSize: 13))),
         Expanded(
             child: Text(v.toString(),
                 style: TextStyle(
@@ -286,7 +387,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
-          title: const Text('تعديل بيانات الشركة'),
+          title: Text('تعديل بيانات الشركة'),
           content: SizedBox(
             width: 500,
             child: SingleChildScrollView(
@@ -304,11 +405,11 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('إلغاء')),
+                child: Text('إلغاء')),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: _gold),
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('حفظ'),
+              child: Text('حفظ'),
             ),
           ],
         ),
@@ -342,20 +443,20 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         child: Column(children: [
           Row(children: [
             Text('الكيانات (${_entities.length})',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.bold)),
             const Spacer(),
             FilledButton.icon(
               style: FilledButton.styleFrom(backgroundColor: _gold),
               onPressed: _addEntity,
               icon: const Icon(Icons.add),
-              label: const Text('كيان جديد'),
+              label: Text('كيان جديد'),
             ),
           ]),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Expanded(
             child: _entities.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text('لا توجد كيانات — أضف واحداً',
                         style: TextStyle(color: _td, fontSize: 14)))
                 : ListView.separated(
@@ -386,7 +487,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
           ),
           alignment: Alignment.center,
           child: Text(e['code'] ?? '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _gold, fontSize: 16, fontWeight: FontWeight.bold)),
         ),
         const SizedBox(width: 12),
@@ -395,36 +496,36 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(e['name_ar'] ?? e['code'],
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: _tp,
                       fontSize: 15,
                       fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Row(children: [
                 Icon(Icons.public, color: _ts, size: 12),
-                const SizedBox(width: 4),
+                SizedBox(width: 4),
                 Text('${e['country']} • ${e['functional_currency']}',
-                    style: const TextStyle(color: _ts, fontSize: 12)),
-                const SizedBox(width: 12),
+                    style: TextStyle(color: _ts, fontSize: 12)),
+                SizedBox(width: 12),
                 Icon(Icons.store, color: _ts, size: 12),
-                const SizedBox(width: 4),
+                SizedBox(width: 4),
                 Text('$brCount فرع',
-                    style: const TextStyle(color: _ts, fontSize: 12)),
+                    style: TextStyle(color: _ts, fontSize: 12)),
                 if (e['cr_number'] != null) ...[
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Icon(Icons.description, color: _ts, size: 12),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                   Text('CR: ${e['cr_number']}',
-                      style: const TextStyle(color: _ts, fontSize: 11)),
+                      style: TextStyle(color: _ts, fontSize: 11)),
                 ],
               ]),
             ],
           ),
         ),
         _badge(e['status'] ?? '', _colorFor(e['status'])),
-        const SizedBox(width: 6),
+        SizedBox(width: 6),
         IconButton(
-          icon: const Icon(Icons.edit, color: _ts, size: 18),
+          icon: Icon(Icons.edit, color: _ts, size: 18),
           onPressed: () => _editEntity(e),
         ),
       ]),
@@ -497,11 +598,11 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('إلغاء')),
+                  child: Text('إلغاء')),
               FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('حفظ'),
+                child: Text('حفظ'),
               ),
             ],
           ),
@@ -552,7 +653,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         child: Column(children: [
           Row(children: [
             Text('الفروع (${_branches.length})',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.bold)),
             const Spacer(),
             if (_entities.isNotEmpty)
@@ -560,13 +661,13 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: _addBranch,
                 icon: const Icon(Icons.add),
-                label: const Text('فرع جديد'),
+                label: Text('فرع جديد'),
               ),
           ]),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Expanded(
             child: _branches.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text('لا توجد فروع',
                         style: TextStyle(color: _td, fontSize: 14)))
                 : ListView.separated(
@@ -594,26 +695,26 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
               children: [
                 Row(children: [
                   Text(b['code'],
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _gold,
                           fontSize: 12,
                           fontFamily: 'monospace')),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Text('— ${b['name_ar'] ?? ''}',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _tp,
                           fontSize: 14,
                           fontWeight: FontWeight.w600)),
                 ]),
-                const SizedBox(height: 3),
+                SizedBox(height: 3),
                 Row(children: [
                   Icon(Icons.place, color: _ts, size: 11),
-                  const SizedBox(width: 3),
+                  SizedBox(width: 3),
                   Text('${b['city'] ?? '—'}, ${b['country'] ?? ''}',
-                      style: const TextStyle(color: _ts, fontSize: 11)),
-                  const SizedBox(width: 10),
+                      style: TextStyle(color: _ts, fontSize: 11)),
+                  SizedBox(width: 10),
                   Text('كيان: ${b['_entity_code']}',
-                      style: const TextStyle(color: _ts, fontSize: 11)),
+                      style: TextStyle(color: _ts, fontSize: 11)),
                 ]),
               ],
             ),
@@ -648,7 +749,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         builder: (ctx, setS) => Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: const Text('فرع جديد'),
+            title: Text('فرع جديد'),
             content: SizedBox(
               width: 500,
               child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -688,11 +789,11 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('إلغاء')),
+                  child: Text('إلغاء')),
               FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('إنشاء'),
+                child: Text('إنشاء'),
               ),
             ],
           ),
@@ -721,12 +822,27 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
   }
 
   // ═════════════════════════════════════════════════════════════
-  // Tab 4: Settings (CompanySettings)
+  // Tab 4: Settings (CompanySettings) — عرض غني بـ 10 تصنيفات
   // ═════════════════════════════════════════════════════════════
 
   Widget _settingsTab() {
+    if (_settings == null || _tenant == null) {
+      return Center(
+          child: Text('لا توجد إعدادات — ابذرها من الخطوة الأولى',
+              style: TextStyle(color: _td)));
+    }
+    return AdvancedSettingsView(
+      tenant: _tenant!,
+      settings: _settings!,
+      entities: _entities,
+      onReload: _load,
+    );
+  }
+
+  // ignore: unused_element
+  Widget _settingsTabLegacy() {
     if (_settings == null) {
-      return const Center(
+      return Center(
           child: Text('لا توجد إعدادات', style: TextStyle(color: _td)));
     }
     final s = _settings!;
@@ -743,54 +859,54 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('الإعدادات المالية',
+            Text('الإعدادات المالية',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.bold)),
-            const Divider(color: _bdr),
+            Divider(color: _bdr),
             _info('العملة الأساسية', s['base_currency']),
             _info('طريقة المحاسبة', _methodLabel(s['accounting_method'])),
             _info('بداية السنة المالية',
                 'شهر ${s['fiscal_year_start_month']} — يوم ${s['fiscal_year_start_day']}'),
             _info('نوع الفترة', s['period_type']),
-            const SizedBox(height: 20),
-            const Text('الضريبة',
+            SizedBox(height: 20),
+            Text('الضريبة',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.bold)),
-            const Divider(color: _bdr),
+            Divider(color: _bdr),
             _info('نسبة VAT', '${s['default_vat_rate']}%'),
             _info('نسبة الزكاة', '${(s['zakat_rate_bp'] ?? 0) / 100}%'),
-            const SizedBox(height: 20),
-            const Text('اللغة والمنطقة',
+            SizedBox(height: 20),
+            Text('اللغة والمنطقة',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.bold)),
-            const Divider(color: _bdr),
+            Divider(color: _bdr),
             _info('اللغة الافتراضية', s['default_language']),
             _info('التقويم', s['default_calendar']),
             _info('المنطقة الزمنية', s['default_timezone']),
-            const SizedBox(height: 20),
-            const Text('الإقفال والاحتفاظ',
+            SizedBox(height: 20),
+            Text('الإقفال والاحتفاظ',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.bold)),
-            const Divider(color: _bdr),
+            Divider(color: _bdr),
             _info('سياسة الإقفال', s['close_lock_policy']),
             _info('فترة الاحتفاظ', '${s['retention_years']} سنة'),
-            const SizedBox(height: 20),
-            const Text('ترقيم المستندات',
+            SizedBox(height: 20),
+            Text('ترقيم المستندات',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.bold)),
-            const Divider(color: _bdr),
+            Divider(color: _bdr),
             _info('قيد يومية', '${s['je_prefix']}-...'),
             _info('فاتورة بيع', '${s['invoice_prefix']}-...'),
             _info('فاتورة شراء', '${s['bill_prefix']}-...'),
             _info('طلب شراء', '${s['po_prefix']}-...'),
             _info('إشعار دائن', '${s['cn_prefix']}-...'),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Row(children: [
               FilledButton.icon(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: _editSettings,
                 icon: const Icon(Icons.edit),
-                label: const Text('تعديل الإعدادات'),
+                label: Text('تعديل الإعدادات'),
               ),
             ]),
           ],
@@ -819,7 +935,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         builder: (ctx, setS) => Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: const Text('تعديل إعدادات الشركة'),
+            title: Text('تعديل إعدادات الشركة'),
             content: SizedBox(
               width: 500,
               child: SingleChildScrollView(
@@ -860,7 +976,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                     onChanged: (v) => setS(() => lockPolicy = v!),
                   ),
                   const SizedBox(height: 8),
-                  const Text('ترقيم المستندات:',
+                  Text('ترقيم المستندات:',
                       style: TextStyle(fontWeight: FontWeight.w600)),
                   _dialogField(jePrefixCtrl, 'قيد يومية'),
                   _dialogField(invPrefixCtrl, 'فاتورة بيع'),
@@ -871,11 +987,11 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('إلغاء')),
+                  child: Text('إلغاء')),
               FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('حفظ'),
+                child: Text('حفظ'),
               ),
             ],
           ),
@@ -908,7 +1024,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
   Widget _brandingTab() {
     final s = _settings;
     if (s == null) {
-      return const Center(
+      return Center(
         child: Text('ابذر إعدادات الشركة أولاً من تبويب "إعدادات"',
             style: TextStyle(color: _ts, fontSize: 13)),
       );
@@ -947,13 +1063,13 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
             color: _gold.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.palette, color: _gold, size: 22),
+          child: Icon(Icons.palette, color: _gold, size: 22),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text('الهوية البصرية للمستندات',
                   style: TextStyle(
                       color: _tp,
@@ -983,9 +1099,9 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            const Icon(Icons.image, color: _gold, size: 18),
-            const SizedBox(width: 8),
-            const Text('شعار الشركة (Logo)',
+            Icon(Icons.image, color: _gold, size: 18),
+            SizedBox(width: 8),
+            Text('شعار الشركة (Logo)',
                 style: TextStyle(
                     color: _tp, fontSize: 14, fontWeight: FontWeight.w800)),
             const Spacer(),
@@ -996,10 +1112,10 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
               onPressed: () => _editBrandField('logo_url',
                   'رابط شعار الشركة (URL أو data:image/png;base64,...)'),
               icon: const Icon(Icons.edit, size: 14),
-              label: const Text('تعديل URL'),
+              label: Text('تعديل URL'),
             ),
           ]),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Container(
             height: 120,
             width: double.infinity,
@@ -1019,8 +1135,8 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                       children: [
                         Icon(Icons.image_outlined,
                             color: _td.withValues(alpha: 0.5), size: 32),
-                        const SizedBox(height: 4),
-                        const Text(
+                        SizedBox(height: 4),
+                        Text(
                             'لا يوجد شعار — أضف URL أو data URI لصورة PNG/JPG/SVG',
                             style:
                                 TextStyle(color: _td, fontSize: 11)),
@@ -1041,9 +1157,9 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                     ),
                   ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Row(children: [
-            const Text('موقع الشعار في الفاتورة:',
+            Text('موقع الشعار في الفاتورة:',
                 style: TextStyle(color: _ts, fontSize: 12)),
             const SizedBox(width: 10),
             ...['right', 'left', 'center'].map((pos) {
@@ -1067,7 +1183,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                               ? 'يسار'
                               : 'وسط',
                       style: TextStyle(
-                          color: sel ? Colors.black : _ts,
+                          color: sel ? core_theme.AC.tp : _ts,
                           fontSize: 11,
                           fontWeight: sel
                               ? FontWeight.w700
@@ -1096,7 +1212,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: const [
+          Row(children: [
             Icon(Icons.palette_outlined, color: _gold, size: 18),
             SizedBox(width: 8),
             Text('الألوان',
@@ -1136,7 +1252,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         InkWell(
           onTap: () async {
@@ -1147,17 +1263,17 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                 textDirection: TextDirection.rtl,
                 child: AlertDialog(
                   backgroundColor: _navy2,
-                  title: Text(label, style: const TextStyle(color: _tp)),
+                  title: Text(label, style: TextStyle(color: _tp)),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      Text(
                           'أدخل قيمة Hex (مثال: #D4AF37)',
                           style: TextStyle(color: _ts, fontSize: 11)),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       TextField(
                         controller: ctrl,
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: _tp,
                             fontSize: 14,
                             fontFamily: 'monospace'),
@@ -1165,10 +1281,10 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                           filled: true,
                           fillColor: _navy3,
                           hintText: '#D4AF37',
-                          hintStyle: const TextStyle(color: _td),
+                          hintStyle: TextStyle(color: _td),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(color: _bdr)),
+                              borderSide: BorderSide(color: _bdr)),
                         ),
                       ),
                     ],
@@ -1176,17 +1292,17 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                   actions: [
                     TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('إلغاء',
+                        child: Text('إلغاء',
                             style: TextStyle(color: _ts))),
                     FilledButton(
                       style: FilledButton.styleFrom(
                           backgroundColor: _gold,
-                          foregroundColor: Colors.black),
+                          foregroundColor: core_theme.AC.tp),
                       onPressed: () {
                         onSet(ctrl.text.trim());
                         Navigator.pop(context);
                       },
-                      child: const Text('حفظ'),
+                      child: Text('حفظ'),
                     ),
                   ],
                 ),
@@ -1212,15 +1328,15 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                   border: Border.all(color: _bdr),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: Text(hex,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _tp,
                         fontSize: 14,
                         fontFamily: 'monospace')),
               ),
-              const Icon(Icons.edit, color: _td, size: 14),
+              Icon(Icons.edit, color: _td, size: 14),
             ]),
           ),
         ),
@@ -1239,7 +1355,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: const [
+          Row(children: [
             Icon(Icons.receipt_long, color: _gold, size: 18),
             SizedBox(width: 8),
             Text('رأس وذيل الفاتورة',
@@ -1304,21 +1420,21 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
             child: AlertDialog(
               backgroundColor: _navy2,
               title: Text(label,
-                  style: const TextStyle(color: _tp, fontSize: 14)),
+                  style: TextStyle(color: _tp, fontSize: 14)),
               content: SizedBox(
                 width: 500,
                 child: TextField(
                   controller: ctrl,
                   maxLines: maxLines,
-                  style: const TextStyle(color: _tp, fontSize: 13),
+                  style: TextStyle(color: _tp, fontSize: 13),
                   decoration: InputDecoration(
                     hintText: placeholder,
-                    hintStyle: const TextStyle(color: _td),
+                    hintStyle: TextStyle(color: _td),
                     filled: true,
                     fillColor: _navy3,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: _bdr)),
+                        borderSide: BorderSide(color: _bdr)),
                   ),
                 ),
               ),
@@ -1326,15 +1442,15 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                 TextButton(
                     onPressed: () => Navigator.pop(context),
                     child:
-                        const Text('إلغاء', style: TextStyle(color: _ts))),
+                        Text('إلغاء', style: TextStyle(color: _ts))),
                 FilledButton(
                   style: FilledButton.styleFrom(
-                      backgroundColor: _gold, foregroundColor: Colors.black),
+                      backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
                   onPressed: () {
                     onSave(ctrl.text);
                     Navigator.pop(context);
                   },
-                  child: const Text('حفظ'),
+                  child: Text('حفظ'),
                 ),
               ],
             ),
@@ -1356,11 +1472,11 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
             Row(children: [
               Expanded(
                 child: Text(label,
-                    style: const TextStyle(color: _td, fontSize: 11)),
+                    style: TextStyle(color: _td, fontSize: 11)),
               ),
-              const Icon(Icons.edit, color: _td, size: 12),
+              Icon(Icons.edit, color: _td, size: 12),
             ]),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               value.isEmpty ? (placeholder ?? '—') : value,
               style: TextStyle(
@@ -1384,12 +1500,12 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         Checkbox(
           value: value,
           onChanged: (v) => onChanged(v ?? false),
-          checkColor: Colors.black,
+          checkColor: core_theme.AC.tp,
           fillColor: WidgetStateProperty.resolveWith<Color?>(
               (s) => s.contains(WidgetState.selected) ? _gold : _navy3),
         ),
         Expanded(
-          child: Text(label, style: const TextStyle(color: _ts, fontSize: 12)),
+          child: Text(label, style: TextStyle(color: _ts, fontSize: 12)),
         ),
       ]),
     );
@@ -1410,7 +1526,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: core_theme.AC.tp.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4))
         ],
@@ -1449,8 +1565,8 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                             fontWeight: FontWeight.w800)),
                     if ((s['invoice_header_html'] ?? '').toString().isNotEmpty)
                       Text(s['invoice_header_html'],
-                          style: const TextStyle(
-                              color: Colors.black54, fontSize: 10)),
+                          style: TextStyle(
+                              color: core_theme.AC.ts, fontSize: 10)),
                   ],
                 ),
               ),
@@ -1462,9 +1578,9 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
                           color: primaryColor,
                           fontSize: 14,
                           fontWeight: FontWeight.w800)),
-                  const Text('INV-2026-000001',
+                  Text('INV-2026-000001',
                       style: TextStyle(
-                          color: Colors.black54,
+                          color: core_theme.AC.ts,
                           fontSize: 10,
                           fontFamily: 'monospace')),
                 ],
@@ -1476,47 +1592,47 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
           Container(
             padding: const EdgeInsets.all(10),
             color: primaryColor.withValues(alpha: 0.08),
-            child: const Row(children: [
+            child: Row(children: [
               Expanded(
                   child: Text('الوصف',
                       style: TextStyle(
-                          color: Colors.black87,
+                          color: core_theme.AC.tp,
                           fontSize: 11,
                           fontWeight: FontWeight.w700))),
               SizedBox(
                   width: 60,
                   child: Text('الكمية',
                       style: TextStyle(
-                          color: Colors.black87,
+                          color: core_theme.AC.tp,
                           fontSize: 11,
                           fontWeight: FontWeight.w700))),
               SizedBox(
                   width: 80,
                   child: Text('الإجمالي',
                       style: TextStyle(
-                          color: Colors.black87,
+                          color: core_theme.AC.tp,
                           fontSize: 11,
                           fontWeight: FontWeight.w700),
                       textAlign: TextAlign.end)),
             ]),
           ),
           const SizedBox(height: 4),
-          Row(children: const [
+          Row(children: [
             Expanded(
                 child: Text('سلعة نموذجية',
-                    style: TextStyle(color: Colors.black87, fontSize: 11))),
+                    style: TextStyle(color: core_theme.AC.tp, fontSize: 11))),
             SizedBox(
                 width: 60,
                 child: Text('2',
                     style: TextStyle(
-                        color: Colors.black87,
+                        color: core_theme.AC.tp,
                         fontSize: 11,
                         fontFamily: 'monospace'))),
             SizedBox(
                 width: 80,
                 child: Text('100.00',
                     style: TextStyle(
-                        color: Colors.black87,
+                        color: core_theme.AC.tp,
                         fontSize: 11,
                         fontFamily: 'monospace'),
                     textAlign: TextAlign.end)),
@@ -1529,10 +1645,10 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(children: [
-              const Expanded(
+              Expanded(
                   child: Text('الإجمالي النهائي',
                       style: TextStyle(
-                          color: Colors.black87,
+                          color: core_theme.AC.tp,
                           fontSize: 12,
                           fontWeight: FontWeight.w800))),
               Text('115.00 SAR',
@@ -1546,8 +1662,8 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
           if ((s['invoice_footer_html'] ?? '').toString().isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(s['invoice_footer_html'],
-                style: const TextStyle(
-                    color: Colors.black54, fontSize: 10, height: 1.5),
+                style: TextStyle(
+                    color: core_theme.AC.ts, fontSize: 10, height: 1.5),
                 textAlign: TextAlign.center),
           ],
           const SizedBox(height: 6),
@@ -1589,35 +1705,35 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen>
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: _navy2,
-          title: Text(label, style: const TextStyle(color: _tp, fontSize: 14)),
+          title: Text(label, style: TextStyle(color: _tp, fontSize: 14)),
           content: SizedBox(
             width: 500,
             child: TextField(
               controller: ctrl,
               maxLines: 3,
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp, fontSize: 12, fontFamily: 'monospace'),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: _navy3,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: _bdr)),
+                    borderSide: BorderSide(color: _bdr)),
               ),
             ),
           ),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء', style: TextStyle(color: _ts))),
+                child: Text('إلغاء', style: TextStyle(color: _ts))),
             FilledButton(
               style: FilledButton.styleFrom(
-                  backgroundColor: _gold, foregroundColor: Colors.black),
+                  backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
               onPressed: () {
                 _updateBrandField(key, ctrl.text);
                 Navigator.pop(context);
               },
-              child: const Text('حفظ'),
+              child: Text('حفظ'),
             ),
           ],
         ),

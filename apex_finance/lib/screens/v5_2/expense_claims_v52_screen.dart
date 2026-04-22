@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class ExpenseClaimsV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class ExpenseClaimsV52Screen extends StatefulWidget {
 }
 
 class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _claims = <_Claim>[
@@ -45,10 +46,10 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
         SavedView(id: 'travel', labelAr: 'سفر فقط', icon: Icons.flight, defaultViewMode: ViewMode.kanban),
       ],
       filterChips: [
-        FilterChipDef(id: 'submitted', labelAr: 'قيد الاعتماد', color: Colors.orange, count: _count(_S.submitted), active: _filter == 'submitted'),
-        FilterChipDef(id: 'approved', labelAr: 'معتمدة', color: Colors.blue, count: _count(_S.approved), active: _filter == 'approved'),
-        FilterChipDef(id: 'reimbursed', labelAr: 'مُسدَّدة', color: Colors.green, count: _count(_S.reimbursed), active: _filter == 'reimbursed'),
-        FilterChipDef(id: 'policyViolation', labelAr: 'خارج السياسة', color: Colors.red, count: _count(_S.policyViolation), active: _filter == 'policyViolation'),
+        FilterChipDef(id: 'submitted', labelAr: 'قيد الاعتماد', color: core_theme.AC.warn, count: _count(_S.submitted), active: _filter == 'submitted'),
+        FilterChipDef(id: 'approved', labelAr: 'معتمدة', color: core_theme.AC.info, count: _count(_S.approved), active: _filter == 'approved'),
+        FilterChipDef(id: 'reimbursed', labelAr: 'مُسدَّدة', color: core_theme.AC.ok, count: _count(_S.reimbursed), active: _filter == 'reimbursed'),
+        FilterChipDef(id: 'policyViolation', labelAr: 'خارج السياسة', color: core_theme.AC.err, count: _count(_S.policyViolation), active: _filter == 'policyViolation'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -74,20 +75,20 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
           child: Padding(padding: const EdgeInsets.all(12), child: Row(children: [
             Container(width: 4, height: 46, color: c.status.color),
             const SizedBox(width: 12),
-            CircleAvatar(radius: 16, backgroundColor: _gold.withOpacity(0.15), child: Text(c.employee[0], style: const TextStyle(color: _gold, fontWeight: FontWeight.w800))),
+            CircleAvatar(radius: 16, backgroundColor: _gold.withOpacity(0.15), child: Text(c.employee[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(c.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(c.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)), child: Text(c.category, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.black54))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(4)), child: Text(c.category, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: core_theme.AC.ts))),
               ]),
               Text('${c.employee} · ${c.reason}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-              Text(c.note, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text(c.note, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
-            Text('${c.amount.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+            Text('${c.amount.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(width: 16),
-            Text(c.date, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(c.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             const SizedBox(width: 16),
             Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: c.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(14)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(c.status.icon, size: 12, color: c.status.color), const SizedBox(width: 4), Text(c.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.status.color))])),
           ])),
@@ -107,35 +108,35 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
         return Container(
           width: 290,
           margin: const EdgeInsets.only(left: 10),
-          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(s.icon, size: 16, color: s.color),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
-                Text('${total.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('${total.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
               Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
             ...items.map((c) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  CircleAvatar(radius: 10, backgroundColor: _gold.withOpacity(0.15), child: Text(c.employee[0], style: const TextStyle(color: _gold, fontSize: 10, fontWeight: FontWeight.w800))),
+                  CircleAvatar(radius: 10, backgroundColor: _gold.withOpacity(0.15), child: Text(c.employee[0], style: TextStyle(color: _gold, fontSize: 10, fontWeight: FontWeight.w800))),
                   const SizedBox(width: 6),
                   Expanded(child: Text(c.employee, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 ]),
                 const SizedBox(height: 4),
                 Text(c.reason, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
-                Text(c.note, style: const TextStyle(fontSize: 10, color: Colors.black54), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(c.note, style: TextStyle(fontSize: 10, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Row(children: [
-                  Text('${c.amount.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
+                  Text('${c.amount.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
                   const Spacer(),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(3)), child: Text(c.category, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.black54))),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(3)), child: Text(c.category, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: core_theme.AC.ts))),
                 ]),
               ]),
             )),
@@ -153,11 +154,11 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
       categories[c.category] = (categories[c.category] ?? 0) + c.amount;
     }
     final max = categories.values.reduce((a, b) => a > b ? a : b);
-    final colors = [_gold, Colors.blue, Colors.green, Colors.orange, Colors.purple, Colors.teal, Colors.pink];
+    final colors = [_gold, core_theme.AC.info, core_theme.AC.ok, core_theme.AC.warn, core_theme.AC.purple, core_theme.AC.info, core_theme.AC.err];
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('توزّع المصروفات حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توزّع المصروفات حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         ...categories.entries.toList().asMap().entries.map((e) {
           final idx = e.key;
@@ -166,7 +167,7 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
           return Padding(padding: const EdgeInsets.only(bottom: 12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [Text(entry.key, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)), const Spacer(), Text('${entry.value.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: colors[idx]))]),
             const SizedBox(height: 4),
-            ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 18, backgroundColor: Colors.grey.shade100, color: colors[idx])),
+            ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 18, backgroundColor: core_theme.AC.navy3, color: colors[idx])),
           ]));
         }),
       ]),
@@ -184,10 +185,10 @@ extension _SX on _S {
         _S.policyViolation => 'خارج السياسة',
       };
   Color get color => switch (this) {
-        _S.submitted => Colors.orange,
-        _S.approved => Colors.blue,
-        _S.reimbursed => Colors.green,
-        _S.policyViolation => Colors.red,
+        _S.submitted => core_theme.AC.warn,
+        _S.approved => core_theme.AC.info,
+        _S.reimbursed => core_theme.AC.ok,
+        _S.policyViolation => core_theme.AC.err,
       };
   IconData get icon => switch (this) {
         _S.submitted => Icons.pending_actions,

@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class SalesPipelineV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class SalesPipelineV52Screen extends StatefulWidget {
 }
 
 class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _deals = <_Deal>[
@@ -45,12 +46,12 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
         SavedView(id: 'stalled', labelAr: 'متوقفة >30 يوم', icon: Icons.warning, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'new', labelAr: 'جديدة', color: Colors.grey, count: _count(_Stg.new_), active: _filter == 'new'),
-        FilterChipDef(id: 'contacted', labelAr: 'تم التواصل', color: Colors.blue, count: _count(_Stg.contacted), active: _filter == 'contacted'),
-        FilterChipDef(id: 'demo', labelAr: 'عرض تقني', color: Colors.cyan, count: _count(_Stg.demo), active: _filter == 'demo'),
-        FilterChipDef(id: 'proposal', labelAr: 'عرض سعر', color: Colors.orange, count: _count(_Stg.proposal), active: _filter == 'proposal'),
+        FilterChipDef(id: 'new', labelAr: 'جديدة', color: core_theme.AC.td, count: _count(_Stg.new_), active: _filter == 'new'),
+        FilterChipDef(id: 'contacted', labelAr: 'تم التواصل', color: core_theme.AC.info, count: _count(_Stg.contacted), active: _filter == 'contacted'),
+        FilterChipDef(id: 'demo', labelAr: 'عرض تقني', color: core_theme.AC.info, count: _count(_Stg.demo), active: _filter == 'demo'),
+        FilterChipDef(id: 'proposal', labelAr: 'عرض سعر', color: core_theme.AC.warn, count: _count(_Stg.proposal), active: _filter == 'proposal'),
         FilterChipDef(id: 'negotiation', labelAr: 'تفاوض', color: _gold, count: _count(_Stg.negotiation), active: _filter == 'negotiation'),
-        FilterChipDef(id: 'won', labelAr: 'مكسوب', color: Colors.green, count: _count(_Stg.closedWon), active: _filter == 'won'),
+        FilterChipDef(id: 'won', labelAr: 'مكسوب', color: core_theme.AC.ok, count: _count(_Stg.closedWon), active: _filter == 'won'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -76,7 +77,7 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
           return Container(
             width: 290,
             margin: const EdgeInsets.only(left: 10),
-            decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+            decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Container(
                 padding: const EdgeInsets.all(10),
@@ -86,7 +87,7 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
                   const SizedBox(width: 8),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(s.labelAr, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: s.color)),
-                    Text('${(total / 1e6).toStringAsFixed(2)}M ر.س', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('${(total / 1e6).toStringAsFixed(2)}M ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ])),
                   Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
                 ]),
@@ -94,27 +95,27 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
               ...items.map((d) => Container(
                     margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 3, offset: const Offset(0, 1))]),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr), boxShadow: [BoxShadow(color: core_theme.AC.tp.withOpacity(0.03), blurRadius: 3, offset: const Offset(0, 1))]),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
-                        Text(d.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+                        Text(d.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                         const Spacer(),
-                        if (d.daysStale > 30) Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: Colors.red.withOpacity(0.15), borderRadius: BorderRadius.circular(3)), child: const Text('راكدة', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: Colors.red))),
+                        if (d.daysStale > 30) Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.15), borderRadius: BorderRadius.circular(3)), child: Text('راكدة', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: core_theme.AC.err))),
                       ]),
                       Text(d.title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800), maxLines: 2, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 2),
-                      Text(d.company, style: const TextStyle(fontSize: 10, color: Colors.black54), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(d.company, style: TextStyle(fontSize: 10, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 6),
                       Row(children: [
-                        Text('${(d.value / 1e3).toStringAsFixed(0)}K', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold)),
+                        Text('${(d.value / 1e3).toStringAsFixed(0)}K', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold)),
                         const Spacer(),
                         Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: s.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)), child: Text('${d.probability}%', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: s.color))),
                       ]),
                       const SizedBox(height: 4),
                       Row(children: [
-                        CircleAvatar(radius: 9, backgroundColor: _navy.withOpacity(0.1), child: Text(d.owner[0], style: const TextStyle(color: _navy, fontSize: 9, fontWeight: FontWeight.w800))),
+                        CircleAvatar(radius: 9, backgroundColor: _navy.withOpacity(0.1), child: Text(d.owner[0], style: TextStyle(color: _navy, fontSize: 9, fontWeight: FontWeight.w800))),
                         const SizedBox(width: 4),
-                        Expanded(child: Text(d.owner, style: const TextStyle(fontSize: 9, color: Colors.black54), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                        Expanded(child: Text(d.owner, style: TextStyle(fontSize: 9, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis)),
                       ]),
                     ]),
                   )),
@@ -150,21 +151,21 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
               Container(width: 4, height: 56, color: d.stage.color),
               const SizedBox(width: 12),
               Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(d.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(d.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 Text(d.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(d.company, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(d.company, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ])),
-              Expanded(child: Text('${d.value.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy), textAlign: TextAlign.end)),
+              Expanded(child: Text('${d.value.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy), textAlign: TextAlign.end)),
               const SizedBox(width: 16),
               SizedBox(width: 90, child: Column(children: [
-                ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: d.probability / 100, minHeight: 8, backgroundColor: Colors.grey.shade200, color: d.stage.color)),
+                ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: d.probability / 100, minHeight: 8, backgroundColor: core_theme.AC.bdr, color: d.stage.color)),
                 const SizedBox(height: 2),
                 Text('${d.probability}%', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: d.stage.color)),
               ])),
               const SizedBox(width: 16),
               SizedBox(width: 100, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                CircleAvatar(radius: 12, backgroundColor: _gold.withOpacity(0.15), child: Text(d.owner[0], style: const TextStyle(color: _gold, fontSize: 11, fontWeight: FontWeight.w800))),
-                Text(d.owner, style: const TextStyle(fontSize: 10, color: Colors.black54), maxLines: 1, overflow: TextOverflow.ellipsis),
+                CircleAvatar(radius: 12, backgroundColor: _gold.withOpacity(0.15), child: Text(d.owner[0], style: TextStyle(color: _gold, fontSize: 11, fontWeight: FontWeight.w800))),
+                Text(d.owner, style: TextStyle(fontSize: 10, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis),
               ])),
               const SizedBox(width: 16),
               Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: d.stage.color.withOpacity(0.12), borderRadius: BorderRadius.circular(14)), child: Text(d.stage.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: d.stage.color))),
@@ -182,7 +183,7 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('قمع المبيعات (Sales Funnel)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('قمع المبيعات (Sales Funnel)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         ...stages.map((s) {
           final value = totals[s]!;
@@ -194,13 +195,13 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
               Row(children: [
                 Text(s.labelAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                 const SizedBox(width: 8),
-                Text('($count صفقة)', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('($count صفقة)', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 const Spacer(),
                 Text('${value.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.color)),
               ]),
               const SizedBox(height: 4),
               Row(children: [
-                Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 24, backgroundColor: Colors.grey.shade100, color: s.color))),
+                Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 24, backgroundColor: core_theme.AC.navy3, color: s.color))),
               ]),
             ]),
           );
@@ -222,12 +223,12 @@ extension _StgX on _Stg {
         _Stg.closedWon => 'مكسوبة ✓',
       };
   Color get color => switch (this) {
-        _Stg.new_ => Colors.grey,
-        _Stg.contacted => Colors.blue,
-        _Stg.demo => Colors.cyan,
-        _Stg.proposal => Colors.orange,
-        _Stg.negotiation => const Color(0xFFD4AF37),
-        _Stg.closedWon => Colors.green,
+        _Stg.new_ => core_theme.AC.td,
+        _Stg.contacted => core_theme.AC.info,
+        _Stg.demo => core_theme.AC.info,
+        _Stg.proposal => core_theme.AC.warn,
+        _Stg.negotiation => core_theme.AC.gold,
+        _Stg.closedWon => core_theme.AC.ok,
       };
 }
 

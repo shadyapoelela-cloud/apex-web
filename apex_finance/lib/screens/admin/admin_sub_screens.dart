@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../api_service.dart';
 import '../../core/apex_app_bar.dart';
 import '../../core/theme.dart';
@@ -1174,7 +1175,7 @@ class _KnowledgeDevConsoleS extends State<KnowledgeDeveloperConsole> {
               final fb = _feedbacks[i];
               final status = fb['status'] ?? 'submitted';
               final statusColor = status == 'accepted' ? Color(0xFF2ECC8A)
-                : status == 'rejected' ? Color(0xFFE74C3C) 
+                : status == 'rejected' ? core_theme.AC.err 
                 : status == 'under_review' ? AC.cyan : AC.ts;
               
               return Container(

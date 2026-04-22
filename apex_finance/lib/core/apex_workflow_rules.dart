@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 /// A rule trigger, e.g. "invoice.created" or "payment.overdue".
 class WorkflowTrigger {
@@ -231,7 +232,7 @@ class _ApexWorkflowBuilderState extends State<ApexWorkflowBuilder> {
                       'و',
                       '${c.field} ${c.op} ${c.value}',
                       Icons.filter_alt_outlined,
-                      Colors.amber.shade700),
+                      core_theme.AC.warn),
                 ),
             ],
             const SizedBox(height: 4),

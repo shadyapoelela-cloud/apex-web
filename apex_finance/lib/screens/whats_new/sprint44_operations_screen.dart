@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/apex_breakpoint_audit.dart';
 import '../../core/apex_kanban.dart';
@@ -212,17 +213,17 @@ class _WorkOrdersTabState extends State<_WorkOrdersTab> {
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange.withValues(alpha: 0.18), AC.navy2],
+              colors: [core_theme.AC.warn.withValues(alpha: 0.18), AC.navy2],
               begin: Alignment.centerRight,
               end: Alignment.centerLeft,
             ),
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
-                color: Colors.orange.shade300.withValues(alpha: 0.35)),
+                color: core_theme.AC.warn.withValues(alpha: 0.35)),
           ),
           child: Row(children: [
             Icon(Icons.precision_manufacturing,
-                color: Colors.orange.shade200, size: 28),
+                color: core_theme.AC.warn, size: 28),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -251,7 +252,7 @@ class _WorkOrdersTabState extends State<_WorkOrdersTab> {
                   _statKpi(
                       'نقص مواد',
                       _orders.where((w) => !w.materialsReady).length.toString(),
-                      Colors.amber.shade700),
+                      core_theme.AC.warn),
                 ]),
           ]),
         ),
@@ -289,7 +290,7 @@ class _GanttTab extends StatelessWidget {
       s: DateTime(2026, 4, 15),
       e: DateTime(2026, 4, 28),
       pct: 0.72,
-      c: Colors.orange,
+      c: core_theme.AC.warn,
     ),
     (
       id: 'WO-002',
@@ -297,7 +298,7 @@ class _GanttTab extends StatelessWidget {
       s: DateTime(2026, 4, 20),
       e: DateTime(2026, 5, 5),
       pct: 0.0,
-      c: Colors.grey,
+      c: core_theme.AC.td,
     ),
     (
       id: 'WO-003',
@@ -305,7 +306,7 @@ class _GanttTab extends StatelessWidget {
       s: DateTime(2026, 4, 10),
       e: DateTime(2026, 4, 22),
       pct: 1.0,
-      c: Colors.purple,
+      c: core_theme.AC.purple,
     ),
     (
       id: 'WO-004',
@@ -313,7 +314,7 @@ class _GanttTab extends StatelessWidget {
       s: DateTime(2026, 4, 1),
       e: DateTime(2026, 4, 14),
       pct: 1.0,
-      c: Colors.green,
+      c: core_theme.AC.ok,
     ),
     (
       id: 'WO-005',
@@ -321,7 +322,7 @@ class _GanttTab extends StatelessWidget {
       s: DateTime(2026, 4, 18),
       e: DateTime(2026, 4, 30),
       pct: 0.38,
-      c: Colors.amber,
+      c: core_theme.AC.warn,
     ),
     (
       id: 'WO-006',
@@ -329,7 +330,7 @@ class _GanttTab extends StatelessWidget {
       s: DateTime(2026, 3, 20),
       e: DateTime(2026, 4, 10),
       pct: 0.5,
-      c: Colors.red,
+      c: core_theme.AC.err,
     ),
   ];
 
@@ -529,16 +530,16 @@ class _ResponsiveTab extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.withValues(alpha: 0.18), AC.navy2],
+                colors: [core_theme.AC.info.withValues(alpha: 0.18), AC.navy2],
                 begin: Alignment.centerRight,
                 end: Alignment.centerLeft,
               ),
               borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(
-                  color: Colors.blue.shade300.withValues(alpha: 0.35)),
+                  color: core_theme.AC.info.withValues(alpha: 0.35)),
             ),
             child: Row(children: [
-              Icon(Icons.devices, color: Colors.blue.shade200, size: 28),
+              Icon(Icons.devices, color: core_theme.AC.info, size: 28),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(
@@ -605,10 +606,10 @@ class _ResponsiveTab extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                for (final k in const [
-                  ('الإيرادات', '124k', Color(0xFFD4AF37)),
+                for (final k in [
+                  ('الإيرادات', '124k', core_theme.AC.gold),
                   ('السيولة', '89k', Color(0xFF27AE60)),
-                  ('AR', '42k', Color(0xFFE74C3C)),
+                  ('AR', '42k', core_theme.AC.err),
                   ('Burn', '15k', Color(0xFFFF9800)),
                 ])
                   Container(

@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class WarrantyServiceScreen extends StatefulWidget {
   const WarrantyServiceScreen({super.key});
@@ -58,9 +59,9 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
         _buildKpis(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.verified, size: 16), text: 'الضمانات'),
             Tab(icon: Icon(Icons.build, size: 16), text: 'طلبات الخدمة'),
@@ -89,7 +90,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
         gradient: const LinearGradient(colors: [Color(0xFF00695C), Color(0xFF00897B)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.verified, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -100,7 +101,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                 Text('الضمانات وخدمة ما بعد البيع',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Warranty & Service — عقود الضمان · SLAs · طلبات الخدمة · الإرجاعات',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -119,11 +120,11 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('ضمانات نشطة', '$active', Colors.green, Icons.check_circle),
-          _kpi('قرب الانتهاء', '$expiring', Colors.orange, Icons.schedule),
-          _kpi('طلبات خدمة مفتوحة', '$openTickets', Colors.blue, Icons.build),
-          _kpi('إرجاعات قيد المعالجة', '$openRmas', Colors.red, Icons.assignment_return),
-          _kpi('متوسط SLA', '${avgSla.toStringAsFixed(1)}%', const Color(0xFFD4AF37), Icons.speed),
+          _kpi('ضمانات نشطة', '$active', core_theme.AC.ok, Icons.check_circle),
+          _kpi('قرب الانتهاء', '$expiring', core_theme.AC.warn, Icons.schedule),
+          _kpi('طلبات خدمة مفتوحة', '$openTickets', core_theme.AC.info, Icons.build),
+          _kpi('إرجاعات قيد المعالجة', '$openRmas', core_theme.AC.err, Icons.assignment_return),
+          _kpi('متوسط SLA', '${avgSla.toStringAsFixed(1)}%', core_theme.AC.gold, Icons.speed),
         ],
       ),
     );
@@ -147,7 +148,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -189,7 +190,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                   children: [
                     Row(
                       children: [
-                        Text(w.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                        Text(w.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -202,7 +203,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                     const SizedBox(height: 4),
                     Text(w.product, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                     Text('العميل: ${w.customer}',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -213,17 +214,17 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.schedule, size: 11, color: Colors.black54),
+                        Icon(Icons.schedule, size: 11, color: core_theme.AC.ts),
                         const SizedBox(width: 3),
                         Text('${w.startDate} → ${w.endDate}',
-                            style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                            style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                       ],
                     ),
                     Row(
                       children: [
-                        const Icon(Icons.access_time, size: 11, color: Colors.black54),
+                        Icon(Icons.access_time, size: 11, color: core_theme.AC.ts),
                         const SizedBox(width: 3),
-                        Text(w.sla, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFD4AF37))),
+                        Text(w.sla, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.gold)),
                       ],
                     ),
                   ],
@@ -233,8 +234,8 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text('${w.slaAchieved}%',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: w.slaAchieved >= 99 ? Colors.green : Colors.orange)),
-                  const Text('SLA تحقق', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: w.slaAchieved >= 99 ? core_theme.AC.ok : core_theme.AC.warn)),
+                  Text('SLA تحقق', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
@@ -286,7 +287,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                               style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)),
                         ),
                         const SizedBox(width: 6),
-                        Text(t.warrantyId, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                        Text(t.warrantyId, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -299,16 +300,16 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(t.createdAt,
-                        style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     Text('${t.hoursOpen} ساعة',
-                        style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w700)),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.tp, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
               Expanded(
                 child: Row(
                   children: [
-                    const Icon(Icons.person, size: 12, color: Colors.black54),
+                    Icon(Icons.person, size: 12, color: core_theme.AC.ts),
                     const SizedBox(width: 4),
                     Text(t.assignee, style: const TextStyle(fontSize: 11)),
                   ],
@@ -333,7 +334,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
       itemCount: _rmas.length,
       itemBuilder: (ctx, i) {
         final r = _rmas[i];
-        final color = r.status == 'approved' ? Colors.blue : r.status == 'investigating' ? Colors.orange : Colors.green;
+        final color = r.status == 'approved' ? core_theme.AC.info : r.status == 'investigating' ? core_theme.AC.warn : core_theme.AC.ok;
         return Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(14),
@@ -361,12 +362,12 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.blue.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
                           child: Text(r.sku,
-                              style: const TextStyle(fontSize: 10, color: Colors.blue, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
+                              style: TextStyle(fontSize: 10, color: core_theme.AC.info, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
                         ),
                         const SizedBox(width: 6),
-                        Text(r.quantity, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(r.quantity, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ],
@@ -376,7 +377,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('التاريخ', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('التاريخ', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     Text(r.date, style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
                   ],
                 ),
@@ -386,7 +387,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text('${_fmt(r.value.toDouble())} ر.س',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
@@ -408,24 +409,24 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
       case 'platinum':
         return const Color(0xFF455A64);
       case 'gold':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'silver':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.blue;
+        return core_theme.AC.info;
     }
   }
 
   Color _statusColor(String s) {
     switch (s) {
       case 'active':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'expiring':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'expired':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -445,15 +446,15 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
   Color _priorityColor(String p) {
     switch (p) {
       case 'critical':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'high':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'medium':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'low':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -475,13 +476,13 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
   Color _ticketStatusColor(String s) {
     switch (s) {
       case 'open':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'in-progress':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'resolved':
-        return Colors.green;
+        return core_theme.AC.ok;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

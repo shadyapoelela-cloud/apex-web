@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ApprovalWorkflowsScreen extends StatefulWidget {
   const ApprovalWorkflowsScreen({super.key});
@@ -53,19 +54,19 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             children: [
-              _kpi('قيد الاعتماد', '$pending', Colors.orange, Icons.pending),
-              _kpi('معتمدة اليوم', '$approved', Colors.green, Icons.check_circle),
-              _kpi('تصعيد', '$escalated', Colors.purple, Icons.trending_up),
-              _kpi('مرفوضة', '$rejected', Colors.red, Icons.cancel),
-              _kpi('متوسط وقت الاعتماد', '2.4 ساعة', Colors.blue, Icons.schedule),
+              _kpi('قيد الاعتماد', '$pending', core_theme.AC.warn, Icons.pending),
+              _kpi('معتمدة اليوم', '$approved', core_theme.AC.ok, Icons.check_circle),
+              _kpi('تصعيد', '$escalated', core_theme.AC.purple, Icons.trending_up),
+              _kpi('مرفوضة', '$rejected', core_theme.AC.err, Icons.cancel),
+              _kpi('متوسط وقت الاعتماد', '2.4 ساعة', core_theme.AC.info, Icons.schedule),
             ],
           ),
         ),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.inbox, size: 16), text: 'قائمة الاعتمادات'),
             Tab(icon: Icon(Icons.rule, size: 16), text: 'مصفوفة الصلاحيات'),
@@ -94,7 +95,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
         gradient: const LinearGradient(colors: [Color(0xFF6A1B9A), Color(0xFF8E24AA)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.approval, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -105,7 +106,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                 Text('مسارات الاعتماد',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Workflow engine · صلاحيات ديناميكية · تصعيد تلقائي عند التأخر',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -132,7 +133,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -191,13 +192,13 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                     Text(r.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                     Row(
                       children: [
-                        const Icon(Icons.person, size: 11, color: Colors.black45),
+                        Icon(Icons.person, size: 11, color: core_theme.AC.td),
                         const SizedBox(width: 4),
-                        Text(r.requester, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(r.requester, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         const SizedBox(width: 10),
-                        const Icon(Icons.schedule, size: 11, color: Colors.black45),
+                        Icon(Icons.schedule, size: 11, color: core_theme.AC.td),
                         const SizedBox(width: 4),
-                        Text(r.submittedAt, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        Text(r.submittedAt, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                       ],
                     ),
                   ],
@@ -207,8 +208,8 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(_fmt(r.amount),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                  const Text('ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                  Text('ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ],
               ),
               const SizedBox(width: 12),
@@ -219,7 +220,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                     _stepIndicator(r.stepsCompleted, 3),
                     const SizedBox(height: 4),
                     Text(_roleLabel(r.currentRole),
-                        style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -235,13 +236,13 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
               if (r.status == 'pending' || r.status == 'in-progress') ...[
                 const SizedBox(width: 6),
                 IconButton(
-                  icon: const Icon(Icons.check_circle_outline, color: Colors.green, size: 22),
+                  icon: Icon(Icons.check_circle_outline, color: core_theme.AC.ok, size: 22),
                   onPressed: () => setState(() => r.status = 'approved'),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 32, minHeight: 28),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.cancel_outlined, color: Colors.red, size: 22),
+                  icon: Icon(Icons.cancel_outlined, color: core_theme.AC.err, size: 22),
                   onPressed: () => setState(() => r.status = 'rejected'),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 32, minHeight: 28),
@@ -263,7 +264,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
               height: 6,
               margin: EdgeInsets.only(right: i < total - 1 ? 4 : 0),
               decoration: BoxDecoration(
-                color: i < completed ? Colors.green : Colors.grey.shade300,
+                color: i < completed ? core_theme.AC.ok : core_theme.AC.bdr,
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -273,12 +274,12 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
   }
 
   Widget _buildDelegationTab() {
-    final roles = const [
+    final roles = [
       _Delegation('المدير العام / CEO', '> 5,000,000', 'أحمد السعدون', 'أي نوع — حد أقصى', Color(0xFF1A237E)),
       _Delegation('المدير المالي / CFO', '1,000,001 — 5,000,000', 'أحمد العتيبي', 'مالي، شراء، عقود', Color(0xFF0D47A1)),
       _Delegation('مدير الإدارة', '250,001 — 1,000,000', 'محمد القحطاني', 'مالي، شراء', Color(0xFF1565C0)),
       _Delegation('مسؤول القسم', '50,001 — 250,000', 'سارة الدوسري', 'شراء، مصاريف', Color(0xFF1976D2)),
-      _Delegation('المشرف المباشر', '10,001 — 50,000', 'نورة الغامدي', 'مصاريف فقط', Color(0xFF1E88E5)),
+      _Delegation('المشرف المباشر', '10,001 — 50,000', 'نورة الغامدي', 'مصاريف فقط', core_theme.AC.info),
       _Delegation('المشرف الذاتي', '≤ 10,000', 'أي موظف ذاتي', 'مصاريف صغيرة', Color(0xFF42A5F5)),
     ];
     return ListView(
@@ -287,13 +288,13 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -332,7 +333,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(d.role, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-                      Text(d.holder, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                      Text(d.holder, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     ],
                   ),
                 ),
@@ -341,7 +342,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('النطاق المالي (ر.س)', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text('النطاق المالي (ر.س)', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       Text(d.range,
                           style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: d.color, fontFamily: 'monospace')),
                     ],
@@ -352,7 +353,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('أنواع الطلبات', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text('أنواع الطلبات', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       Text(d.scope, style: const TextStyle(fontSize: 12)),
                     ],
                   ),
@@ -401,14 +402,14 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.account_tree, color: Color(0xFFD4AF37)),
+                    Icon(Icons.account_tree, color: core_theme.AC.gold),
                     const SizedBox(width: 10),
                     Text(r.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                   ],
@@ -419,9 +420,9 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                     for (var i = 0; i < r.steps.length; i++) ...[
                       Expanded(child: _stepBlock(r.steps[i])),
                       if (i < r.steps.length - 1)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Icon(Icons.arrow_forward, color: Color(0xFFD4AF37)),
+                          child: Icon(Icons.arrow_forward, color: core_theme.AC.gold),
                         ),
                     ],
                   ],
@@ -437,23 +438,23 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: core_theme.AC.navy3,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: const Color(0xFFD4AF37).withOpacity(0.15),
+            backgroundColor: core_theme.AC.gold.withOpacity(0.15),
             child: Text('${s.order}',
-                style: const TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w900, fontSize: 14)),
+                style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w900, fontSize: 14)),
           ),
           const SizedBox(height: 6),
-          Icon(s.icon, size: 18, color: const Color(0xFFD4AF37)),
+          Icon(s.icon, size: 18, color: core_theme.AC.gold),
           const SizedBox(height: 4),
           Text(s.role, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-          Text(s.holder, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(s.holder, textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ],
       ),
     );
@@ -462,40 +463,40 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
   _TypeInfo _typeInfo(String t) {
     switch (t) {
       case 'invoice':
-        return const _TypeInfo('فاتورة', Icons.receipt, Color(0xFFD4AF37));
+        return _TypeInfo('فاتورة', Icons.receipt, core_theme.AC.gold);
       case 'po':
-        return const _TypeInfo('أمر شراء', Icons.shopping_cart, Colors.blue);
+        return _TypeInfo('أمر شراء', Icons.shopping_cart, core_theme.AC.info);
       case 'expense':
-        return const _TypeInfo('مطالبة مصروفات', Icons.payments, Colors.orange);
+        return _TypeInfo('مطالبة مصروفات', Icons.payments, core_theme.AC.warn);
       case 'contract':
-        return const _TypeInfo('عقد', Icons.gavel, Colors.purple);
+        return _TypeInfo('عقد', Icons.gavel, core_theme.AC.purple);
       case 'hr':
-        return const _TypeInfo('موارد بشرية', Icons.people, Colors.teal);
+        return _TypeInfo('موارد بشرية', Icons.people, core_theme.AC.info);
       case 'payment':
-        return const _TypeInfo('دفعة', Icons.send_to_mobile, Colors.green);
+        return _TypeInfo('دفعة', Icons.send_to_mobile, core_theme.AC.ok);
       case 'je':
-        return const _TypeInfo('قيد محاسبي', Icons.book, Colors.indigo);
+        return _TypeInfo('قيد محاسبي', Icons.book, core_theme.AC.purple);
       case 'discount':
-        return const _TypeInfo('خصم', Icons.local_offer, Colors.red);
+        return _TypeInfo('خصم', Icons.local_offer, core_theme.AC.err);
       default:
-        return const _TypeInfo('أخرى', Icons.category, Colors.grey);
+        return _TypeInfo('أخرى', Icons.category, core_theme.AC.td);
     }
   }
 
   Color _statusColor(String s) {
     switch (s) {
       case 'pending':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'in-progress':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'approved':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'rejected':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'escalated':
-        return Colors.purple;
+        return core_theme.AC.purple;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

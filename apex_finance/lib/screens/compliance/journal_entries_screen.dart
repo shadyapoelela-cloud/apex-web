@@ -23,7 +23,7 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
   final _clientC = TextEditingController();
   final _yearC = TextEditingController(text: DateTime.now().year.toString());
   String _prefix = 'JE';
-  static const List<String> _prefixes = ['JE', 'ADJ', 'CLR', 'OPE', 'REV'];
+  static final List<String> _prefixes = ['JE', 'ADJ', 'CLR', 'OPE', 'REV'];
 
   String? _error;
   bool _loading = false;

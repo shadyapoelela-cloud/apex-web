@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -26,7 +27,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
         Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'حزمة المجلس', Icons.folder_special),
@@ -57,9 +58,9 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFF2E7D5B) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFF2E7D5B) : core_theme.AC.ts),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF2E7D5B) : Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF2E7D5B) : core_theme.AC.ts)),
           ],
         ),
       ),
@@ -87,10 +88,10 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFF2E7D5B), Color(0xFF059669)]),
+              gradient: LinearGradient(colors: [Color(0xFF2E7D5B), core_theme.AC.ok]),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.folder_special, color: Colors.white, size: 28),
                 SizedBox(width: 16),
@@ -99,7 +100,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('حزمة اجتماع المجلس — Q1 2026', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                      Text('اجتماع 2026-04-28 · الرياض · 9 أعضاء', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('اجتماع 2026-04-28 · الرياض · 9 أعضاء', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -107,7 +108,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('محتويات الحزمة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('محتويات الحزمة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final item in [
             _PackItem('01', 'جدول الأعمال', 'Agenda', 'agenda.pdf', 2),
@@ -124,12 +125,12 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
           Row(
             children: [
               const Spacer(),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.email, size: 14), label: const Text('إرسال للأعضاء')),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.email, size: 14), label: Text('إرسال للأعضاء')),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.download, size: 14),
-                label: const Text('تحميل الحزمة كاملة (ZIP)'),
+                label: Text('تحميل الحزمة كاملة (ZIP)'),
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D5B), foregroundColor: Colors.white),
               ),
             ],
@@ -143,7 +144,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Row(
         children: [
           Container(
@@ -158,12 +159,12 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.titleAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(item.titleEn, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(item.titleEn, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
-          Expanded(child: Text(item.file, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54))),
-          Text('${item.pages} صفحة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Expanded(child: Text(item.file, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts))),
+          Text('${item.pages} صفحة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(width: 8),
           IconButton(icon: const Icon(Icons.visibility, size: 14), onPressed: () {}, tooltip: 'عرض'),
           IconButton(icon: const Icon(Icons.download, size: 14), onPressed: () {}, tooltip: 'تحميل'),
@@ -180,22 +181,22 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
         children: [
           Row(
             children: [
-              const Text('اجتماعات المجلس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              Text('اجتماعات المجلس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.add, size: 14),
-                label: const Text('جدولة اجتماع'),
+                label: Text('جدولة اجتماع'),
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D5B), foregroundColor: Colors.white),
               ),
             ],
           ),
           const SizedBox(height: 12),
           for (final m in [
-            _Meeting('2026-04-28', 'اجتماع المجلس الأول 2026', 'مجلس الإدارة', '09:00', 'الرياض', 9, 9, 'قادم', const Color(0xFF2563EB)),
-            _Meeting('2026-01-15', 'اجتماع المجلس الرابع 2025', 'مجلس الإدارة', '10:00', 'جدّة', 9, 8, 'مكتمل', const Color(0xFF059669)),
-            _Meeting('2026-02-10', 'لجنة المراجعة Q1 2026', 'لجنة المراجعة', '11:00', 'Zoom', 5, 5, 'مكتمل', const Color(0xFF059669)),
-            _Meeting('2026-03-20', 'لجنة المكافآت', 'المكافآت', '14:00', 'الرياض', 4, 4, 'مكتمل', const Color(0xFF059669)),
+            _Meeting('2026-04-28', 'اجتماع المجلس الأول 2026', 'مجلس الإدارة', '09:00', 'الرياض', 9, 9, 'قادم', core_theme.AC.info),
+            _Meeting('2026-01-15', 'اجتماع المجلس الرابع 2025', 'مجلس الإدارة', '10:00', 'جدّة', 9, 8, 'مكتمل', core_theme.AC.ok),
+            _Meeting('2026-02-10', 'لجنة المراجعة Q1 2026', 'لجنة المراجعة', '11:00', 'Zoom', 5, 5, 'مكتمل', core_theme.AC.ok),
+            _Meeting('2026-03-20', 'لجنة المكافآت', 'المكافآت', '14:00', 'الرياض', 4, 4, 'مكتمل', core_theme.AC.ok),
           ])
             _meetingRow(m),
         ],
@@ -207,7 +208,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Row(
         children: [
           Container(
@@ -217,7 +218,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
             child: Column(
               children: [
                 Text(m.date.substring(8, 10), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: m.color)),
-                Text(m.date.substring(0, 7), style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(m.date.substring(0, 7), style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -228,14 +229,14 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(m.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                Text('${m.committee} · ${m.time} · ${m.location}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('${m.committee} · ${m.time} · ${m.location}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('الحضور', style: TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('الحضور', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               Text('${m.attended}/${m.total}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
             ],
           ),
@@ -260,12 +261,12 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('قرارات المجلس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('قرارات المجلس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final r in [
-            _Resolution('RES-2026-008', 'اعتماد القوائم المالية Q1 2026', 'مُعتمد', 9, 9, 0, const Color(0xFF059669)),
-            _Resolution('RES-2026-007', 'توزيع أرباح 0.85 ر.س/سهم', 'مُعتمد', 8, 8, 0, const Color(0xFF059669)),
-            _Resolution('RES-2026-006', 'ترقية المدير المالي', 'قيد التصويت', 5, 3, 1, const Color(0xFFD97706)),
+            _Resolution('RES-2026-008', 'اعتماد القوائم المالية Q1 2026', 'مُعتمد', 9, 9, 0, core_theme.AC.ok),
+            _Resolution('RES-2026-007', 'توزيع أرباح 0.85 ر.س/سهم', 'مُعتمد', 8, 8, 0, core_theme.AC.ok),
+            _Resolution('RES-2026-006', 'ترقية المدير المالي', 'قيد التصويت', 5, 3, 1, core_theme.AC.warn),
             _Resolution('RES-2026-005', 'استحواذ 30% من شركة XYZ', 'مرفوض', 9, 4, 5, const Color(0xFFB91C1C)),
           ])
             _resolutionCard(r),
@@ -301,11 +302,11 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-              _voteBar('موافق', r.yes, r.total, const Color(0xFF059669)),
+              _voteBar('موافق', r.yes, r.total, core_theme.AC.ok),
               const SizedBox(width: 8),
               _voteBar('معارض', r.no, r.total, const Color(0xFFB91C1C)),
               const SizedBox(width: 8),
-              _voteBar('ممتنع', r.total - r.yes - r.no, r.total, Colors.black45),
+              _voteBar('ممتنع', r.total - r.yes - r.no, r.total, core_theme.AC.td),
             ],
           ),
         ],
@@ -321,7 +322,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
         children: [
           Row(
             children: [
-              Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const Spacer(),
               Text('$count', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
             ],
@@ -339,25 +340,25 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('السياسات المعتمدة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('السياسات المعتمدة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final p in [
-            _Policy('POL-001', 'سياسة مكافحة غسل الأموال', 'AML Policy', '2025-06-15', 'سارية', const Color(0xFF059669)),
-            _Policy('POL-002', 'سياسة تضارب المصالح', 'Conflicts of Interest', '2025-06-15', 'سارية', const Color(0xFF059669)),
-            _Policy('POL-003', 'سياسة الحوكمة', 'Corporate Governance', '2025-09-20', 'سارية', const Color(0xFF059669)),
-            _Policy('POL-004', 'سياسة خصوصية البيانات', 'Data Privacy', '2024-12-01', 'تحتاج تحديث', const Color(0xFFD97706)),
-            _Policy('POL-005', 'سياسة المشتريات', 'Procurement', '2025-03-10', 'سارية', const Color(0xFF059669)),
-            _Policy('POL-006', 'مدوّنة السلوك', 'Code of Conduct', '2024-08-15', 'تحتاج تحديث', const Color(0xFFD97706)),
+            _Policy('POL-001', 'سياسة مكافحة غسل الأموال', 'AML Policy', '2025-06-15', 'سارية', core_theme.AC.ok),
+            _Policy('POL-002', 'سياسة تضارب المصالح', 'Conflicts of Interest', '2025-06-15', 'سارية', core_theme.AC.ok),
+            _Policy('POL-003', 'سياسة الحوكمة', 'Corporate Governance', '2025-09-20', 'سارية', core_theme.AC.ok),
+            _Policy('POL-004', 'سياسة خصوصية البيانات', 'Data Privacy', '2024-12-01', 'تحتاج تحديث', core_theme.AC.warn),
+            _Policy('POL-005', 'سياسة المشتريات', 'Procurement', '2025-03-10', 'سارية', core_theme.AC.ok),
+            _Policy('POL-006', 'مدوّنة السلوك', 'Code of Conduct', '2024-08-15', 'تحتاج تحديث', core_theme.AC.warn),
           ])
             Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.black.withOpacity(0.08))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
               child: Row(
                 children: [
                   const Icon(Icons.policy, size: 18, color: Color(0xFF2E7D5B)),
                   const SizedBox(width: 10),
-                  Text(p.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                  Text(p.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                   const SizedBox(width: 12),
                   Expanded(
                     flex: 2,
@@ -365,11 +366,11 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(p.titleAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                        Text(p.titleEn, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(p.titleEn, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
-                  Expanded(child: Text('اعتماد: ${p.approvedDate}', style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                  Expanded(child: Text('اعتماد: ${p.approvedDate}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(color: p.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
@@ -389,7 +390,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('اللجان المنبثقة من المجلس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('اللجان المنبثقة من المجلس', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -403,7 +404,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _committeeCard('لجنة المراجعة', 'Audit Committee', 5, 4, ['د. عبدالله السالم', 'سارة محمود', 'خالد أحمد'], const Color(0xFF4A148C)),
-                  _committeeCard('لجنة المكافآت', 'Compensation', 4, 3, ['نورا القحطاني', 'محمد الراشد'], const Color(0xFFD4AF37)),
+                  _committeeCard('لجنة المكافآت', 'Compensation', 4, 3, ['نورا القحطاني', 'محمد الراشد'], core_theme.AC.gold),
                   _committeeCard('لجنة الحوكمة', 'Governance', 3, 3, ['أحمد السالم', 'ليلى السعيد'], const Color(0xFF2E7D5B)),
                 ],
               );
@@ -434,7 +435,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(ar, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                    Text(en, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text(en, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -475,7 +476,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
-            Text(label, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
           ],
         ),
       ),
@@ -489,11 +490,11 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.construction, size: 56, color: Colors.black26),
+            Icon(Icons.construction, size: 56, color: core_theme.AC.td),
             const SizedBox(height: 12),
             Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 6),
-            Text(desc, style: const TextStyle(fontSize: 12, color: Colors.black54), textAlign: TextAlign.center),
+            Text(desc, style: TextStyle(fontSize: 12, color: core_theme.AC.ts), textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -544,17 +545,17 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
           child: Row(
             children: [
-              const Icon(Icons.notifications_active, size: 22, color: Color(0xFF7C3AED)),
+              Icon(Icons.notifications_active, size: 22, color: core_theme.AC.purple),
               const SizedBox(width: 8),
-              const Text('مركز التنبيهات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              Text('مركز التنبيهات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(color: const Color(0xFFB91C1C), borderRadius: BorderRadius.circular(12)),
-                child: const Text('12 جديد', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                child: Text('12 جديد', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
               ),
               const Spacer(),
               TextButton.icon(
@@ -562,7 +563,7 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
                   ApexV5UndoToast.show(context, messageAr: 'تم تعليم الكل كمقروءة', onUndo: () {});
                 },
                 icon: const Icon(Icons.done_all, size: 14),
-                label: const Text('تعليم الكل كمقروءة'),
+                label: Text('تعليم الكل كمقروءة'),
               ),
               IconButton(icon: const Icon(Icons.settings), onPressed: () {}, tooltip: 'إعدادات'),
             ],
@@ -591,17 +592,17 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               _notifRow('🚨', 'زاتكا — فاتورة رُفضت', 'INV-2026-187 — BR-KSA-16: VAT amount mismatch', 'قبل 5 دقائق', const Color(0xFFB91C1C), action: 'عرض التفاصيل'),
-              _notifRow('⚡', 'AI Guardrail — يحتاج اعتماد', 'تصنيف 3 قيود بثقة 88% — أقل من الحد 95%', 'قبل 15 دقيقة', const Color(0xFFD97706), action: 'راجع'),
-              _notifRow('📅', 'موعد نهائي قريب', 'إقرار VAT Q1 2026 يستحق خلال 3 أيام', 'قبل ساعة', const Color(0xFFD97706), action: 'ابدأ الآن'),
-              _notifRow('✅', 'مصاريف تمت الموافقة', '5 طلبات سفر لمدير العمليات', 'قبل ساعتين', const Color(0xFF059669)),
+              _notifRow('⚡', 'AI Guardrail — يحتاج اعتماد', 'تصنيف 3 قيود بثقة 88% — أقل من الحد 95%', 'قبل 15 دقيقة', core_theme.AC.warn, action: 'راجع'),
+              _notifRow('📅', 'موعد نهائي قريب', 'إقرار VAT Q1 2026 يستحق خلال 3 أيام', 'قبل ساعة', core_theme.AC.warn, action: 'ابدأ الآن'),
+              _notifRow('✅', 'مصاريف تمت الموافقة', '5 طلبات سفر لمدير العمليات', 'قبل ساعتين', core_theme.AC.ok),
               _notifRow('💸', 'فواتير متأخرة', 'ABC Trading — 45,000 ر.س متأخرة 12 يوم', 'قبل 3 ساعات', const Color(0xFFB91C1C), action: 'أرسل تذكير'),
               _notifRow('🎯', 'APEX Match — تطابق جديد', 'عميل Marriott يبحث عن مراجع SOCPA', 'قبل 4 ساعات', const Color(0xFFE65100), action: 'عرض الفرصة'),
-              _notifRow('🏦', 'مطابقة بنكية تلقائية', 'AI طابقت 18 معاملة — 100% ثقة', 'قبل 6 ساعات', const Color(0xFF059669)),
-              _notifRow('📊', 'تقرير جديد جاهز', 'تقرير المبيعات الأسبوعي — Q1 W17', 'قبل يوم', const Color(0xFF2563EB)),
-              _notifRow('⚠️', 'CSID سينتهي', 'شهادة Fatoora تنتهي خلال 15 يوم', 'قبل يوم', const Color(0xFFD97706), action: 'جدّد'),
+              _notifRow('🏦', 'مطابقة بنكية تلقائية', 'AI طابقت 18 معاملة — 100% ثقة', 'قبل 6 ساعات', core_theme.AC.ok),
+              _notifRow('📊', 'تقرير جديد جاهز', 'تقرير المبيعات الأسبوعي — Q1 W17', 'قبل يوم', core_theme.AC.info),
+              _notifRow('⚠️', 'CSID سينتهي', 'شهادة Fatoora تنتهي خلال 15 يوم', 'قبل يوم', core_theme.AC.warn, action: 'جدّد'),
               _notifRow('📋', 'اجتماع المجلس — تذكير', 'اجتماع 2026-04-28 — حزمة الاجتماع جاهزة', 'قبل يومين', const Color(0xFF2E7D5B)),
               _notifRow('🔒', 'محاولة دخول مشبوهة', 'من IP: 185.220.101.45 — تم الحظر', 'قبل يومين', const Color(0xFFB91C1C), action: 'تفاصيل الأمان'),
-              _notifRow('🎓', 'تدريب متاح', 'دورة ZATCA Phase 2 — 2026-05-15', 'قبل 3 أيام', const Color(0xFF7C3AED), action: 'سجّل'),
+              _notifRow('🎓', 'تدريب متاح', 'دورة ZATCA Phase 2 — 2026-05-15', 'قبل 3 أيام', core_theme.AC.purple, action: 'سجّل'),
             ],
           ),
         ),
@@ -616,19 +617,19 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF7C3AED) : Colors.white,
+          color: active ? core_theme.AC.purple : Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: active ? const Color(0xFF7C3AED) : Colors.black.withOpacity(0.1)),
+          border: Border.all(color: active ? core_theme.AC.purple : core_theme.AC.tp.withOpacity(0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: active ? Colors.white : Colors.black87)),
+            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: active ? Colors.white : core_theme.AC.tp)),
             const SizedBox(width: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(color: (active ? Colors.white : const Color(0xFF7C3AED)).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
-              child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : const Color(0xFF7C3AED))),
+              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.purple).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
+              child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : core_theme.AC.purple)),
             ),
           ],
         ),
@@ -640,7 +641,7 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.black.withOpacity(0.06))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.06))),
       child: Row(
         children: [
           Container(
@@ -656,8 +657,8 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black54)),
-                Text(time, style: const TextStyle(fontSize: 10, color: Colors.black38)),
+                Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
+                Text(time, style: TextStyle(fontSize: 10, color: core_theme.AC.td)),
               ],
             ),
           ),

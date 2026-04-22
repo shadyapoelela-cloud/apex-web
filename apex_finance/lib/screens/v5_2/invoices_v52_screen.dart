@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/templates/multi_view_template.dart';
 
@@ -22,8 +23,8 @@ class InvoicesV52Screen extends StatefulWidget {
 }
 
 class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   String _activeFilter = '';
 
@@ -67,10 +68,10 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
         SavedView(id: 'vip', labelAr: 'عملاء VIP', icon: Icons.diamond, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'paid', labelAr: 'مدفوعة', icon: Icons.check_circle, color: Colors.green, count: 3, active: _activeFilter == 'paid'),
-        FilterChipDef(id: 'pending', labelAr: 'قيد الاستحقاق', icon: Icons.schedule, color: Colors.blue, count: 3, active: _activeFilter == 'pending'),
-        FilterChipDef(id: 'overdue', labelAr: 'متأخرة', icon: Icons.warning, color: Colors.red, count: 2, active: _activeFilter == 'overdue'),
-        FilterChipDef(id: 'draft', labelAr: 'مسودة', icon: Icons.edit, color: Colors.grey, count: 2, active: _activeFilter == 'draft'),
+        FilterChipDef(id: 'paid', labelAr: 'مدفوعة', icon: Icons.check_circle, color: core_theme.AC.ok, count: 3, active: _activeFilter == 'paid'),
+        FilterChipDef(id: 'pending', labelAr: 'قيد الاستحقاق', icon: Icons.schedule, color: core_theme.AC.info, count: 3, active: _activeFilter == 'pending'),
+        FilterChipDef(id: 'overdue', labelAr: 'متأخرة', icon: Icons.warning, color: core_theme.AC.err, count: 2, active: _activeFilter == 'overdue'),
+        FilterChipDef(id: 'draft', labelAr: 'مسودة', icon: Icons.edit, color: core_theme.AC.td, count: 2, active: _activeFilter == 'draft'),
       ],
       onFilterToggle: (id) {
         setState(() => _activeFilter = _activeFilter == id ? '' : id);
@@ -118,10 +119,10 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(inv.id,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontFamily: 'monospace',
                                 fontSize: 11,
-                                color: Colors.black54)),
+                                color: core_theme.AC.ts)),
                         Text(inv.client,
                             style: const TextStyle(
                                 fontSize: 13, fontWeight: FontWeight.w700)),
@@ -131,7 +132,7 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                   Expanded(
                     child: Text(
                       '${inv.amount.toStringAsFixed(0)} ر.س',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w800, color: _navy),
                       textAlign: TextAlign.end,
                     ),
@@ -141,11 +142,11 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text('استحقاق',
-                          style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                          style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       Text(inv.due, style: const TextStyle(fontSize: 12)),
                       if (inv.daysOverdue > 0)
                         Text('متأخرة ${inv.daysOverdue} يوم',
-                            style: const TextStyle(fontSize: 10, color: Colors.red, fontWeight: FontWeight.w700)),
+                            style: TextStyle(fontSize: 10, color: core_theme.AC.err, fontWeight: FontWeight.w700)),
                     ],
                   ),
                   const SizedBox(width: 24),
@@ -176,10 +177,10 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
   // ── Kanban View ────────────────────────────────────────────────
   Widget _buildKanbanView() {
     final columns = {
-      _Status.draft: ('مسودة', Colors.grey, _invoices.where((i) => i.status == _Status.draft).toList()),
-      _Status.pending: ('قيد الاستحقاق', Colors.blue, _invoices.where((i) => i.status == _Status.pending).toList()),
-      _Status.overdue: ('متأخرة', Colors.red, _invoices.where((i) => i.status == _Status.overdue).toList()),
-      _Status.paid: ('مدفوعة', Colors.green, _invoices.where((i) => i.status == _Status.paid).toList()),
+      _Status.draft: ('مسودة', core_theme.AC.td, _invoices.where((i) => i.status == _Status.draft).toList()),
+      _Status.pending: ('قيد الاستحقاق', core_theme.AC.info, _invoices.where((i) => i.status == _Status.pending).toList()),
+      _Status.overdue: ('متأخرة', core_theme.AC.err, _invoices.where((i) => i.status == _Status.overdue).toList()),
+      _Status.paid: ('مدفوعة', core_theme.AC.ok, _invoices.where((i) => i.status == _Status.paid).toList()),
     };
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -193,9 +194,9 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
             width: 280,
             margin: const EdgeInsets.only(left: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: core_theme.AC.navy3,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -229,7 +230,7 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: Text('الإجمالي: ${total.toStringAsFixed(0)} ر.س',
-                      style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ),
                 ...items.map((inv) => Container(
                       margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
@@ -237,14 +238,14 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.grey.shade200),
+                        border: Border.all(color: core_theme.AC.bdr),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(inv.id,
-                              style: const TextStyle(
-                                  fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+                              style: TextStyle(
+                                  fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                           Text(inv.client,
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
                               maxLines: 1,
@@ -253,10 +254,10 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                           Row(
                             children: [
                               Text('${inv.amount.toStringAsFixed(0)} ر.س',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
                               const Spacer(),
-                              Text(inv.due, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                              Text(inv.due, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                             ],
                           ),
                         ],
@@ -278,7 +279,7 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('استحقاقات الفواتير — أبريل 2026',
+          Text('استحقاقات الفواتير — أبريل 2026',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(height: 16),
           Expanded(
@@ -292,15 +293,15 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: inv.status == _Status.overdue ? Colors.red : Colors.grey.shade200,
+                        color: inv.status == _Status.overdue ? core_theme.AC.err : core_theme.AC.bdr,
                       ),
                     ),
                     child: Row(
                       children: [
                         Column(
                           children: [
-                            Text(inv.due.substring(8), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: _gold)),
-                            Text(inv.due.substring(5, 7), style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(inv.due.substring(8), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: _gold)),
+                            Text(inv.due.substring(5, 7), style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                           ],
                         ),
                         const SizedBox(width: 16),
@@ -310,12 +311,12 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                             children: [
                               Text(inv.client, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                               Text('${inv.id} · ${inv.amount.toStringAsFixed(0)} ر.س',
-                                  style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                             ],
                           ),
                         ),
                         Icon(
-                          _statusMeta(inv.status).$1 == Colors.red ? Icons.warning : Icons.schedule,
+                          _statusMeta(inv.status).$1 == core_theme.AC.err ? Icons.warning : Icons.schedule,
                           color: _statusMeta(inv.status).$1,
                         ),
                       ],
@@ -338,17 +339,17 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
       'مسودة': _invoices.where((i) => i.status == _Status.draft).fold<double>(0, (s, i) => s + i.amount),
     };
     final max = totals.values.reduce((a, b) => a > b ? a : b);
-    final colors = [Colors.green, Colors.blue, Colors.red, Colors.grey];
+    final colors = [core_theme.AC.ok, core_theme.AC.info, core_theme.AC.err, core_theme.AC.td];
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('توزّع الفواتير حسب الحالة',
+          Text('توزّع الفواتير حسب الحالة',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(height: 4),
           Text('الإجمالي: ${_invoices.fold<double>(0, (s, i) => s + i.amount).toStringAsFixed(0)} ر.س',
-              style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           const SizedBox(height: 24),
           ...totals.entries.toList().asMap().entries.map((e) {
             final idx = e.key;
@@ -374,7 +375,7 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                     child: LinearProgressIndicator(
                       value: pct,
                       minHeight: 20,
-                      backgroundColor: Colors.grey.shade100,
+                      backgroundColor: core_theme.AC.navy3,
                       color: colors[idx],
                     ),
                   ),
@@ -390,13 +391,13 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
   (Color, String) _statusMeta(_Status s) {
     switch (s) {
       case _Status.paid:
-        return (Colors.green, 'مدفوعة');
+        return (core_theme.AC.ok, 'مدفوعة');
       case _Status.pending:
-        return (Colors.blue, 'قيد الاستحقاق');
+        return (core_theme.AC.info, 'قيد الاستحقاق');
       case _Status.overdue:
-        return (Colors.red, 'متأخرة');
+        return (core_theme.AC.err, 'متأخرة');
       case _Status.draft:
-        return (Colors.grey, 'مسودة');
+        return (core_theme.AC.td, 'مسودة');
     }
   }
 }

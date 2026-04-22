@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -38,7 +39,7 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFF7C3AED), Color(0xFFEC4899)]),
+              gradient: LinearGradient(colors: [core_theme.AC.purple, Color(0xFFEC4899)]),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -49,13 +50,13 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
                   child: const Icon(Icons.auto_awesome, color: Colors.white, size: 36),
                 ),
                 const SizedBox(width: 20),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('معرض وكلاء الذكاء', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
                       SizedBox(height: 4),
-                      Text('12 وكيل ذكاء اصطناعي — كلهم يعملون بالعربية ويعرفون سياق محاسبتك', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      Text('12 وكيل ذكاء اصطناعي — كلهم يعملون بالعربية ويعرفون سياق محاسبتك', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
                     ],
                   ),
                 ),
@@ -64,13 +65,13 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
-                      child: const Text('9 نشط', style: TextStyle(color: Color(0xFF7C3AED), fontSize: 16, fontWeight: FontWeight.w900)),
+                      child: Text('9 نشط', style: TextStyle(color: core_theme.AC.purple, fontSize: 16, fontWeight: FontWeight.w900)),
                     ),
                     const SizedBox(height: 4),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
-                      child: const Text('3 بانتظار الإعداد', style: TextStyle(color: Colors.white, fontSize: 10)),
+                      child: Text('3 بانتظار الإعداد', style: TextStyle(color: Colors.white, fontSize: 10)),
                     ),
                   ],
                 ),
@@ -81,13 +82,13 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
           // Stats
           Row(
             children: [
-              _agentStat('إجمالي الوكلاء', '12', Icons.auto_awesome, const Color(0xFF7C3AED)),
+              _agentStat('إجمالي الوكلاء', '12', Icons.auto_awesome, core_theme.AC.purple),
               const SizedBox(width: 12),
-              _agentStat('اقتراحات هذا الشهر', '1,247', Icons.lightbulb, const Color(0xFF059669)),
+              _agentStat('اقتراحات هذا الشهر', '1,247', Icons.lightbulb, core_theme.AC.ok),
               const SizedBox(width: 12),
-              _agentStat('معدّل الدقة', '94.2%', Icons.verified, const Color(0xFF2563EB)),
+              _agentStat('معدّل الدقة', '94.2%', Icons.verified, core_theme.AC.info),
               const SizedBox(width: 12),
-              _agentStat('وقت موفَّر', '142 ساعة', Icons.schedule, const Color(0xFFD4AF37)),
+              _agentStat('وقت موفَّر', '142 ساعة', Icons.schedule, core_theme.AC.gold),
             ],
           ),
           const SizedBox(height: 20),
@@ -140,7 +141,7 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
-                Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ],
@@ -156,19 +157,19 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF7C3AED) : Colors.white,
+          color: active ? core_theme.AC.purple : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: active ? const Color(0xFF7C3AED) : Colors.black.withOpacity(0.1)),
+          border: Border.all(color: active ? core_theme.AC.purple : core_theme.AC.tp.withOpacity(0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: active ? Colors.white : Colors.black87)),
+            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: active ? Colors.white : core_theme.AC.tp)),
             const SizedBox(width: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(color: (active ? Colors.white : const Color(0xFF7C3AED)).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
-              child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : const Color(0xFF7C3AED))),
+              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.purple).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
+              child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : core_theme.AC.purple)),
             ),
           ],
         ),
@@ -177,14 +178,14 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
   }
 
   final _allAgents = <_Agent>[
-    _Agent('copilot', 'Copilot Conversational AI', 'اسأل أي سؤال محاسبي بالعربية والإنجليزية', Icons.chat_bubble, const Color(0xFF7C3AED), 'copilot', true, 4.9, 542, 'GPT-4 + Claude'),
+    _Agent('copilot', 'Copilot Conversational AI', 'اسأل أي سؤال محاسبي بالعربية والإنجليزية', Icons.chat_bubble, core_theme.AC.purple, 'copilot', true, 4.9, 542, 'GPT-4 + Claude'),
     _Agent('anomaly', 'Anomaly Scanner', 'يفحص كل 6 ساعات · يكشف ازدواج/round numbers/off-hours', Icons.security, const Color(0xFFB91C1C), 'finance', true, 4.8, 287, 'Rule-based + ML'),
-    _Agent('risk-score', 'Transaction Risk Scorer', 'يصنّف كل معاملة 0-100 مع شرح العوامل', Icons.shield, const Color(0xFFD97706), 'audit', true, 4.7, 1847, 'ML Ensemble'),
-    _Agent('bank-rec', 'AI Bank Reconciliation', 'يطابق معاملات البنك مع القيود — 95%+ ثقة = تطبيق فوري', Icons.compare_arrows, const Color(0xFFD4AF37), 'finance', true, 4.9, 318, 'Fuzzy matching + AI'),
-    _Agent('coa-classifier', 'COA Auto-Classifier', 'يصنّف بنود المصاريف تلقائياً حسب شجرة الحسابات', Icons.account_tree, const Color(0xFF2563EB), 'finance', true, 4.6, 964, 'COA Engine v4.3'),
-    _Agent('ocr', 'Receipt/Invoice OCR', 'يستخرج بيانات الإيصالات والفواتير من الصور', Icons.receipt_long, const Color(0xFF059669), 'finance', true, 4.8, 423, 'Claude Vision + OCR'),
+    _Agent('risk-score', 'Transaction Risk Scorer', 'يصنّف كل معاملة 0-100 مع شرح العوامل', Icons.shield, core_theme.AC.warn, 'audit', true, 4.7, 1847, 'ML Ensemble'),
+    _Agent('bank-rec', 'AI Bank Reconciliation', 'يطابق معاملات البنك مع القيود — 95%+ ثقة = تطبيق فوري', Icons.compare_arrows, core_theme.AC.gold, 'finance', true, 4.9, 318, 'Fuzzy matching + AI'),
+    _Agent('coa-classifier', 'COA Auto-Classifier', 'يصنّف بنود المصاريف تلقائياً حسب شجرة الحسابات', Icons.account_tree, core_theme.AC.info, 'finance', true, 4.6, 964, 'COA Engine v4.3'),
+    _Agent('ocr', 'Receipt/Invoice OCR', 'يستخرج بيانات الإيصالات والفواتير من الصور', Icons.receipt_long, core_theme.AC.ok, 'finance', true, 4.8, 423, 'Claude Vision + OCR'),
     _Agent('draft-ai', 'AI Draft Writer', 'يكتب narration للقيود · Audit findings · ML letters', Icons.edit_note, const Color(0xFFEC4899), 'copilot', true, 4.7, 156, 'Claude Sonnet'),
-    _Agent('cashflow', 'Cash Flow Forecaster', 'يتوقّع التدفق النقدي 13 أسبوع بناء على التاريخ', Icons.trending_up, const Color(0xFF059669), 'finance', true, 4.5, 89, 'Time-series ML'),
+    _Agent('cashflow', 'Cash Flow Forecaster', 'يتوقّع التدفق النقدي 13 أسبوع بناء على التاريخ', Icons.trending_up, core_theme.AC.ok, 'finance', true, 4.5, 89, 'Time-series ML'),
     _Agent('zatca-translator', 'ZATCA Error Translator', 'يترجم أخطاء زاتكا BR-KSA-* إلى نصوص عربية مفهومة', Icons.translate, const Color(0xFF2E7D5B), 'audit', true, 4.9, 34, '14 BR-KSA codes'),
     _Agent('apex-match', 'APEX Match', 'يختار أفضل 3 مزوّدين للمطلوب — Toptal-style', Icons.psychology, const Color(0xFFE65100), 'copilot', false, null, 0, 'Recommendation ML'),
     _Agent('benford', 'Benford\'s Law Analyzer', 'يكتشف التلاعب في الأرقام عبر تحليل توزيع الأرقام الأولى', Icons.insights, const Color(0xFF4A148C), 'audit', false, null, 0, 'Statistical analysis'),
@@ -225,7 +226,7 @@ class _AgentCardState extends State<_AgentCard> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _hover ? widget.agent.color.withOpacity(0.4) : Colors.black.withOpacity(0.08), width: _hover ? 2 : 1),
+          border: Border.all(color: _hover ? widget.agent.color.withOpacity(0.4) : core_theme.AC.tp.withOpacity(0.08), width: _hover ? 2 : 1),
           boxShadow: _hover
               ? [BoxShadow(color: widget.agent.color.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 4))]
               : null,
@@ -244,12 +245,12 @@ class _AgentCardState extends State<_AgentCard> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: widget.agent.active ? const Color(0xFF059669).withOpacity(0.12) : Colors.black.withOpacity(0.06),
+                    color: widget.agent.active ? core_theme.AC.ok.withOpacity(0.12) : core_theme.AC.tp.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     widget.agent.active ? '🟢 نشط' : '⏸ يحتاج إعداد',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: widget.agent.active ? const Color(0xFF059669) : Colors.black54),
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: widget.agent.active ? core_theme.AC.ok : core_theme.AC.ts),
                   ),
                 ),
               ],
@@ -257,18 +258,18 @@ class _AgentCardState extends State<_AgentCard> {
             const SizedBox(height: 10),
             Text(widget.agent.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
             const SizedBox(height: 4),
-            Text(widget.agent.description, style: const TextStyle(fontSize: 11, color: Colors.black54), maxLines: 2, overflow: TextOverflow.ellipsis),
+            Text(widget.agent.description, style: TextStyle(fontSize: 11, color: core_theme.AC.ts), maxLines: 2, overflow: TextOverflow.ellipsis),
             const Spacer(),
             if (widget.agent.active) ...[
               Row(
                 children: [
-                  const Icon(Icons.star, color: Color(0xFFD97706), size: 12),
+                  Icon(Icons.star, color: core_theme.AC.warn, size: 12),
                   const SizedBox(width: 2),
                   Text('${widget.agent.rating}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                   const SizedBox(width: 8),
-                  Text('${widget.agent.usageCount} استخدام', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text('${widget.agent.usageCount} استخدام', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   const Spacer(),
-                  Text(widget.agent.engine, style: const TextStyle(fontSize: 9, color: Colors.black45, fontFamily: 'monospace')),
+                  Text(widget.agent.engine, style: TextStyle(fontSize: 9, color: core_theme.AC.td, fontFamily: 'monospace')),
                 ],
               ),
               const SizedBox(height: 6),
@@ -278,7 +279,7 @@ class _AgentCardState extends State<_AgentCard> {
                     child: OutlinedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.settings, size: 12),
-                      label: const Text('إعدادات', style: TextStyle(fontSize: 11)),
+                      label: Text('إعدادات', style: TextStyle(fontSize: 11)),
                       style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 4)),
                     ),
                   ),
@@ -287,7 +288,7 @@ class _AgentCardState extends State<_AgentCard> {
                     child: ElevatedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.play_arrow, size: 12),
-                      label: const Text('اختبر', style: TextStyle(fontSize: 11)),
+                      label: Text('اختبر', style: TextStyle(fontSize: 11)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.agent.color,
                         foregroundColor: Colors.white,
@@ -309,7 +310,7 @@ class _AgentCardState extends State<_AgentCard> {
                     );
                   },
                   icon: const Icon(Icons.power_settings_new, size: 14),
-                  label: const Text('فعّل الآن', style: TextStyle(fontSize: 12)),
+                  label: Text('فعّل الآن', style: TextStyle(fontSize: 12)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: widget.agent.color,
                     foregroundColor: Colors.white,
@@ -343,11 +344,11 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
         // Search bar
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.1))),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.1))),
                 child: TextField(
                   controller: TextEditingController(text: _query),
                   onChanged: (v) => setState(() => _query = v),
@@ -379,17 +380,17 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _resultGroup('العملاء (3)', const Color(0xFF2563EB), [
+              _resultGroup('العملاء (3)', core_theme.AC.info, [
                 _Result('customer', 'SABIC Procurement', 'عبدالرحمن الشهري · VAT: 300001234500003', '/app/erp/finance/sales'),
                 _Result('customer', 'SABIC Subsidiary', 'حساب فرعي · 12 فاتورة', '/app/erp/finance/sales'),
                 _Result('customer', 'SABIC International', 'فرع دولي · USD accounts', '/app/erp/finance/sales'),
               ]),
-              _resultGroup('الفواتير (12)', const Color(0xFFD4AF37), [
+              _resultGroup('الفواتير (12)', core_theme.AC.gold, [
                 _Result('invoice', 'INV-2026-145 — SABIC', '52,500 ر.س · 2026-04-15 · مدفوعة ✓', '/app/erp/finance/invoices'),
                 _Result('invoice', 'INV-2026-132 — SABIC', '18,000 ر.س · 2026-03-28 · مدفوعة ✓', '/app/erp/finance/invoices'),
                 _Result('invoice', 'INV-2026-098 — SABIC', '125,000 ر.س · 2026-02-10 · مدفوعة ✓', '/app/erp/finance/invoices'),
               ]),
-              _resultGroup('المعاملات البنكية (24)', const Color(0xFF059669), [
+              _resultGroup('المعاملات البنكية (24)', core_theme.AC.ok, [
                 _Result('transaction', 'BF-2026-04-18-234 — SABIC', '+52,500 ر.س · الراجحي · 2026-04-18', '/app/erp/treasury/banks'),
                 _Result('transaction', 'BF-2026-04-10-198 — SABIC Deposit', '+18,000 ر.س · الأهلي · 2026-04-10', '/app/erp/treasury/banks'),
               ]),
@@ -397,12 +398,12 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                 _Result('workpaper', 'B-200 — SABIC Accounts Receivable', 'أحمد · قسم B — الموجودات · مكتمل', '/app/audit/fieldwork/workpapers'),
                 _Result('workpaper', 'A-100 — SABIC Engagement Letter', 'د. عبدالله · قسم A — التخطيط · مكتمل', '/app/audit/fieldwork/workpapers'),
               ]),
-              _resultGroup('شاشات (3)', const Color(0xFF7C3AED), [
+              _resultGroup('شاشات (3)', core_theme.AC.purple, [
                 _Result('screen', 'SABIC Audit 2026 — Project', 'مشروع PRJ-2026-001 · 65% مكتمل', '/app/erp/operations/projects'),
                 _Result('screen', 'SABIC Dashboard', 'KPIs خاصة بـ SABIC', '/app/erp/finance/dashboard'),
                 _Result('screen', 'SABIC Fatoora Submissions', 'قائمة الفواتير الإلكترونية', '/app/compliance/zatca/queue'),
               ]),
-              _resultGroup('المستندات (5)', const Color(0xFFD97706), [
+              _resultGroup('المستندات (5)', core_theme.AC.warn, [
                 _Result('document', 'SABIC Audit Report 2025.pdf', '32 صفحة · PDF · آخر تعديل 2025-04-30', '/app/audit/reporting/opinion'),
                 _Result('document', 'SABIC VAT Return Q1 2026.pdf', '4 صفحات · PDF · 2026-04-20', '/app/compliance/tax/vat'),
               ]),
@@ -420,19 +421,19 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF2563EB) : Colors.white,
+          color: active ? core_theme.AC.info : Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: active ? const Color(0xFF2563EB) : Colors.black.withOpacity(0.1)),
+          border: Border.all(color: active ? core_theme.AC.info : core_theme.AC.tp.withOpacity(0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: active ? Colors.white : Colors.black87)),
+            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: active ? Colors.white : core_theme.AC.tp)),
             const SizedBox(width: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(color: (active ? Colors.white : const Color(0xFF2563EB)).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
-              child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : const Color(0xFF2563EB))),
+              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.info).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
+              child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : core_theme.AC.info)),
             ),
           ],
         ),
@@ -454,12 +455,12 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                 child: Text(title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
               ),
               const Spacer(),
-              TextButton(onPressed: () {}, child: const Text('عرض الكل ←', style: TextStyle(fontSize: 11))),
+              TextButton(onPressed: () {}, child: Text('عرض الكل ←', style: TextStyle(fontSize: 11))),
             ],
           ),
           const SizedBox(height: 6),
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 for (int i = 0; i < items.length; i++)
@@ -475,7 +476,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
   Widget _resultRow(_Result r, Color color, {required bool showDivider}) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))) : null),
+      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))) : null),
       child: Row(
         children: [
           Container(
@@ -490,17 +491,17 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
               children: [
                 RichText(
                   text: TextSpan(
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.black87),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.tp),
                     children: _highlight(r.title, _query),
                   ),
                 ),
-                Text(r.subtitle, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(r.subtitle, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
-          Text(r.route, style: const TextStyle(fontSize: 10, color: Colors.black38, fontFamily: 'monospace')),
+          Text(r.route, style: TextStyle(fontSize: 10, color: core_theme.AC.td, fontFamily: 'monospace')),
           const SizedBox(width: 6),
-          const Icon(Icons.arrow_back, size: 14, color: Colors.black38),
+          Icon(Icons.arrow_back, size: 14, color: core_theme.AC.td),
         ],
       ),
     );

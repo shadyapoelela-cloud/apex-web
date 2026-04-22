@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -72,7 +73,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(8, 16, 8, 6),
-          child: Text(title, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.black54, letterSpacing: 1)),
+          child: Text(title, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ts, letterSpacing: 1)),
         ),
         ...children,
       ],
@@ -92,9 +93,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: active ? const Color(0xFF4A148C) : Colors.black54),
+            Icon(icon, size: 16, color: active ? const Color(0xFF4A148C) : core_theme.AC.ts),
             const SizedBox(width: 10),
-            Text(label, style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.w800 : FontWeight.w500, color: active ? const Color(0xFF4A148C) : Colors.black87)),
+            Text(label, style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.w800 : FontWeight.w500, color: active ? const Color(0xFF4A148C) : core_theme.AC.tp)),
           ],
         ),
       ),
@@ -126,11 +127,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('معلومات الشركة', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+          Text('معلومات الشركة', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 Row(
@@ -138,18 +139,18 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                     Container(
                       width: 100,
                       height: 100,
-                      decoration: BoxDecoration(color: const Color(0xFFD4AF37).withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
-                      child: const Icon(Icons.bolt, size: 48, color: Color(0xFFD4AF37)),
+                      decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
+                      child: Icon(Icons.bolt, size: 48, color: core_theme.AC.gold),
                     ),
                     const SizedBox(width: 20),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('شركة الرياض للتجارة', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                        Text('شركة الرياض للتجارة', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 4),
-                        const Text('سجل تجاري: 1010123456 · VAT: 300001234500003', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                        Text('سجل تجاري: 1010123456 · VAT: 300001234500003', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                         const SizedBox(height: 8),
-                        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.edit, size: 14), label: const Text('تعديل')),
+                        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.edit, size: 14), label: Text('تعديل')),
                       ],
                     ),
                   ],
@@ -176,11 +177,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          SizedBox(width: 150, child: Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 150, child: Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(border: Border.all(color: Colors.black.withOpacity(0.1)), borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)), borderRadius: BorderRadius.circular(4)),
               child: Text(value, style: const TextStyle(fontSize: 13)),
             ),
           ),
@@ -197,12 +198,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         children: [
           Row(
             children: [
-              const Text('المستخدمون والصلاحيات', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+              Text('المستخدمون والصلاحيات', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.person_add, size: 16),
-                label: const Text('دعوة مستخدم'),
+                label: Text('دعوة مستخدم'),
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4A148C), foregroundColor: Colors.white),
               ),
             ],
@@ -211,11 +212,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           // Role bundles
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('الأدوار المُعدّة مسبقاً (Role Bundles)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                Text('الأدوار المُعدّة مسبقاً (Role Bundles)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 10),
                 LayoutBuilder(
                   builder: (ctx, constraints) {
@@ -228,9 +229,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       crossAxisSpacing: 8,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        _roleTile('المحاسب', 'erp.*.*.view+post+edit', 3, const Color(0xFF2563EB)),
+                        _roleTile('المحاسب', 'erp.*.*.view+post+edit', 3, core_theme.AC.info),
                         _roleTile('المراجع (Auditor)', 'audit.*.*.*', 1, const Color(0xFF4A148C)),
-                        _roleTile('المدير المالي', 'erp.*.*.approve', 1, const Color(0xFF059669)),
+                        _roleTile('المدير المالي', 'erp.*.*.approve', 1, core_theme.AC.ok),
                         _roleTile('مسؤول الامتثال', 'compliance.*.*.*', 1, const Color(0xFF2E7D5B)),
                       ],
                     );
@@ -240,14 +241,14 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('المستخدمون النشطون', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('المستخدمون النشطون', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final u in [
             _User('أحمد السالم', 'CEO', 'admin@riyadh-trading.com', 'مدير النظام', const Color(0xFFB91C1C), true),
-            _User('سارة محمود', 'CFO', 'sarah@riyadh-trading.com', 'المدير المالي', const Color(0xFF059669), true),
-            _User('خالد أحمد', 'محاسب', 'khaled@riyadh-trading.com', 'المحاسب', const Color(0xFF2563EB), true),
+            _User('سارة محمود', 'CFO', 'sarah@riyadh-trading.com', 'المدير المالي', core_theme.AC.ok, true),
+            _User('خالد أحمد', 'محاسب', 'khaled@riyadh-trading.com', 'المحاسب', core_theme.AC.info, true),
             _User('نورا القحطاني', 'HR Manager', 'nora@riyadh-trading.com', 'مدير النظام', const Color(0xFFB91C1C), true),
-            _User('محمد الراشد', 'مدير العمليات', 'mohammed@riyadh-trading.com', 'المحاسب', const Color(0xFF2563EB), false),
+            _User('محمد الراشد', 'مدير العمليات', 'mohammed@riyadh-trading.com', 'المحاسب', core_theme.AC.info, false),
           ])
             _userRow(u),
         ],
@@ -275,7 +276,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           ),
           const SizedBox(height: 4),
           Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-          Text(capability, style: const TextStyle(fontSize: 9, color: Colors.black54, fontFamily: 'monospace')),
+          Text(capability, style: TextStyle(fontSize: 9, color: core_theme.AC.ts, fontFamily: 'monospace')),
         ],
       ),
     );
@@ -285,7 +286,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Row(
         children: [
           CircleAvatar(
@@ -300,11 +301,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(u.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                Text(u.title, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(u.title, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
-          Expanded(flex: 2, child: Text(u.email, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'))),
+          Expanded(flex: 2, child: Text(u.email, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'))),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: u.roleColor.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
@@ -312,13 +313,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           ),
           const SizedBox(width: 8),
           if (u.twoFa) ...[
-            const Icon(Icons.verified_user, size: 14, color: Color(0xFF059669)),
+            Icon(Icons.verified_user, size: 14, color: core_theme.AC.ok),
             const SizedBox(width: 4),
-            const Text('2FA', style: TextStyle(fontSize: 10, color: Color(0xFF059669), fontWeight: FontWeight.w700)),
+            Text('2FA', style: TextStyle(fontSize: 10, color: core_theme.AC.ok, fontWeight: FontWeight.w700)),
           ] else ...[
-            const Icon(Icons.warning, size: 14, color: Color(0xFFD97706)),
+            Icon(Icons.warning, size: 14, color: core_theme.AC.warn),
             const SizedBox(width: 4),
-            const Text('No 2FA', style: TextStyle(fontSize: 10, color: Color(0xFFD97706))),
+            Text('No 2FA', style: TextStyle(fontSize: 10, color: core_theme.AC.warn)),
           ],
           const SizedBox(width: 8),
           IconButton(icon: const Icon(Icons.edit, size: 14), onPressed: () {}),
@@ -334,9 +335,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('التكاملات الخارجية', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+          Text('التكاملات الخارجية', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
           const SizedBox(height: 16),
-          const Text('الحكومية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.black54)),
+          Text('الحكومية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
           const SizedBox(height: 8),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -350,15 +351,15 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _intCard('زاتكا (Fatoora)', 'فوترة إلكترونية', const Color(0xFF2E7D5B), connected: true),
-                  _intCard('GOSI', 'التأمينات الاجتماعية', const Color(0xFF2563EB), connected: true),
-                  _intCard('Mudad (WPS)', 'حماية الأجور', const Color(0xFF7C3AED), connected: true),
-                  _intCard('UAE FTA', 'ضريبة الإمارات', const Color(0xFFD4AF37), connected: false),
+                  _intCard('GOSI', 'التأمينات الاجتماعية', core_theme.AC.info, connected: true),
+                  _intCard('Mudad (WPS)', 'حماية الأجور', core_theme.AC.purple, connected: true),
+                  _intCard('UAE FTA', 'ضريبة الإمارات', core_theme.AC.gold, connected: false),
                 ],
               );
             },
           ),
           const SizedBox(height: 16),
-          const Text('البنوك', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.black54)),
+          Text('البنوك', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
           const SizedBox(height: 8),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -371,15 +372,15 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 crossAxisSpacing: 8,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _intCard('Lean Technologies', 'Open Banking', const Color(0xFF059669), connected: true),
-                  _intCard('Tarabut Gateway', 'Open Banking', const Color(0xFF059669), connected: true),
-                  _intCard('Salt Edge', 'Banking APIs', const Color(0xFF059669), connected: false),
+                  _intCard('Lean Technologies', 'Open Banking', core_theme.AC.ok, connected: true),
+                  _intCard('Tarabut Gateway', 'Open Banking', core_theme.AC.ok, connected: true),
+                  _intCard('Salt Edge', 'Banking APIs', core_theme.AC.ok, connected: false),
                 ],
               );
             },
           ),
           const SizedBox(height: 16),
-          const Text('الذكاء الاصطناعي', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.black54)),
+          Text('الذكاء الاصطناعي', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
           const SizedBox(height: 8),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -393,7 +394,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _intCard('Anthropic Claude', 'Copilot + OCR', const Color(0xFFEC4899), connected: true),
-                  _intCard('OpenAI', 'Alternative AI', const Color(0xFF059669), connected: false),
+                  _intCard('OpenAI', 'Alternative AI', core_theme.AC.ok, connected: false),
                 ],
               );
             },
@@ -406,7 +407,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   Widget _intCard(String name, String purpose, Color color, {required bool connected}) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: connected ? color.withOpacity(0.4) : Colors.black.withOpacity(0.08), width: connected ? 2 : 1)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: connected ? color.withOpacity(0.4) : core_theme.AC.tp.withOpacity(0.08), width: connected ? 2 : 1)),
       child: Row(
         children: [
           Container(
@@ -420,18 +421,18 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(purpose, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(purpose, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
           if (connected)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: const Color(0xFF059669), borderRadius: BorderRadius.circular(3)),
-              child: const Text('متصل', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w800)),
+              decoration: BoxDecoration(color: core_theme.AC.ok, borderRadius: BorderRadius.circular(3)),
+              child: Text('متصل', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w800)),
             )
           else
-            OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4)), child: const Text('اتصل', style: TextStyle(fontSize: 11))),
+            OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4)), child: Text('اتصل', style: TextStyle(fontSize: 11))),
         ],
       ),
     );
@@ -455,11 +456,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.settings, size: 64, color: Colors.black26),
+            Icon(Icons.settings, size: 64, color: core_theme.AC.td),
             const SizedBox(height: 12),
             Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
             const SizedBox(height: 6),
-            Text(desc, style: const TextStyle(fontSize: 13, color: Colors.black54), textAlign: TextAlign.center),
+            Text(desc, style: TextStyle(fontSize: 13, color: core_theme.AC.ts), textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -539,17 +540,17 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
               for (final col in _selectedColumns)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFF2563EB).withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                  decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(col, style: const TextStyle(fontSize: 11, color: Color(0xFF2563EB), fontWeight: FontWeight.w700)),
+                      Text(col, style: TextStyle(fontSize: 11, color: core_theme.AC.info, fontWeight: FontWeight.w700)),
                       const SizedBox(width: 4),
-                      const Icon(Icons.close, size: 11, color: Color(0xFF2563EB)),
+                      Icon(Icons.close, size: 11, color: core_theme.AC.info),
                     ],
                   ),
                 ),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.add, size: 12), label: const Text('+ عمود', style: TextStyle(fontSize: 11))),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.add, size: 12), label: Text('+ عمود', style: TextStyle(fontSize: 11))),
             ],
           )),
           _builderSection('المرشحات (Filters)', Column(
@@ -558,18 +559,18 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 2),
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: const Color(0xFFD97706).withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
+                  decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
                   child: Row(
                     children: [
-                      const Icon(Icons.filter_list, size: 12, color: Color(0xFFD97706)),
+                      Icon(Icons.filter_list, size: 12, color: core_theme.AC.warn),
                       const SizedBox(width: 6),
                       Expanded(child: Text(f, style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
-                      const Icon(Icons.close, size: 12, color: Color(0xFFD97706)),
+                      Icon(Icons.close, size: 12, color: core_theme.AC.warn),
                     ],
                   ),
                 ),
               const SizedBox(height: 4),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.add, size: 12), label: const Text('+ مرشّح', style: TextStyle(fontSize: 11))),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.add, size: 12), label: Text('+ مرشّح', style: TextStyle(fontSize: 11))),
             ],
           )),
           _builderSection('التجميع (Group By)', Wrap(
@@ -578,8 +579,8 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
               for (final g in _groupBy)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFF059669).withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
-                  child: Text(g, style: const TextStyle(fontSize: 11, color: Color(0xFF059669), fontWeight: FontWeight.w700)),
+                  decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                  child: Text(g, style: TextStyle(fontSize: 11, color: core_theme.AC.ok, fontWeight: FontWeight.w700)),
                 ),
             ],
           )),
@@ -601,12 +602,12 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                     ApexV5UndoToast.show(context, messageAr: 'تم حفظ التقرير · متاح في Saved Reports', onUndo: () {});
                   },
                   icon: const Icon(Icons.save, size: 14),
-                  label: const Text('احفظ'),
+                  label: Text('احفظ'),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4A148C), foregroundColor: Colors.white),
                 ),
               ),
               const SizedBox(width: 6),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.schedule, size: 14), label: const Text('جدولة')),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.schedule, size: 14), label: Text('جدولة')),
             ],
           ),
         ],
@@ -618,11 +619,11 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54)),
+          Text(title, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
           const SizedBox(height: 6),
           child,
         ],
@@ -639,14 +640,14 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
         decoration: BoxDecoration(
           color: active ? const Color(0xFF4A148C).withOpacity(0.12) : null,
           borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: active ? const Color(0xFF4A148C) : Colors.black.withOpacity(0.1)),
+          border: Border.all(color: active ? const Color(0xFF4A148C) : core_theme.AC.tp.withOpacity(0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12, color: active ? const Color(0xFF4A148C) : Colors.black54),
+            Icon(icon, size: 12, color: active ? const Color(0xFF4A148C) : core_theme.AC.ts),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(fontSize: 11, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF4A148C) : Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 11, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF4A148C) : core_theme.AC.ts)),
           ],
         ),
       ),
@@ -658,14 +659,14 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
           child: Row(
             children: [
-              const Text('معاينة مباشرة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              Text('معاينة مباشرة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               const Spacer(),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.picture_as_pdf, size: 14), label: const Text('PDF')),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.picture_as_pdf, size: 14), label: Text('PDF')),
               const SizedBox(width: 8),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.file_download, size: 14), label: const Text('Excel')),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.file_download, size: 14), label: Text('Excel')),
             ],
           ),
         ),
@@ -674,7 +675,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
             padding: const EdgeInsets.all(20),
             child: Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.1))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.1))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -685,7 +686,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(_reportName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
-                            const Text('شركة الرياض للتجارة · Q1 2026', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                            Text('شركة الرياض للتجارة · Q1 2026', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                           ],
                         ),
                       ),
@@ -696,8 +697,8 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                         errorBuilder: (_, __, ___) => Container(
                           width: 60,
                           height: 60,
-                          decoration: BoxDecoration(color: const Color(0xFFD4AF37).withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                          child: const Icon(Icons.bolt, size: 32, color: Color(0xFFD4AF37)),
+                          decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                          child: Icon(Icons.bolt, size: 32, color: core_theme.AC.gold),
                         ),
                       ),
                     ],
@@ -728,7 +729,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                   const SizedBox(height: 20),
                   // Table
                   Container(
-                    decoration: BoxDecoration(border: Border.all(color: Colors.black.withOpacity(0.08)), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)), borderRadius: BorderRadius.circular(6)),
                     child: DataTable(
                       headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
                       headingTextStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
@@ -775,12 +776,12 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                   const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: const Color(0xFF059669).withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
-                    child: const Row(
+                    decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
+                    child: Row(
                       children: [
-                        Icon(Icons.functions, size: 14, color: Color(0xFF059669)),
+                        Icon(Icons.functions, size: 14, color: core_theme.AC.ok),
                         SizedBox(width: 6),
-                        Text('الإجمالي العام: 116,150 ر.س · VAT: 15,150 ر.س', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF059669))),
+                        Text('الإجمالي العام: 116,150 ر.س · VAT: 15,150 ر.س', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
                       ],
                     ),
                   ),

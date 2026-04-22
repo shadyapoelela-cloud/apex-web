@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -49,7 +50,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
                 decoration: BoxDecoration(
                   color: _selected == p.id ? p.color.withOpacity(0.1) : Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _selected == p.id ? p.color : Colors.black.withOpacity(0.06), width: _selected == p.id ? 2 : 1),
+                  border: Border.all(color: _selected == p.id ? p.color : core_theme.AC.tp.withOpacity(0.06), width: _selected == p.id ? 2 : 1),
                 ),
                 child: Row(
                   children: [
@@ -64,15 +65,15 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(p.nameAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                          Text('${p.customers} عميل', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                          Text('${p.customers} عميل', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                         ],
                       ),
                     ),
                     if (p.popular)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                        decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(3)),
-                        child: const Text('شائع', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.w800)),
+                        decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(3)),
+                        child: Text('شائع', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.w800)),
                       ),
                   ],
                 ),
@@ -110,7 +111,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(pack.nameAr, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)),
-                      Text(pack.nameEn, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                      Text(pack.nameEn, style: TextStyle(color: core_theme.AC.ts, fontSize: 14)),
                       const SizedBox(height: 8),
                       Text(pack.description, style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.5)),
                     ],
@@ -137,7 +138,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
           const SizedBox(height: 16),
 
           // What's included
-          const Text('ما يحتويه هذا الباقة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('ما يحتويه هذا الباقة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -163,11 +164,11 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
           const SizedBox(height: 16),
 
           // Unique features
-          const Text('ميزات خاصة بالقطاع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('ميزات خاصة بالقطاع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -188,7 +189,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
           const SizedBox(height: 16),
 
           // KPIs preview
-          const Text('المؤشّرات الأساسية المضمّنة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('المؤشّرات الأساسية المضمّنة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -232,7 +233,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
                     );
                   },
                   icon: const Icon(Icons.check, size: 16),
-                  label: const Text('فعّل الباقة'),
+                  label: Text('فعّل الباقة'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: pack.color,
                     foregroundColor: Colors.white,
@@ -250,7 +251,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
   Widget _includedCard(String title, String detail, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Row(
         children: [
           Container(
@@ -264,7 +265,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-                Text(detail, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(detail, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -280,7 +281,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -288,7 +289,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
             children: [
               Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color, fontFamily: 'monospace')),
               const SizedBox(width: 4),
-              Text(unit, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text(unit, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ],
           ),
         ],
@@ -296,14 +297,14 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
     );
   }
 
-  final _packs = const [
+  final _packs = [
     _Pack(
       id: 'fnb',
       nameAr: 'المطاعم والمقاهي (F&B)',
       nameEn: 'Food & Beverage',
       description: 'محاسبة مطاعم مع إدارة وصفات + تكلفة الصنف + نقاط البيع + تتبع الهدر',
       icon: Icons.restaurant,
-      color: Color(0xFFD97706),
+      color: core_theme.AC.warn,
       customers: 47,
       rating: '⭐ 4.8/5',
       coaAccounts: 145,
@@ -396,7 +397,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
       nameEn: 'Logistics',
       description: 'إدارة الشحنات + مسارات + تكلفة الرحلة + تتبع الأسطول',
       icon: Icons.local_shipping,
-      color: Color(0xFF059669),
+      color: core_theme.AC.ok,
       customers: 41,
       rating: '⭐ 4.6/5',
       coaAccounts: 195,
@@ -427,7 +428,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
       nameEn: 'Retail',
       description: 'POS متعدّد الفروع + إدارة SKU + عروض الترويج + تحليل السلّة',
       icon: Icons.shopping_cart,
-      color: Color(0xFF7C3AED),
+      color: core_theme.AC.purple,
       customers: 68,
       rating: '⭐ 4.8/5',
       coaAccounts: 160,
@@ -508,16 +509,16 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         // Hero search
         Container(
           padding: const EdgeInsets.all(40),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF7C3AED)]),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [core_theme.AC.info, core_theme.AC.purple]),
           ),
           child: Column(
             children: [
               const Icon(Icons.help_center, color: Colors.white, size: 48),
               const SizedBox(height: 12),
-              const Text('مركز المساعدة', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)),
+              Text('مركز المساعدة', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)),
               const SizedBox(height: 4),
-              const Text('كيف يمكننا مساعدتك؟', style: TextStyle(color: Colors.white70, fontSize: 14)),
+              Text('كيف يمكننا مساعدتك؟', style: TextStyle(color: core_theme.AC.ts, fontSize: 14)),
               const SizedBox(height: 16),
               Container(
                 constraints: const BoxConstraints(maxWidth: 600),
@@ -549,7 +550,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         // Tabs
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'الأدلّة', Icons.menu_book),
@@ -573,13 +574,13 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: active ? const Color(0xFF2563EB) : Colors.transparent, width: 2)),
+          border: Border(bottom: BorderSide(color: active ? core_theme.AC.info : Colors.transparent, width: 2)),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFF2563EB) : Colors.black54),
+            Icon(icon, size: 14, color: active ? core_theme.AC.info : core_theme.AC.ts),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? const Color(0xFF2563EB) : Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 13, fontWeight: active ? FontWeight.w800 : FontWeight.w600, color: active ? core_theme.AC.info : core_theme.AC.ts)),
           ],
         ),
       ),
@@ -611,11 +612,11 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             crossAxisSpacing: 12,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _guideCard('بدء الاستخدام', 'كيف تبدأ مع APEX في 10 دقائق', Icons.rocket_launch, const Color(0xFFD4AF37), 'المبتدئون · 8 دقائق'),
+              _guideCard('بدء الاستخدام', 'كيف تبدأ مع APEX في 10 دقائق', Icons.rocket_launch, core_theme.AC.gold, 'المبتدئون · 8 دقائق'),
               _guideCard('إعداد ZATCA', 'دليل CSID + أول فاتورة إلكترونية', Icons.receipt, const Color(0xFF2E7D5B), 'ZATCA · 15 دقيقة'),
-              _guideCard('ربط البنك', 'Lean/Tarabut — مزامنة تلقائية', Icons.account_balance, const Color(0xFF2563EB), 'البنوك · 5 دقائق'),
-              _guideCard('إدارة الرواتب', 'GOSI + WPS + EOSB', Icons.payments, const Color(0xFF7C3AED), 'HR · 20 دقيقة'),
-              _guideCard('المطابقة بالذكاء', 'Bank Reconciliation AI', Icons.compare_arrows, const Color(0xFFD4AF37), 'AI · 10 دقائق'),
+              _guideCard('ربط البنك', 'Lean/Tarabut — مزامنة تلقائية', Icons.account_balance, core_theme.AC.info, 'البنوك · 5 دقائق'),
+              _guideCard('إدارة الرواتب', 'GOSI + WPS + EOSB', Icons.payments, core_theme.AC.purple, 'HR · 20 دقيقة'),
+              _guideCard('المطابقة بالذكاء', 'Bank Reconciliation AI', Icons.compare_arrows, core_theme.AC.gold, 'AI · 10 دقائق'),
               _guideCard('بناء التقارير', 'مُنشئ التقارير المخصّصة', Icons.bar_chart, const Color(0xFFEC4899), 'التقارير · 12 دقيقة'),
             ],
           );
@@ -627,7 +628,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   Widget _guideCard(String title, String desc, IconData icon, Color color, String meta) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -639,7 +640,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           const SizedBox(height: 12),
           Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
-          Text(desc, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text(desc, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           const Spacer(),
           Row(
             children: [
@@ -668,15 +669,15 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             physics: const NeverScrollableScrollPhysics(),
             children: [
               for (final v in [
-                ('جولة في APEX', '3:45', const Color(0xFF2563EB)),
+                ('جولة في APEX', '3:45', core_theme.AC.info),
                 ('إصدار فاتورة ZATCA', '4:20', const Color(0xFF2E7D5B)),
-                ('AI Bank Reconciliation', '5:15', const Color(0xFFD4AF37)),
-                ('إعداد الموظفين', '6:30', const Color(0xFF7C3AED)),
+                ('AI Bank Reconciliation', '5:15', core_theme.AC.gold),
+                ('إعداد الموظفين', '6:30', core_theme.AC.purple),
                 ('مراجعة وضوابط الاعتماد', '4:50', const Color(0xFFB91C1C)),
                 ('تخصيص المنصّة (Studio)', '8:10', const Color(0xFFEC4899)),
               ])
                 Container(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
                   child: Column(
                     children: [
                       Expanded(
@@ -697,7 +698,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(v.$1, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-                            Text(v.$2, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(v.$2, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                           ],
                         ),
                       ),
@@ -726,7 +727,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           ])
             Container(
               margin: const EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
               child: ExpansionTile(
                 title: Text(q.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                 children: [
@@ -748,7 +749,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('اختصارات لوحة المفاتيح', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+          Text('اختصارات لوحة المفاتيح', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           _shortcutGroup('التنقّل', [
             ('Ctrl+K', 'Command Palette — بحث عالمي'),
@@ -782,21 +783,21 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF2563EB))),
+          Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
           const SizedBox(height: 8),
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 for (int i = 0; i < items.length; i++)
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(border: i < items.length - 1 ? Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))) : null),
+                    decoration: BoxDecoration(border: i < items.length - 1 ? Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))) : null),
                     child: Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(4), border: Border.all(color: Colors.black.withOpacity(0.1))),
+                          decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(4), border: Border.all(color: core_theme.AC.tp.withOpacity(0.1))),
                           child: Text(items[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, fontWeight: FontWeight.w700)),
                         ),
                         const SizedBox(width: 12),
@@ -826,12 +827,12 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             crossAxisSpacing: 12,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _contactCard('دردشة مباشرة', 'متاحة 24/7 باللغة العربية', Icons.chat, const Color(0xFF2563EB), '<1 دقيقة'),
-              _contactCard('البريد الإلكتروني', 'support@apex-financial.com', Icons.email, const Color(0xFF7C3AED), '<2 ساعة'),
-              _contactCard('WhatsApp', '+966 11 xxx xxxx', Icons.phone_android, const Color(0xFF059669), '<15 دقيقة'),
-              _contactCard('اتصال هاتفي', 'عملاء Enterprise فقط', Icons.phone, const Color(0xFFD97706), 'مباشر'),
+              _contactCard('دردشة مباشرة', 'متاحة 24/7 باللغة العربية', Icons.chat, core_theme.AC.info, '<1 دقيقة'),
+              _contactCard('البريد الإلكتروني', 'support@apex-financial.com', Icons.email, core_theme.AC.purple, '<2 ساعة'),
+              _contactCard('WhatsApp', '+966 11 xxx xxxx', Icons.phone_android, core_theme.AC.ok, '<15 دقيقة'),
+              _contactCard('اتصال هاتفي', 'عملاء Enterprise فقط', Icons.phone, core_theme.AC.warn, 'مباشر'),
               _contactCard('الأكاديمية', 'دورات مجانية + شهادات', Icons.school, const Color(0xFFEC4899), 'ذاتي'),
-              _contactCard('المجتمع', 'منتدى المستخدمين', Icons.forum, const Color(0xFFD4AF37), 'مجتمعي'),
+              _contactCard('المجتمع', 'منتدى المستخدمين', Icons.forum, core_theme.AC.gold, 'مجتمعي'),
             ],
           );
         },
@@ -842,14 +843,14 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   Widget _contactCard(String title, String detail, IconData icon, Color color, String sla) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)), child: Icon(icon, color: color, size: 20)),
           const SizedBox(height: 10),
           Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-          Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const Spacer(),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text('زمن الاستجابة: $sla', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color))),
         ],

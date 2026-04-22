@@ -37,7 +37,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
   // Meta
   final _periodC = TextEditingController(text: '${DateTime.now().year}-FY');
   String _rateLabel = '2.5% (جريجوري)';
-  static const Map<String, String> _rates = {
+  static final Map<String, String> _rates = {
     '2.5% (جريجوري)': '0.025',
     '2.577% (هجري)': '0.02577',
   };

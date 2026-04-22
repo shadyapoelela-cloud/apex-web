@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ExecutiveDashboardV5Screen extends StatefulWidget {
   const ExecutiveDashboardV5Screen({super.key});
@@ -48,10 +49,10 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFF0D1B3F), Color(0xFF1E3A8A), Color(0xFFD4AF37)],
+          colors: [Color(0xFF0D1B3F), Color(0xFF1E3A8A), core_theme.AC.gold],
         ),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -64,17 +65,17 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.star, color: Color(0xFFD4AF37), size: 32),
+            child: Icon(Icons.star, color: core_theme.AC.gold, size: 32),
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('لوحة التنفيذيين',
                     style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
                 Text('نظرة موحّدة عبر جميع خدمات APEX — للرئيس التنفيذي والمدير المالي',
-                    style: TextStyle(color: Colors.white70, fontSize: 13)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
               ],
             ),
           ),
@@ -108,10 +109,10 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
   Widget _buildNorthStarKpis() {
     return Row(
       children: [
-        _kpiCard('الإيرادات YTD', '18.5M', '+24%', true, Icons.trending_up, const Color(0xFFD4AF37)),
-        _kpiCard('EBITDA', '4.8M', '+31%', true, Icons.savings, Colors.green),
-        _kpiCard('هامش الربح', '26.2%', '+2.1pp', true, Icons.donut_large, Colors.blue),
-        _kpiCard('السيولة النقدية', '12.4M', '+18%', true, Icons.account_balance, Colors.teal),
+        _kpiCard('الإيرادات YTD', '18.5M', '+24%', true, Icons.trending_up, core_theme.AC.gold),
+        _kpiCard('EBITDA', '4.8M', '+31%', true, Icons.savings, core_theme.AC.ok),
+        _kpiCard('هامش الربح', '26.2%', '+2.1pp', true, Icons.donut_large, core_theme.AC.info),
+        _kpiCard('السيولة النقدية', '12.4M', '+18%', true, Icons.account_balance, core_theme.AC.info),
       ],
     );
   }
@@ -141,19 +142,19 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: (positive ? Colors.green : Colors.red).withOpacity(0.12),
+                    color: (positive ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(positive ? Icons.arrow_upward : Icons.arrow_downward,
-                          size: 12, color: positive ? Colors.green : Colors.red),
+                          size: 12, color: positive ? core_theme.AC.ok : core_theme.AC.err),
                       const SizedBox(width: 2),
                       Text(change,
                           style: TextStyle(
                             fontSize: 11,
-                            color: positive ? Colors.green : Colors.red,
+                            color: positive ? core_theme.AC.ok : core_theme.AC.err,
                             fontWeight: FontWeight.w800,
                           )),
                     ],
@@ -162,15 +163,15 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
               ],
             ),
             const SizedBox(height: 14),
-            Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
             const SizedBox(height: 4),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: color)),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(bottom: 3, right: 2),
-                  child: Text('ر.س', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                  child: Text('ر.س', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ),
               ],
             ),
@@ -186,12 +187,12 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('ملخّص الأداء المالي YTD', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          Text('ملخّص الأداء المالي YTD', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -216,27 +217,27 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: core_theme.AC.navy3,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             const SizedBox(height: 4),
-            Text(_fmtM(actual), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+            Text(_fmtM(actual), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
             const SizedBox(height: 2),
             Row(
               children: [
                 Icon(positive ? Icons.arrow_upward : Icons.arrow_downward,
-                    size: 10, color: positive ? Colors.green : Colors.red),
+                    size: 10, color: positive ? core_theme.AC.ok : core_theme.AC.err),
                 Text('${change.abs().toStringAsFixed(1)}%',
                     style: TextStyle(
                       fontSize: 10,
-                      color: positive ? Colors.green : Colors.red,
+                      color: positive ? core_theme.AC.ok : core_theme.AC.err,
                       fontWeight: FontWeight.w700,
                     )),
-                Text(' YoY', style: TextStyle(fontSize: 9, color: Colors.black54)),
+                Text(' YoY', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
               ],
             ),
           ],
@@ -257,15 +258,15 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('الإيرادات الشهرية vs السنة السابقة',
+          Text('الإيرادات الشهرية vs السنة السابقة',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 4),
-          const Text('(مليون ريال)', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('(مليون ريال)', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 20),
           SizedBox(
             height: 180,
@@ -286,7 +287,7 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                                 child: Container(
                                   height: m.prior * 60,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
+                                    color: core_theme.AC.td,
                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                                   ),
                                 ),
@@ -296,10 +297,10 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                                 child: Container(
                                   height: m.current * 60,
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       begin: Alignment.bottomCenter,
                                       end: Alignment.topCenter,
-                                      colors: [Color(0xFFD4AF37), Color(0xFFE6C200)],
+                                      colors: [core_theme.AC.gold, Color(0xFFE6C200)],
                                     ),
                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                                   ),
@@ -310,7 +311,7 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                           const SizedBox(height: 6),
                           Text(m.label, style: const TextStyle(fontSize: 10)),
                           Text('${m.current.toStringAsFixed(1)}M',
-                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                         ],
                       ),
                     ),
@@ -322,9 +323,9 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _legendDot(Colors.grey.shade400, 'السنة السابقة'),
+              _legendDot(core_theme.AC.td, 'السنة السابقة'),
               const SizedBox(width: 20),
-              _legendDot(const Color(0xFFD4AF37), 'الحالي'),
+              _legendDot(core_theme.AC.gold, 'الحالي'),
             ],
           ),
         ],
@@ -343,12 +344,12 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
   }
 
   Widget _buildSegmentMix() {
-    final segments = const [
-      _Seg('ERP', 8500000, Color(0xFFD4AF37)),
+    final segments = [
+      _Seg('ERP', 8500000, core_theme.AC.gold),
       _Seg('المراجعة', 4200000, Color(0xFF4A148C)),
-      _Seg('الاستشارات', 3100000, Colors.blue),
-      _Seg('السوق الرقمي', 1850000, Colors.teal),
-      _Seg('الامتثال', 850000, Colors.green),
+      _Seg('الاستشارات', 3100000, core_theme.AC.info),
+      _Seg('السوق الرقمي', 1850000, core_theme.AC.info),
+      _Seg('الامتثال', 850000, core_theme.AC.ok),
     ];
     final total = segments.fold(0.0, (s, x) => s + x.value);
     return Container(
@@ -356,12 +357,12 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('مزيج الإيرادات حسب القطاع',
+          Text('مزيج الإيرادات حسب القطاع',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 20),
           for (final seg in segments) ...[
@@ -378,13 +379,13 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: seg.color)),
                 const SizedBox(width: 10),
                 Text(_fmtM(seg.value),
-                    style: const TextStyle(fontSize: 12, color: Colors.black87, fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 12, color: core_theme.AC.tp, fontFamily: 'monospace')),
               ],
             ),
             const SizedBox(height: 6),
             LinearProgressIndicator(
               value: seg.value / total,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: core_theme.AC.bdr,
               valueColor: AlwaysStoppedAnimation(seg.color),
               minHeight: 6,
             ),
@@ -412,12 +413,12 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('خريطة مخاطر المؤسسة',
+          Text('خريطة مخاطر المؤسسة',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
           Wrap(
@@ -450,7 +451,7 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(r.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                            Text(r.note, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.3)),
+                            Text(r.note, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.3)),
                           ],
                         ),
                       ),
@@ -474,24 +475,24 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
   }
 
   Widget _buildStrategicInitiatives() {
-    final initiatives = const [
+    final initiatives = [
       _Init('التوسع في UAE', 68, 'Q3 2026', const Color(0xFF006C35)),
-      _Init('رقمنة إقرارات ZATCA', 92, 'Q2 2026', const Color(0xFFD4AF37)),
-      _Init('منتج Marketplace الجديد', 45, 'Q4 2026', Colors.blue),
-      _Init('حصول على SOC2 Type II', 82, 'Q2 2026', Colors.purple),
-      _Init('استهداف عملاء FT 100', 38, 'Q1 2027', Colors.teal),
+      _Init('رقمنة إقرارات ZATCA', 92, 'Q2 2026', core_theme.AC.gold),
+      _Init('منتج Marketplace الجديد', 45, 'Q4 2026', core_theme.AC.info),
+      _Init('حصول على SOC2 Type II', 82, 'Q2 2026', core_theme.AC.purple),
+      _Init('استهداف عملاء FT 100', 38, 'Q1 2027', core_theme.AC.info),
     ];
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('المبادرات الاستراتيجية 2026',
+          Text('المبادرات الاستراتيجية 2026',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
           for (final i in initiatives)
@@ -511,7 +512,7 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                         Container(
                           height: 24,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: core_theme.AC.navy3,
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
@@ -539,7 +540,7 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text('الهدف: ${i.target}',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                   ),
                 ],
               ),
@@ -550,27 +551,27 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
   }
 
   Widget _buildKeyAlerts() {
-    final alerts = const [
+    final alerts = [
       _Alert('فرصة', 'عميل أرامكو ناقش عقد توسعة 3.2M ر.س',
-          'الخطوة: اجتماع CFO الأسبوع القادم', Colors.green, Icons.trending_up),
+          'الخطوة: اجتماع CFO الأسبوع القادم', core_theme.AC.ok, Icons.trending_up),
       _Alert('تنبيه', 'عقد SAP License ينتهي بعد 12 يوم',
-          'الخطوة: التفاوض على التجديد', Colors.orange, Icons.schedule),
+          'الخطوة: التفاوض على التجديد', core_theme.AC.warn, Icons.schedule),
       _Alert('مخاطر', 'معدل تسرّب الموظفين وصل 9% — فوق معيار الصناعة',
-          'الخطوة: مراجعة سياسة المكافآت مع المجلس', Colors.red, Icons.warning),
+          'الخطوة: مراجعة سياسة المكافآت مع المجلس', core_theme.AC.err, Icons.warning),
       _Alert('تقدم', 'تمّ اعتماد CbCR 2025 من ZATCA',
-          'إنجاز: في الموعد بدون تحفظات', Colors.blue, Icons.check_circle),
+          'إنجاز: في الموعد بدون تحفظات', core_theme.AC.info, Icons.check_circle),
     ];
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('تنبيهات تنفيذية رئيسية',
+          Text('تنبيهات تنفيذية رئيسية',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 12),
           for (final a in alerts)
@@ -605,7 +606,7 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(a.headline, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                        Text(a.action, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(a.action, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
@@ -624,13 +625,13 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
   Color _riskColor(String level) {
     switch (level) {
       case 'high':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'medium':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'low':
-        return Colors.green;
+        return core_theme.AC.ok;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

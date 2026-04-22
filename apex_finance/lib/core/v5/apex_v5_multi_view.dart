@@ -16,6 +16,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 enum V5ViewMode { list, kanban, calendar, gantt, pivot, gallery, map }
 
@@ -27,7 +28,7 @@ class V5ViewModeInfo {
   const V5ViewModeInfo(this.icon, this.labelAr, this.labelEn);
 }
 
-const Map<V5ViewMode, V5ViewModeInfo> v5ViewModeInfo = {
+final Map<V5ViewMode, V5ViewModeInfo> v5ViewModeInfo = {
   V5ViewMode.list: V5ViewModeInfo(Icons.view_list, 'قائمة', 'List'),
   V5ViewMode.kanban: V5ViewModeInfo(Icons.view_kanban, 'كانبان', 'Kanban'),
   V5ViewMode.calendar: V5ViewModeInfo(Icons.calendar_month, 'تقويم', 'Calendar'),
@@ -59,7 +60,7 @@ class ApexV5ViewSwitcher extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         border: Border(
-          bottom: BorderSide(color: Colors.black.withOpacity(0.06)),
+          bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06)),
         ),
       ),
       child: Row(
@@ -102,10 +103,10 @@ class _ViewModeButtonState extends State<_ViewModeButton> {
   Widget build(BuildContext context) {
     final info = v5ViewModeInfo[widget.mode]!;
     final color = widget.isActive
-        ? const Color(0xFFD4AF37)
+        ? core_theme.AC.gold
         : _hover
-            ? Colors.black87
-            : Colors.black54;
+            ? core_theme.AC.tp
+            : core_theme.AC.ts;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -118,13 +119,13 @@ class _ViewModeButtonState extends State<_ViewModeButton> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? const Color(0xFFD4AF37).withOpacity(0.12)
+                ? core_theme.AC.gold.withOpacity(0.12)
                 : _hover
-                    ? Colors.black.withOpacity(0.04)
+                    ? core_theme.AC.tp.withOpacity(0.04)
                     : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             border: widget.isActive
-                ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4))
+                ? Border.all(color: core_theme.AC.gold.withOpacity(0.4))
                 : null,
           ),
           child: Row(
@@ -223,11 +224,11 @@ class _ApexV5MultiViewState<T> extends State<ApexV5MultiView<T>> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(info.icon, size: 48, color: Colors.black26),
+            Icon(info.icon, size: 48, color: core_theme.AC.td),
             const SizedBox(height: 10),
             Text(
               'طريقة عرض "${info.labelAr}" غير مدعومة لهذه الشاشة',
-              style: const TextStyle(fontSize: 13, color: Colors.black54),
+              style: TextStyle(fontSize: 13, color: core_theme.AC.ts),
             ),
           ],
         ),

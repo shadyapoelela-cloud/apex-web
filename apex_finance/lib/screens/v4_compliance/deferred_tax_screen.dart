@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class DeferredTaxScreen extends StatefulWidget {
   const DeferredTaxScreen({super.key});
@@ -54,7 +55,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF4A148C),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF4A148C),
           tabs: const [
             Tab(icon: Icon(Icons.compare_arrows, size: 16), text: 'الفروقات المؤقتة'),
@@ -88,21 +89,21 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
         children: [
           const Icon(Icons.account_balance_wallet, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('الضريبة المؤجلة — IAS 12',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Deferred Tax · DTA / DTL · الفروقات المؤقتة بين الأرباح المحاسبية والضريبية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text('معدل الضريبة', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              Text('معدل الضريبة', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
               Text('${_taxRate.toStringAsFixed(0)}%',
                   style: const TextStyle(color: Color(0xFFFFD700), fontSize: 28, fontWeight: FontWeight.w900)),
             ],
@@ -119,13 +120,13 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -141,28 +142,28 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     Expanded(flex: 3, child: Text('البند', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 2, child: Text('القيمة الدفترية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 2, child: Text('القاعدة الضريبية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 2, child: Text('الفرق المؤقت', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('النوع', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(flex: 2, child: Text('DTA/DTL', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(flex: 2, child: Text('DTA/DTL', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                   ],
                 ),
               ),
               for (final d in _differences) _diffRow(d),
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade50,
+                color: core_theme.AC.navy3,
                 child: Row(
                   children: [
                     const Expanded(flex: 7, child: Text('الإجمالي', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13))),
@@ -179,7 +180,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
                               fontSize: 14,
                               fontWeight: FontWeight.w900,
                               fontFamily: 'monospace',
-                              color: _net >= 0 ? Colors.orange : Colors.green)),
+                              color: _net >= 0 ? core_theme.AC.warn : core_theme.AC.ok)),
                     ),
                   ],
                 ),
@@ -197,7 +198,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
       ),
       child: Row(
         children: [
@@ -207,7 +208,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(d.account, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                Text(d.reason, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(d.reason, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -223,13 +224,13 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (isTaxable ? Colors.orange : Colors.green).withOpacity(0.12),
+                color: (isTaxable ? core_theme.AC.warn : core_theme.AC.ok).withOpacity(0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(isTaxable ? 'خاضع' : 'قابل للخصم',
                   style: TextStyle(
                     fontSize: 9,
-                    color: isTaxable ? Colors.orange : Colors.green,
+                    color: isTaxable ? core_theme.AC.warn : core_theme.AC.ok,
                     fontWeight: FontWeight.w800,
                   ),
                   textAlign: TextAlign.center),
@@ -243,7 +244,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
                 fontSize: 13,
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.w800,
-                color: isTaxable ? Colors.orange : Colors.green,
+                color: isTaxable ? core_theme.AC.warn : core_theme.AC.ok,
               ),
             ),
           ),
@@ -262,7 +263,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Colors.orange, Color(0xFFFF7043)]),
+                  gradient: LinearGradient(colors: [core_theme.AC.warn, Color(0xFFFF7043)]),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
@@ -280,10 +281,10 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
                     Text(_fmt(_dtl),
                         style: const TextStyle(
                             color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-                    const Text('ر.س', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    Text('ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                     const SizedBox(height: 8),
                     Text('من فروقات خاضعة للضريبة: ${_fmt(_taxable)} × ${_taxRate.toStringAsFixed(0)}%',
-                        style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                   ],
                 ),
               ),
@@ -293,7 +294,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Colors.green.shade600, Colors.green.shade400]),
+                  gradient: LinearGradient(colors: [core_theme.AC.ok, core_theme.AC.ok]),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
@@ -311,10 +312,10 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
                     Text(_fmt(_dta),
                         style: const TextStyle(
                             color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-                    const Text('ر.س', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    Text('ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                     const SizedBox(height: 8),
                     Text('من فروقات قابلة للخصم: ${_fmt(_deductible)} × ${_taxRate.toStringAsFixed(0)}%',
-                        style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                   ],
                 ),
               ),
@@ -340,7 +341,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
                 _net >= 0 ? '+${_fmt(_net)}' : _fmt(_net),
                 style: const TextStyle(color: Color(0xFFFFD700), fontSize: 28, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
               ),
-              const Text(' ر.س', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(' ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
             ],
           ),
         ),
@@ -348,16 +349,16 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.amber.shade50,
+            color: core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.amber.shade200),
+            border: Border.all(color: core_theme.AC.warn),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.rule, color: Colors.amber),
+                  Icon(Icons.rule, color: core_theme.AC.warn),
                   SizedBox(width: 8),
                   Text('قيد الاعتراف المقترح',
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
@@ -382,14 +383,14 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
-                color: debit ? Colors.green : Colors.orange,
+                color: debit ? core_theme.AC.ok : core_theme.AC.warn,
                 fontFamily: 'monospace',
               )),
           const SizedBox(width: 10),
           Expanded(child: Text(label, style: const TextStyle(fontSize: 12))),
           Text(_fmt(value),
-              style: const TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w800, fontFamily: 'monospace', color: Color(0xFFD4AF37))),
+              style: TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w800, fontFamily: 'monospace', color: core_theme.AC.gold)),
         ],
       ),
     );
@@ -409,7 +410,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -423,32 +424,32 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
                 ],
               ),
               const SizedBox(height: 16),
-              _reconRow('الربح المحاسبي قبل الضريبة', accountingProfit, Colors.black87),
-              _reconRow('+ فروقات دائمة (مصروفات غير معترف بها)', permanentDifferences, Colors.orange),
-              _reconRow('- فروقات مؤقتة خاضعة', _taxable, Colors.orange, subtract: true),
-              _reconRow('+ فروقات مؤقتة قابلة للخصم', _deductible, Colors.green),
+              _reconRow('الربح المحاسبي قبل الضريبة', accountingProfit, core_theme.AC.tp),
+              _reconRow('+ فروقات دائمة (مصروفات غير معترف بها)', permanentDifferences, core_theme.AC.warn),
+              _reconRow('- فروقات مؤقتة خاضعة', _taxable, core_theme.AC.warn, subtract: true),
+              _reconRow('+ فروقات مؤقتة قابلة للخصم', _deductible, core_theme.AC.ok),
               const Divider(),
-              _reconRow('الربح الخاضع للضريبة', taxableProfit, const Color(0xFFD4AF37), bold: true),
+              _reconRow('الربح الخاضع للضريبة', taxableProfit, core_theme.AC.gold, bold: true),
               const SizedBox(height: 16),
-              _reconRow('الضريبة الحالية (${_taxRate.toStringAsFixed(0)}%)', currentTax, Colors.blue, bold: true),
-              _reconRow('+ الضريبة المؤجلة', _net, _net >= 0 ? Colors.orange : Colors.green),
+              _reconRow('الضريبة الحالية (${_taxRate.toStringAsFixed(0)}%)', currentTax, core_theme.AC.info, bold: true),
+              _reconRow('+ الضريبة المؤجلة', _net, _net >= 0 ? core_theme.AC.warn : core_theme.AC.ok),
               const Divider(),
               _reconRow('إجمالي مصروف الضريبة', currentTax + _net, const Color(0xFF4A148C), bold: true),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37).withOpacity(0.1),
+                  color: core_theme.AC.gold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('المعدل الفعلي للضريبة',
+                    Text('المعدل الفعلي للضريبة',
                         style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                     Text('${effectiveRate.toStringAsFixed(2)}%',
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
                   ],
                 ),
               ),
@@ -469,7 +470,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
               style: TextStyle(
                 fontSize: bold ? 14 : 12,
                 fontWeight: bold ? FontWeight.w900 : FontWeight.w500,
-                color: Colors.black87,
+                color: core_theme.AC.tp,
               )),
           Text(
             '${subtract ? '-' : ''}${_fmt(value)}',

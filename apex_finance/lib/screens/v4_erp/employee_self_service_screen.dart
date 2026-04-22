@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class EmployeeSelfServiceScreen extends StatefulWidget {
   const EmployeeSelfServiceScreen({super.key});
@@ -84,7 +85,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
                 Text('مرحباً ${_employee.name} 👋',
                     style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('${_employee.title} · ${_employee.role}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -106,14 +107,14 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(Icons.celebration, color: Color(0xFFFFD700), size: 16),
                     SizedBox(width: 6),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('تاريخ التعيين', style: TextStyle(color: Colors.white70, fontSize: 10)),
+                        Text('تاريخ التعيين', style: TextStyle(color: core_theme.AC.ts, fontSize: 10)),
                         Text('8 سنوات · مارس 2018',
                             style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                       ],
@@ -131,23 +132,23 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
   Widget _miniInfo(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 13, color: Colors.white70),
+        Icon(icon, size: 13, color: core_theme.AC.ts),
         const SizedBox(width: 4),
-        Text(text, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+        Text(text, style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
       ],
     );
   }
 
   Widget _buildQuickActions() {
-    final actions = const [
-      _QA('طلب إجازة', Icons.event_available, Colors.blue),
-      _QA('مطالبة مصروفات', Icons.receipt, Colors.orange),
-      _QA('شهادة راتب', Icons.description, Colors.green),
-      _QA('تعديل بياناتي', Icons.edit, Colors.purple),
-      _QA('قسيمة الراتب', Icons.payments, Color(0xFFD4AF37)),
-      _QA('فحص GOSI', Icons.health_and_safety, Colors.teal),
-      _QA('تعليمات الشركة', Icons.menu_book, Colors.indigo),
-      _QA('قائمة الزملاء', Icons.people, Colors.pink),
+    final actions = [
+      _QA('طلب إجازة', Icons.event_available, core_theme.AC.info),
+      _QA('مطالبة مصروفات', Icons.receipt, core_theme.AC.warn),
+      _QA('شهادة راتب', Icons.description, core_theme.AC.ok),
+      _QA('تعديل بياناتي', Icons.edit, core_theme.AC.purple),
+      _QA('قسيمة الراتب', Icons.payments, core_theme.AC.gold),
+      _QA('فحص GOSI', Icons.health_and_safety, core_theme.AC.info),
+      _QA('تعليمات الشركة', Icons.menu_book, core_theme.AC.purple),
+      _QA('قائمة الزملاء', Icons.people, core_theme.AC.err),
     ];
     return Row(
       children: [
@@ -192,7 +193,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,18 +205,18 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
               const Expanded(
                 child: Text('أرصدة الإجازات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               ),
-              TextButton(onPressed: () {}, child: const Text('عرض الكل', style: TextStyle(fontSize: 11))),
+              TextButton(onPressed: () {}, child: Text('عرض الكل', style: TextStyle(fontSize: 11))),
             ],
           ),
           const SizedBox(height: 10),
-          _leaveBalance('سنوية', 22, 6, Colors.blue),
-          _leaveBalance('مرضية', 30, 3, Colors.orange),
-          _leaveBalance('اضطرارية', 5, 0, Colors.purple),
+          _leaveBalance('سنوية', 22, 6, core_theme.AC.info),
+          _leaveBalance('مرضية', 30, 3, core_theme.AC.warn),
+          _leaveBalance('اضطرارية', 5, 0, core_theme.AC.purple),
           const SizedBox(height: 10),
-          const Text('الطلبات المعلّقة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+          Text('الطلبات المعلّقة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
-          _leaveRequest('LVE-2026-012', 'إجازة سنوية', '2026-05-15 إلى 2026-05-25', 'بانتظار الاعتماد', Colors.orange),
-          _leaveRequest('LVE-2026-008', 'إجازة مرضية', '2026-04-20 (يوم واحد)', 'معتمد', Colors.green),
+          _leaveRequest('LVE-2026-012', 'إجازة سنوية', '2026-05-15 إلى 2026-05-25', 'بانتظار الاعتماد', core_theme.AC.warn),
+          _leaveRequest('LVE-2026-008', 'إجازة مرضية', '2026-04-20 (يوم واحد)', 'معتمد', core_theme.AC.ok),
         ],
       ),
     );
@@ -262,7 +263,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('$type · $dates', style: const TextStyle(fontSize: 11)),
-                Text(id, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                Text(id, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -288,14 +289,14 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.payments, color: Color(0xFFD4AF37)),
+              Icon(Icons.payments, color: core_theme.AC.gold),
               const SizedBox(width: 8),
               const Expanded(
                 child: Text('قسائم الراتب', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
@@ -303,7 +304,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
               TextButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.download, size: 14),
-                label: const Text('كلها', style: TextStyle(fontSize: 11)),
+                label: Text('كلها', style: TextStyle(fontSize: 11)),
               ),
             ],
           ),
@@ -311,18 +312,18 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+              gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('صافي راتب أبريل', style: TextStyle(color: Colors.white70, fontSize: 11)),
-                const Text('24,370 ر.س',
+                Text('صافي راتب أبريل', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
+                Text('24,370 ر.س',
                     style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
                 const SizedBox(height: 4),
-                const Text('تحويل مجدول: 2026-05-01',
-                    style: TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'monospace')),
+                Text('تحويل مجدول: 2026-05-01',
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 11, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -332,20 +333,20 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: core_theme.AC.navy3,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.description, size: 14, color: Colors.black54),
+                  Icon(Icons.description, size: 14, color: core_theme.AC.ts),
                   const SizedBox(width: 6),
                   Expanded(child: Text(s.month, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
                   Text('${_fmt(s.net.toDouble())} ر.س',
-                      style: const TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                      style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
                   const SizedBox(width: 8),
                   IconButton(
-                    icon: const Icon(Icons.download, size: 16, color: Color(0xFFD4AF37)),
+                    icon: Icon(Icons.download, size: 16, color: core_theme.AC.gold),
                     onPressed: () {},
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
@@ -371,14 +372,14 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.verified, color: Colors.green),
+              Icon(Icons.verified, color: core_theme.AC.ok),
               SizedBox(width: 8),
               Text('طلب شهادات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -389,29 +390,29 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: core_theme.AC.navy3,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   Icon(c.hasIssued ? Icons.check_circle : Icons.radio_button_unchecked,
-                      color: c.hasIssued ? Colors.green : Colors.black45, size: 18),
+                      color: c.hasIssued ? core_theme.AC.ok : core_theme.AC.td, size: 18),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(c.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                        Text(c.lastIssue, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text(c.lastIssue, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
                   ElevatedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.request_page, size: 12),
-                    label: const Text('طلب', style: TextStyle(fontSize: 11)),
+                    label: Text('طلب', style: TextStyle(fontSize: 11)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade600,
+                      backgroundColor: core_theme.AC.ok,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       minimumSize: const Size(0, 28),
@@ -426,26 +427,26 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
   }
 
   Widget _buildTeam() {
-    final team = const [
-      _Teammate('سارة الدوسري', 'محاسبة أولى', 'متاحة', Colors.green),
-      _Teammate('محمد القحطاني', 'مدقق داخلي', 'في اجتماع', Colors.orange),
-      _Teammate('نورة الغامدي', 'محللة ضرائب', 'متاحة', Colors.green),
-      _Teammate('فهد الشمري', 'محاسب', 'في إجازة', Colors.grey),
-      _Teammate('لينا البكري', 'مسؤولة موارد بشرية', 'متاحة', Colors.green),
+    final team = [
+      _Teammate('سارة الدوسري', 'محاسبة أولى', 'متاحة', core_theme.AC.ok),
+      _Teammate('محمد القحطاني', 'مدقق داخلي', 'في اجتماع', core_theme.AC.warn),
+      _Teammate('نورة الغامدي', 'محللة ضرائب', 'متاحة', core_theme.AC.ok),
+      _Teammate('فهد الشمري', 'محاسب', 'في إجازة', core_theme.AC.td),
+      _Teammate('لينا البكري', 'مسؤولة موارد بشرية', 'متاحة', core_theme.AC.ok),
     ];
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.people, color: Colors.pink),
+              Icon(Icons.people, color: core_theme.AC.err),
               SizedBox(width: 8),
               Text('فريقي', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -456,7 +457,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: core_theme.AC.navy3,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -465,9 +466,9 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
                     children: [
                       CircleAvatar(
                         radius: 14,
-                        backgroundColor: Colors.pink.withOpacity(0.15),
+                        backgroundColor: core_theme.AC.err.withOpacity(0.15),
                         child: Text(t.name.substring(0, 1),
-                            style: const TextStyle(color: Colors.pink, fontSize: 12, fontWeight: FontWeight.w900)),
+                            style: TextStyle(color: core_theme.AC.err, fontSize: 12, fontWeight: FontWeight.w900)),
                       ),
                       Positioned(
                         right: 0,
@@ -486,7 +487,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(t.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                        Text(t.role, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text(t.role, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
@@ -494,7 +495,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
                       style: TextStyle(fontSize: 10, color: t.statusColor, fontWeight: FontWeight.w700)),
                   const SizedBox(width: 8),
                   IconButton(
-                    icon: const Icon(Icons.chat, size: 14, color: Colors.pink),
+                    icon: Icon(Icons.chat, size: 14, color: core_theme.AC.err),
                     onPressed: () {},
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(minWidth: 24, minHeight: 24),

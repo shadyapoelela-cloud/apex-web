@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CostCentersScreen extends StatefulWidget {
   const CostCentersScreen({super.key});
@@ -17,17 +18,17 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
   String _view = 'summary';
   _CostCenter? _selectedCenter;
 
-  final _centers = const [
+  final _centers = [
     _CostCenter('CC-100', 'المبيعات', 'Sales', 6_200_000, 3_800_000, 18, Color(0xFF1A237E)),
-    _CostCenter('CC-200', 'التسويق', 'Marketing', 1_200_000, 1_420_000, 8, Colors.purple),
-    _CostCenter('CC-300', 'الإنتاج', 'Production', 3_800_000, 2_250_000, 42, Colors.orange),
+    _CostCenter('CC-200', 'التسويق', 'Marketing', 1_200_000, 1_420_000, 8, core_theme.AC.purple),
+    _CostCenter('CC-300', 'الإنتاج', 'Production', 3_800_000, 2_250_000, 42, core_theme.AC.warn),
     _CostCenter('CC-400', 'البحث والتطوير', 'R&D', 0, 2_100_000, 22, Color(0xFF4A148C)),
-    _CostCenter('CC-500', 'تقنية المعلومات', 'IT', 0, 1_280_000, 18, Colors.blue),
-    _CostCenter('CC-600', 'المالية', 'Finance', 0, 890_000, 12, Color(0xFFD4AF37)),
-    _CostCenter('CC-700', 'الموارد البشرية', 'HR', 0, 620_000, 8, Colors.teal),
-    _CostCenter('CC-800', 'خدمة العملاء', 'Customer Service', 1_850_000, 980_000, 15, Colors.green),
-    _CostCenter('CC-900', 'القانونية والامتثال', 'Legal', 0, 540_000, 5, Colors.indigo),
-    _CostCenter('CC-950', 'الإدارة العليا', 'Executive', 0, 1_250_000, 6, Colors.red),
+    _CostCenter('CC-500', 'تقنية المعلومات', 'IT', 0, 1_280_000, 18, core_theme.AC.info),
+    _CostCenter('CC-600', 'المالية', 'Finance', 0, 890_000, 12, core_theme.AC.gold),
+    _CostCenter('CC-700', 'الموارد البشرية', 'HR', 0, 620_000, 8, core_theme.AC.info),
+    _CostCenter('CC-800', 'خدمة العملاء', 'Customer Service', 1_850_000, 980_000, 15, core_theme.AC.ok),
+    _CostCenter('CC-900', 'القانونية والامتثال', 'Legal', 0, 540_000, 5, core_theme.AC.purple),
+    _CostCenter('CC-950', 'الإدارة العليا', 'Executive', 0, 1_250_000, 6, core_theme.AC.err),
   ];
 
   final _lineItems = const [
@@ -75,14 +76,14 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
         children: [
           const Icon(Icons.pie_chart, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('تحليل مراكز التكلفة',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Cost Center Analysis — ربحية كل قسم، توزيع المصروفات، ضوابط الموازنة',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -115,11 +116,11 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
     final directCenters = _centers.where((c) => c.revenue > 0).length;
     return Row(
       children: [
-        _kpi('إجمالي الإيرادات', _fmtM(totalRevenue), const Color(0xFFD4AF37), Icons.trending_up),
-        _kpi('إجمالي التكاليف', _fmtM(totalCost), Colors.orange, Icons.trending_down),
-        _kpi('صافي الربح', _fmtM(totalRevenue - totalCost), Colors.green, Icons.savings),
-        _kpi('مراكز مباشرة', '$directCenters / ${_centers.length}', Colors.blue, Icons.hub),
-        _kpi('إجمالي الموظفين', '$totalHC', Colors.teal, Icons.people),
+        _kpi('إجمالي الإيرادات', _fmtM(totalRevenue), core_theme.AC.gold, Icons.trending_up),
+        _kpi('إجمالي التكاليف', _fmtM(totalCost), core_theme.AC.warn, Icons.trending_down),
+        _kpi('صافي الربح', _fmtM(totalRevenue - totalCost), core_theme.AC.ok, Icons.savings),
+        _kpi('مراكز مباشرة', '$directCenters / ${_centers.length}', core_theme.AC.info, Icons.hub),
+        _kpi('إجمالي الموظفين', '$totalHC', core_theme.AC.info, Icons.people),
       ],
     );
   }
@@ -142,7 +143,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -175,17 +176,17 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF006064) : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: selected ? const Color(0xFF006064) : Colors.black26),
+          border: Border.all(color: selected ? const Color(0xFF006064) : core_theme.AC.td),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: selected ? Colors.white : Colors.black54),
+            Icon(icon, size: 14, color: selected ? Colors.white : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(label,
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: selected ? Colors.white : Colors.black87)),
+                    color: selected ? Colors.white : core_theme.AC.tp)),
           ],
         ),
       ),
@@ -197,13 +198,13 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            color: Colors.grey.shade100,
+            color: core_theme.AC.navy3,
             child: const Row(
               children: [
                 Expanded(child: Text('الرقم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -230,7 +231,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
         color: _selectedCenter?.id == c.id ? const Color(0xFF006064).withOpacity(0.05) : null,
       ),
       child: Row(
@@ -247,7 +248,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(c.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                      Text(c.nameEn, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text(c.nameEn, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     ],
                   ),
                 ),
@@ -258,12 +259,12 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
           Expanded(
             flex: 2,
             child: Text(isDirect ? _fmt(c.revenue) : '—',
-                style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Color(0xFFD4AF37), fontWeight: FontWeight.w700)),
+                style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.gold, fontWeight: FontWeight.w700)),
           ),
           Expanded(
             flex: 2,
             child: Text(_fmt(c.cost),
-                style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.orange, fontWeight: FontWeight.w700)),
+                style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.warn, fontWeight: FontWeight.w700)),
           ),
           Expanded(
             flex: 2,
@@ -272,7 +273,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
                     fontSize: 13,
                     fontFamily: 'monospace',
                     fontWeight: FontWeight.w900,
-                    color: (isDirect ? profit : -c.cost) >= 0 ? Colors.green : Colors.red)),
+                    color: (isDirect ? profit : -c.cost) >= 0 ? core_theme.AC.ok : core_theme.AC.err)),
           ),
           Expanded(
             child: isDirect
@@ -280,17 +281,17 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     margin: const EdgeInsets.only(left: 4),
                     decoration: BoxDecoration(
-                      color: (margin >= 20 ? Colors.green : margin >= 0 ? Colors.orange : Colors.red).withOpacity(0.12),
+                      color: (margin >= 20 ? core_theme.AC.ok : margin >= 0 ? core_theme.AC.warn : core_theme.AC.err).withOpacity(0.12),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text('${margin.toStringAsFixed(1)}%',
                         style: TextStyle(
                             fontSize: 11,
-                            color: margin >= 20 ? Colors.green : margin >= 0 ? Colors.orange : Colors.red,
+                            color: margin >= 20 ? core_theme.AC.ok : margin >= 0 ? core_theme.AC.warn : core_theme.AC.err,
                             fontWeight: FontWeight.w800),
                         textAlign: TextAlign.center),
                   )
-                : const Text('مساند', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                : Text('مساند', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ),
           SizedBox(
             width: 80,
@@ -300,7 +301,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 minimumSize: const Size(0, 28),
               ),
-              child: const Text('تفاصيل', style: TextStyle(fontSize: 11)),
+              child: Text('تفاصيل', style: TextStyle(fontSize: 11)),
             ),
           ),
         ],
@@ -339,7 +340,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
                   Text(_fmtM(c.cost),
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
                   Text('${c.headcount} موظف · ${((c.cost / maxCost) * 100).toStringAsFixed(0)}%',
-                      style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                      style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ],
               ),
             ),
@@ -356,12 +357,12 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('ترتيب مراكز التكلفة المباشرة بالربحية',
+          Text('ترتيب مراكز التكلفة المباشرة بالربحية',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
           for (final c in direct) _profitabilityBar(c, direct.first.revenue - direct.first.cost),
@@ -384,7 +385,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(c.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(c.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                Text(c.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -393,14 +394,14 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
               children: [
                 Container(
                   height: 30,
-                  decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)),
+                  decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(4)),
                 ),
                 FractionallySizedBox(
                   widthFactor: pct,
                   heightFactor: 1,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: profit >= 0 ? Colors.green : Colors.red,
+                      color: profit >= 0 ? core_theme.AC.ok : core_theme.AC.err,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Center(
@@ -448,7 +449,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('${c.id} · ${c.name}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
-                    Text(c.nameEn, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                    Text(c.nameEn, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -461,15 +462,15 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              _drillKpi('الإيرادات', _fmtM(c.revenue), const Color(0xFFD4AF37)),
-              _drillKpi('التكلفة', _fmtM(c.cost), Colors.orange),
-              _drillKpi('الربح/الخسارة', _fmtM(profit), profit >= 0 ? Colors.green : Colors.red),
-              _drillKpi('الموظفون', '${c.headcount}', Colors.blue),
-              _drillKpi('تكلفة/موظف', _fmtM(c.cost / c.headcount), Colors.teal),
+              _drillKpi('الإيرادات', _fmtM(c.revenue), core_theme.AC.gold),
+              _drillKpi('التكلفة', _fmtM(c.cost), core_theme.AC.warn),
+              _drillKpi('الربح/الخسارة', _fmtM(profit), profit >= 0 ? core_theme.AC.ok : core_theme.AC.err),
+              _drillKpi('الموظفون', '${c.headcount}', core_theme.AC.info),
+              _drillKpi('تكلفة/موظف', _fmtM(c.cost / c.headcount), core_theme.AC.info),
             ],
           ),
           const SizedBox(height: 20),
-          const Text('تفصيل مصروفات المركز', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+          Text('تفصيل مصروفات المركز', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
           const SizedBox(height: 12),
           for (final item in _lineItems) _lineItemRow(item, c.cost),
         ],
@@ -489,7 +490,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
           ],
         ),
@@ -503,14 +504,14 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
-          Icon(_lineIcon(item.category), size: 16, color: Colors.black54),
+          Icon(_lineIcon(item.category), size: 16, color: core_theme.AC.ts),
           const SizedBox(width: 8),
           SizedBox(width: 140, child: Text(item.name, style: const TextStyle(fontSize: 12))),
           Expanded(
             child: LinearProgressIndicator(
               value: pct,
-              backgroundColor: Colors.grey.shade200,
-              valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)),
+              backgroundColor: core_theme.AC.bdr,
+              valueColor: AlwaysStoppedAnimation(core_theme.AC.gold),
               minHeight: 6,
             ),
           ),
@@ -521,7 +522,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
           SizedBox(
             width: 50,
             child: Text('${(pct * 100).toStringAsFixed(1)}%',
-                style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ),
         ],
       ),

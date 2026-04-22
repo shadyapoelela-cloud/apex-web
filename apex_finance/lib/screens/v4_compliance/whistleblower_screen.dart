@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class WhistleblowerScreen extends StatefulWidget {
   const WhistleblowerScreen({super.key});
@@ -47,7 +48,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF4A148C),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF4A148C),
           tabs: const [
             Tab(icon: Icon(Icons.inbox, size: 16), text: 'البلاغات'),
@@ -77,7 +78,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
         gradient: const LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF6A1B9A)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.shield_moon, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -88,7 +89,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
                 Text('خط البلاغات الأخلاقية',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Whistleblower Hotline · حماية المبلّغين · تحقيق محايد · سرّي 100%',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -106,10 +107,10 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('بلاغات مستلمة YTD', '${_reports.length}', Colors.blue, Icons.mail),
-          _kpi('قيد التحقيق', '$active', Colors.orange, Icons.search),
-          _kpi('ثبتت صحتها', '$substantiated', Colors.red, Icons.check_circle),
-          _kpi('لم تثبت', '$unsubstantiated', Colors.green, Icons.cancel),
+          _kpi('بلاغات مستلمة YTD', '${_reports.length}', core_theme.AC.info, Icons.mail),
+          _kpi('قيد التحقيق', '$active', core_theme.AC.warn, Icons.search),
+          _kpi('ثبتت صحتها', '$substantiated', core_theme.AC.err, Icons.check_circle),
+          _kpi('لم تثبت', '$unsubstantiated', core_theme.AC.ok, Icons.cancel),
           _kpi('مجهولة الهوية', '$anonymous / ${_reports.length}', const Color(0xFF4A148C), Icons.visibility_off),
         ],
       ),
@@ -134,7 +135,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -181,7 +182,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
                       children: [
                         Row(
                           children: [
-                            Text(r.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w700, color: Colors.black54)),
+                            Text(r.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w700, color: core_theme.AC.ts)),
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -192,7 +193,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
                             const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                              decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                               child: Text(_categoryLabel(r.category),
                                   style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                             ),
@@ -217,19 +218,19 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
                         Text(r.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                         Row(
                           children: [
-                            const Icon(Icons.schedule, size: 11, color: Colors.black54),
+                            Icon(Icons.schedule, size: 11, color: core_theme.AC.ts),
                             const SizedBox(width: 3),
                             Text('استُلم: ${r.receivedAt}',
-                                style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                                style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                             const SizedBox(width: 14),
-                            const Icon(Icons.fact_check, size: 11, color: Colors.black54),
+                            Icon(Icons.fact_check, size: 11, color: core_theme.AC.ts),
                             const SizedBox(width: 3),
                             Text('أُسند: ${r.assignedAt}',
-                                style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                                style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                             const SizedBox(width: 14),
-                            const Icon(Icons.group, size: 11, color: Colors.black54),
+                            Icon(Icons.group, size: 11, color: core_theme.AC.ts),
                             const SizedBox(width: 3),
-                            Text(r.assignee, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                            Text(r.assignee, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                           ],
                         ),
                       ],
@@ -258,13 +259,13 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
   }
 
   Widget _buildChannelsTab() {
-    final channels = const [
-      _Channel('خط ساخن سرّي 24/7', '+966-800-APEX-ETH', 'phone', Colors.blue, 'متاح 24 ساعة · مكالمة مشفّرة · دون تسجيل رقم'),
-      _Channel('بريد إلكتروني آمن', 'ethics@apex-secure.sa', 'email', Colors.green, 'تشفير PGP · فتح فقط بيد فريق الامتثال المستقل'),
-      _Channel('بوابة ويب سرّية', 'ethics.apex.sa', 'web', Colors.purple, 'بدون تسجيل دخول · IP غير مُسجّل · نموذج مشفّر'),
-      _Channel('صندوق بريدي فعلي', 'ص.ب 99123 · الرياض', 'mail', Colors.orange, 'بريد ورقي · لا فتح إلا بواسطة رئيس لجنة الأخلاقيات'),
-      _Channel('طرف ثالث مستقل', 'EthicsPoint by NAVEX', 'third-party', Colors.red, 'خدمة مستقلة · لا اتصال مباشر بالشركة'),
-      _Channel('شخصي لرئيس اللجنة', 'موعد سرّي عند الطلب', 'in-person', Colors.teal, 'في مكان خارج المنشأة · موعد مشفّر'),
+    final channels = [
+      _Channel('خط ساخن سرّي 24/7', '+966-800-APEX-ETH', 'phone', core_theme.AC.info, 'متاح 24 ساعة · مكالمة مشفّرة · دون تسجيل رقم'),
+      _Channel('بريد إلكتروني آمن', 'ethics@apex-secure.sa', 'email', core_theme.AC.ok, 'تشفير PGP · فتح فقط بيد فريق الامتثال المستقل'),
+      _Channel('بوابة ويب سرّية', 'ethics.apex.sa', 'web', core_theme.AC.purple, 'بدون تسجيل دخول · IP غير مُسجّل · نموذج مشفّر'),
+      _Channel('صندوق بريدي فعلي', 'ص.ب 99123 · الرياض', 'mail', core_theme.AC.warn, 'بريد ورقي · لا فتح إلا بواسطة رئيس لجنة الأخلاقيات'),
+      _Channel('طرف ثالث مستقل', 'EthicsPoint by NAVEX', 'third-party', core_theme.AC.err, 'خدمة مستقلة · لا اتصال مباشر بالشركة'),
+      _Channel('شخصي لرئيس اللجنة', 'موعد سرّي عند الطلب', 'in-person', core_theme.AC.info, 'في مكان خارج المنشأة · موعد مشفّر'),
     ];
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -272,13 +273,13 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.security, color: Colors.blue),
+              Icon(Icons.security, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -318,11 +319,11 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
                           style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w800, color: c.color, fontFamily: 'monospace')),
                       const SizedBox(height: 6),
-                      Text(c.description, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.5)),
+                      Text(c.description, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.5)),
                     ],
                   ),
                 ),
-                Icon(Icons.lock, color: Colors.green.shade700, size: 24),
+                Icon(Icons.lock, color: core_theme.AC.ok, size: 24),
               ],
             ),
           ),
@@ -339,7 +340,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,16 +374,16 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.green.shade50,
+            color: core_theme.AC.ok,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.green.shade200),
+            border: Border.all(color: core_theme.AC.ok),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.verified, color: Colors.green),
+                  Icon(Icons.verified, color: core_theme.AC.ok),
                   SizedBox(width: 8),
                   Text('معتمد من', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                 ],
@@ -407,7 +408,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
         children: [
           Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
           const SizedBox(height: 4),
-          Text(detail, style: const TextStyle(fontSize: 12, height: 1.6, color: Colors.black54)),
+          Text(detail, style: TextStyle(fontSize: 12, height: 1.6, color: core_theme.AC.ts)),
         ],
       ),
     );
@@ -418,10 +419,10 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(approved ? Icons.check_circle : Icons.warning, size: 16, color: approved ? Colors.green : Colors.orange),
+          Icon(approved ? Icons.check_circle : Icons.warning, size: 16, color: approved ? core_theme.AC.ok : core_theme.AC.warn),
           const SizedBox(width: 8),
           Expanded(child: Text(name, style: const TextStyle(fontSize: 12))),
-          Text(date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+          Text(date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
         ],
       ),
     );
@@ -472,15 +473,15 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
   Color _severityColor(String s) {
     switch (s) {
       case 'critical':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'high':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'medium':
-        return Colors.amber.shade700;
+        return core_theme.AC.warn;
       case 'low':
-        return Colors.blue;
+        return core_theme.AC.info;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -502,15 +503,15 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
   Color _statusColor(String s) {
     switch (s) {
       case 'investigating':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'substantiated':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'unsubstantiated':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'closed':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.blue;
+        return core_theme.AC.info;
     }
   }
 

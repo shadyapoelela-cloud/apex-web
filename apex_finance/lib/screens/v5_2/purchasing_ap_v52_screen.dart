@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class PurchasingApV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class PurchasingApV52Screen extends StatefulWidget {
 }
 
 class _PurchasingApV52ScreenState extends State<PurchasingApV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _bills = <_Bill>[
@@ -47,11 +48,11 @@ class _PurchasingApV52ScreenState extends State<PurchasingApV52Screen> {
         SavedView(id: 'disputed', labelAr: 'نزاعات', icon: Icons.gavel, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'pendingApproval', labelAr: 'قيد الاعتماد', color: Colors.orange, count: _count(_S.pendingApproval), active: _filter == 'pendingApproval'),
-        FilterChipDef(id: 'approved', labelAr: 'معتمد', color: Colors.blue, count: _count(_S.approved), active: _filter == 'approved'),
-        FilterChipDef(id: 'paid', labelAr: 'مدفوع', color: Colors.green, count: _count(_S.paid), active: _filter == 'paid'),
-        FilterChipDef(id: 'overdue', labelAr: 'متأخّر', color: Colors.red, count: _count(_S.overdue), active: _filter == 'overdue'),
-        FilterChipDef(id: 'disputed', labelAr: 'متنازع', color: Colors.purple, count: _count(_S.disputed), active: _filter == 'disputed'),
+        FilterChipDef(id: 'pendingApproval', labelAr: 'قيد الاعتماد', color: core_theme.AC.warn, count: _count(_S.pendingApproval), active: _filter == 'pendingApproval'),
+        FilterChipDef(id: 'approved', labelAr: 'معتمد', color: core_theme.AC.info, count: _count(_S.approved), active: _filter == 'approved'),
+        FilterChipDef(id: 'paid', labelAr: 'مدفوع', color: core_theme.AC.ok, count: _count(_S.paid), active: _filter == 'paid'),
+        FilterChipDef(id: 'overdue', labelAr: 'متأخّر', color: core_theme.AC.err, count: _count(_S.overdue), active: _filter == 'overdue'),
+        FilterChipDef(id: 'disputed', labelAr: 'متنازع', color: core_theme.AC.purple, count: _count(_S.disputed), active: _filter == 'disputed'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -81,16 +82,16 @@ class _PurchasingApV52ScreenState extends State<PurchasingApV52Screen> {
               const SizedBox(width: 12),
               Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Text(b.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                  Text(b.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                   const SizedBox(width: 8),
-                  Text('← ${b.po}', style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black38)),
+                  Text('← ${b.po}', style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.td)),
                 ]),
                 Text(b.vendor, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
               ])),
-              Expanded(child: Text('${b.amount.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy), textAlign: TextAlign.end)),
+              Expanded(child: Text('${b.amount.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy), textAlign: TextAlign.end)),
               const SizedBox(width: 20),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('تاريخ الاستحقاق', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                Text('تاريخ الاستحقاق', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 Text(b.dueDate, style: const TextStyle(fontSize: 11)),
               ]),
               const SizedBox(width: 16),
@@ -114,29 +115,29 @@ class _PurchasingApV52ScreenState extends State<PurchasingApV52Screen> {
         return Container(
           width: 290,
           margin: const EdgeInsets.only(left: 10),
-          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Container(width: 8, height: 8, decoration: BoxDecoration(color: s.color, shape: BoxShape.circle)),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
-                Text('${(total / 1e3).toStringAsFixed(0)}K ر.س', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('${(total / 1e3).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
               Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
             ...items.map((b) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(b.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+                Text(b.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                 Text(b.vendor, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Row(children: [
-                  Text('${(b.amount / 1e3).toStringAsFixed(0)}K', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
+                  Text('${(b.amount / 1e3).toStringAsFixed(0)}K', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
                   const Spacer(),
-                  Text(b.dueDate, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(b.dueDate, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ]),
               ]),
             )),
@@ -154,7 +155,7 @@ class _PurchasingApV52ScreenState extends State<PurchasingApV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('توزّع فواتير الموردين حسب الحالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توزّع فواتير الموردين حسب الحالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         ...statuses.map((s) {
           final value = totals[s]!;
@@ -162,7 +163,7 @@ class _PurchasingApV52ScreenState extends State<PurchasingApV52Screen> {
           return Padding(padding: const EdgeInsets.only(bottom: 14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [Text(s.labelAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)), const Spacer(), Text('${value.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.color))]),
             const SizedBox(height: 4),
-            ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: Colors.grey.shade100, color: s.color)),
+            ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: core_theme.AC.navy3, color: s.color)),
           ]));
         }),
       ]),
@@ -181,11 +182,11 @@ extension _SX on _S {
         _S.disputed => 'متنازع',
       };
   Color get color => switch (this) {
-        _S.pendingApproval => Colors.orange,
-        _S.approved => Colors.blue,
-        _S.paid => Colors.green,
-        _S.overdue => Colors.red,
-        _S.disputed => Colors.purple,
+        _S.pendingApproval => core_theme.AC.warn,
+        _S.approved => core_theme.AC.info,
+        _S.paid => core_theme.AC.ok,
+        _S.overdue => core_theme.AC.err,
+        _S.disputed => core_theme.AC.purple,
       };
 }
 

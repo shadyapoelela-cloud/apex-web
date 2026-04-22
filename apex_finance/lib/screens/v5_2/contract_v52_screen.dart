@@ -2,13 +2,14 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/object_page_template.dart';
 
 class ContractV52Screen extends StatelessWidget {
   const ContractV52Screen({super.key});
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class ContractV52Screen extends StatelessWidget {
       titleAr: 'عقد CTR-2026-042',
       subtitleAr: 'توريد وصيانة معدات IT · مجموعة الخليج للتوريدات · 2.8M ر.س',
       statusLabelAr: 'نشط',
-      statusColor: Colors.green,
+      statusColor: core_theme.AC.ok,
       processStages: const [
         ProcessStage(labelAr: 'مسودة'),
         ProcessStage(labelAr: 'قيد التفاوض'),
@@ -25,21 +26,21 @@ class ContractV52Screen extends StatelessWidget {
         ProcessStage(labelAr: 'منتهي'),
       ],
       processCurrentIndex: 3,
-      smartButtons: const [
+      smartButtons: [
         SmartButton(icon: Icons.description, labelAr: 'ملاحق', count: 3, color: _navy),
         SmartButton(icon: Icons.shopping_cart, labelAr: 'أوامر شراء', count: 12, color: _gold),
-        SmartButton(icon: Icons.payments, labelAr: 'مدفوعات', count: 8, color: Colors.green),
-        SmartButton(icon: Icons.verified, labelAr: 'موافقات', count: 5, color: Colors.blue),
-        SmartButton(icon: Icons.gavel, labelAr: 'نزاعات', count: 0, color: Colors.red),
+        SmartButton(icon: Icons.payments, labelAr: 'مدفوعات', count: 8, color: core_theme.AC.ok),
+        SmartButton(icon: Icons.verified, labelAr: 'موافقات', count: 5, color: core_theme.AC.info),
+        SmartButton(icon: Icons.gavel, labelAr: 'نزاعات', count: 0, color: core_theme.AC.err),
       ],
       primaryActions: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.picture_as_pdf, size: 16), label: const Text('PDF')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.picture_as_pdf, size: 16), label: Text('PDF')),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: () {},
           style: FilledButton.styleFrom(backgroundColor: _gold),
           icon: const Icon(Icons.add_circle, size: 16),
-          label: const Text('إضافة ملحق'),
+          label: Text('إضافة ملحق'),
         ),
       ],
       tabs: [
@@ -62,12 +63,12 @@ class ContractV52Screen extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: const [
+        Row(children: [
           Expanded(child: _Kpi(label: 'قيمة العقد', value: '2.8M', unit: 'ر.س', color: _gold, icon: Icons.attach_money)),
           SizedBox(width: 10),
-          Expanded(child: _Kpi(label: 'المنفذ حتى الآن', value: '62%', unit: '', color: Colors.green, icon: Icons.check_circle)),
+          Expanded(child: _Kpi(label: 'المنفذ حتى الآن', value: '62%', unit: '', color: core_theme.AC.ok, icon: Icons.check_circle)),
           SizedBox(width: 10),
-          Expanded(child: _Kpi(label: 'تبقّى', value: '240', unit: 'يوم', color: Colors.blue, icon: Icons.schedule)),
+          Expanded(child: _Kpi(label: 'تبقّى', value: '240', unit: 'يوم', color: core_theme.AC.info, icon: Icons.schedule)),
           SizedBox(width: 10),
           Expanded(child: _Kpi(label: 'درجة الأداء', value: '4.7', unit: '/5', color: _navy, icon: Icons.star)),
         ]),
@@ -111,14 +112,14 @@ class ContractV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (ctx, i) => Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(sections[i].$1, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+          Text(sections[i].$1, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(height: 8),
           ...sections[i].$2.map((item) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3),
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Icon(Icons.circle, size: 5, color: _gold),
+                  Icon(Icons.circle, size: 5, color: _gold),
                   const SizedBox(width: 8),
                   Expanded(child: Text(item, style: const TextStyle(fontSize: 12, height: 1.5))),
                 ]),
@@ -149,11 +150,11 @@ class ContractV52Screen extends StatelessWidget {
               Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(color: m.$3 ? _gold : Colors.grey.shade200, shape: BoxShape.circle),
-                child: Icon(m.$4, color: m.$3 ? Colors.white : Colors.grey.shade500, size: 16),
+                decoration: BoxDecoration(color: m.$3 ? _gold : core_theme.AC.bdr, shape: BoxShape.circle),
+                child: Icon(m.$4, color: m.$3 ? Colors.white : core_theme.AC.td, size: 16),
               ),
               if (i < milestones.length - 1)
-                Expanded(child: Container(width: 2, color: m.$3 ? _gold.withOpacity(0.3) : Colors.grey.shade300, margin: const EdgeInsets.symmetric(vertical: 4))),
+                Expanded(child: Container(width: 2, color: m.$3 ? _gold.withOpacity(0.3) : core_theme.AC.bdr, margin: const EdgeInsets.symmetric(vertical: 4))),
             ]),
             const SizedBox(width: 16),
             Expanded(
@@ -161,13 +162,13 @@ class ContractV52Screen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: m.$3 ? _gold.withOpacity(0.06) : Colors.grey.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: m.$3 ? _gold.withOpacity(0.3) : Colors.grey.shade200)),
+                  decoration: BoxDecoration(color: m.$3 ? _gold.withOpacity(0.06) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(8), border: Border.all(color: m.$3 ? _gold.withOpacity(0.3) : core_theme.AC.bdr)),
                   child: Row(children: [
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(m.$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                      Text(m.$1, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                      Text(m.$1, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     ])),
-                    if (m.$3) const Icon(Icons.check_circle, color: Colors.green, size: 18),
+                    if (m.$3) Icon(Icons.check_circle, color: core_theme.AC.ok, size: 18),
                   ]),
                 ),
               ),
@@ -184,31 +185,31 @@ class ContractV52Screen extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Colors.orange.withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.orange.withOpacity(0.3))),
-          child: const Row(children: [
-            Icon(Icons.autorenew, color: Colors.orange, size: 28),
+          decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.warn.withOpacity(0.3))),
+          child: Row(children: [
+            Icon(Icons.autorenew, color: core_theme.AC.warn, size: 28),
             SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('تاريخ انتهاء العقد: 2026-12-31', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-              Text('تبقى 240 يوم — يُنصح بالتقييم قبل 90 يوم من الانتهاء', style: TextStyle(fontSize: 12, color: Colors.black54)),
+              Text('تبقى 240 يوم — يُنصح بالتقييم قبل 90 يوم من الانتهاء', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
             ])),
           ]),
         ),
         const SizedBox(height: 16),
         Row(children: [
-          Expanded(child: FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.autorenew), label: const Text('تجديد العقد لسنة'))),
+          Expanded(child: FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.autorenew), label: Text('تجديد العقد لسنة'))),
           const SizedBox(width: 10),
-          Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.edit), label: const Text('إعادة التفاوض'))),
+          Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.edit), label: Text('إعادة التفاوض'))),
           const SizedBox(width: 10),
-          Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.close), label: const Text('عدم التجديد'))),
+          Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.close), label: Text('عدم التجديد'))),
         ]),
         const SizedBox(height: 20),
-        const Text('مؤشرات التقييم:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
+        Text('مؤشرات التقييم:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 10),
-        _metric('التزام المواعيد', 0.94, Colors.green, '94%'),
+        _metric('التزام المواعيد', 0.94, core_theme.AC.ok, '94%'),
         _metric('جودة المنتجات', 0.88, _gold, '88%'),
-        _metric('جودة الخدمة', 0.96, Colors.green, '96%'),
-        _metric('دقة الفواتير', 0.98, Colors.blue, '98%'),
+        _metric('جودة الخدمة', 0.96, core_theme.AC.ok, '96%'),
+        _metric('دقة الفواتير', 0.98, core_theme.AC.info, '98%'),
       ]),
     );
   }
@@ -219,7 +220,7 @@ class ContractV52Screen extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [Text(label, style: const TextStyle(fontSize: 12)), const Spacer(), Text(pct, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color))]),
         const SizedBox(height: 3),
-        ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: value, minHeight: 6, backgroundColor: Colors.grey.shade200, color: color)),
+        ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: value, minHeight: 6, backgroundColor: core_theme.AC.bdr, color: color)),
       ]),
     );
   }
@@ -240,16 +241,16 @@ class ContractV52Screen extends StatelessWidget {
         final s = sigs[i];
         return Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: s.$5 ? Colors.green.withOpacity(0.3) : Colors.grey.shade300)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: s.$5 ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.bdr)),
           child: Row(children: [
-            CircleAvatar(backgroundColor: _gold.withOpacity(0.15), child: Text(s.$2[0], style: const TextStyle(color: _gold, fontWeight: FontWeight.w800))),
+            CircleAvatar(backgroundColor: _gold.withOpacity(0.15), child: Text(s.$2[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-              Text('${s.$1} · ${s.$3}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
-              Text('تاريخ التوقيع: ${s.$4}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('${s.$1} · ${s.$3}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
+              Text('تاريخ التوقيع: ${s.$4}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ])),
-            if (s.$5) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: const Row(children: [Icon(Icons.check_circle, size: 12, color: Colors.green), SizedBox(width: 4), Text('موقّع', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.green))])),
+            if (s.$5) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Row(children: [Icon(Icons.check_circle, size: 12, color: core_theme.AC.ok), SizedBox(width: 4), Text('موقّع', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))])),
           ]),
         );
       },
@@ -257,12 +258,12 @@ class ContractV52Screen extends StatelessWidget {
   }
 
   Widget _docs() {
-    const docs = [
-      ('العقد الأصلي.pdf', '2.4 MB', '2026-01-15', Icons.picture_as_pdf, Colors.red),
-      ('الملحق رقم 1 - توسع النطاق.pdf', '840 KB', '2026-03-10', Icons.picture_as_pdf, Colors.red),
-      ('الملحق رقم 2 - تعديل الأسعار.pdf', '640 KB', '2026-04-05', Icons.picture_as_pdf, Colors.red),
-      ('ضمان الأداء البنكي.pdf', '320 KB', '2026-01-20', Icons.picture_as_pdf, Colors.red),
-      ('شهادة التأمين.pdf', '480 KB', '2026-01-22', Icons.picture_as_pdf, Colors.red),
+    final docs = [
+      ('العقد الأصلي.pdf', '2.4 MB', '2026-01-15', Icons.picture_as_pdf, core_theme.AC.err),
+      ('الملحق رقم 1 - توسع النطاق.pdf', '840 KB', '2026-03-10', Icons.picture_as_pdf, core_theme.AC.err),
+      ('الملحق رقم 2 - تعديل الأسعار.pdf', '640 KB', '2026-04-05', Icons.picture_as_pdf, core_theme.AC.err),
+      ('ضمان الأداء البنكي.pdf', '320 KB', '2026-01-20', Icons.picture_as_pdf, core_theme.AC.err),
+      ('شهادة التأمين.pdf', '480 KB', '2026-01-22', Icons.picture_as_pdf, core_theme.AC.err),
     ];
     return ListView.separated(
       padding: const EdgeInsets.all(24),
@@ -270,13 +271,13 @@ class ContractV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (ctx, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(children: [
           Icon(docs[i].$4, color: docs[i].$5, size: 24),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(docs[i].$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-            Text('${docs[i].$2} · رُفع ${docs[i].$3}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${docs[i].$2} · رُفع ${docs[i].$3}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           IconButton(icon: const Icon(Icons.visibility), onPressed: () {}),
           IconButton(icon: const Icon(Icons.download), onPressed: () {}),
@@ -288,19 +289,19 @@ class ContractV52Screen extends StatelessWidget {
   Widget _card(String title, Widget child) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]),
     );
   }
 
-  Widget _kv(String k, String v) => SizedBox(width: 200, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: const TextStyle(fontSize: 11, color: Colors.black54)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
+  Widget _kv(String k, String v) => SizedBox(width: 200, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
 
   Widget _bullet(String k, String v) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(children: [
-          const Icon(Icons.circle, size: 6, color: _gold),
+          Icon(Icons.circle, size: 6, color: _gold),
           const SizedBox(width: 8),
-          SizedBox(width: 140, child: Text(k, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 140, child: Text(k, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Expanded(child: Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
         ]),
       );

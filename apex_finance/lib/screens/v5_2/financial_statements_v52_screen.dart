@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class FinancialStatementsV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class FinancialStatementsV52Screen extends StatefulWidget {
 }
 
 class _FinancialStatementsV52ScreenState extends State<FinancialStatementsV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   String _statement = 'bs';
 
@@ -34,8 +35,8 @@ class _FinancialStatementsV52ScreenState extends State<FinancialStatementsV52Scr
       filterChips: [
         FilterChipDef(id: 'bs', labelAr: 'الميزانية', icon: Icons.balance, color: _navy, active: _statement == 'bs'),
         FilterChipDef(id: 'is', labelAr: 'الأرباح والخسائر', icon: Icons.trending_up, color: _gold, active: _statement == 'is'),
-        FilterChipDef(id: 'cf', labelAr: 'التدفقات النقدية', icon: Icons.water_drop, color: Colors.blue, active: _statement == 'cf'),
-        FilterChipDef(id: 'eq', labelAr: 'حقوق الملكية', icon: Icons.donut_large, color: Colors.green, active: _statement == 'eq'),
+        FilterChipDef(id: 'cf', labelAr: 'التدفقات النقدية', icon: Icons.water_drop, color: core_theme.AC.info, active: _statement == 'cf'),
+        FilterChipDef(id: 'eq', labelAr: 'حقوق الملكية', icon: Icons.donut_large, color: core_theme.AC.ok, active: _statement == 'eq'),
       ],
       onFilterToggle: (id) => setState(() => _statement = id),
       onCreateNew: () {},
@@ -170,16 +171,16 @@ class _FinancialStatementsV52ScreenState extends State<FinancialStatementsV52Scr
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(width: 10),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(4)), child: const Text('IFRS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.green))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.1), borderRadius: BorderRadius.circular(4)), child: Text('IFRS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
           const Spacer(),
-          OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.download, size: 14), label: const Text('تصدير')),
+          OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.download, size: 14), label: Text('تصدير')),
         ]),
         const SizedBox(height: 16),
         Expanded(
           child: Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
             child: Column(children: [
               Container(
                 padding: const EdgeInsets.all(10),
@@ -200,14 +201,14 @@ class _FinancialStatementsV52ScreenState extends State<FinancialStatementsV52Scr
                     return Container(
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: r.$5 ? 10 : 6),
                       decoration: BoxDecoration(
-                        color: r.$5 ? Colors.grey.shade100 : (r.$6 ? _gold.withOpacity(0.05) : null),
-                        border: r.$6 ? Border(top: BorderSide(color: _gold, width: 1.5), bottom: BorderSide(color: _gold, width: 0.5)) : Border(bottom: BorderSide(color: Colors.grey.shade100)),
+                        color: r.$5 ? core_theme.AC.navy3 : (r.$6 ? _gold.withOpacity(0.05) : null),
+                        border: r.$6 ? Border(top: BorderSide(color: _gold, width: 1.5), bottom: BorderSide(color: _gold, width: 0.5)) : Border(bottom: BorderSide(color: core_theme.AC.navy3)),
                       ),
                       child: Row(children: [
-                        Expanded(flex: 3, child: Text(r.$1, style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$5 || r.$6 ? FontWeight.w800 : FontWeight.w500, color: r.$5 || r.$6 ? _navy : Colors.black87))),
+                        Expanded(flex: 3, child: Text(r.$1, style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$5 || r.$6 ? FontWeight.w800 : FontWeight.w500, color: r.$5 || r.$6 ? _navy : core_theme.AC.tp))),
                         Expanded(child: Text(r.$2 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, fontFamily: 'monospace'), textAlign: TextAlign.end)),
-                        Expanded(child: Text(r.$3 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, fontFamily: 'monospace', color: Colors.black54), textAlign: TextAlign.end)),
-                        Expanded(child: Text(r.$4 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, color: (r.$4 ?? '').contains('-') ? Colors.red : Colors.green), textAlign: TextAlign.end)),
+                        Expanded(child: Text(r.$3 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, fontFamily: 'monospace', color: core_theme.AC.ts), textAlign: TextAlign.end)),
+                        Expanded(child: Text(r.$4 ?? '', style: TextStyle(fontSize: r.$5 || r.$6 ? 13 : 12, fontWeight: r.$6 ? FontWeight.w800 : FontWeight.w500, color: (r.$4 ?? '').contains('-') ? core_theme.AC.err : core_theme.AC.ok), textAlign: TextAlign.end)),
                       ]),
                     );
                   },
@@ -224,7 +225,7 @@ class _FinancialStatementsV52ScreenState extends State<FinancialStatementsV52Scr
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('الإيرادات vs الأرباح — 4 أرباع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('الإيرادات vs الأرباح — 4 أرباع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         ...[
           ('Q2 2025', 14.8, 3.4),
@@ -235,17 +236,17 @@ class _FinancialStatementsV52ScreenState extends State<FinancialStatementsV52Scr
               Text(q.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               const SizedBox(height: 6),
               Row(children: [
-                SizedBox(width: 80, child: Text('الإيرادات', style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
-                Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: q.$2 / 20, minHeight: 14, backgroundColor: Colors.grey.shade200, color: _navy))),
+                SizedBox(width: 80, child: Text('الإيرادات', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
+                Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: q.$2 / 20, minHeight: 14, backgroundColor: core_theme.AC.bdr, color: _navy))),
                 const SizedBox(width: 10),
-                Text('${q.$2}M ر.س', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _navy)),
+                Text('${q.$2}M ر.س', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _navy)),
               ]),
               const SizedBox(height: 4),
               Row(children: [
-                SizedBox(width: 80, child: Text('صافي الربح', style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
-                Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: q.$3 / 20, minHeight: 14, backgroundColor: Colors.grey.shade200, color: _gold))),
+                SizedBox(width: 80, child: Text('صافي الربح', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
+                Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: q.$3 / 20, minHeight: 14, backgroundColor: core_theme.AC.bdr, color: _gold))),
                 const SizedBox(width: 10),
-                Text('${q.$3}M ر.س', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
+                Text('${q.$3}M ر.س', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
               ]),
             ]))),
       ]),

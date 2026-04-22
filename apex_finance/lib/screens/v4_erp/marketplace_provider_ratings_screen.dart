@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 138 — Marketplace Provider Ratings & Reviews
 class MarketplaceProviderRatingsScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'نظرة عامة'), Tab(text: 'التقييمات'), Tab(text: 'التحليلات'), Tab(text: 'الرد على المراجعات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_overviewTab(), _reviewsTab(), _analyticsTab(), _respondTab()])),
       ])),
@@ -30,10 +31,10 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
   }
 
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
-    decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFBF8F00)])),
+    decoration: BoxDecoration(gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFBF8F00)])),
     child: Row(children: [
-      const CircleAvatar(radius: 30, backgroundColor: Colors.white,
-        child: Text('4.9', style: TextStyle(color: Color(0xFFD4AF37), fontSize: 22, fontWeight: FontWeight.bold))),
+      CircleAvatar(radius: 30, backgroundColor: Colors.white,
+        child: Text('4.9', style: TextStyle(color: core_theme.AC.gold, fontSize: 22, fontWeight: FontWeight.bold))),
       const SizedBox(width: 16),
       const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('التقييمات والمراجعات', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
@@ -52,7 +53,7 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
   );
 
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
-    Expanded(child: _kpi('متوسط', '4.9/5', Icons.star, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('متوسط', '4.9/5', Icons.star, core_theme.AC.gold)),
     Expanded(child: _kpi('عدد المراجعات', '128', Icons.reviews, const Color(0xFF1A237E))),
     Expanded(child: _kpi('5 نجوم', '88%', Icons.thumb_up, const Color(0xFF2E7D32))),
     Expanded(child: _kpi('معدل الرد', '100%', Icons.reply, const Color(0xFF4A148C))),
@@ -62,13 +63,13 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
   Widget _overviewTab() => ListView(padding: const EdgeInsets.all(14), children: [
     Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('توزيع التقييمات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFFD4AF37))),
+      Text('توزيع التقييمات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: core_theme.AC.gold)),
       const SizedBox(height: 12),
       _distrBar('5 ★', 113, 128),
       _distrBar('4 ★', 11, 128),
@@ -78,7 +79,7 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
     ]))),
     const SizedBox(height: 14),
     Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('أعلى الكلمات المستخدمة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4A148C))),
+      Text('أعلى الكلمات المستخدمة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4A148C))),
       const SizedBox(height: 12),
       Wrap(spacing: 8, runSpacing: 8, children: [
         _tag('احترافي', 48),
@@ -98,19 +99,19 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
     child: Row(children: [
       SizedBox(width: 40, child: Text(stars, style: const TextStyle(fontWeight: FontWeight.bold))),
       Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-        value: count / total, minHeight: 14, backgroundColor: Colors.black12,
-        valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37))))),
+        value: count / total, minHeight: 14, backgroundColor: core_theme.AC.bdr,
+        valueColor: AlwaysStoppedAnimation(core_theme.AC.gold)))),
       const SizedBox(width: 8),
       SizedBox(width: 40, child: Text('$count', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold), textAlign: TextAlign.end)),
     ]));
 
   Widget _tag(String word, int count) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    decoration: BoxDecoration(color: const Color(0xFFD4AF37).withValues(alpha: 0.2), borderRadius: BorderRadius.circular(16)),
+    decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(16)),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
       Text(word, style: const TextStyle(fontWeight: FontWeight.bold)),
       const SizedBox(width: 6),
-      Text('×$count', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+      Text('×$count', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
     ]),
   );
 
@@ -124,15 +125,15 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(r.author, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            Text('${r.company} • ${r.date}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('${r.company} • ${r.date}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ])),
           Row(children: List.generate(5, (s) => Icon(Icons.star,
-            color: s < r.rating ? const Color(0xFFD4AF37) : Colors.black12, size: 16))),
+            color: s < r.rating ? core_theme.AC.gold : core_theme.AC.bdr, size: 16))),
         ]),
         const SizedBox(height: 8),
         Text('"${r.text}"', style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
         const SizedBox(height: 6),
-        Text('المشروع: ${r.project}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('المشروع: ${r.project}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         if (r.response != null) ...[
           const SizedBox(height: 10),
           Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(
@@ -154,9 +155,9 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
 
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('📈 اتجاه التقييمات', 'متوسط 4.9/5 مستقر منذ 6 أشهر — لا تراجع', const Color(0xFF2E7D32)),
-    _insight('🎯 معدل التوصية (NPS)', '72 نقطة — "Leader" حسب المعيار العالمي', const Color(0xFFD4AF37)),
+    _insight('🎯 معدل التوصية (NPS)', '72 نقطة — "Leader" حسب المعيار العالمي', core_theme.AC.gold),
     _insight('💬 معدل الرد', '100% — نرد على كل مراجعة خلال 24 ساعة', const Color(0xFF4A148C)),
-    _insight('🌟 Top 3% على المنصة', 'ضمن أعلى 3% من المزوّدين في فئتنا', const Color(0xFFD4AF37)),
+    _insight('🌟 Top 3% على المنصة', 'ضمن أعلى 3% من المزوّدين في فئتنا', core_theme.AC.gold),
     _insight('📊 أداء الشهر', '12 مراجعة جديدة — كلها 5★', const Color(0xFF2E7D32)),
     _insight('⚠️ ملاحظات التحسين', 'عميلان طلبا إيصالات أسرع — تم تحسين النظام', const Color(0xFFE65100)),
   ]);
@@ -168,19 +169,19 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
         Row(children: [
           Expanded(child: Text(r.author, style: const TextStyle(fontWeight: FontWeight.bold))),
           Row(children: List.generate(5, (s) => Icon(Icons.star,
-            color: s < r.rating ? const Color(0xFFD4AF37) : Colors.black12, size: 14))),
+            color: s < r.rating ? core_theme.AC.gold : core_theme.AC.bdr, size: 14))),
         ]),
         const SizedBox(height: 6),
         Text('"${r.text}"', style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
         const SizedBox(height: 10),
         Row(children: [
           OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.smart_toy, size: 14),
-            label: const Text('اقتراح AI')),
+            label: Text('اقتراح AI')),
           const SizedBox(width: 8),
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.reply, size: 14),
-            label: const Text('رد'),
+            label: Text('رد'),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32), foregroundColor: Colors.white),
           ),
         ]),
@@ -192,7 +193,7 @@ class _MarketplaceProviderRatingsScreenState extends State<MarketplaceProviderRa
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   static const List<_Review> _reviews = [

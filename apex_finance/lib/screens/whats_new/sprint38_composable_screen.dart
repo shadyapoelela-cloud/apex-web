@@ -15,6 +15,7 @@ import '../../core/apex_notification_bell.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Sprint38ComposableScreen extends StatefulWidget {
   const Sprint38ComposableScreen({super.key});
@@ -178,7 +179,7 @@ class _Sprint38ComposableScreenState extends State<Sprint38ComposableScreen> {
           border: Border.all(color: AC.gold.withValues(alpha: 0.35)),
         ),
         child: Row(children: [
-          const Icon(Icons.view_quilt, color: Colors.amber, size: 32),
+          Icon(Icons.view_quilt, color: core_theme.AC.warn, size: 32),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
@@ -282,7 +283,7 @@ class _Sprint38ComposableScreenState extends State<Sprint38ComposableScreen> {
             const SizedBox(height: AppSpacing.sm),
             _bucket('31-60 يوم', 0.30, AC.gold),
             const SizedBox(height: AppSpacing.sm),
-            _bucket('61-90 يوم', 0.18, Colors.amber.shade700),
+            _bucket('61-90 يوم', 0.18, core_theme.AC.warn),
             const SizedBox(height: AppSpacing.sm),
             _bucket('> 90 يوم', 0.07, AC.err),
           ],

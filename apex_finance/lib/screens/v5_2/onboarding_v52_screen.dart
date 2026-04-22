@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/templates/form_wizard_template.dart';
 
@@ -32,8 +33,8 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
   bool _importedCoa = false;
   bool _addedUsers = false;
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   @override
   Widget build(BuildContext context) {
@@ -109,13 +110,13 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.06),
+              color: core_theme.AC.info.withOpacity(0.06),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue.withOpacity(0.2)),
+              border: Border.all(color: core_theme.AC.info.withOpacity(0.2)),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.blue, size: 18),
+                Icon(Icons.info_outline, color: core_theme.AC.info, size: 18),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -143,7 +144,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
         _dropdown('السنة المالية تبدأ من', 'يناير',
             const ['يناير', 'أبريل', 'يوليو', 'أكتوبر'], (_) {}),
         const SizedBox(height: 16),
-        const Text('طريقة المحاسبة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+        Text('طريقة المحاسبة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -162,8 +163,8 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('ما الوحدات التي ستستخدمها؟',
-              style: TextStyle(fontSize: 13, color: Colors.black54)),
+          Text('ما الوحدات التي ستستخدمها؟',
+              style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
           const SizedBox(height: 12),
           _moduleCheck(Icons.percent, 'ضريبة القيمة المضافة (VAT)', 'تتبع تلقائي للضريبة', _enabledVAT, (v) => setState(() => _enabledVAT = v!)),
           _moduleCheck(Icons.qr_code, 'ZATCA E-Invoicing', 'فوترة إلكترونية معتمدة من ZATCA', _enabledZatca, (v) => setState(() => _enabledZatca = v!)),
@@ -179,9 +180,9 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: value ? _gold.withOpacity(0.04) : Colors.grey.shade50,
+        color: value ? _gold.withOpacity(0.04) : core_theme.AC.navy3,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: value ? _gold : Colors.grey.shade300),
+        border: Border.all(color: value ? _gold : core_theme.AC.bdr),
       ),
       child: Row(
         children: [
@@ -199,7 +200,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                Text(sub, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(sub, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -214,8 +215,8 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('اختر طريقة إعداد دليل الحسابات:',
-            style: TextStyle(fontSize: 13, color: Colors.black54)),
+        Text('اختر طريقة إعداد دليل الحسابات:',
+            style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
         const SizedBox(height: 16),
         InkWell(
           onTap: () => setState(() => _importedCoa = true),
@@ -241,22 +242,22 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       decoration: BoxDecoration(
         color: selected ? _gold.withOpacity(0.06) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: selected ? _gold : Colors.grey.shade300, width: selected ? 2 : 1),
+        border: Border.all(color: selected ? _gold : core_theme.AC.bdr, width: selected ? 2 : 1),
       ),
       child: Row(
         children: [
-          Icon(icon, color: selected ? _gold : Colors.black54, size: 22),
+          Icon(icon, color: selected ? _gold : core_theme.AC.ts, size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: selected ? _navy : Colors.black87)),
-                Text(sub, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: selected ? _navy : core_theme.AC.tp)),
+                Text(sub, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
-          if (selected) const Icon(Icons.check_circle, color: _gold),
+          if (selected) Icon(Icons.check_circle, color: _gold),
         ],
       ),
     );
@@ -269,14 +270,14 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       children: [
         Row(
           children: [
-            const Expanded(
+            Expanded(
               child: Text('أضف أعضاء الفريق — لكل عضو صلاحيات مختلفة',
-                  style: TextStyle(fontSize: 13, color: Colors.black54)),
+                  style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
             ),
             OutlinedButton.icon(
               onPressed: () => setState(() => _addedUsers = true),
               icon: const Icon(Icons.add, size: 16),
-              label: const Text('إضافة مستخدم'),
+              label: Text('إضافة مستخدم'),
             ),
           ],
         ),
@@ -288,19 +289,19 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: core_theme.AC.navy3,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+              border: Border.all(color: core_theme.AC.bdr, style: BorderStyle.solid),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(Icons.group_add, size: 40, color: Colors.black38),
+                Icon(Icons.group_add, size: 40, color: core_theme.AC.td),
                 SizedBox(height: 8),
                 Text('لم تُضِف مستخدمين بعد',
-                    style: TextStyle(color: Colors.black54)),
+                    style: TextStyle(color: core_theme.AC.ts)),
                 SizedBox(height: 4),
                 Text('يمكنك تخطي هذه الخطوة وإضافتهم لاحقاً',
-                    style: TextStyle(fontSize: 11, color: Colors.black45)),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.td)),
               ],
             ),
           ),
@@ -316,13 +317,13 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Row(
         children: [
           CircleAvatar(
             backgroundColor: _gold.withOpacity(0.15),
-            child: Text(name.substring(0, 1), style: const TextStyle(color: _gold, fontWeight: FontWeight.w800)),
+            child: Text(name.substring(0, 1), style: TextStyle(color: _gold, fontWeight: FontWeight.w800)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -330,7 +331,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                Text('$role · $workspace', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('$role · $workspace', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -350,12 +351,12 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [_gold.withOpacity(0.1), Colors.green.withOpacity(0.08)],
+                colors: [_gold.withOpacity(0.1), core_theme.AC.ok.withOpacity(0.08)],
               ),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: _gold),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.celebration, color: _gold, size: 32),
                 SizedBox(width: 12),
@@ -367,7 +368,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
                       Text('راجع الإعدادات أدناه ثم اضغط "إتمام" لتفعيل النظام',
-                          style: TextStyle(fontSize: 12, color: Colors.black87)),
+                          style: TextStyle(fontSize: 12, color: core_theme.AC.tp)),
                     ],
                   ),
                 ),
@@ -404,18 +405,18 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
+          Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(height: 8),
           ...rows.map((r) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3),
                 child: Row(
                   children: [
-                    Expanded(child: Text(r.$1, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+                    Expanded(child: Text(r.$1, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
                     Text(r.$2, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   ],
                 ),
@@ -472,19 +473,19 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       decoration: BoxDecoration(
         color: selected ? _gold.withOpacity(0.06) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: selected ? _gold : Colors.grey.shade300, width: selected ? 2 : 1),
+        border: Border.all(color: selected ? _gold : core_theme.AC.bdr, width: selected ? 2 : 1),
       ),
       child: Row(
         children: [
           Icon(selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-              color: selected ? _gold : Colors.black38, size: 18),
+              color: selected ? _gold : core_theme.AC.td, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(sub, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(sub, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),

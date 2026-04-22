@@ -16,7 +16,7 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
-  <base href="/apex-web/">
+  <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -33,6 +33,30 @@
 
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- APEX: unregister stale service workers + purge caches on load (fix stale cache issues) -->
+  <script id="apex_sw_cleanup">
+    (function() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var r of regs) {
+            r.unregister().then(function(ok) {
+              if (ok) console.log('[APEX] Unregistered stale service worker');
+            });
+          }
+        }).catch(function(e) { console.warn('[APEX] SW cleanup failed:', e); });
+      }
+      if (window.caches && caches.keys) {
+        caches.keys().then(function(keys) {
+          for (var k of keys) {
+            caches.delete(k).then(function(ok) {
+              if (ok) console.log('[APEX] Deleted cache:', k);
+            });
+          }
+        }).catch(function(e) { console.warn('[APEX] cache cleanup failed:', e); });
+      }
+    })();
+  </script>
 
   <!-- APEX Pre-redirect: skip login if token exists (v6.5.2) -->
   <script id="apex_pre_redirect">

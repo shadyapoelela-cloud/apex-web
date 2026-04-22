@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ApexStudioScreen extends StatefulWidget {
   const ApexStudioScreen({super.key});
@@ -32,8 +33,8 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF7C3AED), Color(0xFFEC4899)],
+              gradient: LinearGradient(
+                colors: [core_theme.AC.purple, Color(0xFFEC4899)],
               ),
               borderRadius: BorderRadius.circular(14),
             ),
@@ -48,7 +49,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                   child: const Icon(Icons.architecture, color: Colors.white, size: 28),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -59,7 +60,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                       SizedBox(height: 4),
                       Text(
                         'أضف حقول · صمّم نماذج · اكتب workflows · من غير مبرمج',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                       ),
                     ],
                   ),
@@ -85,7 +86,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.1)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
             ),
             child: Row(
               children: [
@@ -115,10 +116,10 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: active ? const Color(0xFF7C3AED).withOpacity(0.1) : Colors.transparent,
+            color: active ? core_theme.AC.purple.withOpacity(0.1) : Colors.transparent,
             border: Border(
               bottom: BorderSide(
-                color: active ? const Color(0xFF7C3AED) : Colors.transparent,
+                color: active ? core_theme.AC.purple : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -129,7 +130,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
               Icon(
                 icon,
                 size: 18,
-                color: active ? const Color(0xFF7C3AED) : Colors.black54,
+                color: active ? core_theme.AC.purple : core_theme.AC.ts,
               ),
               const SizedBox(height: 4),
               Text(
@@ -137,7 +138,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: active ? FontWeight.w800 : FontWeight.w500,
-                  color: active ? const Color(0xFF7C3AED) : Colors.black54,
+                  color: active ? core_theme.AC.purple : core_theme.AC.ts,
                 ),
               ),
             ],
@@ -153,7 +154,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +171,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                 icon: const Icon(Icons.add, size: 14),
                 label: const Text('حقل جديد'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF7C3AED),
+                  backgroundColor: core_theme.AC.purple,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   textStyle: const TextStyle(fontSize: 12),
@@ -211,7 +212,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
   Widget _fieldList() {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -222,13 +223,13 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
               decoration: BoxDecoration(
                 border: Border(
                   bottom: i < _customFields.length - 1
-                      ? BorderSide(color: Colors.black.withOpacity(0.04))
+                      ? BorderSide(color: core_theme.AC.tp.withOpacity(0.04))
                       : BorderSide.none,
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.drag_handle, size: 14, color: Colors.black38),
+                  Icon(Icons.drag_handle, size: 14, color: core_theme.AC.td),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.all(6),
@@ -271,13 +272,13 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                         ),
                         Text(
                           '${_customFields[i].key} · ${_fieldTypeLabel(_customFields[i].type)}',
-                          style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace'),
+                          style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace'),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.edit, size: 14, color: Colors.black54),
+                    icon: Icon(Icons.edit, size: 14, color: core_theme.AC.ts),
                     onPressed: () {},
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
@@ -304,18 +305,18 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.remove_red_eye, size: 14, color: Color(0xFF7C3AED)),
+              Icon(Icons.remove_red_eye, size: 14, color: core_theme.AC.purple),
               SizedBox(width: 6),
               Text(
                 'المعاينة المباشرة',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF7C3AED)),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.purple),
               ),
             ],
           ),
@@ -326,7 +327,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,7 +344,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                           children: [
                             Text(
                               f.label,
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black54),
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: core_theme.AC.ts),
                             ),
                             if (f.required)
                               const Text(' *', style: TextStyle(fontSize: 11, color: Color(0xFFB91C1C))),
@@ -353,16 +354,16 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black.withOpacity(0.15)),
+                            border: Border.all(color: core_theme.AC.tp.withOpacity(0.15)),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
                             children: [
-                              Icon(_fieldTypeIcon(f.type), size: 12, color: Colors.black38),
+                              Icon(_fieldTypeIcon(f.type), size: 12, color: core_theme.AC.td),
                               const SizedBox(width: 6),
                               Text(
                                 f.type == _FieldType.dropdown ? 'اختر...' : 'أدخل ${f.label}',
-                                style: const TextStyle(fontSize: 11, color: Colors.black45),
+                                style: TextStyle(fontSize: 11, color: core_theme.AC.td),
                               ),
                             ],
                           ),
@@ -384,7 +385,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,30 +428,30 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF7C3AED).withOpacity(0.04),
+        color: core_theme.AC.purple.withOpacity(0.04),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF7C3AED).withOpacity(0.15)),
+        border: Border.all(color: core_theme.AC.purple.withOpacity(0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.play_arrow, size: 14, color: Color(0xFF7C3AED)),
+              Icon(Icons.play_arrow, size: 14, color: core_theme.AC.purple),
               const SizedBox(width: 6),
               Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               const Spacer(),
               Switch(
                 value: true,
                 onChanged: (_) {},
-                activeColor: const Color(0xFF7C3AED),
+                activeColor: core_theme.AC.purple,
               ),
             ],
           ),
           const SizedBox(height: 6),
-          _rulePart('IF', trigger, const Color(0xFF2563EB)),
-          _rulePart('WHEN', condition, const Color(0xFFD97706)),
-          _rulePart('THEN', actions.join(' · '), const Color(0xFF059669)),
+          _rulePart('IF', trigger, core_theme.AC.info),
+          _rulePart('WHEN', condition, core_theme.AC.warn),
+          _rulePart('THEN', actions.join(' · '), core_theme.AC.ok),
         ],
       ),
     );
@@ -488,11 +489,11 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Icon(Icons.dashboard_customize, size: 48, color: Color(0xFF7C3AED)),
+          Icon(Icons.dashboard_customize, size: 48, color: core_theme.AC.purple),
           SizedBox(height: 12),
           Text(
             'Page Layout Editor',
@@ -501,14 +502,14 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
           SizedBox(height: 6),
           Text(
             'اسحب-أفلت الحقول لتغيير ترتيبها · اخفِ الحقول غير المستخدمة · ضع tooltips',
-            style: TextStyle(fontSize: 13, color: Colors.black54),
+            style: TextStyle(fontSize: 13, color: core_theme.AC.ts),
           ),
           SizedBox(height: 16),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
             child: Text(
               'ميزة متقدّمة — متاحة في Wave 26',
-              style: TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 12, color: core_theme.AC.warn, fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -522,7 +523,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -545,9 +546,9 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF059669).withOpacity(0.04),
+        color: core_theme.AC.ok.withOpacity(0.04),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF059669).withOpacity(0.15)),
+        border: Border.all(color: core_theme.AC.ok.withOpacity(0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -562,13 +563,13 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF059669)),
+                    border: Border.all(color: core_theme.AC.ok),
                   ),
                   child: Row(
                     children: [
                       Text(
                         '${i + 1}',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF059669)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok),
                       ),
                       const SizedBox(width: 6),
                       Text(steps[i], style: const TextStyle(fontSize: 11)),
@@ -576,9 +577,9 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                   ),
                 ),
                 if (i < steps.length - 1)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Icon(Icons.arrow_back, size: 12, color: Color(0xFF059669)),
+                    child: Icon(Icons.arrow_back, size: 12, color: core_theme.AC.ok),
                   ),
               ],
             ],
@@ -602,10 +603,10 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
 
   Color _fieldTypeColor(_FieldType t) {
     switch (t) {
-      case _FieldType.text: return const Color(0xFF2563EB);
-      case _FieldType.number: return const Color(0xFF059669);
-      case _FieldType.date: return const Color(0xFFD97706);
-      case _FieldType.dropdown: return const Color(0xFF7C3AED);
+      case _FieldType.text: return core_theme.AC.info;
+      case _FieldType.number: return core_theme.AC.ok;
+      case _FieldType.date: return core_theme.AC.warn;
+      case _FieldType.dropdown: return core_theme.AC.purple;
       case _FieldType.checkbox: return const Color(0xFFEC4899);
     }
   }

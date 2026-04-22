@@ -17,6 +17,7 @@ import '../../core/apex_sticky_toolbar.dart';
 import '../../core/apex_workflow_rules.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Sprint39ErpScreen extends StatefulWidget {
   const Sprint39ErpScreen({super.key});
@@ -361,7 +362,7 @@ class _CrmTabState extends State<_CrmTab> {
                   status: 'negotiating',
                   title: 'قيد التفاوض',
                   icon: Icons.forum_outlined,
-                  accent: Colors.orange.shade700),
+                  accent: core_theme.AC.warn),
               ApexKanbanColumn(
                   status: 'won',
                   title: 'مكسب',
@@ -394,7 +395,7 @@ class _CrmTabState extends State<_CrmTab> {
           border: Border.all(color: AC.bdr),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
+                color: core_theme.AC.tp.withValues(alpha: 0.15),
                 blurRadius: 6,
                 offset: const Offset(0, 2)),
           ],

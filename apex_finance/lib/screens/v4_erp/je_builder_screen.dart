@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/apex_v5_undo_toast.dart';
 import '../../core/v5/apex_v5_draft_with_ai.dart';
 
@@ -42,25 +43,25 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+              gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
               children: [
                 const Icon(Icons.book, color: Colors.white, size: 32),
                 const SizedBox(width: 14),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('منشئ قيد اليومية', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
-                      Text('قيد مزدوج القيد — يضمن التوازن تلقائياً', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('قيد مزدوج القيد — يضمن التوازن تلقائياً', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: _isBalanced ? const Color(0xFF059669) : const Color(0xFFB91C1C), borderRadius: BorderRadius.circular(6)),
+                  decoration: BoxDecoration(color: _isBalanced ? core_theme.AC.ok : const Color(0xFFB91C1C), borderRadius: BorderRadius.circular(6)),
                   child: Row(
                     children: [
                       Icon(_isBalanced ? Icons.check_circle : Icons.warning, color: Colors.white, size: 14),
@@ -81,12 +82,12 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
           const SizedBox(height: 16),
           // Entry table
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
             child: Column(
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(color: const Color(0xFFF9FAFB), borderRadius: const BorderRadius.vertical(top: Radius.circular(10)), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.06)))),
+                  decoration: BoxDecoration(color: const Color(0xFFF9FAFB), borderRadius: const BorderRadius.vertical(top: Radius.circular(10)), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06)))),
                   child: const Row(
                     children: [
                       Expanded(flex: 3, child: Text('الحساب', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800))),
@@ -102,22 +103,22 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
                   padding: const EdgeInsets.all(10),
                   child: Row(
                     children: [
-                      OutlinedButton.icon(onPressed: () => setState(() => _lines.add(_JeLine('', 0, 0))), icon: const Icon(Icons.add, size: 14), label: const Text('إضافة سطر')),
+                      OutlinedButton.icon(onPressed: () => setState(() => _lines.add(_JeLine('', 0, 0))), icon: const Icon(Icons.add, size: 14), label: Text('إضافة سطر')),
                       const SizedBox(width: 8),
-                      OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.description, size: 14), label: const Text('من قالب')),
+                      OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.description, size: 14), label: Text('من قالب')),
                     ],
                   ),
                 ),
                 // Totals
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: _isBalanced ? const Color(0xFF059669).withOpacity(0.05) : const Color(0xFFB91C1C).withOpacity(0.05)),
+                  decoration: BoxDecoration(color: _isBalanced ? core_theme.AC.ok.withOpacity(0.05) : const Color(0xFFB91C1C).withOpacity(0.05)),
                   child: Row(
                     children: [
                       const Expanded(flex: 3, child: Text('الإجمالي', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
-                      Expanded(flex: 2, child: Text('${_totalDebit.toStringAsFixed(2)}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, fontFamily: 'monospace', color: _isBalanced ? const Color(0xFF059669) : Colors.black87), textAlign: TextAlign.center)),
-                      Expanded(flex: 2, child: Text('${_totalCredit.toStringAsFixed(2)}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, fontFamily: 'monospace', color: _isBalanced ? const Color(0xFF059669) : Colors.black87), textAlign: TextAlign.center)),
-                      Expanded(flex: 3, child: Text('الفارق: ${(_totalDebit - _totalCredit).toStringAsFixed(2)}', style: TextStyle(fontSize: 12, color: _isBalanced ? const Color(0xFF059669) : const Color(0xFFB91C1C)), textAlign: TextAlign.end)),
+                      Expanded(flex: 2, child: Text('${_totalDebit.toStringAsFixed(2)}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, fontFamily: 'monospace', color: _isBalanced ? core_theme.AC.ok : core_theme.AC.tp), textAlign: TextAlign.center)),
+                      Expanded(flex: 2, child: Text('${_totalCredit.toStringAsFixed(2)}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, fontFamily: 'monospace', color: _isBalanced ? core_theme.AC.ok : core_theme.AC.tp), textAlign: TextAlign.center)),
+                      Expanded(flex: 3, child: Text('الفارق: ${(_totalDebit - _totalCredit).toStringAsFixed(2)}', style: TextStyle(fontSize: 12, color: _isBalanced ? core_theme.AC.ok : const Color(0xFFB91C1C)), textAlign: TextAlign.end)),
                       const SizedBox(width: 50),
                     ],
                   ),
@@ -127,7 +128,7 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
           ),
           const SizedBox(height: 16),
           // Narration with AI
-          const Text('الوصف (Narration)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+          Text('الوصف (Narration)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
           ApexV5DraftWithAi(
             controller: _narrationCtl,
@@ -139,17 +140,17 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
           // Actions
           Row(
             children: [
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.save_alt, size: 14), label: const Text('حفظ كمسودّة')),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.save_alt, size: 14), label: Text('حفظ كمسودّة')),
               const SizedBox(width: 8),
-              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.copy, size: 14), label: const Text('حفظ كقالب')),
+              OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.copy, size: 14), label: Text('حفظ كقالب')),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: _isBalanced ? () {
                   ApexV5UndoToast.show(context, messageAr: 'تم ترحيل القيد JE-2026-0542 · ${_totalDebit.toStringAsFixed(0)} ر.س', onUndo: () {});
                 } : null,
                 icon: const Icon(Icons.check, size: 16),
-                label: const Text('ترحيل القيد'),
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD4AF37), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
+                label: Text('ترحيل القيد'),
+                style: ElevatedButton.styleFrom(backgroundColor: core_theme.AC.gold, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
               ),
             ],
           ),
@@ -164,7 +165,7 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
         Expanded(flex: 2, child: _metaField('التاريخ', '2026-04-18', true)),
         const SizedBox(width: 8),
         Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('نوع القيد', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('نوع القيد', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           DropdownButtonFormField<String>(
             value: _type,
@@ -185,11 +186,11 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          decoration: BoxDecoration(border: Border.all(color: Colors.black.withOpacity(0.15)), borderRadius: BorderRadius.circular(4), color: editable ? Colors.white : const Color(0xFFF9FAFB)),
+          decoration: BoxDecoration(border: Border.all(color: core_theme.AC.tp.withOpacity(0.15)), borderRadius: BorderRadius.circular(4), color: editable ? Colors.white : const Color(0xFFF9FAFB)),
           child: Text(value, style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
         ),
       ],
@@ -199,7 +200,7 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   Widget _lineRow(int i) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04)))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04)))),
       child: Row(
         children: [
           Expanded(flex: 3, child: TextField(
@@ -276,17 +277,17 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF7C3AED)]), borderRadius: BorderRadius.circular(14)),
+            decoration: BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF4A148C), core_theme.AC.purple]), borderRadius: BorderRadius.circular(14)),
             child: Row(
               children: [
                 const Icon(Icons.lock_clock, color: Colors.white, size: 32),
                 const SizedBox(width: 14),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('إقفال الفترة — أبريل 2026', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
-                      Text('10 خطوات متسلسلة · لا يمكن تجاوز خطوة', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text('10 خطوات متسلسلة · لا يمكن تجاوز خطوة', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -294,14 +295,14 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text('$done/${_steps.length}', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
-                    Text('${(pct * 100).toInt()}%', style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                    Text('${(pct * 100).toInt()}%', style: TextStyle(color: core_theme.AC.ts, fontSize: 14)),
                   ],
                 ),
               ],
             ),
           ),
           const SizedBox(height: 8),
-          ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(value: pct, minHeight: 10, backgroundColor: Colors.black.withOpacity(0.06), valueColor: const AlwaysStoppedAnimation(Color(0xFF4A148C)))),
+          ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(value: pct, minHeight: 10, backgroundColor: core_theme.AC.tp.withOpacity(0.06), valueColor: const AlwaysStoppedAnimation(Color(0xFF4A148C)))),
           const SizedBox(height: 20),
           for (final s in _steps) _stepCard(s),
         ],
@@ -310,14 +311,14 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
   }
 
   Widget _stepCard(_CloseStep s) {
-    final color = s.done ? const Color(0xFF059669) : s.active ? const Color(0xFF4A148C) : Colors.black45;
+    final color = s.done ? core_theme.AC.ok : s.active ? const Color(0xFF4A148C) : core_theme.AC.td;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: s.active ? const Color(0xFF4A148C).withOpacity(0.06) : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: s.active ? const Color(0xFF4A148C) : Colors.black.withOpacity(0.08), width: s.active ? 2 : 1),
+        border: Border.all(color: s.active ? const Color(0xFF4A148C) : core_theme.AC.tp.withOpacity(0.08), width: s.active ? 2 : 1),
       ),
       child: Row(
         children: [
@@ -325,15 +326,15 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
             width: 36,
             height: 36,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: s.done ? const Color(0xFF059669) : s.active ? const Color(0xFF4A148C).withOpacity(0.15) : Colors.black.withOpacity(0.06), shape: BoxShape.circle),
-            child: s.done ? const Icon(Icons.check, color: Colors.white, size: 18) : Text(s.num, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.active ? const Color(0xFF4A148C) : Colors.black54)),
+            decoration: BoxDecoration(color: s.done ? core_theme.AC.ok : s.active ? const Color(0xFF4A148C).withOpacity(0.15) : core_theme.AC.tp.withOpacity(0.06), shape: BoxShape.circle),
+            child: s.done ? const Icon(Icons.check, color: Colors.white, size: 18) : Text(s.num, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.active ? const Color(0xFF4A148C) : core_theme.AC.ts)),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(s.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.done ? Colors.black54 : Colors.black87, decoration: s.done ? TextDecoration.lineThrough : null)),
+                Text(s.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.done ? core_theme.AC.ts : core_theme.AC.tp, decoration: s.done ? TextDecoration.lineThrough : null)),
                 Text(s.detail, style: TextStyle(fontSize: 12, color: color)),
               ],
             ),
@@ -344,10 +345,10 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
                 ApexV5UndoToast.show(context, messageAr: 'تم إكمال: ${s.title}', onUndo: () {});
               },
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4A148C), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
-              child: const Text('أكمل الخطوة'),
+              child: Text('أكمل الخطوة'),
             )
           else if (s.done)
-            const Icon(Icons.check_circle, color: Color(0xFF059669), size: 20),
+            Icon(Icons.check_circle, color: core_theme.AC.ok, size: 20),
         ],
       ),
     );

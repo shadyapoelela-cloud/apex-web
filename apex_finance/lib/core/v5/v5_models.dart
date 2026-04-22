@@ -15,6 +15,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 import '../v4/v4_groups.dart';
 
@@ -299,7 +300,7 @@ extension AppGroupX on AppGroup {
   Color get color {
     switch (this) {
       case AppGroup.core:
-        return const Color(0xFFD4AF37); // Gold
+        return core_theme.AC.gold; // Gold
       case AppGroup.businessCycles:
         return const Color(0xFF1565C0); // Blue
       case AppGroup.operations:
@@ -374,7 +375,7 @@ extension ChipPhaseX on ChipPhase {
       case ChipPhase.capture:
         return const Color(0xFF1565C0); // Blue
       case ChipPhase.process:
-        return const Color(0xFFD4AF37); // Gold
+        return core_theme.AC.gold; // Gold
       case ChipPhase.report:
         return const Color(0xFF2E7D5B); // Emerald
     }

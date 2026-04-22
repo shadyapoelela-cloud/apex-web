@@ -12,6 +12,7 @@ import '../../core/apex_app_bar.dart';
 import '../../core/apex_white_label_connected.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class WhiteLabelSettingsScreen extends StatelessWidget {
   const WhiteLabelSettingsScreen({super.key});
@@ -110,7 +111,7 @@ class WhiteLabelSettingsScreen extends StatelessWidget {
             width: 44,
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
             decoration: BoxDecoration(
-              color: method == 'GET' ? AC.ok : Colors.orange.shade700,
+              color: method == 'GET' ? AC.ok : core_theme.AC.warn,
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             alignment: Alignment.center,

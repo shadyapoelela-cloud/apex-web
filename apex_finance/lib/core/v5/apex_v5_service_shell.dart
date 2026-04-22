@@ -16,6 +16,8 @@ library;
 
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:js_util' as js_util;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -57,20 +59,27 @@ class SidebarPrefs {
 
 class ApexV5ServiceShell extends ConsumerWidget {
   final V5Service service;
-  final V5MainModule mainModule;
-  final V5Chip activeChip;
+  /// Active main module — null when the shell wraps the Apps Hub.
+  final V5MainModule? mainModule;
+  /// Active chip — null when in Apps Hub mode.
+  final V5Chip? activeChip;
 
   /// Body builder for non-dashboard chips. If null and chip has a
   /// V4SubModule, defaults to ApexSubModuleShell. If null and no
   /// sub-module, shows "coming soon" host.
   final Widget Function(BuildContext ctx, V5Chip chip)? chipBodyBuilder;
 
+  /// Override body entirely (used for Apps Hub). When provided, overrides
+  /// the chip-based body logic.
+  final Widget? bodyOverride;
+
   const ApexV5ServiceShell({
     super.key,
     required this.service,
-    required this.mainModule,
-    required this.activeChip,
+    this.mainModule,
+    this.activeChip,
     this.chipBodyBuilder,
+    this.bodyOverride,
   });
 
   @override
@@ -78,7 +87,11 @@ class ApexV5ServiceShell extends ConsumerWidget {
     ref.watch(appSettingsProvider); // rebuild on theme/mode switch
     final width = MediaQuery.sizeOf(context).width;
     final isNarrow = width < 900;
-    final isMedium = width < 1280; // نُخفي Quick-Access rail أقل من هذا
+    final isMedium = width < 1024; // نُخفي Quick-Access rail أقل من هذا
+
+    // Apps Hub mode = bare chrome (SystemBar + ScreenBar only).
+    // Module screens get the full experience: + ticker + sidebar + rail.
+    final isAppsHub = mainModule == null;
 
     return CallbackShortcuts(
       bindings: {
@@ -93,9 +106,9 @@ class ApexV5ServiceShell extends ConsumerWidget {
           body: Column(children: [
             // ── Layer 1: System Bar (نظام) — 40px ──────────────────────
             _SystemBar(unreadCount: _getUnreadCount(ref)),
-            // ── Layer 2: News ticker (تنبيهات) ─────────────────────────
-            const ApexV5NewsTicker(),
-            const Divider(height: 1),
+            // ── Layer 2: News ticker (hidden in Apps Hub mode) ─────────
+            if (!isAppsHub) const ApexV5NewsTicker(),
+            if (!isAppsHub) const Divider(height: 1),
             // ── Layer 3: Screen Bar (شاشة) — 48px ──────────────────────
             _ScreenBar(
               service: service,
@@ -103,57 +116,34 @@ class ApexV5ServiceShell extends ConsumerWidget {
               activeChip: activeChip,
             ),
             const Divider(height: 1),
-            // ── Layer 4: Body — 3 columns (يسار: قائمة رئيسية، يمين: وصول سريع) ──
+            // ── Layer 4: Body ──────────────────────────────────────────
+            // In Apps Hub mode → body fills full width (no sidebar / rail).
+            // In module mode → sidebar (left) + body + quick-access (right).
             Expanded(
-              child: isNarrow
-                  ? Column(children: [Expanded(child: _buildChipBody(context))])
-                  : Stack(children: [
-                      // Base: content + reserved rails
-                      Row(children: [
-                        const SizedBox(width: 64), // reserved for left sidebar
-                        const VerticalDivider(width: 1),
-                        Expanded(
-                          child: Column(children: [
-                            Expanded(child: _buildChipBody(context)),
-                          ]),
-                        ),
-                        if (!isMedium) const VerticalDivider(width: 1),
-                        if (!isMedium) const SizedBox(width: 56), // right rail
-                      ]),
-                      // Left sidebar overlay (expands over content)
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        child: ValueListenableBuilder<bool>(
-                          valueListenable: SidebarPrefs.collapsed,
-                          builder: (_, collapsed, __) => Material(
-                            elevation: collapsed ? 0 : 8,
-                            shadowColor: Colors.black54,
-                            child: _Sidebar(
-                              service: service,
-                              activeMainId: mainModule.id,
-                              isCollapsed: collapsed,
-                            ),
-                          ),
+              child: isAppsHub || isNarrow
+                  ? Column(children: [Expanded(child: _buildBody(context))])
+                  : Row(children: [
+                      // Left sidebar — عرضه داخلي (64 مطوي / 264 موسَّع)
+                      ValueListenableBuilder<bool>(
+                        valueListenable: SidebarPrefs.collapsed,
+                        builder: (_, collapsed, __) => _Sidebar(
+                          service: service,
+                          activeMainId: mainModule?.id ?? '',
+                          isCollapsed: collapsed,
                         ),
                       ),
-                      // Right quick-access rail (collapsible, visible >= 1280)
-                      if (!isMedium)
-                        const PositionedDirectional(
-                          end: 0,
-                          top: 0,
-                          bottom: 0,
-                          child: _QuickAccessRail(),
-                        ),
+                      const VerticalDivider(width: 1),
+                      Expanded(child: _buildBody(context)),
+                      if (!isMedium) const VerticalDivider(width: 1),
+                      if (!isMedium) const _QuickAccessRail(),
                     ]),
             ),
           ]),
-          drawer: isNarrow
+          drawer: (!isAppsHub && isNarrow)
               ? Drawer(
                   child: _Sidebar(
                     service: service,
-                    activeMainId: mainModule.id,
+                    activeMainId: mainModule?.id ?? '',
                     isCollapsed: false,
                   ),
                 )
@@ -165,31 +155,44 @@ class ApexV5ServiceShell extends ConsumerWidget {
 
   int _getUnreadCount(WidgetRef ref) => 8; // TODO: wire to real provider
 
+  /// Router that picks between body override (Apps Hub) and chip-based body.
+  Widget _buildBody(BuildContext context) {
+    // Apps Hub / custom override mode — render the caller-provided body.
+    if (bodyOverride != null) return bodyOverride!;
+    if (activeChip == null || mainModule == null) {
+      // Defensive: without both we have nothing to render.
+      return const SizedBox.shrink();
+    }
+    return _buildChipBody(context);
+  }
+
   Widget _buildChipBody(BuildContext context) {
+    final chip = activeChip!;
+    final main = mainModule!;
     // Dashboard chip — render action dashboard
-    if (activeChip.isDashboard) {
-      if (activeChip.dashboardWidgets == null ||
-          activeChip.dashboardWidgets!.isEmpty) {
+    if (chip.isDashboard) {
+      if (chip.dashboardWidgets == null ||
+          chip.dashboardWidgets!.isEmpty) {
         return _ComingSoonBanner(
-          titleAr: activeChip.labelAr,
+          titleAr: chip.labelAr,
           subtitleAr: 'لوحة المعلومات قيد البناء — سترى KPIs حية قريباً',
           icon: Icons.dashboard,
         );
       }
       return ApexV5ActionDashboard(
-        titleAr: activeChip.labelAr,
-        subtitleAr: '${service.labelAr} · ${mainModule.labelAr}',
-        widgets: activeChip.dashboardWidgets!,
+        titleAr: chip.labelAr,
+        subtitleAr: '${service.labelAr} · ${main.labelAr}',
+        widgets: chip.dashboardWidgets!,
       );
     }
 
     // Caller-provided builder
     if (chipBodyBuilder != null) {
-      return chipBodyBuilder!(context, activeChip);
+      return chipBodyBuilder!(context, chip);
     }
 
     // V4 sub-module reuse — if chip has sub-module, render existing tabs
-    final sub = activeChip.subModule;
+    final sub = chip.subModule;
     if (sub != null) {
       final firstScreen = sub.visibleTabs.isNotEmpty
           ? sub.visibleTabs.first
@@ -205,9 +208,9 @@ class ApexV5ServiceShell extends ConsumerWidget {
 
     // Fallback — coming soon banner
     return _ComingSoonBanner(
-      titleAr: activeChip.labelAr,
+      titleAr: chip.labelAr,
       subtitleAr: 'هذه الشاشة قيد التطوير',
-      icon: activeChip.icon,
+      icon: chip.icon,
     );
   }
 }
@@ -243,42 +246,46 @@ class _TB {
   static Color get accentHoverBg => accent.withValues(alpha: 0.10);
   static Color get accentActiveBg => accent.withValues(alpha: 0.15);
 
-  // ── Sizing scales ─────────────────────────────────────────────────────
-  static const double barHeight = 56;
-  static const double tapTarget = 40; // Buttons (meets touch min when padded)
-  static const double iconSm = 14;
-  static const double iconMd = 18;
+  // ── G-11..G-20: tokens rewired to DS (Design System) for harmony ─────
+  // Single source of truth for all size/space/motion tokens is core_theme.DS.
+  // _TB.* are now aliases to DS, so topbar stays in sync with the rest of
+  // the shell (sidebar/rail/tabs) automatically.
+  static const double barHeight = core_theme.DS.sidebarRow + 12;        // legacy (topbar+ticker combined)
+  static const double tapTarget = core_theme.DS.barSystem;               // 40 (WCAG min + room)
+  static const double iconSm = core_theme.DS.iconSm;                     // 14
+  static const double iconMd = core_theme.DS.iconLg;                     // 20 (was 18 — aligned to DS.iconLg)
 
-  // Spacing scale (4, 6, 8, 10, 12, 16)
-  static const double sp1 = 4;
-  static const double sp2 = 6;
-  static const double sp3 = 8;
-  static const double sp4 = 10;
-  static const double sp5 = 12;
-  static const double sp6 = 16;
+  // Spacing — DS grid (aliased)
+  static const double sp1 = core_theme.DS.s1;  // 4
+  static const double sp2 = 6;                  // kept for micro-rhythm (e.g. badge offsets)
+  static const double sp3 = core_theme.DS.s2;  // 8
+  static const double sp4 = 10;                 // kept for label gaps
+  static const double sp5 = core_theme.DS.s3;  // 12
+  static const double sp6 = core_theme.DS.s4;  // 16
 
-  // Border radii (6, 8, 10, 20)
-  static const double rSm = 6;
-  static const double rMd = 8;
-  static const double rLg = 10;
-  static const double rPill = 20;
+  // Border radii — DS (aligned)
+  static const double rSm = core_theme.DS.rSm;    // 4 (was 6)
+  static const double rMd = core_theme.DS.rMd;    // 8
+  static const double rLg = core_theme.DS.rLg;    // 12 (was 10 — M3 standard)
+  static const double rPill = core_theme.DS.rPill; // 999 (was 20 — true pill)
   static BorderRadius get brSm => BorderRadius.circular(rSm);
   static BorderRadius get brMd => BorderRadius.circular(rMd);
   static BorderRadius get brLg => BorderRadius.circular(rLg);
+  static BorderRadius get brPill => BorderRadius.circular(rPill);
 
-  // Typography scale (10, 11, 12, 13, 16)
-  static const double fs10 = 10;
-  static const double fs11 = 11;
-  static const double fs12 = 12;
-  static const double fs13 = 13;
-  static const double fs16 = 16;
+  // Typography scale — aligned to DS
+  static const double fs10 = core_theme.DS.fsXs;  // 10
+  static const double fs11 = core_theme.DS.fsSm;  // 11
+  static const double fs12 = core_theme.DS.fsMd;  // 12.5 (was 12 — half-pixel for crispness)
+  static const double fs13 = core_theme.DS.fsLg;  // 14 (was 13 — standard body)
+  static const double fs16 = core_theme.DS.fsXl;  // 16
 
-  // Motion
-  static const Duration motionFast = Duration(milliseconds: 140);
-  static const Duration motionMed = Duration(milliseconds: 180);
-  static const Duration motionSlow = Duration(milliseconds: 240);
+  // Motion — DS (Material 3)
+  static const Duration motionFast = core_theme.DS.motionFast;  // 120
+  static const Duration motionMed = core_theme.DS.motionMed;    // 200 (was 180)
+  static const Duration motionSlow = core_theme.DS.motionSlow;  // 320 (was 240 — for longer state changes)
   static const Duration pulseDur = Duration(milliseconds: 1200);
-  static const Duration tooltipWait = Duration(milliseconds: 500);
+  static const Duration tooltipWait = core_theme.DS.tooltipWait;
 
   // Shadows
   static List<BoxShadow> get barShadow => [
@@ -461,7 +468,10 @@ class _PwaInstallBtnState extends State<_PwaInstallBtn> {
   @override
   void initState() {
     super.initState();
-    _syncFromJs();
+    // استخدم microtask + عدة محاولات لأن beforeinstallprompt قد يكون أُطلق قبل mount
+    Future.microtask(_syncFromJs);
+    Future.delayed(const Duration(milliseconds: 500), _syncFromJs);
+    Future.delayed(const Duration(seconds: 2), _syncFromJs);
     html.window.addEventListener('apex:pwa-changed', _onPwaChanged);
   }
 
@@ -475,10 +485,10 @@ class _PwaInstallBtnState extends State<_PwaInstallBtn> {
 
   void _syncFromJs() {
     try {
-      final pwa = (html.window as dynamic).__APEX_PWA__;
-      if (pwa == null) return;
-      final canInstall = pwa['canInstall'] == true;
-      final isStandalone = pwa['isStandalone'] == true;
+      final canInstall =
+          js_util.callMethod(html.window, 'apexCanInstall', []) == true;
+      final isStandalone =
+          js_util.callMethod(html.window, 'apexIsStandalone', []) == true;
       if (mounted &&
           (_canInstall != canInstall || _isStandalone != isStandalone)) {
         setState(() {
@@ -486,23 +496,143 @@ class _PwaInstallBtnState extends State<_PwaInstallBtn> {
           _isStandalone = isStandalone;
         });
       }
-    } catch (_) {/* silent */}
+    } catch (e) {
+      debugPrint('[APEX] PWA sync error: $e');
+    }
   }
 
   void _triggerInstall() {
     try {
-      (html.window as dynamic).__APEX_PWA__.promptInstall();
-    } catch (_) {/* silent */}
+      final result =
+          js_util.callMethod(html.window, 'apexPromptInstall', []);
+      debugPrint('[APEX] apexPromptInstall result: $result');
+      if (result != 'prompted') {
+        // beforeinstallprompt لم يُلتقط → نعرض تعليمات يدوية
+        _showManualHint();
+      }
+    } catch (e) {
+      debugPrint('[APEX] install error: $e');
+      _showManualHint();
+    }
+  }
+
+  void _showManualHint() {
+    if (!mounted) return;
+    // نستخدم ألوان الـ Theme الحالي (وليس _TB الخاص بالشريط الداكن) —
+    // الحوار يظهر فوق خلفية الشاشة، سواء light أو dark.
+    showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        final onSurface = theme.colorScheme.onSurface;
+        final muted = onSurface.withValues(alpha: 0.72);
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: Row(children: [
+              Icon(Icons.install_desktop,
+                  color: _TB.accent, size: 22),
+              const SizedBox(width: 10),
+              Text('تثبيت APEX كتطبيق سطح مكتب',
+                  style: TextStyle(
+                      color: onSurface,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800)),
+            ]),
+            content: SizedBox(
+              width: 480,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'لم يُطلق المتصفح حدث التثبيت التلقائي. هذا يحدث عادةً عندما:',
+                    style: TextStyle(color: muted, fontSize: 12.5),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('• فتحت الصفحة للتو — جرّب تحديث الصفحة (F5)',
+                      style: TextStyle(color: muted, fontSize: 12)),
+                  Text('• التطبيق مُثبَّت بالفعل من جلسة سابقة',
+                      style: TextStyle(color: muted, fontSize: 12)),
+                  Text('• رفضت التثبيت سابقاً في هذه الجلسة',
+                      style: TextStyle(color: muted, fontSize: 12)),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _TB.accent.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                          color: _TB.accent.withValues(alpha: 0.35)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          Icon(Icons.check_circle,
+                              size: 16, color: _TB.accent),
+                          const SizedBox(width: 6),
+                          Text('الطريقة الأسهل:',
+                              style: TextStyle(
+                                  color: _TB.accent,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800)),
+                        ]),
+                        const SizedBox(height: 8),
+                        Text(
+                            '١. انظر إلى يسار شريط العنوان (بجانب النجمة ⭐)\n'
+                            '٢. ستجد أيقونة تثبيت 💻 أو سهم ⬇️ — اضغطها\n'
+                            '٣. اضغط "تثبيت" في النافذة المنبثقة',
+                            style: TextStyle(
+                                color: onSurface,
+                                fontSize: 12.5,
+                                height: 1.7)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text('أو: ⋯ → "التطبيقات" → "تثبيت هذا الموقع كتطبيق"',
+                      style: TextStyle(
+                          color: muted,
+                          fontSize: 11.5,
+                          fontStyle: FontStyle.italic)),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  html.window.location.reload();
+                },
+                child: const Text('إعادة تحميل الصفحة'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: FilledButton.styleFrom(
+                    backgroundColor: _TB.accent,
+                    foregroundColor: Colors.black),
+                child: const Text('فهمت'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isStandalone || !_canInstall) return const SizedBox.shrink();
+    // لا نُظهر الزر إن كنا بالفعل في وضع standalone (مثبّت)
+    if (_isStandalone) return const SizedBox.shrink();
+    // نُظهر الزر دائماً (حتى لو canInstall=false) — عند الضغط نوجّه للتثبيت اليدوي
     return _TopBarIconBtn(
       icon: Icons.install_desktop,
-      tooltip: 'تثبيت APEX كتطبيق سطح مكتب',
+      tooltip: _canInstall
+          ? 'تثبيت APEX كتطبيق سطح مكتب'
+          : 'تثبيت APEX (عبر قائمة المتصفح)',
       semanticLabel: 'تثبيت التطبيق',
-      color: _TB.accent,
+      color: _canInstall ? _TB.accent : _TB.fgPrimary,
       onPressed: (_) => _triggerInstall(),
     );
   }
@@ -515,33 +645,43 @@ class _PwaInstallBtnState extends State<_PwaInstallBtn> {
 
 class _ScreenBar extends StatelessWidget {
   final V5Service service;
-  final V5MainModule mainModule;
-  final V5Chip activeChip;
+  final V5MainModule? mainModule;
+  final V5Chip? activeChip;
 
   const _ScreenBar({
     required this.service,
-    required this.mainModule,
-    required this.activeChip,
+    this.mainModule,
+    this.activeChip,
   });
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final isCompact = width < 720;
-    final parts = [
+    // Apps Hub mode: only service → "التطبيقات" (no module/chip yet).
+    final isAppsHub = mainModule == null;
+    final parts = <_BreadcrumbPart>[
       _BreadcrumbPart(
           label: service.labelAr,
           route: '/app/${service.id}',
           icon: service.icon,
           color: _TB.accent),
-      _BreadcrumbPart(
-          label: mainModule.labelAr,
-          route: '/app/${service.id}/${mainModule.id}',
-          icon: mainModule.icon),
-      _BreadcrumbPart(
-          label: activeChip.labelAr,
-          route: null,
-          icon: activeChip.icon),
+      if (isAppsHub)
+        _BreadcrumbPart(
+            label: '${service.mainModules.length} تطبيق',
+            route: null,
+            icon: Icons.apps_rounded)
+      else ...[
+        _BreadcrumbPart(
+            label: mainModule!.labelAr,
+            route: '/app/${service.id}/${mainModule!.id}',
+            icon: mainModule!.icon),
+        if (activeChip != null)
+          _BreadcrumbPart(
+              label: activeChip!.labelAr,
+              route: null,
+              icon: activeChip!.icon),
+      ],
     ];
     return Container(
       height: 48,
@@ -755,19 +895,19 @@ class _QuickAccessRailState extends State<_QuickAccessRail> {
                 : MainAxisAlignment.center,
             children: [
               Icon(Icons.push_pin_outlined,
-                  size: _TB.iconMd, color: _TB.accent),
+                  size: _TB.iconMd, color: core_theme.AC.gold),
               if (_expanded) ...[
                 const SizedBox(width: _TB.sp2),
                 Expanded(
                   child: Text('الوصول السريع',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                          color: _TB.fgPrimary,
+                          color: core_theme.AC.tp,
                           fontSize: _TB.fs12,
                           fontWeight: FontWeight.w800)),
                 ),
                 Icon(Icons.chevron_right,
-                    size: _TB.iconSm, color: _TB.fgSecondary),
+                    size: _TB.iconSm, color: core_theme.AC.ts),
               ],
             ],
           ),
@@ -791,7 +931,7 @@ class _QuickAccessRailState extends State<_QuickAccessRail> {
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.center,
             children: [
-              Icon(p.icon, size: _TB.iconMd, color: _TB.fgPrimary),
+              Icon(p.icon, size: _TB.iconMd, color: core_theme.AC.ts),
               if (_expanded) ...[
                 const SizedBox(width: _TB.sp3),
                 Expanded(
@@ -799,7 +939,7 @@ class _QuickAccessRailState extends State<_QuickAccessRail> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: TextStyle(
-                          color: _TB.fgPrimary,
+                          color: core_theme.AC.tp,
                           fontSize: _TB.fs12,
                           fontWeight: FontWeight.w500)),
                 ),
@@ -1969,6 +2109,37 @@ class _Sidebar extends StatelessWidget {
 
 }
 
+// H-28: Keyboard shortcut chip (kbd-like — GitHub Primer / Linear style)
+class _ShortcutChip extends StatelessWidget {
+  final String label;
+  const _ShortcutChip({required this.label});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsetsDirectional.symmetric(
+          horizontal: core_theme.DS.s1 + 2, vertical: 1),
+      decoration: BoxDecoration(
+        color: core_theme.AC.bdr.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(core_theme.DS.rSm),
+        border: Border.all(
+          color: core_theme.AC.bdr.withValues(alpha: 0.6),
+          width: 0.5,
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: core_theme.DS.fs2xs,
+          fontWeight: core_theme.DS.fwSemibold,
+          color: core_theme.AC.td,
+          fontFamilyFallback: const <String>['monospace', 'Menlo', 'Consolas'],
+          height: 1.4,
+        ),
+      ),
+    );
+  }
+}
+
 class _SidebarItem extends StatefulWidget {
   final V5MainModule mainModule;
   final bool isActive;
@@ -1994,6 +2165,8 @@ class _SidebarItemState extends State<_SidebarItem> {
   @override
   Widget build(BuildContext context) {
     final color = widget.serviceColor;
+    final active = widget.isActive;
+    // H-21..H-30: DS-aligned row (44px), leading indicator bar, AC state tokens
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -2003,61 +2176,64 @@ class _SidebarItemState extends State<_SidebarItem> {
           onExit: (_) => setState(() => _hover = false),
           child: GestureDetector(
             onTap: widget.onTap,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: AnimatedContainer(
+              duration: core_theme.DS.motionFast,
+              margin: const EdgeInsetsDirectional.symmetric(
+                  horizontal: core_theme.DS.s2, vertical: 1),
+              constraints: const BoxConstraints(minHeight: core_theme.DS.sidebarRow),
+              padding: const EdgeInsetsDirectional.only(
+                start: core_theme.DS.s1, // leaves room for indicator bar
+                end: core_theme.DS.s3,
+                top: core_theme.DS.s2,
+                bottom: core_theme.DS.s2,
+              ),
               decoration: BoxDecoration(
-                color: widget.isActive
+                color: active
                     ? color.withValues(alpha: 0.12)
                     : _hover
-                        ? color.withValues(alpha: 0.06)
+                        ? core_theme.AC.stateHover
                         : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-                border: widget.isActive
-                    ? Border.all(color: color.withValues(alpha: 0.3))
-                    : null,
+                borderRadius: BorderRadius.circular(core_theme.DS.rMd),
               ),
               child: Row(
                 children: [
+                  // H-22: leading active-indicator bar (SAP Fiori / Linear pattern)
+                  AnimatedContainer(
+                    duration: core_theme.DS.motionFast,
+                    width: 3,
+                    height: active ? 22 : 0,
+                    margin: const EdgeInsetsDirectional.only(end: core_theme.DS.s2),
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(core_theme.DS.rSm),
+                    ),
+                  ),
                   Icon(
                     widget.mainModule.icon,
-                    size: 18,
-                    color: widget.isActive ? color : core_theme.AC.ts,
+                    size: core_theme.DS.iconLg, // H-27: was 18, now 20
+                    color: active ? color : core_theme.AC.ts,
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: core_theme.DS.s3),
                   Expanded(
                     child: Text(
                       widget.mainModule.labelAr,
                       style: TextStyle(
-                        fontSize: 13,
-                        fontWeight:
-                            widget.isActive ? FontWeight.w700 : FontWeight.w500,
-                        color: widget.isActive ? color : core_theme.AC.tp,
+                        fontSize: core_theme.DS.fsLg, // H-25: was 13, now 14
+                        fontWeight: active
+                            ? core_theme.DS.fwBold
+                            : core_theme.DS.fwMedium,
+                        color: active ? color : core_theme.AC.tp,
+                        height: 1.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (widget.isActive && widget.mainModule.chips.isNotEmpty)
-                    Icon(Icons.expand_more, size: 14, color: color)
-                  else if (_hover || widget.isActive)
-                    Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: core_theme.AC.bdr,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: Text(
-                        'Alt+⇧+${widget.shortcutNumber}',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w600,
-                          color: core_theme.AC.td,
-                        ),
-                      ),
-                    ),
+                  if (active && widget.mainModule.chips.isNotEmpty)
+                    Icon(core_theme.AppIcons.chevronDown, // H-29: unified chevron
+                        size: core_theme.DS.iconSm, color: color)
+                  else if (_hover || active)
+                    _ShortcutChip(label: 'Alt+⇧+${widget.shortcutNumber}'), // H-28
                 ],
               ),
             ),
