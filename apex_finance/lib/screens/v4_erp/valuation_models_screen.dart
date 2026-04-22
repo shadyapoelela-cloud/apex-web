@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 132 — Valuation Models (DCF, Multiples, LBO)
 class ValuationModelsScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _ValuationModelsScreenState extends State<ValuationModelsScreen> with Sing
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'DCF'), Tab(text: 'مضاعفات السوق'), Tab(text: 'LBO'), Tab(text: 'ملخص التقييم')])),
         Expanded(child: TabBarView(controller: _tc, children: [_dcfTab(), _multiplesTab(), _lboTab(), _summaryTab()])),
       ])),
@@ -32,13 +33,13 @@ class _ValuationModelsScreenState extends State<ValuationModelsScreen> with Sing
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1565C0), Color(0xFF0D47A1)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.monetization_on, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('نماذج التقييم المالي', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('DCF + Market Multiples + LBO — تقييم ثلاثي متكامل', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('DCF + Market Multiples + LBO — تقييم ثلاثي متكامل', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -46,7 +47,7 @@ class _ValuationModelsScreenState extends State<ValuationModelsScreen> with Sing
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('Enterprise Value', '42.5M', Icons.business, const Color(0xFF0D47A1))),
     Expanded(child: _kpi('Equity Value', '38.2M', Icons.account_balance, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('EV/EBITDA', '10.2x', Icons.show_chart, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('EV/EBITDA', '10.2x', Icons.show_chart, core_theme.AC.gold)),
     Expanded(child: _kpi('القيمة لكل سهم', '382 ر.س', Icons.bookmark, const Color(0xFF4A148C))),
   ]));
 
@@ -54,7 +55,7 @@ class _ValuationModelsScreenState extends State<ValuationModelsScreen> with Sing
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -97,7 +98,7 @@ class _ValuationModelsScreenState extends State<ValuationModelsScreen> with Sing
     return Card(margin: const EdgeInsets.only(bottom: 8), child: Padding(padding: const EdgeInsets.all(14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-        Text(p.sector, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(p.sector, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 8),
         Row(children: [
           _multStat('EV/EBITDA', p.evEbitda),
@@ -110,7 +111,7 @@ class _ValuationModelsScreenState extends State<ValuationModelsScreen> with Sing
   });
 
   Widget _multStat(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
   ]));
 
@@ -137,18 +138,18 @@ class _ValuationModelsScreenState extends State<ValuationModelsScreen> with Sing
 
   Widget _summaryTab() => ListView(padding: const EdgeInsets.all(14), children: [
     Card(child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('📊 نطاق التقييم المجمّع', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF4A148C))),
+      Text('📊 نطاق التقييم المجمّع', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF4A148C))),
       const SizedBox(height: 12),
       _rangeBar('DCF', '38.5M', 0.75),
       _rangeBar('Market Multiples', '42.0M', 0.85),
       _rangeBar('LBO Implied', '45.0M', 0.95),
       const SizedBox(height: 12),
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-        child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('التقييم الموصى به', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD4AF37))),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('التقييم الموصى به', style: TextStyle(fontWeight: FontWeight.bold, color: core_theme.AC.gold)),
           SizedBox(height: 4),
           Text('41.8M ر.س (متوسط ترجيحي)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          Text('نطاق مقبول: 38.0M - 45.0M', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('نطاق مقبول: 38.0M - 45.0M', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ]),
       ),
     ]))),
@@ -163,7 +164,7 @@ class _ValuationModelsScreenState extends State<ValuationModelsScreen> with Sing
       Row(children: [Expanded(child: Text(label)), Text(value, style: const TextStyle(fontWeight: FontWeight.bold))]),
       const SizedBox(height: 4),
       ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: ratio, minHeight: 8,
-        backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)))),
+        backgroundColor: core_theme.AC.bdr, valueColor: AlwaysStoppedAnimation(core_theme.AC.gold))),
     ]));
 
   Widget _insight(String title, String text) => Card(margin: const EdgeInsets.only(bottom: 8),

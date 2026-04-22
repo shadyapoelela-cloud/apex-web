@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 105 — Revenue Recognition (IFRS 15)
 /// 5-step revenue recognition model with contract management
@@ -40,8 +41,8 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
                 child: TabBar(
                   controller: _tc,
                   labelColor: const Color(0xFF4A148C),
-                  unselectedLabelColor: Colors.black54,
-                  indicatorColor: const Color(0xFFD4AF37),
+                  unselectedLabelColor: core_theme.AC.ts,
+                  indicatorColor: core_theme.AC.gold,
                   indicatorWeight: 3,
                   tabs: const [
                     Tab(text: 'العقود'),
@@ -84,13 +85,13 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37),
+              color: core_theme.AC.gold,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.receipt_long, color: Colors.white, size: 32),
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -101,7 +102,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
                 SizedBox(height: 4),
                 Text(
                   'نموذج الخطوات الخمس للاعتراف بالإيرادات من العقود مع العملاء',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                 ),
               ],
             ),
@@ -112,10 +113,10 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
               color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.verified, color: Color(0xFFD4AF37), size: 16),
+                Icon(Icons.verified, color: core_theme.AC.gold, size: 16),
                 SizedBox(width: 4),
                 Text('متوافق IFRS 15', style: TextStyle(color: Colors.white, fontSize: 12)),
               ],
@@ -138,7 +139,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
       child: Row(
         children: [
           Expanded(child: _kpi('العقود النشطة', '$totalContracts', Icons.description, const Color(0xFF1A237E))),
-          Expanded(child: _kpi('إجمالي القيمة', _fmtM(totalValue), Icons.attach_money, const Color(0xFFD4AF37))),
+          Expanded(child: _kpi('إجمالي القيمة', _fmtM(totalValue), Icons.attach_money, core_theme.AC.gold)),
           Expanded(child: _kpi('معترف به', _fmtM(recognized), Icons.check_circle, const Color(0xFF2E7D32))),
           Expanded(child: _kpi('مؤجل', _fmtM(deferred), Icons.schedule, const Color(0xFFE65100))),
         ],
@@ -162,7 +163,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
               ],
             ),
@@ -202,7 +203,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(c.customer, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                          Text(c.id, style: const TextStyle(color: Colors.black54, fontSize: 12)),
+                          Text(c.id, style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -220,7 +221,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text(c.description, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                Text(c.description, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -236,13 +237,13 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6,
-                    backgroundColor: Colors.black12,
-                    valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)),
+                    backgroundColor: core_theme.AC.bdr,
+                    valueColor: AlwaysStoppedAnimation(core_theme.AC.gold),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text('${(progress * 100).toStringAsFixed(1)}% معترف به',
-                    style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -256,7 +257,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       ),
@@ -270,7 +271,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
       ('2', 'تحديد التزامات الأداء', 'تحديد السلع/الخدمات المميزة في العقد',
           'التمييز بين الالتزامات المنفصلة والمجمعة', const Color(0xFF4A148C)),
       ('3', 'تحديد سعر المعاملة', 'حساب المبلغ المتوقع استلامه مقابل نقل السلع',
-          'يشمل المقابل المتغير + قيمة الوقت + المقابل غير النقدي', const Color(0xFFD4AF37)),
+          'يشمل المقابل المتغير + قيمة الوقت + المقابل غير النقدي', core_theme.AC.gold),
       ('4', 'توزيع السعر', 'توزيع سعر المعاملة على التزامات الأداء',
           'بناءً على أسعار البيع المستقلة (SSP)', const Color(0xFF2E7D32)),
       ('5', 'الاعتراف بالإيراد', 'الاعتراف عند/خلال الوفاء بالتزامات الأداء',
@@ -308,7 +309,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
                     children: [
                       Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
                       const SizedBox(height: 4),
-                      Text(desc, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                      Text(desc, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
                       const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.all(8),
@@ -321,7 +322,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
                             Icon(Icons.info_outline, size: 14, color: color),
                             const SizedBox(width: 6),
                             Expanded(
-                              child: Text(detail, style: const TextStyle(fontSize: 11.5, color: Colors.black87)),
+                              child: Text(detail, style: TextStyle(fontSize: 11.5, color: core_theme.AC.tp)),
                             ),
                           ],
                         ),
@@ -355,7 +356,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('${e.period} • ${e.method}', style: const TextStyle(fontSize: 12)),
-                Text('التزام: ${e.obligation}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('التزام: ${e.obligation}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
             trailing: Column(
@@ -364,7 +365,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
               children: [
                 Text(_fmt(e.amount),
                     style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
-                Text(e.date, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(e.date, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -397,7 +398,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
           children: [
             Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
             const SizedBox(height: 6),
-            Text(text, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+            Text(text, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
           ],
         ),
       ),
@@ -408,7 +409,7 @@ class _RevenueRecognitionScreenState extends State<RevenueRecognitionScreen> wit
     if (s.contains('نشط')) return const Color(0xFF2E7D32);
     if (s.contains('معلق')) return const Color(0xFFE65100);
     if (s.contains('مكتمل')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   String _fmt(double v) => '${v.toStringAsFixed(0)} ر.س';

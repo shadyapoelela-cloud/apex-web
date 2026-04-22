@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class InternalOrdersV52Screen extends StatefulWidget {
@@ -15,8 +16,8 @@ class InternalOrdersV52Screen extends StatefulWidget {
 }
 
 class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _orders = <_IO>[
@@ -47,11 +48,11 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
         SavedView(id: 'marketing', labelAr: 'التسويق فقط', icon: Icons.campaign, defaultViewMode: ViewMode.kanban),
       ],
       filterChips: [
-        FilterChipDef(id: 'planning', labelAr: 'تخطيط', color: Colors.grey, count: _cnt(_S.planning), active: _filter == 'planning'),
-        FilterChipDef(id: 'released', labelAr: 'مُفرج', color: Colors.blue, count: _cnt(_S.released), active: _filter == 'released'),
-        FilterChipDef(id: 'active', labelAr: 'نشط', color: Colors.green, count: _cnt(_S.active), active: _filter == 'active'),
-        FilterChipDef(id: 'overBudget', labelAr: 'تجاوز الميزانية', color: Colors.red, count: _cnt(_S.overBudget), active: _filter == 'overBudget'),
-        FilterChipDef(id: 'closed', labelAr: 'مُغلق', color: Colors.grey.shade600, count: _cnt(_S.closed), active: _filter == 'closed'),
+        FilterChipDef(id: 'planning', labelAr: 'تخطيط', color: core_theme.AC.td, count: _cnt(_S.planning), active: _filter == 'planning'),
+        FilterChipDef(id: 'released', labelAr: 'مُفرج', color: core_theme.AC.info, count: _cnt(_S.released), active: _filter == 'released'),
+        FilterChipDef(id: 'active', labelAr: 'نشط', color: core_theme.AC.ok, count: _cnt(_S.active), active: _filter == 'active'),
+        FilterChipDef(id: 'overBudget', labelAr: 'تجاوز الميزانية', color: core_theme.AC.err, count: _cnt(_S.overBudget), active: _filter == 'overBudget'),
+        FilterChipDef(id: 'closed', labelAr: 'مُغلق', color: core_theme.AC.ts, count: _cnt(_S.closed), active: _filter == 'closed'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -80,18 +81,18 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(o.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(o.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)), child: Text(o.category, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(4)), child: Text(o.category, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700))),
               ]),
               Text(o.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-              Text('${o.manager} · ${o.start} → ${o.end}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('${o.manager} · ${o.start} → ${o.end}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
             SizedBox(width: 140, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Row(children: [Text('الفعلي', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)), const Spacer(), Text('${(o.actual / 1000).toStringAsFixed(0)}K / ${(o.budget / 1000).toStringAsFixed(0)}K', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))]),
+              Row(children: [Text('الفعلي', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)), const Spacer(), Text('${(o.actual / 1000).toStringAsFixed(0)}K / ${(o.budget / 1000).toStringAsFixed(0)}K', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))]),
               const SizedBox(height: 2),
-              ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: util.clamp(0.0, 1.0), minHeight: 8, backgroundColor: Colors.grey.shade200, color: util > 1.0 ? Colors.red : util > 0.9 ? Colors.orange : Colors.green)),
-              Text('${(util * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: util > 1.0 ? Colors.red : util > 0.9 ? Colors.orange : Colors.green)),
+              ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: util.clamp(0.0, 1.0), minHeight: 8, backgroundColor: core_theme.AC.bdr, color: util > 1.0 ? core_theme.AC.err : util > 0.9 ? core_theme.AC.warn : core_theme.AC.ok)),
+              Text('${(util * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: util > 1.0 ? core_theme.AC.err : util > 0.9 ? core_theme.AC.warn : core_theme.AC.ok)),
             ])),
             const SizedBox(width: 16),
             Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: o.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(o.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: o.status.color))),
@@ -112,14 +113,14 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
         return Container(
           width: 280,
           margin: const EdgeInsets.only(left: 10),
-          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Container(width: 8, height: 8, decoration: BoxDecoration(color: s.color, shape: BoxShape.circle)),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: s.color)),
-                Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
               Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
@@ -128,22 +129,22 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
               return Container(
                 margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    Text(o.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 9, color: Colors.black54)),
+                    Text(o.id, style: TextStyle(fontFamily: 'monospace', fontSize: 9, color: core_theme.AC.ts)),
                     const Spacer(),
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(3)), child: Text(o.category, style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: _navy))),
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(3)), child: Text(o.category, style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: _navy))),
                   ]),
                   Text(o.title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  Text(o.manager, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(o.manager, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   const SizedBox(height: 6),
-                  ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: util.clamp(0.0, 1.0), minHeight: 6, backgroundColor: Colors.grey.shade200, color: util > 1.0 ? Colors.red : _gold)),
+                  ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: util.clamp(0.0, 1.0), minHeight: 6, backgroundColor: core_theme.AC.bdr, color: util > 1.0 ? core_theme.AC.err : _gold)),
                   const SizedBox(height: 4),
                   Row(children: [
-                    Text('${(o.actual / 1000).toStringAsFixed(0)}K / ${(o.budget / 1000).toStringAsFixed(0)}K', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('${(o.actual / 1000).toStringAsFixed(0)}K / ${(o.budget / 1000).toStringAsFixed(0)}K', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     const Spacer(),
-                    Text('${(util * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: util > 1.0 ? Colors.red : _gold)),
+                    Text('${(util * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: util > 1.0 ? core_theme.AC.err : _gold)),
                   ]),
                 ]),
               );
@@ -164,25 +165,25 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('الميزانية مقابل الفعلي حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('الميزانية مقابل الفعلي حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         ...by.entries.map((e) {
           final util = e.value.$1 > 0 ? e.value.$2 / e.value.$1 : 0.0;
           return Padding(padding: const EdgeInsets.only(bottom: 16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [Text(e.key, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)), const Spacer(), Text('${(util * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: util > 1.0 ? Colors.red : _gold))]),
+            Row(children: [Text(e.key, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)), const Spacer(), Text('${(util * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: util > 1.0 ? core_theme.AC.err : _gold))]),
             const SizedBox(height: 6),
             Row(children: [
-              SizedBox(width: 80, child: Text('الميزانية', style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
-              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: 1.0, minHeight: 14, backgroundColor: Colors.grey.shade100, color: _navy.withOpacity(0.5)))),
+              SizedBox(width: 80, child: Text('الميزانية', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
+              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: 1.0, minHeight: 14, backgroundColor: core_theme.AC.navy3, color: _navy.withOpacity(0.5)))),
               const SizedBox(width: 10),
-              Text('${(e.value.$1 / 1e6).toStringAsFixed(2)}M', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _navy)),
+              Text('${(e.value.$1 / 1e6).toStringAsFixed(2)}M', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _navy)),
             ]),
             const SizedBox(height: 3),
             Row(children: [
-              SizedBox(width: 80, child: Text('الفعلي', style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
-              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: util.clamp(0.0, 1.0), minHeight: 14, backgroundColor: Colors.grey.shade100, color: util > 1.0 ? Colors.red : _gold))),
+              SizedBox(width: 80, child: Text('الفعلي', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
+              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: util.clamp(0.0, 1.0), minHeight: 14, backgroundColor: core_theme.AC.navy3, color: util > 1.0 ? core_theme.AC.err : _gold))),
               const SizedBox(width: 10),
-              Text('${(e.value.$2 / 1e6).toStringAsFixed(2)}M', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: util > 1.0 ? Colors.red : _gold)),
+              Text('${(e.value.$2 / 1e6).toStringAsFixed(2)}M', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: util > 1.0 ? core_theme.AC.err : _gold)),
             ]),
           ]));
         }),
@@ -202,10 +203,10 @@ extension _SX on _S {
         _S.closed => 'مُغلق',
       };
   Color get color => switch (this) {
-        _S.planning => Colors.grey,
-        _S.released => Colors.blue,
-        _S.active => Colors.green,
-        _S.overBudget => Colors.red,
+        _S.planning => core_theme.AC.td,
+        _S.released => core_theme.AC.info,
+        _S.active => core_theme.AC.ok,
+        _S.overBudget => core_theme.AC.err,
         _S.closed => const Color(0xFF607D8B),
       };
 }

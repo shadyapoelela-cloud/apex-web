@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ManufacturingScreen extends StatefulWidget {
   const ManufacturingScreen({super.key});
@@ -37,9 +38,9 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
         _buildStatsRow(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.list_alt, size: 16), text: 'قائمة المواد (BOM)'),
             Tab(icon: Icon(Icons.construction, size: 16), text: 'أوامر الإنتاج'),
@@ -70,7 +71,7 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
         gradient: const LinearGradient(colors: [Color(0xFF37474F), Color(0xFF78909C)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.precision_manufacturing, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -81,7 +82,7 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                 Text('التصنيع',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('هياكل مواد متعددة المستويات، أوامر إنتاج، وجدولة ذكية لمراكز العمل',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -95,10 +96,10 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _stat('أوامر مفتوحة', '12', Colors.blue, Icons.pending_actions),
-          _stat('قيد التنفيذ', '7', Colors.orange, Icons.sync),
-          _stat('مكتملة هذا الشهر', '34', Colors.green, Icons.check_circle),
-          _stat('كفاءة المصنع', '87%', const Color(0xFFD4AF37), Icons.speed),
+          _stat('أوامر مفتوحة', '12', core_theme.AC.info, Icons.pending_actions),
+          _stat('قيد التنفيذ', '7', core_theme.AC.warn, Icons.sync),
+          _stat('مكتملة هذا الشهر', '34', core_theme.AC.ok, Icons.check_circle),
+          _stat('كفاءة المصنع', '87%', core_theme.AC.gold, Icons.speed),
         ],
       ),
     );
@@ -122,7 +123,7 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -159,17 +160,17 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
             margin: const EdgeInsets.only(right: 10, bottom: 20, left: 20),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
-                  color: Colors.grey.shade50,
-                  child: const Row(
+                  color: core_theme.AC.navy3,
+                  child: Row(
                     children: [
-                      Icon(Icons.list_alt, color: Color(0xFFD4AF37), size: 16),
+                      Icon(Icons.list_alt, color: core_theme.AC.gold, size: 16),
                       SizedBox(width: 6),
                       Text('قوائم المواد المسجّلة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                     ],
@@ -186,10 +187,10 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: selected ? const Color(0xFFD4AF37).withOpacity(0.12) : null,
+                            color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
                             border: Border(
-                              bottom: BorderSide(color: Colors.black12.withOpacity(0.5)),
-                              right: BorderSide(color: selected ? const Color(0xFFD4AF37) : Colors.transparent, width: 3),
+                              bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
+                              right: BorderSide(color: selected ? core_theme.AC.gold : Colors.transparent, width: 3),
                             ),
                           ),
                           child: Column(
@@ -202,10 +203,10 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.15),
+                                      color: core_theme.AC.ok.withOpacity(0.15),
                                       borderRadius: BorderRadius.circular(3),
                                     ),
-                                    child: Text(b.status, style: const TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.w700)),
+                                    child: Text(b.status, style: TextStyle(fontSize: 10, color: core_theme.AC.ok, fontWeight: FontWeight.w700)),
                                   ),
                                 ],
                               ),
@@ -214,11 +215,11 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                               const SizedBox(height: 4),
                               Row(
                                 children: [
-                                  Icon(Icons.widgets, size: 12, color: Colors.black54),
+                                  Icon(Icons.widgets, size: 12, color: core_theme.AC.ts),
                                   const SizedBox(width: 4),
-                                  Text('${b.componentCount} مكوّن', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                                  Text('${b.componentCount} مكوّن', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                                   const Spacer(),
-                                  Text('${b.cost.toStringAsFixed(2)} ر.س/وحدة', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                                  Text('${b.cost.toStringAsFixed(2)} ر.س/وحدة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                                 ],
                               ),
                             ],
@@ -237,39 +238,39 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
             margin: const EdgeInsets.only(left: 10, bottom: 20, right: 20),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               children: [
                 Container(
                   padding: const EdgeInsets.all(14),
-                  color: Colors.grey.shade50,
+                  color: core_theme.AC.navy3,
                   child: Row(
                     children: [
-                      const Icon(Icons.account_tree, color: Color(0xFFD4AF37)),
+                      Icon(Icons.account_tree, color: core_theme.AC.gold),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('مكوّنات $_selectedBom', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                            Text('الكميات لكل وحدة إنتاج واحدة', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                            Text('الكميات لكل وحدة إنتاج واحدة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                           ],
                         ),
                       ),
                       OutlinedButton.icon(
                         onPressed: () {},
                         icon: const Icon(Icons.content_copy, size: 14),
-                        label: const Text('نسخ'),
+                        label: Text('نسخ'),
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton.icon(
                         onPressed: () {},
                         icon: const Icon(Icons.play_arrow, size: 14),
-                        label: const Text('أمر إنتاج'),
+                        label: Text('أمر إنتاج'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD4AF37),
+                          backgroundColor: core_theme.AC.gold,
                           foregroundColor: Colors.white,
                         ),
                       ),
@@ -278,13 +279,13 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                 ),
                 Container(
                   padding: const EdgeInsets.all(10),
-                  color: Colors.grey.shade100,
-                  child: const Row(
+                  color: core_theme.AC.navy3,
+                  child: Row(
                     children: [
                       Expanded(flex: 3, child: Text('المكوّن', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                       Expanded(child: Text('الوحدة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                       Expanded(child: Text('الكمية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                      Expanded(child: Text('التكلفة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                      Expanded(child: Text('التكلفة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                     ],
                   ),
                 ),
@@ -296,16 +297,16 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                         decoration: BoxDecoration(
-                          border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                          border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                         ),
                         child: Row(
                           children: [
                             Expanded(flex: 3, child: Text(c.name, style: const TextStyle(fontSize: 12))),
-                            Expanded(child: Text(c.unit, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                            Expanded(child: Text(c.unit, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
                             Expanded(child: Text(c.qty.toStringAsFixed(3), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
                             Expanded(
                               child: Text('${c.cost.toStringAsFixed(2)} ر.س',
-                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                             ),
                           ],
                         ),
@@ -315,14 +316,14 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                 ),
                 Container(
                   padding: const EdgeInsets.all(12),
-                  color: Colors.grey.shade100,
+                  color: core_theme.AC.navy3,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('التكلفة الكلية للوحدة', style: TextStyle(fontWeight: FontWeight.w900)),
+                      Text('التكلفة الكلية للوحدة', style: TextStyle(fontWeight: FontWeight.w900)),
                       Text(
                         '${components.fold(0.0, (s, c) => s + c.cost).toStringAsFixed(2)} ر.س',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace'),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace'),
                       ),
                     ],
                   ),
@@ -349,17 +350,17 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
         final o = orders[i];
         final progress = o.planned > 0 ? o.produced / o.planned : 0.0;
         final statusColor = o.status == 'مكتمل'
-            ? Colors.green
+            ? core_theme.AC.ok
             : o.status == 'قيد التنفيذ'
-                ? Colors.orange
-                : Colors.grey;
+                ? core_theme.AC.warn
+                : core_theme.AC.td;
         return Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -387,13 +388,13 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                   Text('(${(progress * 100).toStringAsFixed(0)}%)',
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: statusColor)),
                   const Spacer(),
-                  Text('الموعد: ${o.deadline}', style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                  Text('الموعد: ${o.deadline}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                 ],
               ),
               const SizedBox(height: 8),
               LinearProgressIndicator(
                 value: progress,
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: core_theme.AC.bdr,
                 valueColor: AlwaysStoppedAnimation(statusColor),
                 minHeight: 6,
               ),
@@ -417,14 +418,14 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
       itemCount: centers.length,
       itemBuilder: (ctx, i) {
         final w = centers[i];
-        final statusColor = w.status == 'عمل' ? Colors.green : Colors.amber;
+        final statusColor = w.status == 'عمل' ? core_theme.AC.ok : core_theme.AC.warn;
         return Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
@@ -449,13 +450,13 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                         Text(w.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                       ],
                     ),
-                    Text(w.supervisor, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text(w.supervisor, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
-              _kpiPill('التوفر', '${w.availability}%', Colors.blue),
+              _kpiPill('التوفر', '${w.availability}%', core_theme.AC.info),
               const SizedBox(width: 6),
-              _kpiPill('الكفاءة', '${w.efficiency}%', const Color(0xFFD4AF37)),
+              _kpiPill('الكفاءة', '${w.efficiency}%', core_theme.AC.gold),
               const SizedBox(width: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -482,7 +483,7 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
       ),
       child: Column(
         children: [
-          Text(label, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
           Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: color)),
         ],
       ),
@@ -495,19 +496,19 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
       children: [
         Row(
           children: [
-            _qcStat('نسبة الجودة', '97.3%', Colors.green),
-            _qcStat('عدد العينات', '284', Colors.blue),
-            _qcStat('عينات مرفوضة', '8', Colors.red),
-            _qcStat('FPY', '94.5%', const Color(0xFFD4AF37)),
+            _qcStat('نسبة الجودة', '97.3%', core_theme.AC.ok),
+            _qcStat('عدد العينات', '284', core_theme.AC.info),
+            _qcStat('عينات مرفوضة', '8', core_theme.AC.err),
+            _qcStat('FPY', '94.5%', core_theme.AC.gold),
           ],
         ),
         const SizedBox(height: 20),
-        const Text('نتائج الفحص الأخيرة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+        Text('نتائج الفحص الأخيرة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
         const SizedBox(height: 10),
-        _qcRow('MO-2026-0141', 'عصير فواكه 250مل', 'مطابق', Colors.green, '2026-04-27 16:30'),
-        _qcRow('MO-2026-0142', 'مشروب غازي 330مل', 'مطابق مع ملاحظات', Colors.amber.shade700, '2026-04-28 09:15'),
-        _qcRow('MO-2026-0139', 'عبوة مياه 500مل', 'مطابق', Colors.green, '2026-04-26 14:20'),
-        _qcRow('MO-2026-0138', 'وجبة سريعة', 'غير مطابق — صدّرت', Colors.red, '2026-04-25 11:00'),
+        _qcRow('MO-2026-0141', 'عصير فواكه 250مل', 'مطابق', core_theme.AC.ok, '2026-04-27 16:30'),
+        _qcRow('MO-2026-0142', 'مشروب غازي 330مل', 'مطابق مع ملاحظات', core_theme.AC.warn, '2026-04-28 09:15'),
+        _qcRow('MO-2026-0139', 'عبوة مياه 500مل', 'مطابق', core_theme.AC.ok, '2026-04-26 14:20'),
+        _qcRow('MO-2026-0138', 'وجبة سريعة', 'غير مطابق — صدّرت', core_theme.AC.err, '2026-04-25 11:00'),
       ],
     );
   }
@@ -524,7 +525,7 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
         ),
         child: Column(
           children: [
-            Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
             const SizedBox(height: 6),
             Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
           ],
@@ -540,7 +541,7 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Row(
         children: [
@@ -557,7 +558,7 @@ class _ManufacturingScreenState extends State<ManufacturingScreen>
                     Text(product, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                   ],
                 ),
-                Text(timestamp, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                Text(timestamp, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
               ],
             ),
           ),

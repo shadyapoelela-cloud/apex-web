@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ConnectedPlanningScreen extends StatefulWidget {
   const ConnectedPlanningScreen({super.key});
@@ -58,8 +59,8 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1565C0), Color(0xFF7C3AED)],
+              gradient: LinearGradient(
+                colors: [Color(0xFF1565C0), core_theme.AC.purple],
               ),
               borderRadius: BorderRadius.circular(14),
             ),
@@ -74,7 +75,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
                   child: const Icon(Icons.tune, color: Colors.white, size: 28),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -85,7 +86,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
                       SizedBox(height: 4),
                       Text(
                         'غيّر driver واحد — جميع السيناريوهات تتحدّث فوراً · مثل Anaplan',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                       ),
                     ],
                   ),
@@ -160,14 +161,14 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.tune, size: 18, color: Color(0xFF7C3AED)),
+              Icon(Icons.tune, size: 18, color: core_theme.AC.purple),
               SizedBox(width: 6),
               Text(
                 'المحرّكات (Drivers)',
@@ -176,7 +177,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
               Spacer(),
               Text(
                 'اسحب — شاهد التأثير',
-                style: TextStyle(fontSize: 11, color: Colors.black54),
+                style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
               ),
             ],
           ),
@@ -188,7 +189,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
             max: 40,
             suffix: '% YoY',
             icon: Icons.trending_up,
-            color: const Color(0xFF059669),
+            color: core_theme.AC.ok,
             onChanged: (v) => setState(() => _salesGrowth = v),
           ),
           _driver(
@@ -198,7 +199,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
             max: 15,
             suffix: '%',
             icon: Icons.groups,
-            color: const Color(0xFF2563EB),
+            color: core_theme.AC.info,
             onChanged: (v) => setState(() => _salaryInflation = v),
           ),
           _driver(
@@ -208,7 +209,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
             max: 150,
             suffix: 'USD/bbl',
             icon: Icons.oil_barrel,
-            color: const Color(0xFFD97706),
+            color: core_theme.AC.warn,
             onChanged: (v) => setState(() => _oilPrice = v),
           ),
           _driver(
@@ -219,7 +220,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
             divisions: 40,
             suffix: 'SAR',
             icon: Icons.currency_exchange,
-            color: const Color(0xFF7C3AED),
+            color: core_theme.AC.purple,
             onChanged: (v) => setState(() => _usdRate = v),
           ),
           _driver(
@@ -229,25 +230,25 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
             max: 15,
             suffix: '%',
             icon: Icons.savings,
-            color: const Color(0xFF059669),
+            color: core_theme.AC.ok,
             onChanged: (v) => setState(() => _costReduction = v),
           ),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB).withOpacity(0.06),
+              color: core_theme.AC.info.withOpacity(0.06),
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.2)),
+              border: Border.all(color: core_theme.AC.info.withOpacity(0.2)),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.lightbulb, size: 14, color: Color(0xFF2563EB)),
+                Icon(Icons.lightbulb, size: 14, color: core_theme.AC.info),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'كل driver مترابط مع 3-5 بنود في القوائم المالية · يعاد الحساب <50ms',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF2563EB)),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.info),
                   ),
                 ),
               ],
@@ -278,7 +279,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
                   icon: const Icon(Icons.save, size: 14),
                   label: const Text('حفظ كسيناريو'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7C3AED),
+                    backgroundColor: core_theme.AC.purple,
                     foregroundColor: Colors.white,
                   ),
                 ),
@@ -362,7 +363,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,7 +381,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: delta >= 0
-                      ? const Color(0xFF059669).withOpacity(0.1)
+                      ? core_theme.AC.ok.withOpacity(0.1)
                       : const Color(0xFFB91C1C).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -389,20 +390,20 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
                     Icon(
                       delta >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
                       size: 12,
-                      color: delta >= 0 ? const Color(0xFF059669) : const Color(0xFFB91C1C),
+                      color: delta >= 0 ? core_theme.AC.ok : const Color(0xFFB91C1C),
                     ),
                     Text(
                       '${pctChange.abs().toStringAsFixed(1)}%',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: delta >= 0 ? const Color(0xFF059669) : const Color(0xFFB91C1C),
+                        color: delta >= 0 ? core_theme.AC.ok : const Color(0xFFB91C1C),
                       ),
                     ),
                     const SizedBox(width: 2),
-                    const Text(
+                    Text(
                       'مقابل السيناريو الأساسي',
-                      style: TextStyle(fontSize: 10, color: Colors.black54),
+                      style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
                     ),
                   ],
                 ),
@@ -410,7 +411,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _pnlRow('المبيعات', sales, color: const Color(0xFF059669), bold: true),
+          _pnlRow('المبيعات', sales, color: core_theme.AC.ok, bold: true),
           _pnlRow('تكلفة البضاعة المباعة', -cogs),
           _pnlRow('إجمالي الربح', grossProfit, color: const Color(0xFF1565C0), bold: true, top: true),
           _pnlRow('الرواتب', -salaries),
@@ -419,7 +420,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
           _pnlRow(
             'EBITDA',
             ebitda,
-            color: delta >= 0 ? const Color(0xFF059669) : const Color(0xFFB91C1C),
+            color: delta >= 0 ? core_theme.AC.ok : const Color(0xFFB91C1C),
             bold: true,
             big: true,
             top: true,
@@ -429,7 +430,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.03),
+              color: core_theme.AC.tp.withOpacity(0.03),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Row(
@@ -493,7 +494,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       decoration: top
           ? BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.black.withOpacity(0.1))),
+              border: Border(top: BorderSide(color: core_theme.AC.tp.withOpacity(0.1))),
             )
           : null,
       child: Row(
@@ -503,7 +504,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
             style: TextStyle(
               fontSize: big ? 14 : 12,
               fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
-              color: color ?? Colors.black87,
+              color: color ?? core_theme.AC.tp,
             ),
           ),
           const Spacer(),
@@ -512,7 +513,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
             style: TextStyle(
               fontSize: big ? 16 : 13,
               fontWeight: bold ? FontWeight.w900 : FontWeight.w600,
-              color: color ?? Colors.black87,
+              color: color ?? core_theme.AC.tp,
               fontFamily: 'monospace',
             ),
           ),
@@ -526,10 +527,10 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         children: [
-          Icon(icon, size: 12, color: Colors.black54),
+          Icon(icon, size: 12, color: core_theme.AC.ts),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(text, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            child: Text(text, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ),
         ],
       ),

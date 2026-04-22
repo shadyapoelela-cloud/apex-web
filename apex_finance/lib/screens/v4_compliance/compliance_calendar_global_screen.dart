@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 146 — Global Compliance Calendar
 class ComplianceCalendarGlobalScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _ComplianceCalendarGlobalScreenState extends State<ComplianceCalendarGloba
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'التقويم'), Tab(text: 'المواعيد القادمة'), Tab(text: 'حسب الجهة'), Tab(text: 'إحصائيات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_calendarTab(), _upcomingTab(), _byAuthorityTab(), _statsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _ComplianceCalendarGlobalScreenState extends State<ComplianceCalendarGloba
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF6A1B9A)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.event_note, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('تقويم الامتثال الشامل', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('كل المواعيد التنظيمية في منطقة واحدة — SA + UAE + Global', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('كل المواعيد التنظيمية في منطقة واحدة — SA + UAE + Global', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -58,7 +59,7 @@ class _ComplianceCalendarGlobalScreenState extends State<ComplianceCalendarGloba
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -86,14 +87,14 @@ class _ComplianceCalendarGlobalScreenState extends State<ComplianceCalendarGloba
       const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(e.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-        Text('${e.authority} • ${e.country}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('${e.authority} • ${e.country}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 4),
         Row(children: [
           Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(color: _priorityColor(e.priority).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
             child: Text(e.priority, style: TextStyle(color: _priorityColor(e.priority), fontSize: 9, fontWeight: FontWeight.bold))),
           const SizedBox(width: 6),
-          Text(e.type, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(e.type, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ]),
       ])),
     ]),
@@ -131,7 +132,7 @@ class _ComplianceCalendarGlobalScreenState extends State<ComplianceCalendarGloba
     _insight('📅 المواعيد 2026', '148 موعد منظم عبر 12 جهة تنظيمية', const Color(0xFF4A148C)),
     _insight('🇸🇦 السعودية', '88 موعد (ZATCA 32 • GOSI 18 • MOC 12 • أخرى 26)', const Color(0xFF2E7D32)),
     _insight('🇦🇪 الإمارات', '42 موعد (FTA 22 • DED 8 • MOHRE 12)', const Color(0xFF1565C0)),
-    _insight('🌍 دولي', '18 موعد (IFRS/BEPS/Pillar2/OECD)', const Color(0xFFD4AF37)),
+    _insight('🌍 دولي', '18 موعد (IFRS/BEPS/Pillar2/OECD)', core_theme.AC.gold),
     _insight('✅ نسبة الالتزام السنوية', '98% مواعيد في موعدها (أعلى من متوسط الصناعة 85%)', const Color(0xFF2E7D32)),
     _insight('⚠️ مواعيد حرجة قادمة', 'إقرار VAT أبريل + الزكاة 2025 + Excise Q1', const Color(0xFFC62828)),
   ]);
@@ -140,13 +141,13 @@ class _ComplianceCalendarGlobalScreenState extends State<ComplianceCalendarGloba
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _priorityColor(String p) {
     if (p.contains('حرج')) return const Color(0xFFC62828);
     if (p.contains('عالي')) return const Color(0xFFE65100);
-    if (p.contains('متوسط')) return const Color(0xFFD4AF37);
+    if (p.contains('متوسط')) return core_theme.AC.gold;
     return const Color(0xFF1A237E);
   }
 
@@ -155,7 +156,7 @@ class _ComplianceCalendarGlobalScreenState extends State<ComplianceCalendarGloba
     if (a.contains('GOSI')) return const Color(0xFF2E7D32);
     if (a.contains('CMA')) return const Color(0xFF4A148C);
     if (a.contains('FTA')) return const Color(0xFF1565C0);
-    return const Color(0xFFD4AF37);
+    return core_theme.AC.gold;
   }
 
   static const List<_Event> _events = [

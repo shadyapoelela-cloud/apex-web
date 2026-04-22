@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 enum WorkOrderStage { planned, released, inProgress, qualityCheck, done }
 
@@ -75,8 +76,8 @@ String workOrderStageLabel(WorkOrderStage s) => switch (s) {
 Color workOrderStageColor(WorkOrderStage s) => switch (s) {
       WorkOrderStage.planned => AC.ts,
       WorkOrderStage.released => AC.gold,
-      WorkOrderStage.inProgress => Colors.orange.shade400,
-      WorkOrderStage.qualityCheck => Colors.purple.shade300,
+      WorkOrderStage.inProgress => core_theme.AC.warn,
+      WorkOrderStage.qualityCheck => core_theme.AC.purple,
       WorkOrderStage.done => AC.ok,
     };
 

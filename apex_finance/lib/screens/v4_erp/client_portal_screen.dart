@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ClientPortalScreen extends StatefulWidget {
   const ClientPortalScreen({super.key});
@@ -31,8 +32,8 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFD4AF37), Color(0xFFE6C200)],
+              gradient: LinearGradient(
+                colors: [core_theme.AC.gold, Color(0xFFE6C200)],
               ),
               borderRadius: BorderRadius.circular(14),
             ),
@@ -47,7 +48,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                   child: const Icon(Icons.account_circle, color: Colors.white, size: 28),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -58,7 +59,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                       SizedBox(height: 4),
                       Text(
                         'يرى عميلك فواتيره · يدفع مباشرة · يُسقط 70% من emails',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                       ),
                     ],
                   ),
@@ -69,7 +70,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
+                  child: Text(
                     'FreshBooks Alternative',
                     style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800),
                   ),
@@ -86,10 +87,10 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFFF3F4F6),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.black.withOpacity(0.12), width: 3),
+                border: Border.all(color: core_theme.AC.tp.withOpacity(0.12), width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: core_theme.AC.tp.withOpacity(0.15),
                     blurRadius: 24,
                     offset: const Offset(0, 10),
                   ),
@@ -103,11 +104,11 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(17)),
-                      border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+                      border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
                     ),
                     child: Row(
                       children: [
-                        ...[Colors.red, Colors.orange, Colors.green].map(
+                        ...[core_theme.AC.err, core_theme.AC.warn, core_theme.AC.ok].map(
                           (c) => Container(
                             width: 10,
                             height: 10,
@@ -123,13 +124,13 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                               color: const Color(0xFFF3F4F6),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(Icons.lock, size: 12, color: Color(0xFF059669)),
+                                Icon(Icons.lock, size: 12, color: core_theme.AC.ok),
                                 SizedBox(width: 6),
                                 Text(
                                   'portal.apex-financial.com/abc-trading',
-                                  style: TextStyle(fontSize: 11, color: Colors.black54),
+                                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                                 ),
                               ],
                             ),
@@ -151,31 +152,31 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD4AF37),
+                                color: core_theme.AC.gold,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: const Icon(Icons.bolt, color: Colors.white, size: 16),
                             ),
                             const SizedBox(width: 8),
-                            const Text(
+                            Text(
                               'شركة الرياض للتجارة',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                             ),
                             const Spacer(),
-                            const Text(
+                            Text(
                               'مرحباً، ABC Trading',
-                              style: TextStyle(fontSize: 12, color: Colors.black54),
+                              style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                             ),
                             const SizedBox(width: 8),
                             CircleAvatar(
                               radius: 14,
-                              backgroundColor: const Color(0xFFD4AF37).withOpacity(0.2),
-                              child: const Text(
+                              backgroundColor: core_theme.AC.gold.withOpacity(0.2),
+                              child: Text(
                                 'A',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
-                                  color: Color(0xFFD4AF37),
+                                  color: core_theme.AC.gold,
                                 ),
                               ),
                             ),
@@ -196,7 +197,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                             _kpi(
                               label: 'فواتير لم تُدفع',
                               value: '3',
-                              color: const Color(0xFFD97706),
+                              color: core_theme.AC.warn,
                               icon: Icons.receipt_long,
                             ),
                             const SizedBox(width: 12),
@@ -204,14 +205,14 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                               label: 'مدفوع هذا العام',
                               value: '245,300',
                               currency: 'ر.س',
-                              color: const Color(0xFF059669),
+                              color: core_theme.AC.ok,
                               icon: Icons.check_circle,
                             ),
                             const SizedBox(width: 12),
                             _kpi(
                               label: 'التالية استحقاقاً',
                               value: '22 أبريل',
-                              color: const Color(0xFF2563EB),
+                              color: core_theme.AC.info,
                               icon: Icons.event,
                             ),
                           ],
@@ -230,16 +231,16 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                         const SizedBox(height: 12),
                         Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black.withOpacity(0.08)),
+                            border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Column(
                             children: [
-                              _invoiceRow('INV-2026-145', '2026-04-22', 12500, 'مدفوعة', const Color(0xFF059669)),
+                              _invoiceRow('INV-2026-145', '2026-04-22', 12500, 'مدفوعة', core_theme.AC.ok),
                               _invoiceRow('INV-2026-167', '2026-04-22', 25000, 'متأخرة', const Color(0xFFB91C1C), payable: true),
-                              _invoiceRow('INV-2026-182', '2026-04-30', 40000, 'مرسلة', const Color(0xFF2563EB), payable: true),
-                              _invoiceRow('INV-2026-191', '2026-05-05', 22500, 'مرسلة', const Color(0xFF2563EB), payable: true),
-                              _invoiceRow('INV-2026-088', '2026-03-15', 15000, 'مدفوعة', const Color(0xFF059669)),
+                              _invoiceRow('INV-2026-182', '2026-04-30', 40000, 'مرسلة', core_theme.AC.info, payable: true),
+                              _invoiceRow('INV-2026-191', '2026-05-05', 22500, 'مرسلة', core_theme.AC.info, payable: true),
+                              _invoiceRow('INV-2026-088', '2026-03-15', 15000, 'مدفوعة', core_theme.AC.ok),
                             ],
                           ),
                         ),
@@ -248,8 +249,8 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFD4AF37), Color(0xFFE6C200)],
+                            gradient: LinearGradient(
+                              colors: [core_theme.AC.gold, Color(0xFFE6C200)],
                             ),
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -267,9 +268,9 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
-                                  foregroundColor: const Color(0xFFD4AF37),
+                                  foregroundColor: core_theme.AC.gold,
                                 ),
-                                child: const Text('ادفع الآن'),
+                                child: Text('ادفع الآن'),
                               ),
                             ],
                           ),
@@ -286,18 +287,18 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB).withOpacity(0.06),
+              color: core_theme.AC.info.withOpacity(0.06),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.2)),
+              border: Border.all(color: core_theme.AC.info.withOpacity(0.2)),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info_outline, size: 16, color: Color(0xFF2563EB)),
+                Icon(Icons.info_outline, size: 16, color: core_theme.AC.info),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'كل عميل يحصل على رابط شخصي + تسجيل دخول آمن · يستخدم نفس بيانات APEX · مجاني للعميل',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF2563EB)),
+                    style: TextStyle(fontSize: 12, color: core_theme.AC.info),
                   ),
                 ),
               ],
@@ -333,7 +334,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                 Expanded(
                   child: Text(
                     label,
-                    style: const TextStyle(fontSize: 11, color: Colors.black54),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -358,7 +359,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                   const SizedBox(width: 4),
                   Text(
                     currency,
-                    style: const TextStyle(fontSize: 10, color: Colors.black45),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.td),
                   ),
                 ],
               ],
@@ -378,20 +379,20 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: active ? const Color(0xFFD4AF37).withOpacity(0.15) : Colors.transparent,
+            color: active ? core_theme.AC.gold.withOpacity(0.15) : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
-            border: active ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4)) : null,
+            border: active ? Border.all(color: core_theme.AC.gold.withOpacity(0.4)) : null,
           ),
           child: Row(
             children: [
-              Icon(icon, size: 14, color: active ? const Color(0xFFD4AF37) : Colors.black54),
+              Icon(icon, size: 14, color: active ? core_theme.AC.gold : core_theme.AC.ts),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  color: active ? const Color(0xFFD4AF37) : Colors.black54,
+                  color: active ? core_theme.AC.gold : core_theme.AC.ts,
                 ),
               ),
             ],
@@ -405,11 +406,11 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         children: [
-          const Icon(Icons.receipt, size: 16, color: Colors.black54),
+          Icon(Icons.receipt, size: 16, color: core_theme.AC.ts),
           const SizedBox(width: 10),
           Expanded(
             flex: 2,
@@ -417,7 +418,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(id, style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w600)),
-                Text(date, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(date, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -442,12 +443,12 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
             OutlinedButton(
               onPressed: () {},
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF059669),
-                side: const BorderSide(color: Color(0xFF059669)),
+                foregroundColor: core_theme.AC.ok,
+                side: BorderSide(color: core_theme.AC.ok),
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 textStyle: const TextStyle(fontSize: 11),
               ),
-              child: const Text('ادفع'),
+              child: Text('ادفع'),
             ),
         ],
       ),

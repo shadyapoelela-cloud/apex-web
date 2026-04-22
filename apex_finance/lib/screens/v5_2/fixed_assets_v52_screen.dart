@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class FixedAssetsV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class FixedAssetsV52Screen extends StatefulWidget {
 }
 
 class _FixedAssetsV52ScreenState extends State<FixedAssetsV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _assets = <_Asset>[
@@ -48,9 +49,9 @@ class _FixedAssetsV52ScreenState extends State<FixedAssetsV52Screen> {
         SavedView(id: 'tech', labelAr: 'تقنية فقط', icon: Icons.computer, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'active', labelAr: 'نشطة', color: Colors.green, count: _count(_S.active), active: _filter == 'active'),
-        FilterChipDef(id: 'fullyDepreciated', labelAr: 'مهلك كاملاً', color: Colors.orange, count: _count(_S.fullyDepreciated), active: _filter == 'fullyDepreciated'),
-        FilterChipDef(id: 'disposed', labelAr: 'مُبيعة/متخلّص منها', color: Colors.grey, count: _count(_S.disposed), active: _filter == 'disposed'),
+        FilterChipDef(id: 'active', labelAr: 'نشطة', color: core_theme.AC.ok, count: _count(_S.active), active: _filter == 'active'),
+        FilterChipDef(id: 'fullyDepreciated', labelAr: 'مهلك كاملاً', color: core_theme.AC.warn, count: _count(_S.fullyDepreciated), active: _filter == 'fullyDepreciated'),
+        FilterChipDef(id: 'disposed', labelAr: 'مُبيعة/متخلّص منها', color: core_theme.AC.td, count: _count(_S.disposed), active: _filter == 'disposed'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -79,27 +80,27 @@ class _FixedAssetsV52ScreenState extends State<FixedAssetsV52Screen> {
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(a.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(a.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)), child: Text(a.category, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.black54))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(4)), child: Text(a.category, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: core_theme.AC.ts))),
               ]),
               Text(a.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-              Text('📍 ${a.location} · شراء ${a.purchaseDate} · عمر ${a.lifeYears} سنة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('📍 ${a.location} · شراء ${a.purchaseDate} · عمر ${a.lifeYears} سنة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
             SizedBox(width: 120, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text('التكلفة', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+              Text('التكلفة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               Text('${a.cost.toStringAsFixed(0)}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
             ])),
             const SizedBox(width: 16),
             SizedBox(width: 140, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text('القيمة الدفترية', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-              Text(netBook.toStringAsFixed(0), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: a.status == _S.disposed ? Colors.grey : _gold)),
+              Text('القيمة الدفترية', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+              Text(netBook.toStringAsFixed(0), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: a.status == _S.disposed ? core_theme.AC.td : _gold)),
             ])),
             const SizedBox(width: 16),
             SizedBox(width: 100, child: Column(children: [
-              Row(children: [Text('إهلاك', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)), const Spacer(), Text('${(a.depPct * 100).toInt()}%', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800))]),
+              Row(children: [Text('إهلاك', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)), const Spacer(), Text('${(a.depPct * 100).toInt()}%', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800))]),
               const SizedBox(height: 2),
-              ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: a.depPct, minHeight: 6, backgroundColor: Colors.grey.shade200, color: a.depPct > 0.8 ? Colors.orange : _navy)),
+              ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: a.depPct, minHeight: 6, backgroundColor: core_theme.AC.bdr, color: a.depPct > 0.8 ? core_theme.AC.warn : _navy)),
             ])),
           ])),
         );
@@ -116,11 +117,11 @@ class _FixedAssetsV52ScreenState extends State<FixedAssetsV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('توزيع الأصول حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توزيع الأصول حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         Expanded(
           child: Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
             child: Column(children: [
               Container(
                 padding: const EdgeInsets.all(12),
@@ -135,13 +136,13 @@ class _FixedAssetsV52ScreenState extends State<FixedAssetsV52Screen> {
               ),
               ...cats.entries.map((e) => Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey.shade200))),
+                    decoration: BoxDecoration(border: Border(top: BorderSide(color: core_theme.AC.bdr))),
                     child: Row(children: [
                       Expanded(flex: 2, child: Text(e.key, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
                       Expanded(child: Text('${e.value.$3}', style: const TextStyle(fontSize: 12), textAlign: TextAlign.center)),
                       Expanded(child: Text(e.value.$1.toStringAsFixed(0), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
-                      Expanded(child: Text(e.value.$2.toStringAsFixed(0), style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.orange), textAlign: TextAlign.end)),
-                      Expanded(child: Text((e.value.$1 - e.value.$2).toStringAsFixed(0), style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: _gold), textAlign: TextAlign.end)),
+                      Expanded(child: Text(e.value.$2.toStringAsFixed(0), style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.warn), textAlign: TextAlign.end)),
+                      Expanded(child: Text((e.value.$1 - e.value.$2).toStringAsFixed(0), style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: _gold), textAlign: TextAlign.end)),
                     ]),
                   )),
             ]),
@@ -155,7 +156,7 @@ class _FixedAssetsV52ScreenState extends State<FixedAssetsV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('توقّع الإهلاك لـ 5 سنوات قادمة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توقّع الإهلاك لـ 5 سنوات قادمة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         ...[
           ('2026', 1840, 0.8),
@@ -166,9 +167,9 @@ class _FixedAssetsV52ScreenState extends State<FixedAssetsV52Screen> {
         ].map((y) => Padding(padding: const EdgeInsets.only(bottom: 14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 SizedBox(width: 60, child: Text(y.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
-                Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: y.$3, minHeight: 22, backgroundColor: Colors.grey.shade100, color: _gold))),
+                Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: y.$3, minHeight: 22, backgroundColor: core_theme.AC.navy3, color: _gold))),
                 const SizedBox(width: 10),
-                SizedBox(width: 120, child: Text('${y.$2}K ر.س', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold), textAlign: TextAlign.end)),
+                SizedBox(width: 120, child: Text('${y.$2}K ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold), textAlign: TextAlign.end)),
               ]),
             ]))),
       ]),
@@ -180,9 +181,9 @@ enum _S { active, fullyDepreciated, disposed }
 
 extension _SX on _S {
   Color get color => switch (this) {
-        _S.active => Colors.green,
-        _S.fullyDepreciated => Colors.orange,
-        _S.disposed => Colors.grey,
+        _S.active => core_theme.AC.ok,
+        _S.fullyDepreciated => core_theme.AC.warn,
+        _S.disposed => core_theme.AC.td,
       };
 }
 

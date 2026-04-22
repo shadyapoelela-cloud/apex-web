@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 // ═══════════════════════════════════════════════════════════
 // APEX UI Components — Shared design system widgets
@@ -1526,7 +1527,7 @@ Widget apexInfoTip(String message, {Color? color, double size = 15}) {
       color: AC.navy2,
       borderRadius: BorderRadius.circular(10),
       border: Border.all(color: AC.iconAccent.withValues(alpha: 0.3)),
-      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 12, offset: Offset(0, 4))],
+      boxShadow: [BoxShadow(color: core_theme.AC.td, blurRadius: 12, offset: Offset(0, 4))],
     ),
     textStyle: TextStyle(color: AC.tp, fontSize: 12, fontFamily: 'Tajawal', height: 1.5),
     waitDuration: const Duration(milliseconds: 300),
@@ -1943,7 +1944,7 @@ class _ApexGlowFABState extends State<ApexGlowFAB> with TickerProviderStateMixin
                 child: InkWell(
                   onTap: _onTap,
                   borderRadius: BorderRadius.circular(16),
-                  splashColor: Colors.white24,
+                  splashColor: core_theme.AC.bdr,
                   highlightColor: Colors.white10,
                   child: Center(
                     child: Transform.rotate(

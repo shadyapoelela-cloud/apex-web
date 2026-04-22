@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 116 — E-Commerce Store Management (Shopify/Salla replacement)
 class EcommerceStoreScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الطلبات'), Tab(text: 'المنتجات'), Tab(text: 'العملاء'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_ordersTab(), _productsTab(), _customersTab(), _analyticsTab()])),
       ])),
@@ -35,10 +36,10 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.shopping_bag, color: Color(0xFF004D40), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('المتجر الإلكتروني', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('إدارة الطلبات، المنتجات، العملاء — تكامل مع Salla وZid', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('إدارة الطلبات، المنتجات، العملاء — تكامل مع Salla وZid', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -58,7 +59,7 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -69,7 +70,7 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
       title: Text(o.id, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${o.customer} • ${o.items} قطعة', style: const TextStyle(fontSize: 11)),
-        Text('${o.paymentMethod} • ${o.shipping}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('${o.paymentMethod} • ${o.shipping}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text('${o.amount.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF00796B))),
@@ -89,7 +90,7 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-          Text('SKU: ${p.sku} • ${p.category}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('SKU: ${p.sku} • ${p.category}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Row(children: [
             _mini('السعر', '${p.price.toStringAsFixed(0)} ر.س'),
@@ -98,16 +99,16 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
           ]),
         ])),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          const Icon(Icons.star, color: Color(0xFFD4AF37), size: 14),
+          Icon(Icons.star, color: core_theme.AC.gold, size: 14),
           Text('${p.rating}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-          Text('${p.reviews} تقييم', style: const TextStyle(fontSize: 9, color: Colors.black54)),
+          Text('${p.reviews} تقييم', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
         ]),
       ]),
     ));
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
   ]));
 
@@ -119,7 +120,7 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
       title: Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text('${c.email} • ${c.city}', style: const TextStyle(fontSize: 11)),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-        Text('${c.ordersCount} طلب', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('${c.ordersCount} طلب', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         Text('${(c.lifetimeValue/1000).toStringAsFixed(1)}K ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
       ]),
     ));
@@ -128,7 +129,7 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('🛒 قيمة السلة', 'متوسط 485 ر.س (+18% YoY)', const Color(0xFF2E7D32)),
     _insight('🚀 معدل التحويل', '4.2% من الزوار — أعلى من الصناعة (2.8%)', const Color(0xFF00796B)),
-    _insight('📦 أسرع منتجات', 'عطور 18% • إلكترونيات 22% • أزياء 32% • أخرى 28%', const Color(0xFFD4AF37)),
+    _insight('📦 أسرع منتجات', 'عطور 18% • إلكترونيات 22% • أزياء 32% • أخرى 28%', core_theme.AC.gold),
     _insight('🎯 إعادة الشراء', '34% من العملاء متكررين', const Color(0xFF4A148C)),
     _insight('💳 طرق الدفع', 'مدى 52% • Apple Pay 18% • بطاقة 22% • تحويل 8%', const Color(0xFF1A237E)),
     _insight('📱 الأجهزة', 'جوال 78% • حاسوب 18% • لوحي 4%', const Color(0xFFE65100)),
@@ -137,7 +138,7 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _statusColor(String s) {
@@ -145,7 +146,7 @@ class _EcommerceStoreScreenState extends State<EcommerceStoreScreen> with Single
     if (s.contains('شحن')) return const Color(0xFF1A237E);
     if (s.contains('قيد')) return const Color(0xFFE65100);
     if (s.contains('ملغى')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Order> _orders = [

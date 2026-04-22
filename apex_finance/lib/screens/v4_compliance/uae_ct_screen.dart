@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class UaeCtScreen extends StatefulWidget {
   const UaeCtScreen({super.key});
@@ -68,9 +69,9 @@ class _UaeCtScreenState extends State<UaeCtScreen>
         _buildHero(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.calculate, size: 16), text: 'حاسبة CT'),
             Tab(icon: Icon(Icons.article, size: 16), text: 'الإقرار'),
@@ -99,7 +100,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
         gradient: const LinearGradient(colors: [Color(0xFF006C35), Color(0xFF00925F)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.flag, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -110,14 +111,14 @@ class _UaeCtScreenState extends State<UaeCtScreen>
                 Text('ضريبة الشركات الإماراتية 🇦🇪',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('UAE Corporate Tax — 9% على الأرباح الخاضعة فوق 375,000 درهم · 0% للشركات الصغيرة',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('السنة المالية', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              Text('السنة المالية', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
               Text('2025', style: TextStyle(color: Color(0xFFFFD700), fontSize: 20, fontWeight: FontWeight.w900)),
             ],
           ),
@@ -184,10 +185,10 @@ class _UaeCtScreenState extends State<UaeCtScreen>
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFD4AF37).withOpacity(0.1) : Colors.grey.shade50,
+          color: selected ? core_theme.AC.gold.withOpacity(0.1) : core_theme.AC.navy3,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: selected ? const Color(0xFFD4AF37) : Colors.black12,
+            color: selected ? core_theme.AC.gold : core_theme.AC.bdr,
             width: selected ? 2 : 1,
           ),
         ),
@@ -197,14 +198,14 @@ class _UaeCtScreenState extends State<UaeCtScreen>
               value: id,
               groupValue: _entityType,
               onChanged: (v) => setState(() => _entityType = v ?? _entityType),
-              activeColor: const Color(0xFFD4AF37),
+              activeColor: core_theme.AC.gold,
             ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: TextStyle(fontSize: 13, fontWeight: selected ? FontWeight.w800 : FontWeight.w600)),
-                  Text(subtitle, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(subtitle, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ],
               ),
             ),
@@ -220,7 +221,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           TextField(
             controller: c,
@@ -246,7 +247,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,13 +276,13 @@ class _UaeCtScreenState extends State<UaeCtScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('ضريبة الشركات المستحقة',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text('ضريبة الشركات المستحقة',
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               const SizedBox(height: 4),
               Text(_fmt(_ctDue),
                   style: const TextStyle(color: Color(0xFFFFD700), fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
               Text('د.إ · معدل فعلي ${_effectiveRate.toStringAsFixed(2)}%',
-                  style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
             ],
           ),
         ),
@@ -291,18 +292,18 @@ class _UaeCtScreenState extends State<UaeCtScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
-              _line('الربح المحاسبي', _accountingProfit, Colors.black87),
-              _line('+ مصروفات غير مخصومة', _parse(_nonDeductible), Colors.red),
-              _line('- دخل معفى', _parse(_exemptIncome), Colors.green),
-              _line('- خسائر مستخدمة', _parse(_lossesBf).clamp(0.0, double.infinity), Colors.blue),
+              _line('الربح المحاسبي', _accountingProfit, core_theme.AC.tp),
+              _line('+ مصروفات غير مخصومة', _parse(_nonDeductible), core_theme.AC.err),
+              _line('- دخل معفى', _parse(_exemptIncome), core_theme.AC.ok),
+              _line('- خسائر مستخدمة', _parse(_lossesBf).clamp(0.0, double.infinity), core_theme.AC.info),
               const Divider(),
-              _line('الدخل الخاضع للضريبة', _taxableIncome, const Color(0xFFD4AF37), bold: true),
-              _line('الشريحة المعفاة (0%)', 375000, Colors.green),
-              _line('الشريحة الخاضعة (9%)', (_taxableIncome - 375000).clamp(0.0, double.infinity), Colors.orange),
+              _line('الدخل الخاضع للضريبة', _taxableIncome, core_theme.AC.gold, bold: true),
+              _line('الشريحة المعفاة (0%)', 375000, core_theme.AC.ok),
+              _line('الشريحة الخاضعة (9%)', (_taxableIncome - 375000).clamp(0.0, double.infinity), core_theme.AC.warn),
             ],
           ),
         ),
@@ -311,13 +312,13 @@ class _UaeCtScreenState extends State<UaeCtScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.green.shade50,
+              color: core_theme.AC.ok,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.green.shade200),
+              border: Border.all(color: core_theme.AC.ok),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.green),
+                Icon(Icons.check_circle, color: core_theme.AC.ok),
                 SizedBox(width: 8),
                 Expanded(child: Text('معفى من الضريبة بناءً على نوع المنشأة المختار', style: TextStyle(fontSize: 12))),
               ],
@@ -336,7 +337,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
               );
             },
             icon: const Icon(Icons.description),
-            label: const Text('توليد الإقرار السنوي'),
+            label: Text('توليد الإقرار السنوي'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF006C35),
               foregroundColor: Colors.white,
@@ -376,7 +377,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,7 +396,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
               _kv('تاريخ الاستحقاق', '30/09/2026 (9 أشهر من نهاية السنة)'),
               _kv('طريقة التقديم', 'EmaraTax portal (FTA)'),
               const Divider(height: 30),
-              const Text('بنود الإقرار الرئيسية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
+              Text('بنود الإقرار الرئيسية', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
               _returnLine('1', 'إجمالي الإيرادات', _parse(_revenue)),
               _returnLine('2', 'تعديلات ضريبية — إضافات', _parse(_nonDeductible)),
@@ -415,7 +416,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
           child: ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.upload_file),
-            label: const Text('إرسال إلى EmaraTax'),
+            label: Text('إرسال إلى EmaraTax'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF006C35),
               foregroundColor: Colors.white,
@@ -431,18 +432,18 @@ class _UaeCtScreenState extends State<UaeCtScreen>
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
-        color: highlight ? const Color(0xFFD4AF37).withOpacity(0.1) : null,
+        color: highlight ? core_theme.AC.gold.withOpacity(0.1) : null,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         children: [
-          SizedBox(width: 24, child: Text(num, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'))),
+          SizedBox(width: 24, child: Text(num, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'))),
           Expanded(child: Text(label, style: TextStyle(fontSize: 12, fontWeight: highlight ? FontWeight.w900 : FontWeight.w500))),
           Text(_fmt(value),
               style: TextStyle(
                 fontSize: highlight ? 14 : 12,
                 fontWeight: FontWeight.w800,
-                color: highlight ? const Color(0xFFD4AF37) : (value < 0 ? Colors.red : Colors.black87),
+                color: highlight ? core_theme.AC.gold : (value < 0 ? core_theme.AC.err : core_theme.AC.tp),
                 fontFamily: 'monospace',
               )),
         ],
@@ -457,7 +458,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
         _ruleSection(
           'الأساسيات',
           Icons.flag,
-          Colors.blue,
+          core_theme.AC.info,
           const [
             'ضريبة الشركات الاتحادية UAE CT — نافذة من 1 يونيو 2023',
             'القانون الاتحادي رقم 47 لسنة 2022 — الهيئة الاتحادية للضرائب FTA',
@@ -469,7 +470,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
         _ruleSection(
           'المناطق الحرة',
           Icons.apartment,
-          Colors.teal,
+          core_theme.AC.info,
           const [
             'الشركات في المناطق الحرة قد تكون Qualifying Free Zone Person (QFZP)',
             'الدخل المؤهّل (Qualifying Income): 0%',
@@ -481,7 +482,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
         _ruleSection(
           'إعفاء الأعمال الصغيرة',
           Icons.store,
-          Colors.green,
+          core_theme.AC.ok,
           const [
             'Small Business Relief متاح للشركات ذات إيرادات ≤ 3 مليون درهم',
             'تطبيق حتى 31 ديسمبر 2026 (قرار مجلس الوزراء رقم 73/2023)',
@@ -493,7 +494,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
         _ruleSection(
           'الخسائر والأسعار بين الأطراف',
           Icons.warning,
-          Colors.orange,
+          core_theme.AC.warn,
           const [
             'ترحيل خسائر لسنوات لاحقة — بدون حد زمني',
             'الحد الأقصى للخسارة المستخدمة في السنة: 75% من الدخل الخاضع',
@@ -511,7 +512,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -546,7 +547,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 160, child: Text(k, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 160, child: Text(k, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Expanded(child: Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
         ],
       ),

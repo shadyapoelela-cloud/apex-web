@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class CrmV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class CrmV52Screen extends StatefulWidget {
 }
 
 class _CrmV52ScreenState extends State<CrmV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _leads = <_Lead>[
@@ -44,12 +45,12 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
         SavedView(id: 'big', labelAr: 'صفقات كبيرة >500K', icon: Icons.star, defaultViewMode: ViewMode.kanban, isShared: true),
       ],
       filterChips: [
-        FilterChipDef(id: 'lead', labelAr: 'Lead', color: Colors.grey, count: _countFor(_Stage.lead), active: _filter == 'lead'),
-        FilterChipDef(id: 'qualified', labelAr: 'Qualified', color: Colors.blue, count: _countFor(_Stage.qualified), active: _filter == 'qualified'),
-        FilterChipDef(id: 'proposal', labelAr: 'Proposal', color: Colors.orange, count: _countFor(_Stage.proposal), active: _filter == 'proposal'),
+        FilterChipDef(id: 'lead', labelAr: 'Lead', color: core_theme.AC.td, count: _countFor(_Stage.lead), active: _filter == 'lead'),
+        FilterChipDef(id: 'qualified', labelAr: 'Qualified', color: core_theme.AC.info, count: _countFor(_Stage.qualified), active: _filter == 'qualified'),
+        FilterChipDef(id: 'proposal', labelAr: 'Proposal', color: core_theme.AC.warn, count: _countFor(_Stage.proposal), active: _filter == 'proposal'),
         FilterChipDef(id: 'negotiation', labelAr: 'Negotiation', color: _gold, count: _countFor(_Stage.negotiation), active: _filter == 'negotiation'),
-        FilterChipDef(id: 'won', labelAr: 'Won', color: Colors.green, count: _countFor(_Stage.won), active: _filter == 'won'),
-        FilterChipDef(id: 'lost', labelAr: 'Lost', color: Colors.red, count: _countFor(_Stage.lost), active: _filter == 'lost'),
+        FilterChipDef(id: 'won', labelAr: 'Won', color: core_theme.AC.ok, count: _countFor(_Stage.won), active: _filter == 'won'),
+        FilterChipDef(id: 'lost', labelAr: 'Lost', color: core_theme.AC.err, count: _countFor(_Stage.lost), active: _filter == 'lost'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -79,20 +80,20 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
                 Container(width: 4, height: 50, color: l.stage.color),
                 const SizedBox(width: 12),
                 Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(l.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                  Text(l.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                   Text(l.company, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                  Text(l.contact, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(l.contact, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ])),
-                Expanded(child: Text('${l.value.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy), textAlign: TextAlign.end)),
+                Expanded(child: Text('${l.value.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy), textAlign: TextAlign.end)),
                 const SizedBox(width: 20),
                 SizedBox(width: 100, child: Column(children: [
-                  ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: l.probability / 100, minHeight: 8, backgroundColor: Colors.grey.shade200, color: l.stage.color)),
+                  ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: l.probability / 100, minHeight: 8, backgroundColor: core_theme.AC.bdr, color: l.stage.color)),
                   const SizedBox(height: 2),
                   Text('${l.probability}%', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: l.stage.color)),
                 ])),
                 const SizedBox(width: 20),
                 Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Text('متوقع الإغلاق', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                  Text('متوقع الإغلاق', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(l.close, style: const TextStyle(fontSize: 11)),
                 ]),
                 const SizedBox(width: 16),
@@ -120,7 +121,7 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
           return Container(
             width: 280,
             margin: const EdgeInsets.only(left: 12),
-            decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+            decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Container(
                 padding: const EdgeInsets.all(12),
@@ -132,18 +133,18 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
                   Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: e.key.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${e.value.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: e.key.color))),
                 ]),
               ),
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), child: Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: const TextStyle(fontSize: 11, color: Colors.black54))),
+              Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), child: Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
               ...e.value.map((l) => Container(
                     margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(l.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+                      Text(l.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                       Text(l.company, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-                      Text(l.contact, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text(l.contact, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       const SizedBox(height: 6),
                       Row(children: [
-                        Text('${(l.value / 1000).toStringAsFixed(0)}K', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
+                        Text('${(l.value / 1000).toStringAsFixed(0)}K', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
                         const Spacer(),
                         Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: e.key.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Text('${l.probability}%', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: e.key.color))),
                       ]),
@@ -164,7 +165,7 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('قيمة خط الأنابيب حسب المرحلة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('قيمة خط الأنابيب حسب المرحلة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         ...stages.map((s) {
           final value = totals[s]!;
@@ -178,7 +179,7 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
                 Text('${value.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.color)),
               ]),
               const SizedBox(height: 4),
-              ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: Colors.grey.shade100, color: s.color)),
+              ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: core_theme.AC.navy3, color: s.color)),
             ]),
           );
         }),
@@ -199,12 +200,12 @@ extension _StageX on _Stage {
         _Stage.lost => 'مفقود',
       };
   Color get color => switch (this) {
-        _Stage.lead => Colors.grey,
-        _Stage.qualified => Colors.blue,
-        _Stage.proposal => Colors.orange,
-        _Stage.negotiation => const Color(0xFFD4AF37),
-        _Stage.won => Colors.green,
-        _Stage.lost => Colors.red,
+        _Stage.lead => core_theme.AC.td,
+        _Stage.qualified => core_theme.AC.info,
+        _Stage.proposal => core_theme.AC.warn,
+        _Stage.negotiation => core_theme.AC.gold,
+        _Stage.won => core_theme.AC.ok,
+        _Stage.lost => core_theme.AC.err,
       };
 }
 

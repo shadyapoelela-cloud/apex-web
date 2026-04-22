@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 111 — Construction Project Accounting
 /// WIP (Work-in-Progress), Retention, %-of-completion, Progress Billing
@@ -22,8 +23,8 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'المشاريع'), Tab(text: 'المستخلصات'), Tab(text: 'المحتجزات'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_projectsTab(), _billingsTab(), _retentionsTab(), _analyticsTab()])),
       ])),
@@ -33,13 +34,13 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.engineering, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('محاسبة مقاولات البناء', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('WIP + Retention + %-of-completion + Progress Billing', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('WIP + Retention + %-of-completion + Progress Billing', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -52,7 +53,7 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
       Expanded(child: _kpi('قيمة العقود', _fmtM(total), Icons.gavel, const Color(0xFF1A237E))),
       Expanded(child: _kpi('مفوتر', _fmtM(billed), Icons.receipt_long, const Color(0xFF2E7D32))),
       Expanded(child: _kpi('محتجز', _fmtM(retention), Icons.lock, const Color(0xFFE65100))),
-      Expanded(child: _kpi('مشاريع نشطة', '${_projects.where((p)=>p.status.contains('نشط')).length}', Icons.construction, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('مشاريع نشطة', '${_projects.where((p)=>p.status.contains('نشط')).length}', Icons.construction, core_theme.AC.gold)),
     ]));
   }
 
@@ -60,7 +61,7 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -74,7 +75,7 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text('${p.code} • ${p.client}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${p.code} • ${p.client}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: _statusColor(p.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
@@ -88,17 +89,17 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
           _mini('محتجز', _fmt(p.retention)),
         ]),
         const SizedBox(height: 8),
-        Text('%-الإنجاز المادي', style: const TextStyle(fontSize: 10, color: Colors.black54)),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: completion, minHeight: 5, backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFF4A148C)))),
+        Text('%-الإنجاز المادي', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: completion, minHeight: 5, backgroundColor: core_theme.AC.bdr, valueColor: const AlwaysStoppedAnimation(Color(0xFF4A148C)))),
         const SizedBox(height: 4),
-        Text('%-المفوتر', style: const TextStyle(fontSize: 10, color: Colors.black54)),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: billedRatio, minHeight: 5, backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFF2E7D32)))),
+        Text('%-المفوتر', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: billedRatio, minHeight: 5, backgroundColor: core_theme.AC.bdr, valueColor: const AlwaysStoppedAnimation(Color(0xFF2E7D32)))),
       ]),
     ));
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
   ]));
 
@@ -109,11 +110,11 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
       title: Text(b.id, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(b.project, style: const TextStyle(fontSize: 12)),
-        Text('${b.period} • ${b.status}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('${b.period} • ${b.status}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text(_fmt(b.amount), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
-        Text('محتجز: ${_fmt(b.retention)}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('محتجز: ${_fmt(b.retention)}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -127,7 +128,7 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(r.project, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-          Text('${r.percentage}% محتجز • الإفراج: ${r.releaseDate}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('${r.percentage}% محتجز • الإفراج: ${r.releaseDate}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Row(children: [
             Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -152,7 +153,7 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _statusColor(String s) {
@@ -160,7 +161,7 @@ class _ConstructionScreenState extends State<ConstructionScreen> with SingleTick
     if (s.contains('متأخر')) return const Color(0xFFC62828);
     if (s.contains('مكتمل')) return const Color(0xFF1A237E);
     if (s.contains('معلق')) return const Color(0xFFE65100);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   String _fmt(double v) => v >= 1000000 ? '${(v/1000000).toStringAsFixed(2)}M' : '${(v/1000).toStringAsFixed(0)}K';

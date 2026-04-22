@@ -16,6 +16,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -148,36 +149,36 @@ class _AiBankReconciliationScreenState
             label: 'إجمالي الاقتراحات',
             value: '$total',
             icon: Icons.list_alt,
-            color: const Color(0xFF2563EB),
+            color: core_theme.AC.info,
           ),
           const SizedBox(width: 12),
           _StatPill(
             label: 'تم التطبيق تلقائياً',
             value: '$autoApplied',
             icon: Icons.check_circle,
-            color: const Color(0xFF059669),
+            color: core_theme.AC.ok,
           ),
           const SizedBox(width: 12),
           _StatPill(
             label: 'بحاجة مراجعة',
             value: '$needsApproval',
             icon: Icons.pending_actions,
-            color: const Color(0xFFD97706),
+            color: core_theme.AC.warn,
           ),
           const SizedBox(width: 12),
           _StatPill(
             label: 'متوسط الثقة',
             value: '${(avgScore * 100).toStringAsFixed(0)}%',
             icon: Icons.insights,
-            color: const Color(0xFF7C3AED),
+            color: core_theme.AC.purple,
           ),
           const Spacer(),
           ElevatedButton.icon(
             onPressed: () => setState(() => _suggestions = _mockSuggestions()),
             icon: const Icon(Icons.refresh, size: 16),
-            label: const Text('تحديث'),
+            label: Text('تحديث'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
+              backgroundColor: core_theme.AC.gold,
               foregroundColor: Colors.white,
             ),
           ),
@@ -290,7 +291,7 @@ class _StatPill extends StatelessWidget {
               ),
               Text(
                 label,
-                style: const TextStyle(fontSize: 11, color: Colors.black54),
+                style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
               ),
             ],
           ),
@@ -315,23 +316,23 @@ class _SuggestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAuto = suggestion.verdict == 'auto_applied';
     final confidenceColor = suggestion.score >= 0.95
-        ? const Color(0xFF059669) // green
+        ? core_theme.AC.ok // green
         : suggestion.score >= 0.80
-            ? const Color(0xFFD97706) // amber
+            ? core_theme.AC.warn // amber
             : const Color(0xFFB91C1C); // red
 
     final dirColor = suggestion.txnDirection == 'credit'
-        ? const Color(0xFF059669)
-        : const Color(0xFFD97706);
+        ? core_theme.AC.ok
+        : core_theme.AC.warn;
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: core_theme.AC.tp.withOpacity(0.03),
             blurRadius: 6,
             offset: const Offset(0, 1),
           ),
@@ -366,10 +367,10 @@ class _SuggestionCard extends StatelessWidget {
                         children: [
                           Text(
                             suggestion.txnExternalId,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'monospace',
                               fontSize: 11,
-                              color: Colors.black54,
+                              color: core_theme.AC.ts,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -403,9 +404,9 @@ class _SuggestionCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             '• ${suggestion.txnDescription}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Colors.black54,
+                              color: core_theme.AC.ts,
                             ),
                           ),
                         ],
@@ -427,7 +428,7 @@ class _SuggestionCard extends StatelessWidget {
                     ),
                     Text(
                       '${suggestion.txnDate.toString().substring(0, 10)}',
-                      style: const TextStyle(fontSize: 11, color: Colors.black54),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                     ),
                   ],
                 ),
@@ -461,11 +462,11 @@ class _SuggestionCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Text(
+                          Text(
                             'اقتراح الذكاء:',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.black54,
+                              color: core_theme.AC.ts,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -502,20 +503,20 @@ class _SuggestionCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF059669).withOpacity(0.12),
+                                color: core_theme.AC.ok.withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.bolt, size: 10, color: Color(0xFF059669)),
+                                  Icon(Icons.bolt, size: 10, color: core_theme.AC.ok),
                                   SizedBox(width: 2),
                                   Text(
                                     'تلقائي',
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w700,
-                                      color: Color(0xFF059669),
+                                      color: core_theme.AC.ok,
                                     ),
                                   ),
                                 ],
@@ -525,15 +526,15 @@ class _SuggestionCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD97706).withOpacity(0.12),
+                                color: core_theme.AC.warn.withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'بحاجة اعتماد',
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFFD97706),
+                                  color: core_theme.AC.warn,
                                 ),
                               ),
                             ),
@@ -547,7 +548,7 @@ class _SuggestionCard extends StatelessWidget {
                                 ? Icons.receipt
                                 : Icons.book,
                             size: 14,
-                            color: Colors.black54,
+                            color: core_theme.AC.ts,
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -561,15 +562,15 @@ class _SuggestionCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             '• ${suggestion.candidateVendor}',
-                            style: const TextStyle(fontSize: 12, color: Colors.black54),
+                            style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                           ),
                           const Spacer(),
                           Text(
                             '${suggestion.candidateAmount.toStringAsFixed(0)} ر.س',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontFamily: 'monospace',
-                              color: Colors.black54,
+                              color: core_theme.AC.ts,
                             ),
                           ),
                         ],
@@ -583,14 +584,14 @@ class _SuggestionCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.04),
+                                color: core_theme.AC.tp.withOpacity(0.04),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 r,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
-                                  color: Colors.black87,
+                                  color: core_theme.AC.tp,
                                 ),
                               ),
                             ),
@@ -606,27 +607,27 @@ class _SuggestionCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.02),
+              color: core_theme.AC.tp.withOpacity(0.02),
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
               border: Border(
-                top: BorderSide(color: Colors.black.withOpacity(0.06)),
+                top: BorderSide(color: core_theme.AC.tp.withOpacity(0.06)),
               ),
             ),
             child: Row(
               children: [
                 TextButton.icon(
                   icon: const Icon(Icons.info_outline, size: 14),
-                  label: const Text('عرض التفاصيل'),
+                  label: Text('عرض التفاصيل'),
                   onPressed: () {},
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.black54,
+                    foregroundColor: core_theme.AC.ts,
                     textStyle: const TextStyle(fontSize: 12),
                   ),
                 ),
                 const Spacer(),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.close, size: 14),
-                  label: const Text('رفض'),
+                  label: Text('رفض'),
                   onPressed: onReject,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFB91C1C),

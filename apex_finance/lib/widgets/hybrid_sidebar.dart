@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../core/theme.dart';
+import '../core/theme.dart' as core_theme;
 
 class HybridSidebar extends StatefulWidget {
   final Widget child;
@@ -108,7 +109,7 @@ class _HybridSidebarState extends State<HybridSidebar> {
     for (final g in _groups) { allItems.addAll(g.items); }
     showDialog(
       context: context,
-      barrierColor: Colors.black54,
+      barrierColor: core_theme.AC.ts,
       builder: (_) => _QuickSearchDialog(items: allItems),
     );
   }

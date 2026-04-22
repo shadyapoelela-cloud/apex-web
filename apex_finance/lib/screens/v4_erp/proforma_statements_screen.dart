@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 131 — Pro-Forma Financial Statements (Advisory)
 class ProformaStatementsScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _ProformaStatementsScreenState extends State<ProformaStatementsScreen> wit
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'قائمة الدخل'), Tab(text: 'المركز المالي'), Tab(text: 'التدفقات النقدية'), Tab(text: 'الافتراضات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_incomeTab(), _balanceTab(), _cashflowTab(), _assumptionsTab()])),
       ])),
@@ -32,20 +33,20 @@ class _ProformaStatementsScreenState extends State<ProformaStatementsScreen> wit
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.assessment, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('القوائم المالية التقديرية', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('Pro-Forma Financials — توقعات 5 سنوات + تحليل الحساسية', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('Pro-Forma Financials — توقعات 5 سنوات + تحليل الحساسية', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
 
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('سنة الأساس', '2026', Icons.calendar_today, const Color(0xFF1A237E))),
-    Expanded(child: _kpi('أفق التوقع', '5 سنوات', Icons.timeline, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('أفق التوقع', '5 سنوات', Icons.timeline, core_theme.AC.gold)),
     Expanded(child: _kpi('CAGR مبيعات', '+18.4%', Icons.trending_up, const Color(0xFF2E7D32))),
     Expanded(child: _kpi('IRR', '26.8%', Icons.stars, const Color(0xFF4A148C))),
   ]));
@@ -54,7 +55,7 @@ class _ProformaStatementsScreenState extends State<ProformaStatementsScreen> wit
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -65,7 +66,7 @@ class _ProformaStatementsScreenState extends State<ProformaStatementsScreen> wit
       child: Row(children: [
         Expanded(flex: 3, child: Text(row.label, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 13))),
         ...row.years.map((v) => Expanded(child: Text(v, textAlign: TextAlign.end,
-          style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 12, color: isBold ? const Color(0xFF4A148C) : Colors.black87)))),
+          style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 12, color: isBold ? const Color(0xFF4A148C) : core_theme.AC.tp)))),
       ]),
     ));
   });
@@ -77,7 +78,7 @@ class _ProformaStatementsScreenState extends State<ProformaStatementsScreen> wit
       child: Row(children: [
         Expanded(flex: 3, child: Text(row.label, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 13))),
         ...row.years.map((v) => Expanded(child: Text(v, textAlign: TextAlign.end,
-          style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 12, color: isBold ? const Color(0xFF1A237E) : Colors.black87)))),
+          style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 12, color: isBold ? const Color(0xFF1A237E) : core_theme.AC.tp)))),
       ]),
     ));
   });
@@ -89,7 +90,7 @@ class _ProformaStatementsScreenState extends State<ProformaStatementsScreen> wit
       child: Row(children: [
         Expanded(flex: 3, child: Text(row.label, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 13))),
         ...row.years.map((v) => Expanded(child: Text(v, textAlign: TextAlign.end,
-          style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 12, color: isBold ? const Color(0xFF2E7D32) : Colors.black87)))),
+          style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: 12, color: isBold ? const Color(0xFF2E7D32) : core_theme.AC.tp)))),
       ]),
     ));
   });
@@ -102,8 +103,8 @@ class _ProformaStatementsScreenState extends State<ProformaStatementsScreen> wit
       title: Text(a.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Text(a.detail, style: const TextStyle(fontSize: 11)),
       trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(color: const Color(0xFFD4AF37).withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
-        child: Text(a.value, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD4AF37)))),
+        decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+        child: Text(a.value, style: TextStyle(fontWeight: FontWeight.bold, color: core_theme.AC.gold))),
     ));
   });
 

@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/form_wizard_template.dart';
 
 class AuditPlanningV52Screen extends StatefulWidget {
@@ -12,9 +13,9 @@ class AuditPlanningV52Screen extends StatefulWidget {
 }
 
 class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
-  static const _purple = Color(0xFF4A148C);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
+  static final _purple = Color(0xFF4A148C);
 
   String _clientName = '';
   bool _independenceOK = false;
@@ -80,7 +81,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
   Widget _step1() {
     return SingleChildScrollView(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('بيانات الشركة المراجَعة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+        Text('بيانات الشركة المراجَعة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
         const SizedBox(height: 12),
         TextField(
           onChanged: (v) => setState(() => _clientName = v),
@@ -118,7 +119,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(color: _purple.withOpacity(0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: _purple.withOpacity(0.3))),
-          child: const Row(children: [
+          child: Row(children: [
             Icon(Icons.info_outline, color: _purple),
             SizedBox(width: 10),
             Expanded(child: Text('وفقاً لـ ISA 220 — يجب التأكد من استقلالية الفريق قبل قبول الارتباط', style: TextStyle(fontSize: 12))),
@@ -128,13 +129,13 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
         ...checks.map((c) => Container(
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.green.withOpacity(0.3))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
               child: Row(children: [
-                const Icon(Icons.check_circle, color: Colors.green),
+                Icon(Icons.check_circle, color: core_theme.AC.ok),
                 const SizedBox(width: 10),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(c.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                  Text(c.$2, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(c.$2, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ])),
               ]),
             )),
@@ -142,7 +143,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
         CheckboxListTile(
           value: _independenceOK,
           onChanged: (v) => setState(() => _independenceOK = v ?? false),
-          title: const Text('أقرّ باستقلالية الفريق والالتزام بمعايير ISA 220', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+          title: Text('أقرّ باستقلالية الفريق والالتزام بمعايير ISA 220', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
           activeColor: _purple,
           dense: true,
         ),
@@ -152,25 +153,25 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
 
   Widget _step3() {
     final risks = [
-      ('low', 'منخفضة', 'الصناعة مستقرة، ضوابط قوية، تاريخ نظيف', Colors.green),
-      ('medium', 'متوسطة', 'بعض مخاطر الصناعة، ضوابط مقبولة', Colors.orange),
-      ('high', 'مرتفعة', 'مخاطر كبيرة في الإيراد، تاريخ معدّلات سابقة', Colors.red),
+      ('low', 'منخفضة', 'الصناعة مستقرة، ضوابط قوية، تاريخ نظيف', core_theme.AC.ok),
+      ('medium', 'متوسطة', 'بعض مخاطر الصناعة، ضوابط مقبولة', core_theme.AC.warn),
+      ('high', 'مرتفعة', 'مخاطر كبيرة في الإيراد، تاريخ معدّلات سابقة', core_theme.AC.err),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('قيّم مستوى المخاطر العام للارتباط', style: TextStyle(fontSize: 13, color: Colors.black54)),
+      Text('قيّم مستوى المخاطر العام للارتباط', style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
       const SizedBox(height: 12),
       ...risks.map((r) => InkWell(
             onTap: () => setState(() => _riskLevel = r.$1),
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: _riskLevel == r.$1 ? r.$4.withOpacity(0.08) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: _riskLevel == r.$1 ? r.$4 : Colors.grey.shade300, width: _riskLevel == r.$1 ? 2 : 1)),
+              decoration: BoxDecoration(color: _riskLevel == r.$1 ? r.$4.withOpacity(0.08) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: _riskLevel == r.$1 ? r.$4 : core_theme.AC.bdr, width: _riskLevel == r.$1 ? 2 : 1)),
               child: Row(children: [
-                Icon(_riskLevel == r.$1 ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: _riskLevel == r.$1 ? r.$4 : Colors.black38),
+                Icon(_riskLevel == r.$1 ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: _riskLevel == r.$1 ? r.$4 : core_theme.AC.td),
                 const SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('مخاطرة ${r.$2}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _riskLevel == r.$1 ? r.$4 : Colors.black87)),
-                  Text(r.$3, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text('مخاطرة ${r.$2}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _riskLevel == r.$1 ? r.$4 : core_theme.AC.tp)),
+                  Text(r.$3, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ])),
                 Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.$4.withOpacity(0.15), borderRadius: BorderRadius.circular(12)), child: Text(r.$2, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.$4))),
               ]),
@@ -185,7 +186,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(color: _gold.withOpacity(0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: _gold)),
-          child: const Row(children: [
+          child: Row(children: [
             Icon(Icons.calculate, color: _gold),
             SizedBox(width: 10),
             Expanded(child: Text('الأهمية النسبية تُحسب تلقائياً كنسبة من إجمالي الأصول / الإيراد', style: TextStyle(fontSize: 12))),
@@ -196,7 +197,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
         const Divider(),
         _kvBig('Overall Materiality (1%)', '845,000 ر.س', color: _gold),
         _kvBig('Performance Materiality (75%)', '633,750 ر.س', color: _navy),
-        _kvBig('Trivial Threshold (5%)', '42,250 ر.س', color: Colors.green),
+        _kvBig('Trivial Threshold (5%)', '42,250 ر.س', color: core_theme.AC.ok),
         const SizedBox(height: 16),
         Row(children: [
           Expanded(child: TextField(decoration: InputDecoration(labelText: 'تعديل Overall (اختياري)', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))))),
@@ -212,37 +213,37 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(children: [
         Expanded(child: Text(label, style: const TextStyle(fontSize: 13))),
-        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color ?? Colors.black87)),
+        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color ?? core_theme.AC.tp)),
       ]),
     );
   }
 
   Widget _step5() {
-    const team = [
+    final team = [
       ('د. محمد الراجحي', 'الشريك المسؤول', 'partner', _gold),
-      ('أحمد العمري', 'مدير المراجعة', 'manager', Colors.blue),
-      ('سارة المطيري', 'مراجع أول', 'senior', Colors.green),
-      ('نورة الدوسري', 'مراجع', 'staff', Colors.grey),
-      ('خالد الشمراني', 'مراجع متدرب', 'junior', Colors.grey),
+      ('أحمد العمري', 'مدير المراجعة', 'manager', core_theme.AC.info),
+      ('سارة المطيري', 'مراجع أول', 'senior', core_theme.AC.ok),
+      ('نورة الدوسري', 'مراجع', 'staff', core_theme.AC.td),
+      ('خالد الشمراني', 'مراجع متدرب', 'junior', core_theme.AC.td),
     ];
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         const Expanded(child: Text('فريق المراجعة المقترح:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-        OutlinedButton.icon(onPressed: () => setState(() => _teamAssigned = true), icon: const Icon(Icons.person_add, size: 16), label: const Text('تعيين الكل')),
+        OutlinedButton.icon(onPressed: () => setState(() => _teamAssigned = true), icon: const Icon(Icons.person_add, size: 16), label: Text('تعيين الكل')),
       ]),
       const SizedBox(height: 12),
       ...team.map((m) => Container(
             margin: const EdgeInsets.only(bottom: 6),
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: _teamAssigned ? Colors.green.withOpacity(0.3) : Colors.grey.shade200)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: _teamAssigned ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.bdr)),
             child: Row(children: [
               CircleAvatar(backgroundColor: m.$4.withOpacity(0.15), child: Text(m.$1[0], style: TextStyle(color: m.$4, fontWeight: FontWeight.w800))),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(m.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(m.$2, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(m.$2, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ])),
-              if (_teamAssigned) const Icon(Icons.check_circle, color: Colors.green, size: 18),
+              if (_teamAssigned) Icon(Icons.check_circle, color: core_theme.AC.ok, size: 18),
             ]),
           )),
     ]);
@@ -255,7 +256,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withOpacity(0.08), _gold.withOpacity(0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Row(children: [
+            Row(children: [
               Icon(Icons.check_circle, color: _purple, size: 28),
               SizedBox(width: 10),
               Text('ملخّص خطة الارتباط', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _purple)),
@@ -274,7 +275,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
         CheckboxListTile(
           value: _reviewedPlan,
           onChanged: (v) => setState(() => _reviewedPlan = v ?? false),
-          title: const Text('راجعت الخطة وجاهزة لإرسالها للشريك', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+          title: Text('راجعت الخطة وجاهزة لإرسالها للشريك', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
           activeColor: _purple,
           dense: true,
         ),
@@ -286,7 +287,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(children: [
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+        Expanded(child: Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
         Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
       ]),
     );

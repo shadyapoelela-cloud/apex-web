@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ContractManagementScreen extends StatefulWidget {
   const ContractManagementScreen({super.key});
@@ -49,10 +50,10 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('إجمالي القيمة', _fmtM(totalValue), const Color(0xFFD4AF37), Icons.attach_money),
-            _kpi('عقود سارية', '$active', Colors.green, Icons.check_circle),
-            _kpi('قرب الانتهاء', '$expiring', Colors.orange, Icons.schedule),
-            _kpi('إجمالي العقود', '${_contracts.length}', Colors.blue, Icons.description),
+            _kpi('إجمالي القيمة', _fmtM(totalValue), core_theme.AC.gold, Icons.attach_money),
+            _kpi('عقود سارية', '$active', core_theme.AC.ok, Icons.check_circle),
+            _kpi('قرب الانتهاء', '$expiring', core_theme.AC.warn, Icons.schedule),
+            _kpi('إجمالي العقود', '${_contracts.length}', core_theme.AC.info, Icons.description),
           ],
         ),
         const SizedBox(height: 16),
@@ -74,21 +75,21 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
         children: [
           const Icon(Icons.gavel, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('إدارة العقود',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('سجل شامل للعقود مع تنبيهات التجديد، SLAs، وتقييم المخاطر',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 16),
-            label: const Text('عقد جديد'),
+            label: Text('عقد جديد'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF455A64),
@@ -117,7 +118,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -159,18 +160,18 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black26),
+        border: Border.all(color: core_theme.AC.td),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$label:', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text('$label:', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           const SizedBox(width: 6),
           DropdownButton<String>(
             value: value,
             underline: const SizedBox(),
             isDense: true,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black87),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.tp),
             items: options.map((o) => DropdownMenuItem(value: o.id, child: Text(o.label))).toList(),
             onChanged: (v) => onChanged(v ?? 'all'),
           ),
@@ -212,7 +213,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(c.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                        Text(c.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -227,13 +228,13 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: (c.side == 'customer' ? Colors.green : Colors.orange).withOpacity(0.12),
+                            color: (c.side == 'customer' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(c.side == 'customer' ? 'عميل' : 'مورد',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: c.side == 'customer' ? Colors.green : Colors.orange,
+                                color: c.side == 'customer' ? core_theme.AC.ok : core_theme.AC.warn,
                                 fontWeight: FontWeight.w800,
                               )),
                         ),
@@ -248,8 +249,8 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(_fmt(c.value),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                  const Text('ر.س إجمالي', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                  Text('ر.س إجمالي', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   const SizedBox(height: 4),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -268,7 +269,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: core_theme.AC.navy3,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -277,7 +278,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('البداية', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text('البداية', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       Text(c.startDate, style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
                     ],
                   ),
@@ -286,7 +287,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('النهاية', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text('النهاية', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       Text(c.endDate, style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
                     ],
                   ),
@@ -295,12 +296,12 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('الأيام المتبقية', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text('الأيام المتبقية', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       Text('${daysLeft < 0 ? 0 : daysLeft} يوم',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w900,
-                            color: daysLeft < 60 ? Colors.orange : Colors.green,
+                            color: daysLeft < 60 ? core_theme.AC.warn : core_theme.AC.ok,
                           )),
                     ],
                   ),
@@ -309,7 +310,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('شروط الدفع', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text('شروط الدفع', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       Text(c.paymentTerms, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                     ],
                   ),
@@ -320,19 +321,19 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
           const SizedBox(height: 10),
           Row(
             children: [
-              const Text('نسبة الإنجاز', style: TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('نسبة الإنجاز', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
               Expanded(
                 child: LinearProgressIndicator(
                   value: c.progress / 100,
-                  backgroundColor: Colors.grey.shade200,
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)),
+                  backgroundColor: core_theme.AC.bdr,
+                  valueColor: AlwaysStoppedAnimation(core_theme.AC.gold),
                   minHeight: 6,
                 ),
               ),
               const SizedBox(width: 8),
               Text('${c.progress}%',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
             ],
           ),
           if (daysLeft < 60 && daysLeft > 0) ...[
@@ -340,23 +341,23 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
+                color: core_theme.AC.warn,
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.orange.shade200),
+                border: Border.all(color: core_theme.AC.warn),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber, color: Colors.orange, size: 16),
+                  Icon(Icons.warning_amber, color: core_theme.AC.warn, size: 16),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       'ينتهي العقد خلال $daysLeft يوم — ابدأ محادثات التجديد',
-                      style: const TextStyle(fontSize: 11, color: Colors.orange),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.warn),
                     ),
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: const Text('تجديد', style: TextStyle(fontSize: 11)),
+                    child: Text('تجديد', style: TextStyle(fontSize: 11)),
                   ),
                 ],
               ),
@@ -370,21 +371,21 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
   Color _typeColor(String t) {
     switch (t) {
       case 'supply':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'service':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'audit':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'advisory':
-        return Colors.indigo;
+        return core_theme.AC.purple;
       case 'lease':
         return Colors.brown;
       case 'license':
         return Colors.deepOrange;
       case 'financing':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -433,13 +434,13 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
   Color _statusColor(String s) {
     switch (s) {
       case 'active':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'expiring':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'expired':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

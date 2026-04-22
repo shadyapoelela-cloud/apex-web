@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class PayrollRunScreen extends StatefulWidget {
   const PayrollRunScreen({super.key});
@@ -52,9 +53,9 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
         _buildStatsRow(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.people, size: 16), text: 'الموظفون'),
             Tab(icon: Icon(Icons.health_and_safety, size: 16), text: 'GOSI / WPS'),
@@ -82,8 +83,8 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+        gradient: LinearGradient(
+          colors: [Color(0xFF1E3A8A), core_theme.AC.info],
         ),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -91,14 +92,14 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
         children: [
           const Icon(Icons.payments, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('مسير الرواتب',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('حساب تلقائي للأساسي والبدلات والحسومات و GOSI — مرتبط بـ WPS',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -132,10 +133,10 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _stat('موظفون مشمولون', '$_includedCount', Colors.blue, Icons.people),
-          _stat('إجمالي الرواتب', _fmt(_grossTotal), Colors.green, Icons.attach_money),
-          _stat('GOSI', _fmt(_gosiTotal), Colors.orange, Icons.health_and_safety),
-          _stat('الصافي', _fmt(_netTotal), const Color(0xFFD4AF37), Icons.account_balance_wallet),
+          _stat('موظفون مشمولون', '$_includedCount', core_theme.AC.info, Icons.people),
+          _stat('إجمالي الرواتب', _fmt(_grossTotal), core_theme.AC.ok, Icons.attach_money),
+          _stat('GOSI', _fmt(_gosiTotal), core_theme.AC.warn, Icons.health_and_safety),
+          _stat('الصافي', _fmt(_netTotal), core_theme.AC.gold, Icons.account_balance_wallet),
         ],
       ),
     );
@@ -159,7 +160,7 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -176,15 +177,15 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
       children: [
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     SizedBox(width: 40),
                     Expanded(flex: 2, child: Text('الموظف', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
@@ -193,7 +194,7 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
                     Expanded(child: Text('البدلات', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
                     Expanded(child: Text('GOSI', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
                     Expanded(child: Text('حسومات', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
-                    Expanded(child: Text('الصافي', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: Color(0xFFD4AF37)))),
+                    Expanded(child: Text('الصافي', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: core_theme.AC.gold))),
                   ],
                 ),
               ),
@@ -201,15 +202,15 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    color: _rows[i].included ? null : Colors.grey.shade50,
-                    border: Border(top: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    color: _rows[i].included ? null : core_theme.AC.navy3,
+                    border: Border(top: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
                       Checkbox(
                         value: _rows[i].included,
                         onChanged: (v) => setState(() => _rows[i].included = v ?? false),
-                        activeColor: const Color(0xFFD4AF37),
+                        activeColor: core_theme.AC.gold,
                       ),
                       Expanded(
                         flex: 2,
@@ -217,19 +218,19 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(_rows[i].name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                            Text(_rows[i].id, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(_rows[i].id, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                           ],
                         ),
                       ),
                       Expanded(flex: 2, child: Text(_rows[i].title, style: const TextStyle(fontSize: 12))),
                       Expanded(child: Text(_fmt(_rows[i].basic), style: const TextStyle(fontSize: 12))),
                       Expanded(child: Text(_fmt(_rows[i].allowances), style: const TextStyle(fontSize: 12))),
-                      Expanded(child: Text(_fmt(_rows[i].gosi), style: const TextStyle(fontSize: 12, color: Colors.orange))),
-                      Expanded(child: Text(_fmt(_rows[i].deductions), style: const TextStyle(fontSize: 12, color: Colors.red))),
+                      Expanded(child: Text(_fmt(_rows[i].gosi), style: TextStyle(fontSize: 12, color: core_theme.AC.warn))),
+                      Expanded(child: Text(_fmt(_rows[i].deductions), style: TextStyle(fontSize: 12, color: core_theme.AC.err))),
                       Expanded(
                         child: Text(
                           _fmt(_rows[i].basic + _rows[i].allowances - _rows[i].gosi - _rows[i].deductions),
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.gold),
                         ),
                       ),
                     ],
@@ -251,7 +252,7 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
           'المستحق على صاحب العمل: ${_fmt(_gosiTotal * 9 / 9)} ر.س (9%)',
           'المستحق على الموظف: ${_fmt(_gosiTotal)} ر.س (9%)',
           'الإجمالي للإيداع: ${_fmt(_gosiTotal * 2)} ر.س',
-          Colors.orange,
+          core_theme.AC.warn,
           Icons.health_and_safety,
         ),
         const SizedBox(height: 12),
@@ -260,20 +261,20 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
           'البنك المحول منه: الراجحي — SA03 8000 0000 6080 1016 7519',
           'تاريخ التنفيذ المقترح: 2026-05-01',
           'عدد المستفيدين: $_includedCount موظف',
-          Colors.blue,
+          core_theme.AC.info,
           Icons.shield,
         ),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.green.shade50,
+            color: core_theme.AC.ok,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.green.shade200),
+            border: Border.all(color: core_theme.AC.ok),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.green),
+              Icon(Icons.check_circle, color: core_theme.AC.ok),
               SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -281,7 +282,7 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
                   style: TextStyle(fontSize: 12),
                 ),
               ),
-              Icon(Icons.download, color: Colors.green, size: 18),
+              Icon(Icons.download, color: core_theme.AC.ok, size: 18),
             ],
           ),
         ),
@@ -320,7 +321,7 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('أنواع الحسومات المطبّقة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+        Text('أنواع الحسومات المطبّقة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
         const SizedBox(height: 12),
         _deductionRow('سلفة', 2, 750),
         _deductionRow('غياب', 1, 300),
@@ -330,8 +331,8 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('إجمالي الحسومات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-            Text(_fmt(_deductionsTotal), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.red)),
+            Text('إجمالي الحسومات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+            Text(_fmt(_deductionsTotal), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: core_theme.AC.err)),
           ],
         ),
       ],
@@ -341,11 +342,11 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
   Widget _deductionRow(String type, int count, double amount) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black12))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.bdr))),
       child: Row(
         children: [
           Expanded(flex: 2, child: Text(type, style: const TextStyle(fontSize: 13))),
-          Expanded(child: Text('$count موظف', style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          Expanded(child: Text('$count موظف', style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Text(_fmt(amount), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
         ],
       ),
@@ -369,14 +370,14 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('تم إرسال المسير للمدير المالي — إجمالي $_includedCount موظف، صافي ${_fmt(_netTotal)}'),
-                  backgroundColor: Colors.green,
+                  backgroundColor: core_theme.AC.ok,
                 ),
               );
             },
             icon: const Icon(Icons.send),
             label: Text('إرسال للمدير المالي — ${_fmt(_netTotal)} صافي'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
+              backgroundColor: core_theme.AC.gold,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -391,17 +392,17 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: done ? Colors.green.shade50 : Colors.grey.shade50,
+        color: done ? core_theme.AC.ok : core_theme.AC.navy3,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: done ? Colors.green.shade200 : Colors.black12),
+        border: Border.all(color: done ? core_theme.AC.ok : core_theme.AC.bdr),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: done ? Colors.green : Colors.grey.shade300,
+            backgroundColor: done ? core_theme.AC.ok : core_theme.AC.bdr,
             child: done
                 ? const Icon(Icons.check, color: Colors.white, size: 18)
-                : Text('$num', style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w700)),
+                : Text('$num', style: TextStyle(color: core_theme.AC.ts, fontWeight: FontWeight.w700)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -409,7 +410,7 @@ class _PayrollRunScreenState extends State<PayrollRunScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),

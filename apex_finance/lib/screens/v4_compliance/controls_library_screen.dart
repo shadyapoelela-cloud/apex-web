@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ControlsLibraryScreen extends StatefulWidget {
   const ControlsLibraryScreen({super.key});
@@ -57,10 +58,10 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
         Row(
           children: [
             _kpi('إجمالي الضوابط', '${_controls.length}', const Color(0xFF4A148C), Icons.library_books),
-            _kpi('فعّالة', '$effective', Colors.green, Icons.check_circle),
-            _kpi('جزئياً', '$partial', Colors.orange, Icons.warning),
-            _kpi('تحتاج تحسين', '$needsImp', Colors.red, Icons.error),
-            _kpi('نسبة نجاح الاختبار', '${(passedTests / totalTests * 100).toStringAsFixed(0)}%', Colors.blue, Icons.analytics),
+            _kpi('فعّالة', '$effective', core_theme.AC.ok, Icons.check_circle),
+            _kpi('جزئياً', '$partial', core_theme.AC.warn, Icons.warning),
+            _kpi('تحتاج تحسين', '$needsImp', core_theme.AC.err, Icons.error),
+            _kpi('نسبة نجاح الاختبار', '${(passedTests / totalTests * 100).toStringAsFixed(0)}%', core_theme.AC.info, Icons.analytics),
           ],
         ),
         const SizedBox(height: 16),
@@ -80,7 +81,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
         gradient: const LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF6A1B9A)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.security, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -91,7 +92,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
                 Text('مكتبة الضوابط الداخلية',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('SOX · COSO 2013 · ISO 31000 — سجل الضوابط مع نتائج الاختبار والتقييم',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -118,7 +119,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -163,18 +164,18 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black26),
+        border: Border.all(color: core_theme.AC.td),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$label:', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text('$label:', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           const SizedBox(width: 6),
           DropdownButton<String>(
             value: value,
             underline: const SizedBox(),
             isDense: true,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black87),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.tp),
             items: ops.map((o) => DropdownMenuItem(value: o.id, child: Text(o.label))).toList(),
             onChanged: (v) => onChanged(v ?? 'all'),
           ),
@@ -188,13 +189,13 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            color: Colors.grey.shade100,
+            color: core_theme.AC.navy3,
             child: const Row(
               children: [
                 Expanded(child: Text('رقم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -219,7 +220,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
       ),
       child: Row(
         children: [
@@ -229,8 +230,8 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-              child: Text(c.domain, style: const TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+              decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              child: Text(c.domain, style: TextStyle(fontSize: 10, color: core_theme.AC.info, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
             ),
           ),
           Expanded(
@@ -238,13 +239,13 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (c.type == 'preventive' ? Colors.green : Colors.orange).withOpacity(0.12),
+                color: (c.type == 'preventive' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(c.type == 'preventive' ? 'وقائي' : 'اكتشافي',
                   style: TextStyle(
                       fontSize: 10,
-                      color: c.type == 'preventive' ? Colors.green : Colors.orange,
+                      color: c.type == 'preventive' ? core_theme.AC.ok : core_theme.AC.warn,
                       fontWeight: FontWeight.w700),
                   textAlign: TextAlign.center),
             ),
@@ -277,8 +278,8 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
                 Expanded(
                   child: LinearProgressIndicator(
                     value: pct,
-                    backgroundColor: Colors.grey.shade200,
-                    valueColor: AlwaysStoppedAnimation(pct >= 0.95 ? Colors.green : pct >= 0.7 ? Colors.orange : Colors.red),
+                    backgroundColor: core_theme.AC.bdr,
+                    valueColor: AlwaysStoppedAnimation(pct >= 0.95 ? core_theme.AC.ok : pct >= 0.7 ? core_theme.AC.warn : core_theme.AC.err),
                     minHeight: 6,
                   ),
                 ),
@@ -307,19 +308,19 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
   }
 
   Widget _buildCosoFramework() {
-    final components = const [
-      _Coso('Control Environment', 'بيئة الرقابة', 5, 5, Colors.blue),
-      _Coso('Risk Assessment', 'تقييم المخاطر', 4, 4, Colors.orange),
-      _Coso('Control Activities', 'الأنشطة الرقابية', 10, 12, Colors.green),
-      _Coso('Information & Communication', 'المعلومات والتواصل', 3, 3, Colors.purple),
-      _Coso('Monitoring Activities', 'أنشطة المتابعة', 2, 3, Colors.teal),
+    final components = [
+      _Coso('Control Environment', 'بيئة الرقابة', 5, 5, core_theme.AC.info),
+      _Coso('Risk Assessment', 'تقييم المخاطر', 4, 4, core_theme.AC.warn),
+      _Coso('Control Activities', 'الأنشطة الرقابية', 10, 12, core_theme.AC.ok),
+      _Coso('Information & Communication', 'المعلومات والتواصل', 3, 3, core_theme.AC.purple),
+      _Coso('Monitoring Activities', 'أنشطة المتابعة', 2, 3, core_theme.AC.info),
     ];
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +359,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(c.nameAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(c.nameEn, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(c.nameEn, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -369,7 +370,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
                 Expanded(
                   child: LinearProgressIndicator(
                     value: pct,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: core_theme.AC.bdr,
                     valueColor: AlwaysStoppedAnimation(c.color),
                     minHeight: 10,
                   ),
@@ -391,13 +392,13 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
   Color _statusColor(String s) {
     switch (s) {
       case 'effective':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'partial':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'needs-improvement':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -417,13 +418,13 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
   Color _riskColor(String r) {
     switch (r) {
       case 'عالٍ':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'متوسط':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'منخفض':
-        return Colors.green;
+        return core_theme.AC.ok;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 }

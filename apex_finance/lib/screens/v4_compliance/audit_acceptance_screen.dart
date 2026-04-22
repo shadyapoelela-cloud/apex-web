@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class AuditAcceptanceScreen extends StatefulWidget {
   const AuditAcceptanceScreen({super.key});
@@ -55,7 +56,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF4A148C),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF4A148C),
           tabs: const [
             Tab(icon: Icon(Icons.verified_user, size: 16), text: 'الاستقلالية'),
@@ -87,7 +88,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
         gradient: const LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF7B1FA2)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.handshake, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -98,7 +99,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                 Text('قبول الارتباط — NEOM Company',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('ISA 220 · ISA 210 · SOCPA — فحص استقلالية وقبول عميل جديد',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -112,11 +113,11 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _pill('عميل جديد', Colors.blue, Icons.new_releases),
-          _pill('شركة مساهمة مدرجة', Colors.purple, Icons.business),
-          _pill('القيمة المتوقعة: 2.4M ر.س', const Color(0xFFD4AF37), Icons.attach_money),
+          _pill('عميل جديد', core_theme.AC.info, Icons.new_releases),
+          _pill('شركة مساهمة مدرجة', core_theme.AC.purple, Icons.business),
+          _pill('القيمة المتوقعة: 2.4M ر.س', core_theme.AC.gold, Icons.attach_money),
           const Spacer(),
-          _pill('فترة المراجعة: 2025', Colors.teal, Icons.calendar_today),
+          _pill('فترة المراجعة: 2025', core_theme.AC.info, Icons.calendar_today),
         ],
       ),
     );
@@ -150,7 +151,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [Colors.green.shade700, Colors.green.shade500]),
+            gradient: LinearGradient(colors: [core_theme.AC.ok, core_theme.AC.ok]),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -161,7 +162,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('فحص الاستقلالية',
+                    Text('فحص الاستقلالية',
                         style: TextStyle(color: Colors.white, fontSize: 14)),
                     Text('$passed / ${_independenceChecks.length} بنود مجتازة',
                         style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
@@ -174,14 +175,14 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text('مستقل ✓',
-                    style: TextStyle(color: Colors.green, fontWeight: FontWeight.w900)),
+                child: Text('مستقل ✓',
+                    style: TextStyle(color: core_theme.AC.ok, fontWeight: FontWeight.w900)),
               ),
             ],
           ),
         ),
         const SizedBox(height: 16),
-        const Text('المعايير وفق ميثاق الأخلاقيات (IESBA Code)',
+        Text('المعايير وفق ميثاق الأخلاقيات (IESBA Code)',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
         const SizedBox(height: 10),
         for (final c in _independenceChecks)
@@ -191,7 +192,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,10 +201,10 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.12),
+                    color: core_theme.AC.ok.withOpacity(0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.check, color: Colors.green, size: 20),
+                  child: Icon(Icons.check, color: core_theme.AC.ok, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -212,13 +213,13 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                     children: [
                       Text(c.category, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 4),
-                      Text(c.description, style: const TextStyle(fontSize: 12, color: Colors.black54, height: 1.5)),
+                      Text(c.description, style: TextStyle(fontSize: 12, color: core_theme.AC.ts, height: 1.5)),
                     ],
                   ),
                 ),
                 Switch(
                   value: c.passed,
-                  activeColor: Colors.green,
+                  activeColor: core_theme.AC.ok,
                   onChanged: (v) => setState(() => c.passed = v),
                 ),
               ],
@@ -228,13 +229,13 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -253,7 +254,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('فحص نزاهة الإدارة والمخاطر', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+        Text('فحص نزاهة الإدارة والمخاطر', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
         const SizedBox(height: 12),
         for (final c in _integrityChecks)
           Container(
@@ -286,7 +287,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                     children: [
                       Text(c.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 4),
-                      Text(c.description, style: const TextStyle(fontSize: 12, color: Colors.black54, height: 1.5)),
+                      Text(c.description, style: TextStyle(fontSize: 12, color: core_theme.AC.ts, height: 1.5)),
                     ],
                   ),
                 ),
@@ -308,12 +309,12 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('الاستفسار من المراجع السابق', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+              Text('الاستفسار من المراجع السابق', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
               _kv('اسم المكتب السابق', 'PwC الشرق الأوسط'),
               _kv('تاريخ آخر مراجعة', '2023-12-31'),
@@ -323,13 +324,13 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade50,
+                  color: core_theme.AC.ok,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.shade200),
+                  border: Border.all(color: core_theme.AC.ok),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green, size: 18),
+                    Icon(Icons.check_circle, color: core_theme.AC.ok, size: 18),
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -337,7 +338,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                         style: TextStyle(fontSize: 12),
                       ),
                     ),
-                    Icon(Icons.attach_file, size: 18, color: Colors.green),
+                    Icon(Icons.attach_file, size: 18, color: core_theme.AC.ok),
                   ],
                 ),
               ),
@@ -357,7 +358,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,7 +372,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                 ],
               ),
               const SizedBox(height: 14),
-              const Text('البنود المطلوبة للإدراج:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
+              Text('البنود المطلوبة للإدراج:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
               _letterItem('هدف ونطاق المراجعة', 'مراجعة القوائم المالية للسنة المنتهية في 31/12/2025 وفق المعايير الدولية'),
               _letterItem('مسؤوليات المراجع', 'إبداء رأي محايد على القوائم بموجب ISA'),
@@ -388,7 +389,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                     child: OutlinedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.preview, size: 16),
-                      label: const Text('معاينة الخطاب'),
+                      label: Text('معاينة الخطاب'),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -396,7 +397,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                     child: ElevatedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.send, size: 16),
-                      label: const Text('إرسال للعميل'),
+                      label: Text('إرسال للعميل'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4A148C),
                         foregroundColor: Colors.white,
@@ -425,7 +426,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-                Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.5)),
+                Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.5)),
               ],
             ),
           ),
@@ -444,7 +445,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
             gradient: const LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF3D0F73)]),
             borderRadius: BorderRadius.circular(14),
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -459,10 +460,10 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
               Text('الشريك: د. عبدالله السهلي',
                   style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
               Text('تاريخ: 2026-04-19',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               SizedBox(height: 16),
               Text('ملخّص الفحص:',
-                  style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700)),
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 12, fontWeight: FontWeight.w700)),
               SizedBox(height: 6),
               Text('✓ الاستقلالية: 6/6 بنود متحققة',
                   style: TextStyle(color: Colors.white, fontSize: 13, height: 1.8)),
@@ -482,21 +483,21 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade50,
+                  color: core_theme.AC.ok,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green.shade300, width: 2),
+                  border: Border.all(color: core_theme.AC.ok, width: 2),
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green, size: 48),
+                    Icon(Icons.check_circle, color: core_theme.AC.ok, size: 48),
                     const SizedBox(height: 10),
-                    const Text('القبول مع إجراءات حماية',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.green)),
+                    Text('القبول مع إجراءات حماية',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.ok)),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'تم فحص جميع المتطلبات — نوصي بالقبول مع متابعة المعاملات ذات العلاقة بشكل مفصل.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Colors.black54),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                     ),
                     const SizedBox(height: 14),
                     SizedBox(
@@ -504,18 +505,18 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                       child: ElevatedButton(
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text('تمّ قبول الارتباط — ينتقل تلقائياً إلى مرحلة التخطيط'),
-                              backgroundColor: Colors.green,
+                              backgroundColor: core_theme.AC.ok,
                             ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: core_theme.AC.ok,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text('قبول الارتباط'),
+                        child: Text('قبول الارتباط'),
                       ),
                     ),
                   ],
@@ -527,21 +528,21 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
+                  color: core_theme.AC.err,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.red.shade200),
+                  border: Border.all(color: core_theme.AC.err),
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.cancel, color: Colors.red.shade400, size: 48),
+                    Icon(Icons.cancel, color: core_theme.AC.err, size: 48),
                     const SizedBox(height: 10),
-                    const Text('رفض الارتباط',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.red)),
+                    Text('رفض الارتباط',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.err)),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'في حال وجود مخاوف جوهرية على الاستقلالية أو نزاهة العميل — يجب التوثيق الكامل للأسباب.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Colors.black54),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                     ),
                     const SizedBox(height: 14),
                     SizedBox(
@@ -549,11 +550,11 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                       child: OutlinedButton(
                         onPressed: () {},
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red,
-                          side: BorderSide(color: Colors.red.shade400),
+                          foregroundColor: core_theme.AC.err,
+                          side: BorderSide(color: core_theme.AC.err),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text('رفض مع التوثيق'),
+                        child: Text('رفض مع التوثيق'),
                       ),
                     ),
                   ],
@@ -572,7 +573,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 180, child: Text(k, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 180, child: Text(k, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Expanded(child: Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, height: 1.5))),
         ],
       ),
@@ -582,13 +583,13 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
   Color _checkColor(String status) {
     switch (status) {
       case 'pass':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'review':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'fail':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

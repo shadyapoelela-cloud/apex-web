@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class InvestmentPortfolioScreen extends StatefulWidget {
   const InvestmentPortfolioScreen({super.key});
@@ -16,17 +17,17 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
-  final _holdings = const [
-    _Holding('ARAMCO', 'أرامكو السعودية', 'equity', 15000, 28.50, 32.15, 15.4, Colors.green),
-    _Holding('SABIC', 'سابك', 'equity', 8000, 76.40, 82.10, 2.1, Colors.green),
-    _Holding('STC', 'الاتصالات السعودية', 'equity', 12000, 38.70, 42.25, -0.8, Colors.green),
-    _Holding('SUKUK-2028', 'صكوك سعودية سيادية 2028', 'sukuk', 500, 1000, 1045, 4.2, Colors.blue),
-    _Holding('GOV-BONDS', 'سندات حكومية 5Y', 'bond', 400, 10000, 10185, 3.8, Colors.blue),
-    _Holding('RAJHI-MF', 'صندوق الراجحي للأسهم', 'fund', 1800, 485, 542, 0.5, Colors.purple),
-    _Holding('RIYAD-MM', 'صندوق الرياض لأسواق المال', 'fund', 2500, 100, 104, 1.2, Colors.teal),
-    _Holding('USD-FXD', 'وديعة بالدولار', 'deposit', 1, 1125000, 1168125, 0, Colors.orange),
-    _Holding('EUR-FXD', 'وديعة باليورو', 'deposit', 1, 820000, 832400, 0, Colors.orange),
-    _Holding('ALINMA-REIT', 'صندوق الإنماء للعقارات', 'reit', 3200, 11.20, 12.85, 6.8, Color(0xFFD4AF37)),
+  final _holdings = [
+    _Holding('ARAMCO', 'أرامكو السعودية', 'equity', 15000, 28.50, 32.15, 15.4, core_theme.AC.ok),
+    _Holding('SABIC', 'سابك', 'equity', 8000, 76.40, 82.10, 2.1, core_theme.AC.ok),
+    _Holding('STC', 'الاتصالات السعودية', 'equity', 12000, 38.70, 42.25, -0.8, core_theme.AC.ok),
+    _Holding('SUKUK-2028', 'صكوك سعودية سيادية 2028', 'sukuk', 500, 1000, 1045, 4.2, core_theme.AC.info),
+    _Holding('GOV-BONDS', 'سندات حكومية 5Y', 'bond', 400, 10000, 10185, 3.8, core_theme.AC.info),
+    _Holding('RAJHI-MF', 'صندوق الراجحي للأسهم', 'fund', 1800, 485, 542, 0.5, core_theme.AC.purple),
+    _Holding('RIYAD-MM', 'صندوق الرياض لأسواق المال', 'fund', 2500, 100, 104, 1.2, core_theme.AC.info),
+    _Holding('USD-FXD', 'وديعة بالدولار', 'deposit', 1, 1125000, 1168125, 0, core_theme.AC.warn),
+    _Holding('EUR-FXD', 'وديعة باليورو', 'deposit', 1, 820000, 832400, 0, core_theme.AC.warn),
+    _Holding('ALINMA-REIT', 'صندوق الإنماء للعقارات', 'reit', 3200, 11.20, 12.85, 6.8, core_theme.AC.gold),
   ];
 
   @override
@@ -54,9 +55,9 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
         _buildSummary(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.list, size: 16), text: 'الحيازات'),
             Tab(icon: Icon(Icons.pie_chart, size: 16), text: 'التخصيص'),
@@ -87,7 +88,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
         gradient: const LinearGradient(colors: [Color(0xFF004D40), Color(0xFF00695C)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.show_chart, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -98,7 +99,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
                 Text('محفظة الاستثمار',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Treasury Investments — أسهم · صكوك · سندات · صناديق · ودائع · REITs',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -112,11 +113,11 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _summary('القيمة السوقية', _fmtM(_totalMarket), null, const Color(0xFFD4AF37), Icons.account_balance),
-          _summary('التكلفة الأصلية', _fmtM(_totalInvested), null, Colors.blue, Icons.input),
-          _summary('الربح/الخسارة', _fmtM(_totalGain), _totalGain >= 0, Colors.green, Icons.trending_up),
-          _summary('العائد الكلي', '${_totalReturn >= 0 ? '+' : ''}${_totalReturn.toStringAsFixed(2)}%', _totalReturn >= 0, Colors.purple, Icons.analytics),
-          _summary('Yield السنوي', '5.82%', true, Colors.teal, Icons.percent),
+          _summary('القيمة السوقية', _fmtM(_totalMarket), null, core_theme.AC.gold, Icons.account_balance),
+          _summary('التكلفة الأصلية', _fmtM(_totalInvested), null, core_theme.AC.info, Icons.input),
+          _summary('الربح/الخسارة', _fmtM(_totalGain), _totalGain >= 0, core_theme.AC.ok, Icons.trending_up),
+          _summary('العائد الكلي', '${_totalReturn >= 0 ? '+' : ''}${_totalReturn.toStringAsFixed(2)}%', _totalReturn >= 0, core_theme.AC.purple, Icons.analytics),
+          _summary('Yield السنوي', '5.82%', true, core_theme.AC.info, Icons.percent),
         ],
       ),
     );
@@ -140,17 +141,17 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Row(
                     children: [
                       if (positive != null)
                         Icon(positive ? Icons.arrow_upward : Icons.arrow_downward,
-                            size: 14, color: positive ? Colors.green : Colors.red),
+                            size: 14, color: positive ? core_theme.AC.ok : core_theme.AC.err),
                       Text(value,
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w900,
-                              color: positive == null ? color : (positive ? Colors.green : Colors.red))),
+                              color: positive == null ? color : (positive ? core_theme.AC.ok : core_theme.AC.err))),
                     ],
                   ),
                 ],
@@ -175,13 +176,13 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: const Row(
                   children: [
                     Expanded(child: Text('الرمز', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -213,7 +214,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
       ),
       child: Row(
         children: [
@@ -233,20 +234,20 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
           Expanded(child: Text(_fmt(h.currentPrice), style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
           Expanded(
             child: Text(_fmtM(market),
-                style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
           ),
           Expanded(
             child: Text(_fmtM(gain),
                 style: TextStyle(
-                    fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: gain >= 0 ? Colors.green : Colors.red)),
+                    fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: gain >= 0 ? core_theme.AC.ok : core_theme.AC.err)),
           ),
           Expanded(
             child: Text(
               '${returnPct >= 0 ? '+' : ''}${returnPct.toStringAsFixed(1)}%',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: returnPct >= 0 ? Colors.green : Colors.red),
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: returnPct >= 0 ? core_theme.AC.ok : core_theme.AC.err),
             ),
           ),
-          Expanded(child: Text('${h.yield}%', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.purple))),
+          Expanded(child: Text('${h.yield}%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.purple))),
         ],
       ),
     );
@@ -273,12 +274,12 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('التخصيص الحالي vs المستهدف',
+              Text('التخصيص الحالي vs المستهدف',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
               for (final entry in byType.entries) _allocationRow(entry.key, entry.value / _totalMarket * 100, target[entry.key] ?? 0),
@@ -289,13 +290,13 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.balance, color: Colors.blue),
+              Icon(Icons.balance, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -324,25 +325,25 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
               const SizedBox(width: 8),
               Text(_typeLabel(type), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               const Spacer(),
-              Text('الحالي: ', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('الحالي: ', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               Text('${actual.toStringAsFixed(1)}%',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
               const SizedBox(width: 14),
-              Text('الهدف: ', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('الهدف: ', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               Text('${target.toStringAsFixed(0)}%',
                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
               const SizedBox(width: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: (diff.abs() < 2 ? Colors.green : Colors.orange).withOpacity(0.12),
+                  color: (diff.abs() < 2 ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
                   '${diff >= 0 ? '+' : ''}${diff.toStringAsFixed(1)}pp',
                   style: TextStyle(
                       fontSize: 10,
-                      color: diff.abs() < 2 ? Colors.green : Colors.orange,
+                      color: diff.abs() < 2 ? core_theme.AC.ok : core_theme.AC.warn,
                       fontWeight: FontWeight.w800),
                 ),
               ),
@@ -351,7 +352,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
           const SizedBox(height: 8),
           Stack(
             children: [
-              Container(height: 12, color: Colors.grey.shade100),
+              Container(height: 12, color: core_theme.AC.navy3),
               FractionallySizedBox(
                 widthFactor: (actual / 100).clamp(0.0, 1.0),
                 child: Container(height: 12, color: color),
@@ -360,7 +361,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
                 left: MediaQuery.of(context).size.width * (target / 100).clamp(0.0, 1.0) * 0.5,
                 top: 0,
                 bottom: 0,
-                child: Container(width: 2, color: Colors.black87),
+                child: Container(width: 2, color: core_theme.AC.tp),
               ),
             ],
           ),
@@ -370,13 +371,13 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
   }
 
   Widget _buildRiskTab() {
-    final metrics = const [
-      _RiskMetric('الانحراف المعياري', '12.4%', 'قياس تذبذب المحفظة', Colors.orange),
-      _RiskMetric('Sharpe Ratio', '1.82', 'أعلى من متوسط السوق (1.2)', Colors.green),
-      _RiskMetric('Max Drawdown', '-8.5%', 'أسوأ انخفاض تاريخي', Colors.red),
-      _RiskMetric('Beta', '0.85', 'أقل تذبذباً من السوق', Colors.blue),
-      _RiskMetric('VaR (95%)', '420K ر.س', 'الخسارة القصوى المتوقّعة', Colors.purple),
-      _RiskMetric('التركيز — أكبر موقف', '28.5%', 'أرامكو (الحد الأعلى 35%)', Colors.amber),
+    final metrics = [
+      _RiskMetric('الانحراف المعياري', '12.4%', 'قياس تذبذب المحفظة', core_theme.AC.warn),
+      _RiskMetric('Sharpe Ratio', '1.82', 'أعلى من متوسط السوق (1.2)', core_theme.AC.ok),
+      _RiskMetric('Max Drawdown', '-8.5%', 'أسوأ انخفاض تاريخي', core_theme.AC.err),
+      _RiskMetric('Beta', '0.85', 'أقل تذبذباً من السوق', core_theme.AC.info),
+      _RiskMetric('VaR (95%)', '420K ر.س', 'الخسارة القصوى المتوقّعة', core_theme.AC.purple),
+      _RiskMetric('التركيز — أكبر موقف', '28.5%', 'أرامكو (الحد الأعلى 35%)', core_theme.AC.warn),
     ];
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -405,7 +406,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
                     Text(m.value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: m.color)),
                     const Spacer(),
                     Text(m.description,
-                        style: const TextStyle(fontSize: 10, color: Colors.black54, height: 1.4)),
+                        style: TextStyle(fontSize: 10, color: core_theme.AC.ts, height: 1.4)),
                   ],
                 ),
               ),
@@ -417,14 +418,14 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.warning_amber, color: Colors.amber),
+                  Icon(Icons.warning_amber, color: core_theme.AC.warn),
                   SizedBox(width: 8),
                   Text('حدود السياسة — مؤشرات المخاطر',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
@@ -449,16 +450,16 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(ok ? Icons.check_circle : Icons.error, size: 18, color: ok ? Colors.green : Colors.red),
+          Icon(ok ? Icons.check_circle : Icons.error, size: 18, color: ok ? core_theme.AC.ok : core_theme.AC.err),
           const SizedBox(width: 10),
           Expanded(flex: 3, child: Text(name, style: const TextStyle(fontSize: 12))),
-          Expanded(child: Text(limit, style: const TextStyle(fontSize: 12, color: Colors.black54, fontFamily: 'monospace'))),
+          Expanded(child: Text(limit, style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontFamily: 'monospace'))),
           Expanded(
             child: Text(actual,
                 style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w900,
-                    color: ok ? Colors.green : Colors.red,
+                    color: ok ? core_theme.AC.ok : core_theme.AC.err,
                     fontFamily: 'monospace')),
           ),
         ],
@@ -467,13 +468,13 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
   }
 
   Widget _buildTransactionsTab() {
-    final txns = const [
-      _Txn('2026-04-18', 'ARAMCO', 'شراء', 5000, 32.15, 160750, Colors.green),
-      _Txn('2026-04-15', 'SUKUK-2028', 'استلام كوبون', 0, 0, 21000, Colors.blue),
-      _Txn('2026-04-10', 'SABIC', 'توزيع أرباح', 0, 0, 48000, Colors.blue),
-      _Txn('2026-04-05', 'RAJHI-MF', 'شراء', 500, 542, 271000, Colors.green),
-      _Txn('2026-04-02', 'STC', 'بيع', 2000, 42.25, 84500, Colors.red),
-      _Txn('2026-03-28', 'USD-FXD', 'تجديد وديعة', 0, 0, 1168125, Colors.amber),
+    final txns = [
+      _Txn('2026-04-18', 'ARAMCO', 'شراء', 5000, 32.15, 160750, core_theme.AC.ok),
+      _Txn('2026-04-15', 'SUKUK-2028', 'استلام كوبون', 0, 0, 21000, core_theme.AC.info),
+      _Txn('2026-04-10', 'SABIC', 'توزيع أرباح', 0, 0, 48000, core_theme.AC.info),
+      _Txn('2026-04-05', 'RAJHI-MF', 'شراء', 500, 542, 271000, core_theme.AC.ok),
+      _Txn('2026-04-02', 'STC', 'بيع', 2000, 42.25, 84500, core_theme.AC.err),
+      _Txn('2026-03-28', 'USD-FXD', 'تجديد وديعة', 0, 0, 1168125, core_theme.AC.warn),
     ];
     return ListView.builder(
       padding: const EdgeInsets.all(20),
@@ -486,7 +487,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
@@ -519,18 +520,18 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
                         Text(t.symbol, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
                       ],
                     ),
-                    Text(t.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                    Text(t.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                   ],
                 ),
               ),
               if (t.units > 0)
                 Text('${t.units.toStringAsFixed(0)} × ${t.price}',
-                    style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
               const SizedBox(width: 12),
               Text(_fmt(t.amount.toDouble()),
                   style: TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w900, color: t.color, fontFamily: 'monospace')),
-              const Text(' ر.س', style: TextStyle(fontSize: 11, color: Colors.black54)),
+              Text(' ر.س', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ],
           ),
         );
@@ -541,18 +542,18 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
   Color _typeColor(String t) {
     switch (t) {
       case 'equity':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'sukuk':
       case 'bond':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'fund':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'deposit':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'reit':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

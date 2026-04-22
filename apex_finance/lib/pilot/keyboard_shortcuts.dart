@@ -23,6 +23,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../core/theme.dart' as core_theme;
 import 'package:flutter/services.dart';
 
 /// Intents — يُستخدمون في ActionHandler
@@ -163,9 +164,9 @@ void showShortcutsHelp(BuildContext context) {
     builder: (_) => Directionality(
       textDirection: TextDirection.rtl,
       child: AlertDialog(
-        backgroundColor: const Color(0xFF132339),
-        title: const Row(children: [
-          Icon(Icons.keyboard, color: Color(0xFFD4AF37)),
+        backgroundColor: core_theme.AC.navy2,
+        title: Row(children: [
+          Icon(Icons.keyboard, color: core_theme.AC.gold),
           SizedBox(width: 8),
           Text('اختصارات لوحة المفاتيح',
               style: TextStyle(color: Colors.white)),
@@ -191,8 +192,8 @@ void showShortcutsHelp(BuildContext context) {
         actions: [
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFD4AF37),
-                foregroundColor: Colors.black),
+                backgroundColor: core_theme.AC.gold,
+                foregroundColor: core_theme.AC.tp),
             onPressed: () => Navigator.pop(context),
             child: const Text('إغلاق'),
           ),
@@ -209,13 +210,13 @@ Widget _kbRow(String keys, String action) {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFF1D3150),
+          color: core_theme.AC.navy3,
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: const Color(0x55FFFFFF)),
         ),
         child: Text(keys,
-            style: const TextStyle(
-                color: Color(0xFFD4AF37),
+            style: TextStyle(
+                color: core_theme.AC.gold,
                 fontSize: 12,
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.w700)),
@@ -223,7 +224,7 @@ Widget _kbRow(String keys, String action) {
       const SizedBox(width: 14),
       Expanded(
         child: Text(action,
-            style: const TextStyle(color: Color(0xFFBCC5D3), fontSize: 13)),
+            style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ),
     ]),
   );

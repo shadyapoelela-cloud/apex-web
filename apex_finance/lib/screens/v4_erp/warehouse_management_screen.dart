@@ -6,20 +6,21 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../pilot/api/pilot_client.dart';
 import '../../pilot/session.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
+Color get _gold => core_theme.AC.gold;
+Color get _navy => core_theme.AC.navy;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
 
 class WarehouseManagementScreen extends StatefulWidget {
   const WarehouseManagementScreen({super.key});
@@ -88,7 +89,7 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
       child: Container(
         color: _navy,
         child: _loading
-            ? const Center(child: CircularProgressIndicator(color: _gold))
+            ? Center(child: CircularProgressIndicator(color: _gold))
             : _error != null
                 ? _errorState()
                 : _content(),
@@ -101,17 +102,17 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
           constraints: const BoxConstraints(maxWidth: 500),
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.warning, color: _err, size: 56),
+            Icon(Icons.warning, color: _err, size: 56),
             const SizedBox(height: 16),
             Text(_error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: _tp, fontSize: 15)),
+                style: TextStyle(color: _tp, fontSize: 15)),
             const SizedBox(height: 20),
             FilledButton.icon(
               style: FilledButton.styleFrom(backgroundColor: _gold),
               onPressed: _load,
               icon: const Icon(Icons.refresh),
-              label: const Text('إعادة المحاولة'),
+              label: Text('إعادة المحاولة'),
             ),
           ]),
         ),
@@ -164,11 +165,11 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
               Row(children: [
                 Icon(icon, color: _gold, size: 18),
                 const SizedBox(width: 6),
-                Text(label, style: const TextStyle(color: _ts, fontSize: 12)),
+                Text(label, style: TextStyle(color: _ts, fontSize: 12)),
               ]),
               const SizedBox(height: 8),
               Text(val,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: _gold, fontSize: 22, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -187,24 +188,24 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(Icons.store, color: _gold),
+          Icon(Icons.store, color: _gold),
           const SizedBox(width: 8),
           Text('${b['code']} — ${b['name_ar'] ?? ''}',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp, fontWeight: FontWeight.bold, fontSize: 15)),
           const SizedBox(width: 8),
           if (b['city'] != null)
-            Text('(${b['city']})', style: const TextStyle(color: _td, fontSize: 12)),
+            Text('(${b['city']})', style: TextStyle(color: _td, fontSize: 12)),
           const Spacer(),
           TextButton.icon(
-            icon: const Icon(Icons.add, color: _gold, size: 18),
-            label: const Text('مستودع', style: TextStyle(color: _gold)),
+            icon: Icon(Icons.add, color: _gold, size: 18),
+            label: Text('مستودع', style: TextStyle(color: _gold)),
             onPressed: () => _addWarehouse(b['id']),
           ),
         ]),
         const SizedBox(height: 8),
         if (warehouses.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(8),
             child: Text('لا توجد مستودعات في هذا الفرع',
                 style: TextStyle(color: _td, fontSize: 13)),
@@ -235,7 +236,7 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
             children: [
               Row(children: [
                 Text(w['name_ar'] ?? w['code'],
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _tp,
                         fontWeight: FontWeight.w600,
                         fontSize: 14)),
@@ -248,12 +249,12 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
                       color: _gold.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text('افتراضي',
+                    child: Text('افتراضي',
                         style: TextStyle(color: _gold, fontSize: 10)),
                   ),
               ]),
               Text('${w['code']} • ${w['type']}',
-                  style: const TextStyle(color: _td, fontSize: 11)),
+                  style: TextStyle(color: _td, fontSize: 11)),
             ],
           ),
         ),
@@ -261,9 +262,9 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text('${stock.length} صنف',
-                style: const TextStyle(color: _ts, fontSize: 12)),
+                style: TextStyle(color: _ts, fontSize: 12)),
             Text(total.toStringAsFixed(0),
-                style: const TextStyle(
+                style: TextStyle(
                     color: _gold, fontWeight: FontWeight.bold, fontSize: 16)),
           ],
         ),
@@ -271,13 +272,13 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
-            color: (w['status'] == 'active' ? _ok : Colors.grey)
+            color: (w['status'] == 'active' ? _ok : core_theme.AC.td)
                 .withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(w['status'] ?? '',
               style: TextStyle(
-                  color: w['status'] == 'active' ? _ok : Colors.grey,
+                  color: w['status'] == 'active' ? _ok : core_theme.AC.td,
                   fontSize: 10,
                   fontWeight: FontWeight.w600)),
         ),
@@ -296,7 +297,7 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
         builder: (ctx, setS) => Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: const Text('مستودع جديد'),
+            title: Text('مستودع جديد'),
             content: SizedBox(
               width: 400,
               child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -326,7 +327,7 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
                 ),
                 CheckboxListTile(
                   value: isDefault,
-                  title: const Text('افتراضي'),
+                  title: Text('افتراضي'),
                   onChanged: (v) => setS(() => isDefault = v ?? false),
                 ),
               ]),
@@ -334,11 +335,11 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('إلغاء')),
+                  child: Text('إلغاء')),
               FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('إنشاء'),
+                child: Text('إنشاء'),
               ),
             ],
           ),
@@ -358,7 +359,7 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
         await _load();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
                 content: Text('تم إنشاء المستودع'),
                 backgroundColor: _ok),
           );

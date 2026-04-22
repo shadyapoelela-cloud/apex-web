@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class BomMrpScreen extends StatefulWidget {
   const BomMrpScreen({super.key});
@@ -19,8 +20,8 @@ class BomMrpScreen extends StatefulWidget {
 }
 
 class _BomMrpScreenState extends State<BomMrpScreen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   int _tab = 0;
   String _selectedProduct = 'أريكة ثلاثية فاخرة';
@@ -58,22 +59,22 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.account_tree, color: _gold),
+                  Icon(Icons.account_tree, color: _gold),
                   const SizedBox(width: 8),
-                  const Text('قائمة المواد BOM / تخطيط المواد MRP',
+                  Text('قائمة المواد BOM / تخطيط المواد MRP',
                       style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: _navy)),
                   const Spacer(),
                   OutlinedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.play_arrow),
-                    label: const Text('تشغيل MRP'),
+                    label: Text('تشغيل MRP'),
                   ),
                   const SizedBox(width: 8),
                   FilledButton.icon(
                     onPressed: () {},
                     style: FilledButton.styleFrom(backgroundColor: _gold),
                     icon: const Icon(Icons.add),
-                    label: const Text('منتج جديد'),
+                    label: Text('منتج جديد'),
                   ),
                 ],
               ),
@@ -83,14 +84,14 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
               color: Colors.white,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Row(
-                children: const [
-                  Expanded(child: _StatCard(icon: Icons.inventory, label: 'BOMs نشطة', value: '142', color: Colors.blue)),
+                children: [
+                  Expanded(child: _StatCard(icon: Icons.inventory, label: 'BOMs نشطة', value: '142', color: core_theme.AC.info)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.warning, label: 'مواد تنقص', value: '8', color: Colors.red)),
+                  Expanded(child: _StatCard(icon: Icons.warning, label: 'مواد تنقص', value: '8', color: core_theme.AC.err)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.local_shipping, label: 'طلبيات معلقة', value: '14', color: Colors.orange)),
+                  Expanded(child: _StatCard(icon: Icons.local_shipping, label: 'طلبيات معلقة', value: '14', color: core_theme.AC.warn)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.factory, label: 'استغلال المحطات', value: '84%', color: Color(0xFFD4AF37))),
+                  Expanded(child: _StatCard(icon: Icons.factory, label: 'استغلال المحطات', value: '84%', color: core_theme.AC.gold)),
                 ],
               ),
             ),
@@ -123,7 +124,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
             children: [
-              const Icon(Icons.search, color: Colors.black54),
+              Icon(Icons.search, color: core_theme.AC.ts),
               const SizedBox(width: 8),
               Expanded(
                 child: Text('المنتج: $_selectedProduct',
@@ -132,7 +133,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
               TextButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.swap_horiz, size: 16),
-                label: const Text('تغيير'),
+                label: Text('تغيير'),
               ),
             ],
           ),
@@ -160,7 +161,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                     Icon(
                       isParent ? Icons.inventory_2 : (b.level == 1 ? Icons.construction : Icons.category),
                       size: 18,
-                      color: isParent ? _gold : Colors.black54,
+                      color: isParent ? _gold : core_theme.AC.ts,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -172,7 +173,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                               style: TextStyle(
                                   fontSize: isParent ? 14 : 13,
                                   fontWeight: isParent ? FontWeight.w800 : FontWeight.w600)),
-                          Text(b.code, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                          Text(b.code, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         ],
                       ),
                     ),
@@ -185,7 +186,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                     SizedBox(
                       width: 100,
                       child: Text('${b.leadTime} يوم',
-                          style: const TextStyle(fontSize: 12, color: Colors.black54),
+                          style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                           textAlign: TextAlign.center),
                     ),
                     SizedBox(
@@ -193,14 +194,14 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: shortage ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                          color: shortage ? core_theme.AC.err.withOpacity(0.1) : core_theme.AC.ok.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text('متوفر: ${b.available}',
                             style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: shortage ? Colors.red : Colors.green),
+                                color: shortage ? core_theme.AC.err : core_theme.AC.ok),
                             textAlign: TextAlign.center),
                       ),
                     ),
@@ -222,9 +223,9 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
       itemBuilder: (ctx, i) {
         final d = _mrpDemand[i];
         final (color, label) = switch (d.priority) {
-          _Priority.high => (Colors.red, 'عاجل'),
-          _Priority.medium => (Colors.orange, 'متوسط'),
-          _Priority.low => (Colors.green, 'منخفض'),
+          _Priority.high => (core_theme.AC.err, 'عاجل'),
+          _Priority.medium => (core_theme.AC.warn, 'متوسط'),
+          _Priority.low => (core_theme.AC.ok, 'منخفض'),
         };
         return Card(
           elevation: 1,
@@ -238,7 +239,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                     color: _gold.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.inventory_2, color: _gold),
+                  child: Icon(Icons.inventory_2, color: _gold),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -249,13 +250,13 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                       Text(d.product,
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                       Text('مطلوب بحلول: ${d.by}',
-                          style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     ],
                   ),
                 ),
-                _MRPCol(label: 'مطلوب', value: '${d.required}', color: Colors.black87),
+                _MRPCol(label: 'مطلوب', value: '${d.required}', color: core_theme.AC.tp),
                 const SizedBox(width: 16),
-                _MRPCol(label: 'متوفر', value: '${d.available}', color: Colors.blue),
+                _MRPCol(label: 'متوفر', value: '${d.available}', color: core_theme.AC.info),
                 const SizedBox(width: 16),
                 _MRPCol(label: 'للتصنيع', value: '${d.toMake}', color: _gold),
                 const SizedBox(width: 16),
@@ -273,7 +274,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                   onPressed: () {},
                   style: FilledButton.styleFrom(backgroundColor: _navy, padding: const EdgeInsets.symmetric(horizontal: 10)),
                   icon: const Icon(Icons.play_arrow, size: 14),
-                  label: const Text('إنشاء أمر إنتاج', style: TextStyle(fontSize: 11)),
+                  label: Text('إنشاء أمر إنتاج', style: TextStyle(fontSize: 11)),
                 ),
               ],
             ),
@@ -334,7 +335,7 @@ class _MRPCol extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color)),
       ],
     );
@@ -394,7 +395,7 @@ class _Tab extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: active ? const Color(0xFFD4AF37) : Colors.transparent,
+              color: active ? core_theme.AC.gold : Colors.transparent,
               width: 3,
             ),
           ),
@@ -404,7 +405,7 @@ class _Tab extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: active ? const Color(0xFFD4AF37) : Colors.black54,
+            color: active ? core_theme.AC.gold : core_theme.AC.ts,
           ),
         ),
       ),

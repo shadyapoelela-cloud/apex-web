@@ -33,7 +33,8 @@ void exportCsv({
   required String filename,
 }) {
   final data = <List<dynamic>>[headers, ...rows];
-  final csvString = const ListToCsvConverter().convert(data);
+  // CRLF (\r\n) مطلوب لفتح Excel على Windows بشكل نظيف، وإلا الكل في صف واحد
+  final csvString = const ListToCsvConverter(eol: '\r\n').convert(data);
   // أضف BOM للـ UTF-8 حتى يفتح Excel العربية بشكل صحيح
   final bom = [0xEF, 0xBB, 0xBF];
   final bytes = [...bom, ...utf8.encode(csvString)];
@@ -50,9 +51,14 @@ void exportXlsx({
   Map<String, dynamic>? meta,
 }) {
   final excel = Excel.createExcel();
-  // إزالة الورقة الافتراضية وإنشاء ورقتنا
-  excel.delete('Sheet1');
-  final sheet = excel[sheetName];
+  // ملاحظة لحزمة excel-4.0.6:
+  //   rename() → ينسخ ثم يحذف، لكن الحذف يتطلب length>1 في وقت الحذف
+  //   (بالفعل 2 بعد النسخ)، لكن XML metadata لا تُحدَّث دائماً
+  //   فيَنتج ملف بـ ورقتين (الأصلية فارغة + الجديدة).
+  //   الحل الموثوق: استخدام الورقة الافتراضية مباشرة + إعادة تسميتها لاحقاً
+  //   بعد كتابة البيانات.
+  final defaultSheetName = excel.getDefaultSheet() ?? 'Sheet1';
+  final sheet = excel[defaultSheetName];
 
   int rowIdx = 0;
 
@@ -125,6 +131,15 @@ void exportXlsx({
           .value = cellValue;
     }
     rowIdx++;
+  }
+
+  // بعد كتابة البيانات: أعد تسمية الورقة الافتراضية إلى sheetName
+  // (إن اختلف). rename() سيعمل الآن لأن البيانات موجودة فعلاً.
+  if (defaultSheetName != sheetName) {
+    try {
+      excel.rename(defaultSheetName, sheetName);
+      excel.setDefaultSheet(sheetName);
+    } catch (_) {/* لو فشل، تبقى الورقة باسم Sheet1 — لا مشكلة */}
   }
 
   final bytes = excel.save(fileName: '$filename.xlsx');
@@ -232,12 +247,31 @@ void printHtmlTable({
   buffer.writeln(
       '<div class="footer">تم الإنشاء: ${DateTime.now().toIso8601String().substring(0, 16).replaceAll("T", " ")}</div>');
 
+  // Auto-trigger print dialog when window opens
+  buffer.writeln('<script>window.addEventListener("load", function(){ setTimeout(function(){ window.print(); }, 300); });</script>');
   buffer.writeln('</body></html>');
 
-  // افتح نافذة جديدة بالـ HTML — نستخدم data: URI بدل document.write
-  // (avoidance للـ undefined_method على HtmlDocument type في Flutter web)
-  final encoded = Uri.encodeComponent(buffer.toString());
-  html.window.open('data:text/html;charset=utf-8,$encoded', '_blank');
+  // استخدم Blob URL بدل data: URI — موثوق أكثر مع المتصفحات الحديثة
+  // (data: URIs قد تُحجب أو تتجاوز حدود الطول، و popup blockers تعاملها
+  // بصرامة أكثر من Blob URLs).
+  final htmlContent = buffer.toString();
+  final blob = html.Blob([htmlContent], 'text/html;charset=utf-8');
+  final url = html.Url.createObjectUrlFromBlob(blob);
+  final popup = html.window.open(url, '_blank', 'width=900,height=700');
+  // في حال حُجبت popup: أعطِ المستخدم تنبيهاً + رابط بديل
+  // ignore: unnecessary_null_comparison
+  if (popup == null) {
+    // بدّل إلى تنزيل HTML كملف للمستخدم ليفتحه يدوياً ويطبعه
+    downloadBytes(
+      utf8.encode(htmlContent),
+      'print_${DateTime.now().millisecondsSinceEpoch}.html',
+      'text/html;charset=utf-8',
+    );
+  }
+  // حرّر الـ URL بعد 60 ثانية (وقت يكفي لفتح النافذة وتحميل المحتوى)
+  Future.delayed(const Duration(seconds: 60), () {
+    html.Url.revokeObjectUrl(url);
+  });
 }
 
 String _escape(String s) => s

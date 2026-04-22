@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'theme.dart' as core_theme;
 
 import 'design_tokens.dart';
 import 'theme.dart';
@@ -36,16 +37,18 @@ class ApexForecastChart extends StatelessWidget {
   final double? thresholdValue;
   final String? thresholdLabel;
   final String yLabel;
-  final Color accent;
+  final Color? accent;
 
-  const ApexForecastChart({
+  ApexForecastChart({
     super.key,
     required this.series,
     this.thresholdValue,
     this.thresholdLabel,
     this.yLabel = 'القيمة',
-    this.accent = const Color(0xFFD4AF37),
+    this.accent,
   });
+
+  Color get effectiveAccent => accent ?? core_theme.AC.gold;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +72,7 @@ class ApexForecastChart extends StatelessWidget {
                   series: series,
                   thresholdValue: thresholdValue,
                   thresholdLabel: thresholdLabel,
-                  accent: accent,
+                  accent: effectiveAccent,
                   textColor: AC.ts,
                   gridColor: AC.navy4,
                 ),
@@ -85,12 +88,12 @@ class ApexForecastChart extends StatelessWidget {
   }
 
   Widget _legend() => Row(children: [
-        _legendItem(Icons.show_chart, 'فعلي', accent, solid: true),
+        _legendItem(Icons.show_chart, 'فعلي', effectiveAccent, solid: true),
         const SizedBox(width: AppSpacing.md),
-        _legendItem(Icons.show_chart, 'توقّع AI', accent, solid: false),
+        _legendItem(Icons.show_chart, 'توقّع AI', effectiveAccent, solid: false),
         const SizedBox(width: AppSpacing.md),
         _legendItem(Icons.square, 'مجال الثقة 90%',
-            accent.withValues(alpha: 0.3), solid: true),
+            effectiveAccent.withValues(alpha: 0.3), solid: true),
         const Spacer(),
         Text(yLabel,
             style: TextStyle(color: AC.td, fontSize: AppFontSize.xs)),
@@ -282,15 +285,15 @@ class _ForecastPainter extends CustomPainter {
         Offset(0, y),
         Offset(size.width, y),
         Paint()
-          ..color = const Color(0xFFE74C3C)
+          ..color = core_theme.AC.err
           ..strokeWidth = 1.5,
       );
       if (thresholdLabel != null) {
         final tp = TextPainter(
           text: TextSpan(
               text: thresholdLabel,
-              style: const TextStyle(
-                  color: Color(0xFFE74C3C), fontSize: 10)),
+              style: TextStyle(
+                  color: core_theme.AC.err, fontSize: 10)),
           textDirection: TextDirection.rtl,
         )..layout();
         tp.paint(canvas, Offset(4, y - 14));

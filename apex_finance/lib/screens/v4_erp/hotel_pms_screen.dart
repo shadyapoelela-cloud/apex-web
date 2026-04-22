@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 121 — Hotel PMS (Opera-class)
 class HotelPmsScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الحجوزات'), Tab(text: 'الغرف'), Tab(text: 'الضيوف'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_bookingsTab(), _roomsTab(), _guestsTab(), _analyticsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF6A1B9A)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.hotel, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('نظام إدارة الفنادق PMS', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('حجوزات، غرف، ضيوف، إيرادات — Opera/Oracle-class', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('حجوزات، غرف، ضيوف، إيرادات — Opera/Oracle-class', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -49,7 +50,7 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
     return Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
       Expanded(child: _kpi('الغرف', '${_rooms.length}', Icons.bed, const Color(0xFF4A148C))),
       Expanded(child: _kpi('الإشغال', '${((occupied/_rooms.length)*100).toStringAsFixed(0)}%', Icons.people, const Color(0xFF2E7D32))),
-      Expanded(child: _kpi('إيراد الشهر', '${(revenue/1000).toStringAsFixed(0)}K', Icons.attach_money, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('إيراد الشهر', '${(revenue/1000).toStringAsFixed(0)}K', Icons.attach_money, core_theme.AC.gold)),
       Expanded(child: _kpi('ADR', '485 ر.س', Icons.trending_up, const Color(0xFF1A237E))),
     ]));
   }
@@ -58,7 +59,7 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -69,7 +70,7 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
       title: Text('${b.id} — ${b.guest}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('غرفة ${b.room} • ${b.roomType}', style: const TextStyle(fontSize: 11)),
-        Text('${b.checkIn} → ${b.checkOut} (${b.nights} ليلة)', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('${b.checkIn} → ${b.checkOut} (${b.nights} ليلة)', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text('${b.totalAmount.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
@@ -88,7 +89,7 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(Icons.bed, color: color, size: 28),
           Text('#${r.number}', style: TextStyle(fontWeight: FontWeight.bold, color: color, fontSize: 13)),
-          Text(r.type, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+          Text(r.type, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
             decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6)),
@@ -101,23 +102,23 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
   Widget _guestsTab() => ListView.builder(padding: const EdgeInsets.all(12), itemCount: _guests.length, itemBuilder: (_, i) {
     final g = _guests[i];
     return Card(margin: const EdgeInsets.only(bottom: 8), child: ListTile(
-      leading: CircleAvatar(backgroundColor: const Color(0xFFD4AF37).withValues(alpha: 0.2),
-        child: Text(g.tier, style: const TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.bold))),
+      leading: CircleAvatar(backgroundColor: core_theme.AC.gold.withValues(alpha: 0.2),
+        child: Text(g.tier, style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.bold))),
       title: Text(g.name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${g.country} • ${g.stays} إقامة', style: const TextStyle(fontSize: 11)),
-        Text('آخر إقامة: ${g.lastStay}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('آخر إقامة: ${g.lastStay}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text('${(g.totalSpent/1000).toStringAsFixed(0)}K ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
-        const Icon(Icons.loyalty, color: Color(0xFFD4AF37), size: 16),
+        Icon(Icons.loyalty, color: core_theme.AC.gold, size: 16),
       ]),
     ));
   });
 
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('🏨 معدل الإشغال', '78% — أعلى من متوسط السوق (68%)', const Color(0xFF2E7D32)),
-    _insight('💰 RevPAR', '378 ر.س (ADR × Occupancy) — نمو 15% YoY', const Color(0xFFD4AF37)),
+    _insight('💰 RevPAR', '378 ر.س (ADR × Occupancy) — نمو 15% YoY', core_theme.AC.gold),
     _insight('🌍 أسواق المصدر', 'السعودية 45% • الخليج 28% • دولي 27%', const Color(0xFF1A237E)),
     _insight('⭐ تقييمات الضيوف', '4.6/5 على Booking.com • 4.7 على TripAdvisor', const Color(0xFF4A148C)),
     _insight('📅 الحجوزات المباشرة', '38% من الموقع مباشرة (يوفر عمولة OTA)', const Color(0xFF2E7D32)),
@@ -127,15 +128,15 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _bookingStatus(String s) {
     if (s.contains('وصل')) return const Color(0xFF2E7D32);
     if (s.contains('مغادر')) return const Color(0xFF1A237E);
-    if (s.contains('محجوز')) return const Color(0xFFD4AF37);
+    if (s.contains('محجوز')) return core_theme.AC.gold;
     if (s.contains('ملغى')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   Color _roomColor(String s) {
@@ -143,7 +144,7 @@ class _HotelPmsScreenState extends State<HotelPmsScreen> with SingleTickerProvid
     if (s.contains('متاح')) return const Color(0xFF2E7D32);
     if (s.contains('تنظيف')) return const Color(0xFFE65100);
     if (s.contains('صيانة')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Booking> _bookings = [

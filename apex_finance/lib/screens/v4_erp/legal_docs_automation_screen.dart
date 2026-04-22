@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 145 — Legal Document Automation
 class LegalDocsAutomationScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'القوالب'), Tab(text: 'المنشأة'), Tab(text: 'الموافقات'), Tab(text: 'E-Signature')])),
         Expanded(child: TabBarView(controller: _tc, children: [_templatesTab(), _createdTab(), _approvalsTab(), _signatureTab()])),
       ])),
@@ -32,13 +33,13 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.auto_stories, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('أتمتة المستندات القانونية', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('قوالب ذكية + توقيع إلكتروني + workflows', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('قوالب ذكية + توقيع إلكتروني + workflows', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -47,14 +48,14 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
     Expanded(child: _kpi('قوالب جاهزة', '${_templates.length}', Icons.description, const Color(0xFF1A237E))),
     Expanded(child: _kpi('مستندات هذا الشهر', '142', Icons.insert_drive_file, const Color(0xFF4A148C))),
     Expanded(child: _kpi('موقّعة', '128', Icons.verified, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('زمن التوقيع', '2.4 ساعة', Icons.speed, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('زمن التوقيع', '2.4 ساعة', Icons.speed, core_theme.AC.gold)),
   ]));
 
   Widget _kpi(String l, String v, IconData i, Color c) => Container(margin: const EdgeInsets.symmetric(horizontal: 4),
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -68,7 +69,7 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
       trailing: ElevatedButton.icon(
         onPressed: () {},
         icon: const Icon(Icons.add, size: 14),
-        label: const Text('إنشاء'),
+        label: Text('إنشاء'),
         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4A148C), foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
       ),
@@ -92,7 +93,7 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
     return Card(margin: const EdgeInsets.only(bottom: 8), child: Padding(padding: const EdgeInsets.all(14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(a.document, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-        Text('قيمة العقد: ${a.value}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('قيمة العقد: ${a.value}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 10),
         Row(children: a.workflow.asMap().entries.map((e) {
           final step = e.value;
@@ -105,7 +106,7 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
               Text(step.role, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               Text(step.status, style: TextStyle(fontSize: 8, color: _stepColor(step.status))),
             ])),
-            if (!isLast) Container(height: 2, width: 20, color: Colors.black26),
+            if (!isLast) Container(height: 2, width: 20, color: core_theme.AC.td),
           ]));
         }).toList()),
       ]),
@@ -114,7 +115,7 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
 
   Widget _signatureTab() => ListView(padding: const EdgeInsets.all(14), children: [
     Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('📝 E-Signature Provider', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4A148C))),
+      Text('📝 E-Signature Provider', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4A148C))),
       const SizedBox(height: 12),
       _provider('DocuSign', 'تكامل API', 'نشط', true),
       _provider('Tawqie (سعودي)', 'ZATCA-approved', 'نشط', true),
@@ -122,7 +123,7 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
     ]))),
     const SizedBox(height: 12),
     Card(child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('إحصائيات التوقيع', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+      Text('إحصائيات التوقيع', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
       const Divider(),
       _stat('مستندات وقّعت', '1,842 (كل الفترات)'),
       _stat('متوسط زمن التوقيع', '2.4 ساعة'),
@@ -132,22 +133,22 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
     ]))),
     const SizedBox(height: 12),
     _insight('🔐 أمان', 'توقيع رقمي بـ PKI + chain of custody + tamper-evident', const Color(0xFF2E7D32)),
-    _insight('⚡ سرعة', 'متوسط 2.4 ساعة vs 5 أيام للتوقيع الورقي', const Color(0xFFD4AF37)),
+    _insight('⚡ سرعة', 'متوسط 2.4 ساعة vs 5 أيام للتوقيع الورقي', core_theme.AC.gold),
     _insight('📱 متعدد المنصات', 'موبايل + ويب + WhatsApp + بريد إلكتروني', const Color(0xFF4A148C)),
   ]);
 
   Widget _provider(String name, String type, String status, bool connected) => Padding(padding: const EdgeInsets.symmetric(vertical: 6),
     child: Row(children: [
       Icon(connected ? Icons.check_circle : Icons.radio_button_unchecked,
-        color: connected ? const Color(0xFF2E7D32) : Colors.grey, size: 20),
+        color: connected ? const Color(0xFF2E7D32) : core_theme.AC.td, size: 20),
       const SizedBox(width: 8),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-        Text(type, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(type, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ])),
       Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(color: connected ? const Color(0xFF2E7D32).withValues(alpha: 0.15) : Colors.grey.shade200, borderRadius: BorderRadius.circular(8)),
-        child: Text(status, style: TextStyle(color: connected ? const Color(0xFF2E7D32) : Colors.black54, fontSize: 10, fontWeight: FontWeight.bold))),
+        decoration: BoxDecoration(color: connected ? const Color(0xFF2E7D32).withValues(alpha: 0.15) : core_theme.AC.bdr, borderRadius: BorderRadius.circular(8)),
+        child: Text(status, style: TextStyle(color: connected ? const Color(0xFF2E7D32) : core_theme.AC.ts, fontSize: 10, fontWeight: FontWeight.bold))),
     ]));
 
   Widget _stat(String l, String v) => Padding(padding: const EdgeInsets.symmetric(vertical: 3),
@@ -165,11 +166,11 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
 
   Color _categoryColor(String c) {
     if (c.contains('توظيف')) return const Color(0xFF2E7D32);
-    if (c.contains('توريد')) return const Color(0xFFD4AF37);
+    if (c.contains('توريد')) return core_theme.AC.gold;
     if (c.contains('شراكة')) return const Color(0xFF4A148C);
     if (c.contains('NDA')) return const Color(0xFFC62828);
     if (c.contains('إيجار')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   IconData _categoryIcon(String c) {
@@ -183,17 +184,17 @@ class _LegalDocsAutomationScreenState extends State<LegalDocsAutomationScreen> w
 
   Color _statusColor(String s) {
     if (s.contains('موقع')) return const Color(0xFF2E7D32);
-    if (s.contains('انتظار')) return const Color(0xFFD4AF37);
-    if (s.contains('مسودة')) return Colors.black54;
+    if (s.contains('انتظار')) return core_theme.AC.gold;
+    if (s.contains('مسودة')) return core_theme.AC.ts;
     if (s.contains('مرفوض')) return const Color(0xFFC62828);
     return const Color(0xFF1A237E);
   }
 
   Color _stepColor(String s) {
     if (s.contains('موافق')) return const Color(0xFF2E7D32);
-    if (s.contains('قيد')) return const Color(0xFFD4AF37);
+    if (s.contains('قيد')) return core_theme.AC.gold;
     if (s.contains('رفض')) return const Color(0xFFC62828);
-    return Colors.grey;
+    return core_theme.AC.td;
   }
 
   IconData _stepIcon(String s) {

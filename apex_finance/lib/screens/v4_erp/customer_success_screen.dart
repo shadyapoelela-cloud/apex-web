@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 144 — Customer Success Platform
 class CustomerSuccessScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'Health Score'), Tab(text: 'المخاطر'), Tab(text: 'Upsell'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_healthTab(), _risksTab(), _upsellTab(), _analyticsTab()])),
       ])),
@@ -32,20 +33,20 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF00695C), Color(0xFF004D40)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.support, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('نجاح العملاء', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('Customer Success — Health score + Churn prediction + Upsell', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('Customer Success — Health score + Churn prediction + Upsell', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
 
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('صحة العملاء', '87%', Icons.favorite, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('Churn متوقع', '2.8%', Icons.trending_down, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('Churn متوقع', '2.8%', Icons.trending_down, core_theme.AC.gold)),
     Expanded(child: _kpi('فرص Upsell', '42', Icons.upgrade, const Color(0xFF4A148C))),
     Expanded(child: _kpi('NPS', '+64', Icons.thumb_up, const Color(0xFF004D40))),
   ]));
@@ -54,7 +55,7 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -70,7 +71,7 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text('${c.plan} • MRR: ${c.mrr}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${c.plan} • MRR: ${c.mrr}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
             decoration: BoxDecoration(color: _scoreColor(c.healthScore).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
@@ -78,7 +79,7 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
         ]),
         const SizedBox(height: 10),
         ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-          value: pct, minHeight: 6, backgroundColor: Colors.black12,
+          value: pct, minHeight: 6, backgroundColor: core_theme.AC.bdr,
           valueColor: AlwaysStoppedAnimation(_scoreColor(c.healthScore)))),
         const SizedBox(height: 8),
         Row(children: [
@@ -91,7 +92,7 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
   });
 
   Widget _signal(String label, String value) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(label, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(label, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(value, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
   ]));
 
@@ -111,7 +112,7 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
         const SizedBox(height: 8),
         Text('السبب: ${r.reason}', style: const TextStyle(fontSize: 12)),
         const SizedBox(height: 4),
-        Text('الأثر: ${r.impact}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('الأثر: ${r.impact}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 8),
         Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFFFFF8E1), borderRadius: BorderRadius.circular(6)),
           child: Text('✅ الإجراء الموصى به: ${r.action}', style: const TextStyle(fontSize: 11.5))),
@@ -129,13 +130,13 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
         ]),
         Text('الترقية المقترحة: ${o.recommendation}', style: const TextStyle(fontSize: 12)),
         const SizedBox(height: 6),
-        Text('السبب: ${o.reason}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('السبب: ${o.reason}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 8),
         ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-          value: o.probability / 100, minHeight: 5, backgroundColor: Colors.black12,
+          value: o.probability / 100, minHeight: 5, backgroundColor: core_theme.AC.bdr,
           valueColor: const AlwaysStoppedAnimation(Color(0xFF2E7D32)))),
         const SizedBox(height: 4),
-        Text('احتمالية النجاح: ${o.probability}%', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('احتمالية النجاح: ${o.probability}%', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -144,7 +145,7 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
     _insight('🎯 العملاء في المنطقة الحرجة', '5 عملاء بصحة < 50 — يتطلب تدخل CSM فوري', const Color(0xFFC62828)),
     _insight('💡 فرص Upsell', '42 عميل مؤهل لخطة أعلى — محتمل +1.8M ر.س ARR', const Color(0xFF2E7D32)),
     _insight('📊 معدل Retention', '94% في آخر 90 يوم — أعلى من Industry (80%)', const Color(0xFF2E7D32)),
-    _insight('🤝 اجتماعات QBR', '12 QBR هذا الربع — 8 متبقية', const Color(0xFFD4AF37)),
+    _insight('🤝 اجتماعات QBR', '12 QBR هذا الربع — 8 متبقية', core_theme.AC.gold),
     _insight('💬 CSAT', '4.6/5 — مستقر منذ 6 أشهر', const Color(0xFF4A148C)),
     _insight('🔔 تنبيهات اليوم', '3 عملاء خفّضوا استخدامهم >40% — تدخل مستحسن', const Color(0xFFE65100)),
   ]);
@@ -153,12 +154,12 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _scoreColor(int s) {
     if (s >= 80) return const Color(0xFF2E7D32);
-    if (s >= 60) return const Color(0xFFD4AF37);
+    if (s >= 60) return core_theme.AC.gold;
     if (s >= 40) return const Color(0xFFE65100);
     return const Color(0xFFC62828);
   }
@@ -166,7 +167,7 @@ class _CustomerSuccessScreenState extends State<CustomerSuccessScreen> with Sing
   Color _severityColor(String s) {
     if (s.contains('حرج')) return const Color(0xFFC62828);
     if (s.contains('عالي')) return const Color(0xFFE65100);
-    if (s.contains('متوسط')) return const Color(0xFFD4AF37);
+    if (s.contains('متوسط')) return core_theme.AC.gold;
     return const Color(0xFF1A237E);
   }
 

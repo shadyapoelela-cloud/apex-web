@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class AnomalyDetectorScreen extends StatefulWidget {
   const AnomalyDetectorScreen({super.key});
@@ -124,11 +125,11 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('مكتشفة اليوم', '${_anomalies.length}', Colors.purple, Icons.visibility),
-            _kpi('حرجة', '$critical', Colors.red, Icons.error),
-            _kpi('عالية الخطورة', '$high', Colors.orange, Icons.warning),
-            _kpi('متوسط الثقة', '${(avgConfidence * 100).toStringAsFixed(0)}%', Colors.blue, Icons.psychology),
-            _kpi('معدل الدقة (Precision)', '92%', Colors.green, Icons.gps_fixed),
+            _kpi('مكتشفة اليوم', '${_anomalies.length}', core_theme.AC.purple, Icons.visibility),
+            _kpi('حرجة', '$critical', core_theme.AC.err, Icons.error),
+            _kpi('عالية الخطورة', '$high', core_theme.AC.warn, Icons.warning),
+            _kpi('متوسط الثقة', '${(avgConfidence * 100).toStringAsFixed(0)}%', core_theme.AC.info, Icons.psychology),
+            _kpi('معدل الدقة (Precision)', '92%', core_theme.AC.ok, Icons.gps_fixed),
           ],
         ),
         const SizedBox(height: 16),
@@ -138,10 +139,10 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
           spacing: 8,
           children: [
             _severityChip('all', 'الكل'),
-            _severityChip('critical', 'حرج', Colors.red),
-            _severityChip('high', 'عالٍ', Colors.orange),
-            _severityChip('medium', 'متوسط', Colors.amber),
-            _severityChip('low', 'منخفض', Colors.blue),
+            _severityChip('critical', 'حرج', core_theme.AC.err),
+            _severityChip('high', 'عالٍ', core_theme.AC.warn),
+            _severityChip('medium', 'متوسط', core_theme.AC.warn),
+            _severityChip('low', 'منخفض', core_theme.AC.info),
           ],
         ),
         const SizedBox(height: 16),
@@ -157,7 +158,7 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
         gradient: const LinearGradient(colors: [Color(0xFF311B92), Color(0xFF512DA8)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.psychology, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -168,7 +169,7 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                 Text('كاشف الشذوذ الذكي',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('AI Anomaly Detection · نمذجة سلوكية · كشف فوري للمعاملات غير الاعتيادية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -181,20 +182,20 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.purple.shade50,
+        color: core_theme.AC.purple,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.purple.shade200),
+        border: Border.all(color: core_theme.AC.purple),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.auto_awesome, color: Colors.purple),
+          Icon(Icons.auto_awesome, color: core_theme.AC.purple),
           SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('محرّك كشف الشذوذ',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.purple)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: core_theme.AC.purple)),
                 Text(
                   '⚡ يفحص 10,000+ معاملة يومياً · 🧠 يتعلم من نمط عمل كل مستخدم · 🎯 ينبّه على النمط قبل الحدوث',
                   style: TextStyle(fontSize: 11, height: 1.5),
@@ -225,7 +226,7 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -289,7 +290,7 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                     children: [
                       Row(
                         children: [
-                          Text(a.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                          Text(a.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -300,13 +301,13 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                            decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                             child: Text(typeInfo.label,
                                 style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                           ),
                           const SizedBox(width: 6),
                           Text(a.timestamp,
-                              style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                              style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -318,7 +319,7 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text('ثقة النموذج', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('ثقة النموذج', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     Text('${(a.confidence * 100).toStringAsFixed(0)}%',
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
                   ],
@@ -331,10 +332,10 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(a.description, style: const TextStyle(fontSize: 12, height: 1.6, color: Colors.black87)),
+                Text(a.description, style: TextStyle(fontSize: 12, height: 1.6, color: core_theme.AC.tp)),
                 const SizedBox(height: 12),
-                const Text('🚩 علامات التنبيه:',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54)),
+                Text('🚩 علامات التنبيه:',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
@@ -356,16 +357,16 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD4AF37).withOpacity(0.08),
+                    color: core_theme.AC.gold.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+                    border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.lightbulb, color: Color(0xFFD4AF37), size: 16),
+                      Icon(Icons.lightbulb, color: core_theme.AC.gold, size: 16),
                       SizedBox(width: 6),
                       Text('الإجراء الموصى به:',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                     ],
                   ),
                 ),
@@ -378,7 +379,7 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                     ElevatedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.check, size: 14),
-                      label: const Text('تأكيد وعلاج', style: TextStyle(fontSize: 11)),
+                      label: Text('تأكيد وعلاج', style: TextStyle(fontSize: 11)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: color,
                         foregroundColor: Colors.white,
@@ -388,13 +389,13 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                     OutlinedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.flag, size: 14),
-                      label: const Text('تصعيد', style: TextStyle(fontSize: 11)),
+                      label: Text('تصعيد', style: TextStyle(fontSize: 11)),
                     ),
                     const SizedBox(width: 8),
                     TextButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.not_interested, size: 14),
-                      label: const Text('إنذار كاذب', style: TextStyle(fontSize: 11)),
+                      label: Text('إنذار كاذب', style: TextStyle(fontSize: 11)),
                     ),
                   ],
                 ),
@@ -409,15 +410,15 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
   Color _severityColor(String s) {
     switch (s) {
       case 'critical':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'high':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'medium':
-        return Colors.amber.shade700;
+        return core_theme.AC.warn;
       case 'low':
-        return Colors.blue;
+        return core_theme.AC.info;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

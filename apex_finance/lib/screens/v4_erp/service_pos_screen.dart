@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ServicePosScreen extends StatefulWidget {
   const ServicePosScreen({super.key});
@@ -20,8 +21,8 @@ class ServicePosScreen extends StatefulWidget {
 }
 
 class _ServicePosScreenState extends State<ServicePosScreen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   int _selectedDay = DateTime.now().weekday - 1;
 
@@ -58,16 +59,16 @@ class _ServicePosScreenState extends State<ServicePosScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.room_service, color: _gold),
+                  Icon(Icons.room_service, color: _gold),
                   const SizedBox(width: 8),
-                  const Text('نقاط بيع الخدمات',
+                  Text('نقاط بيع الخدمات',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                   const Spacer(),
                   FilledButton.icon(
                     onPressed: () {},
                     style: FilledButton.styleFrom(backgroundColor: _gold),
                     icon: const Icon(Icons.add),
-                    label: const Text('حجز جديد'),
+                    label: Text('حجز جديد'),
                   ),
                 ],
               ),
@@ -78,11 +79,11 @@ class _ServicePosScreenState extends State<ServicePosScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
-                  _StatPill(icon: Icons.event_available, label: 'اليوم', value: '${_appointments.length}', color: Colors.blue),
+                  _StatPill(icon: Icons.event_available, label: 'اليوم', value: '${_appointments.length}', color: core_theme.AC.info),
                   const SizedBox(width: 10),
-                  _StatPill(icon: Icons.check_circle, label: 'مكتمل', value: '1', color: Colors.green),
+                  _StatPill(icon: Icons.check_circle, label: 'مكتمل', value: '1', color: core_theme.AC.ok),
                   const SizedBox(width: 10),
-                  _StatPill(icon: Icons.schedule, label: 'قيد التنفيذ', value: '1', color: Colors.orange),
+                  _StatPill(icon: Icons.schedule, label: 'قيد التنفيذ', value: '1', color: core_theme.AC.warn),
                   const SizedBox(width: 10),
                   _StatPill(icon: Icons.attach_money, label: 'إيراد اليوم', value: '1,340 ر.س', color: _gold),
                 ],
@@ -103,7 +104,7 @@ class _ServicePosScreenState extends State<ServicePosScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
-                            color: active ? _gold : Colors.grey.shade100,
+                            color: active ? _gold : core_theme.AC.navy3,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Column(
@@ -111,13 +112,13 @@ class _ServicePosScreenState extends State<ServicePosScreen> {
                               Text(days[i],
                                   style: TextStyle(
                                       fontSize: 11,
-                                      color: active ? Colors.white : Colors.black87,
+                                      color: active ? Colors.white : core_theme.AC.tp,
                                       fontWeight: FontWeight.w700)),
                               const SizedBox(height: 2),
                               Text('${i + 15}',
                                   style: TextStyle(
                                       fontSize: 16,
-                                      color: active ? Colors.white : Colors.black,
+                                      color: active ? Colors.white : core_theme.AC.tp,
                                       fontWeight: FontWeight.w800)),
                             ],
                           ),
@@ -153,7 +154,7 @@ class _ServicePosScreenState extends State<ServicePosScreen> {
                           decoration: BoxDecoration(
                             color: _navy.withOpacity(0.04),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
                               Icon(Icons.menu_book, color: _navy),
                               SizedBox(width: 8),
@@ -177,7 +178,7 @@ class _ServicePosScreenState extends State<ServicePosScreen> {
                                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                                 subtitle: Text('${s.duration} دقيقة', style: const TextStyle(fontSize: 11)),
                                 trailing: Text('${s.price.toStringAsFixed(0)} ر.س',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
                               );
                             },
@@ -235,9 +236,9 @@ class _ApptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label, icon) = switch (appt.status) {
-      _ApptStatus.done => (Colors.green, 'مكتمل', Icons.check_circle),
-      _ApptStatus.inProgress => (Colors.orange, 'قيد التنفيذ', Icons.schedule),
-      _ApptStatus.scheduled => (Colors.blue, 'محجوز', Icons.event),
+      _ApptStatus.done => (core_theme.AC.ok, 'مكتمل', Icons.check_circle),
+      _ApptStatus.inProgress => (core_theme.AC.warn, 'قيد التنفيذ', Icons.schedule),
+      _ApptStatus.scheduled => (core_theme.AC.info, 'محجوز', Icons.event),
     };
 
     return Card(
@@ -251,14 +252,14 @@ class _ApptCard extends StatelessWidget {
               width: 60,
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFFD4AF37).withOpacity(0.1),
+                color: core_theme.AC.gold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
                 children: [
                   Text(appt.time,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                 ],
               ),
             ),
@@ -272,18 +273,18 @@ class _ApptCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.spa, size: 12, color: Colors.black54),
+                      Icon(Icons.spa, size: 12, color: core_theme.AC.ts),
                       const SizedBox(width: 4),
-                      Text(appt.service, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                      Text(appt.service, style: TextStyle(fontSize: 12, color: core_theme.AC.tp)),
                     ],
                   ),
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.person_pin, size: 12, color: Colors.black54),
+                      Icon(Icons.person_pin, size: 12, color: core_theme.AC.ts),
                       const SizedBox(width: 4),
                       Text('الفني: ${appt.tech}',
-                          style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     ],
                   ),
                 ],

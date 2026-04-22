@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 128 — M&A Deal Room / Due Diligence
 class MaDealRoomScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الصفقات'), Tab(text: 'غرفة البيانات'), Tab(text: 'العناية الواجبة'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_dealsTab(), _docsTab(), _ddTab(), _analyticsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF0D47A1)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.handshake, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('غرفة صفقات M&A', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('عمليات الاستحواذ، Virtual Data Room، العناية الواجبة', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('عمليات الاستحواذ، Virtual Data Room، العناية الواجبة', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -47,7 +48,7 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
     final totalValue = _deals.fold<double>(0, (s, d) => s + d.dealValue);
     return Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
       Expanded(child: _kpi('صفقات نشطة', '${_deals.where((d)=>d.status.contains('نشط') || d.status.contains('مفاوضة')).length}', Icons.handshake, const Color(0xFF0D47A1))),
-      Expanded(child: _kpi('قيمة الصفقات', '${(totalValue/1000000).toStringAsFixed(0)}M', Icons.attach_money, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('قيمة الصفقات', '${(totalValue/1000000).toStringAsFixed(0)}M', Icons.attach_money, core_theme.AC.gold)),
       Expanded(child: _kpi('وثائق', '${_docs.length}', Icons.folder, const Color(0xFF4A148C))),
       Expanded(child: _kpi('مستخدمون', '28', Icons.people, const Color(0xFF2E7D32))),
     ]));
@@ -57,7 +58,7 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -71,9 +72,9 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(d.target, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text('${d.type} • ${d.advisor}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${d.type} • ${d.advisor}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
-          Text('${(d.dealValue/1000000).toStringAsFixed(0)}M', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD4AF37), fontSize: 16)),
+          Text('${(d.dealValue/1000000).toStringAsFixed(0)}M', style: TextStyle(fontWeight: FontWeight.bold, color: core_theme.AC.gold, fontSize: 16)),
         ]),
         const SizedBox(height: 10),
         Row(children: [
@@ -81,12 +82,12 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
             decoration: BoxDecoration(color: _dealStatus(d.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Text(d.status, style: TextStyle(color: _dealStatus(d.status), fontSize: 10, fontWeight: FontWeight.bold))),
           const Spacer(),
-          Text('Close: ${d.expectedClose}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('Close: ${d.expectedClose}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ]),
         const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: core_theme.AC.bdr, valueColor: AlwaysStoppedAnimation(core_theme.AC.gold))),
         const SizedBox(height: 4),
-        Text('${d.progress}% مكتمل', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('${d.progress}% مكتمل', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -115,16 +116,16 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
           Text('${d.itemsCompleted}/${d.totalItems}', style: const TextStyle(fontWeight: FontWeight.bold)),
         ]),
         const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: Colors.black12, valueColor: AlwaysStoppedAnimation(d.status.contains('مكتمل') ? const Color(0xFF2E7D32) : const Color(0xFFD4AF37)))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: core_theme.AC.bdr, valueColor: AlwaysStoppedAnimation(d.status.contains('مكتمل') ? const Color(0xFF2E7D32) : core_theme.AC.gold))),
         const SizedBox(height: 4),
-        Text(d.notes, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(d.notes, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
     ));
   });
 
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('💼 Pipeline', '4 صفقات نشطة بقيمة إجمالية 485M ر.س', const Color(0xFF0D47A1)),
-    _insight('⏱️ متوسط الإغلاق', '6.4 شهر من التوقيع لإقفال الصفقة', const Color(0xFFD4AF37)),
+    _insight('⏱️ متوسط الإغلاق', '6.4 شهر من التوقيع لإقفال الصفقة', core_theme.AC.gold),
     _insight('📄 DD Efficiency', '92% وثائق مراجعة — السرعة 3x أعلى مع AI', const Color(0xFF4A148C)),
     _insight('🔐 الأمان', 'تشفير AES-256 + MFA إلزامي • 0 اختراقات', const Color(0xFF2E7D32)),
     _insight('📊 Valuation Multiples', 'قطاع ERP: 4-6x ARR • النظراء الإقليميون 4.2x', const Color(0xFF1A237E)),
@@ -134,13 +135,13 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _dealStatus(String s) {
     if (s.contains('مغلق')) return const Color(0xFF2E7D32);
     if (s.contains('مفاوضة')) return const Color(0xFFE65100);
-    if (s.contains('نشط')) return const Color(0xFFD4AF37);
+    if (s.contains('نشط')) return core_theme.AC.gold;
     if (s.contains('معلق')) return const Color(0xFFC62828);
     return const Color(0xFF1A237E);
   }
@@ -156,17 +157,17 @@ class _MaDealRoomScreenState extends State<MaDealRoomScreen> with SingleTickerPr
   Color _folderColor(String f) {
     if (f.contains('مالية')) return const Color(0xFF2E7D32);
     if (f.contains('قانونية')) return const Color(0xFF4A148C);
-    if (f.contains('تجارية')) return const Color(0xFFD4AF37);
+    if (f.contains('تجارية')) return core_theme.AC.gold;
     if (f.contains('تقنية')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   Color _accessColor(String a) {
     if (a.contains('كامل')) return const Color(0xFF2E7D32);
-    if (a.contains('Q&A')) return const Color(0xFFD4AF37);
+    if (a.contains('Q&A')) return core_theme.AC.gold;
     if (a.contains('عرض')) return const Color(0xFF1A237E);
     if (a.contains('محظور')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Deal> _deals = [

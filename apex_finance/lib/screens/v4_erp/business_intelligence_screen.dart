@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 142 — Business Intelligence Dashboard (executive 360°)
 class BusinessIntelligenceScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _BusinessIntelligenceScreenState extends State<BusinessIntelligenceScreen>
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           isScrollable: true,
           tabs: const [
             Tab(text: 'المبيعات'),
@@ -41,20 +42,20 @@ class _BusinessIntelligenceScreenState extends State<BusinessIntelligenceScreen>
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF0D47A1)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.insights, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('ذكاء الأعمال 360°', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('Business Intelligence — تحليلات متقدمة + تنبؤات AI', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('Business Intelligence — تحليلات متقدمة + تنبؤات AI', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
 
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('إيرادات اليوم', '148K', Icons.today, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('OKRs ✓', '12/14', Icons.flag, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('OKRs ✓', '12/14', Icons.flag, core_theme.AC.gold)),
     Expanded(child: _kpi('NPS', '+64', Icons.sentiment_satisfied, const Color(0xFF4A148C))),
     Expanded(child: _kpi('AI Confidence', '94%', Icons.auto_awesome, const Color(0xFF0D47A1))),
   ]));
@@ -63,17 +64,17 @@ class _BusinessIntelligenceScreenState extends State<BusinessIntelligenceScreen>
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
   Widget _salesTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _metricCard('إجمالي الإيرادات 2026', '24.8M ر.س', '+18.4% YoY', const Color(0xFF2E7D32), Icons.trending_up),
     _metricCard('الإيرادات الربع الثاني', '6.8M ر.س', '+22% QoQ', const Color(0xFF2E7D32), Icons.trending_up),
-    _metricCard('متوسط حجم الصفقة', '48,200 ر.س', '+12% YoY', const Color(0xFFD4AF37), Icons.receipt),
+    _metricCard('متوسط حجم الصفقة', '48,200 ر.س', '+12% YoY', core_theme.AC.gold, Icons.receipt),
     _metricCard('Pipeline نشط', '18.4M ر.س', '142 صفقة', const Color(0xFF1A237E), Icons.filter_alt),
     _metricCard('Win Rate', '34%', '+5% YoY', const Color(0xFF4A148C), Icons.emoji_events),
-    _metricCard('أفضل منتج', 'APEX Enterprise', '8.2M إيرادات', const Color(0xFFD4AF37), Icons.star),
+    _metricCard('أفضل منتج', 'APEX Enterprise', '8.2M إيرادات', core_theme.AC.gold, Icons.star),
     _topList('🏆 أعلى العملاء (Q2 2026)', [
       ('أرامكو السعودية', '2.8M ر.س'),
       ('بنك الراجحي', '1.9M ر.س'),
@@ -100,10 +101,10 @@ class _BusinessIntelligenceScreenState extends State<BusinessIntelligenceScreen>
 
   Widget _customersTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _metricCard('إجمالي العملاء', '2,840', '+18% YoY', const Color(0xFF4A148C), Icons.people),
-    _metricCard('عملاء جدد (الشهر)', '128 عميل', 'CAC: 485 ر.س', const Color(0xFFD4AF37), Icons.person_add),
+    _metricCard('عملاء جدد (الشهر)', '128 عميل', 'CAC: 485 ر.س', core_theme.AC.gold, Icons.person_add),
     _metricCard('Churn Rate', '2.8%', '-1.2% YoY', const Color(0xFF2E7D32), Icons.trending_down),
     _metricCard('متوسط LTV', '42,000 ر.س', 'LTV/CAC: 86x', const Color(0xFF2E7D32), Icons.attach_money),
-    _metricCard('NPS Score', '+64', '"Leaders" tier', const Color(0xFFD4AF37), Icons.thumb_up),
+    _metricCard('NPS Score', '+64', '"Leaders" tier', core_theme.AC.gold, Icons.thumb_up),
     _metricCard('Retention @ 90 days', '94%', 'أعلى من الصناعة', const Color(0xFF2E7D32), Icons.loyalty),
     _topList('💬 أكثر القنوات فاعلية', [
       ('Direct Sales', '42% من الإيرادات'),
@@ -116,11 +117,11 @@ class _BusinessIntelligenceScreenState extends State<BusinessIntelligenceScreen>
 
   Widget _hrTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _metricCard('إجمالي الموظفين', '128 موظف', '+14 هذا العام', const Color(0xFF4A148C), Icons.groups),
-    _metricCard('نسبة السعودة', '87%', 'فوق المستهدف (80%)', const Color(0xFFD4AF37), Icons.flag),
+    _metricCard('نسبة السعودة', '87%', 'فوق المستهدف (80%)', core_theme.AC.gold, Icons.flag),
     _metricCard('eNPS', '+42', '"Excellent" tier', const Color(0xFF2E7D32), Icons.sentiment_very_satisfied),
     _metricCard('معدل الدوران', '8.2%', '-3% YoY', const Color(0xFF2E7D32), Icons.trending_down),
     _metricCard('متوسط زمن التوظيف', '42 يوم', '-8 days YoY', const Color(0xFF2E7D32), Icons.timer),
-    _metricCard('ساعات التدريب/موظف', '48 ساعة', 'سنوياً', const Color(0xFFD4AF37), Icons.school),
+    _metricCard('ساعات التدريب/موظف', '48 ساعة', 'سنوياً', core_theme.AC.gold, Icons.school),
     _topList('⚡ أعلى الأقسام إنتاجية', [
       ('Engineering', '98% OKRs ✓'),
       ('Product', '95%'),
@@ -132,22 +133,22 @@ class _BusinessIntelligenceScreenState extends State<BusinessIntelligenceScreen>
 
   Widget _forecastTab() => ListView(padding: const EdgeInsets.all(14), children: [
     Card(color: const Color(0xFF1A237E).withValues(alpha: 0.05), child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Row(children: [
-        Icon(Icons.auto_awesome, color: Color(0xFFD4AF37)),
+      Row(children: [
+        Icon(Icons.auto_awesome, color: core_theme.AC.gold),
         SizedBox(width: 8),
         Text('تنبؤات AI للربع القادم', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1A237E))),
       ]),
       const SizedBox(height: 12),
       _forecast('الإيرادات', '7.8M ر.س', '92%', const Color(0xFF2E7D32)),
       _forecast('صافي الربح', '1.4M ر.س', '88%', const Color(0xFF2E7D32)),
-      _forecast('العملاء الجدد', '180 - 220', '85%', const Color(0xFFD4AF37)),
+      _forecast('العملاء الجدد', '180 - 220', '85%', core_theme.AC.gold),
       _forecast('OKR completion', '88-92%', '94%', const Color(0xFF2E7D32)),
       _forecast('CAC', '~510 ر.س', '78%', const Color(0xFFE65100)),
     ]))),
     const SizedBox(height: 12),
     _alert('⚠️ تنبيه من AI', 'اكتشاف نمط: العملاء في قطاع الطاقة يلغون اشتراكاتهم 3x أسرع', const Color(0xFFC62828)),
     _alert('💡 توصية', 'زيادة فريق Customer Success بـ 3 موظفين سيقلل Churn بـ 40%', const Color(0xFF2E7D32)),
-    _alert('📈 فرصة', 'قطاع الصحة يُظهر نمو 45% — زِد جهود التسويق فيه', const Color(0xFFD4AF37)),
+    _alert('📈 فرصة', 'قطاع الصحة يُظهر نمو 45% — زِد جهود التسويق فيه', core_theme.AC.gold),
     _alert('🎯 ملاحظة', 'متوسط LTV للمنتج B أعلى من A بـ 2.4x — ركّز عليه', const Color(0xFF4A148C)),
   ]);
 
@@ -167,9 +168,9 @@ class _BusinessIntelligenceScreenState extends State<BusinessIntelligenceScreen>
         child: Icon(icon, color: color)),
       const SizedBox(width: 14),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+        Text(title, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
         Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
-        Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(subtitle, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ])),
     ])));
 

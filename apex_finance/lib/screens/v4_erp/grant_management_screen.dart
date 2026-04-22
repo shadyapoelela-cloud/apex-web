@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 114 — NGO / Grant & Donor Management
 class GrantManagementScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'المنح'), Tab(text: 'المانحون'), Tab(text: 'البرامج'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_grantsTab(), _donorsTab(), _programsTab(), _analyticsTab()])),
       ])),
@@ -35,10 +36,10 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.volunteer_activism, color: Color(0xFF1B5E20), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('إدارة المنح والمانحين', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('القطاع غير الربحي — تتبع المنح، البرامج، التبرعات', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('القطاع غير الربحي — تتبع المنح، البرامج، التبرعات', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -49,7 +50,7 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
     return Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
       Expanded(child: _kpi('إجمالي المنح', _fmtM(total), Icons.volunteer_activism, const Color(0xFF1B5E20))),
       Expanded(child: _kpi('مستخدم', _fmtM(utilized), Icons.check_circle, const Color(0xFF2E7D32))),
-      Expanded(child: _kpi('المانحون', '${_donors.length}', Icons.groups, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('المانحون', '${_donors.length}', Icons.groups, core_theme.AC.gold)),
       Expanded(child: _kpi('برامج نشطة', '${_programs.where((p)=>p.status.contains('نشط')).length}', Icons.campaign, const Color(0xFF4A148C))),
     ]));
   }
@@ -58,7 +59,7 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -72,7 +73,7 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(g.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text('من: ${g.donor} • للبرنامج: ${g.program}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('من: ${g.donor} • للبرنامج: ${g.program}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: _statusColor(g.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
@@ -86,17 +87,17 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
           _mini('الانتهاء', g.endDate),
         ]),
         const SizedBox(height: 8),
-        Text('نسبة الاستخدام', style: const TextStyle(fontSize: 10, color: Colors.black54)),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: util, minHeight: 6, backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFF2E7D32)))),
+        Text('نسبة الاستخدام', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: util, minHeight: 6, backgroundColor: core_theme.AC.bdr, valueColor: const AlwaysStoppedAnimation(Color(0xFF2E7D32)))),
         const SizedBox(height: 4),
         Text('${(util * 100).toStringAsFixed(0)}% • ${g.reports} تقارير مقدمة',
-          style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
     ));
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
   ]));
 
@@ -108,11 +109,11 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
       title: Text(d.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${d.type} • ${d.country}', style: const TextStyle(fontSize: 11)),
-        Text('${d.grantsCount} منح • آخر تبرع: ${d.lastDonation}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('${d.grantsCount} منح • آخر تبرع: ${d.lastDonation}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text(_fmtM(d.totalGiven), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
-        Text('إجمالي التبرع', style: const TextStyle(fontSize: 9, color: Colors.black54)),
+        Text('إجمالي التبرع', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -127,7 +128,7 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text('${p.category} • ${p.beneficiaries} مستفيد', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${p.category} • ${p.beneficiaries} مستفيد', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(color: _statusColor(p.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
@@ -143,7 +144,7 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
     _insight('💚 الأثر', '12,840 مستفيد هذا العام — نمو 32% YoY', const Color(0xFF2E7D32)),
     _insight('💰 معدل التمويل', '87% من البرامج ممولة بالكامل', const Color(0xFF1B5E20)),
     _insight('📊 كفاءة الإنفاق', '92% مباشر للبرامج • 8% إدارية (معيار دولي)', const Color(0xFF1A237E)),
-    _insight('🌍 التنوع الجغرافي', '14 دولة — مانحون من 8 دول', const Color(0xFFD4AF37)),
+    _insight('🌍 التنوع الجغرافي', '14 دولة — مانحون من 8 دول', core_theme.AC.gold),
     _insight('📝 الامتثال', 'تقارير مُرسلة للمانحين في الموعد 98%', const Color(0xFF2E7D32)),
     _insight('🏆 الشفافية', 'تقييم 4.9/5 من Charity Navigator', const Color(0xFF4A148C)),
   ]);
@@ -151,14 +152,14 @@ class _GrantManagementScreenState extends State<GrantManagementScreen> with Sing
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _statusColor(String s) {
     if (s.contains('نشط')) return const Color(0xFF2E7D32);
     if (s.contains('مكتمل')) return const Color(0xFF1A237E);
     if (s.contains('معلق')) return const Color(0xFFE65100);
-    if (s.contains('مغلق')) return Colors.black54;
+    if (s.contains('مغلق')) return core_theme.AC.ts;
     return const Color(0xFF4A148C);
   }
 

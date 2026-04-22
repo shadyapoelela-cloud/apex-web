@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class OkrsScorecardScreen extends StatefulWidget {
   const OkrsScorecardScreen({super.key});
@@ -16,13 +17,13 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
   String _level = 'company';
   String _quarter = 'Q2-2026';
 
-  final _objectives = const [
+  final _objectives = [
     _Objective(
       'OBJ-2026-01',
       '📈 نمو الإيرادات 30% YoY',
       'company',
       'النمو المستدام',
-      Color(0xFFD4AF37),
+      core_theme.AC.gold,
       'أحمد العتيبي',
       [
         _KeyResult('KR-01.1', 'تحقيق 25M ر.س من الإيرادات Q2', 18.5, 25, 'ر.س (M)'),
@@ -61,7 +62,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
       '⭐ رفع رضا العملاء إلى NPS 80+',
       'department',
       'العميل',
-      Colors.blue,
+      core_theme.AC.info,
       'لينا البكري',
       [
         _KeyResult('KR-04.1', 'Net Promoter Score', 76, 80, 'NPS'),
@@ -74,7 +75,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
       '🛡️ الامتثال الكامل لمتطلبات ZATCA',
       'department',
       'الامتثال',
-      Colors.green,
+      core_theme.AC.ok,
       'محمد القحطاني',
       [
         _KeyResult('KR-05.1', 'نسبة الفواتير الموقّعة تلقائياً', 98.5, 99, '%'),
@@ -87,7 +88,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
       '💰 تحسين الكفاءة التشغيلية',
       'department',
       'الكفاءة',
-      Colors.orange,
+      core_theme.AC.warn,
       'فهد الشمري',
       [
         _KeyResult('KR-06.1', 'خفض DSO إلى 32 يوم', 35, 32, 'يوم (عكسي)'),
@@ -114,10 +115,10 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('الأهداف', '${filtered.length}', const Color(0xFFD4AF37), Icons.flag),
-            _kpi('على المسار', '$onTrack', Colors.green, Icons.check_circle),
-            _kpi('تحت المتابعة', '$atRisk', Colors.orange, Icons.warning),
-            _kpi('متأخّرة', '$offTrack', Colors.red, Icons.error),
+            _kpi('الأهداف', '${filtered.length}', core_theme.AC.gold, Icons.flag),
+            _kpi('على المسار', '$onTrack', core_theme.AC.ok, Icons.check_circle),
+            _kpi('تحت المتابعة', '$atRisk', core_theme.AC.warn, Icons.warning),
+            _kpi('متأخّرة', '$offTrack', core_theme.AC.err, Icons.error),
           ],
         ),
         const SizedBox(height: 16),
@@ -153,21 +154,21 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
             child: const Icon(Icons.track_changes, color: Color(0xFF1A237E), size: 32),
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('الأهداف والنتائج الرئيسية (OKRs)',
                     style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
                 Text('منهجية OKR — تتبع الأهداف الاستراتيجية ومقاييس الأداء',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text('متوسط التقدّم', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              Text('متوسط التقدّم', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
               Text('${avgProgress.toStringAsFixed(1)}%',
                   style: const TextStyle(color: Color(0xFFFFD700), fontSize: 32, fontWeight: FontWeight.w900)),
             ],
@@ -195,7 +196,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -216,13 +217,13 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF1A237E) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: selected ? const Color(0xFF1A237E) : Colors.black26),
+          border: Border.all(color: selected ? const Color(0xFF1A237E) : core_theme.AC.td),
         ),
         child: Text(label,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: selected ? Colors.white : Colors.black87,
+              color: selected ? Colors.white : core_theme.AC.tp,
             )),
       ),
     );
@@ -234,13 +235,13 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black26),
+        border: Border.all(color: core_theme.AC.td),
       ),
       child: DropdownButton<String>(
         value: _quarter,
         underline: const SizedBox(),
         isDense: true,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black87),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.tp),
         items: const [
           DropdownMenuItem(value: 'Q1-2026', child: Text('الربع الأول 2026')),
           DropdownMenuItem(value: 'Q2-2026', child: Text('الربع الثاني 2026')),
@@ -255,7 +256,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
 
   Widget _objectiveCard(_Objective o) {
     final color = o.color;
-    final health = o.progress >= 70 ? Colors.green : o.progress >= 40 ? Colors.orange : Colors.red;
+    final health = o.progress >= 70 ? core_theme.AC.ok : o.progress >= 40 ? core_theme.AC.warn : core_theme.AC.err;
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(18),
@@ -269,7 +270,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
         children: [
           Row(
             children: [
-              Text(o.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+              Text(o.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
               const SizedBox(width: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -284,13 +285,13 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: (o.level == 'company' ? Colors.purple : Colors.blue).withOpacity(0.12),
+                  color: (o.level == 'company' ? core_theme.AC.purple : core_theme.AC.info).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(o.level == 'company' ? '🏢 شركة' : '👥 قسم',
                     style: TextStyle(
                       fontSize: 11,
-                      color: o.level == 'company' ? Colors.purple : Colors.blue,
+                      color: o.level == 'company' ? core_theme.AC.purple : core_theme.AC.info,
                       fontWeight: FontWeight.w800,
                     )),
               ),
@@ -301,9 +302,9 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.person_outline, size: 14, color: Colors.black54),
+              Icon(Icons.person_outline, size: 14, color: core_theme.AC.ts),
               const SizedBox(width: 4),
-              Text('المسؤول: ${o.owner}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('المسؤول: ${o.owner}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ],
           ),
           const SizedBox(height: 14),
@@ -318,12 +319,12 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
               children: [
                 Icon(Icons.trending_up, color: health, size: 18),
                 const SizedBox(width: 8),
-                const Text('التقدّم الكلي', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                Text('التقدّم الكلي', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                 const SizedBox(width: 16),
                 Expanded(
                   child: LinearProgressIndicator(
                     value: o.progress / 100,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: core_theme.AC.bdr,
                     valueColor: AlwaysStoppedAnimation(health),
                     minHeight: 10,
                   ),
@@ -335,8 +336,8 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          const Text('النتائج الرئيسية (Key Results)',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.black54)),
+          Text('النتائج الرئيسية (Key Results)',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
           const SizedBox(height: 8),
           for (final kr in o.keyResults) _krRow(kr, color),
         ],
@@ -353,7 +354,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: core_theme.AC.navy3,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -383,7 +384,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
           SizedBox(
             width: 60,
             child: Text(kr.unit.replaceAll(' (عكسي)', ''),
-                style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ),
           SizedBox(
             width: 140,
@@ -392,9 +393,9 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
                 Expanded(
                   child: LinearProgressIndicator(
                     value: pct / 100,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: core_theme.AC.bdr,
                     valueColor: AlwaysStoppedAnimation(
-                        pct >= 70 ? Colors.green : pct >= 40 ? Colors.orange : Colors.red),
+                        pct >= 70 ? core_theme.AC.ok : pct >= 40 ? core_theme.AC.warn : core_theme.AC.err),
                     minHeight: 6,
                   ),
                 ),
@@ -403,7 +404,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
                     style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: pct >= 70 ? Colors.green : pct >= 40 ? Colors.orange : Colors.red)),
+                        color: pct >= 70 ? core_theme.AC.ok : pct >= 40 ? core_theme.AC.warn : core_theme.AC.err)),
               ],
             ),
           ),

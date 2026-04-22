@@ -14,6 +14,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../theme.dart' as core_theme;
 
 class WizardStep {
   final String labelAr;
@@ -59,15 +60,15 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
   int _currentStep = 0;
   bool _isSubmitting = false;
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   void _next() {
     // Validate current step
     final err = widget.steps[_currentStep].validate?.call();
     if (err != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(err), backgroundColor: Colors.red),
+        SnackBar(content: Text(err), backgroundColor: core_theme.AC.err),
       );
       return;
     }
@@ -86,7 +87,7 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
     final err = widget.steps[_currentStep].validate?.call();
     if (err != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(err), backgroundColor: Colors.red),
+        SnackBar(content: Text(err), backgroundColor: core_theme.AC.err),
       );
       return;
     }
@@ -96,7 +97,7 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
     setState(() => _isSubmitting = false);
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم الحفظ بنجاح'), backgroundColor: Colors.green),
+        SnackBar(content: Text('تم الحفظ بنجاح'), backgroundColor: core_theme.AC.ok),
       );
     }
   }
@@ -145,18 +146,18 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(widget.titleAr,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                 if (widget.subtitleAr != null)
                   Text(widget.subtitleAr!,
-                      style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                      style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
               ],
             ),
           ),
           Text(
             'الخطوة ${_currentStep + 1} من ${widget.steps.length}',
-            style: const TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black54),
+            style: TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.ts),
           ),
         ],
       ),
@@ -180,12 +181,12 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
             decoration: BoxDecoration(
               color: active
                   ? _gold.withOpacity(0.08)
-                  : (done ? Colors.green.withOpacity(0.04) : Colors.transparent),
+                  : (done ? core_theme.AC.ok.withOpacity(0.04) : Colors.transparent),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: active
                     ? _gold
-                    : (done ? Colors.green.withOpacity(0.3) : Colors.grey.shade200),
+                    : (done ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.bdr),
                 width: active ? 1.5 : 1,
               ),
             ),
@@ -196,8 +197,8 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
                   height: 28,
                   decoration: BoxDecoration(
                     color: done
-                        ? Colors.green
-                        : (active ? _gold : Colors.grey.shade200),
+                        ? core_theme.AC.ok
+                        : (active ? _gold : core_theme.AC.bdr),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -206,7 +207,7 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
                         : Text(
                             '${i + 1}',
                             style: TextStyle(
-                                color: active ? Colors.white : Colors.black54,
+                                color: active ? Colors.white : core_theme.AC.ts,
                                 fontWeight: FontWeight.w800),
                           ),
                   ),
@@ -221,11 +222,11 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                            color: active ? _navy : Colors.black87),
+                            color: active ? _navy : core_theme.AC.tp),
                       ),
                       if (step.descriptionAr != null)
                         Text(step.descriptionAr!,
-                            style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     ],
                   ),
                 ),
@@ -244,7 +245,7 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
       child: LinearProgressIndicator(
         value: (_currentStep + 1) / widget.steps.length,
         minHeight: 6,
-        backgroundColor: Colors.grey.shade200,
+        backgroundColor: core_theme.AC.bdr,
         color: _gold,
       ),
     );
@@ -263,7 +264,7 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
               Expanded(
                 child: Text(
                   widget.steps[_currentStep].labelAr,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 22, fontWeight: FontWeight.w800, color: _navy),
                 ),
               ),
@@ -272,7 +273,7 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
           if (widget.steps[_currentStep].descriptionAr != null) ...[
             const SizedBox(height: 4),
             Text(widget.steps[_currentStep].descriptionAr!,
-                style: const TextStyle(fontSize: 13, color: Colors.black54)),
+                style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
           ],
           const SizedBox(height: 20),
           Expanded(child: widget.steps[_currentStep].builder(context)),
@@ -287,7 +288,7 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        border: Border(top: BorderSide(color: core_theme.AC.bdr)),
       ),
       child: Row(
         children: [

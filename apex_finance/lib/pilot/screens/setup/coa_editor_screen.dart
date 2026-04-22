@@ -1095,38 +1095,51 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
         ),
         const SizedBox(width: 10),
         Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('شجرة الحسابات',
-                  style: TextStyle(
-                      color: _tp,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      height: 1.1)),
-              const SizedBox(height: 2),
-              Text(
-                _accounts.isEmpty
-                    ? 'لم تبذَر بعد'
-                    : '${_accounts.length} • ${_flatten().length} مرئي',
-                style: TextStyle(color: _ts, fontSize: 11, height: 1.1),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+          child: LayoutBuilder(
+            builder: (ctx, cons) {
+              // إذا المساحة شحيحة جداً، نُخفي العنوان ونكتفي بالأيقونة
+              if (cons.maxWidth < 70) return const SizedBox.shrink();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('شجرة الحسابات',
+                      softWrap: false,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: _tp,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          height: 1.1)),
+                  const SizedBox(height: 2),
+                  Text(
+                    _accounts.isEmpty
+                        ? 'لم تبذَر بعد'
+                        : '${_accounts.length} • ${_flatten().length} مرئي',
+                    style: TextStyle(color: _ts, fontSize: 11, height: 1.1),
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              );
+            },
           ),
         ),
         if (_accounts.isNotEmpty) ...[
           const SizedBox(width: 14),
-          // Compact search field (200px)
-          SizedBox(
-            width: 200,
-            child: TextField(
-              controller: _searchCtrl,
-              focusNode: _searchFocus,
-              style: TextStyle(color: _tp, fontSize: 12.5),
-              decoration: InputDecoration(
-                hintText: 'بحث (/)',
+          // Flexible search field (يتقلّص مع ضيق المساحة، حتى 100px، ثم ينحسر)
+          Flexible(
+            flex: 2,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 200, minWidth: 100),
+              child: TextField(
+                controller: _searchCtrl,
+                focusNode: _searchFocus,
+                style: TextStyle(color: _tp, fontSize: 12.5),
+                decoration: InputDecoration(
+                  hintText: 'بحث (/)',
                 hintStyle: TextStyle(color: _td, fontSize: 12),
                 prefixIcon: Icon(Icons.search, color: _td, size: 16),
                 prefixIconConstraints:
@@ -1157,7 +1170,8 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(color: _gold, width: 1.2)),
               ),
-              onChanged: (v) => setState(() => _searchQuery = v),
+                onChanged: (v) => setState(() => _searchQuery = v),
+              ),
             ),
           ),
           const SizedBox(width: 6),
@@ -2426,7 +2440,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
     double w = 100;
     if (_visibleColumns.contains('select')) w += 36;
     if (_visibleColumns.contains('code')) w += 160;
-    if (_visibleColumns.contains('name')) w += 360;
+    if (_visibleColumns.contains('name')) w += 160; // flex column: min 160 لا min-width 360
     if (_visibleColumns.contains('type')) w += 72;
     if (_visibleColumns.contains('normal')) w += 72;
     if (_visibleColumns.contains('vat')) w += 100;
@@ -2523,23 +2537,70 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
             ),
           ),
         if (_visibleColumns.contains('code'))
-          SizedBox(width: 160, child: Text('الرقم', style: _thStyle)),
+          SizedBox(
+              width: 160,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text('الرقم', style: _thStyle),
+              )),
         if (_visibleColumns.contains('name'))
-          SizedBox(width: 360, child: Text('الاسم', style: _thStyle)),
+          Expanded(
+              child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Text('الاسم', style: _thStyle),
+          )),
         if (_visibleColumns.contains('type'))
-          SizedBox(width: 72, child: Text('النوع', style: _thStyle)),
+          SizedBox(
+              width: 72,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text('النوع', style: _thStyle),
+              )),
         if (_visibleColumns.contains('normal'))
-          SizedBox(width: 72, child: Text('الطبيعة', style: _thStyle)),
+          SizedBox(
+              width: 72,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text('الطبيعة', style: _thStyle),
+              )),
         if (_visibleColumns.contains('vat'))
-          SizedBox(width: 100, child: Text('ضريبة', style: _thStyle)),
+          SizedBox(
+              width: 100,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text('ضريبة', style: _thStyle),
+              )),
         if (_visibleColumns.contains('debit'))
-          SizedBox(width: 100, child: Text('مدين', style: _thStyle, textAlign: TextAlign.end)),
+          SizedBox(
+              width: 100,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text('مدين',
+                    style: _thStyle, textAlign: TextAlign.end),
+              )),
         if (_visibleColumns.contains('credit'))
-          SizedBox(width: 100, child: Text('دائن', style: _thStyle, textAlign: TextAlign.end)),
+          SizedBox(
+              width: 100,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text('دائن',
+                    style: _thStyle, textAlign: TextAlign.end),
+              )),
         if (_visibleColumns.contains('net'))
-          SizedBox(width: 120, child: Text('الرصيد', style: _thStyle, textAlign: TextAlign.end)),
+          SizedBox(
+              width: 120,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text('الرصيد',
+                    style: _thStyle, textAlign: TextAlign.end),
+              )),
         if (_visibleColumns.contains('status'))
-          SizedBox(width: 60, child: Text('حالة', style: _thStyle)),
+          SizedBox(
+              width: 60,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text('حالة', style: _thStyle),
+              )),
         if (_visibleColumns.contains('actions'))
           SizedBox(width: 40, child: _columnsToggleButton()),
       ]),
@@ -2770,8 +2831,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                   ),
                 ),
               if (_visibleColumns.contains('name'))
-                SizedBox(
-                  width: 360,
+                Expanded(
                   child: editing
                       ? TextField(
                           controller: _editCtrl,
@@ -2935,7 +2995,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
 
   Widget _balanceCell(double v, Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsetsDirectional.only(start: 4, end: 8),
       child: Text(_fmt(v),
           style: TextStyle(color: color, fontSize: 12, fontFamily: 'monospace'),
           textAlign: TextAlign.end),

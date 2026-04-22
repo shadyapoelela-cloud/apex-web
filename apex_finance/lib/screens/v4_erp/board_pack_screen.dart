@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class BoardPackScreen extends StatefulWidget {
   const BoardPackScreen({super.key});
@@ -55,7 +56,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF4A148C),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF4A148C),
           tabs: const [
             Tab(icon: Icon(Icons.event, size: 16), text: 'الاجتماعات'),
@@ -91,23 +92,23 @@ class _BoardPackScreenState extends State<BoardPackScreen>
         children: [
           const Icon(Icons.account_balance, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('بوابة مجلس الإدارة',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Board Portal — حقيبة الاجتماع · قرارات · محاضر · Minutes — متوافق مع هيئة السوق المالية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.2),
+              color: core_theme.AC.err.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red),
+              border: Border.all(color: core_theme.AC.err),
             ),
             child: const Row(
               children: [
@@ -130,7 +131,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
       itemBuilder: (ctx, i) {
         final m = _meetings[i];
         final isUpcoming = m.status == 'قادم';
-        final color = isUpcoming ? Colors.blue : Colors.green;
+        final color = isUpcoming ? core_theme.AC.info : core_theme.AC.ok;
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
@@ -154,7 +155,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                   children: [
                     Row(
                       children: [
-                        Text(m.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                        Text(m.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -165,7 +166,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(4)),
+                            decoration: BoxDecoration(color: core_theme.AC.err, borderRadius: BorderRadius.circular(4)),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -184,18 +185,18 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.schedule, size: 12, color: Colors.black54),
+                        Icon(Icons.schedule, size: 12, color: core_theme.AC.ts),
                         const SizedBox(width: 4),
                         Text(m.dateTime,
-                            style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                            style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                         const SizedBox(width: 14),
-                        const Icon(Icons.place, size: 12, color: Colors.black54),
+                        Icon(Icons.place, size: 12, color: core_theme.AC.ts),
                         const SizedBox(width: 4),
-                        Text(m.venue, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(m.venue, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         const SizedBox(width: 14),
-                        const Icon(Icons.description, size: 12, color: Colors.black54),
+                        Icon(Icons.description, size: 12, color: core_theme.AC.ts),
                         const SizedBox(width: 4),
-                        Text('${m.docCount} وثيقة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text('${m.docCount} وثيقة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ],
@@ -207,7 +208,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                     ElevatedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.folder_open, size: 14),
-                      label: const Text('فتح الحقيبة', style: TextStyle(fontSize: 11)),
+                      label: Text('فتح الحقيبة', style: TextStyle(fontSize: 11)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: color,
                         foregroundColor: Colors.white,
@@ -217,13 +218,13 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                     OutlinedButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.description, size: 14),
-                      label: const Text('المحضر', style: TextStyle(fontSize: 11)),
+                      label: Text('المحضر', style: TextStyle(fontSize: 11)),
                     ),
                     const SizedBox(height: 4),
                     TextButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.archive, size: 14),
-                      label: const Text('الحقيبة', style: TextStyle(fontSize: 11)),
+                      label: Text('الحقيبة', style: TextStyle(fontSize: 11)),
                     ),
                   ],
                 ],
@@ -263,21 +264,21 @@ class _BoardPackScreenState extends State<BoardPackScreen>
             children: [
               const Icon(Icons.inventory, color: Colors.white, size: 32),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('حقيبة اجتماع BM-2026-02',
                         style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
                     Text('الربع الثاني 2026 · 2026-04-25 @ 09:00',
-                        style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                   ],
                 ),
               ),
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.download, size: 16),
-                label: const Text('تحميل كاملة (ZIP)', style: TextStyle(fontSize: 12)),
+                label: Text('تحميل كاملة (ZIP)', style: TextStyle(fontSize: 12)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: const BorderSide(color: Colors.white),
@@ -300,7 +301,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: d.ready ? Colors.black12 : Colors.orange.shade200),
+        border: Border.all(color: d.ready ? core_theme.AC.bdr : core_theme.AC.warn),
       ),
       child: Row(
         children: [
@@ -330,9 +331,9 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                           style: TextStyle(fontSize: 10, color: typeInfo.color, fontWeight: FontWeight.w800)),
                     ),
                     const SizedBox(width: 8),
-                    Text('${d.pages} صفحة', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('${d.pages} صفحة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     const SizedBox(width: 8),
-                    Text('بواسطة ${d.owner}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('بواسطة ${d.owner}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                 ),
               ],
@@ -341,14 +342,14 @@ class _BoardPackScreenState extends State<BoardPackScreen>
           if (d.ready)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-              child: const Text('جاهز', style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.w800)),
+              decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              child: Text('جاهز', style: TextStyle(color: core_theme.AC.ok, fontSize: 10, fontWeight: FontWeight.w800)),
             )
           else
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: Colors.orange.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-              child: const Text('قيد الإعداد', style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.w800)),
+              decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              child: Text('قيد الإعداد', style: TextStyle(color: core_theme.AC.warn, fontSize: 10, fontWeight: FontWeight.w800)),
             ),
           IconButton(
             onPressed: () {},
@@ -382,7 +383,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
@@ -390,12 +391,12 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: r.status == 'passed' ? Colors.green.withOpacity(0.12) : Colors.red.withOpacity(0.12),
+                  color: r.status == 'passed' ? core_theme.AC.ok.withOpacity(0.12) : core_theme.AC.err.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   r.status == 'passed' ? Icons.check_circle : Icons.cancel,
-                  color: r.status == 'passed' ? Colors.green : Colors.red,
+                  color: r.status == 'passed' ? core_theme.AC.ok : core_theme.AC.err,
                 ),
               ),
               const SizedBox(width: 12),
@@ -408,29 +409,29 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                       children: [
                         Text(r.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
                         const SizedBox(width: 8),
-                        Text(r.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        Text(r.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                       ],
                     ),
                     Text(r.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                   ],
                 ),
               ),
-              _voteBox('موافق', r.yes, Colors.green),
+              _voteBox('موافق', r.yes, core_theme.AC.ok),
               const SizedBox(width: 6),
-              _voteBox('معارض', r.no, Colors.red),
+              _voteBox('معارض', r.no, core_theme.AC.err),
               const SizedBox(width: 6),
-              _voteBox('ممتنع', r.abstain, Colors.grey),
+              _voteBox('ممتنع', r.abstain, core_theme.AC.td),
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: r.status == 'passed' ? Colors.green.withOpacity(0.15) : Colors.red.withOpacity(0.15),
+                  color: r.status == 'passed' ? core_theme.AC.ok.withOpacity(0.15) : core_theme.AC.err.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   r.status == 'passed' ? 'صادر' : 'مرفوض',
                   style: TextStyle(
-                      color: r.status == 'passed' ? Colors.green : Colors.red,
+                      color: r.status == 'passed' ? core_theme.AC.ok : core_theme.AC.err,
                       fontSize: 11,
                       fontWeight: FontWeight.w800),
                 ),
@@ -445,7 +446,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
   Widget _voteBox(String label, int count, Color color) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Container(
           width: 36,
           height: 28,
@@ -470,7 +471,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
@@ -487,7 +488,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(d.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-                    Text(d.position, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                    Text(d.position, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                     const SizedBox(height: 4),
                     Row(
                       children: [
@@ -500,7 +501,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                           child: Text('عضو منذ ${d.sinceYear}',
                               style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                         ),
@@ -518,18 +519,18 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                       children: [
                         Icon(
                           d.confirmedNextMeeting ? Icons.check_circle : Icons.warning,
-                          color: d.confirmedNextMeeting ? Colors.green : Colors.orange,
+                          color: d.confirmedNextMeeting ? core_theme.AC.ok : core_theme.AC.warn,
                           size: 16,
                         ),
                         const SizedBox(width: 4),
                         Text(d.confirmedNextMeeting ? 'مؤكّد' : 'بانتظار تأكيد',
                             style: TextStyle(
                                 fontSize: 11,
-                                color: d.confirmedNextMeeting ? Colors.green : Colors.orange,
+                                color: d.confirmedNextMeeting ? core_theme.AC.ok : core_theme.AC.warn,
                                 fontWeight: FontWeight.w700)),
                       ],
                     ),
-                    const Text('الاجتماع القادم', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('الاجتماع القادم', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -539,8 +540,8 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
-                          color: d.attendancePct ? Colors.green : Colors.orange)),
-                  const Text('حضور سنوي', style: TextStyle(fontSize: 9, color: Colors.black54)),
+                          color: d.attendancePct ? core_theme.AC.ok : core_theme.AC.warn)),
+                  Text('حضور سنوي', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                 ],
               ),
             ],
@@ -553,27 +554,27 @@ class _BoardPackScreenState extends State<BoardPackScreen>
   _TypeInfo _typeInfo(String t) {
     switch (t) {
       case 'agenda':
-        return const _TypeInfo('جدول أعمال', Icons.list_alt, Color(0xFF4A148C));
+        return _TypeInfo('جدول أعمال', Icons.list_alt, Color(0xFF4A148C));
       case 'minutes':
-        return const _TypeInfo('محضر', Icons.description, Colors.blue);
+        return _TypeInfo('محضر', Icons.description, core_theme.AC.info);
       case 'financials':
-        return const _TypeInfo('قوائم مالية', Icons.account_balance, Color(0xFFD4AF37));
+        return _TypeInfo('قوائم مالية', Icons.account_balance, core_theme.AC.gold);
       case 'audit':
-        return const _TypeInfo('مراجعة', Icons.fact_check, Colors.teal);
+        return _TypeInfo('مراجعة', Icons.fact_check, core_theme.AC.info);
       case 'risk':
-        return const _TypeInfo('مخاطر', Icons.warning, Colors.orange);
+        return _TypeInfo('مخاطر', Icons.warning, core_theme.AC.warn);
       case 'strategy':
-        return const _TypeInfo('استراتيجي', Icons.insights, Colors.purple);
+        return _TypeInfo('استراتيجي', Icons.insights, core_theme.AC.purple);
       case 'resolution':
-        return const _TypeInfo('مقترح قرار', Icons.gavel, Colors.red);
+        return _TypeInfo('مقترح قرار', Icons.gavel, core_theme.AC.err);
       case 'esg':
-        return const _TypeInfo('ESG', Icons.eco, Colors.green);
+        return _TypeInfo('ESG', Icons.eco, core_theme.AC.ok);
       case 'legal':
-        return const _TypeInfo('قانوني', Icons.balance, Colors.indigo);
+        return _TypeInfo('قانوني', Icons.balance, core_theme.AC.purple);
       case 'committees':
-        return const _TypeInfo('اللجان', Icons.groups, Colors.brown);
+        return _TypeInfo('اللجان', Icons.groups, Colors.brown);
       default:
-        return const _TypeInfo('أخرى', Icons.folder, Colors.grey);
+        return _TypeInfo('أخرى', Icons.folder, core_theme.AC.td);
     }
   }
 
@@ -581,13 +582,13 @@ class _BoardPackScreenState extends State<BoardPackScreen>
     switch (role) {
       case 'مستقل':
       case 'مستقلة':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'تنفيذي':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'غير تنفيذي':
-        return Colors.purple;
+        return core_theme.AC.purple;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 }
@@ -638,5 +639,5 @@ class _TypeInfo {
   final String label;
   final IconData icon;
   final Color color;
-  const _TypeInfo(this.label, this.icon, this.color);
+  _TypeInfo(this.label, this.icon, this.color);
 }

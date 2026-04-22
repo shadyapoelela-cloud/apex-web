@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 110 — WhatsApp Business / Customer Messaging
 class WhatsappBusinessScreen extends StatefulWidget {
@@ -23,8 +24,8 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
         body: SafeArea(child: Column(children: [
           _hero(), _kpis(),
           Container(color: Colors.white, child: TabBar(
-            controller: _tc, labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-            indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+            controller: _tc, labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+            indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
             tabs: const [
               Tab(text: 'المحادثات'), Tab(text: 'الحملات'), Tab(text: 'القوالب'), Tab(text: 'التحليلات'),
             ],
@@ -44,10 +45,10 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.chat, color: Color(0xFF25D366), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('WhatsApp Business 🎉 Wave 110', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('خدمة العملاء وإشعارات الحملات عبر WhatsApp Business API', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('خدمة العملاء وإشعارات الحملات عبر WhatsApp Business API', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
       Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
@@ -61,7 +62,7 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('محادثات اليوم', '${_chats.length * 12}', Icons.chat_bubble, const Color(0xFF25D366))),
     Expanded(child: _kpi('معدل الرد', '4.2 دقيقة', Icons.timer, const Color(0xFF1A237E))),
-    Expanded(child: _kpi('حملات نشطة', '${_campaigns.where((c)=>c.status.contains('نشط')).length}', Icons.campaign, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('حملات نشطة', '${_campaigns.where((c)=>c.status.contains('نشط')).length}', Icons.campaign, core_theme.AC.gold)),
     Expanded(child: _kpi('معدل الفتح', '87%', Icons.visibility, const Color(0xFF2E7D32))),
   ]));
 
@@ -69,7 +70,7 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 24), const SizedBox(width: 8),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -82,10 +83,10 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
       ]),
       title: Row(children: [
         Expanded(child: Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
-        Text(c.time, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(c.time, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       subtitle: Row(children: [
-        Icon(c.lastByMe ? Icons.done_all : Icons.chat_bubble_outline, size: 12, color: c.lastByMe ? const Color(0xFF25D366) : Colors.black54),
+        Icon(c.lastByMe ? Icons.done_all : Icons.chat_bubble_outline, size: 12, color: c.lastByMe ? const Color(0xFF25D366) : core_theme.AC.ts),
         const SizedBox(width: 4),
         Expanded(child: Text(c.lastMessage, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12))),
       ]),
@@ -102,7 +103,7 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text(c.segment, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(c.segment, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: _campStatus(c.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
@@ -116,13 +117,13 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
           _miniStat('فتح %', '${(openRate * 100).toStringAsFixed(0)}%'),
         ]),
         const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: openRate.clamp(0, 1), minHeight: 5, backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFF25D366)))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: openRate.clamp(0, 1), minHeight: 5, backgroundColor: core_theme.AC.bdr, valueColor: const AlwaysStoppedAnimation(Color(0xFF25D366)))),
       ]),
     ));
   });
 
   Widget _miniStat(String l, String v) => Expanded(child: Column(children: [
-    Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
   ]));
 
@@ -136,16 +137,16 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
           const SizedBox(width: 10),
           Expanded(child: Text(t.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(color: t.approved ? const Color(0xFF25D366).withValues(alpha: 0.15) : Colors.black12, borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: t.approved ? const Color(0xFF25D366).withValues(alpha: 0.15) : core_theme.AC.bdr, borderRadius: BorderRadius.circular(10)),
             child: Text(t.approved ? 'موافق WhatsApp' : 'قيد المراجعة',
-              style: TextStyle(color: t.approved ? const Color(0xFF128C7E) : Colors.black54, fontSize: 9, fontWeight: FontWeight.bold))),
+              style: TextStyle(color: t.approved ? const Color(0xFF128C7E) : core_theme.AC.ts, fontSize: 9, fontWeight: FontWeight.bold))),
         ]),
         const SizedBox(height: 8),
         Container(padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(color: const Color(0xFFECE5DD), borderRadius: BorderRadius.circular(8)),
-          child: Text(t.body, style: const TextStyle(fontSize: 12, color: Colors.black87))),
+          child: Text(t.body, style: TextStyle(fontSize: 12, color: core_theme.AC.tp))),
         const SizedBox(height: 6),
-        Text('استُخدم ${t.usageCount} مرة • ${t.category}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('استُخدم ${t.usageCount} مرة • ${t.category}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -153,28 +154,28 @@ class _WhatsappBusinessScreenState extends State<WhatsappBusinessScreen> with Si
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('📱 قنوات التواصل', '78% WhatsApp • 12% SMS • 8% Email • 2% Call', const Color(0xFF25D366)),
     _insight('⚡ سرعة الرد', 'متوسط 4.2 دقيقة — أقل من الصناعة (12 دقيقة)', const Color(0xFF1A237E)),
-    _insight('🎯 حملات مؤتمتة', '87% معدل الفتح — أعلى 6x من البريد الإلكتروني', const Color(0xFFD4AF37)),
+    _insight('🎯 حملات مؤتمتة', '87% معدل الفتح — أعلى 6x من البريد الإلكتروني', core_theme.AC.gold),
     _insight('💬 رضا العملاء', 'CSAT 4.6/5 على محادثات WhatsApp', const Color(0xFF2E7D32)),
     _insight('🔔 إشعارات تلقائية', '1,248 إشعار ZATCA + تذكير دفع هذا الشهر', const Color(0xFF4A148C)),
-    _insight('🌟 Wave 110 — إنجاز كبير', 'تجاوزنا 110 شاشة إنتاجية بالكامل! 🎉', const Color(0xFFD4AF37)),
+    _insight('🌟 Wave 110 — إنجاز كبير', 'تجاوزنا 110 شاشة إنتاجية بالكامل! 🎉', core_theme.AC.gold),
   ]);
 
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _campStatus(String s) {
     if (s.contains('نشط')) return const Color(0xFF25D366);
     if (s.contains('مكتمل')) return const Color(0xFF1A237E);
-    if (s.contains('مجدول')) return const Color(0xFFD4AF37);
-    return Colors.black54;
+    if (s.contains('مجدول')) return core_theme.AC.gold;
+    return core_theme.AC.ts;
   }
 
   Color _categoryColor(String c) {
-    if (c.contains('فاتورة')) return const Color(0xFFD4AF37);
+    if (c.contains('فاتورة')) return core_theme.AC.gold;
     if (c.contains('تذكير')) return const Color(0xFFE65100);
     if (c.contains('تسويق')) return const Color(0xFF4A148C);
     if (c.contains('خدمة')) return const Color(0xFF25D366);

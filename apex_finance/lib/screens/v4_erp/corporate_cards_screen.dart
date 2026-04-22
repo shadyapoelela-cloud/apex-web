@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CorporateCardsScreen extends StatefulWidget {
   const CorporateCardsScreen({super.key});
@@ -20,8 +21,8 @@ class CorporateCardsScreen extends StatefulWidget {
 }
 
 class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   int _tab = 0;
 
@@ -55,16 +56,16 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.credit_card, color: _gold),
+                  Icon(Icons.credit_card, color: _gold),
                   const SizedBox(width: 8),
-                  const Text('بطاقات الشركة',
+                  Text('بطاقات الشركة',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                   const Spacer(),
                   FilledButton.icon(
                     onPressed: () {},
                     style: FilledButton.styleFrom(backgroundColor: _gold),
                     icon: const Icon(Icons.add_card),
-                    label: const Text('إصدار بطاقة جديدة'),
+                    label: Text('إصدار بطاقة جديدة'),
                   ),
                 ],
               ),
@@ -75,14 +76,14 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
               color: Colors.white,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Row(
-                children: const [
-                  Expanded(child: _StatCard(icon: Icons.credit_card, label: 'بطاقات نشطة', value: '4', color: Colors.green)),
+                children: [
+                  Expanded(child: _StatCard(icon: Icons.credit_card, label: 'بطاقات نشطة', value: '4', color: core_theme.AC.ok)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.account_balance_wallet, label: 'إجمالي الصرف الشهري', value: '44,460 ر.س', color: Color(0xFFD4AF37))),
+                  Expanded(child: _StatCard(icon: Icons.account_balance_wallet, label: 'إجمالي الصرف الشهري', value: '44,460 ر.س', color: core_theme.AC.gold)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.warning, label: 'تنبيهات سياسة', value: '2', color: Colors.orange)),
+                  Expanded(child: _StatCard(icon: Icons.warning, label: 'تنبيهات سياسة', value: '2', color: core_theme.AC.warn)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.schedule, label: 'إيصالات ناقصة', value: '1', color: Colors.red)),
+                  Expanded(child: _StatCard(icon: Icons.schedule, label: 'إيصالات ناقصة', value: '1', color: core_theme.AC.err)),
                 ],
               ),
             ),
@@ -117,9 +118,9 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
         final c = _cards[i];
         final pct = (c.spent / c.limit * 100).clamp(0.0, 100.0);
         final (statusColor, statusLabel, statusIcon) = switch (c.status) {
-          _CStatus.active => (Colors.green, 'نشطة', Icons.check_circle),
-          _CStatus.frozen => (Colors.grey, 'مجمّدة', Icons.ac_unit),
-          _CStatus.alert => (Colors.red, 'حد شبه منتهٍ', Icons.warning),
+          _CStatus.active => (core_theme.AC.ok, 'نشطة', Icons.check_circle),
+          _CStatus.frozen => (core_theme.AC.td, 'مجمّدة', Icons.ac_unit),
+          _CStatus.alert => (core_theme.AC.err, 'حد شبه منتهٍ', Icons.warning),
         };
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
@@ -132,7 +133,7 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
                   width: 60,
                   height: 40,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [_navy, Color(0xFF4A148C)],
                     ),
                     borderRadius: BorderRadius.circular(6),
@@ -148,9 +149,9 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
                       Text(c.holder,
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                       Text('${c.role} · ${c.type}',
-                          style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       Text('**** **** **** ${c.last4}',
-                          style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.black87)),
+                          style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.tp)),
                     ],
                   ),
                 ),
@@ -161,7 +162,7 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
                     children: [
                       Row(
                         children: [
-                          const Text('الصرف', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                          Text('الصرف', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                           const Spacer(),
                           Text('${c.spent.toStringAsFixed(0)} / ${c.limit.toStringAsFixed(0)} ر.س',
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
@@ -173,8 +174,8 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
                         child: LinearProgressIndicator(
                           value: pct / 100,
                           minHeight: 8,
-                          backgroundColor: Colors.grey.shade200,
-                          color: pct > 90 ? Colors.red : (pct > 70 ? Colors.orange : Colors.green),
+                          backgroundColor: core_theme.AC.bdr,
+                          color: pct > 90 ? core_theme.AC.err : (pct > 70 ? core_theme.AC.warn : core_theme.AC.ok),
                         ),
                       ),
                     ],
@@ -221,10 +222,10 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
           elevation: 1,
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: (problem ? Colors.red : Colors.green).withOpacity(0.1),
+              backgroundColor: (problem ? core_theme.AC.err : core_theme.AC.ok).withOpacity(0.1),
               child: Icon(
                 problem ? Icons.warning : Icons.check_circle,
-                color: problem ? Colors.red : Colors.green,
+                color: problem ? core_theme.AC.err : core_theme.AC.ok,
               ),
             ),
             title: Text(t.merchant, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
@@ -235,9 +236,9 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text('${t.amount.toStringAsFixed(0)} ر.س',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
                 Text(t.status,
-                    style: TextStyle(fontSize: 10, color: problem ? Colors.red : Colors.green)),
+                    style: TextStyle(fontSize: 10, color: problem ? core_theme.AC.err : core_theme.AC.ok)),
               ],
             ),
           ),
@@ -248,12 +249,12 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
 
   Widget _buildPoliciesView() {
     final policies = [
-      ('حد الضيافة اليومي', '150 ر.س للشخص', Icons.restaurant, Colors.orange),
-      ('نقل بين المدن', 'يتطلب اعتماد مسبق', Icons.flight, Colors.blue),
-      ('اشتراكات البرمجيات', 'بدون حد لمن له صلاحية', Icons.subscriptions, Colors.purple),
-      ('ترفيه شخصي', 'محظور تماماً', Icons.block, Colors.red),
-      ('شحن دولي', 'حد 2,000 ر.س شهرياً', Icons.local_shipping, Colors.teal),
-      ('تبرعات', 'يتطلب اعتماد مدير مالي', Icons.volunteer_activism, Colors.green),
+      ('حد الضيافة اليومي', '150 ر.س للشخص', Icons.restaurant, core_theme.AC.warn),
+      ('نقل بين المدن', 'يتطلب اعتماد مسبق', Icons.flight, core_theme.AC.info),
+      ('اشتراكات البرمجيات', 'بدون حد لمن له صلاحية', Icons.subscriptions, core_theme.AC.purple),
+      ('ترفيه شخصي', 'محظور تماماً', Icons.block, core_theme.AC.err),
+      ('شحن دولي', 'حد 2,000 ر.س شهرياً', Icons.local_shipping, core_theme.AC.info),
+      ('تبرعات', 'يتطلب اعتماد مدير مالي', Icons.volunteer_activism, core_theme.AC.ok),
     ];
     return ListView.separated(
       padding: const EdgeInsets.all(16),
@@ -366,7 +367,7 @@ class _Tab extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: active ? const Color(0xFFD4AF37) : Colors.transparent,
+              color: active ? core_theme.AC.gold : Colors.transparent,
               width: 3,
             ),
           ),
@@ -376,7 +377,7 @@ class _Tab extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: active ? const Color(0xFFD4AF37) : Colors.black54,
+            color: active ? core_theme.AC.gold : core_theme.AC.ts,
           ),
         ),
       ),

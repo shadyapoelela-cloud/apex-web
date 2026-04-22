@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 118 — ESG Sustainability Reporting (GRI, SASB, TCFD)
 class SustainabilityReportScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'البيئي E'), Tab(text: 'الاجتماعي S'), Tab(text: 'الحوكمة G'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_envTab(), _socTab(), _govTab(), _analyticsTab()])),
       ])),
@@ -35,10 +36,10 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.eco, color: Color(0xFF1B5E20), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('تقارير الاستدامة ESG', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('GRI · SASB · TCFD · رؤية 2030', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('GRI · SASB · TCFD · رؤية 2030', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
       Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
@@ -52,7 +53,7 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
     Expanded(child: _kpi('تصنيف ESG', 'A+', Icons.grade, const Color(0xFF2E7D32))),
     Expanded(child: _kpi('CO₂ Reduction', '-28%', Icons.co2, const Color(0xFF1B5E20))),
-    Expanded(child: _kpi('السعودة', '87%', Icons.flag, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('السعودة', '87%', Icons.flag, core_theme.AC.gold)),
     Expanded(child: _kpi('تنوع الإدارة', '42%', Icons.diversity_3, const Color(0xFF4A148C))),
   ]));
 
@@ -60,14 +61,14 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
   Widget _envTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _metric('🌍 انبعاثات الكربون Scope 1', '4,280 tCO₂e', '-22% YoY', const Color(0xFF2E7D32), 0.72),
     _metric('⚡ انبعاثات Scope 2', '2,140 tCO₂e', '-18% YoY', const Color(0xFF2E7D32), 0.68),
-    _metric('🏭 انبعاثات Scope 3', '8,920 tCO₂e', '-12% YoY', const Color(0xFFD4AF37), 0.55),
+    _metric('🏭 انبعاثات Scope 3', '8,920 tCO₂e', '-12% YoY', core_theme.AC.gold, 0.55),
     _metric('💧 استهلاك المياه', '48,200 m³', '-8% YoY', const Color(0xFF1A237E), 0.62),
     _metric('🔋 الطاقة المتجددة', '34% من الإجمالي', '+12% YoY', const Color(0xFF2E7D32), 0.34),
     _metric('♻️ إعادة التدوير', '82% النفايات', '+15% YoY', const Color(0xFF2E7D32), 0.82),
@@ -75,7 +76,7 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
   ]);
 
   Widget _socTab() => ListView(padding: const EdgeInsets.all(14), children: [
-    _metric('👥 نسبة السعودة', '87%', '+4% YoY (فوق الهدف 80%)', const Color(0xFFD4AF37), 0.87),
+    _metric('👥 نسبة السعودة', '87%', '+4% YoY (فوق الهدف 80%)', core_theme.AC.gold, 0.87),
     _metric('♀️ تمكين المرأة', '38% قوى عاملة • 42% إدارة', '+8% YoY', const Color(0xFF4A148C), 0.42),
     _metric('🎓 ساعات التدريب', '48 ساعة/موظف سنوياً', '+24% YoY', const Color(0xFF1A237E), 0.80),
     _metric('🏥 حوادث السلامة', '0.8 لكل مليون ساعة', '-42% YoY', const Color(0xFF2E7D32), 0.92),
@@ -85,7 +86,7 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
 
   Widget _govTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _metric('🏛️ استقلالية المجلس', '67% أعضاء مستقلين', 'معيار CMA 33%+', const Color(0xFF2E7D32), 0.67),
-    _metric('🔍 الشفافية', 'تقارير ربعية + سنوية', '100% في الموعد', const Color(0xFFD4AF37), 1.0),
+    _metric('🔍 الشفافية', 'تقارير ربعية + سنوية', '100% في الموعد', core_theme.AC.gold, 1.0),
     _metric('⚖️ سياسة مكافحة الفساد', 'معتمدة من المجلس', 'تدريب 100% موظفين', const Color(0xFF2E7D32), 1.0),
     _metric('🛡️ الأمن السيبراني', 'ISO 27001 معتمد', '0 اختراقات 2025', const Color(0xFF1A237E), 0.95),
     _metric('📋 الامتثال التنظيمي', 'ZATCA + CMA + سابر', '100% متوافق', const Color(0xFF2E7D32), 1.0),
@@ -102,7 +103,7 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
         const SizedBox(height: 4),
         Text(change, style: TextStyle(color: color, fontSize: 11)),
         const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: Colors.black12, valueColor: AlwaysStoppedAnimation(color))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: core_theme.AC.bdr, valueColor: AlwaysStoppedAnimation(color))),
       ]),
     ));
   }
@@ -110,7 +111,7 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('🏆 التصنيفات الخارجية', 'MSCI: A+ • Sustainalytics: Low Risk • CDP: B', const Color(0xFF2E7D32)),
     _insight('🎯 Net Zero 2050', 'على المسار — 28% خفض حتى الآن', const Color(0xFF1B5E20)),
-    _insight('🇸🇦 رؤية 2030', 'متوافق مع 8 أهداف رئيسية من 12', const Color(0xFFD4AF37)),
+    _insight('🇸🇦 رؤية 2030', 'متوافق مع 8 أهداف رئيسية من 12', core_theme.AC.gold),
     _insight('📈 العائد من الاستدامة', 'توفير 18M ر.س من كفاءة الطاقة', const Color(0xFF2E7D32)),
     _insight('⚠️ مخاطر المناخ (TCFD)', '4 مخاطر متوسطة — خطة تخفيف معتمدة', const Color(0xFFE65100)),
     _insight('✅ التدقيق المستقل', 'تقرير 2025 مُدقق من KPMG + Big 4', const Color(0xFF4A148C)),
@@ -119,6 +120,6 @@ class _SustainabilityReportScreenState extends State<SustainabilityReportScreen>
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 }

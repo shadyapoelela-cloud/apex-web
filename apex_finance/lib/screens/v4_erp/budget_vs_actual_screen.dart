@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class BudgetVsActualScreen extends StatefulWidget {
   const BudgetVsActualScreen({super.key});
@@ -68,14 +69,14 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
         children: [
           const Icon(Icons.compare_arrows, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('الموازنة مقابل الفعلي',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('تحليل الانحرافات مع تفسيرات مؤشرات الأداء',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -116,7 +117,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
           _totalRevenueBudget,
           _totalRevenueActual - _totalRevenueBudget,
           true,
-          const Color(0xFFD4AF37),
+          core_theme.AC.gold,
         ),
         _kpiCard(
           'المصروفات',
@@ -124,7 +125,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
           _totalExpenseBudget,
           _totalExpenseActual - _totalExpenseBudget,
           false,
-          Colors.orange,
+          core_theme.AC.warn,
         ),
         _kpiCard(
           'صافي الربح',
@@ -132,7 +133,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
           _netIncomeBudget,
           netVariance,
           true,
-          Colors.green,
+          core_theme.AC.ok,
           customPct: '${netPct >= 0 ? '+' : ''}${netPct.toStringAsFixed(1)}%',
         ),
       ],
@@ -156,22 +157,22 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
           children: [
             Row(
               children: [
-                Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                 const Spacer(),
                 Icon(favorable ? Icons.trending_up : Icons.trending_down,
-                    size: 18, color: favorable ? Colors.green : Colors.red),
+                    size: 18, color: favorable ? core_theme.AC.ok : core_theme.AC.err),
               ],
             ),
             const SizedBox(height: 8),
             Text(_fmt(actual), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color, fontFamily: 'monospace')),
-            Text('موازنة: ${_fmt(budget)}', style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+            Text('موازنة: ${_fmt(budget)}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
             const SizedBox(height: 6),
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: (favorable ? Colors.green : Colors.red).withOpacity(0.12),
+                    color: (favorable ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -179,13 +180,13 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      color: favorable ? Colors.green : Colors.red,
+                      color: favorable ? core_theme.AC.ok : core_theme.AC.err,
                     ),
                   ),
                 ),
                 const SizedBox(width: 6),
                 Text(favorable ? 'مفضّل' : 'غير مفضّل',
-                    style: TextStyle(fontSize: 10, color: favorable ? Colors.green : Colors.red)),
+                    style: TextStyle(fontSize: 10, color: favorable ? core_theme.AC.ok : core_theme.AC.err)),
               ],
             ),
           ],
@@ -206,7 +207,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
         OutlinedButton.icon(
           onPressed: () {},
           icon: const Icon(Icons.download, size: 16),
-          label: const Text('تصدير Excel'),
+          label: Text('تصدير Excel'),
         ),
       ],
     );
@@ -222,17 +223,17 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF5E35B1) : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: selected ? const Color(0xFF5E35B1) : Colors.black26),
+          border: Border.all(color: selected ? const Color(0xFF5E35B1) : core_theme.AC.td),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: selected ? Colors.white : Colors.black54),
+            Icon(icon, size: 16, color: selected ? Colors.white : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
-                  color: selected ? Colors.white : Colors.black87,
+                  color: selected ? Colors.white : core_theme.AC.tp,
                 )),
           ],
         ),
@@ -245,19 +246,19 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            color: Colors.grey.shade100,
-            child: const Row(
+            color: core_theme.AC.navy3,
+            child: Row(
               children: [
                 Expanded(child: Text('الحساب', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                 Expanded(flex: 3, child: Text('الاسم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                 Expanded(flex: 2, child: Text('الموازنة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                Expanded(flex: 2, child: Text('الفعلي', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                Expanded(flex: 2, child: Text('الفعلي', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                 Expanded(flex: 2, child: Text('الانحراف', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                 Expanded(child: Text('%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                 Expanded(flex: 3, child: Text('التحقيق', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -265,9 +266,9 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
             ),
           ),
           for (final l in _lines) _lineRow(l),
-          _totalRow('إجمالي الإيرادات', _totalRevenueBudget, _totalRevenueActual, true, Colors.green),
-          _totalRow('إجمالي المصروفات', _totalExpenseBudget, _totalExpenseActual, false, Colors.orange),
-          _totalRow('صافي الربح', _netIncomeBudget, _netIncomeActual, true, const Color(0xFFD4AF37), isGrand: true),
+          _totalRow('إجمالي الإيرادات', _totalRevenueBudget, _totalRevenueActual, true, core_theme.AC.ok),
+          _totalRow('إجمالي المصروفات', _totalExpenseBudget, _totalExpenseActual, false, core_theme.AC.warn),
+          _totalRow('صافي الربح', _netIncomeBudget, _netIncomeActual, true, core_theme.AC.gold, isGrand: true),
         ],
       ),
     );
@@ -281,7 +282,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
       ),
       child: Row(
         children: [
@@ -292,7 +293,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
           Expanded(flex: 2, child: Text(_fmt(l.budget), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
           Expanded(
             flex: 2,
-            child: Text(_fmt(l.actual), style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Color(0xFFD4AF37), fontWeight: FontWeight.w700)),
+            child: Text(_fmt(l.actual), style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.gold, fontWeight: FontWeight.w700)),
           ),
           Expanded(
             flex: 2,
@@ -301,7 +302,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
                 Icon(
                   favorable ? Icons.arrow_upward : Icons.arrow_downward,
                   size: 12,
-                  color: favorable ? Colors.green : Colors.red,
+                  color: favorable ? core_theme.AC.ok : core_theme.AC.err,
                 ),
                 const SizedBox(width: 4),
                 Text(_fmt(variance.abs()),
@@ -309,7 +310,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
                       fontSize: 12,
                       fontFamily: 'monospace',
                       fontWeight: FontWeight.w700,
-                      color: favorable ? Colors.green : Colors.red,
+                      color: favorable ? core_theme.AC.ok : core_theme.AC.err,
                     )),
               ],
             ),
@@ -319,7 +320,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (favorable ? Colors.green : Colors.red).withOpacity(0.12),
+                color: (favorable ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -327,7 +328,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
-                  color: favorable ? Colors.green : Colors.red,
+                  color: favorable ? core_theme.AC.ok : core_theme.AC.err,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -339,8 +340,8 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
               padding: const EdgeInsets.only(left: 8),
               child: LinearProgressIndicator(
                 value: (l.actual / l.budget).clamp(0.0, 1.5),
-                backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation(favorable ? Colors.green : Colors.red),
+                backgroundColor: core_theme.AC.bdr,
+                valueColor: AlwaysStoppedAnimation(favorable ? core_theme.AC.ok : core_theme.AC.err),
                 minHeight: 6,
               ),
             ),
@@ -356,8 +357,8 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: isGrand ? color.withOpacity(0.1) : Colors.grey.shade50,
-        border: Border(top: BorderSide(color: Colors.black12)),
+        color: isGrand ? color.withOpacity(0.1) : core_theme.AC.navy3,
+        border: Border(top: BorderSide(color: core_theme.AC.bdr)),
       ),
       child: Row(
         children: [
@@ -371,7 +372,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
                   fontSize: 13,
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.w900,
-                  color: favorable ? Colors.green : Colors.red,
+                  color: favorable ? core_theme.AC.ok : core_theme.AC.err,
                 )),
           ),
           const Expanded(flex: 4, child: SizedBox()),
@@ -384,43 +385,43 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: core_theme.AC.info,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade200),
+        border: Border.all(color: core_theme.AC.info),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.lightbulb, color: Colors.blue),
+              Icon(Icons.lightbulb, color: core_theme.AC.info),
               SizedBox(width: 8),
               Text('تفسير أهم الانحرافات',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.blue)),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.info)),
             ],
           ),
           const SizedBox(height: 12),
           _insightRow(
             Icons.trending_up,
-            Colors.green,
+            core_theme.AC.ok,
             'إيرادات المبيعات أعلى بـ 4%',
             'تجاوزنا الموازنة بسبب عقدين جديدين مع SABIC وARAMCO في فبراير. العمل الآن على تأكيد تكرار هذه العقود.',
           ),
           _insightRow(
             Icons.trending_down,
-            Colors.red,
+            core_theme.AC.err,
             'مصروفات التسويق أعلى بـ 34%',
             'زيادة مبالغ فيها بسبب حملة رمضان + معرض القاهرة الدولي. العائد على الاستثمار 2.8x، لكن يجب ضبط الموازنات للأرباع القادمة.',
           ),
           _insightRow(
             Icons.trending_down,
-            Colors.red,
+            core_theme.AC.err,
             'مصروفات السفر أعلى بـ 20%',
             'زيادة ناتجة عن زيارات ميدانية للعملاء في الخليج. نوصي بعقد اجتماعات عبر Zoom عندما يكون ممكناً.',
           ),
           _insightRow(
             Icons.trending_up,
-            Colors.green,
+            core_theme.AC.ok,
             'مصروفات الاتصالات أقل بـ 6%',
             'الانتقال إلى باقات موحّدة مع STC للمنشأة حقّق وفرة شهرية.',
           ),
@@ -449,7 +450,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(detail, style: const TextStyle(fontSize: 12, height: 1.5, color: Colors.black54)),
+                Text(detail, style: TextStyle(fontSize: 12, height: 1.5, color: core_theme.AC.ts)),
               ],
             ),
           ),

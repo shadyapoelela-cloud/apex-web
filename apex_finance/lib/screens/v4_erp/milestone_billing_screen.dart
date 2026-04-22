@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class MilestoneBillingScreen extends StatefulWidget {
   const MilestoneBillingScreen({super.key});
@@ -20,8 +21,8 @@ class MilestoneBillingScreen extends StatefulWidget {
 }
 
 class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   String _selected = 'P-2026-042';
 
@@ -60,24 +61,24 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.flag, color: _gold),
+                  Icon(Icons.flag, color: _gold),
                   const SizedBox(width: 8),
-                  const Text('فوترة المراحل',
+                  Text('فوترة المراحل',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: core_theme.AC.ok.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: Colors.green.withOpacity(0.3)),
+                      border: Border.all(color: core_theme.AC.ok.withOpacity(0.3)),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.check, size: 12, color: Colors.green),
+                        Icon(Icons.check, size: 12, color: core_theme.AC.ok),
                         SizedBox(width: 4),
                         Text('IFRS 15 — منهج نسبة الإنجاز',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.green)),
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.ok)),
                       ],
                     ),
                   ),
@@ -103,10 +104,10 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                           width: 280,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: active ? _gold.withOpacity(0.08) : Colors.grey.shade50,
+                            color: active ? _gold.withOpacity(0.08) : core_theme.AC.navy3,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                                color: active ? _gold : Colors.grey.shade300,
+                                color: active ? _gold : core_theme.AC.bdr,
                                 width: active ? 2 : 1),
                           ),
                           child: Column(
@@ -114,16 +115,16 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.work, size: 14, color: active ? _gold : Colors.black54),
+                                  Icon(Icons.work, size: 14, color: active ? _gold : core_theme.AC.ts),
                                   const SizedBox(width: 6),
                                   Text(p.code,
-                                      style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                                      style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                                   const Spacer(),
                                   Text('${(p.billedPct * 100).toStringAsFixed(0)}%',
                                       style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w800,
-                                          color: active ? _gold : Colors.black87)),
+                                          color: active ? _gold : core_theme.AC.tp)),
                                 ],
                               ),
                               const SizedBox(height: 4),
@@ -132,7 +133,7 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis),
                               Text(p.client,
-                                  style: const TextStyle(fontSize: 11, color: Colors.black54),
+                                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis),
                               const SizedBox(height: 6),
@@ -141,7 +142,7 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                                 child: LinearProgressIndicator(
                                   value: p.billedPct,
                                   minHeight: 4,
-                                  backgroundColor: Colors.grey.shade200,
+                                  backgroundColor: core_theme.AC.bdr,
                                   color: _gold,
                                 ),
                               ),
@@ -172,14 +173,14 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                           icon: Icons.done_all,
                           label: 'مفوتر حتى الآن',
                           value: '${(totalBilled / 1e6).toStringAsFixed(1)}م ر.س',
-                          color: Colors.green)),
+                          color: core_theme.AC.ok)),
                   const SizedBox(width: 10),
                   Expanded(
                       child: _StatCard(
                           icon: Icons.account_balance_wallet,
                           label: 'محتجز (5%)',
                           value: '${(retention / 1e6).toStringAsFixed(2)}م ر.س',
-                          color: Colors.orange)),
+                          color: core_theme.AC.warn)),
                   const SizedBox(width: 10),
                   Expanded(
                       child: _StatCard(
@@ -200,10 +201,10 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                 itemBuilder: (ctx, i) {
                   final m = _milestones[i];
                   final (color, label, icon) = switch (m.status) {
-                    _MStatus.billed => (Colors.green, 'تم الفوترة', Icons.check_circle),
-                    _MStatus.readyToBill => (Colors.orange, 'جاهز للفوترة', Icons.receipt_long),
-                    _MStatus.inProgress => (Colors.blue, 'قيد التنفيذ', Icons.construction),
-                    _MStatus.scheduled => (Colors.grey, 'مجدول', Icons.schedule),
+                    _MStatus.billed => (core_theme.AC.ok, 'تم الفوترة', Icons.check_circle),
+                    _MStatus.readyToBill => (core_theme.AC.warn, 'جاهز للفوترة', Icons.receipt_long),
+                    _MStatus.inProgress => (core_theme.AC.info, 'قيد التنفيذ', Icons.construction),
+                    _MStatus.scheduled => (core_theme.AC.td, 'مجدول', Icons.schedule),
                   };
 
                   return Card(
@@ -232,16 +233,16 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                                 const SizedBox(height: 2),
                                 Row(
                                   children: [
-                                    const Icon(Icons.calendar_today, size: 11, color: Colors.black54),
+                                    Icon(Icons.calendar_today, size: 11, color: core_theme.AC.ts),
                                     const SizedBox(width: 4),
                                     Text('استحقاق: ${m.dueDate}',
-                                        style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                                     if (m.invoice != null) ...[
                                       const SizedBox(width: 10),
-                                      const Icon(Icons.receipt, size: 11, color: Colors.black54),
+                                      Icon(Icons.receipt, size: 11, color: core_theme.AC.ts),
                                       const SizedBox(width: 4),
                                       Text(m.invoice!,
-                                          style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                                          style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                                     ],
                                   ],
                                 ),
@@ -252,10 +253,10 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text('${m.pct}%',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
                               Text('${(m.amount / 1e6).toStringAsFixed(2)}م ر.س',
-                                  style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                                  style: TextStyle(fontSize: 12, color: core_theme.AC.tp)),
                             ],
                           ),
                           const SizedBox(width: 14),
@@ -274,7 +275,7 @@ class _MilestoneBillingScreenState extends State<MilestoneBillingScreen> {
                               onPressed: () {},
                               style: FilledButton.styleFrom(backgroundColor: _gold),
                               icon: const Icon(Icons.send, size: 14),
-                              label: const Text('فوترة الآن'),
+                              label: Text('فوترة الآن'),
                             ),
                           ],
                         ],

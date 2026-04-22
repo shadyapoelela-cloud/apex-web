@@ -5,14 +5,15 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/object_page_template.dart';
 
 class AiReconciliationV52Screen extends StatelessWidget {
   const AiReconciliationV52Screen({super.key});
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
-  static const _purple = Color(0xFF4A148C);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
+  static final _purple = Color(0xFF4A148C);
 
   @override
   Widget build(BuildContext context) {
@@ -21,21 +22,21 @@ class AiReconciliationV52Screen extends StatelessWidget {
       subtitleAr: 'Claude Opus · مطابقة تلقائية لـ 96.2% من المعاملات · 1,240 عملية مطابَقة · 47 تحتاج مراجعة',
       statusLabelAr: 'نشط · AI',
       statusColor: _purple,
-      smartButtons: const [
-        SmartButton(icon: Icons.auto_awesome, labelAr: 'مطابَق تلقائياً', count: 1193, color: Colors.green),
-        SmartButton(icon: Icons.pending, labelAr: 'يحتاج مراجعة', count: 47, color: Colors.orange),
-        SmartButton(icon: Icons.error, labelAr: 'غير متطابق', count: 8, color: Colors.red),
+      smartButtons: [
+        SmartButton(icon: Icons.auto_awesome, labelAr: 'مطابَق تلقائياً', count: 1193, color: core_theme.AC.ok),
+        SmartButton(icon: Icons.pending, labelAr: 'يحتاج مراجعة', count: 47, color: core_theme.AC.warn),
+        SmartButton(icon: Icons.error, labelAr: 'غير متطابق', count: 8, color: core_theme.AC.err),
         SmartButton(icon: Icons.rule, labelAr: 'قاعدة نشطة', count: 34, color: _navy),
         SmartButton(icon: Icons.speed, labelAr: 'معدّل الدقة', count: 96, color: _gold),
       ],
       primaryActions: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.refresh, size: 16), label: const Text('إعادة تشغيل AI')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.refresh, size: 16), label: Text('إعادة تشغيل AI')),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: () {},
           style: FilledButton.styleFrom(backgroundColor: _gold),
           icon: const Icon(Icons.check, size: 16),
-          label: const Text('قبول كل المطابقات'),
+          label: Text('قبول كل المطابقات'),
         ),
       ],
       tabs: [
@@ -58,7 +59,7 @@ class AiReconciliationV52Screen extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Expanded(child: _bigStat('الدقة الكلية', '96.2', '%', Colors.green, Icons.speed)),
+          Expanded(child: _bigStat('الدقة الكلية', '96.2', '%', core_theme.AC.ok, Icons.speed)),
           const SizedBox(width: 10),
           Expanded(child: _bigStat('معاملات اليوم', '1,240', '', _gold, Icons.sync)),
           const SizedBox(width: 10),
@@ -68,9 +69,9 @@ class AiReconciliationV52Screen extends StatelessWidget {
         ]),
         const SizedBox(height: 20),
         _card('أنواع المطابقات النشطة', Column(children: [
-          _typeRow('مطابقة بنكية', 'Bank Reconciliation', 840, 96.8, Icons.account_balance, Colors.blue),
-          _typeRow('مطابقة الذمم المدينة', 'Customer Aging', 280, 94.2, Icons.person, Colors.green),
-          _typeRow('مطابقة الذمم الدائنة', 'Vendor Statements', 82, 98.1, Icons.store, Colors.orange),
+          _typeRow('مطابقة بنكية', 'Bank Reconciliation', 840, 96.8, Icons.account_balance, core_theme.AC.info),
+          _typeRow('مطابقة الذمم المدينة', 'Customer Aging', 280, 94.2, Icons.person, core_theme.AC.ok),
+          _typeRow('مطابقة الذمم الدائنة', 'Vendor Statements', 82, 98.1, Icons.store, core_theme.AC.warn),
           _typeRow('مطابقة المعاملات البينية', 'Intercompany', 38, 92.5, Icons.sync_alt, _purple),
         ])),
         const SizedBox(height: 16),
@@ -78,9 +79,9 @@ class AiReconciliationV52Screen extends StatelessWidget {
           for (final d in const [('السبت', 0.942), ('الأحد', 0.951), ('الاثنين', 0.948), ('الثلاثاء', 0.963), ('الأربعاء', 0.959), ('الخميس', 0.962), ('الجمعة', 0.962)])
             Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
               SizedBox(width: 80, child: Text(d.$1, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
-              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: d.$2, minHeight: 12, backgroundColor: Colors.grey.shade100, color: _gold))),
+              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: d.$2, minHeight: 12, backgroundColor: core_theme.AC.navy3, color: _gold))),
               const SizedBox(width: 10),
-              Text('${(d.$2 * 100).toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
+              Text('${(d.$2 * 100).toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
             ])),
         ])),
       ]),
@@ -93,7 +94,7 @@ class AiReconciliationV52Screen extends StatelessWidget {
       const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(nameAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-        Text('$nameEn · $count عملية', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('$nameEn · $count عملية', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ])),
       Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text('${accuracy.toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color))),
     ]));
@@ -112,36 +113,36 @@ class AiReconciliationV52Screen extends StatelessWidget {
       itemCount: items.length,
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) {
-        final confidenceColor = items[i].$7 >= 0.8 ? Colors.green : items[i].$7 >= 0.6 ? Colors.orange : Colors.red;
+        final confidenceColor = items[i].$7 >= 0.8 ? core_theme.AC.ok : items[i].$7 >= 0.6 ? core_theme.AC.warn : core_theme.AC.err;
         return Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.orange.withOpacity(0.3))),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.warn.withOpacity(0.3))),
           child: Row(children: [
             Container(
               width: 48, height: 48,
               decoration: BoxDecoration(color: _purple.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
-              child: const Icon(Icons.auto_awesome, color: _purple),
+              child: Icon(Icons.auto_awesome, color: _purple),
             ),
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(items[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(items[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Text(items[i].$3, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(items[i].$3, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ]),
               Text(items[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-              Text('${items[i].$5} · ${items[i].$6}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('${items[i].$5} · ${items[i].$6}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
-            Text('${items[i].$4.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+            Text('${items[i].$4.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(width: 16),
             Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Text('ثقة AI', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+              Text('ثقة AI', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               Text('${(items[i].$7 * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: confidenceColor)),
             ]),
             const SizedBox(width: 16),
-            OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.close, size: 14, color: Colors.red), label: const Text('رفض', style: TextStyle(fontSize: 11, color: Colors.red))),
+            OutlinedButton.icon(onPressed: () {}, icon: Icon(Icons.close, size: 14, color: core_theme.AC.err), label: Text('رفض', style: TextStyle(fontSize: 11, color: core_theme.AC.err))),
             const SizedBox(width: 6),
-            FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: Colors.green), icon: const Icon(Icons.check, size: 14), label: const Text('قبول', style: TextStyle(fontSize: 11))),
+            FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: core_theme.AC.ok), icon: const Icon(Icons.check, size: 14), label: Text('قبول', style: TextStyle(fontSize: 11))),
           ]),
         );
       },
@@ -151,12 +152,12 @@ class AiReconciliationV52Screen extends StatelessWidget {
   Widget _matched() {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.check_circle, size: 64, color: Colors.green.withOpacity(0.3)),
+        Icon(Icons.check_circle, size: 64, color: core_theme.AC.ok.withOpacity(0.3)),
         const SizedBox(height: 12),
-        const Text('1,193 مطابقة تلقائية ناجحة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
-        const Text('تم قبولها بثقة >95% بدون تدخل بشري', style: TextStyle(color: Colors.black54)),
+        Text('1,193 مطابقة تلقائية ناجحة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
+        Text('تم قبولها بثقة >95% بدون تدخل بشري', style: TextStyle(color: core_theme.AC.ts)),
         const SizedBox(height: 16),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.list), label: const Text('عرض القائمة الكاملة')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.list), label: Text('عرض القائمة الكاملة')),
       ]),
     );
   }
@@ -173,18 +174,18 @@ class AiReconciliationV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.red.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.red, width: 1.5)),
+        decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.err, width: 1.5)),
         child: Row(children: [
-          const Icon(Icons.error, color: Colors.red, size: 32),
+          Icon(Icons.error, color: core_theme.AC.err, size: 32),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(items[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+            Text(items[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
             Text(items[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-            Text('${items[i].$3} · ${items[i].$5}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text('${items[i].$3} · ${items[i].$5}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
-          Text('${items[i].$4.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.red)),
+          Text('${items[i].$4.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.err)),
           const SizedBox(width: 16),
-          FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _purple), icon: const Icon(Icons.search, size: 14), label: const Text('تحقيق', style: TextStyle(fontSize: 11))),
+          FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _purple), icon: const Icon(Icons.search, size: 14), label: Text('تحقيق', style: TextStyle(fontSize: 11))),
         ]),
       ),
     );
@@ -204,31 +205,31 @@ class AiReconciliationV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(children: [
           Container(
             width: 44, height: 44,
             decoration: BoxDecoration(color: _gold.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
-            child: const Icon(Icons.rule, color: _gold),
+            child: Icon(Icons.rule, color: _gold),
           ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Text(rules[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+              Text(rules[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
               Text(rules[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
             ]),
             const SizedBox(height: 4),
-            Text(rules[i].$3, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.4)),
+            Text(rules[i].$3, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.4)),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Text('دقة', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-            Text('${(rules[i].$4 * 100).toStringAsFixed(0)}%', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.green)),
+            Text('دقة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+            Text('${(rules[i].$4 * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
           ]),
           const SizedBox(width: 16),
           Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Text('تشغيل', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-            Text('${rules[i].$5}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+            Text('تشغيل', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+            Text('${rules[i].$5}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
           ]),
           const SizedBox(width: 16),
           IconButton(icon: const Icon(Icons.edit), onPressed: () {}),
@@ -237,7 +238,7 @@ class AiReconciliationV52Screen extends StatelessWidget {
     );
   }
 
-  Widget _card(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]));
+  Widget _card(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]));
 
   Widget _bigStat(String label, String value, String unit, Color color, IconData icon) => Container(
         padding: const EdgeInsets.all(14),

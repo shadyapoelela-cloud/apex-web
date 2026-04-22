@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/apex_app_bar.dart';
 import '../../core/apex_theme_generator.dart';
@@ -20,7 +21,7 @@ class ThemeGeneratorScreen extends StatefulWidget {
 
 class _ThemeGeneratorScreenState extends State<ThemeGeneratorScreen> {
   Color _base = const Color(0xFF1E3A5F);
-  Color _accent = const Color(0xFFD4AF37);
+  Color _accent = core_theme.AC.gold;
   double _contrast = 1.0;
   bool _isDark = true;
 
@@ -127,12 +128,12 @@ class _ThemeGeneratorScreenState extends State<ThemeGeneratorScreen> {
                     fontWeight: FontWeight.w700)),
             const SizedBox(height: AppSpacing.sm),
             _swatchRow([
-              const Color(0xFFD4AF37),
-              const Color(0xFF2563EB),
+              core_theme.AC.gold,
+              core_theme.AC.info,
               const Color(0xFF9333EA),
               const Color(0xFFE11D48),
-              const Color(0xFF10B981),
-              const Color(0xFFF59E0B),
+              core_theme.AC.ok,
+              core_theme.AC.warn,
               const Color(0xFF0EA5E9),
               const Color(0xFFEC4899),
             ], _accent, (c) => setState(() => _accent = c)),
@@ -316,7 +317,7 @@ class _ThemeGeneratorScreenState extends State<ThemeGeneratorScreen> {
                     backgroundColor: t.primary,
                     foregroundColor: t.btnFg,
                   ),
-                  child: const Text('إجراء'),
+                  child: Text('إجراء'),
                 ),
               ]),
             ),

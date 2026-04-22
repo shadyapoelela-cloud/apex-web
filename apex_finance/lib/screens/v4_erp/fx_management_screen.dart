@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class FxManagementScreen extends StatefulWidget {
   const FxManagementScreen({super.key});
@@ -61,9 +62,9 @@ class _FxManagementScreenState extends State<FxManagementScreen>
         _buildHero(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.currency_exchange, size: 16), text: 'محوّل العملات'),
             Tab(icon: Icon(Icons.account_balance_wallet, size: 16), text: 'الأرصدة متعددة العملات'),
@@ -94,7 +95,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
         gradient: const LinearGradient(colors: [Color(0xFF004D40), Color(0xFF00796B)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.currency_exchange, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -105,7 +106,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                 Text('إدارة العملات الأجنبية',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('أسعار لحظية من البنك المركزي + تحويل + تحليل التعرّض',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -133,8 +134,8 @@ class _FxManagementScreenState extends State<FxManagementScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.black12),
-            boxShadow: [BoxShadow(color: Colors.black12.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+            border: Border.all(color: core_theme.AC.bdr),
+            boxShadow: [BoxShadow(color: core_theme.AC.bdr.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
           ),
           child: Column(
             children: [
@@ -144,7 +145,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('من العملة', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                        Text('من العملة', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
                           value: _fromCurrency,
@@ -168,7 +169,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4AF37).withOpacity(0.15),
+                        color: core_theme.AC.gold.withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
                       child: InkWell(
@@ -180,7 +181,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                           });
                         },
                         borderRadius: BorderRadius.circular(30),
-                        child: const Icon(Icons.swap_horiz, color: Color(0xFFD4AF37), size: 28),
+                        child: Icon(Icons.swap_horiz, color: core_theme.AC.gold, size: 28),
                       ),
                     ),
                   ),
@@ -188,7 +189,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('إلى العملة', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                        Text('إلى العملة', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
                           value: _toCurrency,
@@ -208,7 +209,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                             children: [
                               Text(_fmt(converted),
                                   style: const TextStyle(color: Color(0xFFFFD700), fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-                              Text(_toCurrency, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                              Text(_toCurrency, style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                             ],
                           ),
                         ),
@@ -225,7 +226,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                   _rateInfo('السعر الحالي', '1 $_fromCurrency = ${_convert(1, _fromCurrency, _toCurrency).toStringAsFixed(4)} $_toCurrency'),
                   _rateInfo('السعر العكسي', '1 $_toCurrency = ${inverseRate.toStringAsFixed(4)} $_fromCurrency'),
                   _rateInfo('آخر تحديث', '2026-04-18 15:30 — SAMA'),
-                  _rateInfo('تغيّر خلال 24 ساعة', '+0.12%', color: Colors.green),
+                  _rateInfo('تغيّر خلال 24 ساعة', '+0.12%', color: core_theme.AC.ok),
                 ],
               ),
             ],
@@ -239,11 +240,11 @@ class _FxManagementScreenState extends State<FxManagementScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 2),
         Text(value,
             style: TextStyle(
-                fontSize: 13, fontWeight: FontWeight.w800, color: color ?? Colors.black87, fontFamily: 'monospace')),
+                fontSize: 13, fontWeight: FontWeight.w800, color: color ?? core_theme.AC.tp, fontFamily: 'monospace')),
       ],
     );
   }
@@ -264,7 +265,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+            gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
@@ -277,7 +278,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
               ),
               Text(_fmt(totalInSar),
                   style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Text(' ر.س', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(' ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
             ],
           ),
         ),
@@ -286,13 +287,13 @@ class _FxManagementScreenState extends State<FxManagementScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: const Row(
                   children: [
                     Expanded(flex: 2, child: Text('العملة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800))),
@@ -307,7 +308,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
@@ -332,7 +333,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                       Expanded(
                         flex: 2,
                         child: Text(_fmt(b.sarValue),
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.gold, fontFamily: 'monospace')),
                       ),
                       Expanded(
                         child: Text('${(b.sarValue / totalInSar * 100).toStringAsFixed(1)}%',
@@ -344,7 +345,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            color: b.change == 0 ? Colors.black54 : b.change > 0 ? Colors.green : Colors.red,
+                            color: b.change == 0 ? core_theme.AC.ts : b.change > 0 ? core_theme.AC.ok : core_theme.AC.err,
                           ),
                         ),
                       ),
@@ -373,7 +374,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
@@ -388,27 +389,27 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                   children: [
                     Text(_currencyLabel(code), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                     Text('1 $code = ${rate.toStringAsFixed(4)} ر.س',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54, fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontFamily: 'monospace')),
                   ],
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: change > 0 ? Colors.green.withOpacity(0.12) : Colors.red.withOpacity(0.12),
+                  color: change > 0 ? core_theme.AC.ok.withOpacity(0.12) : core_theme.AC.err.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(change > 0 ? Icons.trending_up : Icons.trending_down,
-                        size: 12, color: change > 0 ? Colors.green : Colors.red),
+                        size: 12, color: change > 0 ? core_theme.AC.ok : core_theme.AC.err),
                     const SizedBox(width: 4),
                     Text('${change > 0 ? '+' : ''}${change.toStringAsFixed(1)}%',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
-                          color: change > 0 ? Colors.green : Colors.red,
+                          color: change > 0 ? core_theme.AC.ok : core_theme.AC.err,
                         )),
                   ],
                 ),
@@ -427,20 +428,20 @@ class _FxManagementScreenState extends State<FxManagementScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.red.shade50,
+            color: core_theme.AC.err,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.red.shade200),
+            border: Border.all(color: core_theme.AC.err),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.warning_amber, color: Colors.red, size: 24),
+              Icon(Icons.warning_amber, color: core_theme.AC.err, size: 24),
               SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('التعرّض الصافي',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.red)),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.err)),
                     SizedBox(height: 4),
                     Text('انخفاض 1% في الدولار يؤثر على الربح بمقدار 45,250 ر.س',
                         style: TextStyle(fontSize: 12)),
@@ -451,26 +452,26 @@ class _FxManagementScreenState extends State<FxManagementScreen>
           ),
         ),
         const SizedBox(height: 16),
-        const Text('التعرّض حسب العملة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+        Text('التعرّض حسب العملة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
         const SizedBox(height: 10),
-        _exposureRow('USD', 4525000, 125000, 1250000, Colors.blue),
-        _exposureRow('EUR', 1860000, 85000, 680000, Colors.indigo),
-        _exposureRow('GBP', 820000, 42000, 210000, Colors.purple),
-        _exposureRow('AED', 560000, 0, 340000, Colors.green),
+        _exposureRow('USD', 4525000, 125000, 1250000, core_theme.AC.info),
+        _exposureRow('EUR', 1860000, 85000, 680000, core_theme.AC.purple),
+        _exposureRow('GBP', 820000, 42000, 210000, core_theme.AC.purple),
+        _exposureRow('AED', 560000, 0, 340000, core_theme.AC.ok),
         const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFD4AF37).withOpacity(0.08),
+            color: core_theme.AC.gold.withOpacity(0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+            border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.shield, color: Color(0xFFD4AF37)),
+                  Icon(Icons.shield, color: core_theme.AC.gold),
                   SizedBox(width: 8),
                   Text('أدوات التحوّط المتاحة',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
@@ -500,7 +501,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -513,7 +514,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                 child: Text(code, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w800)),
               ),
               const SizedBox(width: 10),
-              const Text('تفصيل التعرّض', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('تفصيل التعرّض', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
               const Spacer(),
               Text('صافي: ${_fmt(net)} ر.س', style: TextStyle(color: color, fontWeight: FontWeight.w900)),
             ],
@@ -521,10 +522,10 @@ class _FxManagementScreenState extends State<FxManagementScreen>
           const SizedBox(height: 10),
           Row(
             children: [
-              _exposureCell('مدينون', receivables, Colors.green),
-              _exposureCell('دائنون', payables, Colors.red),
-              _exposureCell('متحوّط', hedged, Colors.blue),
-              _exposureCell('غير محوّط', net - hedged, Colors.orange),
+              _exposureCell('مدينون', receivables, core_theme.AC.ok),
+              _exposureCell('دائنون', payables, core_theme.AC.err),
+              _exposureCell('متحوّط', hedged, core_theme.AC.info),
+              _exposureCell('غير محوّط', net - hedged, core_theme.AC.warn),
             ],
           ),
         ],
@@ -543,7 +544,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
         ),
         child: Column(
           children: [
-            Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             Text(_fmt(value),
                 style: TextStyle(
                   fontSize: 12,
@@ -601,16 +602,16 @@ class _FxManagementScreenState extends State<FxManagementScreen>
   }
 
   Color _currencyColor(String code) {
-    const colors = {
-      'USD': Colors.blue,
-      'EUR': Colors.indigo,
-      'GBP': Colors.purple,
-      'AED': Colors.green,
-      'KWD': Colors.teal,
-      'JPY': Colors.red,
-      'SAR': Color(0xFFD4AF37),
+    final colors = {
+      'USD': core_theme.AC.info,
+      'EUR': core_theme.AC.purple,
+      'GBP': core_theme.AC.purple,
+      'AED': core_theme.AC.ok,
+      'KWD': core_theme.AC.info,
+      'JPY': core_theme.AC.err,
+      'SAR': core_theme.AC.gold,
     };
-    return colors[code] ?? Colors.grey;
+    return colors[code] ?? core_theme.AC.td;
   }
 
   String _fmt(double v) {

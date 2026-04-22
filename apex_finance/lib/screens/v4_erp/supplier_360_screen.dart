@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Supplier360Screen extends StatefulWidget {
   const Supplier360Screen({super.key});
@@ -53,9 +54,9 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
               _buildKpiRow(),
               TabBar(
                 controller: _tab,
-                labelColor: const Color(0xFFD4AF37),
-                unselectedLabelColor: Colors.black54,
-                indicatorColor: const Color(0xFFD4AF37),
+                labelColor: core_theme.AC.gold,
+                unselectedLabelColor: core_theme.AC.ts,
+                indicatorColor: core_theme.AC.gold,
                 tabs: const [
                   Tab(icon: Icon(Icons.info, size: 16), text: 'الملف'),
                   Tab(icon: Icon(Icons.shopping_cart, size: 16), text: 'المشتريات'),
@@ -86,19 +87,19 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       margin: const EdgeInsets.only(left: 20, top: 20, bottom: 20, right: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            color: Colors.grey.shade50,
+            color: core_theme.AC.navy3,
             child: Column(
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.business, color: Color(0xFFD4AF37), size: 16),
+                    Icon(Icons.business, color: core_theme.AC.gold, size: 16),
                     SizedBox(width: 6),
                     Text('الموردون', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                   ],
@@ -128,11 +129,11 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: selected ? const Color(0xFFD4AF37).withOpacity(0.12) : null,
+                      color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
                       border: Border(
-                        bottom: BorderSide(color: Colors.black12.withOpacity(0.5)),
+                        bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
                         right: BorderSide(
-                          color: selected ? const Color(0xFFD4AF37) : Colors.transparent,
+                          color: selected ? core_theme.AC.gold : Colors.transparent,
                           width: 3,
                         ),
                       ),
@@ -151,7 +152,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
                               Text(s.name, style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w800 : FontWeight.w600)),
                               Row(
                                 children: [
-                                  Text(s.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                                  Text(s.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                                   const SizedBox(width: 6),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
@@ -217,7 +218,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
                   ],
                 ),
                 Text('${_selected.id} · ${_selected.country} · ${_selected.category}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace')),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -232,7 +233,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
                       style: const TextStyle(color: Color(0xFFFFD700), fontSize: 20, fontWeight: FontWeight.w900)),
                 ],
               ),
-              const Text('تقييم الأداء', style: TextStyle(color: Colors.white70, fontSize: 10)),
+              Text('تقييم الأداء', style: TextStyle(color: core_theme.AC.ts, fontSize: 10)),
             ],
           ),
         ],
@@ -245,10 +246,10 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       padding: const EdgeInsets.only(left: 10, top: 12, right: 20),
       child: Row(
         children: [
-          _kpi('إجمالي المشتريات YTD', _fmt(_selected.ytdVolume.toDouble()), const Color(0xFFD4AF37), Icons.shopping_cart),
-          _kpi('عدد الطلبات', '${_selected.orderCount}', Colors.blue, Icons.receipt_long),
-          _kpi('متوسط الطلب', _fmt(_selected.ytdVolume / _selected.orderCount), Colors.purple, Icons.trending_up),
-          _kpi('أيام الدفع المستحقة', '45 يوم', Colors.orange, Icons.schedule),
+          _kpi('إجمالي المشتريات YTD', _fmt(_selected.ytdVolume.toDouble()), core_theme.AC.gold, Icons.shopping_cart),
+          _kpi('عدد الطلبات', '${_selected.orderCount}', core_theme.AC.info, Icons.receipt_long),
+          _kpi('متوسط الطلب', _fmt(_selected.ytdVolume / _selected.orderCount), core_theme.AC.purple, Icons.trending_up),
+          _kpi('أيام الدفع المستحقة', '45 يوم', core_theme.AC.warn, Icons.schedule),
         ],
       ),
     );
@@ -272,7 +273,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -349,19 +350,19 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(passed ? Icons.check_circle : Icons.error, size: 16, color: passed ? Colors.green : Colors.red),
+          Icon(passed ? Icons.check_circle : Icons.error, size: 16, color: passed ? core_theme.AC.ok : core_theme.AC.err),
           const SizedBox(width: 8),
           Expanded(child: Text(label, style: const TextStyle(fontSize: 12))),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: (passed ? Colors.green : Colors.red).withOpacity(0.12),
+              color: (passed ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
               borderRadius: BorderRadius.circular(3),
             ),
             child: Text(passed ? 'مطابق' : 'منتهي',
                 style: TextStyle(
                   fontSize: 10,
-                  color: passed ? Colors.green : Colors.red,
+                  color: passed ? core_theme.AC.ok : core_theme.AC.err,
                   fontWeight: FontWeight.w700,
                 )),
           ),
@@ -383,25 +384,25 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       itemCount: orders.length,
       itemBuilder: (ctx, i) {
         final o = orders[i];
-        final statusColor = o.status == 'مستلم' ? Colors.green : Colors.orange;
+        final statusColor = o.status == 'مستلم' ? core_theme.AC.ok : core_theme.AC.warn;
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
               Text(o.number, style: const TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800)),
               const SizedBox(width: 12),
-              Text(o.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+              Text(o.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
               const SizedBox(width: 12),
               Expanded(child: Text(o.item, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
               Text(_fmt(o.amount.toDouble()),
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-              const Text(' ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+              Text(' ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -434,7 +435,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+            gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -447,7 +448,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
               ),
               Text(_fmt(totalPaid.toDouble()),
                   style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Text(' ر.س', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(' ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
             ],
           ),
         ),
@@ -459,28 +460,28 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.12),
+                    color: core_theme.AC.ok.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                  child: Icon(Icons.check_circle, color: core_theme.AC.ok, size: 16),
                 ),
                 const SizedBox(width: 10),
-                Text(p.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                Text(p.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                 const SizedBox(width: 10),
                 Text(p.ref, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
                 const Spacer(),
-                Text(p.bank, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(p.bank, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 12),
                 Text(_fmt(p.amount.toDouble()),
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                const Text(' ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                Text(' ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -494,10 +495,10 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       children: [
         Row(
           children: [
-            _perfCard('التسليم في الموعد', 97, Colors.green),
-            _perfCard('جودة المنتج', 4.8, Colors.blue, suffix: '/5'),
-            _perfCard('الالتزام بالسعر', 99, const Color(0xFFD4AF37)),
-            _perfCard('سرعة الاستجابة', 92, Colors.purple),
+            _perfCard('التسليم في الموعد', 97, core_theme.AC.ok),
+            _perfCard('جودة المنتج', 4.8, core_theme.AC.info, suffix: '/5'),
+            _perfCard('الالتزام بالسعر', 99, core_theme.AC.gold),
+            _perfCard('سرعة الاستجابة', 92, core_theme.AC.purple),
           ],
         ),
         const SizedBox(height: 20),
@@ -506,12 +507,12 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('مراجعات فريق المشتريات (آخر 5)',
+              Text('مراجعات فريق المشتريات (آخر 5)',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 12),
               _reviewRow('2026-04-15', 'محمد القحطاني', 5.0, 'تسليم ممتاز في الوقت — جودة تطابق المواصفات'),
@@ -539,7 +540,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             const SizedBox(height: 6),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -563,7 +564,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: core_theme.AC.navy3,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -571,7 +572,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
         children: [
           Row(
             children: [
-              Text(date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+              Text(date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
               const SizedBox(width: 10),
               Text(reviewer, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
               const Spacer(),
@@ -584,7 +585,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
             ],
           ),
           const SizedBox(height: 4),
-          Text(comment, style: const TextStyle(fontSize: 11, color: Colors.black87, height: 1.4)),
+          Text(comment, style: TextStyle(fontSize: 11, color: core_theme.AC.tp, height: 1.4)),
         ],
       ),
     );
@@ -596,14 +597,14 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: const Color(0xFFD4AF37), size: 18),
+              Icon(icon, color: core_theme.AC.gold, size: 18),
               const SizedBox(width: 8),
               Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -621,7 +622,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 130, child: Text(k, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+          SizedBox(width: 130, child: Text(k, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
           Expanded(child: Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, height: 1.5))),
         ],
       ),
@@ -633,7 +634,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
       case 'Platinum':
         return const Color(0xFF455A64);
       case 'Gold':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'Silver':
         return const Color(0xFF9E9E9E);
       default:

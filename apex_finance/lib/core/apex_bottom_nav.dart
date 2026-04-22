@@ -18,6 +18,7 @@ import 'package:go_router/go_router.dart';
 import 'apex_responsive.dart';
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 class ApexBottomNav extends StatelessWidget {
   final String currentPath;
@@ -60,7 +61,7 @@ class ApexBottomNav extends StatelessWidget {
           color: AC.navy2,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: core_theme.AC.tp.withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, -2),
             ),

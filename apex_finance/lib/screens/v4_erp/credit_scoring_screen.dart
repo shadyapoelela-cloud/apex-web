@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CreditScoringScreen extends StatefulWidget {
   const CreditScoringScreen({super.key});
@@ -15,15 +16,15 @@ class CreditScoringScreen extends StatefulWidget {
 class _CreditScoringScreenState extends State<CreditScoringScreen> {
   String _selectedId = 'CUS-0145';
 
-  final _customers = const [
-    _CreditCustomer('CUS-0145', 'أرامكو السعودية', 92, 'AA', 50_000_000, 4_800_000, 32, 0, 0, Colors.green, 'سجل ممتاز — لا متأخرات'),
-    _CreditCustomer('CUS-0089', 'سابك', 88, 'A+', 25_000_000, 3_200_000, 28, 0, 0, Colors.green, 'عميل استراتيجي — دفع منتظم'),
-    _CreditCustomer('CUS-0213', 'STC', 85, 'A', 8_000_000, 1_450_000, 35, 0, 0, Colors.green, 'دفع ضمن الشروط'),
-    _CreditCustomer('CUS-0178', 'مجموعة بن لادن', 72, 'BBB', 3_000_000, 820_000, 48, 125_000, 1, Colors.amber, 'متأخرات طفيفة 15-30 يوم'),
-    _CreditCustomer('CUS-0298', 'دبي القابضة', 78, 'A-', 5_000_000, 560_000, 42, 0, 0, Colors.green, 'سجل جيد'),
-    _CreditCustomer('CUS-0412', 'مركز التدريب الوطني', 68, 'BBB-', 1_000_000, 180_000, 58, 45_000, 2, Colors.amber, 'عميل جديد — تحت المراقبة'),
-    _CreditCustomer('CUS-0498', 'شركة XYZ القابضة', 52, 'BB', 500_000, 680_000, 92, 340_000, 4, Colors.orange, '⚠ تجاوز الحد — متابعة'),
-    _CreditCustomer('CUS-0521', 'شركة ABC للمقاولات', 38, 'B', 200_000, 420_000, 145, 420_000, 8, Colors.red, '🚨 تعثّر في السداد'),
+  final _customers = [
+    _CreditCustomer('CUS-0145', 'أرامكو السعودية', 92, 'AA', 50_000_000, 4_800_000, 32, 0, 0, core_theme.AC.ok, 'سجل ممتاز — لا متأخرات'),
+    _CreditCustomer('CUS-0089', 'سابك', 88, 'A+', 25_000_000, 3_200_000, 28, 0, 0, core_theme.AC.ok, 'عميل استراتيجي — دفع منتظم'),
+    _CreditCustomer('CUS-0213', 'STC', 85, 'A', 8_000_000, 1_450_000, 35, 0, 0, core_theme.AC.ok, 'دفع ضمن الشروط'),
+    _CreditCustomer('CUS-0178', 'مجموعة بن لادن', 72, 'BBB', 3_000_000, 820_000, 48, 125_000, 1, core_theme.AC.warn, 'متأخرات طفيفة 15-30 يوم'),
+    _CreditCustomer('CUS-0298', 'دبي القابضة', 78, 'A-', 5_000_000, 560_000, 42, 0, 0, core_theme.AC.ok, 'سجل جيد'),
+    _CreditCustomer('CUS-0412', 'مركز التدريب الوطني', 68, 'BBB-', 1_000_000, 180_000, 58, 45_000, 2, core_theme.AC.warn, 'عميل جديد — تحت المراقبة'),
+    _CreditCustomer('CUS-0498', 'شركة XYZ القابضة', 52, 'BB', 500_000, 680_000, 92, 340_000, 4, core_theme.AC.warn, '⚠ تجاوز الحد — متابعة'),
+    _CreditCustomer('CUS-0521', 'شركة ABC للمقاولات', 38, 'B', 200_000, 420_000, 145, 420_000, 8, core_theme.AC.err, '🚨 تعثّر في السداد'),
   ];
 
   _CreditCustomer get _selected => _customers.firstWhere((c) => c.id == _selectedId);
@@ -43,17 +44,17 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
       margin: const EdgeInsets.only(left: 20, top: 20, bottom: 20, right: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(14),
-            color: Colors.grey.shade50,
-            child: const Row(
+            color: core_theme.AC.navy3,
+            child: Row(
               children: [
-                Icon(Icons.credit_score, color: Color(0xFFD4AF37), size: 18),
+                Icon(Icons.credit_score, color: core_theme.AC.gold, size: 18),
                 SizedBox(width: 8),
                 Text('ترتيب حسب المخاطر', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               ],
@@ -70,11 +71,11 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: selected ? const Color(0xFFD4AF37).withOpacity(0.12) : null,
+                      color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
                       border: Border(
-                        bottom: BorderSide(color: Colors.black12.withOpacity(0.5)),
+                        bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
                         right: BorderSide(
-                          color: selected ? const Color(0xFFD4AF37) : Colors.transparent,
+                          color: selected ? core_theme.AC.gold : Colors.transparent,
                           width: 3,
                         ),
                       ),
@@ -110,7 +111,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                                   const SizedBox(width: 4),
                                   if (c.overdue > 0)
                                     Text('• ${c.overdueInvoices} متأخر',
-                                        style: const TextStyle(fontSize: 10, color: Colors.red, fontWeight: FontWeight.w700)),
+                                        style: TextStyle(fontSize: 10, color: core_theme.AC.err, fontWeight: FontWeight.w700)),
                                 ],
                               ),
                             ],
@@ -179,7 +180,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                     children: [
                       Text('${c.score}',
                           style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900)),
-                      const Text('من 100', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                      Text('من 100', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                     ],
                   ),
                 ],
@@ -192,7 +193,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(c.name, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
-                Text(c.id, style: const TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace')),
+                Text(c.id, style: TextStyle(color: core_theme.AC.ts, fontSize: 12, fontFamily: 'monospace')),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -204,8 +205,8 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                           Text(c.rating,
                               style: TextStyle(color: c.color, fontSize: 20, fontWeight: FontWeight.w900)),
                           const SizedBox(width: 6),
-                          const Text('تصنيف',
-                              style: TextStyle(color: Colors.black54, fontSize: 12)),
+                          Text('تصنيف',
+                              style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -233,14 +234,14 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.account_balance, color: Color(0xFFD4AF37)),
+              Icon(Icons.account_balance, color: core_theme.AC.gold),
               SizedBox(width: 8),
               Text('الحد الائتماني والتعرّض', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -252,9 +253,9 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('الحد الائتماني', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text('الحد الائتماني', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     Text(_fmtM(c.creditLimit),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
                   ],
                 ),
               ),
@@ -262,12 +263,12 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('التعرّض الحالي', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text('التعرّض الحالي', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     Text(_fmtM(c.exposure),
                         style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
-                            color: utilization > 1 ? Colors.red : utilization > 0.8 ? Colors.orange : Colors.green,
+                            color: utilization > 1 ? core_theme.AC.err : utilization > 0.8 ? core_theme.AC.warn : core_theme.AC.ok,
                             fontFamily: 'monospace')),
                   ],
                 ),
@@ -275,16 +276,16 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          const Text('نسبة الاستخدام', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('نسبة الاستخدام', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
                 child: LinearProgressIndicator(
                   value: utilization.clamp(0.0, 1.2),
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: core_theme.AC.bdr,
                   valueColor: AlwaysStoppedAnimation(
-                      utilization > 1 ? Colors.red : utilization > 0.8 ? Colors.orange : Colors.green),
+                      utilization > 1 ? core_theme.AC.err : utilization > 0.8 ? core_theme.AC.warn : core_theme.AC.ok),
                   minHeight: 12,
                 ),
               ),
@@ -293,7 +294,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
-                      color: utilization > 1 ? Colors.red : utilization > 0.8 ? Colors.orange : Colors.green)),
+                      color: utilization > 1 ? core_theme.AC.err : utilization > 0.8 ? core_theme.AC.warn : core_theme.AC.ok)),
             ],
           ),
           const SizedBox(height: 10),
@@ -301,17 +302,17 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.red.shade50,
+                color: core_theme.AC.err,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
+                border: Border.all(color: core_theme.AC.err),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.warning, color: Colors.red, size: 18),
+                  Icon(Icons.warning, color: core_theme.AC.err, size: 18),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text('تجاوز الحد الائتماني — مطلوب مراجعة فورية',
-                        style: TextStyle(fontSize: 11, color: Colors.red, fontWeight: FontWeight.w800)),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.err, fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -323,26 +324,26 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
 
   Widget _buildFactorsCard(_CreditCustomer c) {
     final factors = <_Factor>[
-      _Factor('سجل الدفع', c.overdueInvoices == 0 ? 95 : c.overdueInvoices <= 2 ? 72 : 45, c.overdueInvoices == 0 ? Colors.green : Colors.orange),
-      _Factor('متوسط مدة السداد', c.avgDays <= 45 ? 90 : c.avgDays <= 60 ? 72 : 45, c.avgDays <= 45 ? Colors.green : Colors.orange),
-      _Factor('الحجم والتركّز', 85, Colors.blue),
-      _Factor('سنوات التعامل', 88, Colors.purple),
-      _Factor('الصناعة والمخاطر', 78, Colors.teal),
-      _Factor('المصادقات الخارجية (Simah)', 82, const Color(0xFFD4AF37)),
+      _Factor('سجل الدفع', c.overdueInvoices == 0 ? 95 : c.overdueInvoices <= 2 ? 72 : 45, c.overdueInvoices == 0 ? core_theme.AC.ok : core_theme.AC.warn),
+      _Factor('متوسط مدة السداد', c.avgDays <= 45 ? 90 : c.avgDays <= 60 ? 72 : 45, c.avgDays <= 45 ? core_theme.AC.ok : core_theme.AC.warn),
+      _Factor('الحجم والتركّز', 85, core_theme.AC.info),
+      _Factor('سنوات التعامل', 88, core_theme.AC.purple),
+      _Factor('الصناعة والمخاطر', 78, core_theme.AC.info),
+      _Factor('المصادقات الخارجية (Simah)', 82, core_theme.AC.gold),
     ];
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.analytics, color: Colors.purple),
+              Icon(Icons.analytics, color: core_theme.AC.purple),
               SizedBox(width: 8),
               Text('العوامل المكوّنة للنتيجة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -357,7 +358,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                   Expanded(
                     child: LinearProgressIndicator(
                       value: f.score / 100,
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: core_theme.AC.bdr,
                       valueColor: AlwaysStoppedAnimation(f.color),
                       minHeight: 8,
                     ),
@@ -376,24 +377,24 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
   Widget _buildHistoryCard(_CreditCustomer c) {
     final events = <_CreditEvent>[
       _CreditEvent('2026-04-18', 'review', 'مراجعة تلقائية — التقييم انخفض من 94 إلى ${c.score}', c.color),
-      _CreditEvent('2026-03-15', 'payment', 'دفعة مستلمة 1.2M ر.س — INV-2026-0412', Colors.green),
-      _CreditEvent('2026-02-28', 'invoice', 'إصدار فاتورة 2.4M ر.س — INV-2026-0398', Colors.blue),
-      _CreditEvent('2026-01-20', 'limit-change', 'رفع الحد الائتماني من ${_fmtM(c.creditLimit * 0.8)} إلى ${_fmtM(c.creditLimit)}', Colors.purple),
-      _CreditEvent('2025-12-05', 'simah', 'تحديث تصنيف Simah: ${c.rating}', const Color(0xFFD4AF37)),
+      _CreditEvent('2026-03-15', 'payment', 'دفعة مستلمة 1.2M ر.س — INV-2026-0412', core_theme.AC.ok),
+      _CreditEvent('2026-02-28', 'invoice', 'إصدار فاتورة 2.4M ر.س — INV-2026-0398', core_theme.AC.info),
+      _CreditEvent('2026-01-20', 'limit-change', 'رفع الحد الائتماني من ${_fmtM(c.creditLimit * 0.8)} إلى ${_fmtM(c.creditLimit)}', core_theme.AC.purple),
+      _CreditEvent('2025-12-05', 'simah', 'تحديث تصنيف Simah: ${c.rating}', core_theme.AC.gold),
     ];
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.history, color: Colors.blue),
+              Icon(Icons.history, color: core_theme.AC.info),
               SizedBox(width: 8),
               Text('سجل التعاملات الائتمانية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -407,7 +408,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                 children: [
                   Container(width: 10, height: 10, margin: const EdgeInsets.only(top: 4), decoration: BoxDecoration(color: e.color, shape: BoxShape.circle)),
                   const SizedBox(width: 10),
-                  SizedBox(width: 100, child: Text(e.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'))),
+                  SizedBox(width: 100, child: Text(e.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'))),
                   Expanded(child: Text(e.description, style: const TextStyle(fontSize: 12))),
                 ],
               ),

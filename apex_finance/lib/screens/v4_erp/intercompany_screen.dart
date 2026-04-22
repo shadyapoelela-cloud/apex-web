@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class IntercompanyScreen extends StatefulWidget {
   const IntercompanyScreen({super.key});
@@ -16,13 +17,13 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
-  final _entities = const [
-    _Entity('APEX-KSA', 'APEX Holding KSA', 'المملكة العربية السعودية', Color(0xFFD4AF37)),
-    _Entity('APEX-UAE', 'APEX Dubai LLC', 'الإمارات العربية المتحدة', Colors.blue),
-    _Entity('APEX-IND', 'APEX Manufacturing India', 'الهند', Colors.orange),
-    _Entity('APEX-SG', 'APEX Singapore Pte', 'سنغافورة', Colors.green),
-    _Entity('APEX-BH', 'APEX Logistics Bahrain', 'البحرين', Colors.teal),
-    _Entity('APEX-UK', 'APEX Technology UK', 'المملكة المتحدة', Colors.purple),
+  final _entities = [
+    _Entity('APEX-KSA', 'APEX Holding KSA', 'المملكة العربية السعودية', core_theme.AC.gold),
+    _Entity('APEX-UAE', 'APEX Dubai LLC', 'الإمارات العربية المتحدة', core_theme.AC.info),
+    _Entity('APEX-IND', 'APEX Manufacturing India', 'الهند', core_theme.AC.warn),
+    _Entity('APEX-SG', 'APEX Singapore Pte', 'سنغافورة', core_theme.AC.ok),
+    _Entity('APEX-BH', 'APEX Logistics Bahrain', 'البحرين', core_theme.AC.info),
+    _Entity('APEX-UK', 'APEX Technology UK', 'المملكة المتحدة', core_theme.AC.purple),
   ];
 
   final _balances = const [
@@ -66,9 +67,9 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
         _buildKpis(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.compare_arrows, size: 16), text: 'مصفوفة الأرصدة'),
             Tab(icon: Icon(Icons.list, size: 16), text: 'المعاملات'),
@@ -97,7 +98,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
         gradient: const LinearGradient(colors: [Color(0xFF004D40), Color(0xFF00695C)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.business, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -108,7 +109,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
                 Text('تسوية المعاملات بين الشركات',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Intercompany Reconciliation — 6 كيانات · تطابق تلقائي · استبعادات التوحيد',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -126,11 +127,11 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('إجمالي الكيانات', '${_entities.length}', Colors.blue, Icons.business),
-          _kpi('أزواج متطابقة', '$matched / ${_balances.length}', Colors.green, Icons.check_circle),
-          _kpi('قيد التسوية', '$reconciling', Colors.orange, Icons.sync),
-          _kpi('قيد التحقيق', '$investigating', Colors.red, Icons.warning),
-          _kpi('إجمالي الفروقات', _fmtM(totalDiff), const Color(0xFFD4AF37), Icons.calculate),
+          _kpi('إجمالي الكيانات', '${_entities.length}', core_theme.AC.info, Icons.business),
+          _kpi('أزواج متطابقة', '$matched / ${_balances.length}', core_theme.AC.ok, Icons.check_circle),
+          _kpi('قيد التسوية', '$reconciling', core_theme.AC.warn, Icons.sync),
+          _kpi('قيد التحقيق', '$investigating', core_theme.AC.err, Icons.warning),
+          _kpi('إجمالي الفروقات', _fmtM(totalDiff), core_theme.AC.gold, Icons.calculate),
         ],
       ),
     );
@@ -154,7 +155,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -200,11 +201,11 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
                     Text(entityA.code, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w800)),
                   ],
                 ),
-                Text(entityA.name, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(entityA.name, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
-          const Icon(Icons.sync_alt, color: Colors.black45),
+          Icon(Icons.sync_alt, color: core_theme.AC.td),
           Expanded(
             flex: 2,
             child: Padding(
@@ -219,7 +220,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
                       Text(entityB.code, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w800)),
                     ],
                   ),
-                  Text(entityB.name, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(entityB.name, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ],
               ),
             ),
@@ -228,9 +229,9 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('مدين لدى A', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('مدين لدى A', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 Text(_fmtM(b.aBalance),
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.gold, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -238,9 +239,9 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('دائن لدى B', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('دائن لدى B', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 Text(_fmtM(b.bBalance),
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.orange, fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.warn, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -248,12 +249,12 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('الفرق', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('الفرق', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 Text(_fmt(b.difference),
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
-                        color: b.difference == 0 ? Colors.green : Colors.red,
+                        color: b.difference == 0 ? core_theme.AC.ok : core_theme.AC.err,
                         fontFamily: 'monospace')),
               ],
             ),
@@ -303,9 +304,9 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
                 child: Text(t.fromEntity,
                     style: TextStyle(fontSize: 10, color: fromEntity.color, fontWeight: FontWeight.w800)),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4),
-                child: Icon(Icons.arrow_forward, size: 14, color: Colors.black45),
+                child: Icon(Icons.arrow_forward, size: 14, color: core_theme.AC.td),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -315,10 +316,10 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
               ),
               const SizedBox(width: 10),
               Expanded(child: Text(t.description, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
-              Text(t.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+              Text(t.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
               const SizedBox(width: 12),
               Text(_fmt(t.amount),
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.gold, fontFamily: 'monospace')),
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -351,23 +352,23 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('قيود الاستبعاد عند التوحيد (Consolidation Eliminations)',
+              Text('قيود الاستبعاد عند التوحيد (Consolidation Eliminations)',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 8),
-              const Text('Q1 2026 — وفقاً لـ IFRS 10',
-                  style: TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('Q1 2026 — وفقاً لـ IFRS 10',
+                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               const SizedBox(height: 16),
               for (final e in eliminations)
                 Container(
                   margin: const EdgeInsets.only(bottom: 10),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
+                    color: core_theme.AC.navy3,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -384,14 +385,14 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
                           children: [
                             Text(e.description, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                             Text(_catLabel(e.category),
-                                style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                                style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                           ],
                         ),
                       ),
                       Text(_fmt(e.amount),
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                      const Text(' ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                      Text(' ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     ],
                   ),
                 ),
@@ -399,9 +400,9 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37).withOpacity(0.1),
+                  color: core_theme.AC.gold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+                  border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
                 ),
                 child: Row(
                   children: [
@@ -410,10 +411,10 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
                     ),
                     Text(_fmt(total),
-                        style: const TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
                     const SizedBox(width: 4),
-                    const Text('ر.س', style: TextStyle(fontSize: 12, color: Colors.black54)),
+                    Text('ر.س', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -424,13 +425,13 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -448,13 +449,13 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
   Color _statusColor(String s) {
     switch (s) {
       case 'matched':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'reconciling':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'investigating':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -487,13 +488,13 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
   Color _txnStatusColor(String s) {
     switch (s) {
       case 'matched':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'pending-match':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'discrepancy':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -513,19 +514,19 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
   Color _catColor(String c) {
     switch (c) {
       case 'revenue-cogs':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'inventory':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'intra-debt':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'dividends':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'royalties':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'services':
-        return Colors.green;
+        return core_theme.AC.ok;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

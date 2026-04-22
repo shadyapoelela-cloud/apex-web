@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 122 — Marketing Automation (HubSpot-class)
 class MarketingAutomationScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الحملات'), Tab(text: 'خطوط التسويق'), Tab(text: 'تقييم العملاء'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_campsTab(), _funnelsTab(), _leadsTab(), _analyticsTab()])),
       ])),
@@ -35,10 +36,10 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.campaign, color: Color(0xFFBF360C), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('أتمتة التسويق', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('حملات متعددة القنوات، Lead Scoring، Nurturing Automation', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('حملات متعددة القنوات، Lead Scoring، Nurturing Automation', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -54,7 +55,7 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -68,7 +69,7 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(c.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text(c.channel, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(c.channel, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(color: _statusColor(c.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
@@ -87,7 +88,7 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
   ]));
 
@@ -103,9 +104,9 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
           Text('${f.count}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFE65100))),
         ]),
         const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: ratio, minHeight: 10, backgroundColor: Colors.black12, valueColor: const AlwaysStoppedAnimation(Color(0xFFE65100)))),
+        ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: ratio, minHeight: 10, backgroundColor: core_theme.AC.bdr, valueColor: const AlwaysStoppedAnimation(Color(0xFFE65100)))),
         const SizedBox(height: 4),
-        Text('${(ratio * 100).toStringAsFixed(1)}% من البداية', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('${(ratio * 100).toStringAsFixed(1)}% من البداية', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -118,7 +119,7 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
       title: Text(l.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${l.company} • ${l.source}', style: const TextStyle(fontSize: 11)),
-        Text('${l.stage} • ${l.lastActivity}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('${l.stage} • ${l.lastActivity}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(color: _scoreColor(l.score).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
@@ -129,7 +130,7 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('🎯 ROI الحملات', '8.4x — كل ريال إنفاق يعود 8.4 ر.س', const Color(0xFF2E7D32)),
     _insight('📈 أفضل القنوات', 'LinkedIn 24% • Google 28% • WhatsApp 18% • البريد 12%', const Color(0xFFE65100)),
-    _insight('⭐ Lead Score متوسط', '65/100 — Hot Leads 22%', const Color(0xFFD4AF37)),
+    _insight('⭐ Lead Score متوسط', '65/100 — Hot Leads 22%', core_theme.AC.gold),
     _insight('🔄 Nurturing Workflows', '14 تلقائي نشط — معدل فتح 42%', const Color(0xFF4A148C)),
     _insight('💌 A/B Testing', 'النسخة B تفوز في 68% من الاختبارات', const Color(0xFF1A237E)),
     _insight('📊 Attribution Model', 'Multi-touch — أعلى من Last-click بـ 34%', const Color(0xFF2E7D32)),
@@ -138,13 +139,13 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _statusColor(String s) {
     if (s.contains('نشط')) return const Color(0xFF2E7D32);
-    if (s.contains('مجدول')) return const Color(0xFFD4AF37);
-    if (s.contains('منتهي')) return Colors.black54;
+    if (s.contains('مجدول')) return core_theme.AC.gold;
+    if (s.contains('منتهي')) return core_theme.AC.ts;
     if (s.contains('متوقف')) return const Color(0xFFC62828);
     return const Color(0xFF1A237E);
   }
@@ -168,7 +169,7 @@ class _MarketingAutomationScreenState extends State<MarketingAutomationScreen> w
   Color _scoreColor(int s) {
     if (s >= 80) return const Color(0xFFC62828);
     if (s >= 60) return const Color(0xFFE65100);
-    if (s >= 40) return const Color(0xFFD4AF37);
+    if (s >= 40) return core_theme.AC.gold;
     return const Color(0xFF1A237E);
   }
 

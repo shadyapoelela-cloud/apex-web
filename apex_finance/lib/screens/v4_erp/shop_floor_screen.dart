@@ -10,6 +10,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ShopFloorScreen extends StatefulWidget {
   const ShopFloorScreen({super.key});
@@ -19,8 +20,8 @@ class ShopFloorScreen extends StatefulWidget {
 }
 
 class _ShopFloorScreenState extends State<ShopFloorScreen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   static const _stations = <_Station>[
     _Station(name: 'محطة القطع 1', product: 'أريكة فاخرة', operator: 'أحمد', progress: 0.62, oee: 91, status: _MStatus.running),
@@ -54,23 +55,23 @@ class _ShopFloorScreenState extends State<ShopFloorScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const Icon(Icons.factory, color: _gold),
+                  Icon(Icons.factory, color: _gold),
                   const SizedBox(width: 8),
-                  const Text('إدارة خط الإنتاج (Shop Floor)',
+                  Text('إدارة خط الإنتاج (Shop Floor)',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: core_theme.AC.ok.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.circle, size: 8, color: Colors.green),
+                        Icon(Icons.circle, size: 8, color: core_theme.AC.ok),
                         SizedBox(width: 6),
                         Text('6 محطات نشطة · 1 متوقفة',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.green)),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.ok)),
                       ],
                     ),
                   ),
@@ -82,14 +83,14 @@ class _ShopFloorScreenState extends State<ShopFloorScreen> {
               color: Colors.white,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Row(
-                children: const [
-                  Expanded(child: _StatCard(icon: Icons.precision_manufacturing, label: 'OEE الإجمالي', value: '87%', color: Color(0xFFD4AF37))),
+                children: [
+                  Expanded(child: _StatCard(icon: Icons.precision_manufacturing, label: 'OEE الإجمالي', value: '87%', color: core_theme.AC.gold)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.done_all, label: 'منتج اليوم', value: '142 قطعة', color: Colors.green)),
+                  Expanded(child: _StatCard(icon: Icons.done_all, label: 'منتج اليوم', value: '142 قطعة', color: core_theme.AC.ok)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.report_problem, label: 'عيوب اليوم', value: '3', color: Colors.red)),
+                  Expanded(child: _StatCard(icon: Icons.report_problem, label: 'عيوب اليوم', value: '3', color: core_theme.AC.err)),
                   SizedBox(width: 10),
-                  Expanded(child: _StatCard(icon: Icons.schedule, label: 'زمن التوقف', value: '42 د', color: Colors.orange)),
+                  Expanded(child: _StatCard(icon: Icons.schedule, label: 'زمن التوقف', value: '42 د', color: core_theme.AC.warn)),
                 ],
               ),
             ),
@@ -106,7 +107,7 @@ class _ShopFloorScreenState extends State<ShopFloorScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('المحطات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                          Text('المحطات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                           const SizedBox(height: 8),
                           Expanded(
                             child: GridView.builder(
@@ -131,12 +132,12 @@ class _ShopFloorScreenState extends State<ShopFloorScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border(right: BorderSide(color: Colors.grey.shade200)),
+                      border: Border(right: BorderSide(color: core_theme.AC.bdr)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('أوامر الإنتاج',
+                        Text('أوامر الإنتاج',
                             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                         const SizedBox(height: 12),
                         Expanded(
@@ -203,9 +204,9 @@ class _StationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label, icon) = switch (station.status) {
-      _MStatus.running => (Colors.green, 'يعمل', Icons.play_arrow),
-      _MStatus.idle => (Colors.grey, 'متوقفة', Icons.pause),
-      _MStatus.down => (Colors.red, 'عطل', Icons.error),
+      _MStatus.running => (core_theme.AC.ok, 'يعمل', Icons.play_arrow),
+      _MStatus.idle => (core_theme.AC.td, 'متوقفة', Icons.pause),
+      _MStatus.down => (core_theme.AC.err, 'عطل', Icons.error),
     };
 
     return Container(
@@ -215,7 +216,7 @@ class _StationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: color.withOpacity(0.3), width: 2),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2)),
+          BoxShadow(color: core_theme.AC.tp.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -239,7 +240,7 @@ class _StationCard extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        color: station.oee > 90 ? Colors.green : (station.oee > 80 ? Colors.orange : Colors.red))),
+                        color: station.oee > 90 ? core_theme.AC.ok : (station.oee > 80 ? core_theme.AC.warn : core_theme.AC.err))),
             ],
           ),
           const SizedBox(height: 8),
@@ -247,9 +248,9 @@ class _StationCard extends StatelessWidget {
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 2),
           Text(station.product,
-              style: const TextStyle(fontSize: 11, color: Colors.black54), maxLines: 1, overflow: TextOverflow.ellipsis),
+              style: TextStyle(fontSize: 11, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis),
           Text('المشغل: ${station.operator}',
-              style: const TextStyle(fontSize: 10, color: Colors.black45), maxLines: 1, overflow: TextOverflow.ellipsis),
+              style: TextStyle(fontSize: 10, color: core_theme.AC.td), maxLines: 1, overflow: TextOverflow.ellipsis),
           const Spacer(),
           if (station.progress > 0)
             ClipRRect(
@@ -257,7 +258,7 @@ class _StationCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: station.progress,
                 minHeight: 6,
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: core_theme.AC.bdr,
                 color: color,
               ),
             ),
@@ -274,9 +275,9 @@ class _WOCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = switch (wo.priority) {
-      _Prio.high => (Colors.red, 'عاجل'),
-      _Prio.medium => (Colors.orange, 'متوسط'),
-      _Prio.low => (Colors.green, 'منخفض'),
+      _Prio.high => (core_theme.AC.err, 'عاجل'),
+      _Prio.medium => (core_theme.AC.warn, 'متوسط'),
+      _Prio.low => (core_theme.AC.ok, 'منخفض'),
     };
 
     return Container(
@@ -284,14 +285,14 @@ class _WOCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(wo.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+              Text(wo.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -304,7 +305,7 @@ class _WOCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(wo.product, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
           Text('الكمية: ${wo.qty} · متبقي ${wo.dueIn} يوم',
-              style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -314,8 +315,8 @@ class _WOCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: wo.progress,
                     minHeight: 6,
-                    backgroundColor: Colors.grey.shade200,
-                    color: const Color(0xFFD4AF37),
+                    backgroundColor: core_theme.AC.bdr,
+                    color: core_theme.AC.gold,
                   ),
                 ),
               ),

@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class FixedAssetsRegisterScreen extends StatefulWidget {
   const FixedAssetsRegisterScreen({super.key});
@@ -57,9 +58,9 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
         _buildStatsRow(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.list, size: 16), text: 'السجل'),
             Tab(icon: Icon(Icons.trending_down, size: 16), text: 'الإهلاك'),
@@ -90,7 +91,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
         gradient: const LinearGradient(colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.business, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -101,7 +102,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
                 Text('سجل الأصول الثابتة',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('تتبع كامل لدورة حياة الأصل: الاقتناء، الإهلاك، الصيانة، الاستبعاد',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -115,10 +116,10 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _stat('عدد الأصول', '${_assets.length}', Colors.blue, Icons.inventory),
+          _stat('عدد الأصول', '${_assets.length}', core_theme.AC.info, Icons.inventory),
           _stat('التكلفة الأصلية', _fmt(_totalCost), const Color(0xFF7B1FA2), Icons.shopping_cart),
-          _stat('مجمع الإهلاك', _fmt(_totalDepreciation), Colors.orange, Icons.trending_down),
-          _stat('القيمة الدفترية', _fmt(_totalNetBV), const Color(0xFFD4AF37), Icons.account_balance),
+          _stat('مجمع الإهلاك', _fmt(_totalDepreciation), core_theme.AC.warn, Icons.trending_down),
+          _stat('القيمة الدفترية', _fmt(_totalNetBV), core_theme.AC.gold, Icons.account_balance),
         ],
       ),
     );
@@ -142,7 +143,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -171,7 +172,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
@@ -179,8 +180,8 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     Expanded(child: Text('الرقم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 3, child: Text('الاسم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -188,7 +189,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
                     Expanded(child: Text('تاريخ الشراء', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('التكلفة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('العمر', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(child: Text('القيمة الدفترية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(child: Text('القيمة الدفترية', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                     Expanded(child: Text('الحالة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                   ],
                 ),
@@ -197,7 +198,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
@@ -222,7 +223,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
                       Expanded(child: Text('${a.lifeYears} سنة', style: const TextStyle(fontSize: 11))),
                       Expanded(
                         child: Text(_fmt(a.netBookValue),
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37))),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                       ),
                       Expanded(
                         child: Container(
@@ -252,13 +253,13 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFD4AF37) : Colors.grey.shade200,
+          color: selected ? core_theme.AC.gold : core_theme.AC.bdr,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text(label,
             style: TextStyle(
               fontSize: 12,
-              color: selected ? Colors.white : Colors.black87,
+              color: selected ? Colors.white : core_theme.AC.tp,
               fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
             )),
       ),
@@ -272,13 +273,13 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -290,7 +291,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
           ),
         ),
         const SizedBox(height: 16),
-        const Text('إهلاك الشهر الحالي', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+        Text('إهلاك الشهر الحالي', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
         const SizedBox(height: 10),
         for (final a in _assets.where((a) => a.status == 'نشط'))
           _depreciationRow(a),
@@ -298,16 +299,16 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFD4AF37).withOpacity(0.08),
+            color: core_theme.AC.gold.withOpacity(0.08),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+            border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('إجمالي إهلاك الشهر',
+              Text('إجمالي إهلاك الشهر',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-              Text(_fmt(_monthlyDepreciation), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+              Text(_fmt(_monthlyDepreciation), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
             ],
           ),
         ),
@@ -319,14 +320,14 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('تم إنشاء قيد الإهلاك — ${_fmt(_monthlyDepreciation)} ر.س'),
-                  backgroundColor: Colors.green,
+                  backgroundColor: core_theme.AC.ok,
                 ),
               );
             },
             icon: const Icon(Icons.book),
-            label: const Text('ترحيل قيد الإهلاك للشهر'),
+            label: Text('ترحيل قيد الإهلاك للشهر'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD4AF37),
+              backgroundColor: core_theme.AC.gold,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
@@ -347,7 +348,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -359,7 +360,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
               children: [
                 Text(a.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                 Text('${a.code} · عمر ${a.lifeYears} سنوات · $annualRate% سنوياً',
-                    style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -367,10 +368,10 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
             child: Text(_fmt(a.cost), style: const TextStyle(fontSize: 11)),
           ),
           Expanded(
-            child: Text(_fmt(a.netBookValue), style: const TextStyle(fontSize: 11, color: Colors.blue, fontWeight: FontWeight.w700)),
+            child: Text(_fmt(a.netBookValue), style: TextStyle(fontSize: 11, color: core_theme.AC.info, fontWeight: FontWeight.w700)),
           ),
           Expanded(
-            child: Text(_fmt(monthly), style: const TextStyle(fontSize: 13, color: Colors.orange, fontWeight: FontWeight.w900)),
+            child: Text(_fmt(monthly), style: TextStyle(fontSize: 13, color: core_theme.AC.warn, fontWeight: FontWeight.w900)),
           ),
         ],
       ),
@@ -394,26 +395,26 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isDone ? Colors.green.shade50 : Colors.amber.shade50,
+            color: isDone ? core_theme.AC.ok : core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: isDone ? Colors.green.shade200 : Colors.amber.shade200),
+            border: Border.all(color: isDone ? core_theme.AC.ok : core_theme.AC.warn),
           ),
           child: Row(
             children: [
               Icon(isDone ? Icons.check_circle : Icons.schedule,
-                  color: isDone ? Colors.green : Colors.amber.shade700),
+                  color: isDone ? core_theme.AC.ok : core_theme.AC.warn),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(m.description, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                    Text('${m.assetCode} · ${m.date}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text('${m.assetCode} · ${m.date}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
               Text(_fmt(m.cost), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
-              const Text(' ر.س', style: TextStyle(fontSize: 11, color: Colors.black54)),
+              Text(' ر.س', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ],
           ),
         );
@@ -428,16 +429,16 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.orange.shade50,
+            color: core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.orange.shade200),
+            border: Border.all(color: core_theme.AC.warn),
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.info_outline, color: Colors.orange),
+                  Icon(Icons.info_outline, color: core_theme.AC.warn),
                   SizedBox(width: 8),
                   Text('الأصول المرشّحة للاستبعاد',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
@@ -457,29 +458,29 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.red.shade200),
+              border: Border.all(color: core_theme.AC.err),
               borderRadius: BorderRadius.circular(10),
-              color: Colors.red.shade50,
+              color: core_theme.AC.err,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(a.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                 Text('${a.code} · ${a.category} · القيمة الدفترية: ${_fmt(a.netBookValue)} ر.س',
-                    style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(height: 10),
                 Row(
                   children: [
                     TextButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.sell, size: 14),
-                      label: const Text('استبعاد بالبيع'),
+                      label: Text('استبعاد بالبيع'),
                     ),
                     const SizedBox(width: 8),
                     TextButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.delete_forever, size: 14),
-                      label: const Text('استبعاد بالشطب'),
+                      label: Text('استبعاد بالشطب'),
                     ),
                   ],
                 ),
@@ -493,30 +494,30 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
   Color _catColor(String c) {
     switch (c) {
       case 'عقارات':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'معدات':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'مركبات':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'أثاث':
         return Colors.brown;
       case 'أجهزة':
-        return Colors.indigo;
+        return core_theme.AC.purple;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
   Color _statusColor(String s) {
     switch (s) {
       case 'نشط':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'متوقف':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'قيد الإنشاء':
-        return Colors.amber.shade700;
+        return core_theme.AC.warn;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_multi_view.dart';
 
@@ -35,15 +36,15 @@ class InvoicesMultiViewScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB).withOpacity(0.1),
+              color: core_theme.AC.info.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               '${invoices.length} فاتورة',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF2563EB),
+                color: core_theme.AC.info,
               ),
             ),
           ),
@@ -98,8 +99,8 @@ class _Invoice {
 Color _statusColor(_Status s) {
   switch (s) {
     case _Status.draft: return const Color(0xFF6B7280);
-    case _Status.sent: return const Color(0xFF2563EB);
-    case _Status.paid: return const Color(0xFF059669);
+    case _Status.sent: return core_theme.AC.info;
+    case _Status.paid: return core_theme.AC.ok;
     case _Status.overdue: return const Color(0xFFB91C1C);
   }
 }
@@ -129,7 +130,7 @@ class _ListView extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.black.withOpacity(0.1)),
+          border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
         ),
         child: DataTable(
           headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
@@ -201,7 +202,7 @@ class _KanbanView extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.06)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +241,7 @@ class _KanbanView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             child: Text(
               'الإجمالي: ${total.toStringAsFixed(0)} ر.س',
-              style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'),
+              style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'),
             ),
           ),
           for (final inv in items)
@@ -266,9 +267,9 @@ class _KanbanCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 4, offset: const Offset(0, 1)),
+          BoxShadow(color: core_theme.AC.tp.withOpacity(0.03), blurRadius: 4, offset: const Offset(0, 1)),
         ],
       ),
       child: Column(
@@ -276,7 +277,7 @@ class _KanbanCard extends StatelessWidget {
         children: [
           Text(
             invoice.id,
-            style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace'),
+            style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace'),
           ),
           const SizedBox(height: 2),
           Text(
@@ -293,11 +294,11 @@ class _KanbanCard extends StatelessWidget {
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
               ),
               const Spacer(),
-              Icon(Icons.event, size: 11, color: Colors.black45),
+              Icon(Icons.event, size: 11, color: core_theme.AC.td),
               const SizedBox(width: 2),
               Text(
                 invoice.dueDate.toString().substring(5, 10),
-                style: const TextStyle(fontSize: 10, color: Colors.black54),
+                style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
               ),
             ],
           ),
@@ -337,19 +338,19 @@ class _CalendarView extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.black.withOpacity(0.08)),
+            border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2563EB).withOpacity(0.05),
+                  color: core_theme.AC.info.withOpacity(0.05),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.event, size: 16, color: Color(0xFF2563EB)),
+                    Icon(Icons.event, size: 16, color: core_theme.AC.info),
                     const SizedBox(width: 8),
                     Text(
                       date,
@@ -358,7 +359,7 @@ class _CalendarView extends StatelessWidget {
                     const Spacer(),
                     Text(
                       '${items.length} فواتير · ${total.toStringAsFixed(0)} ر.س',
-                      style: const TextStyle(fontSize: 11, color: Colors.black54),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                     ),
                   ],
                 ),
@@ -382,7 +383,7 @@ class _CalendarView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(inv.customer, style: const TextStyle(fontWeight: FontWeight.w600)),
-                            Text(inv.id, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                            Text(inv.id, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                           ],
                         ),
                       ),
@@ -446,7 +447,7 @@ class _GalleryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,7 +466,7 @@ class _GalleryCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   invoice.id,
-                  style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'),
+                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'),
                 ),
               ),
             ],
@@ -533,7 +534,7 @@ class _PivotView extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black.withOpacity(0.1)),
+            border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
           ),
           child: DataTable(
             headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
@@ -555,12 +556,12 @@ class _PivotView extends StatelessWidget {
                       sumFor(c, m) > 0 ? '${sumFor(c, m).toStringAsFixed(0)}' : '—',
                       style: TextStyle(
                         fontFamily: 'monospace',
-                        color: sumFor(c, m) > 0 ? Colors.black87 : Colors.black26,
+                        color: sumFor(c, m) > 0 ? core_theme.AC.tp : core_theme.AC.td,
                       ),
                     )),
                   DataCell(Text(
                     '${months.fold(0.0, (s, m) => s + sumFor(c, m)).toStringAsFixed(0)} ر.س',
-                    style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w700, color: Color(0xFF059669)),
+                    style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w700, color: core_theme.AC.ok),
                   )),
                 ]),
               DataRow(
@@ -574,7 +575,7 @@ class _PivotView extends StatelessWidget {
                     )),
                   DataCell(Text(
                     '${invoices.fold(0.0, (s, i) => s + i.amount).toStringAsFixed(0)} ر.س',
-                    style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w900, color: Color(0xFF059669)),
+                    style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w900, color: core_theme.AC.ok),
                   )),
                 ],
               ),

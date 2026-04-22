@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class BcpScreen extends StatefulWidget {
   const BcpScreen({super.key});
@@ -15,22 +16,22 @@ class BcpScreen extends StatefulWidget {
 class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMixin {
   late final TabController _tab;
 
-  final _scenarios = const [
-    _Scenario('SCN-001', 'انقطاع كامل لمركز البيانات الرئيسي', 'IT', 'high', 4, 1, 'Hot standby في AWS + DNS failover تلقائي', 'مكتمل — آخر اختبار 2026-02-15', Colors.red),
-    _Scenario('SCN-002', 'هجوم Ransomware', 'Cyber', 'critical', 8, 2, 'عزل الشبكات + نسخ احتياطي غير متصل + استعادة من snapshot', 'اختبار سنوي — 2025-11-20', Colors.red),
-    _Scenario('SCN-003', 'فقدان الكهرباء في المبنى', 'Facility', 'medium', 2, 0, 'UPS + مولّد احتياطي 48 ساعة', 'اختبار نصف سنوي', Colors.orange),
-    _Scenario('SCN-004', 'جائحة / وباء', 'People', 'high', 24, 0, 'خطة عمل عن بُعد لـ 100% من الموظفين', 'تم التفعيل 2020 — مستمر', Colors.orange),
-    _Scenario('SCN-005', 'انقطاع الإنترنت', 'Network', 'medium', 1, 0, 'مزوّدين اثنين + 5G failover', 'اختبار شهري', Colors.blue),
-    _Scenario('SCN-006', 'كارثة طبيعية (زلزال/فيضان)', 'Facility', 'low', 72, 24, 'موقع احتياطي في جدة + نسخ عن بُعد', 'محاكاة سنوية', Colors.green),
-    _Scenario('SCN-007', 'فقدان موظف مفتاح مفاجئ', 'People', 'medium', 48, 0, 'خطط التعاقب Succession Plan موثقة', 'مراجعة ربعية', Colors.orange),
-    _Scenario('SCN-008', 'عطل رئيسي في مزود ERP (SAP)', 'Vendor', 'high', 6, 2, 'عقد SLA + مستشار SAP مستقل + نسخة محلية', 'اختبار سنوي', Colors.red),
+  final _scenarios = [
+    _Scenario('SCN-001', 'انقطاع كامل لمركز البيانات الرئيسي', 'IT', 'high', 4, 1, 'Hot standby في AWS + DNS failover تلقائي', 'مكتمل — آخر اختبار 2026-02-15', core_theme.AC.err),
+    _Scenario('SCN-002', 'هجوم Ransomware', 'Cyber', 'critical', 8, 2, 'عزل الشبكات + نسخ احتياطي غير متصل + استعادة من snapshot', 'اختبار سنوي — 2025-11-20', core_theme.AC.err),
+    _Scenario('SCN-003', 'فقدان الكهرباء في المبنى', 'Facility', 'medium', 2, 0, 'UPS + مولّد احتياطي 48 ساعة', 'اختبار نصف سنوي', core_theme.AC.warn),
+    _Scenario('SCN-004', 'جائحة / وباء', 'People', 'high', 24, 0, 'خطة عمل عن بُعد لـ 100% من الموظفين', 'تم التفعيل 2020 — مستمر', core_theme.AC.warn),
+    _Scenario('SCN-005', 'انقطاع الإنترنت', 'Network', 'medium', 1, 0, 'مزوّدين اثنين + 5G failover', 'اختبار شهري', core_theme.AC.info),
+    _Scenario('SCN-006', 'كارثة طبيعية (زلزال/فيضان)', 'Facility', 'low', 72, 24, 'موقع احتياطي في جدة + نسخ عن بُعد', 'محاكاة سنوية', core_theme.AC.ok),
+    _Scenario('SCN-007', 'فقدان موظف مفتاح مفاجئ', 'People', 'medium', 48, 0, 'خطط التعاقب Succession Plan موثقة', 'مراجعة ربعية', core_theme.AC.warn),
+    _Scenario('SCN-008', 'عطل رئيسي في مزود ERP (SAP)', 'Vendor', 'high', 6, 2, 'عقد SLA + مستشار SAP مستقل + نسخة محلية', 'اختبار سنوي', core_theme.AC.err),
   ];
 
-  final _sites = const [
-    _Site('المركز الرئيسي — الرياض', 'primary', 'active', '99.98%', 'تشغيل كامل · 380 موظف', Colors.green),
-    _Site('موقع DR — جدة', 'dr', 'hot-standby', '99.95%', 'جاهز للتفعيل · تزامن مستمر', Colors.blue),
-    _Site('سحابة AWS — الفرنكفورت', 'cloud-dr', 'active', '99.99%', 'تشغيل جزئي · DB replica', Colors.orange),
-    _Site('منازل الموظفين (VDI)', 'remote', 'active', '99.5%', '285 مستخدم متصل', Colors.purple),
+  final _sites = [
+    _Site('المركز الرئيسي — الرياض', 'primary', 'active', '99.98%', 'تشغيل كامل · 380 موظف', core_theme.AC.ok),
+    _Site('موقع DR — جدة', 'dr', 'hot-standby', '99.95%', 'جاهز للتفعيل · تزامن مستمر', core_theme.AC.info),
+    _Site('سحابة AWS — الفرنكفورت', 'cloud-dr', 'active', '99.99%', 'تشغيل جزئي · DB replica', core_theme.AC.warn),
+    _Site('منازل الموظفين (VDI)', 'remote', 'active', '99.5%', '285 مستخدم متصل', core_theme.AC.purple),
   ];
 
   @override
@@ -54,7 +55,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF4A148C),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF4A148C),
           tabs: const [
             Tab(icon: Icon(Icons.event, size: 16), text: 'السيناريوهات'),
@@ -84,7 +85,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
         gradient: const LinearGradient(colors: [Color(0xFFB71C1C), Color(0xFFD32F2F)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.health_and_safety, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -95,7 +96,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                 Text('استمرارية الأعمال والتعافي من الكوارث',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('BCP / DR — ISO 22301 · سيناريوهات · RTO/RPO · اختبارات دورية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -111,11 +112,11 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('سيناريوهات موثّقة', '${_scenarios.length}', Colors.blue, Icons.list),
-          _kpi('حرجة', '$critical', Colors.red, Icons.error),
-          _kpi('عالية', '$high', Colors.orange, Icons.warning),
-          _kpi('Max RTO', '72 ساعة', const Color(0xFFD4AF37), Icons.schedule),
-          _kpi('جاهزية BCP', '96%', Colors.green, Icons.verified),
+          _kpi('سيناريوهات موثّقة', '${_scenarios.length}', core_theme.AC.info, Icons.list),
+          _kpi('حرجة', '$critical', core_theme.AC.err, Icons.error),
+          _kpi('عالية', '$high', core_theme.AC.warn, Icons.warning),
+          _kpi('Max RTO', '72 ساعة', core_theme.AC.gold, Icons.schedule),
+          _kpi('جاهزية BCP', '96%', core_theme.AC.ok, Icons.verified),
         ],
       ),
     );
@@ -139,7 +140,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -181,7 +182,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                       children: [
                         Row(
                           children: [
-                            Text(s.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                            Text(s.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -192,7 +193,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                             const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                              decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                               child: Text(_categoryLabel(s.category),
                                   style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                             ),
@@ -208,24 +209,24 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
                         child: Column(
                           children: [
-                            const Text('RTO', style: TextStyle(fontSize: 9, color: Colors.black54)),
+                            Text('RTO', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                             Text('${s.rto}h',
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.blue)),
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.info)),
                           ],
                         ),
                       ),
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: const Color(0xFFD4AF37).withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
                         child: Column(
                           children: [
-                            const Text('RPO', style: TextStyle(fontSize: 9, color: Colors.black54)),
+                            Text('RPO', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                             Text('${s.rpo}h',
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
                           ],
                         ),
                       ),
@@ -236,13 +237,13 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(8)),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.bolt, size: 14, color: Color(0xFFD4AF37)),
+                    Icon(Icons.bolt, size: 14, color: core_theme.AC.gold),
                     const SizedBox(width: 6),
-                    const Text('خطة التعافي: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                    Text('خطة التعافي: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
                     Expanded(child: Text(s.recoveryPlan, style: const TextStyle(fontSize: 12, height: 1.5))),
                   ],
                 ),
@@ -250,10 +251,10 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
               const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(Icons.verified, size: 12, color: Colors.green),
+                  Icon(Icons.verified, size: 12, color: core_theme.AC.ok),
                   const SizedBox(width: 4),
                   Text(s.testStatus,
-                      style: const TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.w700)),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.ok, fontWeight: FontWeight.w700)),
                 ],
               ),
             ],
@@ -303,7 +304,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text(s.description, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                    Text(s.description, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -312,7 +313,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                 children: [
                   Text(s.availability,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: s.color, fontFamily: 'monospace')),
-                  const Text('Availability', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text('Availability', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ],
               ),
             ],
@@ -360,13 +361,13 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                   children: [
                     Row(
                       children: [
-                        Text(t.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                        Text(t.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                         const SizedBox(width: 8),
-                        Text(t.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        Text(t.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                       ],
                     ),
                     Text(t.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                    Text(t.notes, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text(t.notes, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   ],
                 ),
               ),
@@ -475,13 +476,13 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
   Color _testResultColor(String r) {
     switch (r) {
       case 'passed':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'passed-with-notes':
-        return Colors.amber.shade700;
+        return core_theme.AC.warn;
       case 'failed':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

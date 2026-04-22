@@ -15,6 +15,7 @@ import '../../core/apex_sticky_toolbar.dart';
 import '../../core/apex_white_label.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class Sprint43PlatformScreen extends StatefulWidget {
   const Sprint43PlatformScreen({super.key});
@@ -314,7 +315,7 @@ class _WhiteLabelTab extends StatefulWidget {
 }
 
 class _WhiteLabelTabState extends State<_WhiteLabelTab> {
-  WhiteLabelConfig _cfg = const WhiteLabelConfig();
+  WhiteLabelConfig _cfg = WhiteLabelConfig();
 
   @override
   Widget build(BuildContext context) {
@@ -453,7 +454,7 @@ class _AccessibilityTab extends StatelessWidget {
           _section(
             'التباين (Contrast)',
             Icons.contrast,
-            Colors.blue.shade300,
+            core_theme.AC.info,
             [
               _ContrastRow('نص رئيسي على خلفية Navy',
                   'AC.tp على AC.navy', 11.2, true),
@@ -498,7 +499,7 @@ class _AccessibilityTab extends StatelessWidget {
           _section(
             'أحجام اللمس (Touch Targets)',
             Icons.touch_app_outlined,
-            Colors.purple.shade300,
+            core_theme.AC.purple,
             [
               _CheckRow('كل الأزرار ≥ 44×44 px (WCAG 2.5.5 AAA)', true),
               _CheckRow('الفراغ بين الأهداف ≥ 8 px', true),

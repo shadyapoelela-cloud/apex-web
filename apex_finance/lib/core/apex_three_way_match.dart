@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 class MatchLine {
   final String sku;
@@ -181,8 +182,8 @@ class ApexThreeWayMatch extends StatelessWidget {
                       color: AC.td,
                       fontSize: AppFontSize.xs,
                       fontWeight: FontWeight.w700))),
-          Expanded(child: _colHead('PO', Colors.blue.shade300)),
-          Expanded(child: _colHead('GRN', Colors.purple.shade300)),
+          Expanded(child: _colHead('PO', core_theme.AC.info)),
+          Expanded(child: _colHead('GRN', core_theme.AC.purple)),
           Expanded(child: _colHead('Bill', AC.gold)),
           const SizedBox(width: 80),
         ],
@@ -233,11 +234,11 @@ class ApexThreeWayMatch extends StatelessWidget {
         ),
         Expanded(
           child: _cell('${l.poQty.toStringAsFixed(0)} × ${l.poPrice.toStringAsFixed(2)}',
-              Colors.blue.shade300, highlight: false),
+              core_theme.AC.info, highlight: false),
         ),
         Expanded(
           child: _cell(l.grnQty.toStringAsFixed(0),
-              Colors.purple.shade300,
+              core_theme.AC.purple,
               highlight: l.grnQty != l.poQty),
         ),
         Expanded(
@@ -278,7 +279,7 @@ class ApexThreeWayMatch extends StatelessWidget {
     final (color, label, icon) = switch (s) {
       MatchStatus.ok => (AC.ok, 'مطابق', Icons.check_circle),
       MatchStatus.qty => (AC.err, 'كمية', Icons.warning_amber),
-      MatchStatus.price => (Colors.amber.shade700, 'سعر', Icons.warning_amber),
+      MatchStatus.price => (core_theme.AC.warn, 'سعر', Icons.warning_amber),
       MatchStatus.both => (AC.err, 'الاثنين', Icons.error),
     };
     return Row(mainAxisSize: MainAxisSize.min, children: [

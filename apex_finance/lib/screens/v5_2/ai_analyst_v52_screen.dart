@@ -2,14 +2,15 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/object_page_template.dart';
 
 class AiAnalystV52Screen extends StatelessWidget {
   const AiAnalystV52Screen({super.key});
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
-  static const _purple = Color(0xFF4A148C);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
+  static final _purple = Color(0xFF4A148C);
 
   @override
   Widget build(BuildContext context) {
@@ -18,21 +19,21 @@ class AiAnalystV52Screen extends StatelessWidget {
       subtitleAr: 'Claude 4 Opus · تحليل مستمر لبياناتك المالية · 24 رؤية جديدة هذا الأسبوع',
       statusLabelAr: 'نشط · AI',
       statusColor: _gold,
-      smartButtons: const [
+      smartButtons: [
         SmartButton(icon: Icons.psychology, labelAr: 'رؤية', count: 24, color: _gold),
-        SmartButton(icon: Icons.warning, labelAr: 'تنبيه حرج', count: 3, color: Colors.red),
-        SmartButton(icon: Icons.trending_up, labelAr: 'فرصة', count: 8, color: Colors.green),
+        SmartButton(icon: Icons.warning, labelAr: 'تنبيه حرج', count: 3, color: core_theme.AC.err),
+        SmartButton(icon: Icons.trending_up, labelAr: 'فرصة', count: 8, color: core_theme.AC.ok),
         SmartButton(icon: Icons.lightbulb, labelAr: 'توصية', count: 12, color: _navy),
         SmartButton(icon: Icons.chat, labelAr: 'محادثة', count: 45, color: _purple),
       ],
       primaryActions: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.refresh, size: 16), label: const Text('تحليل جديد')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.refresh, size: 16), label: Text('تحليل جديد')),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: () {},
           style: FilledButton.styleFrom(backgroundColor: _gold),
           icon: const Icon(Icons.auto_awesome, size: 16),
-          label: const Text('اسأل المحلل'),
+          label: Text('اسأل المحلل'),
         ),
       ],
       tabs: [
@@ -64,14 +65,14 @@ class AiAnalystV52Screen extends StatelessWidget {
         'تحسين كبير في دورة التحصيل',
         'متوسط DSO انخفض من 42 يوم إلى 28 يوم — تحسّن 33%. يعزى للتذكيرات الآلية وبرنامج الخصم المبكر 2%.',
         'medium',
-        Colors.green,
+        core_theme.AC.ok,
       ),
       (
         '⚠️',
         'تركّز مخاطر في قطاع الإنشاءات',
         '3 عملاء يمثلون 68% من الذمم المدينة >90 يوم في قطاع الإنشاءات. ينصح بإعادة تقييم حدود الائتمان.',
         'high',
-        Colors.orange,
+        core_theme.AC.warn,
       ),
       (
         '🎯',
@@ -92,7 +93,7 @@ class AiAnalystV52Screen extends StatelessWidget {
         'نمط موسمي مكتشَف',
         'AI اكتشف نمطاً موسمياً قوياً: انخفاض 22% في يوليو-أغسطس (بسبب الإجازات). ينصح بتخطيط الكاش فلو وفقاً لذلك.',
         'low',
-        Colors.blue,
+        core_theme.AC.info,
       ),
     ];
     return ListView.separated(
@@ -112,13 +113,13 @@ class AiAnalystV52Screen extends StatelessWidget {
               Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(_priority(priority), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: color))),
             ]),
             const SizedBox(height: 8),
-            Text(body, style: const TextStyle(fontSize: 12, height: 1.5, color: Colors.black87)),
+            Text(body, style: TextStyle(fontSize: 12, height: 1.5, color: core_theme.AC.tp)),
             const SizedBox(height: 10),
             Row(children: [
-              TextButton.icon(onPressed: () {}, icon: const Icon(Icons.arrow_forward, size: 14), label: const Text('استكشاف', style: TextStyle(fontSize: 11))),
-              TextButton.icon(onPressed: () {}, icon: const Icon(Icons.share, size: 14), label: const Text('مشاركة', style: TextStyle(fontSize: 11))),
+              TextButton.icon(onPressed: () {}, icon: const Icon(Icons.arrow_forward, size: 14), label: Text('استكشاف', style: TextStyle(fontSize: 11))),
+              TextButton.icon(onPressed: () {}, icon: const Icon(Icons.share, size: 14), label: Text('مشاركة', style: TextStyle(fontSize: 11))),
               const Spacer(),
-              Text('قبل 2 ساعة', style: TextStyle(fontSize: 10, color: Colors.grey.shade500)),
+              Text('قبل 2 ساعة', style: TextStyle(fontSize: 10, color: core_theme.AC.td)),
             ]),
           ]),
         );
@@ -140,16 +141,16 @@ class AiAnalystV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: alerts[i].$4 == 'critical' ? Colors.red.withOpacity(0.05) : Colors.orange.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: alerts[i].$4 == 'critical' ? Colors.red : Colors.orange, width: 1.5)),
+        decoration: BoxDecoration(color: alerts[i].$4 == 'critical' ? core_theme.AC.err.withOpacity(0.05) : core_theme.AC.warn.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: alerts[i].$4 == 'critical' ? core_theme.AC.err : core_theme.AC.warn, width: 1.5)),
         child: Row(children: [
           Text(alerts[i].$1, style: const TextStyle(fontSize: 26)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(alerts[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
             const SizedBox(height: 4),
-            Text(alerts[i].$3, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.4)),
+            Text(alerts[i].$3, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.4)),
           ])),
-          OutlinedButton(onPressed: () {}, child: const Text('معالجة', style: TextStyle(fontSize: 11))),
+          OutlinedButton(onPressed: () {}, child: Text('معالجة', style: TextStyle(fontSize: 11))),
         ]),
       ),
     );
@@ -168,20 +169,20 @@ class AiAnalystV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.green.withOpacity(0.04), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.green.withOpacity(0.3))),
+        decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.04), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
         child: Row(children: [
           Text(ops[i].$1, style: const TextStyle(fontSize: 28)),
           const SizedBox(width: 12),
           Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(ops[i].$2, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-            Text(ops[i].$3, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(ops[i].$3, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Text('القيمة', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-            Text(ops[i].$4, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.green)),
+            Text('القيمة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+            Text(ops[i].$4, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
           ]),
           const SizedBox(width: 12),
-          FilledButton(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: Colors.green, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10)), child: const Text('تطبيق', style: TextStyle(fontSize: 11))),
+          FilledButton(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: core_theme.AC.ok, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10)), child: Text('تطبيق', style: TextStyle(fontSize: 11))),
         ]),
       ),
     );
@@ -194,26 +195,26 @@ class AiAnalystV52Screen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withOpacity(0.08), _gold.withOpacity(0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
-          child: const Row(children: [
+          child: Row(children: [
             Icon(Icons.timeline, color: _purple, size: 28),
             SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('نموذج التوقّعات AI', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: _purple)),
-              Text('دقة النموذج 94.2% · تحديث يومي · يعتمد على LSTM + Transformer', style: TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('دقة النموذج 94.2% · تحديث يومي · يعتمد على LSTM + Transformer', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
           ]),
         ),
         const SizedBox(height: 20),
-        const Text('توقّعات الإيرادات — الربع القادم', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توقّعات الإيرادات — الربع القادم', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 12),
         ...[
-          ('مايو 2026', 5.2, 6.1, 5.6, Colors.green),
+          ('مايو 2026', 5.2, 6.1, 5.6, core_theme.AC.ok),
           ('يونيو 2026', 4.8, 5.9, 5.4, _gold),
-          ('يوليو 2026', 4.2, 5.1, 4.6, Colors.orange),
+          ('يوليو 2026', 4.2, 5.1, 4.6, core_theme.AC.warn),
         ].map((m) => Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
                   Expanded(child: Text(m.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
@@ -221,9 +222,9 @@ class AiAnalystV52Screen extends StatelessWidget {
                 ]),
                 const SizedBox(height: 8),
                 Row(children: [
-                  SizedBox(width: 100, child: Text('الحد الأدنى ${m.$2}M', style: const TextStyle(fontSize: 10, color: Colors.black54))),
-                  Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: (m.$4 - m.$2) / (m.$3 - m.$2), minHeight: 8, backgroundColor: Colors.grey.shade200, color: m.$5))),
-                  SizedBox(width: 100, child: Text('الحد الأعلى ${m.$3}M', style: const TextStyle(fontSize: 10, color: Colors.black54), textAlign: TextAlign.end)),
+                  SizedBox(width: 100, child: Text('الحد الأدنى ${m.$2}M', style: TextStyle(fontSize: 10, color: core_theme.AC.ts))),
+                  Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: (m.$4 - m.$2) / (m.$3 - m.$2), minHeight: 8, backgroundColor: core_theme.AC.bdr, color: m.$5))),
+                  SizedBox(width: 100, child: Text('الحد الأعلى ${m.$3}M', style: TextStyle(fontSize: 10, color: core_theme.AC.ts), textAlign: TextAlign.end)),
                 ]),
               ]),
             )),
@@ -245,20 +246,20 @@ class AiAnalystV52Screen extends StatelessWidget {
       )),
       Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: Colors.grey.shade200))),
+        decoration: BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: core_theme.AC.bdr))),
         child: Row(children: [
-          IconButton(icon: const Icon(Icons.attach_file, color: _gold), onPressed: () {}),
+          IconButton(icon: Icon(Icons.attach_file, color: _gold), onPressed: () {}),
           Expanded(child: TextField(
             decoration: InputDecoration(
               hintText: 'اسأل المحلل الذكي...',
               filled: true,
-              fillColor: Colors.grey.shade50,
+              fillColor: core_theme.AC.navy3,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             ),
           )),
           const SizedBox(width: 6),
-          FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.send, size: 16), label: const Text('إرسال')),
+          FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _gold), icon: const Icon(Icons.send, size: 16), label: Text('إرسال')),
         ]),
       ),
     ]);
@@ -268,25 +269,25 @@ class AiAnalystV52Screen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        if (!isMe) CircleAvatar(radius: 16, backgroundColor: _gold.withOpacity(0.15), child: const Icon(Icons.auto_awesome, color: _gold, size: 16)),
+        if (!isMe) CircleAvatar(radius: 16, backgroundColor: _gold.withOpacity(0.15), child: Icon(Icons.auto_awesome, color: _gold, size: 16)),
         if (!isMe) const SizedBox(width: 8),
         Flexible(
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isMe ? _navy.withOpacity(0.08) : Colors.grey.shade50,
+              color: isMe ? _navy.withOpacity(0.08) : core_theme.AC.navy3,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isMe ? _navy.withOpacity(0.2) : Colors.grey.shade200),
+              border: Border.all(color: isMe ? _navy.withOpacity(0.2) : core_theme.AC.bdr),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(name, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.black54)),
+              Text(name, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
               const SizedBox(height: 4),
               Text(text, style: const TextStyle(fontSize: 13, height: 1.5)),
             ]),
           ),
         ),
         if (isMe) const SizedBox(width: 8),
-        if (isMe) CircleAvatar(radius: 16, backgroundColor: _navy.withOpacity(0.15), child: const Icon(Icons.person, color: _navy, size: 16)),
+        if (isMe) CircleAvatar(radius: 16, backgroundColor: _navy.withOpacity(0.15), child: Icon(Icons.person, color: _navy, size: 16)),
       ]),
     );
   }

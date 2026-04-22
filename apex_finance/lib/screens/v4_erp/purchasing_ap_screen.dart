@@ -12,6 +12,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_find_and_recode.dart';
 import '../../core/v5/apex_v5_risk_badge.dart';
@@ -42,7 +43,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFFF9FAFB),
                 border: Border(
-                  bottom: BorderSide(color: Colors.black.withOpacity(0.08)),
+                  bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)),
                 ),
               ),
               child: Row(
@@ -101,20 +102,20 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFFD4AF37).withOpacity(0.15),
+          color: core_theme.AC.gold.withOpacity(0.15),
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4)),
+          border: Border.all(color: core_theme.AC.gold.withOpacity(0.4)),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: const Color(0xFFD4AF37)),
+            Icon(icon, size: 14, color: core_theme.AC.gold),
             const SizedBox(width: 6),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFFD4AF37),
+                color: core_theme.AC.gold,
               ),
             ),
           ],
@@ -131,14 +132,14 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
         margin: const EdgeInsets.only(right: 4),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: Colors.black54),
+            Icon(icon, size: 14, color: core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.black54,
+                color: core_theme.AC.ts,
               ),
             ),
           ],
@@ -150,11 +151,11 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
   Widget _moreMenu() {
     return PopupMenuButton<String>(
       tooltip: 'المزيد',
-      icon: const Row(
+      icon: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('المزيد', style: TextStyle(fontSize: 12, color: Colors.black54)),
-          Icon(Icons.arrow_drop_down, size: 16, color: Colors.black54),
+          Text('المزيد', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
+          Icon(Icons.arrow_drop_down, size: 16, color: core_theme.AC.ts),
         ],
       ),
       itemBuilder: (ctx) => [
@@ -173,7 +174,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
       value: val,
       child: Row(
         children: [
-          Icon(icon, size: 14, color: Colors.black54),
+          Icon(icon, size: 14, color: core_theme.AC.ts),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(fontSize: 12)),
         ],
@@ -202,24 +203,24 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildStatsRow([
-            _Stat('إجمالي الموردين', '47', Icons.business, const Color(0xFF2563EB)),
-            _Stat('معتمدون', '42', Icons.check_circle, const Color(0xFF059669)),
-            _Stat('جدد هذا الشهر', '5', Icons.person_add, const Color(0xFFD97706)),
-            _Stat('قيد المراجعة', '3', Icons.hourglass_bottom, const Color(0xFF7C3AED)),
+            _Stat('إجمالي الموردين', '47', Icons.business, core_theme.AC.info),
+            _Stat('معتمدون', '42', Icons.check_circle, core_theme.AC.ok),
+            _Stat('جدد هذا الشهر', '5', Icons.person_add, core_theme.AC.warn),
+            _Stat('قيد المراجعة', '3', Icons.hourglass_bottom, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text('قائمة الموردين', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              Text('قائمة الموردين', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               const Spacer(),
               _searchField(),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.add, size: 14),
-                label: const Text('مورد جديد'),
+                label: Text('مورد جديد'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD4AF37),
+                  backgroundColor: core_theme.AC.gold,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -230,7 +231,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
@@ -240,7 +241,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF9FAFB),
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                    border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.06))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06))),
                   ),
                   child: Row(
                     children: [
@@ -299,22 +300,22 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildStatsRow([
-            _Stat('PO مفتوحة', '12', Icons.shopping_cart, const Color(0xFF2563EB)),
-            _Stat('قيد الاستلام', '5', Icons.local_shipping, const Color(0xFFD97706)),
-            _Stat('اكتمل الاستلام', '28', Icons.check_circle, const Color(0xFF059669)),
-            _Stat('قيمة إجمالية', '1.2M ر.س', Icons.attach_money, const Color(0xFFD4AF37)),
+            _Stat('PO مفتوحة', '12', Icons.shopping_cart, core_theme.AC.info),
+            _Stat('قيد الاستلام', '5', Icons.local_shipping, core_theme.AC.warn),
+            _Stat('اكتمل الاستلام', '28', Icons.check_circle, core_theme.AC.ok),
+            _Stat('قيمة إجمالية', '1.2M ر.س', Icons.attach_money, core_theme.AC.gold),
           ]),
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text('أوامر الشراء', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              Text('أوامر الشراء', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.add, size: 14),
-                label: const Text('PO جديد'),
+                label: Text('PO جديد'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD4AF37),
+                  backgroundColor: core_theme.AC.gold,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -352,28 +353,28 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildStatsRow([
-            _Stat('فواتير لم تُدفع', '17', Icons.pending, const Color(0xFFD97706)),
-            _Stat('3-Way Match ✓', '12', Icons.verified, const Color(0xFF059669)),
+            _Stat('فواتير لم تُدفع', '17', Icons.pending, core_theme.AC.warn),
+            _Stat('3-Way Match ✓', '12', Icons.verified, core_theme.AC.ok),
             _Stat('بحاجة مراجعة', '3', Icons.warning, const Color(0xFFB91C1C)),
-            _Stat('مبلغ مستحق', '428K ر.س', Icons.payments, const Color(0xFFD4AF37)),
+            _Stat('مبلغ مستحق', '428K ر.س', Icons.payments, core_theme.AC.gold),
           ]),
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text('الفواتير (Bills)', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              Text('الفواتير (Bills)', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               const Spacer(),
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.upload, size: 14),
-                label: const Text('رفع PDF'),
+                label: Text('رفع PDF'),
               ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.add, size: 14),
-                label: const Text('فاتورة جديدة'),
+                label: Text('فاتورة جديدة'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD4AF37),
+                  backgroundColor: core_theme.AC.gold,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -384,7 +385,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
@@ -420,24 +421,24 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildStatsRow([
-            _Stat('مدفوع هذا الشهر', '1.8M ر.س', Icons.payment, const Color(0xFF059669)),
-            _Stat('مستحق خلال أسبوع', '420K ر.س', Icons.event, const Color(0xFFD97706)),
-            _Stat('بطاقات الشركات', '87K ر.س', Icons.credit_card, const Color(0xFF2563EB)),
-            _Stat('ضريبة استقطاع', '24K ر.س', Icons.money_off, const Color(0xFF7C3AED)),
+            _Stat('مدفوع هذا الشهر', '1.8M ر.س', Icons.payment, core_theme.AC.ok),
+            _Stat('مستحق خلال أسبوع', '420K ر.س', Icons.event, core_theme.AC.warn),
+            _Stat('بطاقات الشركات', '87K ر.س', Icons.credit_card, core_theme.AC.info),
+            _Stat('ضريبة استقطاع', '24K ر.س', Icons.money_off, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
-          const Text('المدفوعات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('المدفوعات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(40),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(Icons.payments, size: 56, color: Colors.black26),
+                Icon(Icons.payments, size: 56, color: core_theme.AC.td),
                 SizedBox(height: 12),
                 Text(
                   'شاشة المدفوعات قيد التطوير',
@@ -446,7 +447,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
                 SizedBox(height: 6),
                 Text(
                   'دفع جماعي + WPS + تكامل Mada/STC Pay',
-                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                  style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                 ),
               ],
             ),
@@ -463,24 +464,24 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildStatsRow([
-            _Stat('استلم اليوم', '3', Icons.local_shipping, const Color(0xFF059669)),
-            _Stat('بانتظار الاستلام', '5', Icons.schedule, const Color(0xFFD97706)),
+            _Stat('استلم اليوم', '3', Icons.local_shipping, core_theme.AC.ok),
+            _Stat('بانتظار الاستلام', '5', Icons.schedule, core_theme.AC.warn),
             _Stat('اعتراضات', '1', Icons.warning, const Color(0xFFB91C1C)),
-            _Stat('اكتمل الاستلام', '43 هذا الشهر', Icons.check_circle, const Color(0xFF059669)),
+            _Stat('اكتمل الاستلام', '43 هذا الشهر', Icons.check_circle, core_theme.AC.ok),
           ]),
           const SizedBox(height: 16),
-          const Text('إيصالات الاستلام', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('إيصالات الاستلام', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(40),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(Icons.inventory, size: 56, color: Colors.black26),
+                Icon(Icons.inventory, size: 56, color: core_theme.AC.td),
                 SizedBox(height: 12),
                 Text(
                   'شاشة استلام البضاعة قيد التطوير',
@@ -489,7 +490,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
                 SizedBox(height: 6),
                 Text(
                   'Barcode scan + 3-way match + QC gate',
-                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                  style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                 ),
               ],
             ),
@@ -529,7 +530,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
                         ),
                         Text(
                           s.label,
-                          style: const TextStyle(fontSize: 10, color: Colors.black54),
+                          style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
                         ),
                       ],
                     ),
@@ -770,8 +771,8 @@ class _VendorRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xFFD4AF37).withOpacity(0.05) : null,
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        color: selected ? core_theme.AC.gold.withOpacity(0.05) : null,
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         children: [
@@ -785,20 +786,20 @@ class _VendorRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(vendor.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                Text(vendor.id, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                Text(vendor.id, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
               ],
             ),
           ),
           Expanded(
             child: Text(
               vendor.vat,
-              style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54),
+              style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts),
             ),
           ),
           Expanded(
             child: Row(
               children: [
-                const Icon(Icons.star, size: 12, color: Color(0xFFD97706)),
+                Icon(Icons.star, size: 12, color: core_theme.AC.warn),
                 const SizedBox(width: 3),
                 Text(
                   vendor.rating.toStringAsFixed(1),
@@ -813,7 +814,7 @@ class _VendorRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: vendor.openBills > 0 ? const Color(0xFFD97706) : Colors.black54,
+                color: vendor.openBills > 0 ? core_theme.AC.warn : core_theme.AC.ts,
               ),
             ),
           ),
@@ -824,7 +825,7 @@ class _VendorRow extends StatelessWidget {
                 fontSize: 12,
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.w700,
-                color: vendor.balance > 0 ? const Color(0xFFB91C1C) : Colors.black54,
+                color: vendor.balance > 0 ? const Color(0xFFB91C1C) : core_theme.AC.ts,
               ),
             ),
           ),
@@ -841,12 +842,12 @@ class _POCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = po.status == 'received'
-        ? const Color(0xFF059669)
+        ? core_theme.AC.ok
         : po.status == 'partially_received'
-            ? const Color(0xFFD97706)
+            ? core_theme.AC.warn
             : po.status == 'open'
-                ? const Color(0xFF2563EB)
-                : const Color(0xFF7C3AED);
+                ? core_theme.AC.info
+                : core_theme.AC.purple;
     final statusLabel = po.status == 'received'
         ? 'استُلم'
         : po.status == 'partially_received'
@@ -860,14 +861,14 @@ class _POCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(po.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+              Text(po.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -897,14 +898,14 @@ class _POCard extends StatelessWidget {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: po.progress,
-            backgroundColor: Colors.black.withOpacity(0.06),
+            backgroundColor: core_theme.AC.tp.withOpacity(0.06),
             valueColor: AlwaysStoppedAnimation(statusColor),
             minHeight: 4,
           ),
           const SizedBox(height: 4),
           Text(
             'الاستلام: ${(po.progress * 100).toInt()}%',
-            style: const TextStyle(fontSize: 10, color: Colors.black54),
+            style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
           ),
         ],
       ),
@@ -924,8 +925,8 @@ class _BillRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xFFD4AF37).withOpacity(0.05) : null,
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        color: selected ? core_theme.AC.gold.withOpacity(0.05) : null,
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         children: [
@@ -934,11 +935,11 @@ class _BillRow extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(bill.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+              Text(bill.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
               if (bill.po != null)
                 Text(
                   '→ ${bill.po}',
-                  style: const TextStyle(fontSize: 10, color: Colors.black45, fontFamily: 'monospace'),
+                  style: TextStyle(fontSize: 10, color: core_theme.AC.td, fontFamily: 'monospace'),
                 ),
             ],
           ),
@@ -951,7 +952,7 @@ class _BillRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: bill.threeWay
-                  ? const Color(0xFF059669).withOpacity(0.12)
+                  ? core_theme.AC.ok.withOpacity(0.12)
                   : const Color(0xFFB91C1C).withOpacity(0.12),
               borderRadius: BorderRadius.circular(4),
             ),
@@ -960,7 +961,7 @@ class _BillRow extends StatelessWidget {
                 Icon(
                   bill.threeWay ? Icons.verified : Icons.warning,
                   size: 11,
-                  color: bill.threeWay ? const Color(0xFF059669) : const Color(0xFFB91C1C),
+                  color: bill.threeWay ? core_theme.AC.ok : const Color(0xFFB91C1C),
                 ),
                 const SizedBox(width: 3),
                 Text(
@@ -968,7 +969,7 @@ class _BillRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: bill.threeWay ? const Color(0xFF059669) : const Color(0xFFB91C1C),
+                    color: bill.threeWay ? core_theme.AC.ok : const Color(0xFFB91C1C),
                   ),
                 ),
               ],
@@ -980,7 +981,7 @@ class _BillRow extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             bill.dueDate,
-            style: const TextStyle(fontSize: 11, color: Colors.black54),
+            style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
           ),
           const SizedBox(width: 16),
           SizedBox(

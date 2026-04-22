@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// 🎉 Wave 125 — AI Financial Analyst (Capstone MILESTONE)
 class AiFinancialAnalystScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الرؤى الذكية'), Tab(text: 'التنبؤات'), Tab(text: 'المخاطر'), Tab(text: 'محادثة AI')])),
         Expanded(child: TabBarView(controller: _tc, children: [_insightsTab(), _forecastsTab(), _risksTab(), _chatTab()])),
       ])),
@@ -33,26 +34,26 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFFFD700)]),
+        gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFFFD700)]),
         borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.auto_awesome, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('🎉 المحلل المالي AI — Wave 125', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('ذكاء اصطناعي يفهم أعمالك ويقدم توصيات استراتيجية', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('ذكاء اصطناعي يفهم أعمالك ويقدم توصيات استراتيجية', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
       Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
-        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.auto_awesome, color: Color(0xFFD4AF37), size: 16), SizedBox(width: 4),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(Icons.auto_awesome, color: core_theme.AC.gold, size: 16), SizedBox(width: 4),
           Text('Claude 4', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
         ])),
     ]),
   );
 
   Widget _kpis() => Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
-    Expanded(child: _kpi('رؤى اليوم', '42', Icons.lightbulb, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('رؤى اليوم', '42', Icons.lightbulb, core_theme.AC.gold)),
     Expanded(child: _kpi('دقة التنبؤ', '94%', Icons.trending_up, const Color(0xFF2E7D32))),
     Expanded(child: _kpi('مخاطر مكتشفة', '${_risks.length}', Icons.warning, const Color(0xFFE65100))),
     Expanded(child: _kpi('محادثات', '1,248', Icons.chat, const Color(0xFF4A148C))),
@@ -62,7 +63,7 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -82,12 +83,12 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
             child: Text(ins.priority, style: TextStyle(color: ins.color, fontSize: 9, fontWeight: FontWeight.bold))),
         ]),
         const SizedBox(height: 10),
-        Text(ins.description, style: const TextStyle(fontSize: 12.5, color: Colors.black87)),
+        Text(ins.description, style: TextStyle(fontSize: 12.5, color: core_theme.AC.tp)),
         const SizedBox(height: 10),
         Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(
           color: const Color(0xFFFFF8E1), borderRadius: BorderRadius.circular(8)),
           child: Row(children: [
-            const Icon(Icons.recommend, color: Color(0xFFD4AF37), size: 16),
+            Icon(Icons.recommend, color: core_theme.AC.gold, size: 16),
             const SizedBox(width: 6),
             Expanded(child: Text('التوصية: ${ins.recommendation}', style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500))),
           ])),
@@ -106,13 +107,13 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
         const SizedBox(height: 8),
         Row(children: [
           Expanded(child: _forecastCard('الحالي', f.current, const Color(0xFF1A237E))),
-          const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.arrow_forward, color: Colors.black54)),
-          Expanded(child: _forecastCard('90 يوم', f.forecast90, const Color(0xFFD4AF37))),
-          const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.arrow_forward, color: Colors.black54)),
+          Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.arrow_forward, color: core_theme.AC.ts)),
+          Expanded(child: _forecastCard('90 يوم', f.forecast90, core_theme.AC.gold)),
+          Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.arrow_forward, color: core_theme.AC.ts)),
           Expanded(child: _forecastCard('سنة', f.forecastYear, const Color(0xFF2E7D32))),
         ]),
         const SizedBox(height: 8),
-        Text(f.narrative, style: const TextStyle(fontSize: 11.5, color: Colors.black87)),
+        Text(f.narrative, style: TextStyle(fontSize: 11.5, color: core_theme.AC.tp)),
       ]),
     ));
   });
@@ -120,7 +121,7 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
   Widget _forecastCard(String l, String v, Color c) => Container(padding: const EdgeInsets.all(8),
     decoration: BoxDecoration(color: c.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
     child: Column(children: [
-      Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+      Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       Text(v, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: c)),
     ]),
   );
@@ -143,13 +144,13 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
         Text(r.description, style: const TextStyle(fontSize: 11.5)),
         const SizedBox(height: 6),
         Row(children: [
-          const Icon(Icons.timeline, size: 12, color: Colors.black54),
+          Icon(Icons.timeline, size: 12, color: core_theme.AC.ts),
           const SizedBox(width: 4),
-          Text('احتمالية: ${r.probability}%', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text('احتمالية: ${r.probability}%', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           const SizedBox(width: 12),
-          const Icon(Icons.attach_money, size: 12, color: Colors.black54),
+          Icon(Icons.attach_money, size: 12, color: core_theme.AC.ts),
           const SizedBox(width: 4),
-          Text('أثر مالي: ${r.impact}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text('أثر مالي: ${r.impact}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ]),
       ]),
     ));
@@ -160,31 +161,31 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
       final m = _chat[i];
       return Padding(padding: const EdgeInsets.only(bottom: 8),
         child: Row(mainAxisAlignment: m.isAi ? MainAxisAlignment.start : MainAxisAlignment.end, children: [
-          if (m.isAi) Container(padding: const EdgeInsets.all(6), decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [Color(0xFF4A148C), Color(0xFFD4AF37)]), shape: BoxShape.circle),
+          if (m.isAi) Container(padding: const EdgeInsets.all(6), decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [Color(0xFF4A148C), core_theme.AC.gold]), shape: BoxShape.circle),
             child: const Icon(Icons.auto_awesome, color: Colors.white, size: 16)),
           if (m.isAi) const SizedBox(width: 8),
           Flexible(child: Container(padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: m.isAi ? Colors.white : const Color(0xFF4A148C),
               borderRadius: BorderRadius.circular(14),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)],
+              boxShadow: [BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.05), blurRadius: 4)],
             ),
-            child: Text(m.message, style: TextStyle(fontSize: 13, color: m.isAi ? Colors.black87 : Colors.white)))),
+            child: Text(m.message, style: TextStyle(fontSize: 13, color: m.isAi ? core_theme.AC.tp : Colors.white)))),
           if (!m.isAi) const SizedBox(width: 8),
           if (!m.isAi) const CircleAvatar(radius: 16, backgroundColor: Color(0xFF1A237E), child: Icon(Icons.person, color: Colors.white, size: 16)),
         ]),
       );
     })),
-    Container(padding: const EdgeInsets.all(12), decoration: const BoxDecoration(
-      color: Colors.white, boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)]),
+    Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(
+      color: Colors.white, boxShadow: [BoxShadow(color: core_theme.AC.td, blurRadius: 4)]),
       child: Row(children: [
         Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(color: const Color(0xFFF5F5F7), borderRadius: BorderRadius.circular(24)),
-          child: const Text('اسألني أي شيء عن أعمالك...', style: TextStyle(color: Colors.black45)))),
+          child: Text('اسألني أي شيء عن أعمالك...', style: TextStyle(color: core_theme.AC.td)))),
         const SizedBox(width: 8),
-        Container(padding: const EdgeInsets.all(10), decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [Color(0xFF4A148C), Color(0xFFD4AF37)]), shape: BoxShape.circle),
+        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [Color(0xFF4A148C), core_theme.AC.gold]), shape: BoxShape.circle),
           child: const Icon(Icons.send, color: Colors.white, size: 20)),
       ])),
   ]);
@@ -192,15 +193,15 @@ class _AiFinancialAnalystScreenState extends State<AiFinancialAnalystScreen> wit
   Color _severityColor(String s) {
     if (s.contains('حرج')) return const Color(0xFFC62828);
     if (s.contains('عالي')) return const Color(0xFFE65100);
-    if (s.contains('متوسط')) return const Color(0xFFD4AF37);
+    if (s.contains('متوسط')) return core_theme.AC.gold;
     return const Color(0xFF2E7D32);
   }
 
-  static const List<_Insight> _insights = [
+  static final List<_Insight> _insights = [
     _Insight('نمو غير مستدام في التكاليف التشغيلية', 'تكاليف الموظفين ارتفعت 28% مقابل 14% نمو إيرادات. الفجوة مقلقة وتستدعي مراجعة الهيكل الوظيفي.', 'راجع خطة التوظيف Q3 — 4 مناصب يمكن تأجيلها أو دمجها. توفير متوقع: 1.8M ر.س سنوياً.', 'حرج',
       Icons.trending_up, Color(0xFFC62828)),
     _Insight('فرصة توفير في الضرائب', 'اكتشفنا 480K ر.س مصاريف لم تُستخدم كأوعية خصم VAT قابلة للاسترداد.', 'قدّم طلب تعديل عبر VAT Return Builder قبل نهاية Q2 — المهلة 30 يوم.', 'عالي',
-      Icons.savings, Color(0xFFD4AF37)),
+      Icons.savings, core_theme.AC.gold),
     _Insight('تركّز خطر في قاعدة العملاء', 'أعلى 3 عملاء يمثلون 58% من الإيرادات. فقدان أحدهم = كارثة سيولة.', 'فعّل برنامج تنويع العملاء — الهدف: لا عميل > 15% من الإيرادات خلال 18 شهر.', 'عالي',
       Icons.group, Color(0xFFE65100)),
     _Insight('تحسين دورة التحصيل', 'DSO متوسط 68 يوم (الصناعة 45). السيولة الحبيسة: 4.2M ر.س.', 'طبّق خصم مبكر 2% للدفع خلال 15 يوم + أتمتة التذكيرات. تحسن متوقع: -18 يوم.', 'متوسط',

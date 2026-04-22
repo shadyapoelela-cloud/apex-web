@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class HotelPmsV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class HotelPmsV52Screen extends StatefulWidget {
 }
 
 class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _bookings = <_Booking>[
@@ -47,10 +48,10 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
         SavedView(id: 'noshow', labelAr: 'No Show', icon: Icons.warning, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'reserved', labelAr: 'محجوز', color: Colors.blue, count: _count(_S.reserved), active: _filter == 'reserved'),
-        FilterChipDef(id: 'checkedIn', labelAr: 'داخل', color: Colors.green, count: _count(_S.checkedIn), active: _filter == 'checkedIn'),
-        FilterChipDef(id: 'checkedOut', labelAr: 'مغادر', color: Colors.grey, count: _count(_S.checkedOut), active: _filter == 'checkedOut'),
-        FilterChipDef(id: 'noShow', labelAr: 'No Show', color: Colors.red, count: _count(_S.noShow), active: _filter == 'noShow'),
+        FilterChipDef(id: 'reserved', labelAr: 'محجوز', color: core_theme.AC.info, count: _count(_S.reserved), active: _filter == 'reserved'),
+        FilterChipDef(id: 'checkedIn', labelAr: 'داخل', color: core_theme.AC.ok, count: _count(_S.checkedIn), active: _filter == 'checkedIn'),
+        FilterChipDef(id: 'checkedOut', labelAr: 'مغادر', color: core_theme.AC.td, count: _count(_S.checkedOut), active: _filter == 'checkedOut'),
+        FilterChipDef(id: 'noShow', labelAr: 'No Show', color: core_theme.AC.err, count: _count(_S.noShow), active: _filter == 'noShow'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -81,25 +82,25 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(b.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+                Text(b.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
                 Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _vipColor(b.tier).withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(b.tier, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _vipColor(b.tier)))),
               ]),
               Text(b.guest, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-              Text(b.room, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text(b.room, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('الوصول', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+              Text('الوصول', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               Text(b.checkIn, style: const TextStyle(fontSize: 12)),
-              Text('المغادرة: ${b.checkOut}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text('المغادرة: ${b.checkOut}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ]),
             const SizedBox(width: 20),
             Column(children: [
-              const Icon(Icons.people, size: 14, color: Colors.black54),
+              Icon(Icons.people, size: 14, color: core_theme.AC.ts),
               Text('${b.guests}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             ]),
             const SizedBox(width: 20),
-            Text('${b.amount.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+            Text('${b.amount.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(width: 16),
             Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: b.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(b.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: b.status.color))),
           ])),
@@ -119,36 +120,36 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
         return Container(
           width: 300,
           margin: const EdgeInsets.only(left: 10),
-          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(s.icon, size: 16, color: s.color),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
-                Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
               Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
             ...items.map((b) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Text(b.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+                  Text(b.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                   const Spacer(),
-                  if (b.tier.startsWith('VIP')) const Icon(Icons.star, color: _gold, size: 12),
+                  if (b.tier.startsWith('VIP')) Icon(Icons.star, color: _gold, size: 12),
                 ]),
                 Text(b.guest, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-                Text(b.room, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(b.room, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 const SizedBox(height: 4),
                 Row(children: [
-                  const Icon(Icons.calendar_today, size: 10, color: Colors.black54),
+                  Icon(Icons.calendar_today, size: 10, color: core_theme.AC.ts),
                   const SizedBox(width: 2),
-                  Text('${b.checkIn.substring(5)} → ${b.checkOut.substring(5)}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text('${b.checkIn.substring(5)} → ${b.checkOut.substring(5)}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   const Spacer(),
-                  Text('${b.amount.toStringAsFixed(0)}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _gold)),
+                  Text('${b.amount.toStringAsFixed(0)}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _gold)),
                 ]),
               ]),
             )),
@@ -163,11 +164,11 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('شاشة الإشغال — أبريل 2026', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('شاشة الإشغال — أبريل 2026', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         Expanded(
           child: Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
             child: Column(children: [
               Container(padding: const EdgeInsets.all(10), color: _navy, child: Row(children: [
                 const SizedBox(width: 100, child: Text('الغرفة', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
@@ -175,7 +176,7 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
               ])),
               ..._roomsOccupancy().map((row) => Container(
                     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                    decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey.shade200))),
+                    decoration: BoxDecoration(border: Border(top: BorderSide(color: core_theme.AC.bdr))),
                     child: Row(children: [
                       SizedBox(width: 100, child: Text(row.$1, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))),
                       for (int d = 15; d <= 25; d++)
@@ -191,23 +192,23 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
         ),
         const SizedBox(height: 10),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          _legendDot(Colors.green, 'مشغولة'),
+          _legendDot(core_theme.AC.ok, 'مشغولة'),
           const SizedBox(width: 20),
-          _legendDot(Colors.blue, 'محجوزة'),
+          _legendDot(core_theme.AC.info, 'محجوزة'),
           const SizedBox(width: 20),
-          _legendDot(Colors.orange, 'تنظيف'),
+          _legendDot(core_theme.AC.warn, 'تنظيف'),
           const SizedBox(width: 20),
-          _legendDot(Colors.grey.shade300, 'شاغرة'),
+          _legendDot(core_theme.AC.bdr, 'شاغرة'),
         ]),
       ]),
     );
   }
 
   List<(String, List<Color>)> _roomsOccupancy() {
-    final occ = Colors.green;
-    final res = Colors.blue;
-    final clean = Colors.orange;
-    final empty = Colors.grey.shade300;
+    final occ = core_theme.AC.ok;
+    final res = core_theme.AC.info;
+    final clean = core_theme.AC.warn;
+    final empty = core_theme.AC.bdr;
     return [
       ('Junior Suite 301', [occ, occ, occ, occ, occ, clean, empty, empty, empty, empty, empty]),
       ('Junior Suite 303', [empty, empty, empty, empty, occ, occ, occ, occ, occ, empty, empty]),
@@ -229,16 +230,16 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Expanded(child: _chartCard('ADR', '1,240', 'ر.س', Colors.green, 'متوسط السعر للغرفة')),
+          Expanded(child: _chartCard('ADR', '1,240', 'ر.س', core_theme.AC.ok, 'متوسط السعر للغرفة')),
           const SizedBox(width: 10),
           Expanded(child: _chartCard('Occupancy', '72', '%', _gold, 'نسبة الإشغال')),
           const SizedBox(width: 10),
           Expanded(child: _chartCard('RevPAR', '892', 'ر.س', _navy, 'الإيراد/غرفة متاحة')),
           const SizedBox(width: 10),
-          Expanded(child: _chartCard('GOP', '58', '%', Colors.blue, 'هامش الربح الإجمالي')),
+          Expanded(child: _chartCard('GOP', '58', '%', core_theme.AC.info, 'هامش الربح الإجمالي')),
         ]),
         const SizedBox(height: 24),
-        const Text('الإيرادات الأسبوعية', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('الإيرادات الأسبوعية', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         ...[
           ('الأسبوع 15', 64000),
@@ -247,9 +248,9 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
           ('الأسبوع 18', 92000),
         ].map((w) => Padding(padding: const EdgeInsets.only(bottom: 12), child: Row(children: [
               SizedBox(width: 100, child: Text(w.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: w.$2 / 100000, minHeight: 20, backgroundColor: Colors.grey.shade100, color: _gold))),
+              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: w.$2 / 100000, minHeight: 20, backgroundColor: core_theme.AC.navy3, color: _gold))),
               const SizedBox(width: 10),
-              SizedBox(width: 100, child: Text('${(w.$2 / 1000).toStringAsFixed(0)}K ر.س', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold), textAlign: TextAlign.end)),
+              SizedBox(width: 100, child: Text('${(w.$2 / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold), textAlign: TextAlign.end)),
             ]))),
       ]),
     );
@@ -267,14 +268,14 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
             Text(unit, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
           ]),
           const SizedBox(height: 4),
-          Text(sub, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(sub, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ]),
       );
 
   Color _vipColor(String tier) {
-    if (tier.startsWith('VIP Platinum')) return Colors.purple;
+    if (tier.startsWith('VIP Platinum')) return core_theme.AC.purple;
     if (tier.startsWith('VIP Gold')) return _gold;
-    if (tier == 'Gold') return Colors.amber;
+    if (tier == 'Gold') return core_theme.AC.warn;
     if (tier == 'Silver') return Colors.blueGrey;
     return Colors.brown;
   }
@@ -290,10 +291,10 @@ extension _SX on _S {
         _S.noShow => 'لم يحضر',
       };
   Color get color => switch (this) {
-        _S.reserved => Colors.blue,
-        _S.checkedIn => Colors.green,
-        _S.checkedOut => Colors.grey,
-        _S.noShow => Colors.red,
+        _S.reserved => core_theme.AC.info,
+        _S.checkedIn => core_theme.AC.ok,
+        _S.checkedOut => core_theme.AC.td,
+        _S.noShow => core_theme.AC.err,
       };
   IconData get icon => switch (this) {
         _S.reserved => Icons.event,

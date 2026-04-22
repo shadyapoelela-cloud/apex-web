@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -38,7 +39,7 @@ class _CrmScreenState extends State<CrmScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
       ),
       child: Row(
         children: [
@@ -62,20 +63,20 @@ class _CrmScreenState extends State<CrmScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFFD4AF37).withOpacity(0.15) : null,
+          color: active ? core_theme.AC.gold.withOpacity(0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: core_theme.AC.gold.withOpacity(0.4)) : null,
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFFD4AF37) : Colors.black54),
+            Icon(icon, size: 14, color: active ? core_theme.AC.gold : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                color: active ? const Color(0xFFD4AF37) : Colors.black54,
+                color: active ? core_theme.AC.gold : core_theme.AC.ts,
               ),
             ),
           ],
@@ -87,11 +88,11 @@ class _CrmScreenState extends State<CrmScreen> {
   Widget _moreMenu() {
     return PopupMenuButton<String>(
       tooltip: 'المزيد',
-      icon: const Row(
+      icon: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('المزيد', style: TextStyle(fontSize: 12, color: Colors.black54)),
-          Icon(Icons.arrow_drop_down, size: 16, color: Colors.black54),
+          Text('المزيد', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
+          Icon(Icons.arrow_drop_down, size: 16, color: core_theme.AC.ts),
         ],
       ),
       itemBuilder: (ctx) => [
@@ -109,7 +110,7 @@ class _CrmScreenState extends State<CrmScreen> {
       value: v,
       child: Row(
         children: [
-          Icon(icon, size: 14, color: Colors.black54),
+          Icon(icon, size: 14, color: core_theme.AC.ts),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(fontSize: 12)),
         ],
@@ -137,28 +138,28 @@ class _CrmScreenState extends State<CrmScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('عملاء محتملون جدد', '23', Icons.person_add, const Color(0xFF2563EB)),
-            _Stat('قيد التواصل', '12', Icons.phone, const Color(0xFFD97706)),
-            _Stat('مؤهّلون', '8', Icons.verified, const Color(0xFF059669)),
-            _Stat('معدّل التحويل', '34%', Icons.trending_up, const Color(0xFFD4AF37)),
+            _Stat('عملاء محتملون جدد', '23', Icons.person_add, core_theme.AC.info),
+            _Stat('قيد التواصل', '12', Icons.phone, core_theme.AC.warn),
+            _Stat('مؤهّلون', '8', Icons.verified, core_theme.AC.ok),
+            _Stat('معدّل التحويل', '34%', Icons.trending_up, core_theme.AC.gold),
           ]),
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text('العملاء المحتملون', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              Text('العملاء المحتملون', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               const Spacer(),
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.upload, size: 14),
-                label: const Text('استيراد CSV'),
+                label: Text('استيراد CSV'),
               ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.add, size: 14),
-                label: const Text('عميل محتمل'),
+                label: Text('عميل محتمل'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD4AF37),
+                  backgroundColor: core_theme.AC.gold,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -169,7 +170,7 @@ class _CrmScreenState extends State<CrmScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
@@ -186,16 +187,16 @@ class _CrmScreenState extends State<CrmScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: const Color(0xFFD4AF37).withOpacity(0.2),
+            backgroundColor: core_theme.AC.gold.withOpacity(0.2),
             child: Text(
               lead.company.substring(0, 1),
-              style: const TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w800),
+              style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w800),
             ),
           ),
           const SizedBox(width: 12),
@@ -205,7 +206,7 @@ class _CrmScreenState extends State<CrmScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(lead.company, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text('${lead.contact} — ${lead.title}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('${lead.contact} — ${lead.title}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -238,10 +239,10 @@ class _CrmScreenState extends State<CrmScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.06),
+              color: core_theme.AC.tp.withOpacity(0.06),
               borderRadius: BorderRadius.circular(3),
             ),
-            child: Text(lead.source, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            child: Text(lead.source, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ),
           const SizedBox(width: 8),
           Container(
@@ -257,12 +258,12 @@ class _CrmScreenState extends State<CrmScreen> {
           ),
           const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.phone, size: 14, color: Color(0xFF2563EB)),
+            icon: Icon(Icons.phone, size: 14, color: core_theme.AC.info),
             onPressed: () {},
             tooltip: 'اتصال',
           ),
           IconButton(
-            icon: const Icon(Icons.email, size: 14, color: Color(0xFF7C3AED)),
+            icon: Icon(Icons.email, size: 14, color: core_theme.AC.purple),
             onPressed: () {},
             tooltip: 'بريد',
           ),
@@ -272,18 +273,18 @@ class _CrmScreenState extends State<CrmScreen> {
   }
 
   Color _scoreColor(int score) {
-    if (score >= 80) return const Color(0xFF059669);
-    if (score >= 50) return const Color(0xFFD97706);
+    if (score >= 80) return core_theme.AC.ok;
+    if (score >= 50) return core_theme.AC.warn;
     return const Color(0xFFB91C1C);
   }
 
   Color _statusColor(String status) {
     switch (status) {
-      case 'جديد': return const Color(0xFF2563EB);
-      case 'قيد التواصل': return const Color(0xFFD97706);
-      case 'مؤهّل': return const Color(0xFF059669);
+      case 'جديد': return core_theme.AC.info;
+      case 'قيد التواصل': return core_theme.AC.warn;
+      case 'مؤهّل': return core_theme.AC.ok;
       case 'غير مؤهّل': return const Color(0xFFB91C1C);
-      default: return Colors.black54;
+      default: return core_theme.AC.ts;
     }
   }
 
@@ -296,13 +297,13 @@ class _CrmScreenState extends State<CrmScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('الفرص النشطة', '18', Icons.attach_money, const Color(0xFF2563EB)),
-            _Stat('قيمة خط البيع', '8.4M', Icons.account_balance_wallet, const Color(0xFFD4AF37)),
-            _Stat('معدّل الفوز', '42%', Icons.emoji_events, const Color(0xFF059669)),
-            _Stat('متوسط الصفقة', '467K', Icons.trending_up, const Color(0xFF7C3AED)),
+            _Stat('الفرص النشطة', '18', Icons.attach_money, core_theme.AC.info),
+            _Stat('قيمة خط البيع', '8.4M', Icons.account_balance_wallet, core_theme.AC.gold),
+            _Stat('معدّل الفوز', '42%', Icons.emoji_events, core_theme.AC.ok),
+            _Stat('متوسط الصفقة', '467K', Icons.trending_up, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
-          const Text('الفرص البيعية', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('الفرص البيعية', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -355,7 +356,7 @@ class _CrmScreenState extends State<CrmScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.06)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -408,7 +409,7 @@ class _CrmScreenState extends State<CrmScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,7 +419,7 @@ class _CrmScreenState extends State<CrmScreen> {
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
             maxLines: 2,
           ),
-          Text(opp.company, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(opp.company, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           const SizedBox(height: 6),
           Row(
             children: [
@@ -443,19 +444,19 @@ class _CrmScreenState extends State<CrmScreen> {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.event, size: 10, color: Colors.black54),
+              Icon(Icons.event, size: 10, color: core_theme.AC.ts),
               const SizedBox(width: 3),
               Text(
                 opp.closeDate,
-                style: const TextStyle(fontSize: 10, color: Colors.black54),
+                style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
               ),
               const Spacer(),
               CircleAvatar(
                 radius: 8,
-                backgroundColor: const Color(0xFFD4AF37).withOpacity(0.2),
+                backgroundColor: core_theme.AC.gold.withOpacity(0.2),
                 child: Text(
                   opp.owner.substring(0, 1),
-                  style: const TextStyle(fontSize: 9, color: Color(0xFFD4AF37), fontWeight: FontWeight.w800),
+                  style: TextStyle(fontSize: 9, color: core_theme.AC.gold, fontWeight: FontWeight.w800),
                 ),
               ),
             ],
@@ -468,11 +469,11 @@ class _CrmScreenState extends State<CrmScreen> {
   Color _stageColor(String stage) {
     switch (stage) {
       case 'تواصل أولي': return const Color(0xFF6B7280);
-      case 'تأهّل': return const Color(0xFF2563EB);
-      case 'عرض سعر': return const Color(0xFFD97706);
-      case 'تفاوض': return const Color(0xFF7C3AED);
-      case 'إغلاق': return const Color(0xFF059669);
-      default: return Colors.black54;
+      case 'تأهّل': return core_theme.AC.info;
+      case 'عرض سعر': return core_theme.AC.warn;
+      case 'تفاوض': return core_theme.AC.purple;
+      case 'إغلاق': return core_theme.AC.ok;
+      default: return core_theme.AC.ts;
     }
   }
 
@@ -485,27 +486,27 @@ class _CrmScreenState extends State<CrmScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('أنشطة اليوم', '12', Icons.today, const Color(0xFF2563EB)),
-            _Stat('مكالمات', '23 هذا الأسبوع', Icons.phone, const Color(0xFF059669)),
-            _Stat('اجتماعات', '8 مجدولة', Icons.event, const Color(0xFFD97706)),
-            _Stat('بريد إلكتروني', '47 مُرسَل', Icons.email, const Color(0xFF7C3AED)),
+            _Stat('أنشطة اليوم', '12', Icons.today, core_theme.AC.info),
+            _Stat('مكالمات', '23 هذا الأسبوع', Icons.phone, core_theme.AC.ok),
+            _Stat('اجتماعات', '8 مجدولة', Icons.event, core_theme.AC.warn),
+            _Stat('بريد إلكتروني', '47 مُرسَل', Icons.email, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
-          const Text('الأنشطة الأخيرة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('الأنشطة الأخيرة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
-                _activityRow(Icons.phone, const Color(0xFF059669), 'مكالمة مع SABIC Procurement', 'أحمد — قبل ساعتين', 'اتفق على اجتماع الأسبوع القادم'),
-                _activityRow(Icons.email, const Color(0xFF7C3AED), 'بريد إلى Marriott Hotels', 'سارة — قبل 3 ساعات', 'إرسال عرض السعر النهائي'),
-                _activityRow(Icons.event, const Color(0xFFD97706), 'اجتماع ABC Trading', 'محمد — اليوم 14:00', 'عرض تقديمي + استعراض الخدمات'),
-                _activityRow(Icons.note, const Color(0xFF2563EB), 'ملاحظة: Al Rajhi Bank', 'فاطمة — قبل يوم', 'يفضّلون دفعات ربع سنوية'),
-                _activityRow(Icons.handshake, const Color(0xFFD4AF37), 'توقيع عقد STC', 'خالد — قبل يومين', 'قيمة العقد: 185,000 ر.س'),
+                _activityRow(Icons.phone, core_theme.AC.ok, 'مكالمة مع SABIC Procurement', 'أحمد — قبل ساعتين', 'اتفق على اجتماع الأسبوع القادم'),
+                _activityRow(Icons.email, core_theme.AC.purple, 'بريد إلى Marriott Hotels', 'سارة — قبل 3 ساعات', 'إرسال عرض السعر النهائي'),
+                _activityRow(Icons.event, core_theme.AC.warn, 'اجتماع ABC Trading', 'محمد — اليوم 14:00', 'عرض تقديمي + استعراض الخدمات'),
+                _activityRow(Icons.note, core_theme.AC.info, 'ملاحظة: Al Rajhi Bank', 'فاطمة — قبل يوم', 'يفضّلون دفعات ربع سنوية'),
+                _activityRow(Icons.handshake, core_theme.AC.gold, 'توقيع عقد STC', 'خالد — قبل يومين', 'قيمة العقد: 185,000 ر.س'),
               ],
             ),
           ),
@@ -518,7 +519,7 @@ class _CrmScreenState extends State<CrmScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -537,9 +538,9 @@ class _CrmScreenState extends State<CrmScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(meta, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(meta, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 const SizedBox(height: 4),
-                Text(note, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                Text(note, style: TextStyle(fontSize: 12, color: core_theme.AC.tp)),
               ],
             ),
           ),
@@ -557,13 +558,13 @@ class _CrmScreenState extends State<CrmScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('جهات الاتصال', '234', Icons.contacts, const Color(0xFF2563EB)),
-            _Stat('حسابات فعّالة', '47', Icons.business, const Color(0xFF059669)),
+            _Stat('جهات الاتصال', '234', Icons.contacts, core_theme.AC.info),
+            _Stat('حسابات فعّالة', '47', Icons.business, core_theme.AC.ok),
             _Stat('ترشيحات AI', '12', Icons.auto_awesome, const Color(0xFFEC4899)),
-            _Stat('تحتاج متابعة', '8', Icons.schedule, const Color(0xFFD97706)),
+            _Stat('تحتاج متابعة', '8', Icons.schedule, core_theme.AC.warn),
           ]),
           const SizedBox(height: 16),
-          const Text('جهات الاتصال', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('جهات الاتصال', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (ctx, constraints) {
@@ -592,17 +593,17 @@ class _CrmScreenState extends State<CrmScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: const Color(0xFFD4AF37).withOpacity(0.2),
+            backgroundColor: core_theme.AC.gold.withOpacity(0.2),
             child: Text(
               contact.name.substring(0, 1),
-              style: const TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w800),
+              style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w800),
             ),
           ),
           const SizedBox(height: 8),
@@ -614,14 +615,14 @@ class _CrmScreenState extends State<CrmScreen> {
           ),
           Text(
             contact.title,
-            style: const TextStyle(fontSize: 11, color: Colors.black54),
+            style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
             contact.company,
-            style: const TextStyle(fontSize: 10, color: Colors.black45, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 10, color: core_theme.AC.td, fontWeight: FontWeight.w600),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -629,13 +630,13 @@ class _CrmScreenState extends State<CrmScreen> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.phone, size: 14, color: Color(0xFF059669)),
+                icon: Icon(Icons.phone, size: 14, color: core_theme.AC.ok),
                 onPressed: () {},
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
               ),
               IconButton(
-                icon: const Icon(Icons.email, size: 14, color: Color(0xFF2563EB)),
+                icon: Icon(Icons.email, size: 14, color: core_theme.AC.info),
                 onPressed: () {},
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
@@ -643,7 +644,7 @@ class _CrmScreenState extends State<CrmScreen> {
               const Spacer(),
               Text(
                 '#${contact.dealsCount} صفقات',
-                style: const TextStyle(fontSize: 9, color: Colors.black45),
+                style: TextStyle(fontSize: 9, color: core_theme.AC.td),
               ),
             ],
           ),
@@ -673,7 +674,7 @@ class _CrmScreenState extends State<CrmScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(s.value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: s.color)),
-                        Text(s.label, style: const TextStyle(fontSize: 10, color: Colors.black54), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text(s.label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
@@ -763,18 +764,18 @@ class _OpportunityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final stageColor = {
       'تواصل أولي': const Color(0xFF6B7280),
-      'تأهّل': const Color(0xFF2563EB),
-      'عرض سعر': const Color(0xFFD97706),
-      'تفاوض': const Color(0xFF7C3AED),
-      'إغلاق': const Color(0xFF059669),
-    }[opp.stage] ?? Colors.black54;
+      'تأهّل': core_theme.AC.info,
+      'عرض سعر': core_theme.AC.warn,
+      'تفاوض': core_theme.AC.purple,
+      'إغلاق': core_theme.AC.ok,
+    }[opp.stage] ?? core_theme.AC.ts;
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -801,7 +802,7 @@ class _OpportunityCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(opp.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-          Text(opp.company, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(opp.company, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const Spacer(),
           Text(
             '${opp.amount.toStringAsFixed(0)} ر.س',
@@ -815,11 +816,11 @@ class _OpportunityCard extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.event, size: 11, color: Colors.black54),
+              Icon(Icons.event, size: 11, color: core_theme.AC.ts),
               const SizedBox(width: 3),
-              Text(opp.closeDate, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text(opp.closeDate, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const Spacer(),
-              Text('@ ${opp.owner}', style: const TextStyle(fontSize: 10, color: Colors.black45)),
+              Text('@ ${opp.owner}', style: TextStyle(fontSize: 10, color: core_theme.AC.td)),
             ],
           ),
         ],

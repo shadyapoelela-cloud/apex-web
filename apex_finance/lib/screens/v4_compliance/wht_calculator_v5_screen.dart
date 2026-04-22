@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class WhtCalculatorV5Screen extends StatefulWidget {
   const WhtCalculatorV5Screen({super.key});
@@ -63,9 +64,9 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
         _buildHero(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.calculate, size: 16), text: 'حاسبة'),
             Tab(icon: Icon(Icons.history, size: 16), text: 'السجل الشهري'),
@@ -94,7 +95,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
         gradient: const LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF7B1FA2)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.money_off, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -105,7 +106,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                 Text('ضريبة الاستقطاع (WHT)',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('حساب تلقائي لضريبة الاستقطاع عند الدفع لغير المقيمين — ZATCA',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -188,10 +189,10 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                             margin: const EdgeInsets.only(bottom: 6),
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: _selectedCat == c.id ? const Color(0xFFD4AF37).withOpacity(0.1) : Colors.grey.shade50,
+                              color: _selectedCat == c.id ? core_theme.AC.gold.withOpacity(0.1) : core_theme.AC.navy3,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: _selectedCat == c.id ? const Color(0xFFD4AF37) : Colors.black12,
+                                color: _selectedCat == c.id ? core_theme.AC.gold : core_theme.AC.bdr,
                                 width: _selectedCat == c.id ? 2 : 1,
                               ),
                             ),
@@ -201,7 +202,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                                   value: c.id,
                                   groupValue: _selectedCat,
                                   onChanged: (v) => setState(() => _selectedCat = v ?? _selectedCat),
-                                  activeColor: const Color(0xFFD4AF37),
+                                  activeColor: core_theme.AC.gold,
                                 ),
                                 Expanded(
                                   child: Text(c.nameAr,
@@ -213,14 +214,14 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: _selectedCat == c.id ? const Color(0xFFD4AF37) : Colors.grey.shade300,
+                                    color: _selectedCat == c.id ? core_theme.AC.gold : core_theme.AC.bdr,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text('${c.standardRate}%',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w900,
-                                        color: _selectedCat == c.id ? Colors.white : Colors.black87,
+                                        color: _selectedCat == c.id ? Colors.white : core_theme.AC.tp,
                                       )),
                                 ),
                               ],
@@ -240,8 +241,8 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                         groupValue: _treatyApplied,
                         onChanged: (v) => setState(() => _treatyApplied = v ?? 'standard'),
                         title: Text('المعدل القياسي (${_cat.standardRate}%)'),
-                        subtitle: const Text('بدون شهادة الإقامة الضريبية', style: TextStyle(fontSize: 11)),
-                        activeColor: const Color(0xFFD4AF37),
+                        subtitle: Text('بدون شهادة الإقامة الضريبية', style: TextStyle(fontSize: 11)),
+                        activeColor: core_theme.AC.gold,
                         contentPadding: EdgeInsets.zero,
                         dense: true,
                       ),
@@ -249,9 +250,9 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                         value: 'treaty',
                         groupValue: _treatyApplied,
                         onChanged: (v) => setState(() => _treatyApplied = v ?? 'standard'),
-                        title: const Text('تطبيق الاتفاقية (5%)'),
-                        subtitle: const Text('يتطلب إرفاق شهادة الإقامة الضريبية الأصلية', style: TextStyle(fontSize: 11)),
-                        activeColor: const Color(0xFFD4AF37),
+                        title: Text('تطبيق الاتفاقية (5%)'),
+                        subtitle: Text('يتطلب إرفاق شهادة الإقامة الضريبية الأصلية', style: TextStyle(fontSize: 11)),
+                        activeColor: core_theme.AC.gold,
                         contentPadding: EdgeInsets.zero,
                         dense: true,
                       ),
@@ -289,8 +290,8 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('الضريبة المستقطعة',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text('الضريبة المستقطعة',
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               const SizedBox(height: 4),
               Text('${_rate.toStringAsFixed(0)}%',
                   style: const TextStyle(color: Color(0xFFFFD700), fontSize: 28, fontWeight: FontWeight.w900)),
@@ -298,7 +299,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
               Text(_fmt(_whtAmount),
                   style: const TextStyle(
                       color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Text('ر.س تُستقطع من الدفعة', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              Text('ر.س تُستقطع من الدفعة', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
             ],
           ),
         ),
@@ -308,14 +309,14 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
-              _line('المبلغ الإجمالي', _fmt(_amountV), Colors.black87),
-              _line('يُستقطع WHT (${_rate.toStringAsFixed(0)}%)', '- ${_fmt(_whtAmount)}', Colors.red),
+              _line('المبلغ الإجمالي', _fmt(_amountV), core_theme.AC.tp),
+              _line('يُستقطع WHT (${_rate.toStringAsFixed(0)}%)', '- ${_fmt(_whtAmount)}', core_theme.AC.err),
               const Divider(),
-              _line('الصافي للمستفيد', _fmt(_netPayment), const Color(0xFFD4AF37), bold: true),
+              _line('الصافي للمستفيد', _fmt(_netPayment), core_theme.AC.gold, bold: true),
             ],
           ),
         ),
@@ -323,16 +324,16 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.info_outline, color: Colors.blue, size: 16),
+                  Icon(Icons.info_outline, color: core_theme.AC.info, size: 16),
                   SizedBox(width: 6),
                   Text('إلتزامات الإقرار', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
                 ],
@@ -360,7 +361,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
               );
             },
             icon: const Icon(Icons.add_circle),
-            label: const Text('إضافة إلى الإقرار الشهري'),
+            label: Text('إضافة إلى الإقرار الشهري'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF4A148C),
               foregroundColor: Colors.white,
@@ -397,7 +398,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -415,7 +416,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             const SizedBox(height: 4),
             input,
           ],
@@ -457,7 +458,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
               ),
               Text(_fmt(totalWht),
                   style: const TextStyle(color: Color(0xFFFFD700), fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Text(' ر.س', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(' ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
             ],
           ),
         ),
@@ -466,13 +467,13 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: const Row(
                   children: [
                     Expanded(child: Text('التاريخ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -489,13 +490,13 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
                       Expanded(child: Text(e.date, style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
                       Expanded(flex: 2, child: Text(e.vendor, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
-                      Expanded(flex: 2, child: Text(e.category, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                      Expanded(flex: 2, child: Text(e.category, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
                       Expanded(child: Text(_fmt(e.amount), style: const TextStyle(fontSize: 12))),
                       Expanded(child: Text('${e.rate}%', style: const TextStyle(fontSize: 12))),
                       Expanded(
@@ -508,13 +509,13 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           margin: const EdgeInsets.only(left: 4),
                           decoration: BoxDecoration(
-                            color: (e.status == 'مدفوع' ? Colors.green : Colors.orange).withOpacity(0.15),
+                            color: (e.status == 'مدفوع' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(e.status,
                               style: TextStyle(
                                 fontSize: 10,
-                                color: e.status == 'مدفوع' ? Colors.green : Colors.orange,
+                                color: e.status == 'مدفوع' ? core_theme.AC.ok : core_theme.AC.warn,
                                 fontWeight: FontWeight.w700,
                               ),
                               textAlign: TextAlign.center),
@@ -539,7 +540,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
               );
             },
             icon: const Icon(Icons.send),
-            label: const Text('تقديم الإقرار الشهري إلى ZATCA'),
+            label: Text('تقديم الإقرار الشهري إلى ZATCA'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF4A148C),
               foregroundColor: Colors.white,
@@ -567,13 +568,13 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.amber.shade50,
+            color: core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.amber.shade200),
+            border: Border.all(color: core_theme.AC.warn),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.warning_amber, color: Colors.amber),
+              Icon(Icons.warning_amber, color: core_theme.AC.warn),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -589,13 +590,13 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: const Row(
                   children: [
                     Expanded(flex: 2, child: Text('الدولة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -610,15 +611,15 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
                       Expanded(flex: 2, child: Text(t.country, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-                      Expanded(child: _ratePill(t.dividends, Colors.blue)),
-                      Expanded(child: _ratePill(t.interest, Colors.orange)),
-                      Expanded(child: _ratePill(t.royalties, Colors.purple)),
-                      Expanded(flex: 3, child: Text(t.notes, style: const TextStyle(fontSize: 11, color: Colors.black54))),
+                      Expanded(child: _ratePill(t.dividends, core_theme.AC.info)),
+                      Expanded(child: _ratePill(t.interest, core_theme.AC.warn)),
+                      Expanded(child: _ratePill(t.royalties, core_theme.AC.purple)),
+                      Expanded(flex: 3, child: Text(t.notes, style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
                     ],
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 113 — Healthcare Claims Processing
 /// Insurance claims, CCHI compliance, medical billing
@@ -22,8 +23,8 @@ class _HealthcareClaimsScreenState extends State<HealthcareClaimsScreen> with Si
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'المطالبات'), Tab(text: 'المرضى'), Tab(text: 'الموافقات المسبقة'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_claimsTab(), _patientsTab(), _priorAuthTab(), _analyticsTab()])),
       ])),
@@ -36,10 +37,10 @@ class _HealthcareClaimsScreenState extends State<HealthcareClaimsScreen> with Si
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.local_hospital, color: Color(0xFF006064), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('مطالبات التأمين الصحي', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('معالجة المطالبات مع CCHI، NPHIES، ICD-10', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('معالجة المطالبات مع CCHI، NPHIES، ICD-10', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
       Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
@@ -59,7 +60,7 @@ class _HealthcareClaimsScreenState extends State<HealthcareClaimsScreen> with Si
       Expanded(child: _kpi('المطالبات', '$total', Icons.medical_services, const Color(0xFF006064))),
       Expanded(child: _kpi('معتمد', '$approved', Icons.check_circle, const Color(0xFF2E7D32))),
       Expanded(child: _kpi('قيد المعالجة', '$pending', Icons.hourglass_bottom, const Color(0xFFE65100))),
-      Expanded(child: _kpi('إجمالي القيمة', '${(totalAmount/1000).toStringAsFixed(0)}K', Icons.payments, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('إجمالي القيمة', '${(totalAmount/1000).toStringAsFixed(0)}K', Icons.payments, core_theme.AC.gold)),
     ]));
   }
 
@@ -67,7 +68,7 @@ class _HealthcareClaimsScreenState extends State<HealthcareClaimsScreen> with Si
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -87,14 +88,14 @@ class _HealthcareClaimsScreenState extends State<HealthcareClaimsScreen> with Si
         ]),
         const SizedBox(height: 8),
         Text('التشخيص: ${c.diagnosis}', style: const TextStyle(fontSize: 11.5)),
-        Text('ICD-10: ${c.icd10}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('ICD-10: ${c.icd10}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 6),
         Row(children: [
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: _statusColor(c.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Text(c.status, style: TextStyle(color: _statusColor(c.status), fontSize: 10, fontWeight: FontWeight.bold))),
           const Spacer(),
-          Text(c.date, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(c.date, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ]),
       ]),
     ));
@@ -107,11 +108,11 @@ class _HealthcareClaimsScreenState extends State<HealthcareClaimsScreen> with Si
       title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('ID: ${p.nationalId} • ${p.age} سنة', style: const TextStyle(fontSize: 11)),
-        Text('${p.insurer} • بوليصة: ${p.policy}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('${p.insurer} • بوليصة: ${p.policy}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text('${p.visits} زيارة', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-        Text('${p.totalClaims.toStringAsFixed(0)} ر.س', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('${p.totalClaims.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
     ));
   });
@@ -123,7 +124,7 @@ class _HealthcareClaimsScreenState extends State<HealthcareClaimsScreen> with Si
       title: Text(a.procedure, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${a.patient} • ${a.insurer}', style: const TextStyle(fontSize: 11)),
-        Text('CPT: ${a.cpt} • تاريخ: ${a.date}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('CPT: ${a.cpt} • تاريخ: ${a.date}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text('${a.estimatedCost.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
@@ -146,14 +147,14 @@ class _HealthcareClaimsScreenState extends State<HealthcareClaimsScreen> with Si
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _statusColor(String s) {
     if (s.contains('معتمد') || s.contains('موافق')) return const Color(0xFF2E7D32);
     if (s.contains('قيد')) return const Color(0xFFE65100);
     if (s.contains('مرفوض')) return const Color(0xFFC62828);
-    if (s.contains('مسودة')) return Colors.black54;
+    if (s.contains('مسودة')) return core_theme.AC.ts;
     return const Color(0xFF1A237E);
   }
 

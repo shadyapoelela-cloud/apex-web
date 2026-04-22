@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class RiskRegisterV52Screen extends StatefulWidget {
@@ -12,7 +13,7 @@ class RiskRegisterV52Screen extends StatefulWidget {
 }
 
 class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
-  static const _navy = Color(0xFF1A237E);
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _risks = <_Risk>[
@@ -45,10 +46,10 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
         SavedView(id: 'tech', labelAr: 'مخاطر تقنية', icon: Icons.computer, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'open', labelAr: 'مفتوحة', color: Colors.red, count: _count(_St.open), active: _filter == 'open'),
-        FilterChipDef(id: 'mitigating', labelAr: 'قيد المعالجة', color: Colors.orange, count: _count(_St.mitigating), active: _filter == 'mitigating'),
-        FilterChipDef(id: 'monitoring', labelAr: 'قيد المراقبة', color: Colors.blue, count: _count(_St.monitoring), active: _filter == 'monitoring'),
-        FilterChipDef(id: 'closed', labelAr: 'مغلقة', color: Colors.green, count: _count(_St.closed), active: _filter == 'closed'),
+        FilterChipDef(id: 'open', labelAr: 'مفتوحة', color: core_theme.AC.err, count: _count(_St.open), active: _filter == 'open'),
+        FilterChipDef(id: 'mitigating', labelAr: 'قيد المعالجة', color: core_theme.AC.warn, count: _count(_St.mitigating), active: _filter == 'mitigating'),
+        FilterChipDef(id: 'monitoring', labelAr: 'قيد المراقبة', color: core_theme.AC.info, count: _count(_St.monitoring), active: _filter == 'monitoring'),
+        FilterChipDef(id: 'closed', labelAr: 'مغلقة', color: core_theme.AC.ok, count: _count(_St.closed), active: _filter == 'closed'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -78,16 +79,16 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(r.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(r.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)), child: Text(r.category, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.black54))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(4)), child: Text(r.category, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: core_theme.AC.ts))),
               ]),
               Text(r.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-              Text('المسؤول: ${r.owner} · مراجعة ${r.reviewDate}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('المسؤول: ${r.owner} · مراجعة ${r.reviewDate}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
             SizedBox(width: 120, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [Text('الاحتمال ', style: TextStyle(fontSize: 10, color: Colors.black54)), ..._dots(r.likelihood, Colors.orange)]),
-              Row(children: [Text('الأثر    ', style: TextStyle(fontSize: 10, color: Colors.black54)), ..._dots(r.impact, Colors.red)]),
+              Row(children: [Text('الاحتمال ', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)), ..._dots(r.likelihood, core_theme.AC.warn)]),
+              Row(children: [Text('الأثر    ', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)), ..._dots(r.impact, core_theme.AC.err)]),
             ])),
             const SizedBox(width: 16),
             Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(14)), child: Text(r.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.status.color))),
@@ -97,27 +98,27 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
     );
   }
 
-  List<Widget> _dots(int count, Color color) => List.generate(5, (i) => Padding(padding: const EdgeInsets.only(right: 1), child: Icon(Icons.circle, size: 8, color: i < count ? color : Colors.grey.shade300)));
+  List<Widget> _dots(int count, Color color) => List.generate(5, (i) => Padding(padding: const EdgeInsets.only(right: 1), child: Icon(Icons.circle, size: 8, color: i < count ? color : core_theme.AC.bdr)));
 
   Widget _matrix() {
     // 5x5 risk heatmap (Likelihood × Impact)
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('مصفوفة المخاطر (Heatmap)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('مصفوفة المخاطر (Heatmap)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 4),
-        const Text('الاحتمال (Likelihood) × الأثر (Impact)', style: TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('الاحتمال (Likelihood) × الأثر (Impact)', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 20),
         Expanded(
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             // Y-axis label (Likelihood)
-            const RotatedBox(quarterTurns: 1, child: Padding(padding: EdgeInsets.all(8), child: Text('الاحتمال ←', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black54)))),
+            RotatedBox(quarterTurns: 1, child: Padding(padding: EdgeInsets.all(8), child: Text('الاحتمال ←', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.ts)))),
             const SizedBox(width: 8),
             Expanded(child: Column(children: [
               // Rows: Likelihood 5 down to 1
               for (int l = 5; l >= 1; l--)
                 Expanded(child: Row(children: [
-                  SizedBox(width: 20, child: Text('$l', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black54), textAlign: TextAlign.center)),
+                  SizedBox(width: 20, child: Text('$l', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.ts), textAlign: TextAlign.center)),
                   for (int imp = 1; imp <= 5; imp++)
                     Expanded(child: _matrixCell(l, imp)),
                 ])),
@@ -125,20 +126,20 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
               Row(children: [
                 const SizedBox(width: 20),
                 for (int imp = 1; imp <= 5; imp++)
-                  Expanded(child: Center(child: Padding(padding: const EdgeInsets.only(top: 4), child: Text('$imp', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black54))))),
+                  Expanded(child: Center(child: Padding(padding: const EdgeInsets.only(top: 4), child: Text('$imp', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.ts))))),
               ]),
               const SizedBox(height: 4),
-              const Text('الأثر (Impact) →', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black54)),
+              Text('الأثر (Impact) →', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.ts)),
             ])),
           ]),
         ),
         const SizedBox(height: 12),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          _legendDot(Colors.green, 'منخفضة (1-6)'),
+          _legendDot(core_theme.AC.ok, 'منخفضة (1-6)'),
           const SizedBox(width: 16),
-          _legendDot(Colors.orange, 'متوسطة (7-14)'),
+          _legendDot(core_theme.AC.warn, 'متوسطة (7-14)'),
           const SizedBox(width: 16),
-          _legendDot(Colors.red, 'عالية (15-25)'),
+          _legendDot(core_theme.AC.err, 'عالية (15-25)'),
         ]),
       ]),
     );
@@ -167,9 +168,9 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
   Widget _legendDot(Color color, String label) => Row(children: [Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)), const SizedBox(width: 6), Text(label, style: const TextStyle(fontSize: 11))]);
 
   Color _scoreColor(int score) {
-    if (score >= 15) return Colors.red;
-    if (score >= 7) return Colors.orange;
-    return Colors.green;
+    if (score >= 15) return core_theme.AC.err;
+    if (score >= 7) return core_theme.AC.warn;
+    return core_theme.AC.ok;
   }
 
   Widget _chart() {
@@ -178,11 +179,11 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
       categories[r.category] = (categories[r.category] ?? 0) + 1;
     }
     final max = categories.values.reduce((a, b) => a > b ? a : b);
-    final colors = [Colors.red, Colors.orange, Colors.blue, Colors.purple, _navy];
+    final colors = [core_theme.AC.err, core_theme.AC.warn, core_theme.AC.info, core_theme.AC.purple, _navy];
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('المخاطر حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('المخاطر حسب الفئة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         ...categories.entries.toList().asMap().entries.map((e) {
           final idx = e.key;
@@ -191,7 +192,7 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
           return Padding(padding: const EdgeInsets.only(bottom: 14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [Text(entry.key, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)), const Spacer(), Text('${entry.value} مخاطرة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: colors[idx % colors.length]))]),
             const SizedBox(height: 4),
-            ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: Colors.grey.shade100, color: colors[idx % colors.length])),
+            ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: core_theme.AC.navy3, color: colors[idx % colors.length])),
           ]));
         }),
       ]),
@@ -209,10 +210,10 @@ extension _StX on _St {
         _St.closed => 'مغلقة',
       };
   Color get color => switch (this) {
-        _St.open => Colors.red,
-        _St.mitigating => Colors.orange,
-        _St.monitoring => Colors.blue,
-        _St.closed => Colors.green,
+        _St.open => core_theme.AC.err,
+        _St.mitigating => core_theme.AC.warn,
+        _St.monitoring => core_theme.AC.info,
+        _St.closed => core_theme.AC.ok,
       };
 }
 

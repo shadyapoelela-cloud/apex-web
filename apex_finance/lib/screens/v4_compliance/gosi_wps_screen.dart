@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -36,7 +37,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
       ),
       child: Row(
         children: [
@@ -64,14 +65,14 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFF2E7D5B) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFF2E7D5B) : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                color: active ? const Color(0xFF2E7D5B) : Colors.black54,
+                color: active ? const Color(0xFF2E7D5B) : core_theme.AC.ts,
               ),
             ),
           ],
@@ -99,19 +100,19 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
         children: [
           _statsRow([
             _Stat('سعوديون مسجّلون', '42', Icons.flag, const Color(0xFF2E7D5B)),
-            _Stat('غير سعوديين', '45', Icons.public, const Color(0xFF2563EB)),
-            _Stat('نسبة السعودة', '48%', Icons.equalizer, const Color(0xFFD4AF37)),
-            _Stat('مساهمة GOSI شهرياً', '142K ر.س', Icons.health_and_safety, const Color(0xFF7C3AED)),
+            _Stat('غير سعوديين', '45', Icons.public, core_theme.AC.info),
+            _Stat('نسبة السعودة', '48%', Icons.equalizer, core_theme.AC.gold),
+            _Stat('مساهمة GOSI شهرياً', '142K ر.س', Icons.health_and_safety, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
           Row(
             children: [
-              const Text('قائمة الموظفين المسجّلين في GOSI', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              Text('قائمة الموظفين المسجّلين في GOSI', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               const Spacer(),
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.sync, size: 14),
-                label: const Text('مزامنة مع HR'),
+                label: Text('مزامنة مع HR'),
               ),
             ],
           ),
@@ -120,7 +121,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
@@ -144,7 +145,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.06))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06))),
       ),
       child: const Row(
         children: [
@@ -163,7 +164,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
       ),
       child: Row(
         children: [
@@ -175,7 +176,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                   width: 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: active ? const Color(0xFF059669) : const Color(0xFFD97706),
+                    color: active ? core_theme.AC.ok : core_theme.AC.warn,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -186,14 +187,14 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                     children: [
                       Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                       if (note != null)
-                        Text(note, style: const TextStyle(fontSize: 10, color: Color(0xFFD97706))),
+                        Text(note, style: TextStyle(fontSize: 10, color: core_theme.AC.warn)),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          Expanded(child: Text(nid, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54))),
+          Expanded(child: Text(nid, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts))),
           Expanded(child: Text(role, style: const TextStyle(fontSize: 11))),
           Expanded(
             child: Container(
@@ -201,7 +202,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
               decoration: BoxDecoration(
                 color: nationality == 'سعودي'
                     ? const Color(0xFF2E7D5B).withOpacity(0.12)
-                    : Colors.black.withOpacity(0.06),
+                    : core_theme.AC.tp.withOpacity(0.06),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -209,7 +210,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: nationality == 'سعودي' ? const Color(0xFF2E7D5B) : Colors.black54,
+                  color: nationality == 'سعودي' ? const Color(0xFF2E7D5B) : core_theme.AC.ts,
                 ),
               ),
             ),
@@ -240,8 +241,8 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2E7D5B), Color(0xFF059669)],
+              gradient: LinearGradient(
+                colors: [Color(0xFF2E7D5B), core_theme.AC.ok],
               ),
               borderRadius: BorderRadius.circular(14),
             ),
@@ -272,22 +273,22 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('تفاصيل المساهمات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('تفاصيل المساهمات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
                 _breakdownRow('مساهمة الشركة (11%)', 78_340, const Color(0xFF2E7D5B)),
-                _breakdownRow('مساهمة الموظف (10%)', 64_000, const Color(0xFF2563EB)),
+                _breakdownRow('مساهمة الموظف (10%)', 64_000, core_theme.AC.info),
                 const Divider(),
-                _breakdownRow('إجمالي الإرسال', 142_340, const Color(0xFF059669), bold: true),
-                _breakdownRow('من الأحمال على الشركة', 78_340, const Color(0xFF059669)),
+                _breakdownRow('إجمالي الإرسال', 142_340, core_theme.AC.ok, bold: true),
+                _breakdownRow('من الأحمال على الشركة', 78_340, core_theme.AC.ok),
               ],
             ),
           ),
@@ -295,13 +296,13 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFD97706).withOpacity(0.08),
+              color: core_theme.AC.warn.withOpacity(0.08),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFD97706).withOpacity(0.3)),
+              border: Border.all(color: core_theme.AC.warn.withOpacity(0.3)),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.warning, color: Color(0xFFD97706), size: 18),
+                Icon(Icons.warning, color: core_theme.AC.warn, size: 18),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -319,7 +320,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.preview, size: 14),
-                label: const Text('معاينة'),
+                label: Text('معاينة'),
               ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
@@ -331,7 +332,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                   );
                 },
                 icon: const Icon(Icons.send, size: 14),
-                label: const Text('إرسال الآن'),
+                label: Text('إرسال الآن'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2E7D5B),
                   foregroundColor: Colors.white,
@@ -409,7 +410,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                   child: const Icon(Icons.shield, color: Colors.white, size: 28),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -420,7 +421,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                       SizedBox(height: 4),
                       Text(
                         'ملف SIF جاهز للتسليم لمنصّة مدد — 87 موظف',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 12),
                       ),
                     ],
                   ),
@@ -428,7 +429,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF059669),
+                    color: core_theme.AC.ok,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Row(
@@ -443,23 +444,23 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('ملف SIF — أبريل 2026', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('ملف SIF — أبريل 2026', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
-                _sifRow('عدد الموظفين', '87', Icons.people, const Color(0xFF2563EB)),
-                _sifRow('إجمالي الرواتب', '780,000 ر.س', Icons.payments, const Color(0xFF059669)),
-                _sifRow('معرّف المنشأة', 'EST-8472-2021', Icons.business, Colors.black54),
-                _sifRow('رقم البنك', 'SA03-8000-0000-6080101469XX', Icons.account_balance, const Color(0xFFD4AF37)),
-                _sifRow('تاريخ الاستحقاق', '2026-05-01', Icons.event, const Color(0xFFD97706)),
-                _sifRow('حجم الملف', '4.2 KB', Icons.description, Colors.black54),
+                _sifRow('عدد الموظفين', '87', Icons.people, core_theme.AC.info),
+                _sifRow('إجمالي الرواتب', '780,000 ر.س', Icons.payments, core_theme.AC.ok),
+                _sifRow('معرّف المنشأة', 'EST-8472-2021', Icons.business, core_theme.AC.ts),
+                _sifRow('رقم البنك', 'SA03-8000-0000-6080101469XX', Icons.account_balance, core_theme.AC.gold),
+                _sifRow('تاريخ الاستحقاق', '2026-05-01', Icons.event, core_theme.AC.warn),
+                _sifRow('حجم الملف', '4.2 KB', Icons.description, core_theme.AC.ts),
               ],
             ),
           ),
@@ -469,13 +470,13 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.preview, size: 14),
-                label: const Text('معاينة الملف'),
+                label: Text('معاينة الملف'),
               ),
               const SizedBox(width: 8),
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.download, size: 14),
-                label: const Text('تحميل SIF'),
+                label: Text('تحميل SIF'),
               ),
               const Spacer(),
               ElevatedButton.icon(
@@ -487,7 +488,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                   );
                 },
                 icon: const Icon(Icons.cloud_upload, size: 14),
-                label: const Text('رفع إلى مدد'),
+                label: Text('رفع إلى مدد'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2E7D5B),
                   foregroundColor: Colors.white,
@@ -523,13 +524,13 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('انحرافات هذا الشهر', '3', Icons.warning, const Color(0xFFD97706)),
+            _Stat('انحرافات هذا الشهر', '3', Icons.warning, core_theme.AC.warn),
             _Stat('عالية الخطورة', '1', Icons.error, const Color(0xFFB91C1C)),
-            _Stat('تم حلّها', '7 هذا الربع', Icons.check_circle, const Color(0xFF059669)),
-            _Stat('إجمالي الفوارق', '8,400 ر.س', Icons.compare_arrows, const Color(0xFF7C3AED)),
+            _Stat('تم حلّها', '7 هذا الربع', Icons.check_circle, core_theme.AC.ok),
+            _Stat('إجمالي الفوارق', '8,400 ر.س', Icons.compare_arrows, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
-          const Text('الانحرافات بين GOSI والرواتب', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('الانحرافات بين GOSI والرواتب', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           _varianceCard(
             'سارة محمود',
@@ -542,14 +543,14 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
             'خالد أحمد',
             'تاريخ الالتحاق: GOSI 2022-09-01 vs HR 2022-09-15',
             'فارق 14 يوم — قد يؤثر على حساب العلاوات',
-            const Color(0xFFD97706),
+            core_theme.AC.warn,
             action: 'تأكيد التاريخ',
           ),
           _varianceCard(
             'فاطمة علي',
             'الحالة: GOSI نشط vs HR في إجازة أمومة',
             'تحديث الحالة في GOSI يوفر 1,320 ر.س/شهر',
-            const Color(0xFF2563EB),
+            core_theme.AC.info,
             action: 'تعديل الحالة',
           ),
         ],
@@ -584,7 +585,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                 Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                 Text(issue, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 2),
-                Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -615,14 +616,14 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('سجل الإرساليات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('سجل الإرساليات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final h in [
-            _History('أبريل 2026', 142340, 87, 'معتمد ✓', const Color(0xFF059669)),
-            _History('مارس 2026', 138920, 86, 'معتمد ✓', const Color(0xFF059669)),
-            _History('فبراير 2026', 135600, 85, 'معتمد ✓', const Color(0xFF059669)),
-            _History('يناير 2026', 131480, 84, 'معتمد ✓', const Color(0xFF059669)),
-            _History('ديسمبر 2025', 128300, 82, 'معتمد ✓', const Color(0xFF059669)),
+            _History('أبريل 2026', 142340, 87, 'معتمد ✓', core_theme.AC.ok),
+            _History('مارس 2026', 138920, 86, 'معتمد ✓', core_theme.AC.ok),
+            _History('فبراير 2026', 135600, 85, 'معتمد ✓', core_theme.AC.ok),
+            _History('يناير 2026', 131480, 84, 'معتمد ✓', core_theme.AC.ok),
+            _History('ديسمبر 2025', 128300, 82, 'معتمد ✓', core_theme.AC.ok),
           ])
             Container(
               margin: const EdgeInsets.only(bottom: 8),
@@ -630,18 +631,18 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black.withOpacity(0.08)),
+                border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.event, size: 16, color: Colors.black54),
+                  Icon(Icons.event, size: 16, color: core_theme.AC.ts),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(h.period, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                        Text('${h.employees} موظف', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text('${h.employees} موظف', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
@@ -687,7 +688,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(s.value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: s.color)),
-                        Text(s.label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text(s.label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),

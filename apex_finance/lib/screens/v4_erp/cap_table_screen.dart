@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CapTableScreen extends StatefulWidget {
   const CapTableScreen({super.key});
@@ -17,24 +18,24 @@ class _CapTableScreenState extends State<CapTableScreen>
   late final TabController _tab;
 
   // 1,000,000 total shares fully diluted
-  final _shareholders = const [
-    _Shareholder('SH-001', 'المؤسسون', 'founders', 380000, 38.0, 'Common', '2015-06-15', 1.00, null, Color(0xFFD4AF37)),
-    _Shareholder('SH-002', 'Gulf Capital Partners', 'vc', 145000, 14.5, 'Series A Pref', '2018-03-20', 4.50, '1x Non-participating', Colors.blue),
-    _Shareholder('SH-003', 'Aramco Ventures', 'vc', 95000, 9.5, 'Series B Pref', '2020-09-12', 8.20, '1x Participating', Colors.green),
-    _Shareholder('SH-004', 'STV - Saudi Technology Ventures', 'vc', 80000, 8.0, 'Series B Pref', '2020-09-12', 8.20, '1x Participating', Colors.green),
-    _Shareholder('SH-005', 'Public Investment Fund', 'vc', 125000, 12.5, 'Series C Pref', '2023-11-08', 15.75, '1x Non-participating', Colors.purple),
-    _Shareholder('SH-006', 'Employee Stock Option Pool', 'esop', 85000, 8.5, 'Options', '—', 4.25, null, Colors.orange),
-    _Shareholder('SH-007', 'Angel Investors (Group)', 'angel', 35000, 3.5, 'Common', '2016-11-01', 1.80, null, Colors.teal),
-    _Shareholder('SH-008', 'مستثمرون استراتيجيون', 'strategic', 55000, 5.5, 'Series B Pref', '2021-04-15', 9.10, '1x Participating', Colors.indigo),
+  final _shareholders = [
+    _Shareholder('SH-001', 'المؤسسون', 'founders', 380000, 38.0, 'Common', '2015-06-15', 1.00, null, core_theme.AC.gold),
+    _Shareholder('SH-002', 'Gulf Capital Partners', 'vc', 145000, 14.5, 'Series A Pref', '2018-03-20', 4.50, '1x Non-participating', core_theme.AC.info),
+    _Shareholder('SH-003', 'Aramco Ventures', 'vc', 95000, 9.5, 'Series B Pref', '2020-09-12', 8.20, '1x Participating', core_theme.AC.ok),
+    _Shareholder('SH-004', 'STV - Saudi Technology Ventures', 'vc', 80000, 8.0, 'Series B Pref', '2020-09-12', 8.20, '1x Participating', core_theme.AC.ok),
+    _Shareholder('SH-005', 'Public Investment Fund', 'vc', 125000, 12.5, 'Series C Pref', '2023-11-08', 15.75, '1x Non-participating', core_theme.AC.purple),
+    _Shareholder('SH-006', 'Employee Stock Option Pool', 'esop', 85000, 8.5, 'Options', '—', 4.25, null, core_theme.AC.warn),
+    _Shareholder('SH-007', 'Angel Investors (Group)', 'angel', 35000, 3.5, 'Common', '2016-11-01', 1.80, null, core_theme.AC.info),
+    _Shareholder('SH-008', 'مستثمرون استراتيجيون', 'strategic', 55000, 5.5, 'Series B Pref', '2021-04-15', 9.10, '1x Participating', core_theme.AC.purple),
   ];
 
-  final _rounds = const [
-    _FundingRound('التأسيس', '2015-06', 1.00, 380000, 'المؤسسون', 1500000, Color(0xFFD4AF37)),
-    _FundingRound('Seed (Angel)', '2016-11', 1.80, 35000, 'أفراد مستثمرون', 63000, Colors.teal),
-    _FundingRound('Series A', '2018-03', 4.50, 145000, 'Gulf Capital Partners', 652500, Colors.blue),
-    _FundingRound('Series B', '2020-09', 8.20, 175000, 'Aramco Ventures + STV', 1435000, Colors.green),
-    _FundingRound('Strategic', '2021-04', 9.10, 55000, 'مستثمرون استراتيجيون', 500500, Colors.indigo),
-    _FundingRound('Series C', '2023-11', 15.75, 125000, 'Public Investment Fund', 1968750, Colors.purple),
+  final _rounds = [
+    _FundingRound('التأسيس', '2015-06', 1.00, 380000, 'المؤسسون', 1500000, core_theme.AC.gold),
+    _FundingRound('Seed (Angel)', '2016-11', 1.80, 35000, 'أفراد مستثمرون', 63000, core_theme.AC.info),
+    _FundingRound('Series A', '2018-03', 4.50, 145000, 'Gulf Capital Partners', 652500, core_theme.AC.info),
+    _FundingRound('Series B', '2020-09', 8.20, 175000, 'Aramco Ventures + STV', 1435000, core_theme.AC.ok),
+    _FundingRound('Strategic', '2021-04', 9.10, 55000, 'مستثمرون استراتيجيون', 500500, core_theme.AC.purple),
+    _FundingRound('Series C', '2023-11', 15.75, 125000, 'Public Investment Fund', 1968750, core_theme.AC.purple),
   ];
 
   @override
@@ -60,9 +61,9 @@ class _CapTableScreenState extends State<CapTableScreen>
         _buildSummary(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.people, size: 16), text: 'المساهمون'),
             Tab(icon: Icon(Icons.pie_chart, size: 16), text: 'هيكل الملكية'),
@@ -93,7 +94,7 @@ class _CapTableScreenState extends State<CapTableScreen>
         gradient: const LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF3949AB)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.donut_large, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -104,7 +105,7 @@ class _CapTableScreenState extends State<CapTableScreen>
                 Text('جدول رأس المال (Cap Table)',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('هيكل الملكية · جولات التمويل · التخفيف · شروط الأفضلية · Vesting',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -118,11 +119,11 @@ class _CapTableScreenState extends State<CapTableScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('القيمة الحالية', '485M ر.س', const Color(0xFFD4AF37), Icons.monetization_on),
-          _kpi('إجمالي الأسهم', '${_fmt(_totalShares)}', Colors.blue, Icons.bar_chart),
-          _kpi('عدد المساهمين', '${_shareholders.length}', Colors.purple, Icons.people),
-          _kpi('جولات التمويل', '${_rounds.length}', Colors.green, Icons.trending_up),
-          _kpi('آخر جولة', 'Series C · 15.75', Colors.teal, Icons.flag),
+          _kpi('القيمة الحالية', '485M ر.س', core_theme.AC.gold, Icons.monetization_on),
+          _kpi('إجمالي الأسهم', '${_fmt(_totalShares)}', core_theme.AC.info, Icons.bar_chart),
+          _kpi('عدد المساهمين', '${_shareholders.length}', core_theme.AC.purple, Icons.people),
+          _kpi('جولات التمويل', '${_rounds.length}', core_theme.AC.ok, Icons.trending_up),
+          _kpi('آخر جولة', 'Series C · 15.75', core_theme.AC.info, Icons.flag),
         ],
       ),
     );
@@ -146,7 +147,7 @@ class _CapTableScreenState extends State<CapTableScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -165,13 +166,13 @@ class _CapTableScreenState extends State<CapTableScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
+                color: core_theme.AC.navy3,
                 child: const Row(
                   children: [
                     Expanded(child: Text('المعرّف', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -188,7 +189,7 @@ class _CapTableScreenState extends State<CapTableScreen>
               for (final sh in _shareholders) _shRow(sh),
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade50,
+                color: core_theme.AC.navy3,
                 child: Row(
                   children: [
                     const Expanded(child: SizedBox()),
@@ -200,7 +201,7 @@ class _CapTableScreenState extends State<CapTableScreen>
                     const Expanded(child: SizedBox()),
                     Expanded(
                       child: Text('${_fmtM(_currentValuation)} ر.س',
-                          style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                          style: TextStyle(fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
                     ),
                   ],
                 ),
@@ -217,7 +218,7 @@ class _CapTableScreenState extends State<CapTableScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
       ),
       child: Row(
         children: [
@@ -242,7 +243,7 @@ class _CapTableScreenState extends State<CapTableScreen>
             ),
           ),
           Expanded(child: Text(_fmt(sh.shares.toDouble()), style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
-          Expanded(child: Text('${sh.percentage}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+          Expanded(child: Text('${sh.percentage}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
           Expanded(
             flex: 2,
             child: Column(
@@ -250,14 +251,14 @@ class _CapTableScreenState extends State<CapTableScreen>
               children: [
                 Text(sh.shareClass, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                 if (sh.preference != null)
-                  Text(sh.preference!, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+                  Text(sh.preference!, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
               ],
             ),
           ),
           Expanded(child: Text('${sh.pricePerShare} ر.س', style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
           Expanded(
             child: Text(_fmtM(currentValue),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, fontFamily: 'monospace', color: Colors.green)),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, fontFamily: 'monospace', color: core_theme.AC.ok)),
           ),
         ],
       ),
@@ -280,18 +281,18 @@ class _CapTableScreenState extends State<CapTableScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('التوزيع حسب نوع المساهم',
+              Text('التوزيع حسب نوع المساهم',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 20),
               // Stacked bar
               Container(
                 height: 60,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.grey.shade100),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: core_theme.AC.navy3),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Row(
@@ -324,8 +325,8 @@ class _CapTableScreenState extends State<CapTableScreen>
                       Expanded(flex: 2, child: Text(_typeLabel(entry.key), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
                       Expanded(flex: 4, child: LinearProgressIndicator(
                         value: entry.value / 100,
-                        backgroundColor: Colors.grey.shade100,
-                        valueColor: AlwaysStoppedAnimation(colorByType[entry.key] ?? Colors.grey),
+                        backgroundColor: core_theme.AC.navy3,
+                        valueColor: AlwaysStoppedAnimation(colorByType[entry.key] ?? core_theme.AC.td),
                         minHeight: 10,
                       )),
                       const SizedBox(width: 10),
@@ -341,16 +342,16 @@ class _CapTableScreenState extends State<CapTableScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.info, color: Colors.blue),
+                  Icon(Icons.info, color: core_theme.AC.info),
                   SizedBox(width: 8),
                   Text('ملاحظات هيكل الملكية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                 ],
@@ -373,7 +374,7 @@ class _CapTableScreenState extends State<CapTableScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.circle, size: 6, color: Colors.blue),
+          Icon(Icons.circle, size: 6, color: core_theme.AC.info),
           const SizedBox(width: 8),
           Expanded(child: Text(text, style: const TextStyle(fontSize: 12, height: 1.6))),
         ],
@@ -419,8 +420,8 @@ class _CapTableScreenState extends State<CapTableScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(r.name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
-                Text(r.date, style: const TextStyle(fontSize: 12, color: Colors.black54, fontFamily: 'monospace')),
-                Text(r.leadInvestor, style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w600)),
+                Text(r.date, style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontFamily: 'monospace')),
+                Text(r.leadInvestor, style: TextStyle(fontSize: 11, color: core_theme.AC.tp, fontWeight: FontWeight.w600)),
               ],
             ),
           ),
@@ -429,18 +430,18 @@ class _CapTableScreenState extends State<CapTableScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('سعر السهم', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('سعر السهم', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 Text('${r.pricePerShare} ر.س',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: r.color, fontFamily: 'monospace')),
                 if (prev != null)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.12),
+                      color: core_theme.AC.ok.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text('+${((multiplier - 1) * 100).toStringAsFixed(0)}%',
-                        style: const TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.w800)),
+                        style: TextStyle(fontSize: 10, color: core_theme.AC.ok, fontWeight: FontWeight.w800)),
                   ),
               ],
             ),
@@ -450,7 +451,7 @@ class _CapTableScreenState extends State<CapTableScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('الأسهم المُصدرة', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('الأسهم المُصدرة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 Text(_fmt(r.sharesIssued.toDouble()),
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, fontFamily: 'monospace')),
               ],
@@ -461,9 +462,9 @@ class _CapTableScreenState extends State<CapTableScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Text('إجمالي الجولة', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('إجمالي الجولة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 Text('${_fmtM(r.amount.toDouble())} ر.س',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -485,13 +486,13 @@ class _CapTableScreenState extends State<CapTableScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.amber.shade50,
+            color: core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.amber.shade200),
+            border: Border.all(color: core_theme.AC.warn),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.amber),
+              Icon(Icons.info, color: core_theme.AC.warn),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -509,7 +510,7 @@ class _CapTableScreenState extends State<CapTableScreen>
   }
 
   Widget _scenarioCard(_DilutionScenario s) {
-    final color = s.retention >= 95 ? Colors.green : s.retention >= 80 ? Colors.orange : Colors.red;
+    final color = s.retention >= 95 ? core_theme.AC.ok : s.retention >= 80 ? core_theme.AC.warn : core_theme.AC.err;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -538,15 +539,15 @@ class _CapTableScreenState extends State<CapTableScreen>
           if (s.pricePerShare > 0) ...[
             Row(
               children: [
-                _metric('سعر السهم الجديد', '${s.pricePerShare} ر.س', Colors.blue),
-                _metric('أسهم جديدة', _fmt(s.newShares), Colors.purple),
-                _metric('إجمالي الأسهم بعد', _fmt(_totalShares + s.newShares), Colors.teal),
-                _metric('القيمة بعد الجولة', '${_fmtM(_currentValuation + s.newShares * s.pricePerShare)} ر.س', Colors.green),
+                _metric('سعر السهم الجديد', '${s.pricePerShare} ر.س', core_theme.AC.info),
+                _metric('أسهم جديدة', _fmt(s.newShares), core_theme.AC.purple),
+                _metric('إجمالي الأسهم بعد', _fmt(_totalShares + s.newShares), core_theme.AC.info),
+                _metric('القيمة بعد الجولة', '${_fmtM(_currentValuation + s.newShares * s.pricePerShare)} ر.س', core_theme.AC.ok),
               ],
             ),
             const SizedBox(height: 14),
-            const Text('أثر التخفيف على المساهمين الحاليين:',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.black54)),
+            Text('أثر التخفيف على المساهمين الحاليين:',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
             const SizedBox(height: 10),
             for (final sh in _shareholders.take(5))
               Padding(
@@ -557,23 +558,23 @@ class _CapTableScreenState extends State<CapTableScreen>
                     const SizedBox(width: 8),
                     Expanded(flex: 3, child: Text(sh.name, style: const TextStyle(fontSize: 11))),
                     Text('${sh.percentage}%',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
-                    const Padding(
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Icon(Icons.arrow_forward, size: 11, color: Colors.black45),
+                      child: Icon(Icons.arrow_forward, size: 11, color: core_theme.AC.td),
                     ),
                     Text('${(sh.percentage * s.retention / 100).toStringAsFixed(2)}%',
-                        style: const TextStyle(
-                            fontSize: 12, color: Color(0xFFD4AF37), fontFamily: 'monospace', fontWeight: FontWeight.w800)),
+                        style: TextStyle(
+                            fontSize: 12, color: core_theme.AC.gold, fontFamily: 'monospace', fontWeight: FontWeight.w800)),
                     const SizedBox(width: 10),
                     Text('(${((sh.percentage * s.retention / 100) - sh.percentage).toStringAsFixed(2)}pp)',
-                        style: const TextStyle(fontSize: 10, color: Colors.red)),
+                        style: TextStyle(fontSize: 10, color: core_theme.AC.err)),
                   ],
                 ),
               ),
           ] else
-            const Text('الوضع الحالي — لا تغيير',
-                style: TextStyle(fontSize: 12, color: Colors.black54, fontStyle: FontStyle.italic)),
+            Text('الوضع الحالي — لا تغيير',
+                style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontStyle: FontStyle.italic)),
         ],
       ),
     );
@@ -584,7 +585,7 @@ class _CapTableScreenState extends State<CapTableScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)),
         ],
       ),

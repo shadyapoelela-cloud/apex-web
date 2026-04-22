@@ -20,6 +20,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_risk_badge.dart';
 
@@ -53,8 +54,8 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A148C), Color(0xFF2563EB)],
+        gradient: LinearGradient(
+          colors: [Color(0xFF4A148C), core_theme.AC.info],
         ),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -72,7 +73,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   'تحليل المراجعة التلقائي',
                   style: TextStyle(
@@ -84,7 +85,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
                 SizedBox(height: 4),
                 Text(
                   'ارفع ميزان المراجعة · يفحص 8 اختبارات تلقائياً · نتائج في ثواني',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 13),
                 ),
               ],
             ),
@@ -95,9 +96,9 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
               color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.emoji_events, size: 12, color: Colors.amber),
+                Icon(Icons.emoji_events, size: 12, color: core_theme.AC.warn),
                 SizedBox(width: 4),
                 Text(
                   'يغني عن Inflo + MindBridge',
@@ -143,9 +144,9 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'ملف CSV/Excel — يحتوي على الحسابات + الأرصدة المدينة والدائنة',
-            style: TextStyle(fontSize: 13, color: Colors.black54),
+            style: TextStyle(fontSize: 13, color: core_theme.AC.ts),
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -192,21 +193,21 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
             _StatCard(
               label: 'المعاملات المفحوصة',
               value: '4,821',
-              color: const Color(0xFF2563EB),
+              color: core_theme.AC.info,
               icon: Icons.receipt_long,
             ),
             const SizedBox(width: 12),
             _StatCard(
               label: 'اختبارات نجحت',
               value: '5 / 8',
-              color: const Color(0xFF059669),
+              color: core_theme.AC.ok,
               icon: Icons.check_circle,
             ),
             const SizedBox(width: 12),
             _StatCard(
               label: 'استثناءات',
               value: '23',
-              color: const Color(0xFFD97706),
+              color: core_theme.AC.warn,
               icon: Icons.warning,
             ),
             const SizedBox(width: 12),
@@ -368,7 +369,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,10 +406,10 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
                           children: [
                             Text(
                               t.id,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'monospace',
                                 fontSize: 12,
-                                color: Colors.black54,
+                                color: core_theme.AC.ts,
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -420,7 +421,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
                         ),
                         Text(
                           t.date,
-                          style: const TextStyle(fontSize: 11, color: Colors.black54),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                         ),
                       ],
                     ),
@@ -454,7 +455,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: ExpansionTile(
         leading: Container(
@@ -466,7 +467,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
           child: Icon(icon, color: color, size: 16),
         ),
         title: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-        subtitle: Text(description, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        subtitle: Text(description, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
@@ -504,7 +505,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('• ', style: TextStyle(color: Colors.black54)),
+                          Text('• ', style: TextStyle(color: core_theme.AC.ts)),
                           Expanded(
                             child: Text(
                               f,
@@ -525,10 +526,10 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
 
   (Color, IconData, String) _statusMeta(_TestStatus s) {
     switch (s) {
-      case _TestStatus.pass: return (const Color(0xFF059669), Icons.check_circle, 'نجح');
-      case _TestStatus.warning: return (const Color(0xFFD97706), Icons.warning, 'تحذير');
+      case _TestStatus.pass: return (core_theme.AC.ok, Icons.check_circle, 'نجح');
+      case _TestStatus.warning: return (core_theme.AC.warn, Icons.warning, 'تحذير');
       case _TestStatus.fail: return (const Color(0xFFB91C1C), Icons.error, 'فشل');
-      case _TestStatus.info: return (const Color(0xFF2563EB), Icons.info, 'معلومات');
+      case _TestStatus.info: return (core_theme.AC.info, Icons.info, 'معلومات');
     }
   }
 }
@@ -585,7 +586,7 @@ class _StatCard extends StatelessWidget {
                 value,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color),
               ),
-              Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+              Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ],
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// 🎉 Wave 120 — Restaurant POS (Foodics-killer) MILESTONE
 class RestaurantPosScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _RestaurantPosScreenState extends State<RestaurantPosScreen> with SingleTi
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الطاولات'), Tab(text: 'القائمة'), Tab(text: 'الطلبات'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_tablesTab(), _menuTab(), _ordersTab(), _analyticsTab()])),
       ])),
@@ -35,10 +36,10 @@ class _RestaurantPosScreenState extends State<RestaurantPosScreen> with SingleTi
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.restaurant, color: Color(0xFFBF360C), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('نظام نقاط بيع المطاعم 🎉 Wave 120', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('طاولات، طلبات، مطبخ، توصيل — متعدد الفروع', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('طاولات، طلبات، مطبخ، توصيل — متعدد الفروع', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -48,7 +49,7 @@ class _RestaurantPosScreenState extends State<RestaurantPosScreen> with SingleTi
     final occupied = _tables.where((t)=>t.status.contains('مشغول')).length;
     return Container(padding: const EdgeInsets.all(12), color: Colors.white, child: Row(children: [
       Expanded(child: _kpi('مبيعات اليوم', '${(sales/1000).toStringAsFixed(1)}K', Icons.attach_money, const Color(0xFFBF360C))),
-      Expanded(child: _kpi('طاولات مشغولة', '$occupied/${_tables.length}', Icons.table_restaurant, const Color(0xFFD4AF37))),
+      Expanded(child: _kpi('طاولات مشغولة', '$occupied/${_tables.length}', Icons.table_restaurant, core_theme.AC.gold)),
       Expanded(child: _kpi('طلبات نشطة', '${_orders.where((o)=>o.status.contains('قيد')).length}', Icons.kitchen, const Color(0xFF4A148C))),
       Expanded(child: _kpi('متوسط الفاتورة', '185 ر.س', Icons.receipt, const Color(0xFF2E7D32))),
     ]));
@@ -58,7 +59,7 @@ class _RestaurantPosScreenState extends State<RestaurantPosScreen> with SingleTi
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -70,7 +71,7 @@ class _RestaurantPosScreenState extends State<RestaurantPosScreen> with SingleTi
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(Icons.table_restaurant, color: color, size: 32),
           Text('T-${t.number}', style: TextStyle(fontWeight: FontWeight.bold, color: color, fontSize: 14)),
-          Text('${t.seats} مقعد', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text('${t.seats} مقعد', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
@@ -118,30 +119,30 @@ class _RestaurantPosScreenState extends State<RestaurantPosScreen> with SingleTi
 
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('🍽️ أوقات الذروة', 'الغداء 12-14 • العشاء 20-22 — 68% من المبيعات', const Color(0xFFBF360C)),
-    _insight('🥇 الأكثر مبيعاً', 'كبسة لحم 18% • شاورما دجاج 14% • برياني 12%', const Color(0xFFD4AF37)),
+    _insight('🥇 الأكثر مبيعاً', 'كبسة لحم 18% • شاورما دجاج 14% • برياني 12%', core_theme.AC.gold),
     _insight('⏱️ زمن التحضير', 'متوسط 14 دقيقة (الهدف 15)', const Color(0xFF2E7D32)),
     _insight('💰 نمو سنوي', '+24% YoY على مستوى الفروع', const Color(0xFF4A148C)),
     _insight('📱 طلبات التوصيل', '42% عبر Jahez + HungerStation + Keeta', const Color(0xFF1A237E)),
-    _insight('🎉 Milestone', 'وصلنا Wave 120 — 120 شاشة إنتاجية!', const Color(0xFFD4AF37)),
+    _insight('🎉 Milestone', 'وصلنا Wave 120 — 120 شاشة إنتاجية!', core_theme.AC.gold),
   ]);
 
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _tableColor(String s) {
     if (s.contains('متاح')) return const Color(0xFF2E7D32);
     if (s.contains('مشغول')) return const Color(0xFFBF360C);
-    if (s.contains('محجوز')) return const Color(0xFFD4AF37);
+    if (s.contains('محجوز')) return core_theme.AC.gold;
     if (s.contains('تنظيف')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   Color _categoryColor(String c) {
     if (c.contains('رئيسية')) return const Color(0xFFBF360C);
-    if (c.contains('مقبلات')) return const Color(0xFFD4AF37);
+    if (c.contains('مقبلات')) return core_theme.AC.gold;
     if (c.contains('حلويات')) return const Color(0xFF4A148C);
     if (c.contains('مشروبات')) return const Color(0xFF1A237E);
     return const Color(0xFF2E7D32);
@@ -165,7 +166,7 @@ class _RestaurantPosScreenState extends State<RestaurantPosScreen> with SingleTi
   Color _orderStatus(String s) {
     if (s.contains('مدفوع')) return const Color(0xFF2E7D32);
     if (s.contains('قيد التحضير')) return const Color(0xFFE65100);
-    if (s.contains('جاهز')) return const Color(0xFFD4AF37);
+    if (s.contains('جاهز')) return core_theme.AC.gold;
     return const Color(0xFF1A237E);
   }
 

@@ -9,6 +9,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/templates/object_page_template.dart';
 
@@ -20,8 +21,8 @@ class JeBuilderV52Screen extends StatefulWidget {
 }
 
 class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
       titleAr: 'قيد يومية JE-2026-4218',
       subtitleAr: 'تسوية نهاية الفترة · 45,000 ر.س',
       statusLabelAr: 'قيد الاعتماد',
-      statusColor: Colors.orange,
+      statusColor: core_theme.AC.warn,
       processStages: const [
         ProcessStage(labelAr: 'مسودة'),
         ProcessStage(labelAr: 'قيد الاعتماد'),
@@ -40,22 +41,22 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
       smartButtons: [
         SmartButton(icon: Icons.receipt, labelAr: 'فواتير مرتبطة', count: 3, color: _gold, onTap: () {}),
         SmartButton(icon: Icons.attach_file, labelAr: 'مرفقات', count: 2, color: _navy, onTap: () {}),
-        SmartButton(icon: Icons.link, labelAr: 'معاملات بين شركات', count: 1, color: Colors.purple, onTap: () {}),
-        SmartButton(icon: Icons.history, labelAr: 'قيود عكسية', count: 0, color: Colors.red, onTap: () {}),
+        SmartButton(icon: Icons.link, labelAr: 'معاملات بين شركات', count: 1, color: core_theme.AC.purple, onTap: () {}),
+        SmartButton(icon: Icons.history, labelAr: 'قيود عكسية', count: 0, color: core_theme.AC.err, onTap: () {}),
       ],
       primaryActions: [
         OutlinedButton.icon(
           onPressed: () {},
           icon: const Icon(Icons.close, size: 16),
-          label: const Text('رفض'),
-          style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+          label: Text('رفض'),
+          style: OutlinedButton.styleFrom(foregroundColor: core_theme.AC.err),
         ),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: () {},
           style: FilledButton.styleFrom(backgroundColor: _gold),
           icon: const Icon(Icons.check, size: 16),
-          label: const Text('اعتماد وترحيل'),
+          label: Text('اعتماد وترحيل'),
         ),
       ],
       tabs: [
@@ -140,14 +141,14 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(titleAr,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(height: 12),
           child,
@@ -190,7 +191,7 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
           child: _summaryPill(
             label: 'إجمالي الدائن',
             value: '45,000.00',
-            color: const Color(0xFFD4AF37),
+            color: core_theme.AC.gold,
             icon: Icons.arrow_circle_down,
           ),
         ),
@@ -199,7 +200,7 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
           child: _summaryPill(
             label: 'الفرق',
             value: '0.00',
-            color: Colors.green,
+            color: core_theme.AC.ok,
             icon: Icons.check_circle,
           ),
         ),
@@ -240,8 +241,8 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
       children: [
         _kvRow(Icons.event, 'تاريخ الترحيل المقترح', '2026-04-19'),
         _kvRow(Icons.account_tree, 'الفرع', 'الرياض — فرع رئيسي'),
-        _kvRow(Icons.check_circle, 'الميزان متوازن', 'نعم ✓', color: Colors.green),
-        _kvRow(Icons.warning, 'تنبيه AI', 'قيم كبيرة — يحتاج مراجعة إضافية', color: Colors.orange),
+        _kvRow(Icons.check_circle, 'الميزان متوازن', 'نعم ✓', color: core_theme.AC.ok),
+        _kvRow(Icons.warning, 'تنبيه AI', 'قيم كبيرة — يحتاج مراجعة إضافية', color: core_theme.AC.warn),
       ],
     );
   }
@@ -252,7 +253,7 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
         ],
       ),
@@ -264,9 +265,9 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: color ?? Colors.black54),
+          Icon(icon, size: 16, color: color ?? core_theme.AC.ts),
           const SizedBox(width: 10),
-          Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           const SizedBox(width: 8),
           Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color)),
         ],
@@ -288,14 +289,14 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: core_theme.AC.navy3,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                 ),
                 child: const Row(
@@ -311,25 +312,25 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
               ...lines.map((l) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+                      border: Border(bottom: BorderSide(color: core_theme.AC.bdr)),
                     ),
                     child: Row(
                       children: [
                         SizedBox(width: 40, child: Text(l.$1, style: const TextStyle(fontSize: 12))),
                         Expanded(flex: 3, child: Text(l.$2, style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
                         Expanded(flex: 3, child: Text(l.$3, style: const TextStyle(fontSize: 12))),
-                        SizedBox(width: 120, child: Text(l.$4 > 0 ? l.$4.toStringAsFixed(2) : '—', style: TextStyle(fontSize: 12, fontWeight: l.$4 > 0 ? FontWeight.w800 : FontWeight.w400, color: l.$4 > 0 ? const Color(0xFF2E7D5B) : Colors.black38), textAlign: TextAlign.end)),
-                        SizedBox(width: 120, child: Text(l.$5 > 0 ? l.$5.toStringAsFixed(2) : '—', style: TextStyle(fontSize: 12, fontWeight: l.$5 > 0 ? FontWeight.w800 : FontWeight.w400, color: l.$5 > 0 ? const Color(0xFFD4AF37) : Colors.black38), textAlign: TextAlign.end)),
+                        SizedBox(width: 120, child: Text(l.$4 > 0 ? l.$4.toStringAsFixed(2) : '—', style: TextStyle(fontSize: 12, fontWeight: l.$4 > 0 ? FontWeight.w800 : FontWeight.w400, color: l.$4 > 0 ? const Color(0xFF2E7D5B) : core_theme.AC.td), textAlign: TextAlign.end)),
+                        SizedBox(width: 120, child: Text(l.$5 > 0 ? l.$5.toStringAsFixed(2) : '—', style: TextStyle(fontSize: 12, fontWeight: l.$5 > 0 ? FontWeight.w800 : FontWeight.w400, color: l.$5 > 0 ? core_theme.AC.gold : core_theme.AC.td), textAlign: TextAlign.end)),
                       ],
                     ),
                   )),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: core_theme.AC.navy3,
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Expanded(child: Text('الإجمالي', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy))),
                     SizedBox(width: 120, child: Text('45,000.00', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy), textAlign: TextAlign.end)),
@@ -345,16 +346,16 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
   }
 
   Widget _buildAccountingTab() {
-    return const Center(
+    return Center(
       child: Padding(
         padding: EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.account_balance, size: 56, color: Colors.black26),
+            Icon(Icons.account_balance, size: 56, color: core_theme.AC.td),
             SizedBox(height: 12),
             Text('تبويب المحاسبة — يعرض COA IDs وأسماء الحسابات بالإنجليزي',
-                style: TextStyle(color: Colors.black54)),
+                style: TextStyle(color: core_theme.AC.ts)),
           ],
         ),
       ),
@@ -364,16 +365,16 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
   Widget _buildAttachmentsTab() {
     return ListView(
       padding: const EdgeInsets.all(24),
-      children: const [
+      children: [
         ListTile(
-          leading: Icon(Icons.picture_as_pdf, color: Colors.red),
+          leading: Icon(Icons.picture_as_pdf, color: core_theme.AC.err),
           title: Text('إثبات التحصيل - بنك الرياض.pdf'),
           subtitle: Text('1.4 MB · رُفع 2026-04-19'),
           trailing: Icon(Icons.download),
         ),
         Divider(height: 1),
         ListTile(
-          leading: Icon(Icons.image, color: Colors.blue),
+          leading: Icon(Icons.image, color: core_theme.AC.info),
           title: Text('صورة الإيداع.jpg'),
           subtitle: Text('840 KB · رُفع 2026-04-19'),
           trailing: Icon(Icons.download),
@@ -399,7 +400,7 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: core_theme.AC.bdr),
         ),
         child: Row(
           children: [
@@ -415,7 +416,7 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
                 children: [
                   Text(trail[i].$3, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   Text('${trail[i].$1} · ${trail[i].$2}',
-                      style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                      style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ],
               ),
             ),

@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class EsgDashboardScreen extends StatefulWidget {
   const EsgDashboardScreen({super.key});
@@ -38,7 +39,7 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF2E7D32),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF2E7D32),
           tabs: const [
             Tab(icon: Icon(Icons.eco, size: 16), text: 'البيئة'),
@@ -68,7 +69,7 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
         gradient: const LinearGradient(colors: [Color(0xFF1B5E20), Color(0xFF388E3C)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.eco, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -79,7 +80,7 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
                 Text('الاستدامة والحوكمة (ESG) 🌱',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('متوافق مع رؤية 2030 · GRI Standards · SASB · CDP',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -93,10 +94,10 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _scoreCard('النتيجة الإجمالية', 'A-', 78, const Color(0xFFD4AF37), 'من أفضل 15%'),
-          _scoreCard('البيئة (E)', 'B+', 72, Colors.green, '+5pt YoY'),
-          _scoreCard('الاجتماعية (S)', 'A', 85, Colors.blue, 'ممتاز'),
-          _scoreCard('الحوكمة (G)', 'A', 82, Colors.purple, '+8pt YoY'),
+          _scoreCard('النتيجة الإجمالية', 'A-', 78, core_theme.AC.gold, 'من أفضل 15%'),
+          _scoreCard('البيئة (E)', 'B+', 72, core_theme.AC.ok, '+5pt YoY'),
+          _scoreCard('الاجتماعية (S)', 'A', 85, core_theme.AC.info, 'ممتاز'),
+          _scoreCard('الحوكمة (G)', 'A', 82, core_theme.AC.purple, '+8pt YoY'),
         ],
       ),
     );
@@ -128,15 +129,15 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text('$score', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
-                      const Text('/100', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                      Text('/100', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     ],
                   ),
-                  Text(note, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(note, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ],
               ),
             ),
@@ -150,21 +151,21 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('🌍 الأثر البيئي',
+        Text('🌍 الأثر البيئي',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 12),
         Row(
           children: [
-            _metric('انبعاثات CO₂', '1,240', 'طن/سنة', '-12% YoY', Colors.green, Icons.cloud),
-            _metric('الطاقة المتجددة', '42%', 'من الاستهلاك', '+8pt YoY', Colors.amber, Icons.solar_power),
-            _metric('استهلاك المياه', '8,450', 'm³/سنة', '-18% YoY', Colors.blue, Icons.water_drop),
-            _metric('نسبة التدوير', '68%', 'من النفايات', '+5pt YoY', Colors.teal, Icons.recycling),
+            _metric('انبعاثات CO₂', '1,240', 'طن/سنة', '-12% YoY', core_theme.AC.ok, Icons.cloud),
+            _metric('الطاقة المتجددة', '42%', 'من الاستهلاك', '+8pt YoY', core_theme.AC.warn, Icons.solar_power),
+            _metric('استهلاك المياه', '8,450', 'm³/سنة', '-18% YoY', core_theme.AC.info, Icons.water_drop),
+            _metric('نسبة التدوير', '68%', 'من النفايات', '+5pt YoY', core_theme.AC.info, Icons.recycling),
           ],
         ),
         const SizedBox(height: 20),
         _sectionCard(
           'أهداف بيئية 2030',
-          Colors.green,
+          core_theme.AC.ok,
           Icons.flag,
           [
             _goal('صفر انبعاثات صافية (Net Zero)', 32, 2030),
@@ -176,13 +177,13 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
         const SizedBox(height: 16),
         _sectionCard(
           'مبادرات جارية',
-          Colors.blue,
+          core_theme.AC.info,
           Icons.check_circle,
           [
-            _initiative('تركيب ألواح شمسية على المقر الرئيسي', 'مكتمل', Colors.green, 'إنتاج 1.2 MW — يوفّر 185K ر.س/سنة'),
-            _initiative('برنامج Work From Home 2 أيام/أسبوع', 'مكتمل', Colors.green, 'تقليل انبعاثات النقل 24%'),
-            _initiative('استبدال الأسطول بسيارات كهربائية', 'قيد التنفيذ', Colors.orange, '8 من 15 — يكتمل Q3 2026'),
-            _initiative('نظام جمع مياه الأمطار', 'مخطّط', Colors.blue, 'ميزانية معتمدة 320K ر.س'),
+            _initiative('تركيب ألواح شمسية على المقر الرئيسي', 'مكتمل', core_theme.AC.ok, 'إنتاج 1.2 MW — يوفّر 185K ر.س/سنة'),
+            _initiative('برنامج Work From Home 2 أيام/أسبوع', 'مكتمل', core_theme.AC.ok, 'تقليل انبعاثات النقل 24%'),
+            _initiative('استبدال الأسطول بسيارات كهربائية', 'قيد التنفيذ', core_theme.AC.warn, '8 من 15 — يكتمل Q3 2026'),
+            _initiative('نظام جمع مياه الأمطار', 'مخطّط', core_theme.AC.info, 'ميزانية معتمدة 320K ر.س'),
           ],
         ),
       ],
@@ -193,21 +194,21 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('👥 الأثر الاجتماعي',
+        Text('👥 الأثر الاجتماعي',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 12),
         Row(
           children: [
-            _metric('نسبة السعودة', '72%', 'من الموظفين', '+6pt YoY', Colors.green, Icons.flag),
-            _metric('تمثيل المرأة', '38%', 'من القوى العاملة', '+4pt YoY', Colors.purple, Icons.female),
-            _metric('رضا الموظفين', '4.6/5', 'eNPS: 62', '+0.3 YoY', Colors.blue, Icons.thumb_up),
-            _metric('حوادث السلامة', '0', 'LTIR', '12 شهر بدون حوادث', Colors.teal, Icons.shield),
+            _metric('نسبة السعودة', '72%', 'من الموظفين', '+6pt YoY', core_theme.AC.ok, Icons.flag),
+            _metric('تمثيل المرأة', '38%', 'من القوى العاملة', '+4pt YoY', core_theme.AC.purple, Icons.female),
+            _metric('رضا الموظفين', '4.6/5', 'eNPS: 62', '+0.3 YoY', core_theme.AC.info, Icons.thumb_up),
+            _metric('حوادث السلامة', '0', 'LTIR', '12 شهر بدون حوادث', core_theme.AC.info, Icons.shield),
           ],
         ),
         const SizedBox(height: 20),
         _sectionCard(
           'التنوع والمساواة (D&I)',
-          Colors.purple,
+          core_theme.AC.purple,
           Icons.diversity_3,
           [
             _diversityRow('الجنسيات', '24 جنسية', '+3'),
@@ -220,13 +221,13 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
         const SizedBox(height: 16),
         _sectionCard(
           'الاستثمار المجتمعي',
-          Colors.orange,
+          core_theme.AC.warn,
           Icons.volunteer_activism,
           [
-            _initiative('برنامج تدريب خريجي الجامعات', 'سنوي', Colors.green, '85 خريج/سنة + فرص توظيف'),
-            _initiative('رعاية مدارس التقنية للبنات', 'مستمر', Colors.green, '2.4M ر.س/سنة + أجهزة'),
-            _initiative('تطوع الموظفين — 40 ساعة/سنة', 'مستمر', Colors.green, 'المشاركة 68% من الموظفين'),
-            _initiative('زكاة الشركة والعطاء', 'سنوي', Colors.green, '3.8M ر.س لعام 2025'),
+            _initiative('برنامج تدريب خريجي الجامعات', 'سنوي', core_theme.AC.ok, '85 خريج/سنة + فرص توظيف'),
+            _initiative('رعاية مدارس التقنية للبنات', 'مستمر', core_theme.AC.ok, '2.4M ر.س/سنة + أجهزة'),
+            _initiative('تطوع الموظفين — 40 ساعة/سنة', 'مستمر', core_theme.AC.ok, 'المشاركة 68% من الموظفين'),
+            _initiative('زكاة الشركة والعطاء', 'سنوي', core_theme.AC.ok, '3.8M ر.س لعام 2025'),
           ],
         ),
       ],
@@ -237,21 +238,21 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('🏛️ الحوكمة',
+        Text('🏛️ الحوكمة',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 12),
         Row(
           children: [
-            _metric('أعضاء المجلس المستقلون', '5 من 9', '56%', '+12pt YoY', Colors.purple, Icons.gavel),
-            _metric('اجتماعات المجلس', '12/سنة', 'حضور 96%', 'أعلى من المتطلب', Colors.blue, Icons.meeting_room),
-            _metric('حالات عدم الامتثال', '0', 'في 18 شهر', 'سجل نظيف', Colors.green, Icons.verified),
-            _metric('درجة Simah Corporate', 'AA-', 'تصنيف ائتماني', '+1 رتبة', Colors.teal, Icons.star),
+            _metric('أعضاء المجلس المستقلون', '5 من 9', '56%', '+12pt YoY', core_theme.AC.purple, Icons.gavel),
+            _metric('اجتماعات المجلس', '12/سنة', 'حضور 96%', 'أعلى من المتطلب', core_theme.AC.info, Icons.meeting_room),
+            _metric('حالات عدم الامتثال', '0', 'في 18 شهر', 'سجل نظيف', core_theme.AC.ok, Icons.verified),
+            _metric('درجة Simah Corporate', 'AA-', 'تصنيف ائتماني', '+1 رتبة', core_theme.AC.info, Icons.star),
           ],
         ),
         const SizedBox(height: 20),
         _sectionCard(
           'هيكل الحوكمة',
-          Colors.purple,
+          core_theme.AC.purple,
           Icons.account_tree,
           [
             _govRow('مجلس الإدارة', '9 أعضاء — 5 مستقلون'),
@@ -265,7 +266,7 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
         const SizedBox(height: 16),
         _sectionCard(
           'السياسات المعتمدة',
-          Colors.indigo,
+          core_theme.AC.purple,
           Icons.policy,
           [
             _policyRow('ميثاق السلوك الأخلاقي', true, '2026-01'),
@@ -279,13 +280,13 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
         const SizedBox(height: 16),
         _sectionCard(
           'إفصاحات وتقارير',
-          const Color(0xFFD4AF37),
+          core_theme.AC.gold,
           Icons.description,
           [
-            _initiative('التقرير السنوي ESG 2025', 'منشور', Colors.green, 'GRI Core + SASB — 84 صفحة'),
-            _initiative('إفصاح TCFD', 'منشور', Colors.green, 'مخاطر المناخ — معيار FSB'),
-            _initiative('تقرير CDP Climate', 'قيد الإعداد', Colors.orange, 'تقديم 2026-07'),
-            _initiative('مؤشر MSCI ESG', 'BBB', Colors.blue, 'هدف A خلال 2026'),
+            _initiative('التقرير السنوي ESG 2025', 'منشور', core_theme.AC.ok, 'GRI Core + SASB — 84 صفحة'),
+            _initiative('إفصاح TCFD', 'منشور', core_theme.AC.ok, 'مخاطر المناخ — معيار FSB'),
+            _initiative('تقرير CDP Climate', 'قيد الإعداد', core_theme.AC.warn, 'تقديم 2026-07'),
+            _initiative('مؤشر MSCI ESG', 'BBB', core_theme.AC.info, 'هدف A خلال 2026'),
           ],
         ),
       ],
@@ -307,16 +308,16 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
           children: [
             Icon(icon, color: color, size: 22),
             const SizedBox(height: 10),
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
-            Text(unit, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text(unit, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             const SizedBox(height: 4),
             Text(trend,
                 style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
                     color: trend.startsWith('+') || trend.startsWith('-') && trend.contains('YoY')
-                        ? Colors.green
+                        ? core_theme.AC.ok
                         : color)),
           ],
         ),
@@ -360,7 +361,7 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                Text('هدف $year', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('هدف $year', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -371,9 +372,9 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
                 Expanded(
                   child: LinearProgressIndicator(
                     value: progress / 100,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: core_theme.AC.bdr,
                     valueColor: AlwaysStoppedAnimation(
-                        progress >= 70 ? Colors.green : progress >= 40 ? Colors.orange : Colors.red),
+                        progress >= 70 ? core_theme.AC.ok : progress >= 40 ? core_theme.AC.warn : core_theme.AC.err),
                     minHeight: 8,
                   ),
                 ),
@@ -382,7 +383,7 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
                     style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
-                        color: progress >= 70 ? Colors.green : progress >= 40 ? Colors.orange : Colors.red)),
+                        color: progress >= 70 ? core_theme.AC.ok : progress >= 40 ? core_theme.AC.warn : core_theme.AC.err)),
               ],
             ),
           ),
@@ -407,7 +408,7 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-                Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -422,12 +423,12 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
       child: Row(
         children: [
           Expanded(child: Text(label, style: const TextStyle(fontSize: 12))),
-          Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
+          Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
           const SizedBox(width: 10),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
-            child: Text(note, style: const TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.w700)),
+            decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+            child: Text(note, style: TextStyle(fontSize: 10, color: core_theme.AC.ok, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -439,10 +440,10 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
-          const Icon(Icons.circle, size: 6, color: Colors.purple),
+          Icon(Icons.circle, size: 6, color: core_theme.AC.purple),
           const SizedBox(width: 8),
           SizedBox(width: 200, child: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 12, color: Colors.black87))),
+          Expanded(child: Text(value, style: TextStyle(fontSize: 12, color: core_theme.AC.tp))),
         ],
       ),
     );
@@ -454,11 +455,11 @@ class _EsgDashboardScreenState extends State<EsgDashboardScreen>
       child: Row(
         children: [
           Icon(approved ? Icons.check_circle : Icons.warning,
-              size: 16, color: approved ? Colors.green : Colors.orange),
+              size: 16, color: approved ? core_theme.AC.ok : core_theme.AC.warn),
           const SizedBox(width: 8),
           Expanded(child: Text(name, style: const TextStyle(fontSize: 12))),
           Text('معتمد $date',
-              style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+              style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
         ],
       ),
     );

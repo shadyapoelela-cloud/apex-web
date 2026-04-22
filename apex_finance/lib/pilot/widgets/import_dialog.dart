@@ -16,20 +16,22 @@ library;
 export '../import_utils.dart' show coaMapping, productMapping, vendorMapping, ImportMapping;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../api_service.dart' show ApiResult;
+import '../export_utils.dart' show exportXlsx;
 import '../import_utils.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
+Color get _gold => core_theme.AC.gold;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+Color get _tp => core_theme.AC.tp;
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
 // ignore: unused_element
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+Color get _warn => core_theme.AC.warn;
 
 class ImportDialog extends StatefulWidget {
   final String title;
@@ -59,13 +61,11 @@ class _ImportDialogState extends State<ImportDialog> {
   List<String> _errorLog = [];
 
   Future<void> _pickFile() async {
-    final bytes = await pickFileBytes();
-    if (bytes == null) return;
-    // نحصل على الاسم من الـ input (simplified — نستخدم placeholder)
-    const filename = 'import.xlsx'; // actually pickFileBytes يمكن تطويرها لترجع name
+    final picked = await pickFileWithName();
+    if (picked == null) return;
     if (!mounted) return;
     try {
-      final parsed = autoParse(bytes, filename);
+      final parsed = autoParse(picked.bytes, picked.name);
       final errors = validateRows(
         sheet: parsed,
         mapping: widget.mapping,
@@ -73,7 +73,7 @@ class _ImportDialogState extends State<ImportDialog> {
       );
       setState(() {
         _parsed = parsed;
-        _filename = filename;
+        _filename = picked.name;
         _validationErrors = errors;
         _successCount = 0;
         _errorCount = 0;
@@ -84,6 +84,74 @@ class _ImportDialogState extends State<ImportDialog> {
         _validationErrors = ['فشل parse الملف: $e'];
       });
     }
+  }
+
+  /// تنزيل قالب Excel (.xlsx) مع headers الصحيحة + 3 صفوف مثال.
+  void _downloadTemplate() {
+    // استخرج headers الفريدة من الـ mapping بالمفاتيح العربية المفضّلة
+    final fieldsSeen = <String>{};
+    final headers = <String>[];
+    final fieldOrder = <String>[]; // لتتبّع field لكل header
+    for (final entry in widget.mapping.columnMap.entries) {
+      if (!fieldsSeen.contains(entry.value)) {
+        final arabicKey = widget.mapping.columnMap.entries
+            .firstWhere(
+              (e) =>
+                  e.value == entry.value &&
+                  RegExp(r'[\u0600-\u06FF]').hasMatch(e.key),
+              orElse: () => entry,
+            )
+            .key;
+        headers.add(arabicKey);
+        fieldOrder.add(entry.value);
+        fieldsSeen.add(entry.value);
+      }
+    }
+
+    // 3 صفوف مثال متنوّعة
+    final samples = <Map<String, dynamic>>[
+      {
+        'code': '1110',
+        'name_ar': 'النقدية في الصندوق',
+        'name_en': 'Cash on Hand',
+        'category': 'asset',
+        'normal_balance': 'debit',
+        'type': 'detail',
+        '_parent_code': '1100',
+      },
+      {
+        'code': '4100',
+        'name_ar': 'إيرادات المبيعات',
+        'name_en': 'Sales Revenue',
+        'category': 'revenue',
+        'normal_balance': 'credit',
+        'type': 'detail',
+        '_parent_code': '4000',
+      },
+      {
+        'code': '5210',
+        'name_ar': 'مصروف الإيجار',
+        'name_en': 'Rent Expense',
+        'category': 'expense',
+        'normal_balance': 'debit',
+        'type': 'detail',
+        '_parent_code': '5200',
+      },
+    ];
+
+    final rows = samples.map((sample) {
+      return fieldOrder.map<dynamic>((field) => sample[field] ?? '').toList();
+    }).toList();
+
+    // ملاحظة: لا نُمرّر title ولا meta لأن parseXlsx يبحث عن أول صفّ
+    // ذو 2+ خلية كـ headers، فمعلومات meta قد تختلط مع headers الحقيقية.
+    // الإرشادات تُعرض في الـ UI بدلاً من ذلك.
+    exportXlsx(
+      headers: headers,
+      rows: rows,
+      filename: 'coa_template_${DateTime.now().millisecondsSinceEpoch}',
+      sheetName: 'Accounts',
+    );
   }
 
   Future<void> _runImport() async {
@@ -137,16 +205,16 @@ class _ImportDialogState extends State<ImportDialog> {
                 border: Border(bottom: BorderSide(color: _bdr)),
               ),
               child: Row(children: [
-                const Icon(Icons.upload_file, color: _gold, size: 22),
+                Icon(Icons.upload_file, color: _gold, size: 22),
                 const SizedBox(width: 10),
                 Text(widget.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _tp,
                         fontSize: 16,
                         fontWeight: FontWeight.w800)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.close, color: _ts),
+                  icon: Icon(Icons.close, color: _ts),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
@@ -164,11 +232,11 @@ class _ImportDialogState extends State<ImportDialog> {
                 if (_parsed != null)
                   Text(
                       'الصفوف: ${_parsed!.rowCount} · نجاح: $_successCount · فشل: $_errorCount',
-                      style: const TextStyle(color: _ts, fontSize: 12)),
+                      style: TextStyle(color: _ts, fontSize: 12)),
                 const Spacer(),
                 TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('إغلاق',
+                    child: Text('إغلاق',
                         style: TextStyle(color: _ts))),
                 const SizedBox(width: 8),
                 if (_parsed != null &&
@@ -177,13 +245,13 @@ class _ImportDialogState extends State<ImportDialog> {
                   FilledButton.icon(
                     style: FilledButton.styleFrom(
                         backgroundColor: _gold,
-                        foregroundColor: Colors.black),
+                        foregroundColor: core_theme.AC.bestOn(_gold)),
                     onPressed: _runImport,
                     icon: const Icon(Icons.play_arrow, size: 16),
                     label: Text('استيراد ${_parsed!.rowCount} صف'),
                   )
                 else if (_importing)
-                  const SizedBox(
+                  SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
@@ -206,25 +274,80 @@ class _ImportDialogState extends State<ImportDialog> {
             Icon(Icons.cloud_upload_outlined,
                 color: _gold.withValues(alpha: 0.3), size: 80),
             const SizedBox(height: 16),
-            const Text('اختر ملف Excel (.xlsx) أو CSV لاستيراد البيانات',
+            Text('اختر ملف Excel (.xlsx) أو CSV لاستيراد البيانات',
                 style: TextStyle(color: _tp, fontSize: 14)),
             const SizedBox(height: 8),
-            const Text(
+            Text(
                 'يدعم headers عربية وإنجليزية · الصف الأول هو أسماء الأعمدة',
                 style: TextStyle(color: _ts, fontSize: 11)),
             const SizedBox(height: 20),
-            FilledButton.icon(
-              style: FilledButton.styleFrom(
-                  backgroundColor: _gold,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 14)),
-              onPressed: _pickFile,
-              icon: const Icon(Icons.folder_open),
-              label: const Text('اختر ملف'),
-            ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                    backgroundColor: _gold,
+                    foregroundColor: core_theme.AC.bestOn(_gold),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22, vertical: 14)),
+                onPressed: _pickFile,
+                icon: const Icon(Icons.folder_open),
+                label: const Text('اختر ملف'),
+              ),
+              const SizedBox(width: 10),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: _ok,
+                    side: BorderSide(color: _ok.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 14)),
+                onPressed: _downloadTemplate,
+                icon: const Icon(Icons.file_download, size: 18),
+                label: const Text('نزّل القالب (Excel)'),
+              ),
+            ]),
             const SizedBox(height: 16),
             _buildExpectedFields(),
+          ],
+        ),
+      );
+    }
+    // ملف مرفوع لكنه فارغ تماماً (لا headers ولا rows)
+    if (_parsed!.headers.isEmpty && _parsed!.rows.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, color: _err, size: 64),
+            const SizedBox(height: 12),
+            Text('الملف فارغ أو غير قابل للقراءة',
+                style: TextStyle(
+                    color: _tp,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700)),
+            const SizedBox(height: 6),
+            Text(
+                'تحقق من أن الورقة الأولى تحتوي على headers في الصف الأول وبيانات في الصفوف التالية',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: _ts, fontSize: 12)),
+            const SizedBox(height: 16),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                    backgroundColor: _gold,
+                    foregroundColor: core_theme.AC.bestOn(_gold)),
+                onPressed: _pickFile,
+                icon: const Icon(Icons.folder_open, size: 16),
+                label: const Text('ملف آخر'),
+              ),
+              const SizedBox(width: 10),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: _ok,
+                    side: BorderSide(color: _ok.withValues(alpha: 0.5))),
+                onPressed: _downloadTemplate,
+                icon: const Icon(Icons.file_download, size: 16),
+                label: const Text('نزّل القالب'),
+              ),
+            ]),
           ],
         ),
       );
@@ -236,11 +359,23 @@ class _ImportDialogState extends State<ImportDialog> {
         children: [
           // Summary
           Row(children: [
-            const Icon(Icons.description, color: _gold, size: 18),
+            Icon(Icons.description, color: _gold, size: 18),
             const SizedBox(width: 8),
-            Text('الملف: ${_filename ?? "مجهول"}',
-                style: const TextStyle(color: _tp, fontSize: 13)),
-            const Spacer(),
+            Expanded(
+              child: Text('الملف: ${_filename ?? "مجهول"}',
+                  style: TextStyle(color: _tp, fontSize: 13),
+                  overflow: TextOverflow.ellipsis),
+            ),
+            const SizedBox(width: 8),
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: _ok,
+                  side: BorderSide(color: _ok.withValues(alpha: 0.4))),
+              onPressed: _downloadTemplate,
+              icon: const Icon(Icons.file_download, size: 14),
+              label: const Text('قالب'),
+            ),
+            const SizedBox(width: 6),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(foregroundColor: _ts),
               onPressed: _pickFile,
@@ -269,6 +404,7 @@ class _ImportDialogState extends State<ImportDialog> {
           // Validation errors
           if (_validationErrors.isNotEmpty)
             Container(
+              constraints: const BoxConstraints(maxHeight: 180),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: _err.withValues(alpha: 0.1),
@@ -277,20 +413,31 @@ class _ImportDialogState extends State<ImportDialog> {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(children: [
-                    const Icon(Icons.error_outline, color: _err, size: 16),
+                    Icon(Icons.error_outline, color: _err, size: 16),
                     const SizedBox(width: 6),
                     Text('${_validationErrors.length} مشكلة:',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: _err, fontWeight: FontWeight.w700)),
                   ]),
                   const SizedBox(height: 6),
-                  ..._validationErrors.take(10).map((e) => Text(e,
-                      style: const TextStyle(color: _err, fontSize: 11))),
-                  if (_validationErrors.length > 10)
-                    Text('و ${_validationErrors.length - 10} آخرين...',
-                        style: const TextStyle(color: _err, fontSize: 11)),
+                  Expanded(
+                    child: Scrollbar(
+                      thumbVisibility: true,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _validationErrors.length,
+                        itemBuilder: (_, i) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 1),
+                          child: Text(_validationErrors[i],
+                              style:
+                                  TextStyle(color: _err, fontSize: 11)),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -304,7 +451,7 @@ class _ImportDialogState extends State<ImportDialog> {
               border: Border.all(color: _bdr),
             ),
             child: Row(children: [
-              const Text('الأعمدة المُكتشفة:',
+              Text('الأعمدة المُكتشفة:',
                   style:
                       TextStyle(color: _td, fontSize: 11)),
               const SizedBox(width: 8),
@@ -321,7 +468,7 @@ class _ImportDialogState extends State<ImportDialog> {
                               borderRadius: BorderRadius.circular(3),
                             ),
                             child: Text(h,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: _gold,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600)),
@@ -345,7 +492,7 @@ class _ImportDialogState extends State<ImportDialog> {
                 children: [
                   Text(
                       'معاينة أول 5 صفوف (من أصل ${_parsed!.rowCount}):',
-                      style: const TextStyle(color: _td, fontSize: 11)),
+                      style: TextStyle(color: _td, fontSize: 11)),
                   const SizedBox(height: 6),
                   ...(_parsed!.rows.take(5).toList()).asMap().entries.map((e) {
                     final idx = e.key;
@@ -360,14 +507,14 @@ class _ImportDialogState extends State<ImportDialog> {
                       child: Row(children: [
                         Text('${idx + 1}.',
                             style:
-                                const TextStyle(color: _td, fontSize: 10)),
+                                TextStyle(color: _td, fontSize: 10)),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                               row.entries
                                   .map((e) => '${e.key}: ${e.value}')
                                   .join(' · '),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _ts,
                                   fontSize: 11,
                                   fontFamily: 'monospace'),
@@ -381,7 +528,7 @@ class _ImportDialogState extends State<ImportDialog> {
                     const SizedBox(height: 10),
                     Text('أخطاء الاستيراد (${_errorLog.length}):',
                         style:
-                            const TextStyle(color: _err, fontSize: 11)),
+                            TextStyle(color: _err, fontSize: 11)),
                     const SizedBox(height: 4),
                     ..._errorLog.take(10).map((e) => Container(
                           padding: const EdgeInsets.symmetric(
@@ -391,7 +538,7 @@ class _ImportDialogState extends State<ImportDialog> {
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(e,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _err, fontSize: 10)),
                         )),
                   ],
@@ -416,7 +563,7 @@ class _ImportDialogState extends State<ImportDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('الحقول المطلوبة (يجب أن تكون في الـ headers):',
+          Text('الحقول المطلوبة (يجب أن تكون في الـ headers):',
               style: TextStyle(color: _td, fontSize: 11)),
           const SizedBox(height: 6),
           Wrap(
@@ -433,7 +580,7 @@ class _ImportDialogState extends State<ImportDialog> {
                             Border.all(color: _err.withValues(alpha: 0.4)),
                       ),
                       child: Text(f,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _err,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -442,7 +589,7 @@ class _ImportDialogState extends State<ImportDialog> {
                 .toList(),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
               '💡 الـ headers يمكن أن تكون بالعربية أو الإنجليزية. الـ mapper يتعرّف على: code/الكود، name_ar/الاسم، category/الفئة، إلخ.',
               style: TextStyle(color: _ts, fontSize: 10, height: 1.5)),
         ],

@@ -10,6 +10,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 class V5NewsItem {
   final String authorityAr;
@@ -99,11 +100,11 @@ class _ApexV5NewsTickerState extends State<ApexV5NewsTicker> {
   Color _kindColor(V5NewsKind k) {
     switch (k) {
       case V5NewsKind.deadline:
-        return const Color(0xFFD97706); // amber-600
+        return core_theme.AC.warn; // amber-600
       case V5NewsKind.warning:
-        return const Color(0xFFDC2626); // red-600
+        return core_theme.AC.err; // red-600
       case V5NewsKind.update:
-        return const Color(0xFF2563EB); // blue-600
+        return core_theme.AC.info; // blue-600
       case V5NewsKind.info:
         return const Color(0xFF6B7280); // gray-500
     }
@@ -132,9 +133,9 @@ class _ApexV5NewsTickerState extends State<ApexV5NewsTicker> {
       height: 32,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: widget.background ?? Colors.black.withOpacity(0.04),
+        color: widget.background ?? core_theme.AC.tp.withOpacity(0.04),
         border: Border(
-          bottom: BorderSide(color: Colors.black.withOpacity(0.05)),
+          bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.05)),
         ),
       ),
       child: Row(
@@ -150,7 +151,7 @@ class _ApexV5NewsTickerState extends State<ApexV5NewsTicker> {
             ),
           ),
           const SizedBox(width: 12),
-          Container(width: 1, height: 16, color: Colors.black.withOpacity(0.1)),
+          Container(width: 1, height: 16, color: core_theme.AC.tp.withOpacity(0.1)),
           const SizedBox(width: 12),
           Icon(_kindIcon(item.kind), size: 14, color: color),
           const SizedBox(width: 6),
@@ -169,7 +170,7 @@ class _ApexV5NewsTickerState extends State<ApexV5NewsTicker> {
               child: Text(
                 item.messageAr,
                 key: ValueKey(_index),
-                style: const TextStyle(fontSize: 12, color: Colors.black87),
+                style: TextStyle(fontSize: 12, color: core_theme.AC.tp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -182,7 +183,7 @@ class _ApexV5NewsTickerState extends State<ApexV5NewsTicker> {
                 height: 6,
                 margin: const EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
-                  color: i == _index ? color : Colors.black.withOpacity(0.15),
+                  color: i == _index ? color : core_theme.AC.tp.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
               );

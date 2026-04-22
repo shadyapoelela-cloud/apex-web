@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class LeaseAccountingScreen extends StatefulWidget {
   const LeaseAccountingScreen({super.key});
@@ -50,9 +51,9 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
         _buildKpis(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.list, size: 16), text: 'عقود الإيجار'),
             Tab(icon: Icon(Icons.calculate, size: 16), text: 'الإهلاك والفائدة'),
@@ -81,7 +82,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
         gradient: const LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF3949AB)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.home_work, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -92,7 +93,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
                 Text('المحاسبة عن عقود الإيجار — IFRS 16',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Right-of-Use Assets · Lease Liabilities · حساب الفائدة · جداول السداد',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -107,11 +108,11 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('العقود النشطة', '$active', Colors.blue, Icons.description),
-          _kpi('أصول حق الاستخدام', '${_fmtM(_totalROU)} ر.س', const Color(0xFFD4AF37), Icons.home_work),
-          _kpi('الالتزام القائم', '${_fmtM(_totalLiability)} ر.س', Colors.orange, Icons.trending_down),
-          _kpi('دفعات سنوية', '${_fmtM(_totalAnnualPayment)} ر.س', Colors.green, Icons.payments),
-          _kpi('متوسط مدة الإيجار', '48 شهر', Colors.purple, Icons.schedule),
+          _kpi('العقود النشطة', '$active', core_theme.AC.info, Icons.description),
+          _kpi('أصول حق الاستخدام', '${_fmtM(_totalROU)} ر.س', core_theme.AC.gold, Icons.home_work),
+          _kpi('الالتزام القائم', '${_fmtM(_totalLiability)} ر.س', core_theme.AC.warn, Icons.trending_down),
+          _kpi('دفعات سنوية', '${_fmtM(_totalAnnualPayment)} ر.س', core_theme.AC.ok, Icons.payments),
+          _kpi('متوسط مدة الإيجار', '48 شهر', core_theme.AC.purple, Icons.schedule),
         ],
       ),
     );
@@ -135,7 +136,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -154,14 +155,14 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     Expanded(child: Text('الرقم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 3, child: Text('الوصف', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -169,7 +170,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
                     Expanded(flex: 2, child: Text('إجمالي العقد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('المدة (شهر)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(child: Text('IBR %', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(flex: 2, child: Text('ROU Asset', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(flex: 2, child: Text('ROU Asset', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                     Expanded(flex: 2, child: Text('الالتزام', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                   ],
                 ),
@@ -182,13 +183,13 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -207,8 +208,8 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
-        color: l.status == 'expired' ? Colors.grey.shade50 : null,
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        color: l.status == 'expired' ? core_theme.AC.navy3 : null,
       ),
       child: Row(
         children: [
@@ -220,7 +221,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
               children: [
                 Text(l.description, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                 Text('${l.startDate} → ${l.endDate}',
-                    style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -243,12 +244,12 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
           Expanded(
             flex: 2,
             child: Text(_fmt(l.rouCarrying),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.gold, fontFamily: 'monospace')),
           ),
           Expanded(
             flex: 2,
             child: Text(_fmt(l.liabilityOutstanding),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.orange, fontFamily: 'monospace')),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.warn, fontFamily: 'monospace')),
           ),
         ],
       ),
@@ -272,37 +273,37 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.description, color: Color(0xFFD4AF37)),
+                  Icon(Icons.description, color: core_theme.AC.gold),
                   const SizedBox(width: 8),
                   Text('جدول الإهلاك — ${lease.description}',
                       style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: Colors.blue.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
                     child: Text('أول 12 شهر · مدة كلية ${lease.months}',
-                        style: const TextStyle(fontSize: 11, color: Colors.blue, fontWeight: FontWeight.w800)),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.info, fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(10),
-                color: Colors.grey.shade100,
-                child: const Row(
+                color: core_theme.AC.navy3,
+                child: Row(
                   children: [
                     Expanded(child: Text('الشهر', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 2, child: Text('ROU الافتتاحي', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                     Expanded(flex: 2, child: Text('الدفعة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                    Expanded(flex: 2, child: Text('الفائدة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.orange))),
-                    Expanded(flex: 2, child: Text('الأصل', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(flex: 2, child: Text('الفائدة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.warn))),
+                    Expanded(flex: 2, child: Text('الأصل', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                     Expanded(flex: 2, child: Text('ROU الختامي', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                   ],
                 ),
@@ -311,7 +312,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                   ),
                   child: Row(
                     children: [
@@ -321,12 +322,12 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
                       Expanded(
                         flex: 2,
                         child: Text(_fmt(p.interest),
-                            style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.orange, fontWeight: FontWeight.w700)),
+                            style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.warn, fontWeight: FontWeight.w700)),
                       ),
                       Expanded(
                         flex: 2,
                         child: Text(_fmt(p.principal),
-                            style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Color(0xFFD4AF37), fontWeight: FontWeight.w800)),
+                            style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.gold, fontWeight: FontWeight.w800)),
                       ),
                       Expanded(flex: 2, child: Text(_fmt(p.closing), style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
                     ],
@@ -339,16 +340,16 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.amber.shade50,
+            color: core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.amber.shade200),
+            border: Border.all(color: core_theme.AC.warn),
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.functions, color: Colors.amber),
+                  Icon(Icons.functions, color: core_theme.AC.warn),
                   SizedBox(width: 8),
                   Text('الصيغ المستخدمة', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900)),
                 ],
@@ -378,12 +379,12 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('إفصاحات IFRS 16 المطلوبة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+              Text('إفصاحات IFRS 16 المطلوبة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
               const SizedBox(height: 20),
               _disclosureSection(
                 '1. الأصول: حق الاستخدام (ROU)',
@@ -445,7 +446,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
           Container(
             padding: EdgeInsets.symmetric(vertical: 6, horizontal: l.isTotal ? 8 : 0),
             decoration: l.isTotal
-                ? BoxDecoration(color: const Color(0xFFD4AF37).withOpacity(0.1), borderRadius: BorderRadius.circular(4))
+                ? BoxDecoration(color: core_theme.AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(4))
                 : null,
             child: Row(
               children: [
@@ -461,7 +462,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
                       fontSize: l.isTotal ? 14 : 12,
                       fontWeight: FontWeight.w800,
                       fontFamily: 'monospace',
-                      color: l.isTotal ? const Color(0xFFD4AF37) : Colors.black87),
+                      color: l.isTotal ? core_theme.AC.gold : core_theme.AC.tp),
                 ),
               ],
             ),
@@ -475,11 +476,11 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
       case 'real-estate':
         return Colors.brown;
       case 'vehicle':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'equipment':
-        return Colors.orange;
+        return core_theme.AC.warn;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

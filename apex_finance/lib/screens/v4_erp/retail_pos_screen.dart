@@ -16,6 +16,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import 'package:flutter/services.dart';
 
 import '../../pilot/api/pilot_client.dart';
@@ -83,17 +84,17 @@ class _CartLine {
 // Theme colors (independent of AC)
 // ═══════════════════════════════════════════════════════════════════
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
+Color get _gold => core_theme.AC.gold;
+Color get _navy => core_theme.AC.navy;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+final _warn = core_theme.AC.warn;
 
 // ═══════════════════════════════════════════════════════════════════
 // State
@@ -308,9 +309,9 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
-          title: const Text('فتح وردية جديدة'),
+          title: Text('فتح وردية جديدة'),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('أدخل الرصيد الافتتاحي للنقد في الدرج:'),
+            Text('أدخل الرصيد الافتتاحي للنقد في الدرج:'),
             const SizedBox(height: 12),
             TextField(
               controller: openingCtrl,
@@ -322,11 +323,11 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('إلغاء')),
+                child: Text('إلغاء')),
             FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('فتح')),
+                child: Text('فتح')),
           ],
         ),
       ),
@@ -358,9 +359,9 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
-          title: const Text('إقفال الوردية'),
+          title: Text('إقفال الوردية'),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('أدخل العدّ الفعلي للنقد:'),
+            Text('أدخل العدّ الفعلي للنقد:'),
             const SizedBox(height: 12),
             TextField(
               controller: countCtrl,
@@ -371,11 +372,11 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
           ]),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+                onPressed: () => Navigator.pop(ctx), child: Text('إلغاء')),
             FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: () => Navigator.pop(ctx, countCtrl.text.trim()),
-                child: const Text('إقفال')),
+                child: Text('إقفال')),
           ],
         ),
       ),
@@ -400,7 +401,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
-          title: const Text('Z-Report'),
+          title: Text('Z-Report'),
           content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,7 +418,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
             FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('تم')),
+                child: Text('تم')),
           ],
         ),
       ),
@@ -506,7 +507,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: _navy2,
-          title: const Row(children: [
+          title: Row(children: [
             Icon(Icons.undo, color: _err),
             SizedBox(width: 8),
             Text('تأكيد المرتجع', style: TextStyle(color: _tp)),
@@ -519,9 +520,9 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
               children: [
                 Text(
                     'هل تريد معالجة مرتجع بقيمة ${_grandTotal.toStringAsFixed(2)} $_currency؟',
-                    style: const TextStyle(color: _tp, fontSize: 14)),
+                    style: TextStyle(color: _tp, fontSize: 14)),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                     'سيتم:\n'
                     '• إعادة الأصناف للمخزون\n'
                     '• إنشاء قيد يومية عكسي\n'
@@ -534,13 +535,13 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('إلغاء', style: TextStyle(color: _ts))),
+                child: Text('إلغاء', style: TextStyle(color: _ts))),
             FilledButton.icon(
               style: FilledButton.styleFrom(
                   backgroundColor: _err, foregroundColor: Colors.white),
               onPressed: () => Navigator.pop(context, true),
               icon: const Icon(Icons.undo),
-              label: const Text('معالجة المرتجع'),
+              label: Text('معالجة المرتجع'),
             ),
           ],
         ),
@@ -636,7 +637,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
-          title: Row(children: const [
+          title: Row(children: [
             Icon(Icons.receipt_long, color: _ok),
             SizedBox(width: 8),
             Text('تم البيع ✓'),
@@ -656,7 +657,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
             FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: _gold),
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('تم')),
+                child: Text('تم')),
           ],
         ),
       ),
@@ -681,7 +682,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
       child: Container(
         color: _navy,
         child: _loading
-            ? const Center(
+            ? Center(
                 child: CircularProgressIndicator(color: _gold),
               )
             : _error != null
@@ -707,17 +708,17 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
             border: Border.all(color: _err.withValues(alpha: 0.4)),
           ),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.warning, color: _err, size: 64),
+            Icon(Icons.warning, color: _err, size: 64),
             const SizedBox(height: 16),
             Text(_error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: _tp, fontSize: 15)),
+                style: TextStyle(color: _tp, fontSize: 15)),
             const SizedBox(height: 24),
             FilledButton.icon(
               style: FilledButton.styleFrom(backgroundColor: _gold),
               onPressed: _bootstrap,
               icon: const Icon(Icons.refresh),
-              label: const Text('إعادة المحاولة'),
+              label: Text('إعادة المحاولة'),
             ),
           ]),
         ),
@@ -739,17 +740,17 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
           if (_activeSession == null)
             FilledButton.icon(
               style: FilledButton.styleFrom(
-                  backgroundColor: _gold, foregroundColor: Colors.black),
+                  backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
               onPressed: _openSession,
               icon: const Icon(Icons.lock_open, size: 18),
-              label: const Text('فتح وردية'),
+              label: Text('فتح وردية'),
             )
           else
             Row(children: [
-              const Icon(Icons.lock_open, color: _ok, size: 16),
+              Icon(Icons.lock_open, color: _ok, size: 16),
               const SizedBox(width: 4),
               Text('وردية ${_activeSession!['code']}',
-                  style: const TextStyle(color: _tp, fontSize: 12)),
+                  style: TextStyle(color: _tp, fontSize: 12)),
               const SizedBox(width: 6),
               InkWell(
                   onTap: _closeSession,
@@ -761,14 +762,14 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
             child: TextField(
               controller: _barcodeCtrl,
               focusNode: _barcodeFocus,
-              style: const TextStyle(color: _tp),
+              style: TextStyle(color: _tp),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9A-Za-z\-]')),
               ],
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.qr_code_scanner, color: _gold),
+                prefixIcon: Icon(Icons.qr_code_scanner, color: _gold),
                 hintText: 'امسح باركود أو اكتب SKU ثم Enter',
-                hintStyle: const TextStyle(color: _td),
+                hintStyle: TextStyle(color: _td),
                 filled: true,
                 fillColor: _navy3,
                 border: OutlineInputBorder(
@@ -787,11 +788,11 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
             width: 200,
             child: TextField(
               controller: _searchCtrl,
-              style: const TextStyle(color: _tp),
+              style: TextStyle(color: _tp),
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search, color: _ts, size: 18),
+                prefixIcon: Icon(Icons.search, color: _ts, size: 18),
                 hintText: 'بحث',
-                hintStyle: const TextStyle(color: _td),
+                hintStyle: TextStyle(color: _td),
                 filled: true,
                 fillColor: _navy3,
                 border: OutlineInputBorder(
@@ -841,7 +842,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
   Widget _productsGrid() {
     final items = _filteredVariants;
     if (items.isEmpty) {
-      return const Center(
+      return Center(
         child: Text('لا توجد أصناف — أضف منتجات من شاشة الأصناف أولاً',
             style: TextStyle(color: _td, fontSize: 14)),
       );
@@ -886,23 +887,23 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
               Text(v.productNameAr,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: _tp, fontWeight: FontWeight.w600, fontSize: 13)),
               Text('SKU: ${v.sku}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: _td, fontSize: 10, fontFamily: 'monospace')),
               const SizedBox(height: 4),
               Row(children: [
                 Text('${v.listPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _gold,
                         fontWeight: FontWeight.bold,
                         fontSize: 14)),
                 const SizedBox(width: 4),
                 Text(v.currency,
-                    style: const TextStyle(color: _gold, fontSize: 10)),
+                    style: TextStyle(color: _gold, fontSize: 10)),
                 const Spacer(),
                 Container(
                   padding:
@@ -933,9 +934,9 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
             padding: const EdgeInsets.all(16),
             color: _navy3,
             child: Row(children: [
-              const Icon(Icons.shopping_cart, color: _gold, size: 22),
+              Icon(Icons.shopping_cart, color: _gold, size: 22),
               const SizedBox(width: 8),
-              const Text('السلة',
+              Text('السلة',
                   style: TextStyle(
                       color: _tp,
                       fontSize: 18,
@@ -943,14 +944,14 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
               const Spacer(),
               if (_cart.isNotEmpty)
                 IconButton(
-                  icon: const Icon(Icons.close, color: _err, size: 20),
+                  icon: Icon(Icons.close, color: _err, size: 20),
                   onPressed: () => setState(() => _cart.clear()),
                 ),
             ]),
           ),
           Expanded(
             child: _cart.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -994,18 +995,18 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
                 Text(l.variant.productNameAr,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _tp,
                         fontWeight: FontWeight.w600,
                         fontSize: 13)),
                 Text(l.variant.sku,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _td, fontSize: 11, fontFamily: 'monospace')),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: _err, size: 18),
+            icon: Icon(Icons.delete_outline, color: _err, size: 18),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             onPressed: () => setState(() => _cart.removeAt(i)),
@@ -1030,14 +1031,14 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(color: _bdr),
                 ),
-                child: const Icon(Icons.remove, color: _ts, size: 14),
+                child: Icon(Icons.remove, color: _ts, size: 14),
               ),
             ),
             Container(
               width: 40,
               alignment: Alignment.center,
               child: Text('${l.qty}',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: _tp,
                       fontSize: 14,
                       fontWeight: FontWeight.bold)),
@@ -1051,7 +1052,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(color: _gold),
                 ),
-                child: const Icon(Icons.add, color: _gold, size: 14),
+                child: Icon(Icons.add, color: _gold, size: 14),
               ),
             ),
           ]),
@@ -1061,14 +1062,14 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
             width: 70,
             child: TextField(
               textAlign: TextAlign.center,
-              style: const TextStyle(color: _warn, fontSize: 12),
+              style: TextStyle(color: _warn, fontSize: 12),
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 isDense: true,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                 hintText: 'خصم%',
-                hintStyle: const TextStyle(color: _td, fontSize: 11),
+                hintStyle: TextStyle(color: _td, fontSize: 11),
                 filled: true,
                 fillColor: _navy2,
                 border: OutlineInputBorder(
@@ -1086,7 +1087,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
           ),
           const Spacer(),
           Text('${l.total.toStringAsFixed(2)}',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _gold, fontWeight: FontWeight.bold, fontSize: 15)),
         ]),
       ]),
@@ -1101,7 +1102,7 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
           _totalRow('الإجمالي قبل الضريبة', _taxable, _ts),
           _totalRow('ضريبة (15%)', _vat, _ts),
           if (_discount > 0) _totalRow('الخصم', _discount, _warn),
-          const Divider(color: _bdr),
+          Divider(color: _bdr),
           _totalRow('الإجمالي', _grandTotal, _gold, big: true),
           const SizedBox(height: 12),
           Row(children: [
@@ -1132,17 +1133,17 @@ class _RetailPosScreenState extends State<RetailPosScreen> {
                     ? null
                     : _processReturn,
                 icon: const Icon(Icons.undo),
-                label: const Text('مرتجع', style: TextStyle(fontSize: 14)),
+                label: Text('مرتجع', style: TextStyle(fontSize: 14)),
               ),
             ),
           ]),
           const SizedBox(height: 6),
           Text(_itemCount == 0 ? ' ' : '$_itemCount قطعة في ${_cart.length} صنف',
-              style: const TextStyle(color: _td, fontSize: 11)),
+              style: TextStyle(color: _td, fontSize: 11)),
           if (_lastReceipt != null) ...[
             const SizedBox(height: 4),
             Text('آخر إيصال: $_lastReceipt',
-                style: const TextStyle(color: _ok, fontSize: 11)),
+                style: TextStyle(color: _ok, fontSize: 11)),
           ],
         ]),
       );
@@ -1219,11 +1220,11 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(children: [
-                const Text('الإجمالي المطلوب',
+                Text('الإجمالي المطلوب',
                     style: TextStyle(fontSize: 14)),
                 const Spacer(),
                 Text('${widget.total.toStringAsFixed(2)} ${widget.currency}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: _gold)),
@@ -1248,10 +1249,10 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                       Text(_nameForMethod(e.value.method)),
                       const Spacer(),
                       Text('${e.value.amount.toStringAsFixed(2)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _ok, fontWeight: FontWeight.bold)),
                       IconButton(
-                        icon: const Icon(Icons.close,
+                        icon: Icon(Icons.close,
                             color: _err, size: 14),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -1262,14 +1263,14 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                   )),
               const SizedBox(height: 8),
               Row(children: [
-                const Text('المدفوع'),
+                Text('المدفوع'),
                 const Spacer(),
                 Text('${_paid.toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _ok, fontWeight: FontWeight.bold)),
               ]),
               Row(children: [
-                const Text('المتبقي'),
+                Text('المتبقي'),
                 const Spacer(),
                 Text('${_remaining.toStringAsFixed(2)}',
                     style: TextStyle(
@@ -1308,7 +1309,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                                     Icon(m.$3,
                                         color: _method == m.$1
                                             ? _gold
-                                            : Colors.black54,
+                                            : core_theme.AC.ts,
                                         size: 28),
                                     const SizedBox(height: 4),
                                     Text(m.$2,
@@ -1316,7 +1317,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                                           fontSize: 11,
                                           color: _method == m.$1
                                               ? _gold
-                                              : Colors.black87,
+                                              : core_theme.AC.tp,
                                           fontWeight: FontWeight.w600,
                                         )),
                                   ],
@@ -1366,7 +1367,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
               FilledButton.icon(
                 style: FilledButton.styleFrom(
                   backgroundColor: _gold,
-                  foregroundColor: Colors.black,
+                  foregroundColor: core_theme.AC.tp,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 onPressed: () {
@@ -1380,7 +1381,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                   });
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('إضافة دفعة', style: TextStyle(fontSize: 15)),
+                label: Text('إضافة دفعة', style: TextStyle(fontSize: 15)),
               ),
             ],
 
@@ -1389,7 +1390,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('إلغاء'),
+                  child: Text('إلغاء'),
                 ),
               ),
               const SizedBox(width: 8),
@@ -1397,7 +1398,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 flex: 2,
                 child: FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: done ? _ok : Colors.grey,
+                    backgroundColor: done ? _ok : core_theme.AC.td,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed: done

@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ZakatCalculatorV5Screen extends StatefulWidget {
   const ZakatCalculatorV5Screen({super.key});
@@ -89,21 +90,21 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF0A5F38), Color(0xFF10B981)]),
+        gradient: LinearGradient(colors: [Color(0xFF0A5F38), core_theme.AC.ok]),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
           const Icon(Icons.star, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('حاسبة الزكاة',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('طريقة رأس المال العامل — وفقاً لأنظمة هيئة الزكاة والضريبة والجمارك (ZATCA)',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -138,14 +139,14 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.add_circle, color: Colors.green, size: 18),
+              Icon(Icons.add_circle, color: core_theme.AC.ok, size: 18),
               SizedBox(width: 6),
               Text('يُضاف إلى وعاء الزكاة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
             ],
@@ -154,9 +155,9 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
           _inputRow('حقوق الملكية', _equity, 'رأس المال + الاحتياطيات + الأرباح المحتجزة'),
           _inputRow('الالتزامات طويلة الأجل', _longTermLiab, 'قروض بنكية، صكوك، مكافآت نهاية الخدمة'),
           const SizedBox(height: 20),
-          const Row(
+          Row(
             children: [
-              Icon(Icons.remove_circle, color: Colors.red, size: 18),
+              Icon(Icons.remove_circle, color: core_theme.AC.err, size: 18),
               SizedBox(width: 6),
               Text('يُخصم من وعاء الزكاة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
             ],
@@ -180,7 +181,7 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                Text(hint, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(hint, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -210,16 +211,16 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.amber.shade50,
+        color: core_theme.AC.warn,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber.shade200),
+        border: Border.all(color: core_theme.AC.warn),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.tune, color: Colors.amber, size: 18),
+              Icon(Icons.tune, color: core_theme.AC.warn, size: 18),
               SizedBox(width: 6),
               Text('تعديلات إضافية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
             ],
@@ -248,20 +249,20 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('وعاء الزكاة',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text('وعاء الزكاة',
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               const SizedBox(height: 4),
               Text(_fmt(_zakatBase),
                   style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Divider(color: Colors.white24, height: 32),
-              const Text('الزكاة المستحقة (2.5%)',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Divider(color: core_theme.AC.bdr, height: 32),
+              Text('الزكاة المستحقة (2.5%)',
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               const SizedBox(height: 4),
               Text(_fmt(_zakatDue),
                   style: const TextStyle(color: Color(0xFFFFD700), fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
               const SizedBox(height: 4),
-              const Text('ر.س',
-                  style: TextStyle(color: Colors.white70, fontSize: 11)),
+              Text('ر.س',
+                  style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
             ],
           ),
         ),
@@ -271,21 +272,21 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             children: [
-              _summaryLine('حقوق الملكية', _equityV, '+', Colors.green),
-              _summaryLine('التزامات طويلة الأجل', _longTermLiabV, '+', Colors.green),
-              _summaryLine('تعديلات إضافة', _adjustmentsAddV, '+', Colors.green),
-              _summaryLine('أصول ثابتة', _fixedAssetsV, '-', Colors.red),
-              _summaryLine('استثمارات طويلة', _longTermInvestV, '-', Colors.red),
-              _summaryLine('تعديلات خصم', _adjustmentsSubV, '-', Colors.red),
+              _summaryLine('حقوق الملكية', _equityV, '+', core_theme.AC.ok),
+              _summaryLine('التزامات طويلة الأجل', _longTermLiabV, '+', core_theme.AC.ok),
+              _summaryLine('تعديلات إضافة', _adjustmentsAddV, '+', core_theme.AC.ok),
+              _summaryLine('أصول ثابتة', _fixedAssetsV, '-', core_theme.AC.err),
+              _summaryLine('استثمارات طويلة', _longTermInvestV, '-', core_theme.AC.err),
+              _summaryLine('تعديلات خصم', _adjustmentsSubV, '-', core_theme.AC.err),
               const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('الوعاء النهائي', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
+                  Text('الوعاء النهائي', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
                   Text(_fmt(_zakatBase), style: const TextStyle(fontWeight: FontWeight.w900, fontFamily: 'monospace', color: Color(0xFF0A5F38))),
                 ],
               ),
@@ -306,7 +307,7 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
             children: [
               Text(sign, style: TextStyle(color: color, fontWeight: FontWeight.w900)),
               const SizedBox(width: 6),
-              Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ],
           ),
           Text(_fmt(val), style: const TextStyle(fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w600)),
@@ -319,28 +320,28 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: core_theme.AC.info,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade200),
+        border: Border.all(color: core_theme.AC.info),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.gavel, color: Colors.blue),
+              Icon(Icons.gavel, color: core_theme.AC.info),
               SizedBox(width: 8),
               Text('المرجع النظامي', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
             ],
           ),
           const SizedBox(height: 10),
-          const Text('• اللائحة التنفيذية لجباية الزكاة رقم 2082 بتاريخ 01/06/1438 هـ',
+          Text('• اللائحة التنفيذية لجباية الزكاة رقم 2082 بتاريخ 01/06/1438 هـ',
               style: TextStyle(fontSize: 12, height: 1.7)),
-          const Text('• طريقة رأس المال العامل لأصحاب النشاط الخاضع لنظام الشركات',
+          Text('• طريقة رأس المال العامل لأصحاب النشاط الخاضع لنظام الشركات',
               style: TextStyle(fontSize: 12, height: 1.7)),
-          const Text('• السعر القانوني: 2.5% من الوعاء الزكوي للسنة الهجرية الكاملة',
+          Text('• السعر القانوني: 2.5% من الوعاء الزكوي للسنة الهجرية الكاملة',
               style: TextStyle(fontSize: 12, height: 1.7)),
-          const Text('• الاستحقاق: بعد حولان الحول الهجري على المال',
+          Text('• الاستحقاق: بعد حولان الحول الهجري على المال',
               style: TextStyle(fontSize: 12, height: 1.7)),
         ],
       ),
@@ -353,12 +354,12 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('الخطوات التالية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+          Text('الخطوات التالية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -366,7 +367,7 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
                 child: OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.download, size: 16),
-                  label: const Text('تصدير بيان الزكاة'),
+                  label: Text('تصدير بيان الزكاة'),
                 ),
               ),
               const SizedBox(width: 10),
@@ -374,7 +375,7 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
                 child: OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.attach_file, size: 16),
-                  label: const Text('إرفاق القوائم'),
+                  label: Text('إرفاق القوائم'),
                 ),
               ),
               const SizedBox(width: 10),
@@ -389,7 +390,7 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
                     );
                   },
                   icon: const Icon(Icons.send, size: 16),
-                  label: const Text('تقديم إلى ZATCA'),
+                  label: Text('تقديم إلى ZATCA'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0A5F38),
                     foregroundColor: Colors.white,

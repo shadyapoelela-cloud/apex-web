@@ -16,6 +16,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 enum InboxCategory { approval, review, deadline, mention, alert }
@@ -39,15 +40,15 @@ extension InboxCategoryX on InboxCategory {
   Color get color {
     switch (this) {
       case InboxCategory.approval:
-        return Colors.orange;
+        return core_theme.AC.warn;
       case InboxCategory.review:
-        return Colors.blue;
+        return core_theme.AC.info;
       case InboxCategory.deadline:
-        return Colors.red;
+        return core_theme.AC.err;
       case InboxCategory.mention:
-        return Colors.purple;
+        return core_theme.AC.purple;
       case InboxCategory.alert:
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
     }
   }
 
@@ -168,7 +169,7 @@ class UnifiedInbox extends StatefulWidget {
   static void show(BuildContext context) {
     showDialog<void>(
       context: context,
-      barrierColor: Colors.black38,
+      barrierColor: core_theme.AC.td,
       builder: (ctx) => const _InboxDrawer(),
     );
   }
@@ -191,8 +192,8 @@ class _InboxDrawer extends StatefulWidget {
 
 class _InboxDrawerState extends State<_InboxDrawer> {
   InboxCategory? _filter;
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   List<InboxItem> get _filtered => _filter == null
       ? demoInboxItems
@@ -217,13 +218,13 @@ class _InboxDrawerState extends State<_InboxDrawer> {
                 const Divider(height: 1),
                 Expanded(
                   child: _filtered.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.inbox, size: 64, color: Colors.black26),
+                              Icon(Icons.inbox, size: 64, color: core_theme.AC.td),
                               SizedBox(height: 12),
-                              Text('لا توجد عناصر', style: TextStyle(color: Colors.black45)),
+                              Text('لا توجد عناصر', style: TextStyle(color: core_theme.AC.td)),
                             ],
                           ),
                         )
@@ -237,8 +238,8 @@ class _InboxDrawerState extends State<_InboxDrawer> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    border: Border(top: BorderSide(color: Colors.grey.shade200)),
+                    color: core_theme.AC.navy3,
+                    border: Border(top: BorderSide(color: core_theme.AC.bdr)),
                   ),
                   child: Row(
                     children: [
@@ -268,7 +269,7 @@ class _InboxDrawerState extends State<_InboxDrawer> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [_navy, Color(0xFF4A148C)],
         ),
@@ -277,7 +278,7 @@ class _InboxDrawerState extends State<_InboxDrawer> {
         children: [
           const Icon(Icons.inbox, color: Colors.white, size: 20),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -287,7 +288,7 @@ class _InboxDrawerState extends State<_InboxDrawer> {
                         fontSize: 15,
                         fontWeight: FontWeight.w800)),
                 Text('كل ما ينتظرك في مكان واحد',
-                    style: TextStyle(color: Colors.white70, fontSize: 10)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 10)),
               ],
             ),
           ),
@@ -359,21 +360,21 @@ class _CatChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: active ? color.withOpacity(0.15) : Colors.grey.shade100,
+            color: active ? color.withOpacity(0.15) : core_theme.AC.navy3,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: active ? color : Colors.grey.shade300),
+            border: Border.all(color: active ? color : core_theme.AC.bdr),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 12, color: active ? color : Colors.black54),
+              Icon(icon, size: 12, color: active ? color : core_theme.AC.ts),
               const SizedBox(width: 4),
               Text(
                 label,
                 style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: active ? color : Colors.black87),
+                    color: active ? color : core_theme.AC.tp),
               ),
             ],
           ),
@@ -395,13 +396,13 @@ class _InboxItemTile extends StatelessWidget {
       final diff = item.dueAt!.difference(DateTime.now());
       if (diff.inHours < 12) {
         dueText = 'خلال ${diff.inHours} ساعة';
-        dueColor = Colors.red;
+        dueColor = core_theme.AC.err;
       } else if (diff.inDays < 3) {
         dueText = 'خلال ${diff.inDays} أيام';
-        dueColor = Colors.orange;
+        dueColor = core_theme.AC.warn;
       } else if (diff.inDays < 30) {
         dueText = 'خلال ${diff.inDays} يوم';
-        dueColor = Colors.blue;
+        dueColor = core_theme.AC.info;
       }
     }
 
@@ -436,17 +437,17 @@ class _InboxItemTile extends StatelessWidget {
                           fontSize: 13, fontWeight: FontWeight.w700, height: 1.3)),
                   const SizedBox(height: 2),
                   Text(item.subtitleAr,
-                      style: const TextStyle(
-                          fontSize: 11, color: Colors.black54, height: 1.3),
+                      style: TextStyle(
+                          fontSize: 11, color: core_theme.AC.ts, height: 1.3),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       Text(item.fromAppAr,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 10,
-                              color: Colors.black45,
+                              color: core_theme.AC.td,
                               fontWeight: FontWeight.w600)),
                       if (dueText != null) ...[
                         const SizedBox(width: 8),

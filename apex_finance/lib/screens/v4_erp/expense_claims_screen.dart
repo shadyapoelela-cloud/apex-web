@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ExpenseClaimsScreen extends StatefulWidget {
   const ExpenseClaimsScreen({super.key});
@@ -46,9 +47,9 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
         _buildKpiRow(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.list, size: 16), text: 'جميع المطالبات'),
             Tab(icon: Icon(Icons.add_circle, size: 16), text: 'مطالبة جديدة'),
@@ -77,7 +78,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
         gradient: const LinearGradient(colors: [Color(0xFF1565C0), Color(0xFF1976D2)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.receipt, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -88,7 +89,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                 Text('مطالبات المصروفات',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('تقديم مطالبة، اعتمادها، وتسديدها — مع ربط بإيصالات OCR تلقائية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -107,10 +108,10 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('قيد الاعتماد', '$pending', Colors.orange, Icons.schedule),
-          _kpi('معتمدة للسداد', '$approved', Colors.blue, Icons.check_circle),
-          _kpi('مسدّدة هذا الشهر', '$paid', Colors.green, Icons.payment),
-          _kpi('قيمة المعلّق', _fmt(totalPending), const Color(0xFFD4AF37), Icons.attach_money),
+          _kpi('قيد الاعتماد', '$pending', core_theme.AC.warn, Icons.schedule),
+          _kpi('معتمدة للسداد', '$approved', core_theme.AC.info, Icons.check_circle),
+          _kpi('مسدّدة هذا الشهر', '$paid', core_theme.AC.ok, Icons.payment),
+          _kpi('قيمة المعلّق', _fmt(totalPending), core_theme.AC.gold, Icons.attach_money),
         ],
       ),
     );
@@ -134,7 +135,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -159,7 +160,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
@@ -187,17 +188,17 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.person, size: 12, color: Colors.black45),
+                        Icon(Icons.person, size: 12, color: core_theme.AC.td),
                         const SizedBox(width: 4),
-                        Text(c.employee, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(c.employee, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         const SizedBox(width: 10),
-                        const Icon(Icons.calendar_today, size: 12, color: Colors.black45),
+                        Icon(Icons.calendar_today, size: 12, color: core_theme.AC.td),
                         const SizedBox(width: 4),
-                        Text(c.date, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        Text(c.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                         const SizedBox(width: 10),
-                        const Icon(Icons.attach_file, size: 12, color: Colors.black45),
+                        Icon(Icons.attach_file, size: 12, color: core_theme.AC.td),
                         const SizedBox(width: 4),
-                        Text('${c.receipts} إيصال', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text('${c.receipts} إيصال', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ],
@@ -207,8 +208,8 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(_fmt(c.amount),
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
-                  const Text('ر.س', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
+                  Text('ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   const SizedBox(height: 4),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -225,14 +226,14 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                 Column(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.check_circle, color: Colors.green, size: 22),
+                      icon: Icon(Icons.check_circle, color: core_theme.AC.ok, size: 22),
                       onPressed: () => setState(() => c.status = 'معتمد'),
                       tooltip: 'اعتماد',
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(minWidth: 32, minHeight: 28),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.cancel, color: Colors.red, size: 22),
+                      icon: Icon(Icons.cancel, color: core_theme.AC.err, size: 22),
                       onPressed: () => setState(() => c.status = 'مرفوض'),
                       tooltip: 'رفض',
                       padding: EdgeInsets.zero,
@@ -255,20 +256,20 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.camera_alt, color: Colors.blue, size: 28),
+              Icon(Icons.camera_alt, color: core_theme.AC.info, size: 28),
               SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('ارفع إيصالاتك — نحن نستخرج البيانات',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.blue)),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
                     Text('OCR يستخرج المبلغ، التاريخ، وBرقم الضريبي تلقائياً',
                         style: TextStyle(fontSize: 11)),
                   ],
@@ -283,19 +284,19 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('معلومات المطالبة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+              Text('معلومات المطالبة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
               const SizedBox(height: 16),
               _formField('الموظف', 'أحمد محمد العتيبي', Icons.person, readOnly: true),
               _formField('تاريخ المصروف', '2026-04-19', Icons.calendar_today),
               _formField('العنوان', 'سفر عمل إلى جدة لاجتماع عملاء', Icons.title),
               _formField('المبلغ بالريال', '3200', Icons.attach_money),
               const SizedBox(height: 12),
-              const Text('الفئة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+              Text('الفئة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -316,19 +317,19 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                 child: Container(
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
+                    color: core_theme.AC.navy3,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.black26, style: BorderStyle.solid),
+                    border: Border.all(color: core_theme.AC.td, style: BorderStyle.solid),
                   ),
-                  child: const Column(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.cloud_upload, size: 32, color: Colors.black45),
+                      Icon(Icons.cloud_upload, size: 32, color: core_theme.AC.td),
                       SizedBox(height: 6),
                       Text('اسحب وأفلت الإيصالات هنا أو اضغط للاختيار',
-                          style: TextStyle(fontSize: 12, color: Colors.black54)),
+                          style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                       Text('JPG / PNG / PDF — حد أقصى 10MB',
-                          style: TextStyle(fontSize: 10, color: Colors.black38)),
+                          style: TextStyle(fontSize: 10, color: core_theme.AC.td)),
                     ],
                   ),
                 ),
@@ -339,7 +340,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {},
-                      child: const Text('حفظ كمسوّدة'),
+                      child: Text('حفظ كمسوّدة'),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -347,16 +348,16 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                     child: ElevatedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text('أُرسلت المطالبة للمدير المباشر للاعتماد'),
-                            backgroundColor: Colors.green,
+                            backgroundColor: core_theme.AC.ok,
                           ),
                         );
                       },
                       icon: const Icon(Icons.send, size: 16),
-                      label: const Text('إرسال للاعتماد'),
+                      label: Text('إرسال للاعتماد'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD4AF37),
+                        backgroundColor: core_theme.AC.gold,
                         foregroundColor: Colors.white,
                       ),
                     ),
@@ -382,7 +383,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           isDense: true,
           filled: readOnly,
-          fillColor: readOnly ? Colors.grey.shade50 : null,
+          fillColor: readOnly ? core_theme.AC.navy3 : null,
         ),
         controller: TextEditingController(text: value),
       ),
@@ -395,7 +396,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black26),
+        border: Border.all(color: core_theme.AC.td),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -430,12 +431,12 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
+                  border: Border.all(color: core_theme.AC.bdr),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('حسب الفئة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                    Text('حسب الفئة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 12),
                     for (final e in byCategory.entries)
                       Padding(
@@ -452,7 +453,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                               width: 48,
                               alignment: Alignment.centerRight,
                               child: Text('${(e.value / total * 100).toStringAsFixed(0)}%',
-                                  style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                             ),
                           ],
                         ),
@@ -468,12 +469,12 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
+                  border: Border.all(color: core_theme.AC.bdr),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('حسب الموظف', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                    Text('حسب الموظف', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 12),
                     for (final e in byEmp.entries)
                       Padding(
@@ -482,8 +483,8 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                           children: [
                             CircleAvatar(
                               radius: 12,
-                              backgroundColor: const Color(0xFFD4AF37).withOpacity(0.15),
-                              child: const Icon(Icons.person, size: 14, color: Color(0xFFD4AF37)),
+                              backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+                              child: Icon(Icons.person, size: 14, color: core_theme.AC.gold),
                             ),
                             const SizedBox(width: 8),
                             Expanded(child: Text(e.key, style: const TextStyle(fontSize: 12))),
@@ -505,19 +506,19 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
   _CatInfo _categoryInfo(String cat) {
     switch (cat) {
       case 'travel':
-        return const _CatInfo(Icons.flight, Colors.blue);
+        return _CatInfo(Icons.flight, core_theme.AC.info);
       case 'transport':
-        return const _CatInfo(Icons.local_taxi, Colors.orange);
+        return _CatInfo(Icons.local_taxi, core_theme.AC.warn);
       case 'hospitality':
-        return const _CatInfo(Icons.restaurant, Colors.green);
+        return _CatInfo(Icons.restaurant, core_theme.AC.ok);
       case 'office':
-        return const _CatInfo(Icons.print, Colors.grey);
+        return _CatInfo(Icons.print, core_theme.AC.td);
       case 'software':
-        return const _CatInfo(Icons.apps, Colors.purple);
+        return _CatInfo(Icons.apps, core_theme.AC.purple);
       case 'training':
-        return const _CatInfo(Icons.school, Colors.red);
+        return _CatInfo(Icons.school, core_theme.AC.err);
       default:
-        return const _CatInfo(Icons.category, Colors.teal);
+        return _CatInfo(Icons.category, core_theme.AC.info);
     }
   }
 
@@ -543,15 +544,15 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
   Color _statusColor(String s) {
     switch (s) {
       case 'قيد الاعتماد':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'معتمد':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'مسدّد':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'مرفوض':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

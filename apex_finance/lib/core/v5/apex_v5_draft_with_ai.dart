@@ -21,6 +21,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 class ApexV5DraftWithAi extends StatefulWidget {
   final TextEditingController controller;
@@ -62,7 +63,7 @@ class _ApexV5DraftWithAiState extends State<ApexV5DraftWithAi> {
         if (widget.labelAr != null) ...[
           Text(
             widget.labelAr!,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black54),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: core_theme.AC.ts),
           ),
           const SizedBox(height: 4),
         ],
@@ -105,10 +106,10 @@ class _ApexV5DraftWithAiState extends State<ApexV5DraftWithAi> {
           decoration: BoxDecoration(
             gradient: _loading
                 ? null
-                : const LinearGradient(
-                    colors: [Color(0xFF7C3AED), Color(0xFFEC4899)],
+                : LinearGradient(
+                    colors: [core_theme.AC.purple, Color(0xFFEC4899)],
                   ),
-            color: _loading ? Colors.black.withOpacity(0.05) : null,
+            color: _loading ? core_theme.AC.tp.withOpacity(0.05) : null,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
@@ -128,7 +129,7 @@ class _ApexV5DraftWithAiState extends State<ApexV5DraftWithAi> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: _loading ? Colors.black54 : Colors.white,
+                  color: _loading ? core_theme.AC.ts : Colors.white,
                 ),
               ),
             ],
@@ -142,20 +143,20 @@ class _ApexV5DraftWithAiState extends State<ApexV5DraftWithAi> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFF7C3AED).withOpacity(0.05),
+        color: core_theme.AC.purple.withOpacity(0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF7C3AED).withOpacity(0.2)),
+        border: Border.all(color: core_theme.AC.purple.withOpacity(0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome, size: 14, color: Color(0xFF7C3AED)),
+              Icon(Icons.auto_awesome, size: 14, color: core_theme.AC.purple),
               const SizedBox(width: 6),
-              const Text(
+              Text(
                 'اقتراحات الذكاء',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF7C3AED)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: core_theme.AC.purple),
               ),
               const Spacer(),
               IconButton(
@@ -180,14 +181,14 @@ class _ApexV5DraftWithAiState extends State<ApexV5DraftWithAi> {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: Colors.black.withOpacity(0.08)),
+                      border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
                     ),
                     child: Row(
                       children: [
                         Expanded(
                           child: Text(s, style: const TextStyle(fontSize: 12)),
                         ),
-                        const Icon(Icons.arrow_back, size: 14, color: Color(0xFF7C3AED)),
+                        Icon(Icons.arrow_back, size: 14, color: core_theme.AC.purple),
                       ],
                     ),
                   ),

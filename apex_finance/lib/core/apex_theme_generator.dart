@@ -10,7 +10,7 @@
 /// Contract:
 ///   generateApexTheme(
 ///     base: Color(0xFF1E3A5F),     // navy / brand dark
-///     accent: Color(0xFFD4AF37),   // gold / CTA
+///     accent: core_theme.AC.gold,   // gold / CTA
 ///     contrast: 1.0,               // 0.7 low … 1.3 high
 ///     isDark: true,
 ///   ) → ApexTheme
@@ -21,6 +21,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'theme.dart' as core_theme;
 
 import 'theme.dart';
 

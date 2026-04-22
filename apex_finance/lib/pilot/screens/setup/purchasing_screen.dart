@@ -9,27 +9,28 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../core/theme.dart' as core_theme;
 
 import '../../api/pilot_client.dart';
 import '../../export_utils.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
-const _blue = Color(0xFF3B82F6);
-const _indigo = Color(0xFF6366F1);
+Color get _gold => core_theme.AC.gold;
+Color get _navy => core_theme.AC.navy;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+Color get _warn => core_theme.AC.warn;
+final _blue = core_theme.AC.info;
+final _indigo = core_theme.AC.purple;
 
-const _kPoStatuses = <String, Map<String, dynamic>>{
+Map<String, Map<String, dynamic>> get _kPoStatuses => <String, Map<String, dynamic>>{
   'draft': {'ar': 'مسودّة', 'color': _td},
   'submitted': {'ar': 'مُقدَّم', 'color': _warn},
   'approved': {'ar': 'معتمد', 'color': _blue},
@@ -40,7 +41,7 @@ const _kPoStatuses = <String, Map<String, dynamic>>{
   'cancelled': {'ar': 'ملغى', 'color': _err},
 };
 
-const _kPiStatuses = <String, Map<String, dynamic>>{
+Map<String, Map<String, dynamic>> get _kPiStatuses => <String, Map<String, dynamic>>{
   'draft': {'ar': 'مسودّة', 'color': _td},
   'submitted': {'ar': 'مُقدَّم', 'color': _warn},
   'posted': {'ar': 'مُرحَّل', 'color': _blue},
@@ -206,7 +207,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
           ),
           Expanded(
             child: _loading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(color: _gold))
                 : _error != null
                     ? _errorView()
@@ -234,12 +235,12 @@ class _PurchasingScreenState extends State<PurchasingScreen>
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: _gold.withValues(alpha: 0.4)),
           ),
-          child: const Icon(Icons.shopping_bag, color: _gold, size: 22),
+          child: Icon(Icons.shopping_bag, color: _gold, size: 22),
         ),
         const SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text('المشتريات',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.w800)),
@@ -251,7 +252,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         const Spacer(),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+              foregroundColor: _tp, side: BorderSide(color: _bdr)),
           onPressed: _load,
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('تحديث'),
@@ -262,9 +263,9 @@ class _PurchasingScreenState extends State<PurchasingScreen>
 
   Widget _errorView() => Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.error_outline, color: _err, size: 48),
+          Icon(Icons.error_outline, color: _err, size: 48),
           const SizedBox(height: 12),
-          Text(_error!, style: const TextStyle(color: _ts)),
+          Text(_error!, style: TextStyle(color: _ts)),
         ]),
       );
 
@@ -292,7 +293,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
           const Spacer(),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _createPo,
             icon: const Icon(Icons.add, size: 16),
             label: const Text('أمر شراء جديد'),
@@ -325,7 +326,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
           borderRadius: BorderRadius.circular(6),
           border: Border.all(color: _bdr),
         ),
-        child: Row(children: const [
+        child: Row(children: [
           SizedBox(width: 130, child: Text('رقم الأمر', style: _th)),
           SizedBox(width: 95, child: Text('التاريخ', style: _th)),
           Expanded(flex: 2, child: Text('المورد', style: _th)),
@@ -353,7 +354,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         SizedBox(
           width: 130,
           child: Text(p['po_number'] ?? '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _gold,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -362,13 +363,13 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         SizedBox(
           width: 95,
           child: Text(p['order_date'] ?? '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _ts, fontSize: 11, fontFamily: 'monospace')),
         ),
         Expanded(
           flex: 2,
           child: Text(_vendorName(p['vendor_id']),
-              style: const TextStyle(color: _tp, fontSize: 12),
+              style: TextStyle(color: _tp, fontSize: 12),
               overflow: TextOverflow.ellipsis),
         ),
         SizedBox(
@@ -378,7 +379,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         SizedBox(
           width: 120,
           child: Text(_fmt(total),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -393,7 +394,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                 tooltip: 'اعتماد',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.check_circle, color: _ok, size: 16),
+                icon: Icon(Icons.check_circle, color: _ok, size: 16),
                 onPressed: () => _approvePo(p['id']),
               ),
             if (status == 'approved')
@@ -401,7 +402,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                 tooltip: 'إصدار',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.send, color: _blue, size: 16),
+                icon: Icon(Icons.send, color: _blue, size: 16),
                 onPressed: () => _issuePo(p['id']),
               ),
             if (status == 'issued' || status == 'partially_received')
@@ -409,21 +410,21 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                 tooltip: 'استلام بضاعة (GRN)',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.call_received, color: _gold, size: 16),
+                icon: Icon(Icons.call_received, color: _gold, size: 16),
                 onPressed: () => _createGrn(p),
               ),
             IconButton(
               tooltip: 'طباعة / PDF',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: const Icon(Icons.print, color: _indigo, size: 16),
+              icon: Icon(Icons.print, color: _indigo, size: 16),
               onPressed: () => _printPo(p['id']),
             ),
             IconButton(
               tooltip: 'عرض',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: const Icon(Icons.visibility, color: _ts, size: 16),
+              icon: Icon(Icons.visibility, color: _ts, size: 16),
               onPressed: () => _showPoDetail(p['id']),
             ),
           ]),
@@ -434,7 +435,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
 
   Future<void> _createPo() async {
     if (_vendors.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _warn, content: Text('أضف مورداً أولاً')));
       return;
     }
@@ -606,7 +607,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
           const Spacer(),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _createPi,
             icon: const Icon(Icons.add, size: 16),
             label: const Text('فاتورة شراء جديدة'),
@@ -639,7 +640,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
           borderRadius: BorderRadius.circular(6),
           border: Border.all(color: _bdr),
         ),
-        child: Row(children: const [
+        child: Row(children: [
           SizedBox(width: 130, child: Text('رقم الفاتورة', style: _th)),
           SizedBox(width: 95, child: Text('التاريخ', style: _th)),
           Expanded(flex: 2, child: Text('المورد', style: _th)),
@@ -671,7 +672,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         SizedBox(
           width: 130,
           child: Text(p['invoice_number'] ?? '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _gold,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -680,13 +681,13 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         SizedBox(
           width: 95,
           child: Text(p['invoice_date'] ?? '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _ts, fontSize: 11, fontFamily: 'monospace')),
         ),
         Expanded(
           flex: 2,
           child: Text(_vendorName(p['vendor_id']),
-              style: const TextStyle(color: _tp, fontSize: 12),
+              style: TextStyle(color: _tp, fontSize: 12),
               overflow: TextOverflow.ellipsis),
         ),
         SizedBox(
@@ -695,7 +696,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         SizedBox(
           width: 110,
           child: Text(_fmt(total),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -720,7 +721,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                 tooltip: 'ترحيل إلى GL',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.check_circle, color: _ok, size: 16),
+                icon: Icon(Icons.check_circle, color: _ok, size: 16),
                 onPressed: () => _postPi(p['id']),
               ),
             if ((status == 'posted' || status == 'partially_paid') && due > 0)
@@ -728,21 +729,21 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                 tooltip: 'تسديد',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.payments, color: _gold, size: 16),
+                icon: Icon(Icons.payments, color: _gold, size: 16),
                 onPressed: () => _payInvoice(p),
               ),
             IconButton(
               tooltip: 'طباعة / PDF',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: const Icon(Icons.print, color: _indigo, size: 16),
+              icon: Icon(Icons.print, color: _indigo, size: 16),
               onPressed: () => _printPi(p['id']),
             ),
             IconButton(
               tooltip: 'عرض',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: const Icon(Icons.visibility, color: _ts, size: 16),
+              icon: Icon(Icons.visibility, color: _ts, size: 16),
               onPressed: () => _showPiDetail(p['id']),
             ),
           ]),
@@ -753,7 +754,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
 
   Future<void> _createPi() async {
     if (_vendors.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _warn, content: Text('أضف مورداً أولاً')));
       return;
     }
@@ -776,17 +777,17 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         child: AlertDialog(
           backgroundColor: _navy2,
           title:
-              const Text('ترحيل الفاتورة إلى GL', style: TextStyle(color: _tp)),
-          content: const Text(
+              Text('ترحيل الفاتورة إلى GL', style: TextStyle(color: _tp)),
+          content: Text(
               'سيتم إنشاء قيد يومية بقيد مدين (مصاريف/مخزون + VAT) ودائن (ذمم الموردين).\n\nلا يمكن التراجع بعد الترحيل.',
               style: TextStyle(color: _ts, height: 1.5)),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('إلغاء', style: TextStyle(color: _ts))),
+                child: Text('إلغاء', style: TextStyle(color: _ts))),
             FilledButton(
                 style: FilledButton.styleFrom(
-                    backgroundColor: _gold, foregroundColor: Colors.black),
+                    backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
                 onPressed: () => Navigator.pop(context, true),
                 child: const Text('ترحيل')),
           ],
@@ -845,7 +846,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
           const Spacer(),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _createStandalonePayment,
             icon: const Icon(Icons.add, size: 16),
             label: const Text('دفعة جديدة'),
@@ -871,7 +872,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: _bdr),
                     ),
-                    child: Row(children: const [
+                    child: Row(children: [
                       SizedBox(
                           width: 130, child: Text('رقم الدفعة', style: _th)),
                       SizedBox(width: 95, child: Text('التاريخ', style: _th)),
@@ -900,7 +901,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                         SizedBox(
                           width: 130,
                           child: Text(p['payment_number'] ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _gold,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -909,7 +910,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                         SizedBox(
                           width: 95,
                           child: Text(p['payment_date'] ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _ts,
                                   fontSize: 11,
                                   fontFamily: 'monospace')),
@@ -917,7 +918,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                         Expanded(
                           flex: 2,
                           child: Text(_vendorName(p['vendor_id']),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _tp, fontSize: 12),
                               overflow: TextOverflow.ellipsis),
                         ),
@@ -932,7 +933,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                         SizedBox(
                           width: 120,
                           child: Text(_fmt(amt),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _ok,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
@@ -942,7 +943,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                         SizedBox(
                           width: 120,
                           child: Text(p['reference_number'] ?? '—',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _td,
                                   fontSize: 10,
                                   fontFamily: 'monospace'),
@@ -959,7 +960,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
 
   Future<void> _createStandalonePayment() async {
     if (_vendors.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _warn, content: Text('أضف مورداً أولاً')));
       return;
     }
@@ -969,7 +970,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: _navy2,
-          title: const Text('اختر المورد', style: TextStyle(color: _tp)),
+          title: Text('اختر المورد', style: TextStyle(color: _tp)),
           content: SizedBox(
             width: 360,
             child: ListView(
@@ -985,7 +986,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(v['code'] ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _gold,
                                   fontSize: 10,
                                   fontFamily: 'monospace',
@@ -993,11 +994,11 @@ class _PurchasingScreenState extends State<PurchasingScreen>
                         ),
                         title: Text(v['legal_name_ar'] ?? '',
                             style:
-                                const TextStyle(color: _tp, fontSize: 13)),
+                                TextStyle(color: _tp, fontSize: 13)),
                         subtitle: Text(
                             'رصيد مستحق: ${_fmt(asDouble(v['outstanding_balance']))}',
                             style:
-                                const TextStyle(color: _td, fontSize: 11)),
+                                TextStyle(color: _td, fontSize: 11)),
                         onTap: () => Navigator.pop(context, v),
                       ))
                   .toList(),
@@ -1026,13 +1027,13 @@ class _PurchasingScreenState extends State<PurchasingScreen>
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, color: _gold.withValues(alpha: 0.4), size: 72),
         const SizedBox(height: 14),
-        Text(title, style: const TextStyle(color: _tp, fontSize: 16)),
+        Text(title, style: TextStyle(color: _tp, fontSize: 16)),
         const SizedBox(height: 6),
-        Text(subtitle, style: const TextStyle(color: _ts, fontSize: 12)),
+        Text(subtitle, style: TextStyle(color: _ts, fontSize: 12)),
         const SizedBox(height: 18),
         FilledButton.icon(
           style: FilledButton.styleFrom(
-              backgroundColor: _gold, foregroundColor: Colors.black),
+              backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
           onPressed: onCta,
           icon: const Icon(Icons.add, size: 14),
           label: Text(cta),
@@ -1053,7 +1054,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(color: _td, fontSize: 10)),
+            Text(label, style: TextStyle(color: _td, fontSize: 10)),
             const SizedBox(height: 2),
             Text(value,
                 style: TextStyle(
@@ -1090,7 +1091,7 @@ class _PurchasingScreenState extends State<PurchasingScreen>
   }
 }
 
-const _th = TextStyle(
+final _th = TextStyle(
     color: _td, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5);
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1150,7 +1151,7 @@ class _PoDialogState extends State<_PoDialog> {
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: _navy2,
-          title: const Text('اختر صنفاً', style: TextStyle(color: _tp)),
+          title: Text('اختر صنفاً', style: TextStyle(color: _tp)),
           content: SizedBox(
             width: 400,
             height: 400,
@@ -1160,7 +1161,7 @@ class _PoDialogState extends State<_PoDialog> {
                         dense: true,
                         title: Text(
                             '${p['code']} — ${p['name_ar']}',
-                            style: const TextStyle(color: _tp, fontSize: 12)),
+                            style: TextStyle(color: _tp, fontSize: 12)),
                         onTap: () => Navigator.pop(context, p['id'] as String),
                       ))
                   .toList(),
@@ -1178,7 +1179,7 @@ class _PoDialogState extends State<_PoDialog> {
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: _navy2,
-          title: const Text('اختر متغيّراً', style: TextStyle(color: _tp)),
+          title: Text('اختر متغيّراً', style: TextStyle(color: _tp)),
           content: SizedBox(
             width: 400,
             height: 400,
@@ -1187,15 +1188,15 @@ class _PoDialogState extends State<_PoDialog> {
                   .map((v) => ListTile(
                         dense: true,
                         title: Text(v['sku'] ?? '',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: _gold,
                                 fontSize: 12,
                                 fontFamily: 'monospace')),
                         subtitle: Text(v['display_name_ar'] ?? '',
-                            style: const TextStyle(color: _ts, fontSize: 11)),
+                            style: TextStyle(color: _ts, fontSize: 11)),
                         trailing: Text(
                             'تكلفة: ${(v['default_cost'] ?? 0)}',
-                            style: const TextStyle(color: _td, fontSize: 10)),
+                            style: TextStyle(color: _td, fontSize: 10)),
                         onTap: () => Navigator.pop(context, v),
                       ))
                   .toList(),
@@ -1274,7 +1275,7 @@ class _PoDialogState extends State<_PoDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم إنشاء أمر الشراء ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل الإنشاء');
@@ -1287,7 +1288,7 @@ class _PoDialogState extends State<_PoDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.receipt_long, color: _gold),
           SizedBox(width: 8),
           Text('أمر شراء جديد', style: TextStyle(color: _tp)),
@@ -1368,9 +1369,9 @@ class _PoDialogState extends State<_PoDialog> {
                 const SizedBox(height: 14),
                 // Lines
                 Row(children: [
-                  const Icon(Icons.list, color: _gold, size: 16),
+                  Icon(Icons.list, color: _gold, size: 16),
                   const SizedBox(width: 6),
-                  const Text('السطور',
+                  Text('السطور',
                       style: TextStyle(
                           color: _tp,
                           fontSize: 13,
@@ -1390,7 +1391,7 @@ class _PoDialogState extends State<_PoDialog> {
                   decoration: BoxDecoration(
                       color: _navy3,
                       borderRadius: BorderRadius.circular(4)),
-                  child: Row(children: const [
+                  child: Row(children: [
                     SizedBox(width: 40, child: Text('#', style: _th)),
                     Expanded(flex: 3, child: Text('الوصف', style: _th)),
                     SizedBox(width: 70, child: Text('الكمية', style: _th)),
@@ -1427,15 +1428,15 @@ class _PoDialogState extends State<_PoDialog> {
                 TextField(
                   controller: _notes,
                   maxLines: 2,
-                  style: const TextStyle(color: _tp, fontSize: 12),
+                  style: TextStyle(color: _tp, fontSize: 12),
                   decoration: InputDecoration(
                     labelText: 'ملاحظات للمورد',
-                    labelStyle: const TextStyle(color: _td),
+                    labelStyle: TextStyle(color: _td),
                     filled: true,
                     fillColor: _navy3,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: _bdr)),
+                        borderSide: BorderSide(color: _bdr)),
                   ),
                 ),
                 if (_error != null) ...[
@@ -1446,11 +1447,11 @@ class _PoDialogState extends State<_PoDialog> {
                         color: _err.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6)),
                     child: Row(children: [
-                      const Icon(Icons.error_outline, color: _err, size: 16),
+                      Icon(Icons.error_outline, color: _err, size: 16),
                       const SizedBox(width: 6),
                       Expanded(
                           child: Text(_error!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _err, fontSize: 12))),
                     ]),
                   ),
@@ -1462,10 +1463,10 @@ class _PoDialogState extends State<_PoDialog> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -1490,7 +1491,7 @@ class _PoDialogState extends State<_PoDialog> {
         SizedBox(
             width: 40,
             child: Text('${i + 1}',
-                style: const TextStyle(color: _ts, fontSize: 11))),
+                style: TextStyle(color: _ts, fontSize: 11))),
         Expanded(
           flex: 3,
           child: Row(children: [
@@ -1500,8 +1501,8 @@ class _PoDialogState extends State<_PoDialog> {
                   ..selection = TextSelection.collapsed(
                       offset: l.description.length),
                 onChanged: (v) => l.description = v,
-                style: const TextStyle(color: _tp, fontSize: 12),
-                decoration: const InputDecoration(
+                style: TextStyle(color: _tp, fontSize: 12),
+                decoration: InputDecoration(
                   hintText: 'الوصف',
                   hintStyle: TextStyle(color: _td),
                   isDense: true,
@@ -1515,7 +1516,7 @@ class _PoDialogState extends State<_PoDialog> {
               tooltip: 'اختيار صنف',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: const Icon(Icons.search, color: _gold, size: 14),
+              icon: Icon(Icons.search, color: _gold, size: 14),
               onPressed: () => _pickVariant(i),
             ),
           ]),
@@ -1526,7 +1527,7 @@ class _PoDialogState extends State<_PoDialog> {
             controller: TextEditingController(text: '${l.qty}'),
             keyboardType: TextInputType.number,
             onChanged: (v) => l.qty = double.tryParse(v) ?? 0,
-            style: const TextStyle(
+            style: TextStyle(
                 color: _tp, fontSize: 11, fontFamily: 'monospace'),
             decoration: const InputDecoration(
               isDense: true,
@@ -1543,7 +1544,7 @@ class _PoDialogState extends State<_PoDialog> {
             controller: TextEditingController(text: '${l.unitPrice}'),
             keyboardType: TextInputType.number,
             onChanged: (v) => setState(() => l.unitPrice = double.tryParse(v) ?? 0),
-            style: const TextStyle(
+            style: TextStyle(
                 color: _tp, fontSize: 11, fontFamily: 'monospace'),
             decoration: const InputDecoration(
               isDense: true,
@@ -1560,7 +1561,7 @@ class _PoDialogState extends State<_PoDialog> {
             controller: TextEditingController(text: '${l.vatRate}'),
             keyboardType: TextInputType.number,
             onChanged: (v) => setState(() => l.vatRate = double.tryParse(v) ?? 15),
-            style: const TextStyle(
+            style: TextStyle(
                 color: _tp, fontSize: 11, fontFamily: 'monospace'),
             decoration: const InputDecoration(
               isDense: true,
@@ -1576,7 +1577,7 @@ class _PoDialogState extends State<_PoDialog> {
           child: Text(
               (l.qty * l.unitPrice * (1 + l.vatRate / 100))
                   .toStringAsFixed(2),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _gold,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -1588,7 +1589,7 @@ class _PoDialogState extends State<_PoDialog> {
           child: IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            icon: const Icon(Icons.delete, color: _err, size: 14),
+            icon: Icon(Icons.delete, color: _err, size: 14),
             onPressed: _lines.length > 1
                 ? () => setState(() => _lines.removeAt(i))
                 : null,
@@ -1603,7 +1604,7 @@ class _PoDialogState extends State<_PoDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 10)),
+        Text(label, style: TextStyle(color: _td, fontSize: 10)),
         const SizedBox(height: 3),
         Text(value.toStringAsFixed(2),
             style: TextStyle(
@@ -1619,7 +1620,7 @@ class _PoDialogState extends State<_PoDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         InkWell(
           onTap: () => _pickDate(expected),
@@ -1632,7 +1633,7 @@ class _PoDialogState extends State<_PoDialog> {
               border: Border.all(color: _bdr),
             ),
             child: Row(children: [
-              const Icon(Icons.calendar_today, color: _td, size: 14),
+              Icon(Icons.calendar_today, color: _td, size: 14),
               const SizedBox(width: 6),
               Text(
                 date == null
@@ -1655,7 +1656,7 @@ class _PoDialogState extends State<_PoDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1668,8 +1669,8 @@ class _PoDialogState extends State<_PoDialog> {
               value: value,
               isExpanded: true,
               dropdownColor: _navy2,
-              style: const TextStyle(color: _tp, fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down, color: _ts),
+              style: TextStyle(color: _tp, fontSize: 12),
+              icon: Icon(Icons.arrow_drop_down, color: _ts),
               items: items,
               onChanged: onChanged,
             ),
@@ -1762,7 +1763,7 @@ class _GrnDialogState extends State<_GrnDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok,
           content: Text('تم استلام البضاعة وتحديث المخزون ✓')));
     } else {
@@ -1778,12 +1779,12 @@ class _GrnDialogState extends State<_GrnDialog> {
       child: AlertDialog(
         backgroundColor: _navy2,
         title: Row(children: [
-          const Icon(Icons.call_received, color: _gold),
+          Icon(Icons.call_received, color: _gold),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
                 'استلام بضاعة — ${widget.poDetail['po_number'] ?? ""}',
-                style: const TextStyle(color: _tp)),
+                style: TextStyle(color: _tp)),
           ),
         ]),
         content: SizedBox(
@@ -1798,7 +1799,7 @@ class _GrnDialogState extends State<_GrnDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('المستودع *',
+                        Text('المستودع *',
                             style: TextStyle(color: _td, fontSize: 11)),
                         const SizedBox(height: 4),
                         Container(
@@ -1813,9 +1814,9 @@ class _GrnDialogState extends State<_GrnDialog> {
                               value: _warehouseId,
                               isExpanded: true,
                               dropdownColor: _navy2,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _tp, fontSize: 12),
-                              icon: const Icon(Icons.arrow_drop_down,
+                              icon: Icon(Icons.arrow_drop_down,
                                   color: _ts),
                               items: widget.warehouses
                                   .map((w) => DropdownMenuItem(
@@ -1837,7 +1838,7 @@ class _GrnDialogState extends State<_GrnDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('تاريخ الاستلام',
+                        Text('تاريخ الاستلام',
                             style: TextStyle(color: _td, fontSize: 11)),
                         const SizedBox(height: 4),
                         InkWell(
@@ -1861,12 +1862,12 @@ class _GrnDialogState extends State<_GrnDialog> {
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(color: _bdr)),
                             child: Row(children: [
-                              const Icon(Icons.calendar_today,
+                              Icon(Icons.calendar_today,
                                   color: _td, size: 14),
                               const SizedBox(width: 6),
                               Text(
                                 '${_receivedAt.year}-${_receivedAt.month.toString().padLeft(2, '0')}-${_receivedAt.day.toString().padLeft(2, '0')}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: _tp,
                                     fontSize: 12,
                                     fontFamily: 'monospace'),
@@ -1881,20 +1882,20 @@ class _GrnDialogState extends State<_GrnDialog> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _deliveryNote,
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: _tp, fontSize: 12, fontFamily: 'monospace'),
                   decoration: InputDecoration(
                     labelText: 'رقم بوليصة التسليم',
-                    labelStyle: const TextStyle(color: _td),
+                    labelStyle: TextStyle(color: _td),
                     filled: true,
                     fillColor: _navy3,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: _bdr)),
+                        borderSide: BorderSide(color: _bdr)),
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Text('السطور:',
+                Text('السطور:',
                     style: TextStyle(
                         color: _tp,
                         fontSize: 13,
@@ -1906,7 +1907,7 @@ class _GrnDialogState extends State<_GrnDialog> {
                   decoration: BoxDecoration(
                       color: _navy3,
                       borderRadius: BorderRadius.circular(4)),
-                  child: Row(children: const [
+                  child: Row(children: [
                     Expanded(flex: 3, child: Text('الوصف', style: _th)),
                     SizedBox(width: 80, child: Text('مطلوب', style: _th)),
                     SizedBox(width: 80, child: Text('مُستلَم', style: _th)),
@@ -1930,13 +1931,13 @@ class _GrnDialogState extends State<_GrnDialog> {
                         flex: 3,
                         child: Text(l['description'] ?? '',
                             style:
-                                const TextStyle(color: _tp, fontSize: 12),
+                                TextStyle(color: _tp, fontSize: 12),
                             overflow: TextOverflow.ellipsis),
                       ),
                       SizedBox(
                         width: 80,
                         child: Text(ordered.toStringAsFixed(2),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: _ts,
                                 fontSize: 11,
                                 fontFamily: 'monospace'),
@@ -1957,7 +1958,7 @@ class _GrnDialogState extends State<_GrnDialog> {
                           controller: _qtyCtrls[l['id']]
                             ?..text = remaining.toStringAsFixed(2),
                           keyboardType: TextInputType.number,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _gold,
                               fontSize: 11,
                               fontFamily: 'monospace',
@@ -1970,7 +1971,7 @@ class _GrnDialogState extends State<_GrnDialog> {
                                 horizontal: 6, vertical: 6),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(4),
-                                borderSide: const BorderSide(color: _bdr)),
+                                borderSide: BorderSide(color: _bdr)),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -1982,21 +1983,21 @@ class _GrnDialogState extends State<_GrnDialog> {
                 TextField(
                   controller: _notes,
                   maxLines: 2,
-                  style: const TextStyle(color: _tp, fontSize: 12),
+                  style: TextStyle(color: _tp, fontSize: 12),
                   decoration: InputDecoration(
                     labelText: 'ملاحظات',
-                    labelStyle: const TextStyle(color: _td),
+                    labelStyle: TextStyle(color: _td),
                     filled: true,
                     fillColor: _navy3,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: _bdr)),
+                        borderSide: BorderSide(color: _bdr)),
                   ),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Text(_error!,
-                      style: const TextStyle(color: _err, fontSize: 12)),
+                      style: TextStyle(color: _err, fontSize: 12)),
                 ],
               ],
             ),
@@ -2005,10 +2006,10 @@ class _GrnDialogState extends State<_GrnDialog> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -2136,7 +2137,7 @@ class _PiDialogState extends State<_PiDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.receipt, color: _gold),
           SizedBox(width: 8),
           Text('فاتورة شراء جديدة', style: TextStyle(color: _tp)),
@@ -2154,7 +2155,7 @@ class _PiDialogState extends State<_PiDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('المورد *',
+                        Text('المورد *',
                             style: TextStyle(color: _td, fontSize: 11)),
                         const SizedBox(height: 4),
                         Container(
@@ -2169,9 +2170,9 @@ class _PiDialogState extends State<_PiDialog> {
                               value: _vendorId,
                               isExpanded: true,
                               dropdownColor: _navy2,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _tp, fontSize: 12),
-                              icon: const Icon(Icons.arrow_drop_down,
+                              icon: Icon(Icons.arrow_drop_down,
                                   color: _ts),
                               items: [
                                 const DropdownMenuItem<String?>(
@@ -2197,7 +2198,7 @@ class _PiDialogState extends State<_PiDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('تاريخ الفاتورة',
+                        Text('تاريخ الفاتورة',
                             style: TextStyle(color: _td, fontSize: 11)),
                         const SizedBox(height: 4),
                         InkWell(
@@ -2221,12 +2222,12 @@ class _PiDialogState extends State<_PiDialog> {
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(color: _bdr)),
                             child: Row(children: [
-                              const Icon(Icons.calendar_today,
+                              Icon(Icons.calendar_today,
                                   color: _td, size: 14),
                               const SizedBox(width: 6),
                               Text(
                                 '${_invoiceDate.year}-${_invoiceDate.month.toString().padLeft(2, '0')}-${_invoiceDate.day.toString().padLeft(2, '0')}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: _tp,
                                     fontSize: 12,
                                     fontFamily: 'monospace'),
@@ -2242,12 +2243,12 @@ class _PiDialogState extends State<_PiDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('رقم فاتورة المورد',
+                        Text('رقم فاتورة المورد',
                             style: TextStyle(color: _td, fontSize: 11)),
                         const SizedBox(height: 4),
                         TextField(
                           controller: _vendorInvNum,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _tp,
                               fontSize: 12,
                               fontFamily: 'monospace'),
@@ -2259,7 +2260,7 @@ class _PiDialogState extends State<_PiDialog> {
                                 horizontal: 10, vertical: 10),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
-                                borderSide: const BorderSide(color: _bdr)),
+                                borderSide: BorderSide(color: _bdr)),
                           ),
                         ),
                       ],
@@ -2269,9 +2270,9 @@ class _PiDialogState extends State<_PiDialog> {
                 const SizedBox(height: 14),
                 // Lines (reuse PoLine row logic — simplified)
                 Row(children: [
-                  const Icon(Icons.list, color: _gold, size: 16),
+                  Icon(Icons.list, color: _gold, size: 16),
                   const SizedBox(width: 6),
-                  const Text('السطور',
+                  Text('السطور',
                       style: TextStyle(
                           color: _tp,
                           fontSize: 13,
@@ -2299,14 +2300,14 @@ class _PiDialogState extends State<_PiDialog> {
                       SizedBox(
                           width: 30,
                           child: Text('${i + 1}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _ts, fontSize: 11))),
                       Expanded(
                         flex: 3,
                         child: TextField(
                           onChanged: (v) => l.description = v,
-                          style: const TextStyle(color: _tp, fontSize: 12),
-                          decoration: const InputDecoration(
+                          style: TextStyle(color: _tp, fontSize: 12),
+                          decoration: InputDecoration(
                             hintText: 'الوصف',
                             hintStyle: TextStyle(color: _td),
                             isDense: true,
@@ -2322,11 +2323,11 @@ class _PiDialogState extends State<_PiDialog> {
                           keyboardType: TextInputType.number,
                           onChanged: (v) =>
                               setState(() => l.qty = double.tryParse(v) ?? 0),
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _tp,
                               fontSize: 11,
                               fontFamily: 'monospace'),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'كمية',
                             hintStyle: TextStyle(color: _td),
                             isDense: true,
@@ -2343,11 +2344,11 @@ class _PiDialogState extends State<_PiDialog> {
                           keyboardType: TextInputType.number,
                           onChanged: (v) => setState(
                               () => l.unitPrice = double.tryParse(v) ?? 0),
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _tp,
                               fontSize: 11,
                               fontFamily: 'monospace'),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'تكلفة',
                             hintStyle: TextStyle(color: _td),
                             isDense: true,
@@ -2365,11 +2366,11 @@ class _PiDialogState extends State<_PiDialog> {
                           keyboardType: TextInputType.number,
                           onChanged: (v) => setState(() =>
                               l.vatRate = double.tryParse(v) ?? 15),
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _tp,
                               fontSize: 11,
                               fontFamily: 'monospace'),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'VAT%',
                             hintStyle: TextStyle(color: _td),
                             isDense: true,
@@ -2385,7 +2386,7 @@ class _PiDialogState extends State<_PiDialog> {
                         child: Text(
                             (l.qty * l.unitPrice * (1 + l.vatRate / 100))
                                 .toStringAsFixed(2),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: _gold,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -2397,7 +2398,7 @@ class _PiDialogState extends State<_PiDialog> {
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          icon: const Icon(Icons.delete,
+                          icon: Icon(Icons.delete,
                               color: _err, size: 14),
                           onPressed: _lines.length > 1
                               ? () => setState(() => _lines.removeAt(i))
@@ -2413,14 +2414,14 @@ class _PiDialogState extends State<_PiDialog> {
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('الشحن',
+                      Text('الشحن',
                           style: TextStyle(color: _td, fontSize: 11)),
                       const SizedBox(height: 4),
                       TextField(
                         controller: _shipping,
                         keyboardType: TextInputType.number,
                         onChanged: (_) => setState(() {}),
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: _tp,
                             fontSize: 12,
                             fontFamily: 'monospace'),
@@ -2432,7 +2433,7 @@ class _PiDialogState extends State<_PiDialog> {
                               horizontal: 10, vertical: 10),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(6),
-                              borderSide: const BorderSide(color: _bdr)),
+                              borderSide: BorderSide(color: _bdr)),
                         ),
                       ),
                     ],
@@ -2453,11 +2454,11 @@ class _PiDialogState extends State<_PiDialog> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('المجموع',
+                              Text('المجموع',
                                   style: TextStyle(
                                       color: _td, fontSize: 10)),
                               Text(_subtotal.toStringAsFixed(2),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: _tp,
                                       fontSize: 13,
                                       fontFamily: 'monospace')),
@@ -2468,11 +2469,11 @@ class _PiDialogState extends State<_PiDialog> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('VAT',
+                              Text('VAT',
                                   style: TextStyle(
                                       color: _td, fontSize: 10)),
                               Text(_vat.toStringAsFixed(2),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: _warn,
                                       fontSize: 13,
                                       fontFamily: 'monospace')),
@@ -2483,11 +2484,11 @@ class _PiDialogState extends State<_PiDialog> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('الإجمالي',
+                              Text('الإجمالي',
                                   style: TextStyle(
                                       color: _td, fontSize: 10)),
                               Text(_total.toStringAsFixed(2),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: _gold,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w800,
@@ -2515,7 +2516,7 @@ class _PiDialogState extends State<_PiDialog> {
                     Checkbox(
                       value: _autoPost,
                       onChanged: (v) => setState(() => _autoPost = v ?? false),
-                      checkColor: Colors.black,
+                      checkColor: core_theme.AC.tp,
                       fillColor: WidgetStateProperty.resolveWith<Color?>((s) =>
                           s.contains(WidgetState.selected) ? _gold : _navy3),
                     ),
@@ -2536,7 +2537,7 @@ class _PiDialogState extends State<_PiDialog> {
                               _autoPost
                                   ? 'مدين: مصروفات/مخزون + VAT مدخلات. دائن: ذمم الموردين. تظهر في التقارير فوراً.'
                                   : 'الفاتورة لن تؤثر على الحسابات حتى تضغط ✓ يدوياً من قائمة الفواتير.',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _ts, fontSize: 11, height: 1.4)),
                         ],
                       ),
@@ -2546,7 +2547,7 @@ class _PiDialogState extends State<_PiDialog> {
                 if (_error != null) ...[
                   const SizedBox(height: 10),
                   Text(_error!,
-                      style: const TextStyle(color: _err, fontSize: 12)),
+                      style: TextStyle(color: _err, fontSize: 12)),
                 ],
               ],
             ),
@@ -2555,10 +2556,10 @@ class _PiDialogState extends State<_PiDialog> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -2639,7 +2640,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم تسجيل الدفعة ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل التسجيل');
@@ -2656,11 +2657,11 @@ class _PaymentDialogState extends State<_PaymentDialog> {
       child: AlertDialog(
         backgroundColor: _navy2,
         title: Row(children: [
-          const Icon(Icons.payments, color: _gold),
+          Icon(Icons.payments, color: _gold),
           const SizedBox(width: 8),
           Expanded(
               child: Text('دفعة — $invLabel',
-                  style: const TextStyle(color: _tp))),
+                  style: TextStyle(color: _tp))),
         ]),
         content: SizedBox(
           width: 460,
@@ -2670,13 +2671,13 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('المبلغ *',
+                    Text('المبلغ *',
                         style: TextStyle(color: _td, fontSize: 11)),
                     const SizedBox(height: 4),
                     TextField(
                       controller: _amount,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _gold,
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -2689,7 +2690,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                             horizontal: 10, vertical: 12),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6),
-                            borderSide: const BorderSide(color: _bdr)),
+                            borderSide: BorderSide(color: _bdr)),
                       ),
                     ),
                   ],
@@ -2700,7 +2701,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('التاريخ',
+                    Text('التاريخ',
                         style: TextStyle(color: _td, fontSize: 11)),
                     const SizedBox(height: 4),
                     InkWell(
@@ -2722,12 +2723,12 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: _bdr)),
                         child: Row(children: [
-                          const Icon(Icons.calendar_today,
+                          Icon(Icons.calendar_today,
                               color: _td, size: 14),
                           const SizedBox(width: 6),
                           Text(
                             '${_paymentDate.year}-${_paymentDate.month.toString().padLeft(2, '0')}-${_paymentDate.day.toString().padLeft(2, '0')}',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: _tp,
                                 fontSize: 12,
                                 fontFamily: 'monospace'),
@@ -2745,7 +2746,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('طريقة الدفع',
+                    Text('طريقة الدفع',
                         style: TextStyle(color: _td, fontSize: 11)),
                     const SizedBox(height: 4),
                     Container(
@@ -2759,8 +2760,8 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                           value: _method,
                           isExpanded: true,
                           dropdownColor: _navy2,
-                          style: const TextStyle(color: _tp, fontSize: 12),
-                          icon: const Icon(Icons.arrow_drop_down,
+                          style: TextStyle(color: _tp, fontSize: 12),
+                          icon: Icon(Icons.arrow_drop_down,
                               color: _ts),
                           items: _kPaymentMethods.entries
                               .map((e) => DropdownMenuItem(
@@ -2784,7 +2785,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('من حساب',
+                    Text('من حساب',
                         style: TextStyle(color: _td, fontSize: 11)),
                     const SizedBox(height: 4),
                     Container(
@@ -2798,8 +2799,8 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                           value: _paidFromAccount,
                           isExpanded: true,
                           dropdownColor: _navy2,
-                          style: const TextStyle(color: _tp, fontSize: 12),
-                          icon: const Icon(Icons.arrow_drop_down,
+                          style: TextStyle(color: _tp, fontSize: 12),
+                          icon: Icon(Icons.arrow_drop_down,
                               color: _ts),
                           items: const [
                             DropdownMenuItem(
@@ -2820,47 +2821,47 @@ class _PaymentDialogState extends State<_PaymentDialog> {
             const SizedBox(height: 10),
             TextField(
               controller: _refNumber,
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp, fontSize: 12, fontFamily: 'monospace'),
               decoration: InputDecoration(
                 labelText: 'رقم المرجع (شيك/تحويل)',
-                labelStyle: const TextStyle(color: _td),
+                labelStyle: TextStyle(color: _td),
                 filled: true,
                 fillColor: _navy3,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: _bdr)),
+                    borderSide: BorderSide(color: _bdr)),
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _notes,
               maxLines: 2,
-              style: const TextStyle(color: _tp, fontSize: 12),
+              style: TextStyle(color: _tp, fontSize: 12),
               decoration: InputDecoration(
                 labelText: 'ملاحظات',
-                labelStyle: const TextStyle(color: _td),
+                labelStyle: TextStyle(color: _td),
                 filled: true,
                 fillColor: _navy3,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: _bdr)),
+                    borderSide: BorderSide(color: _bdr)),
               ),
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),
               Text(_error!,
-                  style: const TextStyle(color: _err, fontSize: 12)),
+                  style: TextStyle(color: _err, fontSize: 12)),
             ],
           ]),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -2900,14 +2901,14 @@ class _DetailDialog extends StatelessWidget {
         title: Row(children: [
           Icon(icon, color: _gold),
           const SizedBox(width: 8),
-          Text(title, style: const TextStyle(color: _tp)),
+          Text(title, style: TextStyle(color: _tp)),
           const Spacer(),
           Text(
               data['po_number'] ??
                   data['invoice_number'] ??
                   data['grn_number'] ??
                   '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _gold,
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
@@ -2949,7 +2950,7 @@ class _DetailDialog extends StatelessWidget {
                           bold: true)),
                 ]),
                 const SizedBox(height: 12),
-                const Text('السطور:',
+                Text('السطور:',
                     style: TextStyle(
                         color: _tp,
                         fontSize: 13,
@@ -2965,12 +2966,12 @@ class _DetailDialog extends StatelessWidget {
                         SizedBox(
                             width: 30,
                             child: Text('${l['line_number']}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: _ts, fontSize: 11))),
                         Expanded(
                           flex: 3,
                           child: Text(l['description'] ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _tp, fontSize: 12),
                               overflow: TextOverflow.ellipsis),
                         ),
@@ -2978,7 +2979,7 @@ class _DetailDialog extends StatelessWidget {
                           width: 60,
                           child: Text(
                               (l['qty_ordered'] ?? l['qty'] ?? 0).toString(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _ts,
                                   fontSize: 11,
                                   fontFamily: 'monospace'),
@@ -2989,7 +2990,7 @@ class _DetailDialog extends StatelessWidget {
                           child: Text(
                               (l['unit_price'] ?? l['unit_cost'] ?? 0)
                                   .toString(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _tp,
                                   fontSize: 11,
                                   fontFamily: 'monospace'),
@@ -2999,7 +3000,7 @@ class _DetailDialog extends StatelessWidget {
                           width: 80,
                           child: Text(
                               (l['line_total'] ?? 0).toString(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: _gold,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
@@ -3015,7 +3016,7 @@ class _DetailDialog extends StatelessWidget {
         actions: [
           FilledButton(
               style: FilledButton.styleFrom(
-                  backgroundColor: _gold, foregroundColor: Colors.black),
+                  backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
               onPressed: () => Navigator.pop(context),
               child: const Text('إغلاق')),
         ],
@@ -3030,7 +3031,7 @@ class _DetailDialog extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(k, style: const TextStyle(color: _td, fontSize: 10)),
+          Text(k, style: TextStyle(color: _td, fontSize: 10)),
           const SizedBox(height: 2),
           Text(v,
               style: TextStyle(

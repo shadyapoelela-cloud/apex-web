@@ -16,6 +16,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'theme.dart' as core_theme;
 
 import 'design_tokens.dart';
 import 'theme.dart';
@@ -28,14 +29,14 @@ class WhiteLabelConfig {
   final double radiusScale;
   final double typeScale;
 
-  const WhiteLabelConfig({
-    this.primary = const Color(0xFFD4AF37),
+  WhiteLabelConfig({
+    Color? primary,
     this.secondary = const Color(0xFF2E75B6),
     this.brandText = 'APEX',
     this.darkMode = true,
     this.radiusScale = 1.0,
     this.typeScale = 1.0,
-  });
+  }) : primary = primary ?? core_theme.AC.gold;
 
   WhiteLabelConfig copyWith({
     Color? primary,
@@ -85,8 +86,8 @@ class _ApexWhiteLabelEditorState extends State<ApexWhiteLabelEditor> {
     widget.onChanged(next);
   }
 
-  static const _palette = [
-    Color(0xFFD4AF37), // gold (default)
+  static final _palette = [
+    core_theme.AC.gold, // gold (default)
     Color(0xFF2E75B6), // blue
     Color(0xFF27AE60), // green
     Color(0xFF9B59B6), // purple
@@ -210,7 +211,7 @@ class _ApexWhiteLabelEditorState extends State<ApexWhiteLabelEditor> {
               Text(_cfg.brandText,
                   style: TextStyle(
                       color:
-                          _cfg.darkMode ? Colors.white : Colors.black87,
+                          _cfg.darkMode ? Colors.white : core_theme.AC.tp,
                       fontSize: AppFontSize.xl * _cfg.typeScale,
                       fontWeight: FontWeight.w800)),
             ]),
@@ -218,7 +219,7 @@ class _ApexWhiteLabelEditorState extends State<ApexWhiteLabelEditor> {
             Divider(
                 color: _cfg.darkMode
                     ? Colors.white10
-                    : Colors.black.withValues(alpha: 0.08)),
+                    : core_theme.AC.tp.withValues(alpha: 0.08)),
             const SizedBox(height: AppSpacing.sm),
             // Demo button row
             Row(children: [
@@ -270,8 +271,8 @@ class _ApexWhiteLabelEditorState extends State<ApexWhiteLabelEditor> {
                     'معاينة مباشرة — كل التغييرات تُعرض هنا فوراً.',
                     style: TextStyle(
                         color: _cfg.darkMode
-                            ? Colors.white70
-                            : Colors.black87,
+                            ? core_theme.AC.ts
+                            : core_theme.AC.tp,
                         fontSize: AppFontSize.xs * _cfg.typeScale),
                   ),
                 ),
@@ -300,7 +301,7 @@ class _ApexWhiteLabelEditorState extends State<ApexWhiteLabelEditor> {
           color: c,
           shape: BoxShape.circle,
           border: Border.all(
-              color: selected ? AC.tp : Colors.white24,
+              color: selected ? AC.tp : core_theme.AC.bdr,
               width: selected ? 3 : 1),
         ),
         child: selected

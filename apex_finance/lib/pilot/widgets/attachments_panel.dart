@@ -17,20 +17,21 @@ library;
 import 'dart:convert';
 import 'dart:html' as html;
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../api/pilot_client.dart';
 import '../session.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
+Color get _gold => core_theme.AC.gold;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+Color get _warn => core_theme.AC.warn;
 
 const _kKinds = <String, String>{
   'invoice': 'فاتورة',
@@ -97,7 +98,7 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
     // Size guard — 2MB max for data URI
     if (!mounted) return;
     if (file.size > 2 * 1024 * 1024) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _err,
           content: Text('الملف كبير جداً (>2MB). استخدم S3 للملفات الكبيرة.')));
       return;
@@ -121,15 +122,15 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
           textDirection: TextDirection.rtl,
           child: AlertDialog(
             backgroundColor: _navy2,
-            title: const Text('تفاصيل المرفق',
+            title: Text('تفاصيل المرفق',
                 style: TextStyle(color: _tp)),
             content: SizedBox(
               width: 400,
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Text('الملف: ${file.name}',
-                    style: const TextStyle(color: _ts, fontSize: 12)),
+                    style: TextStyle(color: _ts, fontSize: 12)),
                 Text('الحجم: ${(file.size / 1024).toStringAsFixed(1)} KB',
-                    style: const TextStyle(color: _td, fontSize: 11)),
+                    style: TextStyle(color: _td, fontSize: 11)),
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -142,7 +143,7 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
                       value: kind,
                       isExpanded: true,
                       dropdownColor: _navy2,
-                      style: const TextStyle(color: _tp, fontSize: 12),
+                      style: TextStyle(color: _tp, fontSize: 12),
                       items: _kKinds.entries
                           .map((e) => DropdownMenuItem(
                               value: e.key, child: Text(e.value)))
@@ -154,15 +155,15 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
                 const SizedBox(height: 10),
                 TextField(
                   controller: descCtrl,
-                  style: const TextStyle(color: _tp, fontSize: 12),
+                  style: TextStyle(color: _tp, fontSize: 12),
                   decoration: InputDecoration(
                     hintText: 'وصف (اختياري)',
-                    hintStyle: const TextStyle(color: _td),
+                    hintStyle: TextStyle(color: _td),
                     filled: true,
                     fillColor: _navy3,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: _bdr)),
+                        borderSide: BorderSide(color: _bdr)),
                   ),
                 ),
               ]),
@@ -170,10 +171,10 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('إلغاء', style: TextStyle(color: _ts))),
+                  child: Text('إلغاء', style: TextStyle(color: _ts))),
               FilledButton(
                 style: FilledButton.styleFrom(
-                    backgroundColor: _gold, foregroundColor: Colors.black),
+                    backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
                 onPressed: () {
                   description = descCtrl.text;
                   Navigator.pop(ctx, true);
@@ -206,7 +207,7 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
     });
     if (!mounted) return;
     if (r.success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم رفع المرفق ✓')));
       _load();
     } else {
@@ -239,13 +240,13 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: _navy2,
-          title: const Text('حذف المرفق', style: TextStyle(color: _tp)),
+          title: Text('حذف المرفق', style: TextStyle(color: _tp)),
           content: Text('هل تريد حذف "${att['filename']}"؟',
-              style: const TextStyle(color: _ts)),
+              style: TextStyle(color: _ts)),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('إلغاء', style: TextStyle(color: _ts))),
+                child: Text('إلغاء', style: TextStyle(color: _ts))),
             FilledButton(
               style: FilledButton.styleFrom(
                   backgroundColor: _err, foregroundColor: Colors.white),
@@ -280,10 +281,10 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            const Icon(Icons.attach_file, color: _gold, size: 16),
+            Icon(Icons.attach_file, color: _gold, size: 16),
             const SizedBox(width: 6),
             Text(widget.title ?? 'المرفقات',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _tp, fontSize: 13, fontWeight: FontWeight.w700)),
             const SizedBox(width: 6),
             if (_items.isNotEmpty)
@@ -293,7 +294,7 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
                     color: _gold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10)),
                 child: Text('${_items.length}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _gold,
                         fontSize: 10,
                         fontWeight: FontWeight.w800)),
@@ -312,7 +313,7 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
           ]),
           const SizedBox(height: 8),
           if (_loading)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(20),
               child: Center(
                   child: SizedBox(
@@ -329,7 +330,7 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
                   color: _navy3.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: _bdr.withAlpha(100))),
-              child: const Text('لا توجد مرفقات حتى الآن',
+              child: Text('لا توجد مرفقات حتى الآن',
                   style: TextStyle(color: _td, fontSize: 11),
                   textAlign: TextAlign.center),
             )
@@ -365,14 +366,14 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
                 Expanded(
                   child: Text(
                       att['filename'] ?? '—',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _tp,
                           fontSize: 12,
                           fontWeight: FontWeight.w600),
                       overflow: TextOverflow.ellipsis),
                 ),
                 if (locked)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(right: 4),
                     child: Icon(Icons.lock, color: _warn, size: 12),
                   ),
@@ -386,24 +387,24 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
                       color: _gold.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(3)),
                   child: Text(_kKinds[att['kind']] ?? att['kind'] ?? '',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _gold,
                           fontSize: 9,
                           fontWeight: FontWeight.w700)),
                 ),
                 const SizedBox(width: 6),
                 Text(_sizeStr(att['size_bytes']),
-                    style: const TextStyle(color: _td, fontSize: 10)),
+                    style: TextStyle(color: _td, fontSize: 10)),
                 const SizedBox(width: 6),
                 Text(
                     (att['uploaded_at'] ?? '').toString().substring(
                         0, (att['uploaded_at'] ?? '').toString().length.clamp(0, 10)),
-                    style: const TextStyle(color: _td, fontSize: 10)),
+                    style: TextStyle(color: _td, fontSize: 10)),
               ]),
               if ((att['description'] ?? '').toString().isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(att['description'],
-                    style: const TextStyle(color: _ts, fontSize: 10),
+                    style: TextStyle(color: _ts, fontSize: 10),
                     overflow: TextOverflow.ellipsis),
               ],
             ],
@@ -413,7 +414,7 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
           tooltip: 'تنزيل',
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
-          icon: const Icon(Icons.download, color: _gold, size: 16),
+          icon: Icon(Icons.download, color: _gold, size: 16),
           onPressed: () => _downloadAttachment(att),
         ),
         if (!widget.readOnly && !locked) ...[
@@ -422,7 +423,7 @@ class _AttachmentsPanelState extends State<AttachmentsPanel> {
             tooltip: 'حذف',
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            icon: const Icon(Icons.delete, color: _err, size: 16),
+            icon: Icon(Icons.delete, color: _err, size: 16),
             onPressed: () => _deleteAttachment(att),
           ),
         ],

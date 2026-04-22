@@ -22,6 +22,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 import 'apex_v5_undo_toast.dart';
 
@@ -57,7 +58,7 @@ class ApexV5FindAndRecodeBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+            color: core_theme.AC.tp.withOpacity(0.25),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -68,7 +69,7 @@ class ApexV5FindAndRecodeBar extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37),
+              color: core_theme.AC.gold,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -151,7 +152,7 @@ class _BarActionState extends State<_BarAction> {
   Widget build(BuildContext context) {
     final disabled = widget.onTap == null;
     final bgColor = widget.primary
-        ? const Color(0xFFD4AF37)
+        ? core_theme.AC.gold
         : widget.destructive
             ? const Color(0xFFB91C1C)
             : Colors.white.withOpacity(_hover ? 0.15 : 0.08);
@@ -273,10 +274,10 @@ class _ApexV5RecodeDialogState extends State<ApexV5RecodeDialog> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD4AF37).withOpacity(0.15),
+                    color: core_theme.AC.gold.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.swap_horiz, color: Color(0xFFD4AF37), size: 22),
+                  child: Icon(Icons.swap_horiz, color: core_theme.AC.gold, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Column(
@@ -288,7 +289,7 @@ class _ApexV5RecodeDialogState extends State<ApexV5RecodeDialog> {
                     ),
                     Text(
                       'سيتم تعديل ${widget.count} ${widget.itemTypeLabelAr}',
-                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                     ),
                   ],
                 ),
@@ -338,11 +339,11 @@ class _ApexV5RecodeDialogState extends State<ApexV5RecodeDialog> {
               decoration: BoxDecoration(
                 color: const Color(0xFFFEF3C7),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFFD97706).withOpacity(0.3)),
+                border: Border.all(color: core_theme.AC.warn.withOpacity(0.3)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.warning, size: 14, color: Color(0xFFD97706)),
+                  Icon(Icons.warning, size: 14, color: core_theme.AC.warn),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -369,7 +370,7 @@ class _ApexV5RecodeDialogState extends State<ApexV5RecodeDialog> {
                   icon: const Icon(Icons.check, size: 16),
                   label: Text('تطبيق على ${widget.count}'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4AF37),
+                    backgroundColor: core_theme.AC.gold,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),

@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../core/theme.dart' as core_theme;
 
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
@@ -18,17 +19,17 @@ import '../../session.dart';
 import '../../widgets/attachments_panel.dart';
 import '../../widgets/import_dialog.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
+Color get _gold => core_theme.AC.gold;
+Color get _navy => core_theme.AC.navy;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+Color get _warn => core_theme.AC.warn;
 
 const _kKinds = <String, String>{
   'goods': 'سلع',
@@ -223,24 +224,24 @@ class _VendorsScreenState extends State<VendorsScreen> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: _gold.withValues(alpha: 0.4)),
           ),
-          child: const Icon(Icons.local_shipping, color: _gold, size: 22),
+          child: Icon(Icons.local_shipping, color: _gold, size: 22),
         ),
         const SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('الموردون',
+            Text('الموردون',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 3),
             Text('${_vendors.length} مورد — ${_activeOnly ? "نشط فقط" : "الكل"}',
-                style: const TextStyle(color: _ts, fontSize: 12)),
+                style: TextStyle(color: _ts, fontSize: 12)),
           ],
         ),
         const Spacer(),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+              foregroundColor: _tp, side: BorderSide(color: _bdr)),
           onPressed: _load,
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('تحديث'),
@@ -257,7 +258,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
         const SizedBox(width: 6),
         FilledButton.icon(
           style: FilledButton.styleFrom(
-              backgroundColor: _gold, foregroundColor: Colors.black),
+              backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
           onPressed: _add,
           icon: const Icon(Icons.add, size: 16),
           label: const Text('مورد جديد'),
@@ -275,20 +276,20 @@ class _VendorsScreenState extends State<VendorsScreen> {
           width: 280,
           child: TextField(
             controller: _searchCtrl,
-            style: const TextStyle(color: _tp, fontSize: 13),
+            style: TextStyle(color: _tp, fontSize: 13),
             decoration: InputDecoration(
               hintText: 'بحث بالرقم أو الاسم...',
-              hintStyle: const TextStyle(color: _td),
-              prefixIcon: const Icon(Icons.search, color: _td, size: 18),
+              hintStyle: TextStyle(color: _td),
+              prefixIcon: Icon(Icons.search, color: _td, size: 18),
               isDense: true,
               filled: true,
               fillColor: _navy3,
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: _bdr)),
+                  borderSide: BorderSide(color: _bdr)),
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: _bdr)),
+                  borderSide: BorderSide(color: _bdr)),
             ),
             onSubmitted: (v) {
               _search = v;
@@ -326,11 +327,11 @@ class _VendorsScreenState extends State<VendorsScreen> {
               setState(() => _activeOnly = v ?? true);
               _load();
             },
-            checkColor: Colors.black,
+            checkColor: core_theme.AC.tp,
             fillColor: WidgetStateProperty.resolveWith<Color?>(
                 (s) => s.contains(WidgetState.selected) ? _gold : _navy3),
           ),
-          const Text('نشط فقط', style: TextStyle(color: _ts, fontSize: 12)),
+          Text('نشط فقط', style: TextStyle(color: _ts, fontSize: 12)),
         ]),
       ]),
     );
@@ -350,7 +351,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
         ),
         child: Text(label,
             style: TextStyle(
-                color: sel ? Colors.black : _ts,
+                color: sel ? core_theme.AC.tp : _ts,
                 fontSize: 11,
                 fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
       ),
@@ -372,7 +373,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
         const SizedBox(width: 10),
         Expanded(
             child: _kpi('خدمات', '${_countByKind("services")}',
-                Icons.build, const Color(0xFF6366F1))),
+                Icons.build, core_theme.AC.purple)),
         const SizedBox(width: 10),
         Expanded(
             child: _kpi(
@@ -413,7 +414,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+              Text(label, style: TextStyle(color: _td, fontSize: 11)),
               const SizedBox(height: 2),
               Text(value,
                   style: TextStyle(
@@ -431,18 +432,18 @@ class _VendorsScreenState extends State<VendorsScreen> {
 
   Widget _body() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(color: _gold));
+      return Center(child: CircularProgressIndicator(color: _gold));
     }
     if (_error != null) {
       return Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.error_outline, color: _err, size: 48),
+          Icon(Icons.error_outline, color: _err, size: 48),
           const SizedBox(height: 12),
-          Text(_error!, style: const TextStyle(color: _ts)),
+          Text(_error!, style: TextStyle(color: _ts)),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-                foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+                foregroundColor: _tp, side: BorderSide(color: _bdr)),
             onPressed: _load,
             icon: const Icon(Icons.refresh, size: 16),
             label: const Text('إعادة المحاولة'),
@@ -456,12 +457,12 @@ class _VendorsScreenState extends State<VendorsScreen> {
           Icon(Icons.local_shipping_outlined,
               color: _gold.withValues(alpha: 0.4), size: 72),
           const SizedBox(height: 14),
-          const Text('لا يوجد موردون بعد',
+          Text('لا يوجد موردون بعد',
               style: TextStyle(color: _tp, fontSize: 16)),
           const SizedBox(height: 20),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _add,
             icon: const Icon(Icons.add),
             label: const Text('إضافة أول مورد'),
@@ -480,7 +481,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: _bdr),
           ),
-          child: Row(children: const [
+          child: Row(children: [
             SizedBox(width: 90, child: Text('الكود', style: _th)),
             Expanded(flex: 3, child: Text('الاسم', style: _th)),
             SizedBox(width: 70, child: Text('النوع', style: _th)),
@@ -527,7 +528,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
               SizedBox(
                 width: 90,
                 child: Text(v['code'] ?? '',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _gold,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -540,13 +541,13 @@ class _VendorsScreenState extends State<VendorsScreen> {
                   children: [
                     Row(children: [
                       if (preferred) ...[
-                        const Icon(Icons.star,
+                        Icon(Icons.star,
                             color: _warn, size: 12),
                         const SizedBox(width: 4),
                       ],
                       Flexible(
                         child: Text(v['legal_name_ar'] ?? '',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: _tp,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600),
@@ -556,7 +557,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
                     if ((v['contact_name'] ?? '').toString().isNotEmpty)
                       Text(
                           '${v['contact_name']}${(v['phone'] ?? '').toString().isNotEmpty ? " · ${v["phone"]}" : ""}',
-                          style: const TextStyle(color: _td, fontSize: 10),
+                          style: TextStyle(color: _td, fontSize: 10),
                           overflow: TextOverflow.ellipsis),
                   ],
                 ),
@@ -567,25 +568,25 @@ class _VendorsScreenState extends State<VendorsScreen> {
                       v['kind'] == 'goods'
                           ? _ok
                           : v['kind'] == 'services'
-                              ? const Color(0xFF6366F1)
+                              ? core_theme.AC.purple
                               : _warn)),
               SizedBox(
                 width: 80,
                 child: Text(
                   _kCountries[v['country']] ?? v['country'] ?? '—',
-                  style: const TextStyle(color: _ts, fontSize: 11),
+                  style: TextStyle(color: _ts, fontSize: 11),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               SizedBox(
                 width: 90,
                 child: Text(_kTerms[v['payment_terms']] ?? v['payment_terms'] ?? '—',
-                    style: const TextStyle(color: _ts, fontSize: 11)),
+                    style: TextStyle(color: _ts, fontSize: 11)),
               ),
               SizedBox(
                 width: 120,
                 child: Text(_fmt(ytd),
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _tp,
                         fontSize: 12,
                         fontFamily: 'monospace'),
@@ -614,7 +615,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
                   IconButton(
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    icon: const Icon(Icons.edit, color: _ts, size: 16),
+                    icon: Icon(Icons.edit, color: _ts, size: 16),
                     onPressed: () => _edit(v),
                   ),
                 ]),
@@ -651,7 +652,7 @@ class _VendorsScreenState extends State<VendorsScreen> {
   }
 }
 
-const _th = TextStyle(
+final _th = TextStyle(
     color: _td, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5);
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -769,7 +770,7 @@ class _VendorDialogState extends State<_VendorDialog> {
       if (!mounted) return;
       if (r.success) {
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: _ok, content: Text('تم تحديث المورد ✓')));
       } else {
         setState(() => _error = r.error ?? 'فشل التحديث');
@@ -805,7 +806,7 @@ class _VendorDialogState extends State<_VendorDialog> {
       if (!mounted) return;
       if (r.success) {
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: _ok, content: Text('تم إنشاء المورد ✓')));
       } else {
         setState(() => _error = r.error ?? 'فشل الإنشاء');
@@ -820,10 +821,10 @@ class _VendorDialogState extends State<_VendorDialog> {
       child: AlertDialog(
         backgroundColor: _navy2,
         title: Row(children: [
-          const Icon(Icons.local_shipping, color: _gold),
+          Icon(Icons.local_shipping, color: _gold),
           const SizedBox(width: 8),
           Text(_isEdit ? 'تعديل مورد' : 'مورد جديد',
-              style: const TextStyle(color: _tp)),
+              style: TextStyle(color: _tp)),
         ]),
         content: SizedBox(
           width: 680,
@@ -950,11 +951,11 @@ class _VendorDialogState extends State<_VendorDialog> {
                       border: Border.all(color: _err.withValues(alpha: 0.4)),
                     ),
                     child: Row(children: [
-                      const Icon(Icons.error_outline, color: _err, size: 16),
+                      Icon(Icons.error_outline, color: _err, size: 16),
                       const SizedBox(width: 6),
                       Expanded(
                           child: Text(_error!,
-                              style: const TextStyle(color: _err, fontSize: 12))),
+                              style: TextStyle(color: _err, fontSize: 12))),
                     ]),
                   ),
                 ],
@@ -965,11 +966,11 @@ class _VendorDialogState extends State<_VendorDialog> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء', style: TextStyle(color: _ts)),
+            child: Text('إلغاء', style: TextStyle(color: _ts)),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -993,7 +994,7 @@ class _VendorDialogState extends State<_VendorDialog> {
                 color: _gold, borderRadius: BorderRadius.circular(2))),
         const SizedBox(width: 8),
         Text(t,
-            style: const TextStyle(
+            style: TextStyle(
                 color: _tp, fontSize: 13, fontWeight: FontWeight.w800)),
       ]),
     );
@@ -1004,7 +1005,7 @@ class _VendorDialogState extends State<_VendorDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
@@ -1019,10 +1020,10 @@ class _VendorDialogState extends State<_VendorDialog> {
             fillColor: _navy3,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
@@ -1037,7 +1038,7 @@ class _VendorDialogState extends State<_VendorDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1052,7 +1053,7 @@ class _VendorDialogState extends State<_VendorDialog> {
               isExpanded: true,
               dropdownColor: _navy2,
               style: TextStyle(color: enabled ? _tp : _td, fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down, color: _ts),
+              icon: Icon(Icons.arrow_drop_down, color: _ts),
               items: items,
               onChanged: enabled ? onChanged : null,
             ),
@@ -1067,11 +1068,11 @@ class _VendorDialogState extends State<_VendorDialog> {
       Checkbox(
         value: value,
         onChanged: (v) => onChanged(v ?? false),
-        checkColor: Colors.black,
+        checkColor: core_theme.AC.tp,
         fillColor: WidgetStateProperty.resolveWith<Color?>(
             (s) => s.contains(WidgetState.selected) ? _gold : _navy3),
       ),
-      Text(label, style: const TextStyle(color: _ts, fontSize: 12)),
+      Text(label, style: TextStyle(color: _ts, fontSize: 12)),
     ]);
   }
 }
@@ -1124,7 +1125,7 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
                 color: _gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(4)),
             child: Text(v['code'] ?? '',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _gold,
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -1133,7 +1134,7 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
           const SizedBox(width: 10),
           Expanded(
               child: Text(v['legal_name_ar'] ?? '',
-                  style: const TextStyle(color: _tp, fontSize: 15))),
+                  style: TextStyle(color: _tp, fontSize: 15))),
         ]),
         content: SizedBox(
           width: 580,
@@ -1182,9 +1183,9 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
                   title: 'مستندات المورد (CR, VAT, IBAN)',
                 ),
                 const SizedBox(height: 14),
-                const Divider(color: _bdr, height: 1),
+                Divider(color: _bdr, height: 1),
                 const SizedBox(height: 14),
-                Row(children: const [
+                Row(children: [
                   Icon(Icons.account_balance_wallet, color: _gold, size: 16),
                   SizedBox(width: 6),
                   Text('كشف حساب المورد',
@@ -1195,13 +1196,13 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
                 ]),
                 const SizedBox(height: 10),
                 if (_loading)
-                  const Center(
+                  Center(
                       child: Padding(
                     padding: EdgeInsets.all(20),
                     child: CircularProgressIndicator(color: _gold),
                   ))
                 else if (_error != null)
-                  Text(_error!, style: const TextStyle(color: _err, fontSize: 12))
+                  Text(_error!, style: TextStyle(color: _err, fontSize: 12))
                 else if (_ledger != null)
                   _buildLedger(_ledger!),
               ],
@@ -1211,7 +1212,7 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
         actions: [
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: () => Navigator.pop(context),
             child: const Text('إغلاق'),
           ),
@@ -1244,7 +1245,7 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
       ]),
       if (aging != null) ...[
         const SizedBox(height: 10),
-        const Text('أعمار الديون:',
+        Text('أعمار الديون:',
             style: TextStyle(color: _td, fontSize: 11, fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
         Row(children: [
@@ -1269,7 +1270,7 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 10)),
+        Text(label, style: TextStyle(color: _td, fontSize: 10)),
         const SizedBox(height: 3),
         Text(_fmt(value),
             style: TextStyle(
@@ -1296,7 +1297,7 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
                 color: color, fontSize: 10, fontWeight: FontWeight.w700)),
         const SizedBox(height: 2),
         Text(_fmt(v),
-            style: const TextStyle(
+            style: TextStyle(
                 color: _tp, fontSize: 11, fontFamily: 'monospace')),
       ]),
     );
@@ -1308,7 +1309,7 @@ class _VendorDetailDialogState extends State<_VendorDetailDialog> {
       child: Row(children: [
         SizedBox(
           width: 110,
-          child: Text(k, style: const TextStyle(color: _td, fontSize: 11)),
+          child: Text(k, style: TextStyle(color: _td, fontSize: 11)),
         ),
         Expanded(
           child: Text(v,

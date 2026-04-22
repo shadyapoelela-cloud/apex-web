@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class ProjectsV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class ProjectsV52Screen extends StatefulWidget {
 }
 
 class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _projects = <_Proj>[
@@ -44,11 +45,11 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
         SavedView(id: 'huge', labelAr: 'مشاريع كبرى >10M', icon: Icons.star, defaultViewMode: ViewMode.kanban, isShared: true),
       ],
       filterChips: [
-        FilterChipDef(id: 'planning', labelAr: 'تخطيط', color: Colors.grey, count: _cnt(_St.planning), active: _filter == 'planning'),
-        FilterChipDef(id: 'onTrack', labelAr: 'على المسار', color: Colors.green, count: _cnt(_St.onTrack), active: _filter == 'onTrack'),
-        FilterChipDef(id: 'atRisk', labelAr: 'بخطر', color: Colors.orange, count: _cnt(_St.atRisk), active: _filter == 'atRisk'),
-        FilterChipDef(id: 'delayed', labelAr: 'متأخّر', color: Colors.red, count: _cnt(_St.delayed), active: _filter == 'delayed'),
-        FilterChipDef(id: 'completed', labelAr: 'مكتمل', color: Colors.blue, count: _cnt(_St.completed), active: _filter == 'completed'),
+        FilterChipDef(id: 'planning', labelAr: 'تخطيط', color: core_theme.AC.td, count: _cnt(_St.planning), active: _filter == 'planning'),
+        FilterChipDef(id: 'onTrack', labelAr: 'على المسار', color: core_theme.AC.ok, count: _cnt(_St.onTrack), active: _filter == 'onTrack'),
+        FilterChipDef(id: 'atRisk', labelAr: 'بخطر', color: core_theme.AC.warn, count: _cnt(_St.atRisk), active: _filter == 'atRisk'),
+        FilterChipDef(id: 'delayed', labelAr: 'متأخّر', color: core_theme.AC.err, count: _cnt(_St.delayed), active: _filter == 'delayed'),
+        FilterChipDef(id: 'completed', labelAr: 'مكتمل', color: core_theme.AC.info, count: _cnt(_St.completed), active: _filter == 'completed'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -80,31 +81,31 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
                 const SizedBox(width: 12),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    Text(p.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                    Text(p.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                     const SizedBox(width: 8),
                     Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: p.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(p.status.labelAr, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: p.status.color))),
                   ]),
                   Text(p.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                  Text(p.client, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                  Text(p.client, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                 ])),
                 Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Text('${(p.value / 1e6).toStringAsFixed(1)}M ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
-                  Text(p.due, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text('${(p.value / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+                  Text(p.due, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 ]),
               ]),
               const SizedBox(height: 10),
               Row(children: [
-                Expanded(flex: 4, child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: p.progress, minHeight: 10, backgroundColor: Colors.grey.shade200, color: p.status.color))),
+                Expanded(flex: 4, child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: p.progress, minHeight: 10, backgroundColor: core_theme.AC.bdr, color: p.status.color))),
                 const SizedBox(width: 10),
                 Text('${(p.progress * 100).toInt()}%', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                 const Spacer(),
                 Row(children: [
-                  CircleAvatar(radius: 10, backgroundColor: _gold.withOpacity(0.15), child: Text(p.pm[0], style: const TextStyle(color: _gold, fontSize: 10, fontWeight: FontWeight.w800))),
+                  CircleAvatar(radius: 10, backgroundColor: _gold.withOpacity(0.15), child: Text(p.pm[0], style: TextStyle(color: _gold, fontSize: 10, fontWeight: FontWeight.w800))),
                   const SizedBox(width: 4),
-                  Text(p.pm, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(p.pm, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ]),
                 const SizedBox(width: 10),
-                Row(children: [const Icon(Icons.group, size: 14, color: Colors.black45), const SizedBox(width: 2), Text('${p.team}', style: const TextStyle(fontSize: 11, color: Colors.black54))]),
+                Row(children: [Icon(Icons.group, size: 14, color: core_theme.AC.td), const SizedBox(width: 2), Text('${p.team}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))]),
               ]),
             ]),
           ),
@@ -126,7 +127,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
           return Container(
             width: 300,
             margin: const EdgeInsets.only(left: 10),
-            decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+            decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Container(
                 padding: const EdgeInsets.all(12),
@@ -136,7 +137,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
                   const SizedBox(width: 8),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
-                    Text('${(total / 1e6).toStringAsFixed(1)}M ر.س', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text('${(total / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ])),
                   Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
                 ]),
@@ -144,19 +145,19 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
               ...items.map((p) => Container(
                     margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(p.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+                      Text(p.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                       Text(p.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800), maxLines: 2, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 2),
-                      Text(p.client, style: const TextStyle(fontSize: 10, color: Colors.black54), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(p.client, style: TextStyle(fontSize: 10, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 6),
-                      ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: p.progress, minHeight: 6, backgroundColor: Colors.grey.shade200, color: s.color)),
+                      ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: p.progress, minHeight: 6, backgroundColor: core_theme.AC.bdr, color: s.color)),
                       const SizedBox(height: 6),
                       Row(children: [
-                        Text('${(p.value / 1e6).toStringAsFixed(1)}M', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _gold)),
+                        Text('${(p.value / 1e6).toStringAsFixed(1)}M', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _gold)),
                         const Spacer(),
-                        Text('${(p.progress * 100).toInt()}%', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text('${(p.progress * 100).toInt()}%', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       ]),
                     ]),
                   )),
@@ -173,22 +174,22 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('الجدول الزمني (Gantt)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('الجدول الزمني (Gantt)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         Expanded(
           child: ListView(children: _projects.where((p) => p.status != _St.completed).map((p) {
             return Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
                   Expanded(flex: 3, child: Text(p.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                  Text('استحقاق ${p.due}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text('استحقاق ${p.due}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ]),
                 const SizedBox(height: 6),
                 Stack(children: [
-                  Container(height: 22, decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4))),
+                  Container(height: 22, decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(4))),
                   FractionallySizedBox(
                     widthFactor: p.progress,
                     child: Container(
@@ -216,7 +217,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('توزيع المشاريع حسب الحالة (بالقيمة)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توزيع المشاريع حسب الحالة (بالقيمة)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         ...statuses.map((s) {
           final value = totals[s]!;
@@ -232,7 +233,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
                 Text('${(value / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.color)),
               ]),
               const SizedBox(height: 4),
-              ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: Colors.grey.shade100, color: s.color)),
+              ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: core_theme.AC.navy3, color: s.color)),
             ]),
           );
         }),
@@ -252,11 +253,11 @@ extension _StX on _St {
         _St.completed => 'مكتمل',
       };
   Color get color => switch (this) {
-        _St.planning => Colors.grey,
-        _St.onTrack => Colors.green,
-        _St.atRisk => Colors.orange,
-        _St.delayed => Colors.red,
-        _St.completed => Colors.blue,
+        _St.planning => core_theme.AC.td,
+        _St.onTrack => core_theme.AC.ok,
+        _St.atRisk => core_theme.AC.warn,
+        _St.delayed => core_theme.AC.err,
+        _St.completed => core_theme.AC.info,
       };
   IconData get icon => switch (this) {
         _St.planning => Icons.edit_calendar,

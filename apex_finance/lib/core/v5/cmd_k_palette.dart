@@ -17,6 +17,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,7 +29,7 @@ class CmdKPalette extends StatefulWidget {
   static void show(BuildContext context) {
     showGeneralDialog<void>(
       context: context,
-      barrierColor: Colors.black54,
+      barrierColor: core_theme.AC.ts,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
       transitionDuration: const Duration(milliseconds: 180),
@@ -66,7 +67,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
         label: 'اسأل المساعد الذكي: "${_ctrl.text}"',
         sub: 'يذهب إلى المساعد الذكي مع سؤالك',
         icon: Icons.auto_awesome,
-        color: const Color(0xFFD4AF37),
+        color: core_theme.AC.gold,
         onSelect: (ctx) {
           Navigator.of(ctx).pop();
           ctx.go('/app/platform/ai/copilot');
@@ -130,7 +131,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
           label: 'قاعدة المعرفة',
           sub: 'استعرض الأدلة والمراجع',
           icon: Icons.menu_book,
-          color: Colors.teal,
+          color: core_theme.AC.info,
           onSelect: (ctx) {
             Navigator.of(ctx).pop();
             ctx.go('/app/erp/reports-bi/knowledge');
@@ -141,7 +142,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
           label: 'التنبيهات',
           sub: 'مركز التنبيهات العام',
           icon: Icons.notifications,
-          color: Colors.orange,
+          color: core_theme.AC.warn,
           onSelect: (ctx) {
             Navigator.of(ctx).pop();
             ctx.go('/app/platform/notifications/center');
@@ -152,7 +153,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
           label: 'لوحة وكلاء الذكاء',
           sub: 'AI Agents Gallery',
           icon: Icons.smart_toy,
-          color: Colors.purple,
+          color: core_theme.AC.purple,
           onSelect: (ctx) {
             Navigator.of(ctx).pop();
             ctx.go('/app/platform/ai/agents');
@@ -163,7 +164,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
           label: 'إعدادات المنصّة',
           sub: 'Admin Panel',
           icon: Icons.settings,
-          color: Colors.grey,
+          color: core_theme.AC.td,
           onSelect: (ctx) {
             Navigator.of(ctx).pop();
             ctx.go('/app/platform/admin/settings');
@@ -226,7 +227,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 24, offset: const Offset(0, 12)),
+                  BoxShadow(color: core_theme.AC.tp.withOpacity(0.3), blurRadius: 24, offset: const Offset(0, 12)),
                 ],
               ),
               child: Column(
@@ -236,20 +237,20 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+                      border: Border(bottom: BorderSide(color: core_theme.AC.bdr)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.search, color: Color(0xFFD4AF37)),
+                        Icon(Icons.search, color: core_theme.AC.gold),
                         const SizedBox(width: 12),
                         Expanded(
                           child: TextField(
                             controller: _ctrl,
                             focusNode: _focus,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: 'اكتب للبحث أو اسأل المساعد الذكي...',
-                              hintStyle: TextStyle(color: Colors.black45),
+                              hintStyle: TextStyle(color: core_theme.AC.td),
                             ),
                             style: const TextStyle(fontSize: 16),
                             onChanged: (_) => setState(() => _highlighted = 0),
@@ -262,12 +263,12 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: core_theme.AC.navy3,
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: Colors.grey.shade300),
+                            border: Border.all(color: core_theme.AC.bdr),
                           ),
-                          child: const Text('ESC',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.black54)),
+                          child: Text('ESC',
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: core_theme.AC.ts)),
                         ),
                       ],
                     ),
@@ -275,9 +276,9 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                   // Items
                   Flexible(
                     child: items.isEmpty
-                        ? const Padding(
+                        ? Padding(
                             padding: EdgeInsets.all(24),
-                            child: Text('لا توجد نتائج', style: TextStyle(color: Colors.black45)),
+                            child: Text('لا توجد نتائج', style: TextStyle(color: core_theme.AC.td)),
                           )
                         : ListView.builder(
                             shrinkWrap: true,
@@ -291,7 +292,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                                   onTap: () => item.onSelect(context),
                                   child: Container(
                                     color: highlighted
-                                        ? const Color(0xFFD4AF37).withOpacity(0.08)
+                                        ? core_theme.AC.gold.withOpacity(0.08)
                                         : Colors.transparent,
                                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                                     child: Row(
@@ -315,7 +316,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis),
                                               Text(item.sub,
-                                                  style: const TextStyle(fontSize: 11, color: Colors.black54),
+                                                  style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis),
                                             ],
@@ -347,11 +348,11 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
+                      color: core_theme.AC.navy3,
                       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
-                      border: Border(top: BorderSide(color: Colors.grey.shade200)),
+                      border: Border(top: BorderSide(color: core_theme.AC.bdr)),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         _KeyHint(keys: ['↑', '↓'], label: 'تنقّل'),
                         SizedBox(width: 14),
@@ -360,7 +361,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                         _KeyHint(keys: ['Esc'], label: 'إغلاق'),
                         Spacer(),
                         Text('APEX Command Palette',
-                            style: TextStyle(fontSize: 10, color: Colors.black45, fontWeight: FontWeight.w600)),
+                            style: TextStyle(fontSize: 10, color: core_theme.AC.td, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -422,14 +423,14 @@ class _KeyHint extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(3),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
-            child: Text(k, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.black54)),
+            child: Text(k, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: core_theme.AC.ts)),
           ),
           const SizedBox(width: 2),
         ],
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ],
     );
   }

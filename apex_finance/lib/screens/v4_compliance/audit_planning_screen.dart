@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class AuditPlanningScreen extends StatefulWidget {
   const AuditPlanningScreen({super.key});
@@ -41,7 +42,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF4A148C),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF4A148C),
           tabs: const [
             Tab(icon: Icon(Icons.business, size: 16), text: 'فهم المنشأة'),
@@ -77,14 +78,14 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
         children: [
           const Icon(Icons.edit_calendar, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('تخطيط الارتباط — SABIC Ltd.',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('ISA 300 · SOCPA معيار (315) · للسنة المنتهية 2025-12-31',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -113,10 +114,10 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _progressCard('فهم المنشأة', 1.0, Colors.green, Icons.check_circle),
-          _progressCard('تقييم المخاطر', 0.70, Colors.orange, Icons.sync),
-          _progressCard('الأهمية النسبية', 0.40, Colors.blue, Icons.sync),
-          _progressCard('الاستراتيجية', 0.10, Colors.grey, Icons.pending),
+          _progressCard('فهم المنشأة', 1.0, core_theme.AC.ok, Icons.check_circle),
+          _progressCard('تقييم المخاطر', 0.70, core_theme.AC.warn, Icons.sync),
+          _progressCard('الأهمية النسبية', 0.40, core_theme.AC.info, Icons.sync),
+          _progressCard('الاستراتيجية', 0.10, core_theme.AC.td, Icons.pending),
         ],
       ),
     );
@@ -146,7 +147,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
             const SizedBox(height: 6),
             LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: core_theme.AC.bdr,
               valueColor: AlwaysStoppedAnimation(color),
               minHeight: 4,
             ),
@@ -163,7 +164,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
         _section(
           'معلومات عامة عن العميل',
           Icons.info,
-          Colors.blue,
+          core_theme.AC.info,
           [
             _kv('الاسم التجاري', 'الشركة السعودية للصناعات الأساسية (سابك)'),
             _kv('السجل التجاري', '1010004000'),
@@ -177,7 +178,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
         _section(
           'البيئة التشغيلية',
           Icons.factory,
-          Colors.teal,
+          core_theme.AC.info,
           [
             _kv('المجال', 'إنتاج وتسويق المنتجات البتروكيماوية والأسمدة والمعادن'),
             _kv('المنتجات الرئيسية', 'إيثيلين، بروبيلين، ميثانول، MEG، البولي بروبلين'),
@@ -190,7 +191,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
         _section(
           'نظام الرقابة الداخلية',
           Icons.security,
-          Colors.purple,
+          core_theme.AC.purple,
           [
             _kv('إطار الحوكمة', 'مجلس إدارة + 5 لجان (مراجعة، مخاطر، مكافآت، حوكمة، استثمار)'),
             _kv('لجنة المراجعة', '5 أعضاء — 3 مستقلين — 4 مالي معتمد'),
@@ -217,7 +218,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
       itemCount: risks.length,
       itemBuilder: (ctx, i) {
         final r = risks[i];
-        final severity = r.severity == 'جوهري' ? Colors.red : r.severity == 'مهم' ? Colors.orange : Colors.green;
+        final severity = r.severity == 'جوهري' ? core_theme.AC.err : r.severity == 'مهم' ? core_theme.AC.warn : core_theme.AC.ok;
         return Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(14),
@@ -263,15 +264,15 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: core_theme.AC.navy3,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.bolt, size: 14, color: Color(0xFFD4AF37)),
+                    Icon(Icons.bolt, size: 14, color: core_theme.AC.gold),
                     const SizedBox(width: 6),
-                    const Text('الاستجابة المخططة: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                    Text('الاستجابة المخططة: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
                     Expanded(child: Text(r.response, style: const TextStyle(fontSize: 12, height: 1.4))),
                   ],
                 ),
@@ -284,7 +285,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
   }
 
   Widget _riskMetric(String label, String level) {
-    final color = level == 'عالٍ' ? Colors.red : level == 'متوسط' ? Colors.orange : Colors.green;
+    final color = level == 'عالٍ' ? core_theme.AC.err : level == 'متوسط' ? core_theme.AC.warn : core_theme.AC.ok;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -295,7 +296,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
         ),
         child: Row(
           children: [
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             const Spacer(),
             Text(level, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
           ],
@@ -316,13 +317,13 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -339,12 +340,12 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('القيم المرجعية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+              Text('القيم المرجعية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
               _kv('إيرادات الشركة للسنة المالية', '${_fmt(revenue)} ر.س'),
               _kv('مجمل الربح', '${_fmt(revenue * 0.28)} ر.س'),
@@ -359,12 +360,12 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('نسبة الأهمية النسبية المختارة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+              Text('نسبة الأهمية النسبية المختارة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -391,7 +392,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
                 ],
               ),
               const SizedBox(height: 16),
-              const Text('عتبة الأداء (Performance)', style: TextStyle(fontSize: 12, color: Colors.black54)),
+              Text('عتبة الأداء (Performance)', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
               Row(
                 children: [
                   Expanded(
@@ -402,17 +403,17 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
                       divisions: 8,
                       label: '${_performanceThreshold.toStringAsFixed(0)}%',
                       onChanged: (v) => setState(() => _performanceThreshold = v),
-                      activeColor: const Color(0xFFD4AF37),
+                      activeColor: core_theme.AC.gold,
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD4AF37).withOpacity(0.1),
+                      color: core_theme.AC.gold.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text('${_performanceThreshold.toStringAsFixed(0)}%',
-                        style: const TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w900, fontSize: 18)),
+                        style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w900, fontSize: 18)),
                   ),
                 ],
               ),
@@ -428,13 +429,13 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
           ),
           child: Column(
             children: [
-              const Text('النتائج المحسوبة', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text('النتائج المحسوبة', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               const SizedBox(height: 12),
               _resultLine('الأهمية النسبية للتخطيط', planning, const Color(0xFFFFD700)),
-              const Divider(color: Colors.white24),
+              Divider(color: core_theme.AC.bdr),
               _resultLine('عتبة الأداء', performance, Colors.white),
-              const Divider(color: Colors.white24),
-              _resultLine('الخطأ التافه الواضح', clearlyTrivial, Colors.white70),
+              Divider(color: core_theme.AC.bdr),
+              _resultLine('الخطأ التافه الواضح', clearlyTrivial, core_theme.AC.ts),
             ],
           ),
         ),
@@ -453,7 +454,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
             children: [
               Text(_fmt(value), style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 20, fontFamily: 'monospace')),
               const SizedBox(width: 4),
-              const Text('ر.س', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              Text('ر.س', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
             ],
           ),
         ],
@@ -479,19 +480,19 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Row(
             children: [
-              _strategyStat('إجمالي الساعات', '$totalHours', const Color(0xFFD4AF37)),
-              _strategyStat('عدد المراحل', '${phases.length}', Colors.blue),
-              _strategyStat('تاريخ البدء', '2026-01-05', Colors.green),
-              _strategyStat('تاريخ الإنتهاء', '2026-05-15', Colors.orange),
+              _strategyStat('إجمالي الساعات', '$totalHours', core_theme.AC.gold),
+              _strategyStat('عدد المراحل', '${phases.length}', core_theme.AC.info),
+              _strategyStat('تاريخ البدء', '2026-01-05', core_theme.AC.ok),
+              _strategyStat('تاريخ الإنتهاء', '2026-05-15', core_theme.AC.warn),
             ],
           ),
         ),
         const SizedBox(height: 20),
-        const Text('الجدول الزمني للارتباط', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+        Text('الجدول الزمني للارتباط', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 12),
         for (final p in phases)
           Container(
@@ -521,7 +522,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
                       Text(p.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 4),
                       Text('${p.fromDate} → ${p.toDate}',
-                          style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                          style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     ],
                   ),
                 ),
@@ -550,11 +551,11 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
   Color _phaseColor(String status) {
     switch (status) {
       case 'مكتمل':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'قيد التنفيذ':
-        return Colors.orange;
+        return core_theme.AC.warn;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -562,7 +563,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
     return Expanded(
       child: Column(
         children: [
-          Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color)),
         ],
@@ -576,7 +577,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -601,7 +602,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 180, child: Text(k, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+          SizedBox(width: 180, child: Text(k, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
           Expanded(child: Text(v, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, height: 1.5))),
         ],
       ),

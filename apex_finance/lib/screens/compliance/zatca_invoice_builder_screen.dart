@@ -15,6 +15,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../api_service.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ZatcaInvoiceBuilderScreen extends StatefulWidget {
   const ZatcaInvoiceBuilderScreen({super.key});
@@ -450,10 +451,10 @@ class _ZatcaInvoiceBuilderScreenState extends State<ZatcaInvoiceBuilderScreen> {
       ),
       const SizedBox(height: 10),
       Text('امسحه بتطبيق ZATCA للتحقق',
-        style: TextStyle(color: Colors.grey.shade700, fontSize: 11)),
+        style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
       const SizedBox(height: 6),
       SelectableText(qrB64.length > 60 ? '${qrB64.substring(0, 60)}…' : qrB64,
-        style: TextStyle(color: Colors.grey.shade600, fontSize: 10, fontFamily: 'monospace')),
+        style: TextStyle(color: core_theme.AC.ts, fontSize: 10, fontFamily: 'monospace')),
     ]),
   );
 

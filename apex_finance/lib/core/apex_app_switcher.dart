@@ -12,6 +12,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 import 'design_tokens.dart';
@@ -34,7 +35,7 @@ class ApexModuleTile {
 }
 
 /// The canonical APEX module set. Each group maps to a colour band.
-const List<ApexModuleTile> kApexModules = [
+final List<ApexModuleTile> kApexModules = [
   // Core finance
   ApexModuleTile(
     label: 'الامتثال',
@@ -76,14 +77,14 @@ const List<ApexModuleTile> kApexModules = [
     label: 'Copilot',
     subtitle: 'مساعد AI مالي',
     icon: Icons.psychology_outlined,
-    accent: Color(0xFFD4AF37),
+    accent: core_theme.AC.gold,
     route: '/copilot',
   ),
   ApexModuleTile(
     label: 'المعرفة',
     subtitle: 'Knowledge Brain',
     icon: Icons.menu_book_outlined,
-    accent: Color(0xFF8B5CF6),
+    accent: core_theme.AC.purple,
     route: '/knowledge',
   ),
   // New
@@ -106,13 +107,14 @@ const List<ApexModuleTile> kApexModules = [
 /// Shows the app-switcher modal over the current route.
 Future<void> showApexAppSwitcher(
   BuildContext context, {
-  List<ApexModuleTile> modules = kApexModules,
+  List<ApexModuleTile>? modules,
 }) {
+  final m = modules ?? kApexModules;
   return showDialog<void>(
     context: context,
     barrierDismissible: true,
-    barrierColor: Colors.black.withValues(alpha: 0.6),
-    builder: (ctx) => ApexAppSwitcherDialog(modules: modules),
+    barrierColor: core_theme.AC.tp.withValues(alpha: 0.6),
+    builder: (ctx) => ApexAppSwitcherDialog(modules: m),
   );
 }
 
@@ -143,7 +145,7 @@ class ApexAppSwitcherDialog extends StatelessWidget {
             border: Border.all(color: AC.bdr),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.4),
+                color: core_theme.AC.tp.withValues(alpha: 0.4),
                 blurRadius: 40,
                 offset: const Offset(0, 20),
               ),

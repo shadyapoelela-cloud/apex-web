@@ -10,24 +10,25 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../core/theme.dart' as core_theme;
 
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
+Color get _gold => core_theme.AC.gold;
+Color get _navy => core_theme.AC.navy;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+Color get _warn => core_theme.AC.warn;
 
-const _kReasons = <String, Map<String, dynamic>>{
+final _kReasons = <String, Map<String, dynamic>>{
   'po_receipt': {'ar': 'استلام مشتريات', 'color': _ok, 'icon': Icons.call_received, 'sign': 1},
   'pos_sale': {'ar': 'بيع', 'color': _err, 'icon': Icons.shopping_cart, 'sign': -1},
   'pos_return': {'ar': 'إرجاع', 'color': _warn, 'icon': Icons.reply, 'sign': 1},
@@ -35,7 +36,7 @@ const _kReasons = <String, Map<String, dynamic>>{
   'transfer_out': {'ar': 'تحويل صادر', 'color': _err, 'icon': Icons.call_made, 'sign': -1},
   'adjustment_plus': {'ar': 'تسوية زيادة', 'color': _ok, 'icon': Icons.add_circle, 'sign': 1},
   'adjustment_minus': {'ar': 'تسوية نقص', 'color': _err, 'icon': Icons.remove_circle, 'sign': -1},
-  'stocktake': {'ar': 'جرد', 'color': Color(0xFF6366F1), 'icon': Icons.fact_check, 'sign': 0},
+  'stocktake': {'ar': 'جرد', 'color': core_theme.AC.purple, 'icon': Icons.fact_check, 'sign': 0},
   'damage': {'ar': 'تلف', 'color': _err, 'icon': Icons.broken_image, 'sign': -1},
   'theft': {'ar': 'سرقة', 'color': _err, 'icon': Icons.security, 'sign': -1},
   'expiry': {'ar': 'انتهاء صلاحية', 'color': _err, 'icon': Icons.hourglass_empty, 'sign': -1},
@@ -162,7 +163,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
 
   Future<void> _recordTransfer() async {
     if (_warehouses.length < 2) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _warn,
           content: Text('تحتاج مستودعين على الأقل لإجراء التحويل')));
       return;
@@ -191,7 +192,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
           _header(),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator(color: _gold))
+                ? Center(child: CircularProgressIndicator(color: _gold))
                 : _error != null
                     ? _errorView()
                     : _warehouses.isEmpty
@@ -216,25 +217,25 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: _gold.withValues(alpha: 0.4)),
           ),
-          child: const Icon(Icons.swap_vert, color: _gold, size: 22),
+          child: Icon(Icons.swap_vert, color: _gold, size: 22),
         ),
         const SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('حركات المخزون والتحويلات',
+            Text('حركات المخزون والتحويلات',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 3),
             Text(
                 '${_warehouses.length} مستودع · ${_movements.length} حركة معروضة',
-                style: const TextStyle(color: _ts, fontSize: 12)),
+                style: TextStyle(color: _ts, fontSize: 12)),
           ],
         ),
         const Spacer(),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+              foregroundColor: _tp, side: BorderSide(color: _bdr)),
           onPressed: () {
             if (_selectedWarehouseId != null) {
               _loadWarehouseData(_selectedWarehouseId!);
@@ -247,7 +248,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
               foregroundColor: _gold,
-              side: const BorderSide(color: _gold)),
+              side: BorderSide(color: _gold)),
           onPressed: _recordTransfer,
           icon: const Icon(Icons.swap_horiz, size: 16),
           label: const Text('تحويل'),
@@ -255,7 +256,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
         const SizedBox(width: 8),
         FilledButton.icon(
           style: FilledButton.styleFrom(
-              backgroundColor: _gold, foregroundColor: Colors.black),
+              backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
           onPressed: _recordMovement,
           icon: const Icon(Icons.add, size: 16),
           label: const Text('تسوية / جرد'),
@@ -281,9 +282,9 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
       child: Column(children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: _bdr))),
-          child: Row(children: const [
+          child: Row(children: [
             Icon(Icons.warehouse, color: _gold, size: 16),
             SizedBox(width: 6),
             Text('المستودعات',
@@ -323,7 +324,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                               borderRadius: BorderRadius.circular(3),
                             ),
                             child: Text(w['code'] ?? '',
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: _gold,
                                     fontSize: 10,
                                     fontFamily: 'monospace',
@@ -331,11 +332,11 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                           ),
                           const SizedBox(width: 6),
                           if (w['is_default'] == true)
-                            const Icon(Icons.star, color: _warn, size: 12),
+                            Icon(Icons.star, color: _warn, size: 12),
                         ]),
                         const SizedBox(height: 5),
                         Text(w['name_ar'] ?? '',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: _tp,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600),
@@ -343,12 +344,12 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                         const SizedBox(height: 2),
                         Text(
                           '${w['_branch_code']}${(w['_branch_city'] ?? '').toString().isNotEmpty ? " — ${w["_branch_city"]}" : ""}',
-                          style: const TextStyle(color: _td, fontSize: 10),
+                          style: TextStyle(color: _td, fontSize: 10),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
                         Text(_typeLabel(w['type']),
-                            style: const TextStyle(color: _ts, fontSize: 10)),
+                            style: TextStyle(color: _ts, fontSize: 10)),
                       ],
                     ),
                   ),
@@ -377,7 +378,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
 
   Widget _warehouseDetail() {
     if (_selectedWarehouseId == null) {
-      return const Center(
+      return Center(
         child: Text('اختر مستودعاً',
             style: TextStyle(color: _ts, fontSize: 13)),
       );
@@ -387,7 +388,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
       child: Column(children: [
         Container(
           color: _navy2,
-          child: const TabBar(
+          child: TabBar(
             indicatorColor: _gold,
             labelColor: _gold,
             unselectedLabelColor: _ts,
@@ -410,7 +411,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
 
   Widget _stockLevelsTab() {
     if (_stockLevels.isEmpty) {
-      return const Center(
+      return Center(
           child: Text('لا توجد أرصدة في هذا المستودع',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
@@ -424,7 +425,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: _bdr),
           ),
-          child: Row(children: const [
+          child: Row(children: [
             Expanded(flex: 3, child: Text('SKU / المتغيّر', style: _th)),
             SizedBox(width: 100, child: Text('الرصيد', style: _th, textAlign: TextAlign.end)),
             SizedBox(width: 100, child: Text('محجوز', style: _th, textAlign: TextAlign.end)),
@@ -455,7 +456,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
         Expanded(
           flex: 3,
           child: Text(s['variant_id'] ?? '',
-              style: const TextStyle(
+              style: TextStyle(
                   color: _ts, fontSize: 11, fontFamily: 'monospace'),
               overflow: TextOverflow.ellipsis),
         ),
@@ -481,7 +482,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
         SizedBox(
           width: 100,
           child: Text(_fmt(available),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -491,7 +492,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
         SizedBox(
           width: 100,
           child: Text(_fmt(avgCost),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _ts, fontSize: 11, fontFamily: 'monospace'),
               textAlign: TextAlign.end),
         ),
@@ -501,7 +502,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
 
   Widget _movementsTab() {
     if (_movements.isEmpty) {
-      return const Center(
+      return Center(
           child: Text('لا توجد حركات بعد',
               style: TextStyle(color: _ts, fontSize: 13)));
     }
@@ -546,17 +547,17 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(m['variant_id'] ?? '',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _ts,
                           fontSize: 11,
                           fontFamily: 'monospace'),
                       overflow: TextOverflow.ellipsis),
                   if ((m['reference_number'] ?? '').toString().isNotEmpty)
                     Text('#${m['reference_number']}',
-                        style: const TextStyle(color: _td, fontSize: 10)),
+                        style: TextStyle(color: _td, fontSize: 10)),
                   if ((m['notes'] ?? '').toString().isNotEmpty)
                     Text(m['notes'],
-                        style: const TextStyle(color: _td, fontSize: 10),
+                        style: TextStyle(color: _td, fontSize: 10),
                         overflow: TextOverflow.ellipsis),
                 ],
               ),
@@ -579,9 +580,9 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text('رصيد:',
-                      style: const TextStyle(color: _td, fontSize: 9)),
+                      style: TextStyle(color: _td, fontSize: 9)),
                   Text(_fmt(balanceAfter),
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: _tp,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -593,7 +594,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
               width: 90,
               child: Text(
                   performedAt.length >= 16 ? performedAt.substring(0, 16).replaceAll('T', ' ') : performedAt,
-                  style: const TextStyle(color: _td, fontSize: 10)),
+                  style: TextStyle(color: _td, fontSize: 10)),
             ),
           ]),
         );
@@ -604,13 +605,13 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
   Widget _errorView() {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.error_outline, color: _err, size: 48),
+        Icon(Icons.error_outline, color: _err, size: 48),
         const SizedBox(height: 12),
-        Text(_error!, style: const TextStyle(color: _ts)),
+        Text(_error!, style: TextStyle(color: _ts)),
         const SizedBox(height: 16),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+              foregroundColor: _tp, side: BorderSide(color: _bdr)),
           onPressed: _loadInitial,
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('إعادة المحاولة'),
@@ -625,10 +626,10 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
         Icon(Icons.warehouse_outlined,
             color: _gold.withValues(alpha: 0.4), size: 72),
         const SizedBox(height: 14),
-        const Text('لا توجد مستودعات بعد',
+        Text('لا توجد مستودعات بعد',
             style: TextStyle(color: _tp, fontSize: 16)),
         const SizedBox(height: 8),
-        const Text('يجب إنشاء مستودع من شاشة "المستودعات" أولاً',
+        Text('يجب إنشاء مستودع من شاشة "المستودعات" أولاً',
             style: TextStyle(color: _ts, fontSize: 12)),
       ]),
     );
@@ -644,7 +645,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
   }
 }
 
-const _th = TextStyle(
+final _th = TextStyle(
     color: _td, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5);
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -734,7 +735,7 @@ class _MovementDialogState extends State<_MovementDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم تسجيل الحركة ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل التسجيل');
@@ -757,7 +758,7 @@ class _MovementDialogState extends State<_MovementDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.edit_note, color: _gold),
           SizedBox(width: 8),
           Text('تسجيل حركة مخزون', style: TextStyle(color: _tp)),
@@ -820,7 +821,7 @@ class _MovementDialogState extends State<_MovementDialog> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(_error!,
-                    style: const TextStyle(color: _err, fontSize: 12)),
+                    style: TextStyle(color: _err, fontSize: 12)),
               ),
             ],
           ]),
@@ -828,10 +829,10 @@ class _MovementDialogState extends State<_MovementDialog> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -849,7 +850,7 @@ class _MovementDialogState extends State<_MovementDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
@@ -864,10 +865,10 @@ class _MovementDialogState extends State<_MovementDialog> {
             fillColor: _navy3,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
@@ -881,7 +882,7 @@ class _MovementDialogState extends State<_MovementDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -894,8 +895,8 @@ class _MovementDialogState extends State<_MovementDialog> {
               value: value,
               isExpanded: true,
               dropdownColor: _navy2,
-              style: const TextStyle(color: _tp, fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down, color: _ts),
+              style: TextStyle(color: _tp, fontSize: 12),
+              icon: Icon(Icons.arrow_drop_down, color: _ts),
               items: items,
               onChanged: onChanged,
             ),
@@ -1038,7 +1039,7 @@ class _TransferDialogState extends State<_TransferDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.swap_horiz, color: _gold),
           SizedBox(width: 8),
           Text('تحويل بين المستودعات', style: TextStyle(color: _tp)),
@@ -1059,7 +1060,7 @@ class _TransferDialogState extends State<_TransferDialog> {
                         .toList(),
                     (v) => setState(() => _sourceId = v)),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Icon(Icons.arrow_back, color: _gold),
               ),
@@ -1123,7 +1124,7 @@ class _TransferDialogState extends State<_TransferDialog> {
                     color: _err.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6)),
                 child: Text(_error!,
-                    style: const TextStyle(color: _err, fontSize: 12)),
+                    style: TextStyle(color: _err, fontSize: 12)),
               ),
             ],
           ]),
@@ -1131,10 +1132,10 @@ class _TransferDialogState extends State<_TransferDialog> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -1152,7 +1153,7 @@ class _TransferDialogState extends State<_TransferDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
@@ -1167,10 +1168,10 @@ class _TransferDialogState extends State<_TransferDialog> {
             fillColor: _navy3,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
@@ -1184,7 +1185,7 @@ class _TransferDialogState extends State<_TransferDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1197,8 +1198,8 @@ class _TransferDialogState extends State<_TransferDialog> {
               value: value,
               isExpanded: true,
               dropdownColor: _navy2,
-              style: const TextStyle(color: _tp, fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down, color: _ts),
+              style: TextStyle(color: _tp, fontSize: 12),
+              icon: Icon(Icons.arrow_drop_down, color: _ts),
               items: items,
               onChanged: onChanged,
             ),

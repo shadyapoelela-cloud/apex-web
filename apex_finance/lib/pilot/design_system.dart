@@ -12,6 +12,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../core/theme.dart' as core_theme;
 
 /// APEX Design tokens
 class AD {
@@ -22,115 +23,115 @@ class AD {
   // ══════════════════════════════════════════════════════════════════
 
   // Brand — ذهبي فاخر + كحلي عميق (هوية APEX الأساسية)
-  static const gold = Color(0xFFD4AF37);
+  static Color get gold => core_theme.AC.gold;
   static const goldLight = Color(0xFFE5C459);
   static const goldDark = Color(0xFFA88A2C);
 
   // Navy scale — 5 مستويات من الأغمق للأفتح
-  static const navy = Color(0xFF0A1628); // background deepest
-  static const navy2 = Color(0xFF132339); // surfaces
-  static const navy3 = Color(0xFF1D3150); // elevated surfaces
+  static Color get navy => core_theme.AC.navy; // background deepest
+  static Color get navy2 => core_theme.AC.navy2; // surfaces
+  static Color get navy3 => core_theme.AC.navy3; // elevated surfaces
   static const navy4 = Color(0xFF2A3E5E); // borders prominent
   static const navy5 = Color(0xFF3A4E6E); // dividers
 
   // Text scale — 4 مستويات (primary / secondary / tertiary / disabled)
   static const tp = Color(0xFFFFFFFF); // primary
-  static const ts = Color(0xFFBCC5D3); // secondary
-  static const td = Color(0xFF6B7A90); // tertiary
+  static Color get ts => core_theme.AC.ts; // secondary
+  static Color get td => core_theme.AC.td; // tertiary
   static const tq = Color(0xFF475266); // quaternary (disabled)
 
   // Borders
-  static const bdr = Color(0x33FFFFFF); // 20% white — most borders
+  static Color get bdr => core_theme.AC.bdr; // 20% white — most borders
   static const bdrStrong = Color(0x55FFFFFF); // 33% white
   static const bdrSubtle = Color(0x1AFFFFFF); // 10% white
 
   // Semantic — success/error/warning/info
-  static const ok = Color(0xFF10B981); // emerald
-  static const okLight = Color(0xFF34D399);
-  static const okDark = Color(0xFF059669);
+  static Color get ok => core_theme.AC.ok; // emerald
+  static Color get okLight => core_theme.AC.ok;
+  static Color get okDark => core_theme.AC.ok;
 
-  static const err = Color(0xFFEF4444); // red
-  static const errLight = Color(0xFFF87171);
-  static const errDark = Color(0xFFDC2626);
+  static Color get err => core_theme.AC.err; // red
+  static Color get errLight => core_theme.AC.err;
+  static Color get errDark => core_theme.AC.err;
 
-  static const warn = Color(0xFFF59E0B); // amber
-  static const warnLight = Color(0xFFFBBF24);
-  static const warnDark = Color(0xFFD97706);
+  static Color get warn => core_theme.AC.warn; // amber
+  static Color get warnLight => core_theme.AC.warn;
+  static Color get warnDark => core_theme.AC.warn;
 
-  static const info = Color(0xFF3B82F6); // blue
-  static const infoLight = Color(0xFF60A5FA);
-  static const infoDark = Color(0xFF2563EB);
+  static Color get info => core_theme.AC.info; // blue
+  static Color get infoLight => core_theme.AC.info;
+  static Color get infoDark => core_theme.AC.info;
 
   // Accents — للـ categories / tags / charts
-  static const indigo = Color(0xFF6366F1);
-  static const purple = Color(0xFF8B5CF6);
+  static Color get indigo => core_theme.AC.purple;
+  static Color get purple => core_theme.AC.purple;
   static const pink = Color(0xFFEC4899);
   static const teal = Color(0xFF14B8A6);
 
   // Category-specific (مطابق لـ CoA)
-  static const catAsset = Color(0xFF10B981);
-  static const catLiability = Color(0xFFF59E0B);
-  static const catEquity = Color(0xFF8B5CF6);
-  static const catRevenue = Color(0xFF3B82F6);
-  static const catExpense = Color(0xFFEF4444);
+  static Color get catAsset => core_theme.AC.ok;
+  static Color get catLiability => core_theme.AC.warn;
+  static Color get catEquity => core_theme.AC.purple;
+  static Color get catRevenue => core_theme.AC.info;
+  static Color get catExpense => core_theme.AC.err;
 
   // ══════════════════════════════════════════════════════════════════
   // 3.2 — Typography Scale
   // ══════════════════════════════════════════════════════════════════
 
   // العناوين (Display)
-  static const TextStyle display = TextStyle(
+  static TextStyle get display => TextStyle(
     color: tp, fontSize: 28, fontWeight: FontWeight.w900,
     letterSpacing: -0.5,
   );
-  static const TextStyle h1 = TextStyle(
+  static TextStyle get h1 => TextStyle(
     color: tp, fontSize: 22, fontWeight: FontWeight.w800,
     letterSpacing: -0.3,
   );
-  static const TextStyle h2 = TextStyle(
+  static TextStyle get h2 => TextStyle(
     color: tp, fontSize: 18, fontWeight: FontWeight.w800,
   );
-  static const TextStyle h3 = TextStyle(
+  static TextStyle get h3 => TextStyle(
     color: tp, fontSize: 15, fontWeight: FontWeight.w700,
   );
-  static const TextStyle h4 = TextStyle(
+  static TextStyle get h4 => TextStyle(
     color: tp, fontSize: 13, fontWeight: FontWeight.w700,
   );
 
   // النصوص (Body)
-  static const TextStyle bodyLg = TextStyle(
+  static TextStyle get bodyLg => TextStyle(
     color: tp, fontSize: 14, height: 1.5,
   );
-  static const TextStyle body = TextStyle(
+  static TextStyle get body => TextStyle(
     color: tp, fontSize: 13, height: 1.5,
   );
-  static const TextStyle bodySm = TextStyle(
+  static TextStyle get bodySm => TextStyle(
     color: ts, fontSize: 12, height: 1.4,
   );
-  static const TextStyle bodyXs = TextStyle(
+  static TextStyle get bodyXs => TextStyle(
     color: td, fontSize: 11, height: 1.4,
   );
 
   // Labels (forms / captions)
-  static const TextStyle label = TextStyle(
+  static TextStyle get label => TextStyle(
     color: td, fontSize: 11, fontWeight: FontWeight.w600,
     letterSpacing: 0.3,
   );
-  static const TextStyle labelStrong = TextStyle(
+  static TextStyle get labelStrong => TextStyle(
     color: tp, fontSize: 12, fontWeight: FontWeight.w700,
   );
 
   // Numbers — monospace for tables
-  static const TextStyle mono = TextStyle(
+  static TextStyle get mono => TextStyle(
     color: tp, fontSize: 12, fontFamily: 'monospace',
   );
-  static const TextStyle monoBold = TextStyle(
+  static TextStyle get monoBold => TextStyle(
     color: tp, fontSize: 13, fontWeight: FontWeight.w800,
     fontFamily: 'monospace',
   );
 
   // Tables
-  static const TextStyle th = TextStyle(
+  static TextStyle get th => TextStyle(
     color: td, fontSize: 11, fontWeight: FontWeight.w700,
     letterSpacing: 0.5,
   );
@@ -206,14 +207,14 @@ class AD {
 
   static ButtonStyle get btnPrimary => FilledButton.styleFrom(
         backgroundColor: gold,
-        foregroundColor: Colors.black,
+        foregroundColor: core_theme.AC.tp,
         padding: padButton,
         shape: RoundedRectangleBorder(borderRadius: brSm),
       );
 
   static ButtonStyle get btnSecondary => OutlinedButton.styleFrom(
         foregroundColor: tp,
-        side: const BorderSide(color: bdr),
+        side: BorderSide(color: bdr),
         padding: padButton,
         shape: RoundedRectangleBorder(borderRadius: brSm),
       );
@@ -255,11 +256,11 @@ class AD {
       contentPadding: padFieldH,
       border: OutlineInputBorder(
         borderRadius: brSm,
-        borderSide: const BorderSide(color: bdr),
+        borderSide: BorderSide(color: bdr),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: brSm,
-        borderSide: const BorderSide(color: bdr),
+        borderSide: BorderSide(color: bdr),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: brSm,
@@ -267,7 +268,7 @@ class AD {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: brSm,
-        borderSide: const BorderSide(color: err),
+        borderSide: BorderSide(color: err),
       ),
     );
   }
@@ -335,7 +336,7 @@ class AD {
         child: Text(
           text,
           style: TextStyle(
-            color: selected ? Colors.black : ts,
+            color: selected ? core_theme.AC.tp : ts,
             fontSize: 11,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
           ),
@@ -387,7 +388,7 @@ class AD {
   }
 
   // Helper — كان متعارضاً مع label constant فاستخدمنا _label
-  static const TextStyle label_ = label;
+  static TextStyle get label_ => label;
 
   /// Category color helper
   static Color categoryColor(String? category) {

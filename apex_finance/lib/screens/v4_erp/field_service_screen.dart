@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 119 — Field Service Management
 class FieldServiceScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'أوامر العمل'), Tab(text: 'الفنيون'), Tab(text: 'الجدولة'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_ordersTab(), _techsTab(), _scheduleTab(), _analyticsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.engineering, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('إدارة الخدمة الميدانية', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('إرسال الفنيين، جدولة، GPS، OTP توقيع إلكتروني', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('إرسال الفنيين، جدولة، GPS، OTP توقيع إلكتروني', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -54,7 +55,7 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -69,7 +70,7 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(o.id, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
             Text('${o.customer} • ${o.service}', style: const TextStyle(fontSize: 11)),
-            Text('📍 ${o.location}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('📍 ${o.location}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -81,10 +82,10 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
         ]),
         const SizedBox(height: 8),
         Row(children: [
-          const Icon(Icons.person, size: 14, color: Colors.black54),
+          Icon(Icons.person, size: 14, color: core_theme.AC.ts),
           const SizedBox(width: 4),
           Expanded(child: Text('الفني: ${o.technician}', style: const TextStyle(fontSize: 11))),
-          const Icon(Icons.schedule, size: 14, color: Colors.black54),
+          Icon(Icons.schedule, size: 14, color: core_theme.AC.ts),
           const SizedBox(width: 4),
           Text(o.scheduledTime, style: const TextStyle(fontSize: 11)),
         ]),
@@ -105,10 +106,10 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${t.specialty} • ${t.city}', style: const TextStyle(fontSize: 11)),
         Row(children: [
-          const Icon(Icons.star, color: Color(0xFFD4AF37), size: 12),
+          Icon(Icons.star, color: core_theme.AC.gold, size: 12),
           Text(' ${t.rating}', style: const TextStyle(fontSize: 11)),
           const SizedBox(width: 8),
-          Text('${t.completedToday} اليوم', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('${t.completedToday} اليوم', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ]),
       ]),
       trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -126,15 +127,15 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
             child: Text(t.name.substring(0, 1), style: const TextStyle(color: Color(0xFF4A148C), fontWeight: FontWeight.bold, fontSize: 12))),
           const SizedBox(width: 8),
           Expanded(child: Text(t.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
-          Text('${tasks.length} مهام', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('${tasks.length} مهام', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ]),
-        if (tasks.isEmpty) const Padding(padding: EdgeInsets.all(8), child: Text('لا مهام اليوم', style: TextStyle(fontSize: 11, color: Colors.black38))),
+        if (tasks.isEmpty) Padding(padding: EdgeInsets.all(8), child: Text('لا مهام اليوم', style: TextStyle(fontSize: 11, color: core_theme.AC.td))),
         ...tasks.map((o) => Padding(padding: const EdgeInsets.only(top: 6), child: Row(children: [
           Container(width: 4, height: 32, decoration: BoxDecoration(color: _priorityColor(o.priority), borderRadius: BorderRadius.circular(2))),
           const SizedBox(width: 8),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(o.customer, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-            Text('${o.scheduledTime} • ${o.service}', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('${o.scheduledTime} • ${o.service}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ])),
         ]))),
       ]),
@@ -144,7 +145,7 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('⏱️ زمن الاستجابة', 'متوسط 42 دقيقة للطلبات العاجلة', const Color(0xFF2E7D32)),
     _insight('✅ Fix-First-Visit', '87% من الطلبات تُحل في الزيارة الأولى', const Color(0xFF1A237E)),
-    _insight('📍 كفاءة المسار', 'خوارزمية AI توفر 24% من الوقود', const Color(0xFFD4AF37)),
+    _insight('📍 كفاءة المسار', 'خوارزمية AI توفر 24% من الوقود', core_theme.AC.gold),
     _insight('⭐ رضا العملاء', '4.7/5 متوسط التقييمات', const Color(0xFF4A148C)),
     _insight('💰 إيرادات الخدمات', '2.8M ر.س شهرياً — نمو 18%', const Color(0xFF2E7D32)),
     _insight('🚨 SLA Breaches', '6% فقط — تحسن 40% YoY', const Color(0xFFE65100)),
@@ -153,7 +154,7 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _priorityColor(String p) {
@@ -167,14 +168,14 @@ class _FieldServiceScreenState extends State<FieldServiceScreen> with SingleTick
     if (s.contains('مكتمل')) return const Color(0xFF2E7D32);
     if (s.contains('قيد')) return const Color(0xFFE65100);
     if (s.contains('مجدول')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   Color _availColor(String a) {
     if (a.contains('متاح')) return const Color(0xFF2E7D32);
     if (a.contains('في المسار')) return const Color(0xFFE65100);
     if (a.contains('مشغول')) return const Color(0xFF1A237E);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Order> _orders = [

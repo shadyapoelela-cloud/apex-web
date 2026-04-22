@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 
 import 'design_tokens.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 enum ValidationLevel { idle, info, warning, error, ok }
 
@@ -115,7 +116,7 @@ class _ApexSemanticFieldState extends State<ApexSemanticField> {
       case ValidationLevel.error:
         return AC.err;
       case ValidationLevel.warning:
-        return Colors.amber.shade700;
+        return core_theme.AC.warn;
       case ValidationLevel.info:
         return AC.gold;
       case ValidationLevel.ok:

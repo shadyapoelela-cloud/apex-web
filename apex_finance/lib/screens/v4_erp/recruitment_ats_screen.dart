@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class RecruitmentAtsScreen extends StatefulWidget {
   const RecruitmentAtsScreen({super.key});
@@ -27,15 +28,15 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
     _Position('JOB-2026-035', 'مساعد إداري', 'العمليات', 'full-time', 'paused', 8, 2, 'الرياض', 8000),
   ];
 
-  final _candidates = const [
-    _Candidate('CAN-2026-0284', 'ياسر الحربي', 'JOB-2026-042', 5, 'محاسبة', 4.8, 'offer', '2020', Colors.green),
-    _Candidate('CAN-2026-0283', 'رنا المطيري', 'JOB-2026-040', 8, 'مراجعة CPA', 4.9, 'final', '2018', Colors.green),
-    _Candidate('CAN-2026-0282', 'خالد الحربي', 'JOB-2026-040', 6, 'مراجعة', 4.7, 'interview', '2019', Colors.blue),
-    _Candidate('CAN-2026-0281', 'نورة الغامدي', 'JOB-2026-041', 3, 'ISC2, CEH', 4.5, 'interview', '2022', Colors.blue),
-    _Candidate('CAN-2026-0280', 'فهد القحطاني', 'JOB-2026-041', 4, 'CISSP', 4.6, 'screening', '2021', Colors.amber),
-    _Candidate('CAN-2026-0279', 'سارة البكري', 'JOB-2026-042', 2, 'ACCA Part-qualified', 3.8, 'screening', '2023', Colors.amber),
-    _Candidate('CAN-2026-0278', 'محمد العتيبي', 'JOB-2026-036', 7, 'مبيعات تقنية', 4.4, 'interview', '2019', Colors.blue),
-    _Candidate('CAN-2026-0277', 'لينا سالم', 'JOB-2026-042', 4, 'محاسبة', 4.2, 'sourced', '2021', Colors.grey),
+  final _candidates = [
+    _Candidate('CAN-2026-0284', 'ياسر الحربي', 'JOB-2026-042', 5, 'محاسبة', 4.8, 'offer', '2020', core_theme.AC.ok),
+    _Candidate('CAN-2026-0283', 'رنا المطيري', 'JOB-2026-040', 8, 'مراجعة CPA', 4.9, 'final', '2018', core_theme.AC.ok),
+    _Candidate('CAN-2026-0282', 'خالد الحربي', 'JOB-2026-040', 6, 'مراجعة', 4.7, 'interview', '2019', core_theme.AC.info),
+    _Candidate('CAN-2026-0281', 'نورة الغامدي', 'JOB-2026-041', 3, 'ISC2, CEH', 4.5, 'interview', '2022', core_theme.AC.info),
+    _Candidate('CAN-2026-0280', 'فهد القحطاني', 'JOB-2026-041', 4, 'CISSP', 4.6, 'screening', '2021', core_theme.AC.warn),
+    _Candidate('CAN-2026-0279', 'سارة البكري', 'JOB-2026-042', 2, 'ACCA Part-qualified', 3.8, 'screening', '2023', core_theme.AC.warn),
+    _Candidate('CAN-2026-0278', 'محمد العتيبي', 'JOB-2026-036', 7, 'مبيعات تقنية', 4.4, 'interview', '2019', core_theme.AC.info),
+    _Candidate('CAN-2026-0277', 'لينا سالم', 'JOB-2026-042', 4, 'محاسبة', 4.2, 'sourced', '2021', core_theme.AC.td),
   ];
 
   @override
@@ -58,9 +59,9 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
         _buildKpis(),
         TabBar(
           controller: _tab,
-          labelColor: const Color(0xFFD4AF37),
-          unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37),
+          labelColor: core_theme.AC.gold,
+          unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold,
           tabs: const [
             Tab(icon: Icon(Icons.work, size: 16), text: 'الشواغر'),
             Tab(icon: Icon(Icons.person_search, size: 16), text: 'المرشحون'),
@@ -93,21 +94,21 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
         children: [
           const Icon(Icons.groups, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('التوظيف وتتبع المرشحين',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('ATS — شواغر · مرشحون · مقابلات · عروض · متابعة مع Seek + LinkedIn',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 16),
-            label: const Text('شاغر جديد'),
+            label: Text('شاغر جديد'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF00695C),
@@ -126,11 +127,11 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _kpi('شواغر مفتوحة', '$open', Colors.blue, Icons.work),
-          _kpi('إجمالي المتقدمين', '$totalApps', const Color(0xFFD4AF37), Icons.people),
-          _kpi('قيد المعالجة', '$inProcess', Colors.orange, Icons.sync),
-          _kpi('متوسط زمن التوظيف', '28 يوم', Colors.green, Icons.schedule),
-          _kpi('نسبة القبول', '68%', Colors.teal, Icons.thumb_up),
+          _kpi('شواغر مفتوحة', '$open', core_theme.AC.info, Icons.work),
+          _kpi('إجمالي المتقدمين', '$totalApps', core_theme.AC.gold, Icons.people),
+          _kpi('قيد المعالجة', '$inProcess', core_theme.AC.warn, Icons.sync),
+          _kpi('متوسط زمن التوظيف', '28 يوم', core_theme.AC.ok, Icons.schedule),
+          _kpi('نسبة القبول', '68%', core_theme.AC.info, Icons.thumb_up),
         ],
       ),
     );
@@ -154,7 +155,7 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -195,7 +196,7 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                   children: [
                     Row(
                       children: [
-                        Text(p.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                        Text(p.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -206,7 +207,7 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                           child: Text(_typeLabel(p.type),
                               style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                         ),
@@ -216,17 +217,17 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                     Text(p.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                     Row(
                       children: [
-                        const Icon(Icons.business, size: 11, color: Colors.black54),
+                        Icon(Icons.business, size: 11, color: core_theme.AC.ts),
                         const SizedBox(width: 3),
-                        Text(p.department, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(p.department, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         const SizedBox(width: 10),
-                        const Icon(Icons.place, size: 11, color: Colors.black54),
+                        Icon(Icons.place, size: 11, color: core_theme.AC.ts),
                         const SizedBox(width: 3),
-                        Text(p.location, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(p.location, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         const SizedBox(width: 10),
-                        const Icon(Icons.payments, size: 11, color: Colors.black54),
+                        Icon(Icons.payments, size: 11, color: core_theme.AC.ts),
                         const SizedBox(width: 3),
-                        Text('${p.salary} ر.س/شهر', style: const TextStyle(fontSize: 11, color: Color(0xFFD4AF37), fontWeight: FontWeight.w700)),
+                        Text('${p.salary} ر.س/شهر', style: TextStyle(fontSize: 11, color: core_theme.AC.gold, fontWeight: FontWeight.w700)),
                       ],
                     ),
                   ],
@@ -236,11 +237,11 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text('${p.applications}',
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37))),
-                  const Text('متقدم', style: TextStyle(fontSize: 10, color: Colors.black54)),
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: core_theme.AC.gold)),
+                  Text('متقدم', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   const SizedBox(height: 4),
                   Text('${p.shortlisted} في القائمة القصيرة',
-                      style: const TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.w700)),
+                      style: TextStyle(fontSize: 10, color: core_theme.AC.info, fontWeight: FontWeight.w700)),
                 ],
               ),
             ],
@@ -281,23 +282,23 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                   children: [
                     Row(
                       children: [
-                        Text(c.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                        Text(c.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                         const SizedBox(width: 8),
                         Text(c.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                       ],
                     ),
                     Text('→ ${position.title}',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     Row(
                       children: [
-                        const Icon(Icons.school, size: 11, color: Colors.black54),
+                        Icon(Icons.school, size: 11, color: core_theme.AC.ts),
                         const SizedBox(width: 3),
-                        Text(c.qualifications, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(c.qualifications, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         const SizedBox(width: 10),
-                        const Icon(Icons.business_center, size: 11, color: Colors.black54),
+                        Icon(Icons.business_center, size: 11, color: core_theme.AC.ts),
                         const SizedBox(width: 3),
                         Text('${c.experience} سنوات خبرة',
-                            style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                            style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ],
@@ -322,9 +323,9 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.event, size: 14),
-                  label: const Text('حجز مقابلة', style: TextStyle(fontSize: 11)),
+                  label: Text('حجز مقابلة', style: TextStyle(fontSize: 11)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: core_theme.AC.info,
                     foregroundColor: Colors.white,
                   ),
                 )
@@ -332,9 +333,9 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.email, size: 14),
-                  label: const Text('إرسال عرض', style: TextStyle(fontSize: 11)),
+                  label: Text('إرسال عرض', style: TextStyle(fontSize: 11)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4AF37),
+                    backgroundColor: core_theme.AC.gold,
                     foregroundColor: Colors.white,
                   ),
                 ),
@@ -356,13 +357,13 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
   }
 
   Widget _buildPipelineTab() {
-    final stages = const [
-      _Stage('sourced', 'مرشّح مستهدف', Colors.grey),
-      _Stage('screening', 'فرز أولي', Colors.amber),
-      _Stage('interview', 'مقابلة', Colors.blue),
-      _Stage('final', 'مقابلة نهائية', Colors.purple),
-      _Stage('offer', 'عرض توظيف', Color(0xFFD4AF37)),
-      _Stage('hired', 'تم التعيين', Colors.green),
+    final stages = [
+      _Stage('sourced', 'مرشّح مستهدف', core_theme.AC.td),
+      _Stage('screening', 'فرز أولي', core_theme.AC.warn),
+      _Stage('interview', 'مقابلة', core_theme.AC.info),
+      _Stage('final', 'مقابلة نهائية', core_theme.AC.purple),
+      _Stage('offer', 'عرض توظيف', core_theme.AC.gold),
+      _Stage('hired', 'تم التعيين', core_theme.AC.ok),
     ];
     return SizedBox(
       height: 520,
@@ -375,9 +376,9 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
+                    color: core_theme.AC.navy3,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.black12),
+                    border: Border.all(color: core_theme.AC.bdr),
                   ),
                   child: Column(
                     children: [
@@ -415,7 +416,7 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.black12),
+                                  border: Border.all(color: core_theme.AC.bdr),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -425,7 +426,7 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis),
                                     Text('${c.experience}س · ⭐${c.rating}',
-                                        style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                                        style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                                   ],
                                 ),
                               ),
@@ -445,17 +446,17 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
   Color _posStatusColor(String s) {
     switch (s) {
       case 'published':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'interviewing':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'offer':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'hired':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'paused':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -494,21 +495,21 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
   Color _stageColor(String s) {
     switch (s) {
       case 'sourced':
-        return Colors.grey;
+        return core_theme.AC.td;
       case 'screening':
-        return Colors.amber;
+        return core_theme.AC.warn;
       case 'interview':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'final':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'offer':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'hired':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'rejected':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

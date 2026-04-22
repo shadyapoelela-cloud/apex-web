@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 import '../../core/v5/apex_v5_undo_toast.dart';
 
@@ -36,7 +37,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
       ),
       child: Row(
         children: [
@@ -64,14 +65,14 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: active ? const Color(0xFFB91C1C) : Colors.black54),
+            Icon(icon, size: 14, color: active ? const Color(0xFFB91C1C) : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                color: active ? const Color(0xFFB91C1C) : Colors.black54,
+                color: active ? const Color(0xFFB91C1C) : core_theme.AC.ts,
               ),
             ),
           ],
@@ -98,21 +99,21 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('فحوصات اليوم', '47', Icons.search, const Color(0xFF2563EB)),
-            _Stat('تطابقات PEP', '2', Icons.warning, const Color(0xFFD97706)),
-            _Stat('عقوبات', '0', Icons.block, const Color(0xFF059669)),
+            _Stat('فحوصات اليوم', '47', Icons.search, core_theme.AC.info),
+            _Stat('تطابقات PEP', '2', Icons.warning, core_theme.AC.warn),
+            _Stat('عقوبات', '0', Icons.block, core_theme.AC.ok),
             _Stat('بحاجة مراجعة', '5', Icons.pending_actions, const Color(0xFFB91C1C)),
           ]),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFB91C1C), Color(0xFF7C3AED)],
+              gradient: LinearGradient(
+                colors: [Color(0xFFB91C1C), core_theme.AC.purple],
               ),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.security, color: Colors.white, size: 28),
                 SizedBox(width: 16),
@@ -127,7 +128,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
                       SizedBox(height: 4),
                       Text(
                         'فحص تلقائي مقابل: OFAC · EU · UN · SAMA · KSA PEP Lists',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                        style: TextStyle(color: core_theme.AC.ts, fontSize: 12),
                       ),
                     ],
                   ),
@@ -136,14 +137,14 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('فحص عميل/مورّد جديد', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('فحص عميل/مورّد جديد', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
             ),
             child: Column(
               children: [
@@ -188,7 +189,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
                       );
                     },
                     icon: const Icon(Icons.search, size: 16),
-                    label: const Text('ابدأ الفحص'),
+                    label: Text('ابدأ الفحص'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFB91C1C),
                       foregroundColor: Colors.white,
@@ -200,10 +201,10 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('النتائج الأخيرة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+          Text('النتائج الأخيرة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
-          _screeningResult('ABC Trading Co — محمد علي', 'نظيف ✓', const Color(0xFF059669), 'لا تطابقات'),
-          _screeningResult('SABIC Procurement — عبدالرحمن', 'تطابق PEP', const Color(0xFFD97706), 'تطابق جزئي مع قائمة SAMA'),
+          _screeningResult('ABC Trading Co — محمد علي', 'نظيف ✓', core_theme.AC.ok, 'لا تطابقات'),
+          _screeningResult('SABIC Procurement — عبدالرحمن', 'تطابق PEP', core_theme.AC.warn, 'تطابق جزئي مع قائمة SAMA'),
           _screeningResult('XYZ Holdings Ltd', 'عالي الخطورة', const Color(0xFFB91C1C), 'تطابق OFAC — مطلوب توقّف'),
         ],
       ),
@@ -228,7 +229,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(
-              color == const Color(0xFF059669) ? Icons.check_circle : Icons.warning,
+              color == core_theme.AC.ok ? Icons.check_circle : Icons.warning,
               color: color,
               size: 16,
             ),
@@ -239,7 +240,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                Text(detail, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -263,13 +264,13 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _statsRow([
-            _Stat('حالات مفتوحة', '8', Icons.folder_open, const Color(0xFF2563EB)),
+            _Stat('حالات مفتوحة', '8', Icons.folder_open, core_theme.AC.info),
             _Stat('عالية الخطورة', '2', Icons.error, const Color(0xFFB91C1C)),
-            _Stat('محلّلة هذا الشهر', '14', Icons.check_circle, const Color(0xFF059669)),
-            _Stat('متوسط زمن الحل', '4.2 يوم', Icons.timer, const Color(0xFF7C3AED)),
+            _Stat('محلّلة هذا الشهر', '14', Icons.check_circle, core_theme.AC.ok),
+            _Stat('متوسط زمن الحل', '4.2 يوم', Icons.timer, core_theme.AC.purple),
           ]),
           const SizedBox(height: 16),
-          const Text('الحالات النشطة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('الحالات النشطة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final c in [
             _Case('AML-2026-012', 'XYZ Holdings Ltd', 'عالية', 'تطابق OFAC', 'تحت التحقيق'),
@@ -287,8 +288,8 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
     final color = c.severity == 'عالية'
         ? const Color(0xFFB91C1C)
         : c.severity == 'متوسطة'
-            ? const Color(0xFFD97706)
-            : const Color(0xFF2563EB);
+            ? core_theme.AC.warn
+            : core_theme.AC.info;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -312,7 +313,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
               children: [
                 Row(
                   children: [
-                    Text(c.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+                    Text(c.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
@@ -326,20 +327,20 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(c.subject, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                Text(c.reason, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(c.reason, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.06),
+              color: core_theme.AC.tp.withOpacity(0.06),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(c.status, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
           ),
           const SizedBox(width: 8),
-          TextButton(onPressed: () {}, child: const Text('عرض')),
+          TextButton(onPressed: () {}, child: Text('عرض')),
         ],
       ),
     );
@@ -351,15 +352,15 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('قواعد المراقبة النشطة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('قواعد المراقبة النشطة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final r in [
             _Rule('Structuring — الهيكلة', 'معاملات متعدّدة تحت 10K خلال 24 ساعة', true, const Color(0xFFB91C1C)),
-            _Rule('Round Number Transactions', 'مبالغ مستديرة > 50K', true, const Color(0xFFD97706)),
+            _Rule('Round Number Transactions', 'مبالغ مستديرة > 50K', true, core_theme.AC.warn),
             _Rule('Cross-Border Large', 'تحويلات > 100K عبر الحدود', true, const Color(0xFFB91C1C)),
-            _Rule('New Vendor Large', 'أول معاملة مع مورد جديد > 50K', true, const Color(0xFFD97706)),
-            _Rule('Off-hours Activity', 'معاملات بين 22:00-06:00', true, const Color(0xFF7C3AED)),
-            _Rule('Sanctions Screening', 'فحص تلقائي لكل مورد/عميل جديد', true, const Color(0xFF059669)),
+            _Rule('New Vendor Large', 'أول معاملة مع مورد جديد > 50K', true, core_theme.AC.warn),
+            _Rule('Off-hours Activity', 'معاملات بين 22:00-06:00', true, core_theme.AC.purple),
+            _Rule('Sanctions Screening', 'فحص تلقائي لكل مورد/عميل جديد', true, core_theme.AC.ok),
           ])
             _ruleCard(r),
         ],
@@ -374,7 +375,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Row(
         children: [
@@ -392,7 +393,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(rule.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                Text(rule.desc, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text(rule.desc, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -431,12 +432,12 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
           const SizedBox(height: 16),
           _statsRow([
             _Stat('إيداعات هذا العام', '7', Icons.description, const Color(0xFFB91C1C)),
-            _Stat('قيد الإعداد', '2', Icons.edit, const Color(0xFFD97706)),
-            _Stat('مقبولة', '5', Icons.check_circle, const Color(0xFF059669)),
+            _Stat('قيد الإعداد', '2', Icons.edit, core_theme.AC.warn),
+            _Stat('مقبولة', '5', Icons.check_circle, core_theme.AC.ok),
             _Stat('مرفوضة', '0', Icons.block, const Color(0xFF6B7280)),
           ]),
           const SizedBox(height: 16),
-          const Text('السجل', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('السجل', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final s in [
             _Sar('SAR-2026-007', 'XYZ Holdings', '2026-04-10', 'قيد الإعداد'),
@@ -452,9 +453,9 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
 
   Widget _sarRow(_Sar s) {
     final statusColor = s.status == 'مقبول'
-        ? const Color(0xFF059669)
+        ? core_theme.AC.ok
         : s.status == 'قيد الإعداد'
-            ? const Color(0xFFD97706)
+            ? core_theme.AC.warn
             : const Color(0xFF6B7280);
 
     return Container(
@@ -463,16 +464,16 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.description, color: Colors.black54, size: 18),
+          Icon(Icons.description, color: core_theme.AC.ts, size: 18),
           const SizedBox(width: 10),
-          Text(s.id, style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.black54)),
+          Text(s.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
           const SizedBox(width: 16),
           Expanded(child: Text(s.subject, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-          Text(s.date, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text(s.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -493,15 +494,15 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('قوائم المراقبة المتصلة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          Text('قوائم المراقبة المتصلة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           for (final w in [
             _Watchlist('OFAC SDN List', 'وزارة الخزانة الأمريكية', '12,847 اسم', true, const Color(0xFFB91C1C)),
-            _Watchlist('EU Consolidated List', 'الاتحاد الأوروبي', '3,421 اسم', true, const Color(0xFF2563EB)),
-            _Watchlist('UN Security Council', 'الأمم المتحدة', '892 اسم', true, const Color(0xFF059669)),
-            _Watchlist('SAMA PEP List', 'ساما السعودية', '2,134 اسم', true, const Color(0xFFD4AF37)),
-            _Watchlist('Interpol Red Notices', 'الإنتربول', '6,718 اسم', true, const Color(0xFF7C3AED)),
-            _Watchlist('Internal Watchlist', 'قائمة داخلية', '47 اسم', true, Colors.black54),
+            _Watchlist('EU Consolidated List', 'الاتحاد الأوروبي', '3,421 اسم', true, core_theme.AC.info),
+            _Watchlist('UN Security Council', 'الأمم المتحدة', '892 اسم', true, core_theme.AC.ok),
+            _Watchlist('SAMA PEP List', 'ساما السعودية', '2,134 اسم', true, core_theme.AC.gold),
+            _Watchlist('Interpol Red Notices', 'الإنتربول', '6,718 اسم', true, core_theme.AC.purple),
+            _Watchlist('Internal Watchlist', 'قائمة داخلية', '47 اسم', true, core_theme.AC.ts),
           ])
             Container(
               margin: const EdgeInsets.only(bottom: 8),
@@ -509,7 +510,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black.withOpacity(0.08)),
+                border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
               ),
               child: Row(
                 children: [
@@ -524,22 +525,22 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(w.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                        Text('${w.source} · ${w.count}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text('${w.source} · ${w.count}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF059669).withOpacity(0.12),
+                      color: core_theme.AC.ok.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.sync, size: 11, color: Color(0xFF059669)),
+                        Icon(Icons.sync, size: 11, color: core_theme.AC.ok),
                         SizedBox(width: 3),
-                        Text('متزامن', style: TextStyle(fontSize: 10, color: Color(0xFF059669), fontWeight: FontWeight.w700)),
+                        Text('متزامن', style: TextStyle(fontSize: 10, color: core_theme.AC.ok, fontWeight: FontWeight.w700)),
                       ],
                     ),
                   ),
@@ -572,7 +573,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(s.value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: s.color)),
-                        Text(s.label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text(s.label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                       ],
                     ),
                   ),

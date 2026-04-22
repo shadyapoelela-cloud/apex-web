@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class ActivityLogScreen extends StatefulWidget {
   const ActivityLogScreen({super.key});
@@ -60,10 +61,10 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('مجموع الأحداث', '${_events.length}', Colors.blue, Icons.receipt_long),
-            _kpi('حرجة', '$critical', Colors.red, Icons.error),
-            _kpi('تحذيرات', '$warning', Colors.orange, Icons.warning),
-            _kpi('معلوماتية', '$info', Colors.green, Icons.info),
+            _kpi('مجموع الأحداث', '${_events.length}', core_theme.AC.info, Icons.receipt_long),
+            _kpi('حرجة', '$critical', core_theme.AC.err, Icons.error),
+            _kpi('تحذيرات', '$warning', core_theme.AC.warn, Icons.warning),
+            _kpi('معلوماتية', '$info', core_theme.AC.ok, Icons.info),
           ],
         ),
         const SizedBox(height: 16),
@@ -85,21 +86,21 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
         children: [
           const Icon(Icons.shield, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('سجل النشاط والتدقيق',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('سجل غير قابل للتعديل (Immutable) لكل الأحداث عبر النظام · متوافق مع ISO 27001',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.download, size: 16),
-            label: const Text('تصدير'),
+            label: Text('تصدير'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF1A237E),
@@ -128,7 +129,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -187,12 +188,12 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black26),
+        border: Border.all(color: core_theme.AC.td),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$label:', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text('$label:', style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
           const SizedBox(width: 6),
           Expanded(
             child: DropdownButton<String>(
@@ -200,7 +201,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
               underline: const SizedBox(),
               isDense: true,
               isExpanded: true,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black87),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: core_theme.AC.tp),
               items: items,
               onChanged: (v) => onChanged(v ?? 'all'),
             ),
@@ -241,7 +242,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
               children: [
                 Row(
                   children: [
-                    Text(e.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                    Text(e.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -260,10 +261,10 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
+                        color: core_theme.AC.bdr,
                         borderRadius: BorderRadius.circular(3),
                       ),
-                      child: Text(e.action, style: const TextStyle(fontSize: 9, fontFamily: 'monospace', color: Colors.black87, fontWeight: FontWeight.w700)),
+                      child: Text(e.action, style: TextStyle(fontSize: 9, fontFamily: 'monospace', color: core_theme.AC.tp, fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -272,21 +273,21 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.person, size: 11, color: Colors.black45),
+                    Icon(Icons.person, size: 11, color: core_theme.AC.td),
                     const SizedBox(width: 4),
-                    Text(e.user, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text(e.user, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                     const SizedBox(width: 12),
-                    const Icon(Icons.schedule, size: 11, color: Colors.black45),
+                    Icon(Icons.schedule, size: 11, color: core_theme.AC.td),
                     const SizedBox(width: 4),
-                    Text(e.timestamp, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                    Text(e.timestamp, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     const SizedBox(width: 12),
-                    const Icon(Icons.public, size: 11, color: Colors.black45),
+                    Icon(Icons.public, size: 11, color: core_theme.AC.td),
                     const SizedBox(width: 4),
-                    Text(e.ip, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                    Text(e.ip, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     const SizedBox(width: 12),
-                    const Icon(Icons.devices, size: 11, color: Colors.black45),
+                    Icon(Icons.devices, size: 11, color: core_theme.AC.td),
                     const SizedBox(width: 4),
-                    Text(e.device, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                    Text(e.device, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   ],
                 ),
               ],
@@ -307,13 +308,13 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
   Color _severityColor(String s) {
     switch (s) {
       case 'critical':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'warning':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'info':
-        return Colors.blue;
+        return core_theme.AC.info;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -334,22 +335,22 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
     switch (m) {
       case 'finance':
       case 'erp':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'hr':
-        return Colors.teal;
+        return core_theme.AC.info;
       case 'compliance':
       case 'zatca':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'audit':
         return const Color(0xFF4A148C);
       case 'auth':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'ai':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'system':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.blue;
+        return core_theme.AC.info;
     }
   }
 }

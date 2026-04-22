@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 import 'v5_data.dart';
@@ -20,7 +21,8 @@ class ApexV5ServiceSwitcher extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       tooltip: 'التبديل بين خدمات APEX',
-      icon: const Icon(Icons.apps, size: 22),
+      color: core_theme.AC.topBarFg,
+      icon: const Icon(Icons.apps, size: 18),
       onPressed: () => _openPicker(context),
     );
   }
@@ -28,7 +30,7 @@ class ApexV5ServiceSwitcher extends StatelessWidget {
   void _openPicker(BuildContext context) {
     showDialog(
       context: context,
-      barrierColor: Colors.black45,
+      barrierColor: core_theme.AC.td,
       builder: (ctx) => _ServicePickerDialog(currentServiceId: currentServiceId),
     );
   }
@@ -58,7 +60,7 @@ class _ServicePickerDialog extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.apps, size: 28),
+                    const Icon(Icons.apps, size: 20),
                     const SizedBox(width: 12),
                     Text(
                       'خدمات APEX',
@@ -77,7 +79,7 @@ class _ServicePickerDialog extends StatelessWidget {
                 Text(
                   'اختر خدمة للانتقال إليها · ⌘+Shift+K',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.black54,
+                        color: core_theme.AC.ts,
                       ),
                 ),
                 const SizedBox(height: 20),
@@ -111,17 +113,17 @@ class _ServicePickerDialog extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.04),
+                    color: core_theme.AC.tp.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.keyboard, size: 16, color: Colors.black54),
+                      Icon(Icons.keyboard, size: 16, color: core_theme.AC.ts),
                       const SizedBox(width: 8),
                       Text(
                         'اختصار: Alt+1..5 للانتقال السريع · ⌘K لـ Command Palette',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.black54,
+                              color: core_theme.AC.ts,
                             ),
                       ),
                     ],
@@ -158,7 +160,7 @@ class _ServiceTileState extends State<_ServiceTile> {
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.service.color;
+    final color = core_theme.AC.gold;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -174,7 +176,7 @@ class _ServiceTileState extends State<_ServiceTile> {
                 ? color.withOpacity(0.12)
                 : _hover
                     ? color.withOpacity(0.06)
-                    : Colors.black.withOpacity(0.03),
+                    : core_theme.AC.tp.withOpacity(0.03),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: widget.isActive ? color : color.withOpacity(_hover ? 0.4 : 0.15),
@@ -197,26 +199,26 @@ class _ServiceTileState extends State<_ServiceTile> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: color.withOpacity(0.18),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(widget.service.icon, color: color, size: 22),
+                    child: Icon(widget.service.icon, color: color, size: 16),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Text(
                     widget.service.labelAr,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: widget.isActive ? color : Colors.black87,
+                      color: widget.isActive ? color : core_theme.AC.tp,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   Text(
                     widget.service.descriptionAr,
-                    style: const TextStyle(fontSize: 11, color: Colors.black54),
+                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

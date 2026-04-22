@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class ProfitCentersV52Screen extends StatefulWidget {
@@ -15,8 +16,8 @@ class ProfitCentersV52Screen extends StatefulWidget {
 }
 
 class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   static const _centers = <_PC>[
     _PC('PC-1000', 'المجموعة الكلّية', null, 'عبدالله المحمد', 84500000, 62000000, 22500000, _S.profitable),
@@ -47,10 +48,10 @@ class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
         SavedView(id: 'by-region', labelAr: 'حسب المنطقة', icon: Icons.map, defaultViewMode: ViewMode.pivot),
       ],
       filterChips: [
-        FilterChipDef(id: 'star', labelAr: 'نجوم', icon: Icons.star, color: Colors.green, count: _cnt(_S.starPerformer), active: _filter == 'star'),
+        FilterChipDef(id: 'star', labelAr: 'نجوم', icon: Icons.star, color: core_theme.AC.ok, count: _cnt(_S.starPerformer), active: _filter == 'star'),
         FilterChipDef(id: 'profitable', labelAr: 'مربحة', icon: Icons.trending_up, color: _gold, count: _cnt(_S.profitable), active: _filter == 'profitable'),
-        FilterChipDef(id: 'lowMargin', labelAr: 'هامش منخفض', icon: Icons.warning, color: Colors.orange, count: _cnt(_S.lowMargin), active: _filter == 'lowMargin'),
-        FilterChipDef(id: 'loss', labelAr: 'خاسرة', icon: Icons.trending_down, color: Colors.red, count: _cnt(_S.loss), active: _filter == 'loss'),
+        FilterChipDef(id: 'lowMargin', labelAr: 'هامش منخفض', icon: Icons.warning, color: core_theme.AC.warn, count: _cnt(_S.lowMargin), active: _filter == 'lowMargin'),
+        FilterChipDef(id: 'loss', labelAr: 'خاسرة', icon: Icons.trending_down, color: core_theme.AC.err, count: _cnt(_S.loss), active: _filter == 'loss'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -83,19 +84,19 @@ class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
               Icon(depth == 0 ? Icons.business : Icons.corporate_fare, color: c.status.color, size: 20),
               const SizedBox(width: 10),
               Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(c.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(c.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 Text(c.name, style: TextStyle(fontSize: depth == 0 ? 14 : 13, fontWeight: FontWeight.w800)),
-                Text('المسؤول: ${c.manager}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('المسؤول: ${c.manager}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ])),
-              _kv('الإيراد', '${(c.revenue / 1e6).toStringAsFixed(2)}M', Colors.blue),
+              _kv('الإيراد', '${(c.revenue / 1e6).toStringAsFixed(2)}M', core_theme.AC.info),
               const SizedBox(width: 14),
-              _kv('التكلفة', '${(c.cost / 1e6).toStringAsFixed(2)}M', Colors.orange),
+              _kv('التكلفة', '${(c.cost / 1e6).toStringAsFixed(2)}M', core_theme.AC.warn),
               const SizedBox(width: 14),
-              _kv('الربح', '${(c.profit / 1e6).toStringAsFixed(2)}M', c.profit >= 0 ? Colors.green : Colors.red),
+              _kv('الربح', '${(c.profit / 1e6).toStringAsFixed(2)}M', c.profit >= 0 ? core_theme.AC.ok : core_theme.AC.err),
               const SizedBox(width: 14),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('الهامش', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-                Text('${margin.toStringAsFixed(1)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: margin >= 20 ? Colors.green : margin >= 10 ? _gold : Colors.red)),
+                Text('الهامش', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+                Text('${margin.toStringAsFixed(1)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: margin >= 20 ? core_theme.AC.ok : margin >= 10 ? _gold : core_theme.AC.err)),
               ]),
               const SizedBox(width: 14),
               Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: c.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(c.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.status.color))),
@@ -114,7 +115,7 @@ class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
 
   Widget _kv(String label, String value, Color color) {
     return Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-      Text(label, style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+      Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)),
     ]);
   }
@@ -124,10 +125,10 @@ class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('هيكل المراكز — تحليل Top-Down', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('هيكل المراكز — تحليل Top-Down', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         Expanded(child: Container(
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(children: [
             Container(padding: const EdgeInsets.all(10), color: _navy, child: const Row(children: [
               Expanded(flex: 3, child: Text('المركز', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
@@ -142,16 +143,16 @@ class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
               final isRoot = c.parent == null;
               return Container(
                 padding: EdgeInsetsDirectional.only(start: 10 + depth * 20, end: 10, top: 10, bottom: 10),
-                decoration: BoxDecoration(color: isRoot ? _gold.withOpacity(0.05) : null, border: Border(top: BorderSide(color: Colors.grey.shade200))),
+                decoration: BoxDecoration(color: isRoot ? _gold.withOpacity(0.05) : null, border: Border(top: BorderSide(color: core_theme.AC.bdr))),
                 child: Row(children: [
                   Expanded(flex: 3, child: Row(children: [
-                    if (depth > 0) Text('└ ', style: TextStyle(color: Colors.grey.shade400)),
+                    if (depth > 0) Text('└ ', style: TextStyle(color: core_theme.AC.td)),
                     Expanded(child: Text(c.name, style: TextStyle(fontSize: isRoot ? 13 : 12, fontWeight: isRoot ? FontWeight.w800 : FontWeight.w500))),
                   ])),
                   Expanded(child: Text((c.revenue / 1e6).toStringAsFixed(2), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
-                  Expanded(child: Text((c.cost / 1e6).toStringAsFixed(2), style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.orange), textAlign: TextAlign.end)),
-                  Expanded(child: Text((c.profit / 1e6).toStringAsFixed(2), style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: c.profit >= 0 ? Colors.green : Colors.red), textAlign: TextAlign.end)),
-                  Expanded(child: Text('${margin.toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: margin >= 20 ? Colors.green : margin >= 10 ? _gold : Colors.red), textAlign: TextAlign.end)),
+                  Expanded(child: Text((c.cost / 1e6).toStringAsFixed(2), style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.warn), textAlign: TextAlign.end)),
+                  Expanded(child: Text((c.profit / 1e6).toStringAsFixed(2), style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: c.profit >= 0 ? core_theme.AC.ok : core_theme.AC.err), textAlign: TextAlign.end)),
+                  Expanded(child: Text('${margin.toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: margin >= 20 ? core_theme.AC.ok : margin >= 10 ? _gold : core_theme.AC.err), textAlign: TextAlign.end)),
                 ]),
               );
             }).toList())),
@@ -168,16 +169,16 @@ class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('مقارنة الربحية (Leaves فقط)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('مقارنة الربحية (Leaves فقط)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         ...leaves.map((c) {
           final pct = c.profit.abs() / max;
           return Padding(padding: const EdgeInsets.only(bottom: 12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               SizedBox(width: 200, child: Text(c.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: pct, minHeight: 22, backgroundColor: Colors.grey.shade100, color: c.profit >= 0 ? Colors.green : Colors.red))),
+              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: pct, minHeight: 22, backgroundColor: core_theme.AC.navy3, color: c.profit >= 0 ? core_theme.AC.ok : core_theme.AC.err))),
               const SizedBox(width: 10),
-              SizedBox(width: 120, child: Text('${c.profit >= 0 ? '+' : ''}${(c.profit / 1e6).toStringAsFixed(2)}M ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: c.profit >= 0 ? Colors.green : Colors.red), textAlign: TextAlign.end)),
+              SizedBox(width: 120, child: Text('${c.profit >= 0 ? '+' : ''}${(c.profit / 1e6).toStringAsFixed(2)}M ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: c.profit >= 0 ? core_theme.AC.ok : core_theme.AC.err), textAlign: TextAlign.end)),
             ]),
           ]));
         }),
@@ -196,10 +197,10 @@ extension _SX on _S {
         _S.loss => 'خاسرة',
       };
   Color get color => switch (this) {
-        _S.starPerformer => Colors.green,
-        _S.profitable => const Color(0xFFD4AF37),
-        _S.lowMargin => Colors.orange,
-        _S.loss => Colors.red,
+        _S.starPerformer => core_theme.AC.ok,
+        _S.profitable => core_theme.AC.gold,
+        _S.lowMargin => core_theme.AC.warn,
+        _S.loss => core_theme.AC.err,
       };
 }
 

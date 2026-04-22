@@ -14,6 +14,7 @@ import 'apex_notification_bell_live.dart';
 import 'design_tokens.dart';
 import 'session.dart';
 import 'theme.dart';
+import 'theme.dart' as core_theme;
 
 /// Primary action button descriptor for the toolbar.
 class ApexToolbarAction {
@@ -64,7 +65,7 @@ class ApexStickyToolbar extends StatelessWidget {
         border: Border(bottom: BorderSide(color: AC.navy4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: core_theme.AC.tp.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 class V5ShowcaseScreen extends StatefulWidget {
@@ -56,26 +57,26 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
     return SliverAppBar(
       expandedHeight: 240,
       pinned: true,
-      backgroundColor: const Color(0xFFD4AF37),
+      backgroundColor: core_theme.AC.gold,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => context.go('/app'),
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFFD4AF37),
-                Color(0xFF7C3AED),
-                Color(0xFF2563EB),
+                core_theme.AC.gold,
+                core_theme.AC.purple,
+                core_theme.AC.info,
               ],
             ),
           ),
           padding: const EdgeInsets.fromLTRB(60, 80, 60, 24),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -97,7 +98,7 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
                     child: Text(
                       '— معرض التحسينات',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: core_theme.AC.ts,
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),
@@ -151,29 +152,29 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: active ? const Color(0xFFD4AF37) : Colors.white,
+            color: active ? core_theme.AC.gold : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: active ? const Color(0xFFD4AF37) : Colors.black.withOpacity(0.12),
+              color: active ? core_theme.AC.gold : core_theme.AC.tp.withOpacity(0.12),
             ),
           ),
           child: Row(
             children: [
-              Icon(icon, size: 14, color: active ? Colors.white : Colors.black54),
+              Icon(icon, size: 14, color: active ? Colors.white : core_theme.AC.ts),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: active ? Colors.white : Colors.black87,
+                  color: active ? Colors.white : core_theme.AC.tp,
                 ),
               ),
               const SizedBox(width: 4),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
-                  color: active ? Colors.white.withOpacity(0.25) : Colors.black.withOpacity(0.08),
+                  color: active ? Colors.white.withOpacity(0.25) : core_theme.AC.tp.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -181,7 +182,7 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    color: active ? Colors.white : Colors.black54,
+                    color: active ? Colors.white : core_theme.AC.ts,
                   ),
                 ),
               ),
@@ -198,21 +199,21 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF059669).withOpacity(0.08),
-            const Color(0xFF2563EB).withOpacity(0.08),
+            core_theme.AC.ok.withOpacity(0.08),
+            core_theme.AC.info.withOpacity(0.08),
           ],
         ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black.withOpacity(0.06)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.06)),
       ),
       child: Row(
         children: [
-          _statBlock('18', 'تحسين جاهز', const Color(0xFF2563EB)),
-          _statBlock('18', 'منصّة مُستبدَلة', const Color(0xFF7C3AED)),
-          _statBlock('7', 'Wave backend مدمج', const Color(0xFF059669)),
-          _statBlock('70', 'chip في V5', const Color(0xFFD97706)),
-          _statBlock('~\$400K', 'قيمة سنوية', const Color(0xFFD4AF37)),
-          _statBlock('0', 'errors', const Color(0xFF059669)),
+          _statBlock('18', 'تحسين جاهز', core_theme.AC.info),
+          _statBlock('18', 'منصّة مُستبدَلة', core_theme.AC.purple),
+          _statBlock('7', 'Wave backend مدمج', core_theme.AC.ok),
+          _statBlock('70', 'chip في V5', core_theme.AC.warn),
+          _statBlock('~\$400K', 'قيمة سنوية', core_theme.AC.gold),
+          _statBlock('0', 'errors', core_theme.AC.ok),
         ],
       ),
     );
@@ -232,7 +233,7 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
           ),
           Text(
             label,
-            style: const TextStyle(fontSize: 11, color: Colors.black54),
+            style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
           ),
         ],
       ),
@@ -268,14 +269,14 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.swap_horiz, color: Color(0xFF7C3AED), size: 20),
+              Icon(Icons.swap_horiz, color: core_theme.AC.purple, size: 20),
               SizedBox(width: 8),
               Text(
                 'المنصّات المُستبدَلة — قيمة سنوية مُدمجة',
@@ -310,21 +311,21 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
                       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
                     ),
                   ),
-                  const Icon(Icons.arrow_back, size: 14, color: Colors.black38),
+                  Icon(Icons.arrow_back, size: 14, color: core_theme.AC.td),
                   const SizedBox(width: 8),
                   Expanded(
                     flex: 2,
                     child: Text(
                       item.replaces!,
-                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                     ),
                   ),
                   Text(
                     item.value ?? '',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF059669),
+                      color: core_theme.AC.ok,
                       fontFamily: 'monospace',
                     ),
                   ),
@@ -335,8 +336,8 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFD4AF37), Color(0xFFE6C200)],
+              gradient: LinearGradient(
+                colors: [core_theme.AC.gold, Color(0xFFE6C200)],
               ),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -366,9 +367,9 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
     return Center(
       child: Column(
         children: [
-          const Icon(Icons.bolt, size: 32, color: Color(0xFFD4AF37)),
+          Icon(Icons.bolt, size: 32, color: core_theme.AC.gold),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'APEX V5.1 POC · أفضل منصّة مالية عربية في العالم',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
           ),
@@ -377,7 +378,7 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
             'Branch: poc/v5-1-shell · 18/20 enhancements · 0 errors',
             style: TextStyle(
               fontSize: 11,
-              color: Colors.black54,
+              color: core_theme.AC.ts,
               fontFamily: 'monospace',
             ),
           ),
@@ -422,7 +423,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Workspaces',
     descAr: 'تجميع اختصارات بالدور — CFO / محاسب / مراجع / مستشار',
     icon: Icons.person_pin,
-    color: const Color(0xFFD4AF37),
+    color: core_theme.AC.gold,
     route: '/workspace/cfo',
     category: 'ux',
     replaces: 'SAP Fiori Spaces',
@@ -434,7 +435,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Action Dashboards',
     descAr: '"5 فواتير متأخرة [أرسل تذكير]" بدل KPIs ساكنة',
     icon: Icons.dashboard,
-    color: const Color(0xFFD4AF37),
+    color: core_theme.AC.gold,
     route: '/app/erp/finance/dashboard',
     category: 'ux',
     replaces: 'QuickBooks + Xero',
@@ -446,7 +447,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Multiple Views',
     descAr: 'قائمة / Kanban / تقويم / معرض / محوري — لنفس البيانات',
     icon: Icons.view_quilt,
-    color: const Color(0xFF7C3AED),
+    color: core_theme.AC.purple,
     route: '/app/erp/finance/invoices',
     category: 'ux',
     replaces: 'Notion + Odoo',
@@ -458,7 +459,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Find & Recode',
     descAr: 'اختر 100 قيد — عدّلهم جماعياً بعملية واحدة',
     icon: Icons.swap_horiz,
-    color: const Color(0xFFD4AF37),
+    color: core_theme.AC.gold,
     route: '/app/erp/finance/invoices',
     category: 'accounting',
     replaces: 'Xero Find & Recode',
@@ -482,7 +483,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Undo Everywhere',
     descAr: 'Cmd+Z عالمي + toast "تم · [تراجع]" لكل عملية',
     icon: Icons.undo,
-    color: const Color(0xFF2563EB),
+    color: core_theme.AC.info,
     route: '/app/erp/treasury/recon',
     category: 'ux',
     replaces: 'Superhuman + Linear',
@@ -494,7 +495,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Onboarding Journey',
     descAr: '10 خطوات مع progress bar + شهر مجاني 🎁 عند الاكتمال',
     icon: Icons.rocket_launch,
-    color: const Color(0xFF7C3AED),
+    color: core_theme.AC.purple,
     route: '/app/erp/finance/onboarding',
     category: 'ux',
     replaces: 'QuickBooks onboarding',
@@ -518,7 +519,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Real-time GCC Tax',
     descAr: '6 دول · VAT + WHT + Zakat + الطوابع + البلدية · شرح عربي',
     icon: Icons.calculate,
-    color: const Color(0xFF059669),
+    color: core_theme.AC.ok,
     route: '/app/compliance/tax/vat',
     category: 'tax',
     worldFirst: true,
@@ -531,7 +532,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'APEX Studio',
     descAr: 'مصمّم بدون كود — حقول + Workflow + Approvals',
     icon: Icons.architecture,
-    color: const Color(0xFF7C3AED),
+    color: core_theme.AC.purple,
     route: '/app/erp/finance/gl',
     category: 'ux',
     replaces: 'Odoo Studio + SF LAB',
@@ -543,7 +544,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Client Portal',
     descAr: 'عميلك يرى فواتيره + يدفع مباشرة — 70% أقل emails',
     icon: Icons.account_circle,
-    color: const Color(0xFFD4AF37),
+    color: core_theme.AC.gold,
     route: '/app/erp/finance/reports',
     category: 'accounting',
     replaces: 'Freshbooks portal',
@@ -555,7 +556,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'News Ticker',
     descAr: 'ZATCA + FTA + GOSI + SAMA — تحديثات حيّة في التوبار',
     icon: Icons.campaign,
-    color: const Color(0xFF2563EB),
+    color: core_theme.AC.info,
     route: '/app/erp/finance/dashboard',
     category: 'ux',
     replaces: 'Bloomberg Terminal',
@@ -603,7 +604,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Keyboard Shortcuts',
     descAr: 'Alt+1..5 للخدمات · Ctrl+Z عالمي · Ctrl+K للبحث',
     icon: Icons.keyboard,
-    color: const Color(0xFF2563EB),
+    color: core_theme.AC.info,
     route: '/app',
     category: 'ux',
     replaces: 'Linear + Vim',
@@ -615,7 +616,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'Mobile Receipt',
     descAr: 'صوّر → AI تستخرج كل شيء في 3 ثواني',
     icon: Icons.camera_alt,
-    color: const Color(0xFF059669),
+    color: core_theme.AC.ok,
     route: '/app/erp/finance/consolidation',
     category: 'ai',
     replaces: 'Expensify',
@@ -627,7 +628,7 @@ final _items = <_ShowcaseItem>[
     nameEn: 'AI Bank Reconciliation',
     descAr: 'اقتراحات مع confidence % + approve/reject + Undo',
     icon: Icons.compare_arrows,
-    color: const Color(0xFFD4AF37),
+    color: core_theme.AC.gold,
     route: '/app/erp/treasury/recon',
     category: 'ai',
     replaces: 'Xero Auto-Match',
@@ -675,7 +676,7 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: core_theme.AC.tp.withOpacity(0.04),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -698,15 +699,15 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.04),
+                      color: core_theme.AC.tp.withOpacity(0.04),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       '#${widget.item.number}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: Colors.black54,
+                        color: core_theme.AC.ts,
                         fontFamily: 'monospace',
                       ),
                     ),
@@ -716,7 +717,7 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4AF37),
+                        color: core_theme.AC.gold,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Row(
@@ -748,7 +749,7 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
               const SizedBox(height: 4),
               Text(
                 widget.item.descAr,
-                style: const TextStyle(fontSize: 12, color: Colors.black54),
+                style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -757,19 +758,19 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF059669).withOpacity(0.08),
+                    color: core_theme.AC.ok.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.swap_horiz, size: 11, color: Color(0xFF059669)),
+                      Icon(Icons.swap_horiz, size: 11, color: core_theme.AC.ok),
                       const SizedBox(width: 4),
                       Text(
                         'يستبدل ${widget.item.replaces}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
-                          color: Color(0xFF059669),
+                          color: core_theme.AC.ok,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -778,7 +779,7 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF059669),
+                            color: core_theme.AC.ok,
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(
@@ -800,16 +801,16 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                 children: [
                   Text(
                     widget.item.route,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: Colors.black38,
+                      color: core_theme.AC.td,
                       fontFamily: 'monospace',
                     ),
                   ),
                   const Spacer(),
                   Icon(Icons.arrow_back,
                       size: 14,
-                      color: _hover ? widget.item.color : Colors.black38),
+                      color: _hover ? widget.item.color : core_theme.AC.td),
                 ],
               ),
             ],

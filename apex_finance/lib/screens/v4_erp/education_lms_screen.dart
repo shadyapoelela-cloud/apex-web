@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 123 — Education / School SIS (Student Information System)
 class EducationLmsScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _EducationLmsScreenState extends State<EducationLmsScreen> with SingleTick
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الطلاب'), Tab(text: 'المعلمون'), Tab(text: 'الرسوم'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_studentsTab(), _teachersTab(), _feesTab(), _analyticsTab()])),
       ])),
@@ -35,10 +36,10 @@ class _EducationLmsScreenState extends State<EducationLmsScreen> with SingleTick
       Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.school, color: Color(0xFF0D47A1), size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('نظام إدارة المدارس SIS', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('طلاب، درجات، حضور، رسوم — متوافق مع نظام نور', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('طلاب، درجات، حضور، رسوم — متوافق مع نظام نور', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -58,7 +59,7 @@ class _EducationLmsScreenState extends State<EducationLmsScreen> with SingleTick
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -89,7 +90,7 @@ class _EducationLmsScreenState extends State<EducationLmsScreen> with SingleTick
       title: Text(t.name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text('${t.subject} • ${t.classes} صف • ${t.students} طالب', style: const TextStyle(fontSize: 11)),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.star, color: Color(0xFFD4AF37), size: 16),
+        Icon(Icons.star, color: core_theme.AC.gold, size: 16),
         Text(' ${t.rating}', style: const TextStyle(fontWeight: FontWeight.bold)),
       ]),
     ));
@@ -113,7 +114,7 @@ class _EducationLmsScreenState extends State<EducationLmsScreen> with SingleTick
 
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('📚 المعدل العام', '84.2% — ارتفاع 3.2% عن العام السابق', const Color(0xFF2E7D32)),
-    _insight('👨‍🎓 معدل الحضور', '94% — الهدف 95%', const Color(0xFFD4AF37)),
+    _insight('👨‍🎓 معدل الحضور', '94% — الهدف 95%', core_theme.AC.gold),
     _insight('💰 تحصيل الرسوم', '87% — متوسط تأخر 12 يوم', const Color(0xFFE65100)),
     _insight('⭐ تقييم المعلمين', '4.6/5 متوسط تقييمات الأهالي', const Color(0xFF4A148C)),
     _insight('📖 المادة الأقوى', 'الرياضيات 88% • العلوم 85% • اللغة العربية 90%', const Color(0xFF0D47A1)),
@@ -123,12 +124,12 @@ class _EducationLmsScreenState extends State<EducationLmsScreen> with SingleTick
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _gpaColor(int s) {
     if (s >= 90) return const Color(0xFF2E7D32);
-    if (s >= 75) return const Color(0xFFD4AF37);
+    if (s >= 75) return core_theme.AC.gold;
     if (s >= 60) return const Color(0xFFE65100);
     return const Color(0xFFC62828);
   }
@@ -137,7 +138,7 @@ class _EducationLmsScreenState extends State<EducationLmsScreen> with SingleTick
     if (s.contains('مدفوع')) return const Color(0xFF2E7D32);
     if (s.contains('جزئي')) return const Color(0xFFE65100);
     if (s.contains('متأخر')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Student> _students = [

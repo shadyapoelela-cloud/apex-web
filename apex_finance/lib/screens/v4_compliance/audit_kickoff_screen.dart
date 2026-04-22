@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class AuditKickoffScreen extends StatefulWidget {
   const AuditKickoffScreen({super.key});
@@ -36,7 +37,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
         TabBar(
           controller: _tab,
           labelColor: const Color(0xFF4A148C),
-          unselectedLabelColor: Colors.black54,
+          unselectedLabelColor: core_theme.AC.ts,
           indicatorColor: const Color(0xFF4A148C),
           tabs: const [
             Tab(icon: Icon(Icons.groups, size: 16), text: 'فريق الارتباط'),
@@ -68,7 +69,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
         gradient: const LinearGradient(colors: [Color(0xFF4A148C), Color(0xFF7B1FA2)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.rocket_launch, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -79,7 +80,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                 Text('بدء الارتباط — NEOM Company',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('تشكيل الفريق · اجتماع البدء · قائمة مطلوبات أوّلية · توزيع صلاحيات النظام',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -107,18 +108,18 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFFD4AF37), Color(0xFFE6C200)]),
+            gradient: LinearGradient(colors: [core_theme.AC.gold, Color(0xFFE6C200)]),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
               const Icon(Icons.groups, color: Colors.white, size: 32),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('فريق متخصص ومتنوع', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    Text('فريق متخصص ومتنوع', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                     Text('9 أعضاء · 4 مستويات · 2 تخصص نوعي',
                         style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
                   ],
@@ -126,7 +127,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
               ),
               Text('$totalHours',
                   style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
-              const Text(' ساعة', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(' ساعة', style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
             ],
           ),
         ),
@@ -138,7 +139,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Row(
               children: [
@@ -154,18 +155,18 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                     children: [
                       Row(
                         children: [
-                          Text(m.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                          Text(m.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                           const SizedBox(width: 8),
                           Text(m.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                         ],
                       ),
-                      Text(m.role, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                      Text(m.role, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
                     ],
                   ),
                 ),
-                _metric('الخبرة', '${m.experience} سنة', Colors.blue),
+                _metric('الخبرة', '${m.experience} سنة', core_theme.AC.info),
                 const SizedBox(width: 8),
-                _metric('الساعات', '${m.hours}', const Color(0xFFD4AF37)),
+                _metric('الساعات', '${m.hours}', core_theme.AC.gold),
               ],
             ),
           ),
@@ -176,7 +177,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
   Widget _metric(String label, String value, Color color) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color, fontFamily: 'monospace')),
       ],
     );
@@ -204,7 +205,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,11 +221,11 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.15),
+                      color: core_theme.AC.warn.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text('قادم بعد 3 أيام',
-                        style: TextStyle(fontSize: 11, color: Colors.orange, fontWeight: FontWeight.w800)),
+                    child: Text('قادم بعد 3 أيام',
+                        style: TextStyle(fontSize: 11, color: core_theme.AC.warn, fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -241,7 +242,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
           ),
         ),
         const SizedBox(height: 20),
-        const Text('جدول الأعمال', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+        Text('جدول الأعمال', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 10),
         for (final a in agenda)
           Container(
@@ -250,7 +251,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Row(
               children: [
@@ -272,12 +273,12 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                     children: [
                       Text(a.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                       if (a.detail.isNotEmpty)
-                        Text(a.detail, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.4)),
+                        Text(a.detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.4)),
                     ],
                   ),
                 ),
                 Text('${a.mins} د',
-                    style: const TextStyle(fontSize: 12, color: Colors.black54, fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -291,7 +292,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: core_theme.AC.navy3,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -302,7 +303,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
                 ],
               ),
@@ -337,7 +338,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black12),
+            border: Border.all(color: core_theme.AC.bdr),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,14 +350,14 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                   ),
                   Text('$received / ${items.length} مستلم',
-                      style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w700)),
+                      style: TextStyle(fontSize: 12, color: core_theme.AC.ts, fontWeight: FontWeight.w700)),
                 ],
               ),
               const SizedBox(height: 10),
               LinearProgressIndicator(
                 value: received / items.length,
-                backgroundColor: Colors.grey.shade200,
-                valueColor: const AlwaysStoppedAnimation(Color(0xFFD4AF37)),
+                backgroundColor: core_theme.AC.bdr,
+                valueColor: AlwaysStoppedAnimation(core_theme.AC.gold),
                 minHeight: 8,
               ),
             ],
@@ -370,7 +371,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Row(
               children: [
@@ -380,13 +381,13 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.08),
+                    color: core_theme.AC.info.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text(i.category, style: const TextStyle(fontSize: 10, color: Colors.blue)),
+                  child: Text(i.category, style: TextStyle(fontSize: 10, color: core_theme.AC.info)),
                 ),
                 const SizedBox(width: 10),
-                Text(i.dueDate, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                Text(i.dueDate, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                 const SizedBox(width: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -408,13 +409,13 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: core_theme.AC.info,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.blue.shade200),
+            border: Border.all(color: core_theme.AC.info),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue),
+              Icon(Icons.info, color: core_theme.AC.info),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -444,13 +445,13 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.amber.shade50,
+            color: core_theme.AC.warn,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.amber.shade200),
+            border: Border.all(color: core_theme.AC.warn),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.lock, color: Colors.amber),
+              Icon(Icons.lock, color: core_theme.AC.warn),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -469,7 +470,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: core_theme.AC.bdr),
             ),
             child: Row(
               children: [
@@ -477,11 +478,11 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: (s.granted ? Colors.green : Colors.orange).withOpacity(0.12),
+                    color: (s.granted ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(s.granted ? Icons.lock_open : Icons.lock_outline,
-                      color: s.granted ? Colors.green : Colors.orange),
+                      color: s.granted ? core_theme.AC.ok : core_theme.AC.warn),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -489,21 +490,21 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(s.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                      Text(s.description, style: const TextStyle(fontSize: 11, color: Colors.black54)),
-                      Text(s.scope, style: const TextStyle(fontSize: 11, color: Colors.black87, height: 1.4)),
+                      Text(s.description, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
+                      Text(s.scope, style: TextStyle(fontSize: 11, color: core_theme.AC.tp, height: 1.4)),
                     ],
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: (s.granted ? Colors.green : Colors.orange).withOpacity(0.15),
+                    color: (s.granted ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(s.granted ? 'ممنوح' : 'قيد المعالجة',
                       style: TextStyle(
                         fontSize: 11,
-                        color: s.granted ? Colors.green : Colors.orange,
+                        color: s.granted ? core_theme.AC.ok : core_theme.AC.warn,
                         fontWeight: FontWeight.w800,
                       )),
                 ),
@@ -516,11 +517,11 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
 
   Color _roleColor(String role) {
     if (role.contains('الشريك')) return const Color(0xFF4A148C);
-    if (role.contains('مدير')) return Colors.blue;
-    if (role.contains('مراجع أول')) return Colors.teal;
-    if (role.contains('أخصائي')) return Colors.orange;
-    if (role.contains('متدرب')) return Colors.grey;
-    return Colors.indigo;
+    if (role.contains('مدير')) return core_theme.AC.info;
+    if (role.contains('مراجع أول')) return core_theme.AC.info;
+    if (role.contains('أخصائي')) return core_theme.AC.warn;
+    if (role.contains('متدرب')) return core_theme.AC.td;
+    return core_theme.AC.purple;
   }
 
   IconData _roleIcon(String role) {
@@ -546,11 +547,11 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
   Color _pblStatusColor(String s) {
     switch (s) {
       case 'مستلم':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'قيد الإعداد':
-        return Colors.orange;
+        return core_theme.AC.warn;
       default:
-        return Colors.blue;
+        return core_theme.AC.info;
     }
   }
 }

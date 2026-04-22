@@ -33,7 +33,7 @@ class Breakpoint {
   });
 }
 
-const List<Breakpoint> kBreakpoints = [
+final List<Breakpoint> kBreakpoints = [
   Breakpoint(
       label: '375 × 812',
       deviceClass: 'Mobile — iPhone 13',

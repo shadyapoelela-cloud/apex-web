@@ -2,14 +2,15 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/object_page_template.dart';
 
 class WorkpapersV52Screen extends StatelessWidget {
   const WorkpapersV52Screen({super.key});
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
-  static const _purple = Color(0xFF4A148C);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
+  static final _purple = Color(0xFF4A148C);
 
   @override
   Widget build(BuildContext context) {
@@ -26,17 +27,17 @@ class WorkpapersV52Screen extends StatelessWidget {
         ProcessStage(labelAr: 'مؤرشف'),
       ],
       processCurrentIndex: 2,
-      smartButtons: const [
+      smartButtons: [
         SmartButton(icon: Icons.description, labelAr: 'إجراء اختبار', count: 8, color: _gold),
         SmartButton(icon: Icons.attach_file, labelAr: 'دليل', count: 14, color: _navy),
-        SmartButton(icon: Icons.comment, labelAr: 'ملاحظة', count: 6, color: Colors.blue),
-        SmartButton(icon: Icons.warning, labelAr: 'مشكلة', count: 2, color: Colors.orange),
-        SmartButton(icon: Icons.link, labelAr: 'رابط قيد', count: 12, color: Colors.green),
+        SmartButton(icon: Icons.comment, labelAr: 'ملاحظة', count: 6, color: core_theme.AC.info),
+        SmartButton(icon: Icons.warning, labelAr: 'مشكلة', count: 2, color: core_theme.AC.warn),
+        SmartButton(icon: Icons.link, labelAr: 'رابط قيد', count: 12, color: core_theme.AC.ok),
       ],
       primaryActions: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.print, size: 16), label: const Text('طباعة')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.print, size: 16), label: Text('طباعة')),
         const SizedBox(width: 8),
-        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _purple), icon: const Icon(Icons.check, size: 16), label: const Text('إنهاء المراجعة')),
+        FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _purple), icon: const Icon(Icons.check, size: 16), label: Text('إنهاء المراجعة')),
       ],
       tabs: [
         ObjectPageTab(id: 'overview', labelAr: 'معلومات الورقة', icon: Icons.dashboard, builder: (_) => _overview()),
@@ -80,11 +81,11 @@ class WorkpapersV52Screen extends StatelessWidget {
         ])),
         const SizedBox(height: 16),
         _card('ملخّص النتائج', Column(children: [
-          _summaryRow('عدد الإجراءات', '8', '8 مكتمل', Colors.green),
-          _summaryRow('الأدلة المجمّعة', '14 ملف', 'جميعها مقبولة', Colors.green),
-          _summaryRow('القضايا المكتشفة', '2 قضية', '1 جوهرية · 1 غير جوهرية', Colors.orange),
+          _summaryRow('عدد الإجراءات', '8', '8 مكتمل', core_theme.AC.ok),
+          _summaryRow('الأدلة المجمّعة', '14 ملف', 'جميعها مقبولة', core_theme.AC.ok),
+          _summaryRow('القضايا المكتشفة', '2 قضية', '1 جوهرية · 1 غير جوهرية', core_theme.AC.warn),
           _summaryRow('التعديلات المقترحة', '1 قيد', '45K ر.س', _gold),
-          _summaryRow('مستوى الثقة', '92%', 'يسمح بإبداء الرأي', Colors.green),
+          _summaryRow('مستوى الثقة', '92%', 'يسمح بإبداء الرأي', core_theme.AC.ok),
         ])),
       ]),
     );
@@ -107,19 +108,19 @@ class WorkpapersV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: procs[i].$4 ? Colors.green.withOpacity(0.3) : Colors.orange.withOpacity(0.3))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: procs[i].$4 ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.warn.withOpacity(0.3))),
         child: Row(children: [
-          Icon(procs[i].$4 ? Icons.check_circle : Icons.pending, color: procs[i].$4 ? Colors.green : Colors.orange),
+          Icon(procs[i].$4 ? Icons.check_circle : Icons.pending, color: procs[i].$4 ? core_theme.AC.ok : core_theme.AC.warn),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Text(procs[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+              Text(procs[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _purple.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(procs[i].$3, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: _purple))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _purple.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(procs[i].$3, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: _purple))),
             ]),
             Text(procs[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
           ])),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (procs[i].$4 ? Colors.green : Colors.orange).withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(procs[i].$5, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: procs[i].$4 ? Colors.green : Colors.orange))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (procs[i].$4 ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(procs[i].$5, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: procs[i].$4 ? core_theme.AC.ok : core_theme.AC.warn))),
         ]),
       ),
     );
@@ -129,12 +130,12 @@ class WorkpapersV52Screen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('ربط ميزان المراجعة (Trial Balance Tie-Out)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('ربط ميزان المراجعة (Trial Balance Tie-Out)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 4),
-        const Text('التحقق من مطابقة الأرصدة بين ورقة العمل والميزان', style: TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('التحقق من مطابقة الأرصدة بين ورقة العمل والميزان', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 16),
         Container(
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(children: [
             Container(padding: const EdgeInsets.all(10), color: _navy, child: const Row(children: [
               Expanded(flex: 2, child: Text('الحساب', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
@@ -145,13 +146,13 @@ class WorkpapersV52Screen extends StatelessWidget {
             ])),
             ..._tieoutRows().map((r) => Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey.shade200))),
+                  decoration: BoxDecoration(border: Border(top: BorderSide(color: core_theme.AC.bdr))),
                   child: Row(children: [
                     Expanded(flex: 2, child: Text(r.$1, style: const TextStyle(fontSize: 12, fontFamily: 'monospace'))),
                     Expanded(child: Text(r.$2, style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
                     Expanded(child: Text(r.$3, style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
-                    Expanded(child: Text(r.$4, style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: r.$4 == '0' ? Colors.green : Colors.red, fontWeight: FontWeight.w800), textAlign: TextAlign.end)),
-                    Expanded(child: Align(alignment: Alignment.centerLeft, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: (r.$4 == '0' ? Colors.green : Colors.orange).withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(r.$4 == '0' ? '✓ متطابق' : 'تسوية مطلوبة', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: r.$4 == '0' ? Colors.green : Colors.orange))))),
+                    Expanded(child: Text(r.$4, style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: r.$4 == '0' ? core_theme.AC.ok : core_theme.AC.err, fontWeight: FontWeight.w800), textAlign: TextAlign.end)),
+                    Expanded(child: Align(alignment: Alignment.centerLeft, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: (r.$4 == '0' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(r.$4 == '0' ? '✓ متطابق' : 'تسوية مطلوبة', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: r.$4 == '0' ? core_theme.AC.ok : core_theme.AC.warn))))),
                   ]),
                 )),
           ]),
@@ -169,15 +170,15 @@ class WorkpapersV52Screen extends StatelessWidget {
       ];
 
   Widget _evidence() {
-    const docs = [
-      ('BANK-CONF-001', 'مصادقة بنك الرياض', 'PDF', '4.2 MB', true, Colors.red),
-      ('BANK-CONF-002', 'مصادقة بنك الراجحي', 'PDF', '3.8 MB', true, Colors.red),
-      ('BANK-CONF-003', 'مصادقة بنك الأهلي', 'PDF', '4.1 MB', true, Colors.red),
-      ('BANK-CONF-004', 'مصادقة بنك HSBC', 'PDF', '3.9 MB', true, Colors.red),
-      ('BANK-REC-001', 'تسوية بنكية ديسمبر', 'Excel', '240 KB', true, Colors.green),
-      ('GL-EXTRACT', 'مستخرج دفتر الأستاذ', 'Excel', '1.8 MB', true, Colors.green),
-      ('POLICY-CASH', 'سياسة النقدية للعميل', 'PDF', '890 KB', true, Colors.red),
-      ('CUTOFF-TEST', 'نتائج اختبار القطع الزمني', 'Excel', '420 KB', true, Colors.green),
+    final docs = [
+      ('BANK-CONF-001', 'مصادقة بنك الرياض', 'PDF', '4.2 MB', true, core_theme.AC.err),
+      ('BANK-CONF-002', 'مصادقة بنك الراجحي', 'PDF', '3.8 MB', true, core_theme.AC.err),
+      ('BANK-CONF-003', 'مصادقة بنك الأهلي', 'PDF', '4.1 MB', true, core_theme.AC.err),
+      ('BANK-CONF-004', 'مصادقة بنك HSBC', 'PDF', '3.9 MB', true, core_theme.AC.err),
+      ('BANK-REC-001', 'تسوية بنكية ديسمبر', 'Excel', '240 KB', true, core_theme.AC.ok),
+      ('GL-EXTRACT', 'مستخرج دفتر الأستاذ', 'Excel', '1.8 MB', true, core_theme.AC.ok),
+      ('POLICY-CASH', 'سياسة النقدية للعميل', 'PDF', '890 KB', true, core_theme.AC.err),
+      ('CUTOFF-TEST', 'نتائج اختبار القطع الزمني', 'Excel', '420 KB', true, core_theme.AC.ok),
     ];
     return ListView.separated(
       padding: const EdgeInsets.all(24),
@@ -185,15 +186,15 @@ class WorkpapersV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(children: [
           Icon(Icons.insert_drive_file, color: docs[i].$6),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(docs[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+            Text(docs[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
             Text(docs[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
           ])),
-          Text('${docs[i].$3} · ${docs[i].$4}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('${docs[i].$3} · ${docs[i].$4}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(width: 12),
           IconButton(icon: const Icon(Icons.visibility, size: 18), onPressed: () {}),
           IconButton(icon: const Icon(Icons.download, size: 18), onPressed: () {}),
@@ -203,9 +204,9 @@ class WorkpapersV52Screen extends StatelessWidget {
   }
 
   Widget _findings() {
-    const findings = [
-      ('F-001', 'فرق 45,000 ر.س في مصادقة بنك HSBC', 'جوهرية', Colors.orange, 'يتطلب تسوية عبر قيد تعديلي قبل الإقفال'),
-      ('F-002', 'قيد ليلي في 2025-12-31 بقيمة 45K الساعة 23:47', 'غير جوهرية', Colors.blue, 'تم التحقق — معاملة مشروعة لتحويل بنكي'),
+    final findings = [
+      ('F-001', 'فرق 45,000 ر.س في مصادقة بنك HSBC', 'جوهرية', core_theme.AC.warn, 'يتطلب تسوية عبر قيد تعديلي قبل الإقفال'),
+      ('F-002', 'قيد ليلي في 2025-12-31 بقيمة 45K الساعة 23:47', 'غير جوهرية', core_theme.AC.info, 'تم التحقق — معاملة مشروعة لتحويل بنكي'),
     ];
     return ListView.separated(
       padding: const EdgeInsets.all(24),
@@ -225,7 +226,7 @@ class WorkpapersV52Screen extends StatelessWidget {
           const SizedBox(height: 6),
           Text(findings[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          Text(findings[i].$5, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.5)),
+          Text(findings[i].$5, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.5)),
         ]),
       ),
     );
@@ -237,8 +238,8 @@ class WorkpapersV52Screen extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withOpacity(0.06), Colors.green.withOpacity(0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
-          child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withOpacity(0.06), core_theme.AC.ok.withOpacity(0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [Icon(Icons.done_all, color: _purple), SizedBox(width: 8), Text('خلاصة ورقة العمل', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _purple))]),
             SizedBox(height: 12),
             Text(
@@ -256,24 +257,24 @@ class WorkpapersV52Screen extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Row(children: [
-          Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.edit), label: const Text('تعديل الخلاصة'))),
+          Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.edit), label: Text('تعديل الخلاصة'))),
           const SizedBox(width: 10),
-          Expanded(child: FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _purple), icon: const Icon(Icons.check_circle), label: const Text('اعتماد الخلاصة'))),
+          Expanded(child: FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _purple), icon: const Icon(Icons.check_circle), label: Text('اعتماد الخلاصة'))),
         ]),
       ]),
     );
   }
 
-  Widget _card(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]));
+  Widget _card(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)), const SizedBox(height: 12), child]));
 
-  Widget _kv(String k, String v) => SizedBox(width: 200, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: const TextStyle(fontSize: 11, color: Colors.black54)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
+  Widget _kv(String k, String v) => SizedBox(width: 200, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
 
-  Widget _bullet(String text) => Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [const Icon(Icons.check_circle_outline, size: 14, color: _purple), const SizedBox(width: 8), Expanded(child: Text(text, style: const TextStyle(fontSize: 12, height: 1.5)))]));
+  Widget _bullet(String text) => Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Icon(Icons.check_circle_outline, size: 14, color: _purple), const SizedBox(width: 8), Expanded(child: Text(text, style: const TextStyle(fontSize: 12, height: 1.5)))]));
 
   Widget _summaryRow(String label, String value, String sub, Color color) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54))),
+        Expanded(child: Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
         Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color))),
         const SizedBox(width: 10),
-        Text(sub, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text(sub, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]));
 }

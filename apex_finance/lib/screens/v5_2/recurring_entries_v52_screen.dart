@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class RecurringEntriesV52Screen extends StatefulWidget {
@@ -12,8 +13,8 @@ class RecurringEntriesV52Screen extends StatefulWidget {
 }
 
 class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
   String _filter = '';
 
   static const _rules = <_RR>[
@@ -45,11 +46,11 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
         SavedView(id: 'high-value', labelAr: 'عالية القيمة >100K', icon: Icons.star, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'monthly', labelAr: 'شهري', color: Colors.blue, count: _rules.where((r) => r.freq == _Freq.monthly).length, active: _filter == 'monthly'),
+        FilterChipDef(id: 'monthly', labelAr: 'شهري', color: core_theme.AC.info, count: _rules.where((r) => r.freq == _Freq.monthly).length, active: _filter == 'monthly'),
         FilterChipDef(id: 'quarterly', labelAr: 'ربع سنوي', color: _gold, count: _rules.where((r) => r.freq == _Freq.quarterly).length, active: _filter == 'quarterly'),
-        FilterChipDef(id: 'yearly', labelAr: 'سنوي', color: Colors.purple, count: _rules.where((r) => r.freq == _Freq.yearly).length, active: _filter == 'yearly'),
-        FilterChipDef(id: 'active', labelAr: 'نشطة', color: Colors.green, count: _cnt(_S.active), active: _filter == 'active'),
-        FilterChipDef(id: 'paused', labelAr: 'متوقفة', color: Colors.orange, count: _cnt(_S.paused), active: _filter == 'paused'),
+        FilterChipDef(id: 'yearly', labelAr: 'سنوي', color: core_theme.AC.purple, count: _rules.where((r) => r.freq == _Freq.yearly).length, active: _filter == 'yearly'),
+        FilterChipDef(id: 'active', labelAr: 'نشطة', color: core_theme.AC.ok, count: _cnt(_S.active), active: _filter == 'active'),
+        FilterChipDef(id: 'paused', labelAr: 'متوقفة', color: core_theme.AC.warn, count: _cnt(_S.paused), active: _filter == 'paused'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
@@ -87,34 +88,34 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(r.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(r.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
                 Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: r.freq.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(r.freq.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: r.freq.color))),
               ]),
               Text(r.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-              Text('المسؤول: ${r.owner}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+              Text('المسؤول: ${r.owner}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text('المبلغ', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-              Text('${(r.amount / 1000).toStringAsFixed(0)}K', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _gold)),
+              Text('المبلغ', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+              Text('${(r.amount / 1000).toStringAsFixed(0)}K', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _gold)),
             ]),
             const SizedBox(width: 20),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('الاستحقاق التالي', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+              Text('الاستحقاق التالي', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               Text(r.nextRun, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             ]),
             const SizedBox(width: 20),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('الإحصائيات', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+              Text('الإحصائيات', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               Row(children: [
-                Icon(Icons.check_circle, size: 12, color: Colors.green),
+                Icon(Icons.check_circle, size: 12, color: core_theme.AC.ok),
                 const SizedBox(width: 2),
                 Text('${r.runsDone}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                 if (r.runsLeft > 0) ...[
                   const SizedBox(width: 6),
-                  Icon(Icons.schedule, size: 12, color: Colors.grey.shade500),
+                  Icon(Icons.schedule, size: 12, color: core_theme.AC.td),
                   const SizedBox(width: 2),
-                  Text('${r.runsLeft}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text('${r.runsLeft}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ],
               ]),
             ]),
@@ -122,7 +123,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
             Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(r.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.status.color))),
             const SizedBox(width: 8),
             IconButton(
-              icon: Icon(r.status == _S.active ? Icons.pause : Icons.play_arrow, size: 18, color: r.status == _S.active ? Colors.orange : Colors.green),
+              icon: Icon(r.status == _S.active ? Icons.pause : Icons.play_arrow, size: 18, color: r.status == _S.active ? core_theme.AC.warn : core_theme.AC.ok),
               onPressed: () {},
               tooltip: r.status == _S.active ? 'إيقاف مؤقت' : 'تفعيل',
             ),
@@ -136,7 +137,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('جدول الاستحقاقات القادمة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('جدول الاستحقاقات القادمة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 16),
         Expanded(
           child: ListView(children: [
@@ -144,14 +145,14 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
                 child: Row(children: [
                   Container(
                     width: 56, padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(color: r.freq.color.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
                     child: Column(children: [
                       Text(r.nextRun.substring(8), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: r.freq.color)),
-                      Text(r.nextRun.substring(5, 7), style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text(r.nextRun.substring(5, 7), style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     ]),
                   ),
                   const SizedBox(width: 14),
@@ -160,10 +161,10 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
                     Row(children: [
                       Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: r.freq.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(r.freq.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: r.freq.color))),
                       const SizedBox(width: 6),
-                      Text(r.owner, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text(r.owner, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     ]),
                   ])),
-                  Text('${(r.amount / 1000).toStringAsFixed(0)}K ر.س', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: _gold)),
+                  Text('${(r.amount / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: _gold)),
                 ]),
               );
             }),
@@ -178,7 +179,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('توزيع القيم حسب التكرار', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توزيع القيم حسب التكرار', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         ...freqs.map((f) {
           final rules = _rules.where((r) => r.freq == f && r.status == _S.active).toList();
@@ -192,16 +193,16 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(f.labelAr, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                Text('${rules.length} قاعدة نشطة', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                Text('${rules.length} قاعدة نشطة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               ])),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('كل تشغيل', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                Text('كل تشغيل', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                 Text('${(total / 1000).toStringAsFixed(0)}K', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: f.color)),
               ]),
               const SizedBox(width: 24),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('سنوياً', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-                Text('${(annualized / 1e6).toStringAsFixed(2)}M ر.س', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _gold)),
+                Text('سنوياً', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+                Text('${(annualized / 1e6).toStringAsFixed(2)}M ر.س', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _gold)),
               ]),
             ]),
           ));
@@ -221,9 +222,9 @@ extension _FreqX on _Freq {
         _Freq.yearly => 'سنوي',
       };
   Color get color => switch (this) {
-        _Freq.monthly => Colors.blue,
-        _Freq.quarterly => const Color(0xFFD4AF37),
-        _Freq.yearly => Colors.purple,
+        _Freq.monthly => core_theme.AC.info,
+        _Freq.quarterly => core_theme.AC.gold,
+        _Freq.yearly => core_theme.AC.purple,
       };
   IconData get icon => switch (this) {
         _Freq.monthly => Icons.calendar_month,
@@ -239,9 +240,9 @@ extension _SX on _S {
         _S.draft => 'مسودة',
       };
   Color get color => switch (this) {
-        _S.active => Colors.green,
-        _S.paused => Colors.orange,
-        _S.draft => Colors.grey,
+        _S.active => core_theme.AC.ok,
+        _S.paused => core_theme.AC.warn,
+        _S.draft => core_theme.AC.td,
       };
 }
 

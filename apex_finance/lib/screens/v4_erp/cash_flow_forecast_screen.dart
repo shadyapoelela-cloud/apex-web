@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CashFlowForecastScreen extends StatefulWidget {
   const CashFlowForecastScreen({super.key});
@@ -74,7 +75,7 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
         gradient: const LinearGradient(colors: [Color(0xFF006064), Color(0xFF00ACC1)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.waterfall_chart, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -85,7 +86,7 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
                 Text('التدفق النقدي المتوقع — 13 أسبوع',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('توقع ذكي بناءً على الفواتير المفتوحة، الموردين، الرواتب، وأنماط التحصيل',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -97,16 +98,16 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
   Widget _buildScenarioSelector() {
     return Row(
       children: [
-        _scenarioChip('pessimistic', 'متحفظ', Colors.red, Icons.trending_down),
+        _scenarioChip('pessimistic', 'متحفظ', core_theme.AC.err, Icons.trending_down),
         const SizedBox(width: 8),
-        _scenarioChip('base', 'أساسي', const Color(0xFFD4AF37), Icons.timeline),
+        _scenarioChip('base', 'أساسي', core_theme.AC.gold, Icons.timeline),
         const SizedBox(width: 8),
-        _scenarioChip('optimistic', 'متفائل', Colors.green, Icons.trending_up),
+        _scenarioChip('optimistic', 'متفائل', core_theme.AC.ok, Icons.trending_up),
         const Spacer(),
         TextButton.icon(
           onPressed: () {},
           icon: const Icon(Icons.settings, size: 16),
-          label: const Text('تخصيص الافتراضات'),
+          label: Text('تخصيص الافتراضات'),
         ),
       ],
     );
@@ -122,13 +123,13 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
         decoration: BoxDecoration(
           color: selected ? color.withOpacity(0.15) : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: selected ? color : Colors.black26, width: selected ? 2 : 1),
+          border: Border.all(color: selected ? color : core_theme.AC.td, width: selected ? 2 : 1),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: selected ? color : Colors.black54),
+            Icon(icon, size: 16, color: selected ? color : core_theme.AC.ts),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w800 : FontWeight.w500, color: selected ? color : Colors.black87)),
+            Text(label, style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w800 : FontWeight.w500, color: selected ? color : core_theme.AC.tp)),
           ],
         ),
       ),
@@ -143,11 +144,11 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
 
     return Row(
       children: [
-        _kpi('الرصيد الحالي', _fmt(485200), Colors.blue, Icons.account_balance),
-        _kpi('إجمالي الوارد', _fmt(totalIn), Colors.green, Icons.arrow_downward),
-        _kpi('إجمالي الصادر', _fmt(totalOut), Colors.orange, Icons.arrow_upward),
-        _kpi('رصيد آخر أسبوع', _fmt(endBal), const Color(0xFFD4AF37), Icons.flag),
-        _kpi('أدنى رصيد', _fmt(minBal), minBal < 300000 ? Colors.red : Colors.teal, Icons.warning_amber),
+        _kpi('الرصيد الحالي', _fmt(485200), core_theme.AC.info, Icons.account_balance),
+        _kpi('إجمالي الوارد', _fmt(totalIn), core_theme.AC.ok, Icons.arrow_downward),
+        _kpi('إجمالي الصادر', _fmt(totalOut), core_theme.AC.warn, Icons.arrow_upward),
+        _kpi('رصيد آخر أسبوع', _fmt(endBal), core_theme.AC.gold, Icons.flag),
+        _kpi('أدنى رصيد', _fmt(minBal), minBal < 300000 ? core_theme.AC.err : core_theme.AC.info, Icons.warning_amber),
       ],
     );
   }
@@ -170,7 +171,7 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -188,12 +189,12 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('الرصيد النقدي المتوقع', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+          Text('الرصيد النقدي المتوقع', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           const SizedBox(height: 16),
           SizedBox(
             height: 180,
@@ -210,7 +211,7 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text(_fmt(_closingBalance(w)),
-                                style: TextStyle(fontSize: 9, color: _selectedWeek == w ? const Color(0xFFD4AF37) : Colors.black54, fontWeight: FontWeight.w700)),
+                                style: TextStyle(fontSize: 9, color: _selectedWeek == w ? core_theme.AC.gold : core_theme.AC.ts, fontWeight: FontWeight.w700)),
                             const SizedBox(height: 2),
                             Container(
                               height: (_closingBalance(w) / maxVal) * 120,
@@ -219,7 +220,7 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
                                   colors: _selectedWeek == w
-                                      ? [const Color(0xFFD4AF37), const Color(0xFFE6C200)]
+                                      ? [core_theme.AC.gold, const Color(0xFFE6C200)]
                                       : [const Color(0xFF00ACC1), const Color(0xFF006064)],
                                 ),
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
@@ -245,21 +246,21 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            color: Colors.grey.shade100,
-            child: const Row(
+            color: core_theme.AC.navy3,
+            child: Row(
               children: [
                 Expanded(flex: 2, child: Text('الأسبوع', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800))),
                 Expanded(flex: 2, child: Text('افتتاحي', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800))),
-                Expanded(flex: 2, child: Text('وارد', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.green))),
-                Expanded(flex: 2, child: Text('صادر', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.orange))),
+                Expanded(flex: 2, child: Text('وارد', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
+                Expanded(flex: 2, child: Text('صادر', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.warn))),
                 Expanded(flex: 2, child: Text('صافي', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800))),
-                Expanded(flex: 2, child: Text('ختامي', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                Expanded(flex: 2, child: Text('ختامي', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
               ],
             ),
           ),
@@ -269,15 +270,15 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: _selectedWeek == w ? const Color(0xFFD4AF37).withOpacity(0.08) : null,
-                  border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                  color: _selectedWeek == w ? core_theme.AC.gold.withOpacity(0.08) : null,
+                  border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                 ),
                 child: Row(
                   children: [
                     Expanded(flex: 2, child: Text('أسبوع $w', style: TextStyle(fontSize: 12, fontWeight: _selectedWeek == w ? FontWeight.w800 : FontWeight.w500))),
                     Expanded(flex: 2, child: Text(_fmt(_openingBalance(w)), style: const TextStyle(fontSize: 12))),
-                    Expanded(flex: 2, child: Text(_fmt(_inflows(w, _scenario)), style: const TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.w700))),
-                    Expanded(flex: 2, child: Text(_fmt(_outflows(w, _scenario)), style: const TextStyle(fontSize: 12, color: Colors.orange, fontWeight: FontWeight.w700))),
+                    Expanded(flex: 2, child: Text(_fmt(_inflows(w, _scenario)), style: TextStyle(fontSize: 12, color: core_theme.AC.ok, fontWeight: FontWeight.w700))),
+                    Expanded(flex: 2, child: Text(_fmt(_outflows(w, _scenario)), style: TextStyle(fontSize: 12, color: core_theme.AC.warn, fontWeight: FontWeight.w700))),
                     Expanded(
                       flex: 2,
                       child: Text(
@@ -285,11 +286,11 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
-                          color: _inflows(w, _scenario) > _outflows(w, _scenario) ? Colors.green : Colors.red,
+                          color: _inflows(w, _scenario) > _outflows(w, _scenario) ? core_theme.AC.ok : core_theme.AC.err,
                         ),
                       ),
                     ),
-                    Expanded(flex: 2, child: Text(_fmt(_closingBalance(w)), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37)))),
+                    Expanded(flex: 2, child: Text(_fmt(_closingBalance(w)), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.gold))),
                   ],
                 ),
               ),
@@ -303,16 +304,16 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: core_theme.AC.info,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade200),
+        border: Border.all(color: core_theme.AC.info),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.insights, color: Colors.blue),
+              Icon(Icons.insights, color: core_theme.AC.info),
               const SizedBox(width: 8),
               Text('تفاصيل الأسبوع $_selectedWeek',
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
@@ -329,18 +330,18 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.red.shade50,
+                color: core_theme.AC.err,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade300),
+                border: Border.all(color: core_theme.AC.err),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.warning, color: Colors.red, size: 18),
+                  Icon(Icons.warning, color: core_theme.AC.err, size: 18),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'تنبيه: الرصيد المتوقع أقل من الحد الأدنى الآمن (300,000 ر.س). فكّر في تسريع التحصيل أو تأجيل دفعة.',
-                      style: TextStyle(fontSize: 11, color: Colors.red),
+                      style: TextStyle(fontSize: 11, color: core_theme.AC.err),
                     ),
                   ),
                 ],
@@ -363,7 +364,7 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: const TextStyle(fontSize: 12)),
-                Text(hint, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text(hint, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ],
             ),
           ),

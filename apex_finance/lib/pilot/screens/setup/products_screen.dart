@@ -9,22 +9,23 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../../core/theme.dart' as core_theme;
 
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 
-const _gold = Color(0xFFD4AF37);
-const _navy = Color(0xFF0A1628);
-const _navy2 = Color(0xFF132339);
-const _navy3 = Color(0xFF1D3150);
-const _bdr = Color(0x33FFFFFF);
-const _tp = Color(0xFFFFFFFF);
-const _ts = Color(0xFFBCC5D3);
-const _td = Color(0xFF6B7A90);
-const _ok = Color(0xFF10B981);
-const _err = Color(0xFFEF4444);
-const _warn = Color(0xFFF59E0B);
+Color get _gold => core_theme.AC.gold;
+Color get _navy => core_theme.AC.navy;
+Color get _navy2 => core_theme.AC.navy2;
+Color get _navy3 => core_theme.AC.navy3;
+Color get _bdr => core_theme.AC.bdr;
+final _tp = Color(0xFFFFFFFF);
+Color get _ts => core_theme.AC.ts;
+Color get _td => core_theme.AC.td;
+Color get _ok => core_theme.AC.ok;
+Color get _err => core_theme.AC.err;
+Color get _warn => core_theme.AC.warn;
 
 const _kKinds = <String, String>{
   'goods': 'سلعة',
@@ -207,7 +208,7 @@ class _ProductsScreenState extends State<ProductsScreen>
           ),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator(color: _gold))
+                ? Center(child: CircularProgressIndicator(color: _gold))
                 : _error != null
                     ? _errorView()
                     : TabBarView(controller: _tab, children: [
@@ -236,25 +237,25 @@ class _ProductsScreenState extends State<ProductsScreen>
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: _gold.withValues(alpha: 0.4)),
           ),
-          child: const Icon(Icons.inventory, color: _gold, size: 22),
+          child: Icon(Icons.inventory, color: _gold, size: 22),
         ),
         const SizedBox(width: 14),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('الأصناف والكتالوج',
+            Text('الأصناف والكتالوج',
                 style: TextStyle(
                     color: _tp, fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 3),
             Text(
                 '${_products.length} صنف · ${_categories.length} فئة · ${_brands.length} علامة',
-                style: const TextStyle(color: _ts, fontSize: 12)),
+                style: TextStyle(color: _ts, fontSize: 12)),
           ],
         ),
         const Spacer(),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+              foregroundColor: _tp, side: BorderSide(color: _bdr)),
           onPressed: _load,
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('تحديث'),
@@ -266,13 +267,13 @@ class _ProductsScreenState extends State<ProductsScreen>
   Widget _errorView() {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.error_outline, color: _err, size: 48),
+        Icon(Icons.error_outline, color: _err, size: 48),
         const SizedBox(height: 12),
-        Text(_error!, style: const TextStyle(color: _ts)),
+        Text(_error!, style: TextStyle(color: _ts)),
         const SizedBox(height: 16),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+              foregroundColor: _tp, side: BorderSide(color: _bdr)),
           onPressed: _load,
           icon: const Icon(Icons.refresh, size: 16),
           label: const Text('إعادة المحاولة'),
@@ -307,20 +308,20 @@ class _ProductsScreenState extends State<ProductsScreen>
           width: 240,
           child: TextField(
             controller: _searchCtrl,
-            style: const TextStyle(color: _tp, fontSize: 12),
+            style: TextStyle(color: _tp, fontSize: 12),
             decoration: InputDecoration(
               hintText: 'بحث...',
-              hintStyle: const TextStyle(color: _td),
-              prefixIcon: const Icon(Icons.search, color: _td, size: 16),
+              hintStyle: TextStyle(color: _td),
+              prefixIcon: Icon(Icons.search, color: _td, size: 16),
               isDense: true,
               filled: true,
               fillColor: _navy3,
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
-                  borderSide: const BorderSide(color: _bdr)),
+                  borderSide: BorderSide(color: _bdr)),
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
-                  borderSide: const BorderSide(color: _bdr)),
+                  borderSide: BorderSide(color: _bdr)),
             ),
             onChanged: (v) => setState(() => _search = v),
           ),
@@ -351,7 +352,7 @@ class _ProductsScreenState extends State<ProductsScreen>
         const Spacer(),
         FilledButton.icon(
           style: FilledButton.styleFrom(
-              backgroundColor: _gold, foregroundColor: Colors.black),
+              backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
           onPressed: _addProduct,
           icon: const Icon(Icons.add, size: 14),
           label: const Text('صنف جديد'),
@@ -374,9 +375,9 @@ class _ProductsScreenState extends State<ProductsScreen>
         child: DropdownButton<T>(
           value: value,
           dropdownColor: _navy2,
-          style: const TextStyle(color: _tp, fontSize: 12),
-          icon: const Icon(Icons.arrow_drop_down, color: _ts, size: 18),
-          hint: Text(label, style: const TextStyle(color: _td, fontSize: 12)),
+          style: TextStyle(color: _tp, fontSize: 12),
+          icon: Icon(Icons.arrow_drop_down, color: _ts, size: 18),
+          hint: Text(label, style: TextStyle(color: _td, fontSize: 12)),
           items: items,
           onChanged: onChanged,
         ),
@@ -392,12 +393,12 @@ class _ProductsScreenState extends State<ProductsScreen>
           Icon(Icons.inventory_2_outlined,
               color: _gold.withValues(alpha: 0.4), size: 56),
           const SizedBox(height: 10),
-          const Text('لا توجد أصناف',
+          Text('لا توجد أصناف',
               style: TextStyle(color: _ts, fontSize: 14)),
           const SizedBox(height: 14),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _addProduct,
             icon: const Icon(Icons.add, size: 14),
             label: const Text('صنف جديد'),
@@ -466,7 +467,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                           color: _gold.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(3)),
                       child: Text(p['code'] ?? '',
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: _gold,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -474,7 +475,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(p['name_ar'] ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: _tp,
                             fontSize: 13,
                             fontWeight: FontWeight.w600),
@@ -484,7 +485,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                 const SizedBox(height: 3),
                 Row(children: [
                   Text('$catName · $brandName',
-                      style: const TextStyle(color: _td, fontSize: 10)),
+                      style: TextStyle(color: _td, fontSize: 10)),
                   const SizedBox(width: 6),
                   _dot(_statusColor(p['status'])),
                   const SizedBox(width: 3),
@@ -502,7 +503,7 @@ class _ProductsScreenState extends State<ProductsScreen>
             children: [
               Text('${p['active_variant_count'] ?? 0} متغيّر',
                   style:
-                      const TextStyle(color: _ts, fontSize: 10)),
+                      TextStyle(color: _ts, fontSize: 10)),
               const SizedBox(height: 2),
               Text(_fmt(stock),
                   style: TextStyle(
@@ -544,7 +545,7 @@ class _ProductsScreenState extends State<ProductsScreen>
           Icon(Icons.touch_app,
               color: _gold.withValues(alpha: 0.4), size: 56),
           const SizedBox(height: 10),
-          const Text('اختر صنفاً لعرض تفاصيله',
+          Text('اختر صنفاً لعرض تفاصيله',
               style: TextStyle(color: _ts, fontSize: 13)),
         ]),
       );
@@ -563,7 +564,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                 color: _gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(4)),
             child: Text(p['code'] ?? '',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _gold,
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -572,12 +573,12 @@ class _ProductsScreenState extends State<ProductsScreen>
           const SizedBox(width: 10),
           Expanded(
             child: Text(p['name_ar'] ?? '',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _tp, fontSize: 16, fontWeight: FontWeight.w800)),
           ),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-                foregroundColor: _tp, side: const BorderSide(color: _bdr)),
+                foregroundColor: _tp, side: BorderSide(color: _bdr)),
             onPressed: () => _editProduct(p),
             icon: const Icon(Icons.edit, size: 14),
             label: const Text('تعديل'),
@@ -613,15 +614,15 @@ class _ProductsScreenState extends State<ProductsScreen>
               border: Border.all(color: _bdr),
             ),
             child: Text(p['description_ar'],
-                style: const TextStyle(color: _ts, fontSize: 12, height: 1.5)),
+                style: TextStyle(color: _ts, fontSize: 12, height: 1.5)),
           ),
         ],
         const SizedBox(height: 18),
         // Variants section
         Row(children: [
-          const Icon(Icons.style, color: _gold, size: 16),
+          Icon(Icons.style, color: _gold, size: 16),
           const SizedBox(width: 6),
-          const Text('المتغيّرات (Variants)',
+          Text('المتغيّرات (Variants)',
               style: TextStyle(
                   color: _tp, fontSize: 14, fontWeight: FontWeight.w800)),
           const SizedBox(width: 8),
@@ -631,7 +632,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                 color: _gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(3)),
             child: Text('${_variants.length}',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _gold,
                     fontSize: 11,
                     fontWeight: FontWeight.w700)),
@@ -640,7 +641,7 @@ class _ProductsScreenState extends State<ProductsScreen>
           FilledButton.icon(
             style: FilledButton.styleFrom(
                 backgroundColor: _gold,
-                foregroundColor: Colors.black,
+                foregroundColor: core_theme.AC.tp,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
             onPressed: () => _addVariant(p['id']),
             icon: const Icon(Icons.add, size: 12),
@@ -655,7 +656,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                 color: _navy2,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(color: _bdr)),
-            child: const Text('لا توجد متغيّرات — اضغط "متغيّر جديد"',
+            child: Text('لا توجد متغيّرات — اضغط "متغيّر جديد"',
                 style: TextStyle(color: _td, fontSize: 11),
                 textAlign: TextAlign.center),
           )
@@ -692,7 +693,7 @@ class _ProductsScreenState extends State<ProductsScreen>
               SizedBox(
                 width: 100,
                 child: Text(v['sku'] ?? '',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _gold,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -702,13 +703,13 @@ class _ProductsScreenState extends State<ProductsScreen>
               Expanded(
                 child: Text(
                     v['display_name_ar'] ?? (v['attribute_values'] as Map?)?.values.join(' / ') ?? '',
-                    style: const TextStyle(color: _tp, fontSize: 12),
+                    style: TextStyle(color: _tp, fontSize: 12),
                     overflow: TextOverflow.ellipsis),
               ),
               SizedBox(
                 width: 80,
                 child: Text('تكلفة: ${_fmt(cost)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _td,
                         fontSize: 10,
                         fontFamily: 'monospace'),
@@ -717,7 +718,7 @@ class _ProductsScreenState extends State<ProductsScreen>
               SizedBox(
                 width: 80,
                 child: Text('سعر: ${_fmt(price)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: _warn,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -755,10 +756,10 @@ class _ProductsScreenState extends State<ProductsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            const Icon(Icons.qr_code, color: _gold, size: 14),
+            Icon(Icons.qr_code, color: _gold, size: 14),
             const SizedBox(width: 4),
             Text('الباركود (${_barcodes.length})',
-                style: const TextStyle(
+                style: TextStyle(
                     color: _tp, fontSize: 12, fontWeight: FontWeight.w700)),
             const Spacer(),
             TextButton.icon(
@@ -773,7 +774,7 @@ class _ProductsScreenState extends State<ProductsScreen>
           ]),
           const SizedBox(height: 6),
           if (_barcodes.isEmpty)
-            const Text('لا توجد باركودات',
+            Text('لا توجد باركودات',
                 style: TextStyle(color: _td, fontSize: 11))
           else
             ..._barcodes.map((b) => Container(
@@ -785,7 +786,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                       borderRadius: BorderRadius.circular(4)),
                   child: Row(children: [
                     Text(b['value'] ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: _tp,
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
@@ -795,7 +796,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 5, vertical: 1),
                         decoration: BoxDecoration(
-                            color: const Color(0xFF6366F1).withValues(alpha: 0.14),
+                            color: core_theme.AC.purple.withValues(alpha: 0.14),
                             borderRadius: BorderRadius.circular(3)),
                         child: Text(_kBarcodeTypes[b['type']] ?? b['type'],
                             style: const TextStyle(
@@ -804,7 +805,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                                 fontWeight: FontWeight.w700))),
                     const Spacer(),
                     Text(b['scope'] ?? '',
-                        style: const TextStyle(color: _td, fontSize: 10)),
+                        style: TextStyle(color: _td, fontSize: 10)),
                   ]),
                 )),
         ],
@@ -823,11 +824,11 @@ class _ProductsScreenState extends State<ProductsScreen>
         color: _navy2.withValues(alpha: 0.5),
         child: Row(children: [
           Text('${_categories.length} فئة',
-              style: const TextStyle(color: _ts, fontSize: 12)),
+              style: TextStyle(color: _ts, fontSize: 12)),
           const Spacer(),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _addCategory,
             icon: const Icon(Icons.add, size: 14),
             label: const Text('فئة جديدة'),
@@ -836,7 +837,7 @@ class _ProductsScreenState extends State<ProductsScreen>
       ),
       Expanded(
         child: _categories.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text('لا توجد فئات بعد',
                     style: TextStyle(color: _ts, fontSize: 13)))
             : ListView.separated(
@@ -846,7 +847,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                 itemBuilder: (_, i) {
                   final c = _categories[i];
                   final color =
-                      _parseHex(c['color_hex']) ?? const Color(0xFF6366F1);
+                      _parseHex(c['color_hex']) ?? core_theme.AC.purple;
                   return Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -879,7 +880,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                                   borderRadius: BorderRadius.circular(3),
                                 ),
                                 child: Text(c['code'] ?? '',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         color: _gold,
                                         fontSize: 10,
                                         fontFamily: 'monospace',
@@ -887,7 +888,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                               ),
                               const SizedBox(width: 6),
                               Text(c['name_ar'] ?? '',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: _tp,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600)),
@@ -895,7 +896,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                             if ((c['name_en'] ?? '').toString().isNotEmpty) ...[
                               const SizedBox(height: 2),
                               Text(c['name_en'],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: _td, fontSize: 10)),
                             ],
                           ],
@@ -906,7 +907,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                              color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                              color: core_theme.AC.purple.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(3)),
                           child: Text(
                               _kVatCodes[c['default_vat_code']] ??
@@ -935,11 +936,11 @@ class _ProductsScreenState extends State<ProductsScreen>
         color: _navy2.withValues(alpha: 0.5),
         child: Row(children: [
           Text('${_brands.length} علامة تجارية',
-              style: const TextStyle(color: _ts, fontSize: 12)),
+              style: TextStyle(color: _ts, fontSize: 12)),
           const Spacer(),
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _addBrand,
             icon: const Icon(Icons.add, size: 14),
             label: const Text('علامة جديدة'),
@@ -948,7 +949,7 @@ class _ProductsScreenState extends State<ProductsScreen>
       ),
       Expanded(
         child: _brands.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text('لا توجد علامات تجارية',
                     style: TextStyle(color: _ts, fontSize: 13)))
             : GridView.builder(
@@ -981,7 +982,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                                   color: _gold.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(3)),
                               child: Text(b['code'] ?? '',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: _gold,
                                       fontSize: 10,
                                       fontFamily: 'monospace',
@@ -989,21 +990,21 @@ class _ProductsScreenState extends State<ProductsScreen>
                           const Spacer(),
                           if ((b['country_of_origin'] ?? '').toString().isNotEmpty)
                             Text(b['country_of_origin'],
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: _ts,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600)),
                         ]),
                         const SizedBox(height: 8),
                         Text(b['name_ar'] ?? '',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: _tp,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700),
                             overflow: TextOverflow.ellipsis),
                         if ((b['name_en'] ?? '').toString().isNotEmpty)
                           Text(b['name_en'],
-                              style: const TextStyle(color: _td, fontSize: 10),
+                              style: TextStyle(color: _td, fontSize: 10),
                               overflow: TextOverflow.ellipsis),
                       ],
                     ),
@@ -1084,7 +1085,7 @@ class _ProductsScreenState extends State<ProductsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(k, style: const TextStyle(color: _td, fontSize: 10)),
+          Text(k, style: TextStyle(color: _td, fontSize: 10)),
           const SizedBox(height: 2),
           Text(v,
               style: TextStyle(
@@ -1228,7 +1229,7 @@ class _ProductDialogState extends State<_ProductDialog> {
       if (!mounted) return;
       if (r.success) {
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: _ok, content: Text('تم التحديث ✓')));
       } else {
         setState(() => _error = r.error ?? 'فشل التحديث');
@@ -1275,7 +1276,7 @@ class _ProductDialogState extends State<_ProductDialog> {
         setState(() => _loading = false);
         if (!mounted) return;
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: _ok,
             content: Text('تم إنشاء الصنف + متغيّر افتراضي ✓ (ظاهر في POS)')));
       } else {
@@ -1292,10 +1293,10 @@ class _ProductDialogState extends State<_ProductDialog> {
       child: AlertDialog(
         backgroundColor: _navy2,
         title: Row(children: [
-          const Icon(Icons.inventory_2, color: _gold),
+          Icon(Icons.inventory_2, color: _gold),
           const SizedBox(width: 8),
           Text(_isEdit ? 'تعديل صنف' : 'صنف جديد',
-              style: const TextStyle(color: _tp)),
+              style: TextStyle(color: _tp)),
         ]),
         content: SizedBox(
           width: 620,
@@ -1402,11 +1403,11 @@ class _ProductDialogState extends State<_ProductDialog> {
                       border: Border.all(color: _err.withValues(alpha: 0.4)),
                     ),
                     child: Row(children: [
-                      const Icon(Icons.error_outline, color: _err, size: 16),
+                      Icon(Icons.error_outline, color: _err, size: 16),
                       const SizedBox(width: 6),
                       Expanded(
                           child: Text(_error!,
-                              style: const TextStyle(color: _err, fontSize: 12))),
+                              style: TextStyle(color: _err, fontSize: 12))),
                     ]),
                   ),
                 ],
@@ -1417,10 +1418,10 @@ class _ProductDialogState extends State<_ProductDialog> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -1438,7 +1439,7 @@ class _ProductDialogState extends State<_ProductDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
@@ -1454,10 +1455,10 @@ class _ProductDialogState extends State<_ProductDialog> {
             fillColor: _navy3,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
@@ -1472,7 +1473,7 @@ class _ProductDialogState extends State<_ProductDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1486,7 +1487,7 @@ class _ProductDialogState extends State<_ProductDialog> {
               isExpanded: true,
               dropdownColor: _navy2,
               style: TextStyle(color: enabled ? _tp : _td, fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down, color: _ts),
+              icon: Icon(Icons.arrow_drop_down, color: _ts),
               items: items,
               onChanged: enabled ? onChanged : null,
             ),
@@ -1504,11 +1505,11 @@ class _ProductDialogState extends State<_ProductDialog> {
           Checkbox(
             value: value,
             onChanged: (v) => onChanged(v ?? false),
-            checkColor: Colors.black,
+            checkColor: core_theme.AC.tp,
             fillColor: WidgetStateProperty.resolveWith<Color?>(
                 (s) => s.contains(WidgetState.selected) ? _gold : _navy3),
           ),
-          Text(label, style: const TextStyle(color: _ts, fontSize: 12)),
+          Text(label, style: TextStyle(color: _ts, fontSize: 12)),
         ]),
       ),
     );
@@ -1571,7 +1572,7 @@ class _VariantDialogState extends State<_VariantDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم إنشاء المتغيّر ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل الإنشاء');
@@ -1584,7 +1585,7 @@ class _VariantDialogState extends State<_VariantDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.style, color: _gold),
           SizedBox(width: 8),
           Text('متغيّر جديد', style: TextStyle(color: _tp)),
@@ -1618,26 +1619,26 @@ class _VariantDialogState extends State<_VariantDialog> {
               Checkbox(
                 value: _trackStock,
                 onChanged: (v) => setState(() => _trackStock = v ?? true),
-                checkColor: Colors.black,
+                checkColor: core_theme.AC.tp,
                 fillColor: WidgetStateProperty.resolveWith<Color?>(
                     (s) => s.contains(WidgetState.selected) ? _gold : _navy3),
               ),
-              const Text('تتبّع المخزون',
+              Text('تتبّع المخزون',
                   style: TextStyle(color: _ts, fontSize: 12)),
             ]),
             if (_error != null) ...[
               const SizedBox(height: 10),
-              Text(_error!, style: const TextStyle(color: _err, fontSize: 12)),
+              Text(_error!, style: TextStyle(color: _err, fontSize: 12)),
             ],
           ]),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -1655,7 +1656,7 @@ class _VariantDialogState extends State<_VariantDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
@@ -1669,10 +1670,10 @@ class _VariantDialogState extends State<_VariantDialog> {
             fillColor: _navy3,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: _bdr)),
+                borderSide: BorderSide(color: _bdr)),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
@@ -1686,7 +1687,7 @@ class _VariantDialogState extends State<_VariantDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: _td, fontSize: 11)),
+        Text(label, style: TextStyle(color: _td, fontSize: 11)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1699,8 +1700,8 @@ class _VariantDialogState extends State<_VariantDialog> {
               value: value,
               isExpanded: true,
               dropdownColor: _navy2,
-              style: const TextStyle(color: _tp, fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down, color: _ts),
+              style: TextStyle(color: _tp, fontSize: 12),
+              icon: Icon(Icons.arrow_drop_down, color: _ts),
               items: items,
               onChanged: onChanged,
             ),
@@ -1756,7 +1757,7 @@ class _BarcodeDialogState extends State<_BarcodeDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم إضافة الباركود ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل الإضافة');
@@ -1769,7 +1770,7 @@ class _BarcodeDialogState extends State<_BarcodeDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.qr_code, color: _gold),
           SizedBox(width: 8),
           Text('باركود جديد', style: TextStyle(color: _tp)),
@@ -1779,15 +1780,15 @@ class _BarcodeDialogState extends State<_BarcodeDialog> {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             TextField(
               controller: _value,
-              style: const TextStyle(color: _tp, fontFamily: 'monospace'),
+              style: TextStyle(color: _tp, fontFamily: 'monospace'),
               decoration: InputDecoration(
                 labelText: 'القيمة *',
-                labelStyle: const TextStyle(color: _td),
+                labelStyle: TextStyle(color: _td),
                 filled: true,
                 fillColor: _navy3,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: _bdr)),
+                    borderSide: BorderSide(color: _bdr)),
               ),
             ),
             const SizedBox(height: 10),
@@ -1804,8 +1805,8 @@ class _BarcodeDialogState extends State<_BarcodeDialog> {
                       value: _type,
                       isExpanded: true,
                       dropdownColor: _navy2,
-                      style: const TextStyle(color: _tp, fontSize: 12),
-                      icon: const Icon(Icons.arrow_drop_down, color: _ts),
+                      style: TextStyle(color: _tp, fontSize: 12),
+                      icon: Icon(Icons.arrow_drop_down, color: _ts),
                       items: _kBarcodeTypes.entries
                           .map((e) => DropdownMenuItem(
                               value: e.key, child: Text(e.value)))
@@ -1828,8 +1829,8 @@ class _BarcodeDialogState extends State<_BarcodeDialog> {
                       value: _scope,
                       isExpanded: true,
                       dropdownColor: _navy2,
-                      style: const TextStyle(color: _tp, fontSize: 12),
-                      icon: const Icon(Icons.arrow_drop_down, color: _ts),
+                      style: TextStyle(color: _tp, fontSize: 12),
+                      icon: Icon(Icons.arrow_drop_down, color: _ts),
                       items: const [
                         DropdownMenuItem(value: 'primary', child: Text('رئيسي')),
                         DropdownMenuItem(value: 'carton', child: Text('كرتون')),
@@ -1849,30 +1850,30 @@ class _BarcodeDialogState extends State<_BarcodeDialog> {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'وحدات لكل مسح',
-                labelStyle: const TextStyle(color: _td),
+                labelStyle: TextStyle(color: _td),
                 filled: true,
                 fillColor: _navy3,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: _bdr)),
+                    borderSide: BorderSide(color: _bdr)),
               ),
-              style: const TextStyle(color: _tp, fontFamily: 'monospace'),
+              style: TextStyle(color: _tp, fontFamily: 'monospace'),
               controller: TextEditingController(text: '$_unitsPerScan'),
               onChanged: (v) => _unitsPerScan = int.tryParse(v) ?? 1,
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),
-              Text(_error!, style: const TextStyle(color: _err, fontSize: 12)),
+              Text(_error!, style: TextStyle(color: _err, fontSize: 12)),
             ],
           ]),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -1935,7 +1936,7 @@ class _CategoryDialogState extends State<_CategoryDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم إنشاء الفئة ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل الإنشاء');
@@ -1948,7 +1949,7 @@ class _CategoryDialogState extends State<_CategoryDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.category, color: _gold),
           SizedBox(width: 8),
           Text('فئة جديدة', style: TextStyle(color: _tp)),
@@ -1959,20 +1960,20 @@ class _CategoryDialogState extends State<_CategoryDialog> {
             TextField(
               controller: _code,
               decoration: _inputDec('الكود *', mono: true),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp, fontSize: 12, fontFamily: 'monospace'),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _nameAr,
               decoration: _inputDec('الاسم العربي *'),
-              style: const TextStyle(color: _tp, fontSize: 12),
+              style: TextStyle(color: _tp, fontSize: 12),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _nameEn,
               decoration: _inputDec('الاسم الإنجليزي'),
-              style: const TextStyle(color: _tp, fontSize: 12),
+              style: TextStyle(color: _tp, fontSize: 12),
             ),
             const SizedBox(height: 8),
             Container(
@@ -1986,8 +1987,8 @@ class _CategoryDialogState extends State<_CategoryDialog> {
                   value: _vatCode,
                   isExpanded: true,
                   dropdownColor: _navy2,
-                  style: const TextStyle(color: _tp, fontSize: 12),
-                  icon: const Icon(Icons.arrow_drop_down, color: _ts),
+                  style: TextStyle(color: _tp, fontSize: 12),
+                  icon: Icon(Icons.arrow_drop_down, color: _ts),
                   items: _kVatCodes.entries
                       .map((e) => DropdownMenuItem(
                           value: e.key, child: Text(e.value)))
@@ -2000,22 +2001,22 @@ class _CategoryDialogState extends State<_CategoryDialog> {
             TextField(
               controller: _colorHex,
               decoration: _inputDec('لون (Hex) — #RRGGBB', mono: true),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp, fontSize: 12, fontFamily: 'monospace'),
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),
-              Text(_error!, style: const TextStyle(color: _err, fontSize: 12)),
+              Text(_error!, style: TextStyle(color: _err, fontSize: 12)),
             ],
           ]),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -2031,16 +2032,16 @@ class _CategoryDialogState extends State<_CategoryDialog> {
   InputDecoration _inputDec(String label, {bool mono = false}) =>
       InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: _td),
+        labelStyle: TextStyle(color: _td),
         isDense: true,
         filled: true,
         fillColor: _navy3,
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(6),
-            borderSide: const BorderSide(color: _bdr)),
+            borderSide: BorderSide(color: _bdr)),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(6),
-            borderSide: const BorderSide(color: _bdr)),
+            borderSide: BorderSide(color: _bdr)),
       );
 }
 
@@ -2091,7 +2092,7 @@ class _BrandDialogState extends State<_BrandDialog> {
     if (!mounted) return;
     if (r.success) {
       Navigator.pop(context, true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _ok, content: Text('تم إنشاء العلامة ✓')));
     } else {
       setState(() => _error = r.error ?? 'فشل الإنشاء');
@@ -2104,7 +2105,7 @@ class _BrandDialogState extends State<_BrandDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         backgroundColor: _navy2,
-        title: const Row(children: [
+        title: Row(children: [
           Icon(Icons.label, color: _gold),
           SizedBox(width: 8),
           Text('علامة تجارية جديدة', style: TextStyle(color: _tp)),
@@ -2115,41 +2116,41 @@ class _BrandDialogState extends State<_BrandDialog> {
             TextField(
               controller: _code,
               decoration: _dec('الكود *', mono: true),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp, fontSize: 12, fontFamily: 'monospace'),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _nameAr,
               decoration: _dec('الاسم العربي *'),
-              style: const TextStyle(color: _tp, fontSize: 12),
+              style: TextStyle(color: _tp, fontSize: 12),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _nameEn,
               decoration: _dec('الاسم الإنجليزي'),
-              style: const TextStyle(color: _tp, fontSize: 12),
+              style: TextStyle(color: _tp, fontSize: 12),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _country,
               decoration: _dec('بلد المنشأ (ISO 2 حرف)', mono: true),
-              style: const TextStyle(
+              style: TextStyle(
                   color: _tp, fontSize: 12, fontFamily: 'monospace'),
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),
-              Text(_error!, style: const TextStyle(color: _err, fontSize: 12)),
+              Text(_error!, style: TextStyle(color: _err, fontSize: 12)),
             ],
           ]),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إلغاء', style: TextStyle(color: _ts))),
+              child: Text('إلغاء', style: TextStyle(color: _ts))),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: _gold, foregroundColor: Colors.black),
+                backgroundColor: _gold, foregroundColor: core_theme.AC.tp),
             onPressed: _loading ? null : _submit,
             child: _loading
                 ? const SizedBox(
@@ -2164,15 +2165,15 @@ class _BrandDialogState extends State<_BrandDialog> {
 
   InputDecoration _dec(String label, {bool mono = false}) => InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: _td),
+        labelStyle: TextStyle(color: _td),
         isDense: true,
         filled: true,
         fillColor: _navy3,
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(6),
-            borderSide: const BorderSide(color: _bdr)),
+            borderSide: BorderSide(color: _bdr)),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(6),
-            borderSide: const BorderSide(color: _bdr)),
+            borderSide: BorderSide(color: _bdr)),
       );
 }

@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../theme.dart' as core_theme;
 
 class V5OnboardingStep {
   final String id;
@@ -166,8 +167,8 @@ class _ApexV5OnboardingScreenState extends State<ApexV5OnboardingScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isComplete
-                    ? [const Color(0xFFD4AF37), const Color(0xFFE6C200)]
-                    : [const Color(0xFF2563EB), const Color(0xFF7C3AED)],
+                    ? [core_theme.AC.gold, const Color(0xFFE6C200)]
+                    : [core_theme.AC.info, core_theme.AC.purple],
               ),
               borderRadius: BorderRadius.circular(16),
             ),
@@ -205,8 +206,8 @@ class _ApexV5OnboardingScreenState extends State<ApexV5OnboardingScreen> {
                         isComplete
                             ? 'شهر مجاني كامل + أولوية الدعم — استمتع!'
                             : 'نساعدك في إعداد كل شيء في 10 دقائق · ما يمكن تخطّيه هو اختياري',
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: TextStyle(
+                          color: core_theme.AC.ts,
                           fontSize: 13,
                         ),
                       ),
@@ -230,7 +231,7 @@ class _ApexV5OnboardingScreenState extends State<ApexV5OnboardingScreen> {
                 child: Container(
                   height: 10,
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.06),
+                    color: core_theme.AC.tp.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: ClipRRect(
@@ -239,7 +240,7 @@ class _ApexV5OnboardingScreenState extends State<ApexV5OnboardingScreen> {
                       value: _progress,
                       backgroundColor: Colors.transparent,
                       valueColor: AlwaysStoppedAnimation(
-                        isComplete ? const Color(0xFFD4AF37) : const Color(0xFF7C3AED),
+                        isComplete ? core_theme.AC.gold : core_theme.AC.purple,
                       ),
                     ),
                   ),
@@ -250,8 +251,8 @@ class _ApexV5OnboardingScreenState extends State<ApexV5OnboardingScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: isComplete
-                      ? const Color(0xFFD4AF37)
-                      : const Color(0xFF7C3AED),
+                      ? core_theme.AC.gold
+                      : core_theme.AC.purple,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -268,7 +269,7 @@ class _ApexV5OnboardingScreenState extends State<ApexV5OnboardingScreen> {
           const SizedBox(height: 4),
           Text(
             '${_completed.length} من ${v5OnboardingSteps.length} مكتملة',
-            style: const TextStyle(fontSize: 11, color: Colors.black54),
+            style: TextStyle(fontSize: 11, color: core_theme.AC.ts),
           ),
           const SizedBox(height: 20),
 
@@ -336,19 +337,19 @@ class _StepCardState extends State<_StepCard> {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: widget.isActive
-              ? const Color(0xFF7C3AED).withOpacity(0.05)
+              ? core_theme.AC.purple.withOpacity(0.05)
               : widget.isComplete
-                  ? const Color(0xFFD4AF37).withOpacity(0.04)
+                  ? core_theme.AC.gold.withOpacity(0.04)
                   : _hover
-                      ? Colors.black.withOpacity(0.02)
+                      ? core_theme.AC.tp.withOpacity(0.02)
                       : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: widget.isActive
-                ? const Color(0xFF7C3AED).withOpacity(0.3)
+                ? core_theme.AC.purple.withOpacity(0.3)
                 : widget.isComplete
-                    ? const Color(0xFFD4AF37).withOpacity(0.3)
-                    : Colors.black.withOpacity(0.1),
+                    ? core_theme.AC.gold.withOpacity(0.3)
+                    : core_theme.AC.tp.withOpacity(0.1),
             width: widget.isActive ? 2 : 1,
           ),
         ),
@@ -363,13 +364,13 @@ class _StepCardState extends State<_StepCard> {
                 height: 32,
                 decoration: BoxDecoration(
                   color: widget.isComplete
-                      ? const Color(0xFFD4AF37)
+                      ? core_theme.AC.gold
                       : widget.isActive
-                          ? const Color(0xFF7C3AED).withOpacity(0.15)
-                          : Colors.black.withOpacity(0.06),
+                          ? core_theme.AC.purple.withOpacity(0.15)
+                          : core_theme.AC.tp.withOpacity(0.06),
                   shape: BoxShape.circle,
                   border: widget.isActive
-                      ? Border.all(color: const Color(0xFF7C3AED), width: 2)
+                      ? Border.all(color: core_theme.AC.purple, width: 2)
                       : null,
                 ),
                 child: Center(
@@ -380,7 +381,7 @@ class _StepCardState extends State<_StepCard> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w800,
-                            color: widget.isActive ? const Color(0xFF7C3AED) : Colors.black54,
+                            color: widget.isActive ? core_theme.AC.purple : core_theme.AC.ts,
                           ),
                         ),
                 ),
@@ -409,7 +410,7 @@ class _StepCardState extends State<_StepCard> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: widget.isComplete ? Colors.black54 : Colors.black87,
+                          color: widget.isComplete ? core_theme.AC.ts : core_theme.AC.tp,
                           decoration: widget.isComplete ? TextDecoration.lineThrough : null,
                         ),
                       ),
@@ -418,14 +419,14 @@ class _StepCardState extends State<_StepCard> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.06),
+                            color: core_theme.AC.tp.withOpacity(0.06),
                             borderRadius: BorderRadius.circular(3),
                           ),
-                          child: const Text(
+                          child: Text(
                             'اختياري',
                             style: TextStyle(
                               fontSize: 9,
-                              color: Colors.black54,
+                              color: core_theme.AC.ts,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -436,7 +437,7 @@ class _StepCardState extends State<_StepCard> {
                   const SizedBox(height: 2),
                   Text(
                     widget.step.descriptionAr,
-                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    style: TextStyle(fontSize: 12, color: core_theme.AC.ts),
                   ),
                 ],
               ),
@@ -448,9 +449,9 @@ class _StepCardState extends State<_StepCard> {
                 onPressed: widget.onToggle,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: widget.isActive
-                      ? const Color(0xFF7C3AED)
-                      : Colors.black.withOpacity(0.06),
-                  foregroundColor: widget.isActive ? Colors.white : Colors.black54,
+                      ? core_theme.AC.purple
+                      : core_theme.AC.tp.withOpacity(0.06),
+                  foregroundColor: widget.isActive ? Colors.white : core_theme.AC.ts,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
@@ -467,8 +468,8 @@ enum _State { pending, active, done }
 
 Color _stateColor(_State s) {
   switch (s) {
-    case _State.done: return const Color(0xFFD4AF37);
-    case _State.active: return const Color(0xFF7C3AED);
-    case _State.pending: return Colors.black45;
+    case _State.done: return core_theme.AC.gold;
+    case _State.active: return core_theme.AC.purple;
+    case _State.pending: return core_theme.AC.td;
   }
 }

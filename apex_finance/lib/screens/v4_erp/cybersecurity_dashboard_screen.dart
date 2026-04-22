@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class CybersecurityDashboardScreen extends StatefulWidget {
   const CybersecurityDashboardScreen({super.key});
@@ -33,11 +34,11 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('تنبيهات اليوم', '42', '+12 من أمس', Colors.red, Icons.warning),
-            _kpi('هجمات محجوبة', '1,847', 'آخر 24 ساعة', Colors.orange, Icons.shield),
-            _kpi('حوادث نشطة', '2', '1 حرج', Colors.red, Icons.error),
-            _kpi('متوسط زمن الاحتواء', '18 دقيقة', 'MTTR', Colors.blue, Icons.timer),
-            _kpi('نسبة الأجهزة المحدّثة', '98.5%', '156/158', Colors.green, Icons.system_update),
+            _kpi('تنبيهات اليوم', '42', '+12 من أمس', core_theme.AC.err, Icons.warning),
+            _kpi('هجمات محجوبة', '1,847', 'آخر 24 ساعة', core_theme.AC.warn, Icons.shield),
+            _kpi('حوادث نشطة', '2', '1 حرج', core_theme.AC.err, Icons.error),
+            _kpi('متوسط زمن الاحتواء', '18 دقيقة', 'MTTR', core_theme.AC.info, Icons.timer),
+            _kpi('نسبة الأجهزة المحدّثة', '98.5%', '156/158', core_theme.AC.ok, Icons.system_update),
           ],
         ),
         const SizedBox(height: 16),
@@ -66,21 +67,21 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
         children: [
           const Icon(Icons.security, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('الأمن السيبراني — SOC',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('NIST · ISO 27001 · SOC 2 · Security Operations Center — مراقبة 24/7',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.green.shade500,
+              color: core_theme.AC.ok,
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Row(
@@ -102,7 +103,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [Colors.green.shade700, Colors.green.shade500]),
+        gradient: LinearGradient(colors: [core_theme.AC.ok, core_theme.AC.ok]),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -128,7 +129,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                       children: [
                         Text('$score',
                             style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
-                        const Text('/100', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                        Text('/100', style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
                       ],
                     ),
                   ],
@@ -141,8 +142,8 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('درجة الوضع الأمني العامة',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                Text('درجة الوضع الأمني العامة',
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
                 const Text('قوي — من أفضل 20% في الصناعة',
                     style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 12),
@@ -170,7 +171,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+        Text(label, style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
         const SizedBox(width: 4),
         Text('$value%',
             style: const TextStyle(color: Color(0xFFFFD700), fontSize: 13, fontWeight: FontWeight.w900)),
@@ -196,9 +197,9 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color)),
-                  Text(note, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+                  Text(note, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
                 ],
               ),
             ),
@@ -214,14 +215,14 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.warning, color: Colors.red),
+              Icon(Icons.warning, color: core_theme.AC.err),
               SizedBox(width: 8),
               Text('آخر الحوادث الأمنية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -256,7 +257,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
               children: [
                 Row(
                   children: [
-                    Text(i.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+                    Text(i.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -277,18 +278,18 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                 Text(i.title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                 Row(
                   children: [
-                    const Icon(Icons.schedule, size: 10, color: Colors.black45),
+                    Icon(Icons.schedule, size: 10, color: core_theme.AC.td),
                     const SizedBox(width: 3),
-                    Text(i.detectedAt, style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                    Text(i.detectedAt, style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                     const SizedBox(width: 10),
-                    const Icon(Icons.sensors, size: 10, color: Colors.black45),
+                    Icon(Icons.sensors, size: 10, color: core_theme.AC.td),
                     const SizedBox(width: 3),
-                    Text(i.detector, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text(i.detector, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     if (i.durationMin > 0) ...[
                       const SizedBox(width: 10),
-                      const Icon(Icons.timelapse, size: 10, color: Colors.black45),
+                      Icon(Icons.timelapse, size: 10, color: core_theme.AC.td),
                       const SizedBox(width: 3),
-                      Text('${i.durationMin}د', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                      Text('${i.durationMin}د', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     ],
                   ],
                 ),
@@ -299,7 +300,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
             ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: core_theme.AC.err,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 minimumSize: const Size(0, 28),
@@ -312,14 +313,14 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
   }
 
   Widget _buildThreatMap() {
-    final origins = const [
-      _ThreatOrigin('🇷🇺 روسيا', 342, Colors.red),
-      _ThreatOrigin('🇨🇳 الصين', 285, Colors.red),
+    final origins = [
+      _ThreatOrigin('🇷🇺 روسيا', 342, core_theme.AC.err),
+      _ThreatOrigin('🇨🇳 الصين', 285, core_theme.AC.err),
       _ThreatOrigin('🇰🇵 كوريا الشمالية', 124, Colors.deepOrange),
-      _ThreatOrigin('🇮🇷 إيران', 98, Colors.orange),
-      _ThreatOrigin('🇺🇸 الولايات المتحدة', 76, Colors.amber),
-      _ThreatOrigin('🇳🇱 هولندا', 48, Colors.green),
-      _ThreatOrigin('أخرى', 318, Colors.grey),
+      _ThreatOrigin('🇮🇷 إيران', 98, core_theme.AC.warn),
+      _ThreatOrigin('🇺🇸 الولايات المتحدة', 76, core_theme.AC.warn),
+      _ThreatOrigin('🇳🇱 هولندا', 48, core_theme.AC.ok),
+      _ThreatOrigin('أخرى', 318, core_theme.AC.td),
     ];
     final total = origins.fold(0, (s, o) => s + o.attempts);
     return Container(
@@ -327,7 +328,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,7 +340,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
               Text('التهديدات حسب المصدر', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
           ),
-          const Text('آخر 24 ساعة', style: TextStyle(fontSize: 11, color: Colors.black54)),
+          Text('آخر 24 ساعة', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(height: 14),
           for (final o in origins)
             Padding(
@@ -350,7 +351,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                   Expanded(
                     child: LinearProgressIndicator(
                       value: o.attempts / total,
-                      backgroundColor: Colors.grey.shade100,
+                      backgroundColor: core_theme.AC.navy3,
                       valueColor: AlwaysStoppedAnimation(o.color),
                       minHeight: 10,
                     ),
@@ -364,12 +365,12 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: core_theme.AC.info,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info, color: Colors.blue, size: 16),
+                Icon(Icons.info, color: core_theme.AC.info, size: 16),
                 const SizedBox(width: 6),
                 const Expanded(
                   child: Text(
@@ -378,7 +379,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                   ),
                 ),
                 Text('$total',
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.blue, fontFamily: 'monospace')),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: core_theme.AC.info, fontFamily: 'monospace')),
               ],
             ),
           ),
@@ -388,27 +389,27 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
   }
 
   Widget _buildComplianceStatus() {
-    final standards = const [
-      _Standard('ISO 27001', 'إدارة أمن المعلومات', 2026, 'معتمد', Colors.green),
-      _Standard('SOC 2 Type II', 'ضوابط المنظمة', 2026, 'معتمد', Colors.green),
-      _Standard('PCI DSS', 'أمن بيانات البطاقات', 2026, 'مطابق', Colors.green),
-      _Standard('NIST CSF', 'إطار الأمن السيبراني', 2026, 'متبع', Colors.blue),
-      _Standard('GDPR / NDMO', 'حماية البيانات الشخصية', 2026, 'مطابق', Colors.green),
-      _Standard('هيئة الأمن السيبراني NCA', 'الضوابط الأساسية ECC', 2026, 'مطابق', Colors.green),
+    final standards = [
+      _Standard('ISO 27001', 'إدارة أمن المعلومات', 2026, 'معتمد', core_theme.AC.ok),
+      _Standard('SOC 2 Type II', 'ضوابط المنظمة', 2026, 'معتمد', core_theme.AC.ok),
+      _Standard('PCI DSS', 'أمن بيانات البطاقات', 2026, 'مطابق', core_theme.AC.ok),
+      _Standard('NIST CSF', 'إطار الأمن السيبراني', 2026, 'متبع', core_theme.AC.info),
+      _Standard('GDPR / NDMO', 'حماية البيانات الشخصية', 2026, 'مطابق', core_theme.AC.ok),
+      _Standard('هيئة الأمن السيبراني NCA', 'الضوابط الأساسية ECC', 2026, 'مطابق', core_theme.AC.ok),
     ];
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.verified, color: Colors.green),
+              Icon(Icons.verified, color: core_theme.AC.ok),
               SizedBox(width: 8),
               Text('الامتثال للمعايير الأمنية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             ],
@@ -439,7 +440,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(s.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
-                            Text(s.description, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                            Text(s.description, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                             const SizedBox(height: 4),
                             Row(
                               children: [
@@ -451,7 +452,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                                 ),
                                 const SizedBox(width: 6),
                                 Text('سنوي ${s.year}',
-                                    style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                                    style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
                               ],
                             ),
                           ],
@@ -470,15 +471,15 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
   Color _severityColor(String s) {
     switch (s) {
       case 'critical':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'high':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'medium':
-        return Colors.amber.shade700;
+        return core_theme.AC.warn;
       case 'low':
-        return Colors.blue;
+        return core_theme.AC.info;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -515,15 +516,15 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
   Color _statusColor(String s) {
     switch (s) {
       case 'active':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'investigating':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'contained':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'resolved':
-        return Colors.green;
+        return core_theme.AC.ok;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

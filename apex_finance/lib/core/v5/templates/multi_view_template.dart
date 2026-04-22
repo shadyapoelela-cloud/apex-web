@@ -20,6 +20,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../theme.dart' as core_theme;
 
 enum ViewMode { list, kanban, calendar, pivot, chart }
 
@@ -147,8 +148,8 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
   final _searchCtrl = TextEditingController();
   String _savedViewId = '';
 
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
 
   @override
   void initState() {
@@ -194,11 +195,11 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(widget.titleAr,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
                 if (widget.subtitleAr != null)
                   Text(widget.subtitleAr!,
-                      style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                      style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
               ],
             ),
           ),
@@ -212,12 +213,12 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                 hintStyle: const TextStyle(fontSize: 12),
                 prefixIcon: const Icon(Icons.search, size: 18),
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: core_theme.AC.navy3,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
+                  borderSide: BorderSide(color: core_theme.AC.bdr),
                 ),
               ),
             ),
@@ -264,7 +265,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.bookmark_border, size: 14, color: _navy),
+                      Icon(Icons.bookmark_border, size: 14, color: _navy),
                       const SizedBox(width: 4),
                       Text(
                         _savedViewId.isEmpty
@@ -273,11 +274,11 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                                 .firstWhere((v) => v.id == _savedViewId,
                                     orElse: () => widget.savedViews.first)
                                 .labelAr,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12, color: _navy, fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.arrow_drop_down, size: 16, color: _navy),
+                      Icon(Icons.arrow_drop_down, size: 16, color: _navy),
                     ],
                   ),
                 ),
@@ -293,7 +294,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                             Text(v.labelAr),
                             if (v.isShared) ...[
                               const Spacer(),
-                              const Icon(Icons.group, size: 12, color: Colors.black45),
+                              Icon(Icons.group, size: 12, color: core_theme.AC.td),
                             ],
                           ],
                         ),
@@ -311,7 +312,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
               Container(
                 width: 1,
                 height: 20,
-                color: Colors.grey.shade300,
+                color: core_theme.AC.bdr,
               ),
               const SizedBox(width: 10),
             ],
@@ -325,12 +326,12 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                       decoration: BoxDecoration(
                         color: c.active
                             ? (c.color ?? _gold).withOpacity(0.12)
-                            : Colors.grey.shade100,
+                            : core_theme.AC.navy3,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                             color: c.active
                                 ? (c.color ?? _gold)
-                                : Colors.grey.shade300),
+                                : core_theme.AC.bdr),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -340,7 +341,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                                 size: 12,
                                 color: c.active
                                     ? (c.color ?? _gold)
-                                    : Colors.black54),
+                                    : core_theme.AC.ts),
                             const SizedBox(width: 4),
                           ],
                           Text(
@@ -350,7 +351,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                               fontWeight: FontWeight.w700,
                               color: c.active
                                   ? (c.color ?? _gold)
-                                  : Colors.black87,
+                                  : core_theme.AC.tp,
                             ),
                           ),
                           if (c.count != null) ...[
@@ -388,7 +389,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: core_theme.AC.navy3,
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.all(3),
@@ -407,7 +408,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                       boxShadow: active
                           ? [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: core_theme.AC.tp.withOpacity(0.06),
                                 blurRadius: 3,
                                 offset: const Offset(0, 1),
                               ),
@@ -418,14 +419,14 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(v.icon,
-                            size: 14, color: active ? _gold : Colors.black54),
+                            size: 14, color: active ? _gold : core_theme.AC.ts),
                         const SizedBox(width: 4),
                         Text(
                           v.labelAr,
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: active ? _navy : Colors.black54,
+                            color: active ? _navy : core_theme.AC.ts,
                           ),
                         ),
                       ],
@@ -467,10 +468,10 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(_view.icon, size: 64, color: Colors.grey.shade300),
+          Icon(_view.icon, size: 64, color: core_theme.AC.bdr),
           const SizedBox(height: 16),
           Text('عرض ${_view.labelAr} قيد التطوير',
-              style: const TextStyle(color: Colors.black54)),
+              style: TextStyle(color: core_theme.AC.ts)),
         ],
       ),
     );
@@ -493,10 +494,10 @@ class _MiniBtn extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: core_theme.AC.navy3,
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Icon(icon, size: 14, color: Colors.black54),
+          child: Icon(icon, size: 14, color: core_theme.AC.ts),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 143 — Procurement / RFQ Workflow
 class ProcurementRfqScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'RFQ نشطة'), Tab(text: 'مقارنة العروض'), Tab(text: 'الموردون'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_rfqTab(), _compareTab(), _suppliersTab(), _analyticsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF4A148C)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.shopping_cart, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('المشتريات RFQ', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('Request for Quotation — مقارنة عروض الموردين تلقائياً', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('Request for Quotation — مقارنة عروض الموردين تلقائياً', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -47,14 +48,14 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
     Expanded(child: _kpi('RFQ نشطة', '${_rfqs.length}', Icons.assignment, const Color(0xFF4A148C))),
     Expanded(child: _kpi('موردون نشطون', '48', Icons.business, const Color(0xFF1A237E))),
     Expanded(child: _kpi('توفير محقق', '18.4%', Icons.savings, const Color(0xFF2E7D32))),
-    Expanded(child: _kpi('زمن الدورة', '8 أيام', Icons.speed, const Color(0xFFD4AF37))),
+    Expanded(child: _kpi('زمن الدورة', '8 أيام', Icons.speed, core_theme.AC.gold)),
   ]));
 
   Widget _kpi(String l, String v, IconData i, Color c) => Container(margin: const EdgeInsets.symmetric(horizontal: 4),
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -68,7 +69,7 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
             decoration: BoxDecoration(color: _statusColor(r.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
             child: Text(r.status, style: TextStyle(color: _statusColor(r.status), fontSize: 10, fontWeight: FontWeight.bold))),
         ]),
-        Text('${r.id} • ${r.category}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Text('${r.id} • ${r.category}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         const SizedBox(height: 10),
         Row(children: [
           _mini('الميزانية', r.budget),
@@ -81,14 +82,14 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
   });
 
   Widget _mini(String l, String v) => Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(l, style: const TextStyle(fontSize: 9, color: Colors.black54)),
+    Text(l, style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
     Text(v, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
   ]));
 
   Widget _compareTab() => ListView(padding: const EdgeInsets.all(14), children: [
-    const Text('RFQ-2026-0042: توريد أجهزة كمبيوتر', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4A148C))),
+    Text('RFQ-2026-0042: توريد أجهزة كمبيوتر', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF4A148C))),
     const SizedBox(height: 12),
-    ..._bids.map((b) => Card(margin: const EdgeInsets.only(bottom: 8), color: b.recommended ? const Color(0xFFD4AF37).withValues(alpha: 0.05) : null,
+    ..._bids.map((b) => Card(margin: const EdgeInsets.only(bottom: 8), color: b.recommended ? core_theme.AC.gold.withValues(alpha: 0.05) : null,
       child: Padding(padding: const EdgeInsets.all(14),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
@@ -98,15 +99,15 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(b.supplier, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
               Row(children: [
-                const Icon(Icons.star, color: Color(0xFFD4AF37), size: 12),
+                Icon(Icons.star, color: core_theme.AC.gold, size: 12),
                 Text(' ${b.rating}', style: const TextStyle(fontSize: 11)),
                 const SizedBox(width: 8),
-                Text('${b.historyDeals} صفقة سابقة', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                Text('${b.historyDeals} صفقة سابقة', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ]),
             ])),
             if (b.recommended) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(8)),
-              child: const Text('موصى به AI', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
+              decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(8)),
+              child: Text('موصى به AI', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
           ]),
           const SizedBox(height: 10),
           Row(children: [
@@ -116,7 +117,7 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
             _mini('الدفع', b.paymentTerms),
           ]),
           const SizedBox(height: 8),
-          Text(b.notes, style: const TextStyle(fontSize: 11, color: Colors.black87)),
+          Text(b.notes, style: TextStyle(fontSize: 11, color: core_theme.AC.tp)),
         ]),
       ),
     )),
@@ -133,14 +134,14 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
           decoration: BoxDecoration(color: _tierColor(s.tier).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
           child: Text(s.tier, style: TextStyle(color: _tierColor(s.tier), fontSize: 9, fontWeight: FontWeight.bold))),
         const SizedBox(height: 2),
-        Row(children: [const Icon(Icons.star, color: Color(0xFFD4AF37), size: 12), Text(' ${s.rating}', style: const TextStyle(fontSize: 11))]),
+        Row(children: [Icon(Icons.star, color: core_theme.AC.gold, size: 12), Text(' ${s.rating}', style: const TextStyle(fontSize: 11))]),
       ]),
     ));
   });
 
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('💰 توفير سنوي', '2.8M ر.س توفير من مقارنة RFQ (+14% YoY)', const Color(0xFF2E7D32)),
-    _insight('⏱️ زمن الدورة', '8 أيام متوسط من RFQ للـ PO (انخفاض 42% بعد الأتمتة)', const Color(0xFFD4AF37)),
+    _insight('⏱️ زمن الدورة', '8 أيام متوسط من RFQ للـ PO (انخفاض 42% بعد الأتمتة)', core_theme.AC.gold),
     _insight('🎯 معدل الفوز للموردين', 'مورد "أ" 38% • مورد "ب" 28% • مورد "ج" 18% • أخرى 16%', const Color(0xFF4A148C)),
     _insight('📊 توزيع الإنفاق', 'تقنية 42% • مواد خام 28% • خدمات 18% • أخرى 12%', const Color(0xFF1A237E)),
     _insight('⚠️ تركيز الموردين', 'Top 3 موردين = 62% من الإنفاق — مخاطر تركّز', const Color(0xFFE65100)),
@@ -151,22 +152,22 @@ class _ProcurementRfqScreenState extends State<ProcurementRfqScreen> with Single
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
       const SizedBox(height: 6),
-      Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _statusColor(String s) {
     if (s.contains('نشط')) return const Color(0xFF2E7D32);
-    if (s.contains('تقييم')) return const Color(0xFFD4AF37);
+    if (s.contains('تقييم')) return core_theme.AC.gold;
     if (s.contains('ترسية')) return const Color(0xFF4A148C);
     if (s.contains('ملغى')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   Color _tierColor(String t) {
-    if (t.contains('Gold')) return const Color(0xFFD4AF37);
-    if (t.contains('Silver')) return Colors.grey;
+    if (t.contains('Gold')) return core_theme.AC.gold;
+    if (t.contains('Silver')) return core_theme.AC.td;
     if (t.contains('Bronze')) return const Color(0xFF6D4C41);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   static const List<_Rfq> _rfqs = [

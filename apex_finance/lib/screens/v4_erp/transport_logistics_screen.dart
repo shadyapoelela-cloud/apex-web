@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 /// Wave 124 — Transport & Logistics (TMS)
 class TransportLogisticsScreen extends StatefulWidget {
@@ -21,8 +22,8 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
       body: SafeArea(child: Column(children: [
         _hero(), _kpis(),
         Container(color: Colors.white, child: TabBar(controller: _tc,
-          labelColor: const Color(0xFF4A148C), unselectedLabelColor: Colors.black54,
-          indicatorColor: const Color(0xFFD4AF37), indicatorWeight: 3,
+          labelColor: const Color(0xFF4A148C), unselectedLabelColor: core_theme.AC.ts,
+          indicatorColor: core_theme.AC.gold, indicatorWeight: 3,
           tabs: const [Tab(text: 'الشحنات'), Tab(text: 'الأسطول'), Tab(text: 'السائقون'), Tab(text: 'التحليلات')])),
         Expanded(child: TabBarView(controller: _tc, children: [_shipmentsTab(), _fleetTab(), _driversTab(), _analyticsTab()])),
       ])),
@@ -32,13 +33,13 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
   Widget _hero() => Container(padding: const EdgeInsets.all(20),
     decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF004D40), Color(0xFF00251A)])),
     child: Row(children: [
-      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFD4AF37), borderRadius: BorderRadius.circular(12)),
+      Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: core_theme.AC.gold, borderRadius: BorderRadius.circular(12)),
         child: const Icon(Icons.local_shipping, color: Colors.white, size: 32)),
       const SizedBox(width: 16),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('نظام النقل واللوجستيات TMS', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         SizedBox(height: 4),
-        Text('شحنات، مسارات AI، GPS Real-time، توصيل آخر ميل', style: TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('شحنات، مسارات AI، GPS Real-time، توصيل آخر ميل', style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
       ])),
     ]),
   );
@@ -54,7 +55,7 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
     padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
     child: Row(children: [Icon(i, color: c, size: 22), const SizedBox(width: 6),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(l, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text(l, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         Text(v, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c))])),
     ]));
 
@@ -69,7 +70,7 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(s.trackingNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
             Text('${s.from} → ${s.to}', style: const TextStyle(fontSize: 11)),
-            Text('العميل: ${s.customer} • ${s.weight}kg', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+            Text('العميل: ${s.customer} • ${s.weight}kg', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('${s.amount.toStringAsFixed(0)} ر.س', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
@@ -80,7 +81,7 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
         ]),
         const SizedBox(height: 8),
         Row(children: [
-          const Icon(Icons.person, size: 12, color: Colors.black54),
+          Icon(Icons.person, size: 12, color: core_theme.AC.ts),
           const SizedBox(width: 4),
           Expanded(child: Text('السائق: ${s.driver} • ${s.vehicle}', style: const TextStyle(fontSize: 10))),
           Text('ETA: ${s.eta}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
@@ -97,7 +98,7 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
       title: Text('${v.plate} — ${v.model}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('${v.type} • سعة ${v.capacity}', style: const TextStyle(fontSize: 11)),
-        Text('وقود: ${v.fuelLevel}% • عداد ${v.odometer}km', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+        Text('وقود: ${v.fuelLevel}% • عداد ${v.odometer}km', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
       ]),
       trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
         decoration: BoxDecoration(color: _vehicleStatus(v.status).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
@@ -118,10 +119,10 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
       subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('رخصة: ${d.licenseType} • ${d.experience} سنة', style: const TextStyle(fontSize: 11)),
         Row(children: [
-          const Icon(Icons.star, color: Color(0xFFD4AF37), size: 12),
+          Icon(Icons.star, color: core_theme.AC.gold, size: 12),
           Text(' ${d.rating}', style: const TextStyle(fontSize: 11)),
           const SizedBox(width: 8),
-          Text('${d.tripsToday} رحلة اليوم', style: const TextStyle(fontSize: 10, color: Colors.black54)),
+          Text('${d.tripsToday} رحلة اليوم', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ]),
       ]),
       trailing: Text(d.status, style: TextStyle(color: _driverStatus(d.status), fontSize: 11, fontWeight: FontWeight.bold)),
@@ -131,7 +132,7 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
   Widget _analyticsTab() => ListView(padding: const EdgeInsets.all(14), children: [
     _insight('📦 حجم الشحنات', '2,840 شحنة شهرياً — نمو 28% YoY', const Color(0xFF004D40)),
     _insight('⏱️ Delivery Time', 'متوسط 6.4 ساعة داخل المدينة، 18.2 ساعة بين المدن', const Color(0xFF2E7D32)),
-    _insight('💰 تكلفة الكيلومتر', '1.85 ر.س/كم — توفير 12% بأتمتة المسارات', const Color(0xFFD4AF37)),
+    _insight('💰 تكلفة الكيلومتر', '1.85 ر.س/كم — توفير 12% بأتمتة المسارات', core_theme.AC.gold),
     _insight('🚗 استخدام الأسطول', '87% معدل استخدام — أعلى من الصناعة (72%)', const Color(0xFF4A148C)),
     _insight('🌿 بصمة الكربون', '182 gCO₂/km — تحسن 22% بعد اعتماد EV', const Color(0xFF1B5E20)),
     _insight('📱 تكامل SPL/TABADUL', '100% شحنات موثقة عبر المنصة الوطنية', const Color(0xFF1A237E)),
@@ -140,13 +141,13 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
   Widget _insight(String t, String txt, Color c) => Card(margin: const EdgeInsets.only(bottom: 10),
     child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c)),
-      const SizedBox(height: 6), Text(txt, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+      const SizedBox(height: 6), Text(txt, style: TextStyle(fontSize: 13, color: core_theme.AC.tp)),
     ])));
 
   Color _shipmentStatus(String s) {
     if (s.contains('مسلم')) return const Color(0xFF2E7D32);
     if (s.contains('الطريق')) return const Color(0xFFE65100);
-    if (s.contains('التجهيز')) return const Color(0xFFD4AF37);
+    if (s.contains('التجهيز')) return core_theme.AC.gold;
     if (s.contains('ملغى')) return const Color(0xFFC62828);
     return const Color(0xFF1A237E);
   }
@@ -155,7 +156,7 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
     if (s.contains('نشط')) return const Color(0xFF2E7D32);
     if (s.contains('صيانة')) return const Color(0xFFE65100);
     if (s.contains('خارج الخدمة')) return const Color(0xFFC62828);
-    return Colors.black54;
+    return core_theme.AC.ts;
   }
 
   IconData _vehicleIcon(String t) {
@@ -168,8 +169,8 @@ class _TransportLogisticsScreenState extends State<TransportLogisticsScreen> wit
   Color _driverStatus(String s) {
     if (s.contains('في رحلة')) return const Color(0xFFE65100);
     if (s.contains('متاح')) return const Color(0xFF2E7D32);
-    if (s.contains('استراحة')) return const Color(0xFFD4AF37);
-    return Colors.black54;
+    if (s.contains('استراحة')) return core_theme.AC.gold;
+    return core_theme.AC.ts;
   }
 
   static const List<_Shipment> _shipments = [

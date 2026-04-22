@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class HelpdeskTicketsScreen extends StatefulWidget {
   const HelpdeskTicketsScreen({super.key});
@@ -54,11 +55,11 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('تذاكر نشطة', '$open', Colors.blue, Icons.inbox),
-            _kpi('حرجة', '$critical', Colors.red, Icons.error),
-            _kpi('انتهاك SLA', '$slaBreach', Colors.orange, Icons.schedule),
-            _kpi('معدل الحل', '${(resolved / _tickets.length * 100).toStringAsFixed(0)}%', Colors.green, Icons.check_circle),
-            _kpi('متوسط زمن الاستجابة', '2.4 ساعة', const Color(0xFFD4AF37), Icons.timer),
+            _kpi('تذاكر نشطة', '$open', core_theme.AC.info, Icons.inbox),
+            _kpi('حرجة', '$critical', core_theme.AC.err, Icons.error),
+            _kpi('انتهاك SLA', '$slaBreach', core_theme.AC.warn, Icons.schedule),
+            _kpi('معدل الحل', '${(resolved / _tickets.length * 100).toStringAsFixed(0)}%', core_theme.AC.ok, Icons.check_circle),
+            _kpi('متوسط زمن الاستجابة', '2.4 ساعة', core_theme.AC.gold, Icons.timer),
           ],
         ),
         const SizedBox(height: 16),
@@ -91,21 +92,21 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
         children: [
           const Icon(Icons.support_agent, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('خدمة العملاء والدعم الفني',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Helpdesk · SLA tracking · تصعيد تلقائي · قاعدة معرفية',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 16),
-            label: const Text('تذكرة جديدة'),
+            label: Text('تذكرة جديدة'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF00695C),
@@ -134,7 +135,7 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -155,13 +156,13 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF00695C) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: selected ? const Color(0xFF00695C) : Colors.black26),
+          border: Border.all(color: selected ? const Color(0xFF00695C) : core_theme.AC.td),
         ),
         child: Text(label,
             style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : Colors.black87)),
+                color: selected ? Colors.white : core_theme.AC.tp)),
       ),
     );
   }
@@ -176,7 +177,7 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: slaBreach ? Colors.red : pc.withOpacity(0.3), width: slaBreach ? 2 : 1),
+        border: Border.all(color: slaBreach ? core_theme.AC.err : pc.withOpacity(0.3), width: slaBreach ? 2 : 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,7 +207,7 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                           child: Text(t.category,
                               style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                         ),
@@ -214,8 +215,8 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(3)),
-                            child: const Text('SLA BREACH',
+                            decoration: BoxDecoration(color: core_theme.AC.err, borderRadius: BorderRadius.circular(3)),
+                            child: Text('SLA BREACH',
                                 style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900)),
                           ),
                         ],
@@ -226,20 +227,20 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.business, size: 11, color: Colors.black45),
+                        Icon(Icons.business, size: 11, color: core_theme.AC.td),
                         const SizedBox(width: 4),
-                        Text(t.customer, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(t.customer, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                         const SizedBox(width: 10),
-                        const Icon(Icons.schedule, size: 11, color: Colors.black45),
+                        Icon(Icons.schedule, size: 11, color: core_theme.AC.td),
                         const SizedBox(width: 4),
-                        Text(t.createdAt, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace')),
+                        Text(t.createdAt, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace')),
                         const SizedBox(width: 10),
-                        Icon(Icons.timer, size: 11, color: slaBreach ? Colors.red : Colors.black45),
+                        Icon(Icons.timer, size: 11, color: slaBreach ? core_theme.AC.err : core_theme.AC.td),
                         const SizedBox(width: 4),
                         Text('مفتوحة ${t.hoursOpen} ساعة',
                             style: TextStyle(
                                 fontSize: 11,
-                                color: slaBreach ? Colors.red : Colors.black54,
+                                color: slaBreach ? core_theme.AC.err : core_theme.AC.ts,
                                 fontWeight: slaBreach ? FontWeight.w800 : FontWeight.w500)),
                       ],
                     ),
@@ -266,13 +267,13 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
                   if (t.assignee != null)
                     Row(
                       children: [
-                        const Icon(Icons.person, size: 12, color: Colors.black54),
+                        Icon(Icons.person, size: 12, color: core_theme.AC.ts),
                         const SizedBox(width: 4),
-                        Text(t.assignee!, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                        Text(t.assignee!, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                       ],
                     )
                   else
-                    const Text('غير مُعيّن', style: TextStyle(fontSize: 11, color: Colors.orange, fontWeight: FontWeight.w700)),
+                    Text('غير مُعيّن', style: TextStyle(fontSize: 11, color: core_theme.AC.warn, fontWeight: FontWeight.w700)),
                 ],
               ),
             ],
@@ -285,15 +286,15 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
   Color _priorityColor(String p) {
     switch (p) {
       case 'critical':
-        return Colors.red;
+        return core_theme.AC.err;
       case 'urgent':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'normal':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'low':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
@@ -315,17 +316,17 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
   Color _statusColor(String s) {
     switch (s) {
       case 'open':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'in-progress':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'waiting':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'resolved':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'closed':
-        return Colors.grey;
+        return core_theme.AC.td;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

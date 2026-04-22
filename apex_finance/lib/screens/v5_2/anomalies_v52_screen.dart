@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 import '../../core/v5/templates/multi_view_template.dart';
 
 class AnomaliesV52Screen extends StatefulWidget {
@@ -12,9 +13,9 @@ class AnomaliesV52Screen extends StatefulWidget {
 }
 
 class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
-  static const _gold = Color(0xFFD4AF37);
-  static const _navy = Color(0xFF1A237E);
-  static const _purple = Color(0xFF4A148C);
+  static Color get _gold => core_theme.AC.gold;
+  static final _navy = Color(0xFF1A237E);
+  static final _purple = Color(0xFF4A148C);
   String _filter = '';
 
   static const _items = <_An>[
@@ -47,16 +48,16 @@ class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
         SavedView(id: 'high-conf', labelAr: 'ثقة >90%', icon: Icons.verified, defaultViewMode: ViewMode.list),
       ],
       filterChips: [
-        FilterChipDef(id: 'critical', labelAr: 'حرج', color: Colors.red, count: _cnt(_Sev.critical), active: _filter == 'critical'),
-        FilterChipDef(id: 'high', labelAr: 'عالٍ', color: Colors.orange, count: _cnt(_Sev.high), active: _filter == 'high'),
+        FilterChipDef(id: 'critical', labelAr: 'حرج', color: core_theme.AC.err, count: _cnt(_Sev.critical), active: _filter == 'critical'),
+        FilterChipDef(id: 'high', labelAr: 'عالٍ', color: core_theme.AC.warn, count: _cnt(_Sev.high), active: _filter == 'high'),
         FilterChipDef(id: 'medium', labelAr: 'متوسط', color: _gold, count: _cnt(_Sev.medium), active: _filter == 'medium'),
-        FilterChipDef(id: 'low', labelAr: 'منخفض', color: Colors.blue, count: _cnt(_Sev.low), active: _filter == 'low'),
+        FilterChipDef(id: 'low', labelAr: 'منخفض', color: core_theme.AC.info, count: _cnt(_Sev.low), active: _filter == 'low'),
       ],
       onFilterToggle: (id) => setState(() => _filter = _filter == id ? '' : id),
       onCreateNew: () {},
       createLabelAr: 'قاعدة كشف جديدة',
       headerActions: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.settings, size: 14), label: const Text('إعدادات AI')),
+        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.settings, size: 14), label: Text('إعدادات AI')),
       ],
       listBuilder: (_) => _list(),
       kanbanBuilder: (_) => _kanban(),
@@ -80,31 +81,31 @@ class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
           child: Row(children: [
             Container(width: 4, height: 60, color: a.severity.color),
             const SizedBox(width: 12),
-            Container(width: 44, height: 44, decoration: BoxDecoration(color: _purple.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.psychology, color: _purple)),
+            Container(width: 44, height: 44, decoration: BoxDecoration(color: _purple.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.psychology, color: _purple)),
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Text(a.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Colors.black54)),
+                Text(a.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _purple.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(a.kind.labelAr, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _purple))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _purple.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(a.kind.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _purple))),
               ]),
               Text(a.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-              Text(a.description, style: const TextStyle(fontSize: 11, color: Colors.black54, height: 1.4)),
+              Text(a.description, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.4)),
               const SizedBox(height: 4),
-              Text('الفاعل: ${a.actor} · ${a.date}', style: const TextStyle(fontSize: 10, color: Colors.black45)),
+              Text('الفاعل: ${a.actor} · ${a.date}', style: TextStyle(fontSize: 10, color: core_theme.AC.td)),
             ])),
-            Text('${a.amount >= 1 ? a.amount.toStringAsFixed(0) : a.amount.toStringAsFixed(2)} ر.س', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+            Text('${a.amount >= 1 ? a.amount.toStringAsFixed(0) : a.amount.toStringAsFixed(2)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(width: 16),
             Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Text('ثقة AI', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-              Text('${(a.confidence * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: a.confidence >= 0.9 ? Colors.red : a.confidence >= 0.8 ? Colors.orange : Colors.blue)),
+              Text('ثقة AI', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+              Text('${(a.confidence * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: a.confidence >= 0.9 ? core_theme.AC.err : a.confidence >= 0.8 ? core_theme.AC.warn : core_theme.AC.info)),
             ]),
             const SizedBox(width: 16),
             Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: a.severity.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(a.severity.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: a.severity.color))),
             const SizedBox(width: 10),
-            OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), minimumSize: Size.zero), child: const Text('تجاهل', style: TextStyle(fontSize: 11))),
+            OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), minimumSize: Size.zero), child: Text('تجاهل', style: TextStyle(fontSize: 11))),
             const SizedBox(width: 6),
-            FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _purple, padding: const EdgeInsets.symmetric(horizontal: 10)), icon: const Icon(Icons.search, size: 14), label: const Text('تحقيق', style: TextStyle(fontSize: 11))),
+            FilledButton.icon(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: _purple, padding: const EdgeInsets.symmetric(horizontal: 10)), icon: const Icon(Icons.search, size: 14), label: Text('تحقيق', style: TextStyle(fontSize: 11))),
           ]),
         );
       },
@@ -121,7 +122,7 @@ class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
         return Container(
           width: 280,
           margin: const EdgeInsets.only(left: 10),
-          decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(Icons.warning_amber, color: s.color, size: 18),
@@ -131,16 +132,16 @@ class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
             ...items.map((a) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade200)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Text(a.id, style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.black54)),
+                  Text(a.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                   const Spacer(),
                   Text('${(a.confidence * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: s.color)),
                 ]),
                 Text(a.title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
-                Text(a.description, style: const TextStyle(fontSize: 9, color: Colors.black54), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(a.description, style: TextStyle(fontSize: 9, color: core_theme.AC.ts), maxLines: 2, overflow: TextOverflow.ellipsis),
               ]),
             )),
             const SizedBox(height: 8),
@@ -159,15 +160,15 @@ class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('توزيع الشذوذات حسب النوع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
+        Text('توزيع الشذوذات حسب النوع', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
         const SizedBox(height: 20),
         ...byKind.entries.map((e) {
           final pct = e.value / max;
           return Padding(padding: const EdgeInsets.only(bottom: 12), child: Row(children: [
             SizedBox(width: 160, child: Text(e.key.labelAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-            Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: Colors.grey.shade100, color: _purple))),
+            Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: pct, minHeight: 20, backgroundColor: core_theme.AC.navy3, color: _purple))),
             const SizedBox(width: 10),
-            SizedBox(width: 80, child: Text('${e.value} تنبيه', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _purple), textAlign: TextAlign.end)),
+            SizedBox(width: 80, child: Text('${e.value} تنبيه', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _purple), textAlign: TextAlign.end)),
           ]));
         }),
       ]),
@@ -186,10 +187,10 @@ extension _SevX on _Sev {
         _Sev.low => 'منخفض',
       };
   Color get color => switch (this) {
-        _Sev.critical => Colors.red,
-        _Sev.high => Colors.orange,
-        _Sev.medium => const Color(0xFFD4AF37),
-        _Sev.low => Colors.blue,
+        _Sev.critical => core_theme.AC.err,
+        _Sev.high => core_theme.AC.warn,
+        _Sev.medium => core_theme.AC.gold,
+        _Sev.low => core_theme.AC.info,
       };
 }
 

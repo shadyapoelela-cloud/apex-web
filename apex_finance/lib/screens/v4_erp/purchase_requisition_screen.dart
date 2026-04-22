@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class PurchaseRequisitionScreen extends StatefulWidget {
   const PurchaseRequisitionScreen({super.key});
@@ -43,11 +44,11 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            _kpi('إجمالي القيم', _fmtM(total.toDouble()), Colors.blue, Icons.monetization_on),
-            _kpi('بانتظار الاعتماد', '$pending', Colors.orange, Icons.pending),
-            _kpi('جارٍ التوريد', '$sourcing', Colors.purple, Icons.local_shipping),
-            _kpi('معتمدة', '$approved', Colors.green, Icons.check_circle),
-            _kpi('تحوّلت لـ PO', '$converted', const Color(0xFFD4AF37), Icons.receipt),
+            _kpi('إجمالي القيم', _fmtM(total.toDouble()), core_theme.AC.info, Icons.monetization_on),
+            _kpi('بانتظار الاعتماد', '$pending', core_theme.AC.warn, Icons.pending),
+            _kpi('جارٍ التوريد', '$sourcing', core_theme.AC.purple, Icons.local_shipping),
+            _kpi('معتمدة', '$approved', core_theme.AC.ok, Icons.check_circle),
+            _kpi('تحوّلت لـ PO', '$converted', core_theme.AC.gold, Icons.receipt),
           ],
         ),
         const SizedBox(height: 16),
@@ -60,9 +61,9 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
             ElevatedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.add, size: 16),
-              label: const Text('طلب شراء جديد'),
+              label: Text('طلب شراء جديد'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD4AF37),
+                backgroundColor: core_theme.AC.gold,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -81,7 +82,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
         gradient: const LinearGradient(colors: [Color(0xFF37474F), Color(0xFF546E7A)]),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.shopping_cart, color: Colors.white, size: 36),
           SizedBox(width: 14),
@@ -92,7 +93,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
                 Text('طلبات الشراء (PR)',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('Purchase Requisition Workflow — طلب → اعتماد → توريد → أمر شراء → استلام',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -119,7 +120,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -140,17 +141,17 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF37474F) : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: selected ? const Color(0xFF37474F) : Colors.black26),
+          border: Border.all(color: selected ? const Color(0xFF37474F) : core_theme.AC.td),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 14, color: selected ? Colors.white : Colors.black54),
+            Icon(icon, size: 14, color: selected ? Colors.white : core_theme.AC.ts),
             const SizedBox(width: 6),
             Text(label,
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: selected ? Colors.white : Colors.black87)),
+                    color: selected ? Colors.white : core_theme.AC.tp)),
           ],
         ),
       ),
@@ -158,12 +159,12 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
   }
 
   Widget _buildKanban() {
-    final stages = const [
-      _Stage('draft', 'مسوّدة', Colors.grey),
-      _Stage('pending', 'بانتظار الاعتماد', Colors.orange),
-      _Stage('sourcing', 'جارٍ التوريد', Colors.purple),
-      _Stage('approved', 'معتمد', Colors.green),
-      _Stage('converted', 'تحوّل لـ PO', Color(0xFFD4AF37)),
+    final stages = [
+      _Stage('draft', 'مسوّدة', core_theme.AC.td),
+      _Stage('pending', 'بانتظار الاعتماد', core_theme.AC.warn),
+      _Stage('sourcing', 'جارٍ التوريد', core_theme.AC.purple),
+      _Stage('approved', 'معتمد', core_theme.AC.ok),
+      _Stage('converted', 'تحوّل لـ PO', core_theme.AC.gold),
     ];
     return SizedBox(
       height: 520,
@@ -174,9 +175,9 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: core_theme.AC.navy3,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12),
+                  border: Border.all(color: core_theme.AC.bdr),
                 ),
                 child: Column(
                   children: [
@@ -227,39 +228,39 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(r.id, style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.black54)),
+          Text(r.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
           const SizedBox(height: 4),
           Text(r.title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800), maxLines: 2, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: const Color(0xFFD4AF37).withOpacity(0.1), borderRadius: BorderRadius.circular(3)),
+            decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(3)),
             child: Text('${_fmt(r.amount.toDouble())} ر.س',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
           ),
           const SizedBox(height: 6),
           Row(
             children: [
-              Icon(Icons.person, size: 11, color: Colors.black45),
+              Icon(Icons.person, size: 11, color: core_theme.AC.td),
               const SizedBox(width: 3),
-              Expanded(child: Text(r.requester, style: const TextStyle(fontSize: 10, color: Colors.black54))),
+              Expanded(child: Text(r.requester, style: TextStyle(fontSize: 10, color: core_theme.AC.ts))),
             ],
           ),
           Row(
             children: [
-              const Icon(Icons.calendar_today, size: 10, color: Colors.black45),
+              Icon(Icons.calendar_today, size: 10, color: core_theme.AC.td),
               const SizedBox(width: 3),
               Text(r.createdAt.substring(5),
-                  style: const TextStyle(fontSize: 10, color: Colors.black54, fontFamily: 'monospace')),
+                  style: TextStyle(fontSize: 10, color: core_theme.AC.ts, fontFamily: 'monospace')),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
                 child: Text(r.department, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700)),
               ),
             ],
@@ -271,7 +272,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
                 Expanded(
                   child: Container(
                     height: 4,
-                    color: i < r.stepsCompleted ? stageColor : Colors.grey.shade300,
+                    color: i < r.stepsCompleted ? stageColor : core_theme.AC.bdr,
                   ),
                 ),
                 if (i < r.totalSteps - 1) const SizedBox(width: 2),
@@ -288,13 +289,13 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: core_theme.AC.bdr),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            color: Colors.grey.shade100,
+            color: core_theme.AC.navy3,
             child: const Row(
               children: [
                 Expanded(child: Text('الرقم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -319,7 +320,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
       ),
       child: Row(
         children: [
@@ -327,18 +328,18 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
           Expanded(flex: 3, child: Text(r.title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
           Expanded(
             child: Text(_fmt(r.amount.toDouble()),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFFD4AF37), fontFamily: 'monospace')),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.gold, fontFamily: 'monospace')),
           ),
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: core_theme.AC.bdr, borderRadius: BorderRadius.circular(3)),
               child: Text(r.department, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
             ),
           ),
           Expanded(flex: 2, child: Text(r.requester, style: const TextStyle(fontSize: 12))),
-          Expanded(child: Text(r.createdAt, style: const TextStyle(fontSize: 11, color: Colors.black54, fontFamily: 'monospace'))),
+          Expanded(child: Text(r.createdAt, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'))),
           Expanded(
             flex: 2,
             child: Row(
@@ -346,7 +347,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
                 Expanded(
                   child: LinearProgressIndicator(
                     value: r.stepsCompleted / r.totalSteps,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: core_theme.AC.bdr,
                     valueColor: AlwaysStoppedAnimation(stageColor),
                     minHeight: 6,
                   ),
@@ -375,19 +376,19 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
   Color _stageColor(String s) {
     switch (s) {
       case 'draft':
-        return Colors.grey;
+        return core_theme.AC.td;
       case 'pending':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'sourcing':
-        return Colors.purple;
+        return core_theme.AC.purple;
       case 'approved':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'converted':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'rejected':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 

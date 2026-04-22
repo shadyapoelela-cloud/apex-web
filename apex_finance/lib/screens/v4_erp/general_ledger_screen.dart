@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../core/theme.dart' as core_theme;
 
 class GeneralLedgerScreen extends StatefulWidget {
   const GeneralLedgerScreen({super.key});
@@ -75,7 +76,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                 child: Container(
                   margin: const EdgeInsets.only(right: 20, bottom: 20, left: 10),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black12),
+                    border: Border.all(color: core_theme.AC.bdr),
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                   ),
@@ -83,12 +84,12 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
-                        color: Colors.grey.shade50,
+                        color: core_theme.AC.navy3,
                         child: Column(
                           children: [
-                            const Row(
+                            Row(
                               children: [
-                                Icon(Icons.account_tree, size: 16, color: Color(0xFFD4AF37)),
+                                Icon(Icons.account_tree, size: 16, color: core_theme.AC.gold),
                                 SizedBox(width: 6),
                                 Text('الحسابات', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                               ],
@@ -119,11 +120,11 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? const Color(0xFFD4AF37).withOpacity(0.12) : null,
+                                  color: isSelected ? core_theme.AC.gold.withOpacity(0.12) : null,
                                   border: Border(
-                                    bottom: BorderSide(color: Colors.black12.withOpacity(0.5)),
+                                    bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
                                     right: BorderSide(
-                                      color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
+                                      color: isSelected ? core_theme.AC.gold : Colors.transparent,
                                       width: 3,
                                     ),
                                   ),
@@ -156,7 +157,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                                                 fontSize: 12,
                                                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                                               )),
-                                          Text(a.type, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                                          Text(a.type, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                                         ],
                                       ),
                                     ),
@@ -164,7 +165,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                                         style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w700,
-                                          color: a.nature == 'debit' ? Colors.green : Colors.orange,
+                                          color: a.nature == 'debit' ? core_theme.AC.ok : core_theme.AC.warn,
                                         )),
                                   ],
                                 ),
@@ -182,7 +183,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                 child: Container(
                   margin: const EdgeInsets.only(left: 20, bottom: 20, right: 10),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black12),
+                    border: Border.all(color: core_theme.AC.bdr),
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                   ),
@@ -190,7 +191,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.all(14),
-                        color: Colors.grey.shade50,
+                        color: core_theme.AC.navy3,
                         child: Row(
                           children: [
                             Container(
@@ -210,7 +211,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                                   Text(account.nameAr,
                                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
                                   Text('${account.type} · الطبيعة: ${account.nature == 'debit' ? 'مدين' : 'دائن'}',
-                                      style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                                      style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                                 ],
                               ),
                             ),
@@ -229,14 +230,14 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.all(10),
-                        color: Colors.grey.shade100,
-                        child: const Row(
+                        color: core_theme.AC.navy3,
+                        child: Row(
                           children: [
                             Expanded(child: Text('التاريخ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                             Expanded(child: Text('رقم القيد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                             Expanded(flex: 3, child: Text('البيان', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
-                            Expanded(child: Text('مدين', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.green))),
-                            Expanded(child: Text('دائن', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.orange))),
+                            Expanded(child: Text('مدين', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
+                            Expanded(child: Text('دائن', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.warn))),
                             Expanded(child: Text('المرجع', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
                           ],
                         ),
@@ -249,7 +250,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                             return Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               decoration: BoxDecoration(
-                                border: Border(bottom: BorderSide(color: Colors.black12.withOpacity(0.5))),
+                                border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
                               ),
                               child: Row(
                                 children: [
@@ -265,18 +266,18 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                                     child: Text(
                                       t.debit > 0 ? _fmt(t.debit) : '—',
                                       style: TextStyle(
-                                          fontSize: 12, fontWeight: FontWeight.w700, color: t.debit > 0 ? Colors.green : Colors.black26),
+                                          fontSize: 12, fontWeight: FontWeight.w700, color: t.debit > 0 ? core_theme.AC.ok : core_theme.AC.td),
                                     ),
                                   ),
                                   Expanded(
                                     child: Text(
                                       t.credit > 0 ? _fmt(t.credit) : '—',
                                       style: TextStyle(
-                                          fontSize: 12, fontWeight: FontWeight.w700, color: t.credit > 0 ? Colors.orange : Colors.black26),
+                                          fontSize: 12, fontWeight: FontWeight.w700, color: t.credit > 0 ? core_theme.AC.warn : core_theme.AC.td),
                                     ),
                                   ),
                                   Expanded(
-                                    child: Text(t.ref, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                                    child: Text(t.ref, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                                   ),
                                 ],
                               ),
@@ -286,17 +287,17 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.all(12),
-                        color: Colors.grey.shade100,
+                        color: core_theme.AC.navy3,
                         child: Row(
                           children: [
                             const Expanded(flex: 4, child: Text('الإجماليات', style: TextStyle(fontWeight: FontWeight.w900))),
                             Expanded(
                               child: Text(_fmt(totalDebit),
-                                  style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.green)),
+                                  style: TextStyle(fontWeight: FontWeight.w900, color: core_theme.AC.ok)),
                             ),
                             Expanded(
                               child: Text(_fmt(totalCredit),
-                                  style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.orange)),
+                                  style: TextStyle(fontWeight: FontWeight.w900, color: core_theme.AC.warn)),
                             ),
                             const Expanded(child: SizedBox()),
                           ],
@@ -318,21 +319,21 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)]),
+        gradient: LinearGradient(colors: [Color(0xFF1E3A8A), core_theme.AC.info]),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
           const Icon(Icons.book, color: Colors.white, size: 36),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('دفتر الأستاذ العام',
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
                 Text('تفصيل حركة كل حساب مع التنقل الذكي بين الحسابات',
-                    style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    style: TextStyle(color: core_theme.AC.ts, fontSize: 12)),
               ],
             ),
           ),
@@ -371,10 +372,10 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          _statCard('الأصول', assets, Colors.green, Icons.trending_up),
-          _statCard('الخصوم', liab, Colors.orange, Icons.trending_down),
-          _statCard('حقوق الملكية', equity, Colors.blue, Icons.account_balance),
-          _statCard('الإيرادات', rev, const Color(0xFFD4AF37), Icons.attach_money),
+          _statCard('الأصول', assets, core_theme.AC.ok, Icons.trending_up),
+          _statCard('الخصوم', liab, core_theme.AC.warn, Icons.trending_down),
+          _statCard('حقوق الملكية', equity, core_theme.AC.info, Icons.account_balance),
+          _statCard('الإيرادات', rev, core_theme.AC.gold, Icons.attach_money),
         ],
       ),
     );
@@ -398,7 +399,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  Text(label, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                   Text(_fmt(value), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color)),
                 ],
               ),
@@ -412,17 +413,17 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
   Color _typeColor(String type) {
     switch (type) {
       case 'أصول':
-        return Colors.green;
+        return core_theme.AC.ok;
       case 'خصوم':
-        return Colors.orange;
+        return core_theme.AC.warn;
       case 'حقوق ملكية':
-        return Colors.blue;
+        return core_theme.AC.info;
       case 'إيرادات':
-        return const Color(0xFFD4AF37);
+        return core_theme.AC.gold;
       case 'مصروفات':
-        return Colors.red;
+        return core_theme.AC.err;
       default:
-        return Colors.grey;
+        return core_theme.AC.td;
     }
   }
 
