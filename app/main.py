@@ -768,20 +768,8 @@ import time
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    import traceback
-    tb = traceback.format_exc()
-    logging.error(f"Unhandled: {exc}\n{tb}", exc_info=True)
-    # مؤقت: نُرجِع رسالة الخطأ الفعلية للتشخيص (سنعيده لاحقاً)
-    return JSONResponse(
-        status_code=500,
-        content={
-            "success": False,
-            "error": "Internal server error",
-            "debug_type": type(exc).__name__,
-            "debug_message": str(exc)[:500],
-            "debug_trace": tb.split("\n")[-4:-1] if tb else [],
-        },
-    )
+    logging.error(f"Unhandled: {exc}", exc_info=True)
+    return JSONResponse(status_code=500, content={"success": False, "error": "Internal server error"})
 
 
 # ======================================================================
