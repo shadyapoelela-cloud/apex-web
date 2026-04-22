@@ -37,8 +37,11 @@ from __future__ import annotations
 
 import json
 import logging
+import logging.handlers
 import os
 import re
+import tempfile
+import traceback
 from decimal import Decimal, InvalidOperation
 from typing import Any, Optional
 
@@ -47,6 +50,26 @@ from sqlalchemy.orm import Session
 from app.pilot.models import Entity, GLAccount
 
 logger = logging.getLogger(__name__)
+
+# Debug log file لتشخيص أخطاء استخراج الـ AI
+_DEBUG_LOG = os.path.join(tempfile.gettempdir(), "apex_ai_extraction.log")
+if not any(
+    isinstance(h, logging.FileHandler) and getattr(h, "baseFilename", "") == _DEBUG_LOG
+    for h in logger.handlers
+):
+    try:
+        _fh = logging.handlers.RotatingFileHandler(
+            _DEBUG_LOG, maxBytes=2_000_000, backupCount=2, encoding="utf-8"
+        )
+        _fh.setLevel(logging.DEBUG)
+        _fh.setFormatter(
+            logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
+        )
+        logger.addHandler(_fh)
+        logger.setLevel(logging.DEBUG)
+        logger.info("AI extraction debug log initialized at %s", _DEBUG_LOG)
+    except Exception:  # noqa: BLE001
+        pass
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 AI_MODEL = os.environ.get("APEX_AI_MODEL", "claude-sonnet-4-20250514")
@@ -192,15 +215,27 @@ def _call_claude_extraction(file_base64: str, media_type: str) -> dict[str, Any]
         ],
     }
 
-    response = client.messages.create(
-        model=AI_MODEL,
-        max_tokens=2000,
-        temperature=0.1,  # دقّة عالية، لا إبداع
-        system=EXTRACTION_SYSTEM_PROMPT,
-        messages=[user_message],
+    logger.info(
+        "Calling Claude: model=%s, media=%s, b64_len=%d",
+        AI_MODEL, media_type, len(file_base64),
     )
+    try:
+        response = client.messages.create(
+            model=AI_MODEL,
+            max_tokens=2000,
+            temperature=0.1,  # دقّة عالية، لا إبداع
+            system=EXTRACTION_SYSTEM_PROMPT,
+            messages=[user_message],
+        )
+    except Exception as call_ex:  # noqa: BLE001
+        logger.error(
+            "Claude API call failed: %s: %s\n%s",
+            type(call_ex).__name__, call_ex, traceback.format_exc(),
+        )
+        raise
 
     ai_text = response.content[0].text.strip() if response.content else ""
+    logger.info("Claude returned %d chars (first 200: %r)", len(ai_text), ai_text[:200])
     parsed = _safe_json_parse(ai_text)
     if parsed is None:
         logger.error("AI extraction returned non-JSON: %r", ai_text[:500])

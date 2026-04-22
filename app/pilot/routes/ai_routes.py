@@ -294,6 +294,156 @@ async def read_document(
         raise HTTPException(503, str(ex))
     except Exception as ex:  # noqa: BLE001
         logger.error("AI extraction failed: %s", ex, exc_info=True)
-        raise HTTPException(500, "فشل استخراج القيد من المستند")
+        # نُرجِع تفاصيل الخطأ مع نوعه لتسهيل التشخيص
+        raise HTTPException(
+            500,
+            f"فشل استخراج القيد من المستند — {type(ex).__name__}: {str(ex)[:400]}",
+        )
+
+    # لو الـ AI رفض الاستخراج (مثلاً: المستند ليس فاتورة، أو متعدد)
+    # نُرجِع HTTP 400 بدل 200 حتى يلتقطها frontend كـ error
+    if not raw.get("success"):
+        reason = raw.get(
+            "reason",
+            "تعذّر استخراج القيد — قد يكون المستند غير واضح أو يحوي أكثر من فاتورة",
+        )
+        logger.info("AI refused extraction: %s", reason)
+        raise HTTPException(400, reason)
 
     return _shape_for_read_document(db, entity, raw)
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Narration Generator — يقترح البيان من سطور القيد الحالية
+# ──────────────────────────────────────────────────────────────────────────
+
+
+class SuggestMemoLine(BaseModel):
+    account_id: Optional[str] = None
+    account_code: Optional[str] = None
+    account_name: Optional[str] = None
+    debit: float = 0.0
+    credit: float = 0.0
+    description: Optional[str] = None
+
+
+class SuggestMemoRequest(BaseModel):
+    lines: list[SuggestMemoLine] = Field(default_factory=list)
+    kind: Optional[str] = "manual"
+    date: Optional[str] = None
+    reference: Optional[str] = None
+    language: str = "ar"
+
+
+class SuggestMemoResponse(BaseModel):
+    suggested_memo: str
+    confidence: float
+
+
+_MEMO_SYSTEM_PROMPT = """أنت محاسب سعودي خبير. مهمتك: قراءة سطور قيد يومية
+واقتراح "بيان" (memo) احترافي مختصر بالعربية يصف الغرض من القيد.
+
+قواعد:
+1. البيان يجب أن يكون **جملة واحدة** موجزة (10-25 كلمة).
+2. يصف الغرض التجاري، ليس مجرد تكرار للحسابات.
+3. لا تُضِف تواريخ أو أرقام مستندات — فقط وصف الطبيعة.
+4. مثال جيد: "إثبات فاتورة مشتريات مكتبية من مكتبة جرير — آجل"
+5. مثال سيء: "حساب المشتريات مدين، حساب الموردون دائن"
+6. إن كان القيد غامضاً، اقترح بياناً عاماً دقيقاً.
+7. الإخراج: JSON فقط بهذه الصيغة {"suggested_memo": "...", "confidence": 0.85}
+
+لا تُضِف أي شرح خارج JSON."""
+
+
+@router.post("/ai/suggest-memo", response_model=SuggestMemoResponse)
+def suggest_memo(payload: SuggestMemoRequest, db: Session = Depends(get_db)):
+    """اقتراح بيان (memo) احترافي من سطور القيد بالذكاء الاصطناعي.
+
+    يُستخدم من حقل "البيان" في نموذج قيد اليومية — زر ✨ trailing.
+    """
+    if not ANTHROPIC_API_KEY:
+        raise HTTPException(
+            503,
+            "ميزة الذكاء الاصطناعي غير مُفعَّلة. يلزم تعيين ANTHROPIC_API_KEY.",
+        )
+
+    if not payload.lines or len(payload.lines) < 2:
+        raise HTTPException(
+            400,
+            "يلزم سطران على الأقل في القيد لاقتراح بيان دقيق.",
+        )
+
+    # نُحضر أسماء الحسابات إن لم تكن مرفقة
+    account_ids = [
+        ln.account_id for ln in payload.lines if ln.account_id
+    ]
+    accounts_map: dict[str, tuple[str, str]] = {}
+    if account_ids:
+        rows = (
+            db.query(GLAccount)
+            .filter(GLAccount.id.in_(account_ids))
+            .all()
+        )
+        accounts_map = {
+            acc.id: (acc.code or "", acc.name_ar or "") for acc in rows
+        }
+
+    # نبني سياقاً واضحاً
+    lines_desc_parts = []
+    for i, ln in enumerate(payload.lines, 1):
+        code = ln.account_code
+        name = ln.account_name
+        if ln.account_id and ln.account_id in accounts_map:
+            c, n = accounts_map[ln.account_id]
+            code = code or c
+            name = name or n
+        side = "مدين" if ln.debit > 0 else ("دائن" if ln.credit > 0 else "—")
+        amount = ln.debit if ln.debit > 0 else ln.credit
+        line_txt = f"السطر {i}: [{code or '?'}] {name or '?'} · {side} {amount:.2f}"
+        if ln.description:
+            line_txt += f' · "{ln.description}"'
+        lines_desc_parts.append(line_txt)
+
+    user_message = (
+        "اقترح بياناً مختصراً احترافياً للقيد التالي:\n\n"
+        + "\n".join(lines_desc_parts)
+    )
+    if payload.reference:
+        user_message += f"\n\nالرقم المرجعي: {payload.reference}"
+    if payload.kind and payload.kind != "manual":
+        user_message += f"\nنوع القيد: {payload.kind}"
+
+    try:
+        import anthropic  # type: ignore
+
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        import os as _os
+
+        model = _os.environ.get("APEX_AI_MODEL", "claude-sonnet-4-20250514")
+        response = client.messages.create(
+            model=model,
+            max_tokens=300,
+            temperature=0.2,
+            system=_MEMO_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_message}],
+        )
+        ai_text = response.content[0].text.strip() if response.content else ""
+        from app.pilot.services.ai_extraction import _safe_json_parse
+
+        parsed = _safe_json_parse(ai_text)
+        if not parsed or "suggested_memo" not in parsed:
+            # fallback: just return the raw text as memo
+            return SuggestMemoResponse(
+                suggested_memo=ai_text[:200] if ai_text else "قيد يومية",
+                confidence=0.5,
+            )
+        return SuggestMemoResponse(
+            suggested_memo=str(parsed.get("suggested_memo", ""))[:300],
+            confidence=float(parsed.get("confidence", 0.7) or 0.7),
+        )
+    except Exception as ex:  # noqa: BLE001
+        logger.error("AI suggest-memo failed: %s", ex, exc_info=True)
+        raise HTTPException(
+            500,
+            f"فشل اقتراح البيان — {type(ex).__name__}: {str(ex)[:200]}",
+        )
