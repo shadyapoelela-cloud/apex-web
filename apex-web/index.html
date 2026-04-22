@@ -16,7 +16,7 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
-  <base href="/apex-web/">
+  <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -33,6 +33,30 @@
 
   <title>apex_finance</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- APEX: unregister stale service workers + purge caches on load (fix stale cache issues) -->
+  <script id="apex_sw_cleanup">
+    (function() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var r of regs) {
+            r.unregister().then(function(ok) {
+              if (ok) console.log('[APEX] Unregistered stale service worker');
+            });
+          }
+        }).catch(function(e) { console.warn('[APEX] SW cleanup failed:', e); });
+      }
+      if (window.caches && caches.keys) {
+        caches.keys().then(function(keys) {
+          for (var k of keys) {
+            caches.delete(k).then(function(ok) {
+              if (ok) console.log('[APEX] Deleted cache:', k);
+            });
+          }
+        }).catch(function(e) { console.warn('[APEX] cache cleanup failed:', e); });
+      }
+    })();
+  </script>
 
   <!-- APEX Pre-redirect: skip login if token exists (v6.5.2) -->
   <script id="apex_pre_redirect">
@@ -51,6 +75,43 @@
           window.location.hash = '#/login';
         }
       }
+    })();
+  </script>
+
+  <!-- APEX PWA install prompt capture + standalone detection -->
+  <script id="apex_pwa_install">
+    (function() {
+      window.__APEX_PWA__ = {
+        installEvent: null,
+        canInstall: false,
+        isStandalone: window.matchMedia('(display-mode: standalone)').matches ||
+                      window.navigator.standalone === true,
+        promptInstall: function() {
+          if (!this.installEvent) return false;
+          this.installEvent.prompt();
+          this.installEvent.userChoice.then(function(choice) {
+            console.log('[APEX] PWA install choice:', choice.outcome);
+            window.__APEX_PWA__.installEvent = null;
+            window.__APEX_PWA__.canInstall = false;
+            window.dispatchEvent(new Event('apex:pwa-changed'));
+          });
+          return true;
+        }
+      };
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window.__APEX_PWA__.installEvent = e;
+        window.__APEX_PWA__.canInstall = true;
+        window.dispatchEvent(new Event('apex:pwa-changed'));
+        console.log('[APEX] PWA install prompt ready');
+      });
+      window.addEventListener('appinstalled', function() {
+        window.__APEX_PWA__.installEvent = null;
+        window.__APEX_PWA__.canInstall = false;
+        window.__APEX_PWA__.isStandalone = true;
+        window.dispatchEvent(new Event('apex:pwa-changed'));
+        console.log('[APEX] PWA installed');
+      });
     })();
   </script>
 </head>

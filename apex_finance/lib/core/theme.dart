@@ -379,6 +379,21 @@ class AC {
 
   // ── Border ──
   static Color get bdr => _current.border;
+
+  // ── Top bar (4-layer shell) ──
+  static Color get topBarBg => _current.bg2;
+  static Color get topBarFg => _current.textPrimary;
+  static Color get topBarFgDim => _current.textSecondary;
+  static Color get topBarAccent => _current.primary;
+  static Color get topBarBorder => _current.border;
+
+  // ── Helper: pick black/white text based on background luminance ──
+  /// Returns a foreground color (black or white) with best contrast against [bg].
+  /// Uses WCAG luminance formula — matches both dark + light themes.
+  static Color bestOn(Color bg) {
+    final luminance = bg.computeLuminance();
+    return luminance > 0.5 ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
+  }
 }
 
 InputDecoration apexInput(String label, {IconData? icon}) => InputDecoration(
