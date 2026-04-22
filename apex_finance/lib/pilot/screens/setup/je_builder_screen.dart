@@ -21,6 +21,7 @@ import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 import '../../widgets/attachments_panel.dart';
+import 'je_builder_live_v52.dart';
 
 // Wave R — CSV download helpers (dart:html wrappers)
 dynamic _makeBlob(List<int> bytes, String type) =>
@@ -351,26 +352,32 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   }
 
   // ───────────────────────────────────────────────────────────────────
-  // Inline create — النموذج يحلّ محل قائمة القيود داخل الـ Expanded،
-  // مع بقاء: البطاقات العلوية + القائمة الجانبية + شريط الإجماليات.
+  // Create flow — يفتح V5.2 ObjectPage screen (JeBuilderLiveV52Screen)
+  // كصفحة فرعية. هذه الصفحة فيها: stepper + chatter + tabs + smart
+  // buttons + AI integrations (قراءة مستند + اكتب بياناً) + real backend.
   // ───────────────────────────────────────────────────────────────────
-  void _openInline(_InlineMode mode) {
+  Future<void> _openInline(_InlineMode mode) async {
     if (_accounts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: _warn,
           content: Text('ابذر شجرة الحسابات أولاً')));
       return;
     }
-    setState(() => _inlineMode = mode);
+    // نفتح V5.2 screen — يدعم الوضعين manual و ai (الـ AI bar موجود
+    // داخل الـ screen نفسها فلا يهمّ mode هنا)
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => const JeBuilderLiveV52Screen(),
+      ),
+    );
+    if (!mounted) return;
+    if (saved == true) _load();
   }
 
   void _closeInline({bool reload = false}) {
-    if (!mounted) return;
-    setState(() => _inlineMode = _InlineMode.list);
-    if (reload) _load();
+    if (reload && mounted) _load();
   }
 
-  // Legacy: kept for keyboard shortcut (N) + any external caller.
   void _create() => _openInline(_InlineMode.createManual);
 
   Future<void> _post(String id) async {
@@ -546,39 +553,25 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
             child: Scaffold(
               backgroundColor: _navy,
               body: Column(children: [
-                // عند فتح لوحة الإنشاء، نُخفي الهيدر (العنوان + بطاقات
-                // الإجماليات + شريط الأزرار) ليحلّ النموذج محلّها بالكامل.
-                // الأشرطة الثلاث العلوية (APEX/ticker/company) والسايدبار
-                // من الـ app shell فلا تتأثر.
-                if (_inlineMode == _InlineMode.list) _header(visible),
-                if (_selectedIds.isNotEmpty &&
-                    _inlineMode == _InlineMode.list)
-                  _bulkActionBar(),
-                if (_activeFilterCount > 0 &&
-                    _selectedIds.isEmpty &&
-                    _inlineMode == _InlineMode.list)
+                _header(visible),
+                if (_selectedIds.isNotEmpty) _bulkActionBar(),
+                if (_activeFilterCount > 0 && _selectedIds.isEmpty)
                   _activeFiltersStrip(),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
-                    child: _inlineMode == _InlineMode.createManual
-                        ? _inlineManualPanel()
-                        : _inlineMode == _InlineMode.createAi
-                            ? _inlineAiPanel()
-                            : _loading
-                                ? _loadingSkeleton()
-                                : _error != null
-                                    ? _errorView()
-                                    : hasNoEntries
-                                        ? _emptyView()
-                                        : hasNoResults
-                                            ? _noResultsView()
-                                            : _list(visible),
+                    child: _loading
+                        ? _loadingSkeleton()
+                        : _error != null
+                            ? _errorView()
+                            : hasNoEntries
+                                ? _emptyView()
+                                : hasNoResults
+                                    ? _noResultsView()
+                                    : _list(visible),
                   ),
                 ),
-                // Wave Q — sticky totals footer (يُخفى عند فتح لوحة الإنشاء)
-                if (_inlineMode == _InlineMode.list &&
-                    !_loading &&
+                if (!_loading &&
                     _error == null &&
                     !hasNoEntries &&
                     !hasNoResults)
