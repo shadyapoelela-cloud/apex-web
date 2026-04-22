@@ -1305,6 +1305,54 @@ try:
     from app.phase1.models.platform_models import Base as PilotBase, engine as pilot_engine
     # Create pilot tables if missing (idempotent)
     PilotBase.metadata.create_all(bind=pilot_engine)
+
+    # ─── Schema drift fix — أضِف الأعمدة الناقصة لـ pilot_company_settings
+    # create_all() لا يعدّل الجداول القائمة، لذا نضيف الأعمدة الجديدة يدوياً
+    # عبر ALTER TABLE IF NOT EXISTS (آمن + idempotent على PostgreSQL).
+    try:
+        from sqlalchemy import text as _sql_text
+        _COMPANY_SETTINGS_NEW_COLS = [
+            ("logo_url", "VARCHAR(500)"),
+            ("logo_position", "VARCHAR(20) NOT NULL DEFAULT 'right'"),
+            ("brand_primary_color", "VARCHAR(7) NOT NULL DEFAULT '#D4AF37'"),
+            ("brand_secondary_color", "VARCHAR(7) NOT NULL DEFAULT '#0A1628'"),
+            ("invoice_header_html", "VARCHAR(2000)"),
+            ("invoice_footer_html", "VARCHAR(2000)"),
+            ("invoice_terms_ar", "VARCHAR(2000)"),
+            ("invoice_terms_en", "VARCHAR(2000)"),
+            ("signature_url", "VARCHAR(500)"),
+            ("show_vat_breakdown", "BOOLEAN NOT NULL DEFAULT TRUE"),
+            ("show_qr_on_invoice", "BOOLEAN NOT NULL DEFAULT TRUE"),
+            ("extras", "JSON NOT NULL DEFAULT '{}'"),
+        ]
+        with pilot_engine.connect() as _conn:
+            # detect dialect to pick correct syntax
+            _dialect = pilot_engine.dialect.name  # postgresql | sqlite | ...
+            for col, ddl in _COMPANY_SETTINGS_NEW_COLS:
+                try:
+                    if _dialect == "postgresql":
+                        _conn.execute(_sql_text(
+                            f"ALTER TABLE pilot_company_settings ADD COLUMN IF NOT EXISTS {col} {ddl}"
+                        ))
+                    else:
+                        # SQLite — use PRAGMA to check then ALTER
+                        rows = _conn.execute(_sql_text(
+                            "PRAGMA table_info(pilot_company_settings)"
+                        )).fetchall()
+                        existing = {r[1] for r in rows}
+                        if col not in existing:
+                            # SQLite doesn't support all defaults inline — use permissive version
+                            safe_ddl = ddl.replace("NOT NULL DEFAULT TRUE", "DEFAULT 1")
+                            safe_ddl = safe_ddl.replace("NOT NULL DEFAULT ", "DEFAULT ")
+                            _conn.execute(_sql_text(
+                                f"ALTER TABLE pilot_company_settings ADD COLUMN {col} {safe_ddl}"
+                            ))
+                except Exception as _col_err:
+                    logging.warning(f"Column {col} alter skipped: {_col_err}")
+            _conn.commit()
+        logging.info("Pilot schema drift check: pilot_company_settings columns ensured")
+    except Exception as _mig_err:
+        logging.error(f"Pilot schema drift fix failed: {_mig_err}", exc_info=True)
     app.include_router(pilot_router)
     app.include_router(pilot_catalog_router)
     app.include_router(pilot_pricing_router)
