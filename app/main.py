@@ -53,7 +53,13 @@ class AccountClosureRequest(BaseModel):
 
 
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "apex-admin-2026")
+_ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 if ADMIN_SECRET == "apex-admin-2026":
+    if _ENVIRONMENT == "production":
+        raise RuntimeError(
+            "FATAL: ADMIN_SECRET must be set in production! "
+            "Refusing to start with default secret."
+        )
     logging.warning("ADMIN_SECRET is using default value! Set ADMIN_SECRET env var in production.")
 
 
@@ -355,15 +361,34 @@ _cors_env = os.environ.get("CORS_ORIGINS", "")
 _cors_origins = [o.strip() for o in _cors_env.split(",") if o.strip()] if _cors_env else ["*"]
 _allow_creds = "*" not in _cors_origins  # credentials forbidden with wildcard
 if not _allow_creds:
-    logging.warning("CORS allows all origins — set CORS_ORIGINS env var in production")
+    if _ENVIRONMENT == "production":
+        logging.error("CORS_ORIGINS is wildcard in production! Set specific origins.")
+        _cors_origins = ["https://shadyapex.github.io"]
+        _allow_creds = True
+    else:
+        logging.warning("CORS allows all origins \u2014 set CORS_ORIGINS env var in production")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
     allow_credentials=_allow_creds,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["Content-Disposition"],
+    expose_headers=["Content-Disposition", "X-Request-ID", "X-Process-Time"],
 )
+
+# Production middleware stack
+try:
+    from app.core.middleware import (
+        RequestIdMiddleware, TimingMiddleware,
+        SecurityHeadersMiddleware, RequestLoggingMiddleware,
+    )
+    app.add_middleware(RequestLoggingMiddleware)
+    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(TimingMiddleware)
+    app.add_middleware(RequestIdMiddleware)
+    logging.info("✓ Production middleware loaded")
+except Exception as e:
+    logging.warning(f"Production middleware not loaded: {e}")
 orch = AnalysisOrchestrator()
 from fastapi.responses import JSONResponse
 from collections import defaultdict
@@ -374,6 +399,15 @@ import time
 async def global_exception_handler(request, exc):
     logging.error(f"Unhandled: {exc}", exc_info=True)
     return JSONResponse(status_code=500, content={"success": False, "error": "Internal server error"})
+
+
+@app.exception_handler(404)
+async def not_found_handler(request, exc):
+    """Return structured JSON for 404 instead of default HTML."""
+    return JSONResponse(
+        status_code=404,
+        content={"success": False, "error": "Endpoint not found", "path": str(request.url.path)},
+    )
 
 
 # ======================================================================
@@ -492,6 +526,46 @@ app.include_router(archive_r, tags=["Archive"])
 app.include_router(catalog_r, tags=["Service Catalog"])
 app.include_router(social_auth_r, tags=["Social Auth"])
 app.include_router(copilot_router)
+
+# ── Transfer Pricing ──
+try:
+    from app.core.transfer_pricing_routes import router as tp_router
+    app.include_router(tp_router, tags=["Transfer Pricing"])
+    logging.info("✓ Transfer Pricing routes loaded")
+except Exception as e:
+    logging.warning(f"Transfer Pricing routes not loaded: {e}")
+
+# ── Budget vs Actual ──
+try:
+    from app.core.budget_routes import router as budget_router
+    app.include_router(budget_router, tags=["Budget vs Actual"])
+    logging.info("✓ Budget vs Actual routes loaded")
+except Exception as e:
+    logging.warning(f"Budget vs Actual routes not loaded: {e}")
+
+# ── Inventory & Warehouse ──
+try:
+    from app.core.inventory_routes import router as inventory_router
+    app.include_router(inventory_router, tags=["Inventory"])
+    logging.info("✓ Inventory routes loaded")
+except Exception as e:
+    logging.warning(f"Inventory routes not loaded: {e}")
+
+# ── Purchase Orders & Sales Orders ──
+try:
+    from app.core.po_so_routes import router as po_so_router
+    app.include_router(po_so_router, tags=["PO/SO"])
+    logging.info("✓ PO/SO routes loaded")
+except Exception as e:
+    logging.warning(f"PO/SO routes not loaded: {e}")
+
+# ── Project Accounting ──
+try:
+    from app.core.project_accounting_routes import router as project_acct_router
+    app.include_router(project_acct_router, tags=["Project Accounting"])
+    logging.info("✓ Project Accounting routes loaded")
+except Exception as e:
+    logging.warning(f"Transfer Pricing routes not loaded: {e}")
 
 
 @app.get("/")

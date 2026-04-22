@@ -322,6 +322,22 @@ class ApiService {
     } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
 
+  // ── Transfer Pricing ──
+  static Future<ApiResult> tpAnalyse(Map body) => _post('/tp/analyse', body);
+  static Future<ApiResult> tpMethods() => _get('/tp/methods');
+
+  // ── Budget vs Actual ──
+  static Future<ApiResult> budgetAnalyse(Map body) => _post('/budget/analyse', body);
+
+  // ── Inventory ──
+  static Future<ApiResult> inventoryProcess(Map body) => _post('/inventory/process', body);
+
+  // ── PO/SO ──
+  static Future<ApiResult> orderProcess(Map body) => _post('/orders/process', body);
+
+  // ── Project Accounting ──
+  static Future<ApiResult> projectAnalyse(Map body) => _post('/projects/analyse', body);
+
   static Future<ApiResult> analyzeReport({required List<int> bytes, required String fileName, String industry = 'retail'}) async {
     try {
       final request = http.MultipartRequest('POST', Uri.parse('$_base/analyze/report?industry=$industry'));

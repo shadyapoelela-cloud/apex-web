@@ -12,11 +12,17 @@ from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
+_ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 JWT_SECRET = os.environ.get("JWT_SECRET", "apex-dev-secret-CHANGE-IN-PRODUCTION")
 JWT_ALGORITHM = "HS256"
 
 if JWT_SECRET == "apex-dev-secret-CHANGE-IN-PRODUCTION":
-    logger.warning("⚠ JWT_SECRET is using default value! Set JWT_SECRET env var in production.")
+    if _ENVIRONMENT == "production":
+        raise RuntimeError(
+            "FATAL: JWT_SECRET must be set in production! "
+            "Refusing to start with default secret."
+        )
+    logger.warning("JWT_SECRET is using default value! Set JWT_SECRET env var in production.")
 
 
 def extract_user_id(authorization: str = None) -> str:

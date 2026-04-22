@@ -1,6 +1,8 @@
 ﻿import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'api_service.dart';
+import 'core/apex_sidebar.dart';
 import 'screens/dashboard/enhanced_dashboard.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme.dart';
@@ -680,7 +682,7 @@ class MainNav extends ConsumerStatefulWidget {
 }
 class _MainNavS extends ConsumerState<MainNav> {
   int _i = 0;
-  bool _dr = false;
+  bool _sidebarCollapsed = false;
   List _cl = [];
   List<String> _activeClients = [];
   final _bizKey = GlobalKey();
@@ -691,6 +693,7 @@ class _MainNavS extends ConsumerState<MainNav> {
   String _userName = S.dname ?? 'User';
   String _clientLabel = '\u0644\u0645 \u064a\u062a\u0645 \u0627\u062e\u062a\u064a\u0627\u0631 \u0639\u0645\u064a\u0644';
   int _hoveredDrawerIndex = -1;
+  final _focusNode = FocusNode();
   @override
   void initState() {
     super.initState();
@@ -702,6 +705,37 @@ class _MainNavS extends ConsumerState<MainNav> {
     });
   }
 
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  // Cmd+K / Ctrl+K handler
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.keyK &&
+        (HardwareKeyboard.instance.isMetaPressed || HardwareKeyboard.instance.isControlPressed)) {
+      ApexCommandPalette.show(context);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+
+  // ── Sidebar item ID for current tab ──
+  String get _activeItemId {
+    switch (_i) {
+      case 0: return 'dashboard';
+      case 1: return 'clients';
+      case 2: return 'analysis';
+      case 3: return 'marketplace';
+      case 4: return 'providers';
+      case 5: return 'subscription';
+      case 6: return 'admin';
+      default: return 'dashboard';
+    }
+  }
 
   @override Widget build(BuildContext c) {
     _drawerItemCounter = 0;
@@ -709,248 +743,186 @@ class _MainNavS extends ConsumerState<MainNav> {
           onSwitchToClients: () => setState(() => _i = 1),
           onCreateClient: () {
             setState(() => _i = 1);
-            // Trigger create wizard after tab switch
           },
           onNavigateToCoa: _goToCoa,
         ), ClientsTab(), AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
-    return Scaffold(
-      backgroundColor: AC.navy,
-      body: Column(children: [
-        Container(padding: EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [AC.navy2, AC.navy2.withValues(alpha: 0.95)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-            border: Border(bottom: BorderSide(color: AC.gold.withValues(alpha: 0.12), width: 0.5)),
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 8, offset: const Offset(0, 2))],
-          ),
-          child: Row(children: [
-            ApexLogo(fontSize: 18, onTap: () => setState(() => _i = 0)),
-            _appBarDivider(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(color: AC.navy3.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-            ApexIconButton(icon: Icons.search, tooltip: 'البحث في المنصة', onPressed: () {
-              showSearch(context: context, delegate: ApexSearch());
-            }),
-            Builder(key: _bizKey, builder: (btnCtx) => ApexIconButton(icon: Icons.business, tooltip: 'تبديل العميل النشط',
-              showBadge: _activeClients.isNotEmpty, badgeColor: AC.ok,
-              onPressed: () {
-                final RenderBox btn = btnCtx.findRenderObject() as RenderBox;
-                final Offset pos = btn.localToGlobal(Offset.zero);
-                final Size sz = btn.size;
-                showMenu<String>(
-                  context: context,
-                  color: AC.navy2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: AC.gold, width: 0.5)),
-                  position: RelativeRect.fromLTRB(pos.dx, pos.dy + sz.height, MediaQuery.of(context).size.width - pos.dx - 250, 0),
-                  items: _cl.isEmpty
-                    ? [PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.ts, fontSize: 12)))]
-                    : _cl.take(10).map((cl) {
-                        final name = (cl['name_ar'] ?? cl['name'] ?? '') as String;
-                        final sel = _activeClients.contains(name);
-                        return PopupMenuItem<String>(
-                          value: name,
-                          height: 40,
-                          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                            Text(name, style: TextStyle(color: sel ? AC.gold : AC.tp, fontSize: 12, fontWeight: sel ? FontWeight.bold : FontWeight.normal)),
-                            SizedBox(width: 8),
-                            Icon(sel ? Icons.check_box : Icons.check_box_outline_blank, color: sel ? AC.gold : AC.ts, size: 18),
-                          ]),
-                        );
-                      }).toList(),
-                ).then((v) { if (v != null && v.isNotEmpty) setState(() { if (_activeClients.contains(v)) _activeClients.remove(v); else _activeClients.add(v); }); });
-              },
-            )),
-
-            Builder(key: _notifKey, builder: (notifCtx) => ApexIconButton(
-              icon: Icons.notifications_outlined,
-              tooltip: 'الإشعارات والتنبيهات',
-              showBadge: _notifs.any((n) => n['is_read'] != true),
-              badgeColor: AC.gold,
-              onPressed: () {
-                final RenderBox btn = notifCtx.findRenderObject() as RenderBox;
-                final Offset pos = btn.localToGlobal(Offset.zero);
-                final Size sz = btn.size;
-                showMenu<String>(
-                  context: context,
-                  color: AC.navy2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: AC.gold, width: 0.5)),
-                  position: RelativeRect.fromLTRB(pos.dx, pos.dy + sz.height, MediaQuery.of(context).size.width - pos.dx - 300, 0),
-                  items: _notifs.isEmpty
-                    ? [PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.ts, fontSize: 12)))]
-                    : [
-                      ..._notifs.take(8).map((n) {
-                        final unread = n['is_read'] != true;
-                        final title = (n['title'] ?? n['message'] ?? '') as String;
-                        return PopupMenuItem<String>(
-                          value: n['id']?.toString() ?? '',
-                          height: 44,
-                          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                            Expanded(child: Text(title, textAlign: TextAlign.right, overflow: TextOverflow.ellipsis, style: TextStyle(color: unread ? AC.gold : AC.tp, fontSize: 11, fontWeight: unread ? FontWeight.bold : FontWeight.normal))),
-                            SizedBox(width: 8),
-                            Icon(unread ? Icons.circle : Icons.circle_outlined, color: unread ? AC.gold : AC.ts, size: 8),
-                          ]),
-                        );
-                      }),
-                      PopupMenuItem<String>(value: 'all', height: 36, child: Center(child: Text('\u0639\u0631\u0636 \u0627\u0644\u0643\u0644', style: TextStyle(color: AC.gold, fontSize: 11, fontWeight: FontWeight.bold)))),
-                    ],
-                ).then((v) { if (v == 'all') context.go('/notifications'); });
-              },
-            )),
-            ])),
-            _appBarDivider(),
-            _buildThemePicker(),
-            _buildLangToggle(),
-            Spacer(),
-            MouseRegion(
-              onEnter: (_) => setState(() => _hovUserSection = 1),
-              onExit: (_) => setState(() => _hovUserSection = 0),
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => context.push('/settings'),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutCubic,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: _hovUserSection == 1 ? AC.gold.withValues(alpha: 0.06) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _hovUserSection == 1 ? AC.gold.withValues(alpha: 0.15) : Colors.transparent,
-                    ),
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'),
-                        style: TextStyle(color: _hovUserSection == 1 ? AC.gold : AC.tp.withValues(alpha: 0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.2)),
-                      SizedBox(height: 2),
-                      Text(_activeClients.isEmpty ? _clientLabel : _activeClients.join(' , '),
-                        style: TextStyle(color: AC.ts.withValues(alpha: 0.7), fontSize: 10)),
-                    ]),
-                    SizedBox(width: 8),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 32, height: 32,
-                      decoration: BoxDecoration(
-                        color: AC.gold.withValues(alpha: _hovUserSection == 1 ? 0.15 : 0.08),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(child: Text(
-                        (S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'U'))[0].toUpperCase(),
-                        style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold),
-                      )),
-                    ),
-                  ]),
-                ),
-              ),
+    return Focus(
+      focusNode: _focusNode,
+      autofocus: true,
+      onKeyEvent: _handleKeyEvent,
+      child: Scaffold(
+        backgroundColor: AC.navy,
+        body: Column(children: [
+          // ── Top bar ──
+          Container(padding: EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 10),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [AC.navy2, AC.navy2.withValues(alpha: 0.95)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+              border: Border(bottom: BorderSide(color: AC.gold.withValues(alpha: 0.12), width: 0.5)),
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 8, offset: const Offset(0, 2))],
             ),
-          ]),
-        ),
-        Expanded(child: Stack(children: [
-          Row(children: [
-            Expanded(child: tabs[_i]),
-            if (_dr) MouseRegion(onExit: (_) => setState(() => _dr = false),
-              child: SizedBox(width: 260,
-                child: ClipRRect(
-                  child: Container(
-                  decoration: BoxDecoration(
-                    color: AC.navy2.withValues(alpha: 0.92),
-                    border: Border(left: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 30, offset: Offset(-4, 0))],
-                  ),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                  child: Material(color: Colors.transparent,
-                child: Column(children: [
-
-                  Expanded(child: ListView(padding: EdgeInsets.zero, children: [
-        ExpansionTile(
-          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
-          tilePadding: EdgeInsets.symmetric(horizontal: 16),
-          title: Text('الأساسي', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
-          initiallyExpanded: true,
-          children: [
-          _drawerItem(Icons.dashboard_rounded, 'الرئيسية', () { setState(() { _i = 0; _dr = false; }); }, isActive: _i == 0),
-          _drawerItem(Icons.smart_toy, 'Apex Copilot', () { context.push('/copilot'); setState(() => _dr = false); }, isGold: true),
-          _drawerItem(Icons.business_rounded, 'العملاء', () { setState(() { _i = 1; _dr = false; }); }, isActive: _i == 1),
-          ],
-        ),
-        ExpansionTile(
-          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
-          tilePadding: EdgeInsets.symmetric(horizontal: 16),
-          title: Text('المسار المالي', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
-          initiallyExpanded: true,
-          children: [
-          _drawerItem(Icons.account_tree, 'شجرة الحسابات COA', () => _goToCoa(), isGold: true),
-          _drawerItem(Icons.table_chart, 'ميزان المراجعة TB', () { context.push('/financial-ops'); setState(() => _dr = false); }),
-          _drawerItem(Icons.receipt_long, 'القوائم المالية', () { context.push('/financial-ops'); setState(() => _dr = false); }),
-          _drawerItem(Icons.analytics_rounded, 'التحليل المالي', () { setState(() { _i = 2; _dr = false; }); }, isActive: _i == 2),
-          ],
-        ),
-        ExpansionTile(
-          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
-          tilePadding: EdgeInsets.symmetric(horizontal: 16),
-          title: Text('الجاهزية والامتثال', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
-          children: [
-          _drawerItem(Icons.shield_rounded, 'الجاهزية التمويلية', () { _comingSoon(); }),
-          _drawerItem(Icons.checklist_rounded, 'الامتثال', () { _comingSoon(); }),
-          _drawerItem(Icons.workspace_premium, 'الأهلية الترخيصية', () { _comingSoon(); }),
-          _drawerItem(Icons.volunteer_activism, 'الدعم والحوافز', () { _comingSoon(); }),
-          _drawerItem(Icons.gavel_rounded, 'المراجعة المحاسبية والقانونية', () { context.push('/audit-workflow'); setState(() => _dr = false); }),
-          ],
-        ),
-        ExpansionTile(
-          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
-          tilePadding: EdgeInsets.symmetric(horizontal: 16),
-          title: Text('السوق', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
-          children: [
-          _drawerItem(Icons.store_rounded, 'سوق الخدمات', () { setState(() { _i = 3; _dr = false; }); }, isActive: _i == 3),
-          _drawerItem(Icons.work_rounded, 'مقدمو الخدمات', () { context.push('/provider-kanban'); setState(() => _dr = false); }),
-          _drawerItem(Icons.menu_book, 'Bookkeeping', () { _comingSoon(); }),
-          ],
-        ),
-        ExpansionTile(
-          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
-          tilePadding: EdgeInsets.symmetric(horizontal: 16),
-          title: Text('التقارير والمعرفة', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
-          children: [
-          _drawerItem(Icons.bar_chart_rounded, 'التقارير', () { _comingSoon(); }),
-          _drawerItem(Icons.folder_outlined, 'الأرشيف', () { context.go('/archive'); setState(() => _dr = false); }),
-          _drawerItem(Icons.psychology, 'العقل المعرفي', () { context.push('/knowledge-brain'); setState(() => _dr = false); }),
-          _drawerItem(Icons.admin_panel_settings, 'Reviewer Console', () { context.go('/admin/reviewer'); setState(() => _dr = false); }),
-          ],
-        ),
-        ExpansionTile(
-          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
-          tilePadding: EdgeInsets.symmetric(horizontal: 16),
-          title: Text('الإدارة', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
-          children: [
-          _drawerItem(Icons.settings, 'الإدارة والإعدادات', () { context.push('/settings'); setState(() => _dr = false); }),
-          _drawerItem(Icons.diamond_outlined, 'الحساب والاشتراكات', () { setState(() { _i = 5; _dr = false; }); }, isActive: _i == 5),
-          ],
-        ),
-                  ])),
+            child: Row(children: [
+              ApexLogo(fontSize: 18, onTap: () => setState(() => _i = 0)),
+              _appBarDivider(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(color: AC.navy3.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+              // ── Global search (Cmd+K) ──
+              ApexIconButton(icon: Icons.search, tooltip: '\u0628\u062d\u062b \u0633\u0631\u064a\u0639 (Ctrl+K)', onPressed: () {
+                ApexCommandPalette.show(context);
+              }),
+              Builder(key: _bizKey, builder: (btnCtx) => ApexIconButton(icon: Icons.business, tooltip: '\u062a\u0628\u062f\u064a\u0644 \u0627\u0644\u0639\u0645\u064a\u0644 \u0627\u0644\u0646\u0634\u0637',
+                showBadge: _activeClients.isNotEmpty, badgeColor: AC.ok,
+                onPressed: () {
+                  final RenderBox btn = btnCtx.findRenderObject() as RenderBox;
+                  final Offset pos = btn.localToGlobal(Offset.zero);
+                  final Size sz = btn.size;
+                  showMenu<String>(
+                    context: context, color: AC.navy2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: AC.gold, width: 0.5)),
+                    position: RelativeRect.fromLTRB(pos.dx, pos.dy + sz.height, MediaQuery.of(context).size.width - pos.dx - 250, 0),
+                    items: _cl.isEmpty
+                      ? [PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u064a\u0648\u062c\u062f \u0639\u0645\u0644\u0627\u0621', style: TextStyle(color: AC.ts, fontSize: 12)))]
+                      : _cl.take(10).map((cl) {
+                          final name = (cl['name_ar'] ?? cl['name'] ?? '') as String;
+                          final sel = _activeClients.contains(name);
+                          return PopupMenuItem<String>(value: name, height: 40,
+                            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                              Text(name, style: TextStyle(color: sel ? AC.gold : AC.tp, fontSize: 12, fontWeight: sel ? FontWeight.bold : FontWeight.normal)),
+                              SizedBox(width: 8),
+                              Icon(sel ? Icons.check_box : Icons.check_box_outline_blank, color: sel ? AC.gold : AC.ts, size: 18),
+                            ]),
+                          );
+                        }).toList(),
+                  ).then((v) { if (v != null && v.isNotEmpty) setState(() { if (_activeClients.contains(v)) _activeClients.remove(v); else _activeClients.add(v); }); });
+                },
+              )),
+              Builder(key: _notifKey, builder: (notifCtx) => ApexIconButton(
+                icon: Icons.notifications_outlined, tooltip: '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a',
+                showBadge: _notifs.any((n) => n['is_read'] != true), badgeColor: AC.gold,
+                onPressed: () {
+                  final RenderBox btn = notifCtx.findRenderObject() as RenderBox;
+                  final Offset pos = btn.localToGlobal(Offset.zero);
+                  final Size sz = btn.size;
+                  showMenu<String>(
+                    context: context, color: AC.navy2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: AC.gold, width: 0.5)),
+                    position: RelativeRect.fromLTRB(pos.dx, pos.dy + sz.height, MediaQuery.of(context).size.width - pos.dx - 300, 0),
+                    items: _notifs.isEmpty
+                      ? [PopupMenuItem<String>(value: '', enabled: false, child: Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.ts, fontSize: 12)))]
+                      : [
+                        ..._notifs.take(8).map((n) {
+                          final unread = n['is_read'] != true;
+                          final title = (n['title'] ?? n['message'] ?? '') as String;
+                          return PopupMenuItem<String>(value: n['id']?.toString() ?? '', height: 44,
+                            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                              Expanded(child: Text(title, textAlign: TextAlign.right, overflow: TextOverflow.ellipsis, style: TextStyle(color: unread ? AC.gold : AC.tp, fontSize: 11, fontWeight: unread ? FontWeight.bold : FontWeight.normal))),
+                              SizedBox(width: 8),
+                              Icon(unread ? Icons.circle : Icons.circle_outlined, color: unread ? AC.gold : AC.ts, size: 8),
+                            ]),
+                          );
+                        }),
+                        PopupMenuItem<String>(value: 'all', height: 36, child: Center(child: Text('\u0639\u0631\u0636 \u0627\u0644\u0643\u0644', style: TextStyle(color: AC.gold, fontSize: 11, fontWeight: FontWeight.bold)))),
+                      ],
+                  ).then((v) { if (v == 'all') context.go('/notifications'); });
+                },
+              )),
+              ])),
+              _appBarDivider(),
+              // Keyboard shortcut hint
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: AC.navy3.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6), border: Border.all(color: AC.bdr.withValues(alpha: 0.2))),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.keyboard_command_key, color: AC.td, size: 12),
+                  const SizedBox(width: 2),
+                  Text('K', style: TextStyle(color: AC.td, fontSize: 11, fontWeight: FontWeight.w600)),
                 ]),
               ),
-            )),
-          ))),
-            if (!_dr) MouseRegion(onEnter: (_) => setState(() => _dr = true),
-              child: Container(width: 8, color: Colors.transparent)),
-          ]),
-          if (_dr) Positioned(left: 0, top: 0, bottom: 0, right: 260,
-            child: GestureDetector(onTap: () => setState(() => _dr = false), behavior: HitTestBehavior.translucent, child: const SizedBox.expand())),
-          Positioned(right: _fabX, bottom: _fabY,
-            child: GestureDetector(
-              onPanUpdate: (d) => setState(() { _fabX = (_fabX - d.delta.dx).clamp(0, 300); _fabY = (_fabY - d.delta.dy).clamp(0, 600); }),
-              child: ApexGlowFAB(
-                icon: Icons.smart_toy,
-                tooltip: 'Apex Copilot — المساعد الذكي',
-                onPressed: () => context.go('/copilot'),
+              _appBarDivider(),
+              _buildThemePicker(),
+              _buildLangToggle(),
+              Spacer(),
+              MouseRegion(
+                onEnter: (_) => setState(() => _hovUserSection = 1),
+                onExit: (_) => setState(() => _hovUserSection = 0),
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () => context.push('/settings'),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200), curve: Curves.easeOutCubic,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _hovUserSection == 1 ? AC.gold.withValues(alpha: 0.06) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _hovUserSection == 1 ? AC.gold.withValues(alpha: 0.15) : Colors.transparent),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                        Text(S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'User'),
+                          style: TextStyle(color: _hovUserSection == 1 ? AC.gold : AC.tp.withValues(alpha: 0.85), fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.2)),
+                        SizedBox(height: 2),
+                        Text(_activeClients.isEmpty ? _clientLabel : _activeClients.join(' , '),
+                          style: TextStyle(color: AC.ts.withValues(alpha: 0.7), fontSize: 10)),
+                      ]),
+                      SizedBox(width: 8),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200), width: 32, height: 32,
+                        decoration: BoxDecoration(color: AC.gold.withValues(alpha: _hovUserSection == 1 ? 0.15 : 0.08), shape: BoxShape.circle),
+                        child: Center(child: Text((S.dname?.isNotEmpty == true ? S.dname! : (S.uname ?? 'U'))[0].toUpperCase(),
+                          style: TextStyle(color: AC.gold, fontSize: 14, fontWeight: FontWeight.bold))),
+                      ),
+                    ]),
+                  ),
+                ),
               ),
-            ),
+            ]),
           ),
-        ])),
-      ]),
+          // ── Body: sidebar (right, RTL) + content ──
+          Expanded(child: Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              // ── Collapsible sidebar ──
+              ApexSidebar(
+                activeItemId: _activeItemId,
+                collapsed: _sidebarCollapsed,
+                onToggleCollapse: () => setState(() => _sidebarCollapsed = !_sidebarCollapsed),
+                onItemSelected: (id) {
+                  // Map sidebar IDs to tab indices for embedded tabs
+                  switch (id) {
+                    case 'dashboard': setState(() => _i = 0);
+                    case 'clients': setState(() => _i = 1);
+                    case 'analysis': setState(() => _i = 2);
+                    case 'marketplace': setState(() => _i = 3);
+                    case 'providers': setState(() => _i = 4);
+                    case 'subscription': setState(() => _i = 5);
+                    case 'admin': setState(() => _i = 6);
+                  }
+                },
+              ),
+              // ── Content area ──
+              Expanded(child: Stack(children: [
+                tabs[_i],
+                // ── Quick action "+ جديد" FAB ──
+                Positioned(left: _fabX, bottom: _fabY + 64,
+                  child: const ApexQuickActionButton(),
+                ),
+                // ── Copilot FAB ──
+                Positioned(left: _fabX, bottom: _fabY,
+                  child: GestureDetector(
+                    onPanUpdate: (d) => setState(() { _fabX = (_fabX + d.delta.dx).clamp(0, 300); _fabY = (_fabY - d.delta.dy).clamp(0, 600); }),
+                    child: ApexGlowFAB(
+                      icon: Icons.smart_toy,
+                      tooltip: 'Apex Copilot \u2014 \u0627\u0644\u0645\u0633\u0627\u0639\u062f \u0627\u0644\u0630\u0643\u064a',
+                      onPressed: () => context.go('/copilot'),
+                    ),
+                  ),
+                ),
+              ])),
+            ],
+          )),
+        ]),
+      ),
     );
   }
 
@@ -1052,9 +1024,8 @@ class _MainNavS extends ConsumerState<MainNav> {
 
   void _comingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('قريبًا — هذه الخدمة قيد التطوير'),
+      SnackBar(content: Text('\u0642\u0631\u064a\u0628\u064b\u0627 \u2014 \u0647\u0630\u0647 \u0627\u0644\u062e\u062f\u0645\u0629 \u0642\u064a\u062f \u0627\u0644\u062a\u0637\u0648\u064a\u0631'),
         backgroundColor: AC.navy2, duration: Duration(seconds: 2)));
-    setState(() => _dr = false);
   }
 
   int _drawerItemCounter = 0;
@@ -2461,56 +2432,4 @@ class _AdminS extends ConsumerState<AdminTab> {
         ApexIconButton(icon: Icons.security, color: AC.gold,
           tooltip: 'سجل التدقيق', onPressed: ()=>context.go('/admin/audit')),
       ]),
-    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
-      RefreshIndicator(onRefresh: _load, color: AC.gold, child: ListView(padding: EdgeInsets.all(14), children: [
-        // Stats Grid
-        GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.6,
-          children: [
-            _statCard('\u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u0648\u0646', '${_stats['total_users']??_users.length}', Icons.people, AC.gold),
-            _statCard('\u0627\u0644\u0639\u0645\u0644\u0627\u0621', '${_stats['total_clients']??0}', Icons.business, AC.cyan),
-            _statCard('\u0645\u0642\u062f\u0645\u0648 \u0627\u0644\u062e\u062f\u0645\u0627\u062a', '${_stats['total_providers']??0}', Icons.work, AC.ok),
-            _statCard('\u0627\u0644\u0637\u0644\u0628\u0627\u062a', '${_stats['total_requests']??0}', Icons.assignment, AC.warn),
-            _statCard('\u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a', '${_stats['total_feedback']??0}', Icons.feedback, AC.purple),
-            _statCard('\u0627\u0644\u062a\u062d\u0644\u064a\u0644\u0627\u062a', '${_stats['total_analyses']??0}', Icons.analytics, AC.info),
-          ]),
-        SizedBox(height: 16),
-        // Quick Actions
-        _card('\u0625\u062c\u0631\u0627\u0621\u0627\u062a \u0633\u0631\u064a\u0639\u0629', [
-          _actionTile('\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u0639\u0631\u0641\u064a\u0629', Icons.rate_review, AC.cyan,
-            ()=>context.go('/admin/reviewer')),
-          _actionTile('\u062a\u062d\u0642\u0642 \u0645\u0642\u062f\u0645\u064a \u0627\u0644\u062e\u062f\u0645\u0627\u062a', Icons.verified_user, AC.ok,
-            ()=>context.go('/admin/providers/verify')),
-          _actionTile('\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a', Icons.policy, AC.warn,
-            ()=>context.go('/admin/policies')),
-        ]),
-        SizedBox(height: 16),
-        // Users List
-        _card('\u0622\u062e\u0631 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u064a\u0646', [
-          if(_users.isEmpty) Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u064a\u0627\u0646\u0627\u062a', style: TextStyle(color: AC.ts))
-          else ..._users.take(10).map((u) => Padding(padding: EdgeInsets.only(bottom: 8),
-            child: Row(children: [
-              CircleAvatar(backgroundColor: AC.navy4, radius: 16,
-                child: Text((u['display_name']??u['username']??'?')[0], style: TextStyle(color: AC.gold, fontSize: 12))),
-              SizedBox(width: 10),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(u['display_name']??u['username']??'', style: TextStyle(color: AC.tp, fontSize: 13)),
-                Text('${u['email']??''} \u2022 ${u['plan']??'free'}', style: TextStyle(color: AC.ts, fontSize: 10))])),
-              _badge(u['status']??'active', u['status']=='active'?AC.ok:AC.err)])))
-        ]),
-      ])));
-
-  Widget _statCard(String label, String value, IconData icon, Color color) => Container(
-    padding: EdgeInsets.all(14),
-    decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: color.withValues(alpha: 0.3))),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Icon(icon, color: color, size: 22), Spacer(),
-        Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold))]),
-      SizedBox(height: 6),
-      Text(label, style: TextStyle(color: AC.ts, fontSize: 11))]));
-
-  Widget _actionTile(String label, IconData icon, Color color, VoidCallback onTap) =>
-    ApexActionTile(label: label, icon: icon, color: color, onTap: onTap);
-}
-
+    body: _ld ? Ce

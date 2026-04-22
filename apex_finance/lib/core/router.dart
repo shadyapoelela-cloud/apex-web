@@ -38,6 +38,8 @@ import '../coa_mapping_screen.dart';
 import '../coa_quality_screen.dart';
 import '../coa_review_screen.dart';
 import '../screens/simulation/financial_simulation_screen.dart';
+import '../screens/compliance/transfer_pricing_screen.dart';
+import '../screens/compliance/budget_actual_screen.dart';
 import '../screens/simulation/compliance_check_screen.dart';
 import '../screens/simulation/roadmap_screen.dart';
 import '../screens/simulation/trial_balance_screen.dart';
@@ -242,6 +244,10 @@ final appRouter = GoRouter(
     }),
     GoRoute(path: '/marketplace/new-request', pageBuilder: (c, s) => _apexPage(const NewServiceRequestScreen(), s)),
     GoRoute(path: '/clients/create', pageBuilder: (c, s) => _apexPage(const ClientCreateScreen2(), s)),
+    // ─── Transfer Pricing ───
+    GoRoute(path: '/compliance/transfer-pricing', pageBuilder: (c, s) => _apexPage(const TransferPricingScreen(), s)),
+    GoRoute(path: '/compliance/budget-actual', pageBuilder: (c, s) => _apexPage(const BudgetActualScreen(), s)),
+
     GoRoute(path: '/audit/service', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
       return _apexPage(audit.AuditServiceScreen(
