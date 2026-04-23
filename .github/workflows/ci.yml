@@ -36,6 +36,18 @@ jobs:
       - name: Bandit security scan
         run: bandit -r app/ -ll -q --skip B101,B311 -f txt || echo "::warning::Bandit found issues (non-blocking)"
 
+      - name: Dependency CVE scan (pip-audit)
+        # Install the real runtime requirements so pip-audit sees the
+        # exact versions we ship, not just tooling. --desc makes
+        # findings greppable in the Actions log. Non-blocking for now
+        # (we just patched 4 CVEs in 317d369 — flip to blocking once
+        # we've had a week without new findings on main).
+        run: |
+          pip install pip-audit
+          pip install -r requirements.txt
+          pip-audit --desc --progress-spinner=off \
+            || echo "::warning::pip-audit found vulnerabilities (non-blocking — investigate)"
+
       - name: Syntax check all Python files
         run: |
           echo "Running py_compile on all .py files under app/..."
