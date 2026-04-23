@@ -113,16 +113,18 @@ class ApexV5ServiceShell extends ConsumerWidget {
         autofocus: true,
         child: Scaffold(
           body: Column(children: [
-            // ── Layer 1: System Bar (نظام) — 40px ──────────────────────
-            _SystemBar(unreadCount: _getUnreadCount(ref)),
-            // ── Layer 2: News ticker (hidden in Apps Hub mode) ─────────
-            if (!isAppsHub) const ApexV5NewsTicker(),
-            if (!isAppsHub) const Divider(height: 1),
-            // ── Layer 3: Screen Bar (شاشة) — 48px ──────────────────────
-            _ScreenBar(
+            // ── UNIFIED TOP BAR (56px) — 10R research synthesis ────────
+            // Consolidates the old 3-layer stack (SystemBar 40 +
+            // NewsTicker 32 + ScreenBar 48 = 120px) into a single
+            // horizontal bar, matching SAP Fiori / Microsoft 365 /
+            // Zoho One / Salesforce Lightning / Linear patterns.
+            // News ticker reachable via notification bell "announcements"
+            // section on demand.
+            _UnifiedTopBar(
               service: service,
               mainModule: mainModule,
               activeChip: activeChip,
+              unreadCount: _getUnreadCount(ref),
             ),
             const Divider(height: 1),
             // ── Layer 4: Body ──────────────────────────────────────────
@@ -420,6 +422,137 @@ class _TB {
 // يحتوي: Brand + Global search + Theme/Lang + Help + PWA install +
 //        Notifications + Avatar
 // ══════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════
+// _UnifiedTopBar — single-bar consolidation (10R research)
+// Replaces _SystemBar + _ScreenBar (and the standalone NewsTicker) with
+// ONE 56px horizontal bar, following SAP Fiori Shell Bar + Zoho One
+// unified launcher patterns.
+//
+// Layout (RTL):
+//   [app-switcher] [logo] [breadcrumb ...]          [+ create] [tenant]
+//                                                   [⌘K] [🌐] [🌙] [🔔] [👤]
+//
+// Responsive collapse:
+//   < 720px  → hide app-switcher, compact breadcrumb, tenant-icon-only
+//   < 900px  → hide language/theme toggles (accessible via avatar menu)
+// ══════════════════════════════════════════════════════════════════════════
+class _UnifiedTopBar extends StatelessWidget {
+  final V5Service service;
+  final V5MainModule? mainModule;
+  final V5Chip? activeChip;
+  final int unreadCount;
+
+  const _UnifiedTopBar({
+    required this.service,
+    required this.unreadCount,
+    this.mainModule,
+    this.activeChip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final isCompact = width < 720;
+    final isMedium = width < 900;
+    final isAppsHub = mainModule == null;
+
+    final parts = <_BreadcrumbPart>[
+      _BreadcrumbPart(
+          label: service.labelAr,
+          route: '/app/${service.id}',
+          icon: service.icon,
+          color: _TB.accent),
+      if (isAppsHub)
+        _BreadcrumbPart(
+            label: '${service.mainModules.length} تطبيق',
+            route: null,
+            icon: Icons.apps_rounded)
+      else ...[
+        _BreadcrumbPart(
+            label: mainModule!.labelAr,
+            route: '/app/${service.id}/${mainModule!.id}',
+            icon: mainModule!.icon),
+        if (activeChip != null)
+          _BreadcrumbPart(
+              label: activeChip!.labelAr,
+              route: null,
+              icon: activeChip!.icon),
+      ],
+    ];
+
+    return Semantics(
+      container: true,
+      label: 'الشريط العلوي الموحّد',
+      child: Container(
+        height: 56,
+        padding:
+            const EdgeInsetsDirectional.symmetric(horizontal: _TB.sp3),
+        decoration: BoxDecoration(
+          color: _TB.bg,
+          border: Border(bottom: BorderSide(color: _TB.border)),
+          boxShadow: _TB.barShadow,
+        ),
+        child: IconTheme.merge(
+          data: IconThemeData(color: _TB.fgPrimary, size: _TB.iconMd),
+          child: DefaultTextStyle.merge(
+            style: _TB.tsNav,
+            child: FocusTraversalGroup(
+              child: Row(children: [
+                // ── Leading: app-switcher + logo ──────────────
+                if (!isCompact) const _AppSwitcherButton(),
+                if (!isCompact) const SizedBox(width: _TB.sp2),
+                const _BrandLogo(),
+                const SizedBox(width: _TB.sp3),
+                // subtle divider between brand and breadcrumb
+                Container(
+                    width: 1,
+                    height: 24,
+                    color: _TB.border.withValues(alpha: 0.7)),
+                const SizedBox(width: _TB.sp3),
+                // ── Center: breadcrumb (flex) ─────────────────
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: isCompact
+                      ? _CompactBreadcrumb(parts: parts)
+                      : _Breadcrumb(parts: parts),
+                ),
+                const SizedBox(width: _TB.sp3),
+                const Spacer(),
+                // ── Trailing: actions cluster ─────────────────
+                if (!isCompact) const QuickCreateButton(),
+                if (!isCompact) const SizedBox(width: _TB.sp2),
+                const TenantChip(),
+                const SizedBox(width: _TB.sp2),
+                if (width >= 1024) const ApexV5WorkspaceSelector(),
+                if (width >= 1024) const SizedBox(width: _TB.sp2),
+                Container(
+                    width: 1,
+                    height: 24,
+                    color: _TB.border.withValues(alpha: 0.7)),
+                const SizedBox(width: _TB.sp2),
+                const _CmdKButton(),
+                if (!isMedium) const SizedBox(width: _TB.sp1),
+                if (!isMedium) const _LangToggleBtn(),
+                if (!isMedium) const _ThemeToggleBtn(),
+                if (!isCompact)
+                  _TopBarIconBtn(
+                    icon: Icons.help_outline,
+                    tooltip: 'المساعدة (Shift+/)',
+                    semanticLabel: 'فتح المساعدة',
+                    onPressed: (ctx) => _SystemBar._showHelpDialog(ctx),
+                  ),
+                const _PwaInstallBtn(),
+                _NotifBellButton(count: unreadCount),
+                const _AvatarMenu(online: true),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _SystemBar extends StatelessWidget {
   final int unreadCount;

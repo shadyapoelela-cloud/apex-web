@@ -380,16 +380,29 @@ class _AppsHubScreenState extends State<AppsHubScreen> {
       ];
     }
     if (_view == _HubView.grouped) {
+      // APEX signature "Bento Spaces" layout — distinct from Odoo's
+      // uniform grid. Each AppGroup becomes a full-width section with
+      // a colored header strip, and the first app in each section is
+      // rendered as a HERO tile (2× wider) while the rest are compact
+      // tiles. Synthesis of Zoho One Spaces + Bento Grid 2026 pattern.
       final groups = _byGroup(apps);
       final out = <Widget>[];
       var runningIndex = 0;
       for (final entry in groups.entries) {
         out.add(SliverToBoxAdapter(
-          child: _GroupHeader(group: entry.key, count: entry.value.length),
+          child: _BentoSectionHeader(
+              group: entry.key, count: entry.value.length),
         ));
         out.add(SliverPadding(
-          padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 12),
-          sliver: _appsGrid(svc, entry.value, baseIndex: runningIndex),
+          padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
+          sliver: SliverToBoxAdapter(
+            child: _BentoSectionBody(
+              svc: svc,
+              apps: entry.value,
+              baseIndex: runningIndex,
+              highlight: _search,
+            ),
+          ),
         ));
         runningIndex += entry.value.length;
       }
@@ -1130,4 +1143,388 @@ class _AppTileState extends State<_AppTile>
           ],
         ),
       );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// APEX Bento Spaces — signature section layout
+// ═══════════════════════════════════════════════════════════════════
+// Synthesizes 10R research:
+//   • Zoho One "Spaces"  → functional grouping with colored identity
+//   • Bento Grid (2026)  → variable tile sizes for visual hierarchy
+//   • Salesforce         → personalized navigation with hero items
+//   • Enterprise UX 2026 → 3–5 key items read first, grouped sections
+//
+// Each section: colored header strip (with group color + icon + count)
+// followed by a body containing:
+//   – 1 HERO tile (2 cols × 1 row) for the first/most-important app
+//   – N compact regular tiles for the remaining apps
+//
+// Distinct from Odoo's flat uniform grid.
+// ═══════════════════════════════════════════════════════════════════
+
+class _BentoSectionHeader extends StatelessWidget {
+  final AppGroup group;
+  final int count;
+  const _BentoSectionHeader({required this.group, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = group.color;
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 18, 16, 8),
+      child: Container(
+        padding: const EdgeInsetsDirectional.fromSTEB(14, 12, 12, 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: AlignmentDirectional.centerStart,
+            end: AlignmentDirectional.centerEnd,
+            colors: <Color>[
+              c.withValues(alpha: 0.14),
+              c.withValues(alpha: 0.03),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border(
+            bottom: BorderSide(color: c.withValues(alpha: 0.35), width: 2),
+          ),
+        ),
+        child: Row(children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: c.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(group.icon, color: c, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(group.labelAr,
+                    style: TextStyle(
+                      color: c,
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.2,
+                    )),
+                const SizedBox(height: 1),
+                Text('$count تطبيق · ${group.labelEn}',
+                    style: TextStyle(
+                      color: c.withValues(alpha: 0.75),
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                    )),
+              ],
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+class _BentoSectionBody extends StatelessWidget {
+  final V5Service svc;
+  final List<V5MainModule> apps;
+  final int baseIndex;
+  final String highlight;
+  const _BentoSectionBody({
+    required this.svc,
+    required this.apps,
+    required this.baseIndex,
+    required this.highlight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (apps.isEmpty) return const SizedBox.shrink();
+    return LayoutBuilder(builder: (ctx, cons) {
+      final w = cons.maxWidth;
+      // Target tile width ~140–160px. Figure out how many small tiles
+      // fit per row, reserving 2 slots for the hero.
+      const targetTile = 150.0;
+      const gap = 10.0;
+      final cols = ((w + gap) / (targetTile + gap)).floor().clamp(3, 8);
+      // Hero takes 2 columns; remaining tiles fill the rest.
+      final rest = apps.skip(1).toList();
+      final hero = apps.first;
+      // Compute sizes so everything lines up on one row on wide screens.
+      final tileW = (w - gap * (cols - 1)) / cols;
+      final heroW = tileW * 2 + gap;
+      const tileH = 112.0;
+      const heroH = 112.0;
+      return Wrap(
+        spacing: gap,
+        runSpacing: gap,
+        children: [
+          SizedBox(
+            width: heroW,
+            height: heroH,
+            child: _BentoHeroTile(
+                svc: svc, app: hero, index: baseIndex, highlight: highlight),
+          ),
+          for (int i = 0; i < rest.length; i++)
+            SizedBox(
+              width: tileW,
+              height: tileH,
+              child: _BentoCompactTile(
+                  svc: svc,
+                  app: rest[i],
+                  index: baseIndex + 1 + i,
+                  highlight: highlight),
+            ),
+        ],
+      );
+    });
+  }
+}
+
+// ─── HERO TILE (2×) — gradient background, prominent identity ─────
+class _BentoHeroTile extends StatefulWidget {
+  final V5Service svc;
+  final V5MainModule app;
+  final int index;
+  final String highlight;
+  const _BentoHeroTile({
+    required this.svc,
+    required this.app,
+    required this.index,
+    required this.highlight,
+  });
+  @override
+  State<_BentoHeroTile> createState() => _BentoHeroTileState();
+}
+
+class _BentoHeroTileState extends State<_BentoHeroTile> {
+  bool _hover = false;
+  @override
+  Widget build(BuildContext context) {
+    final c = moduleColor(widget.app.id, fallback: widget.svc.color);
+    final chipCount = widget.app.chips.length;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () =>
+            context.go('/app/${widget.svc.id}/${widget.app.id}'),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: AlignmentDirectional.topStart,
+              end: AlignmentDirectional.bottomEnd,
+              colors: [
+                c,
+                Color.alphaBlend(Colors.black.withValues(alpha: 0.28), c),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: _hover
+                ? [
+                    BoxShadow(
+                      color: c.withValues(alpha: 0.40),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: c.withValues(alpha: 0.18),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+          ),
+          child: Stack(children: [
+            // Decorative watermark icon bottom-right
+            PositionedDirectional(
+              bottom: -12,
+              end: -12,
+              child: Icon(widget.app.icon,
+                  color: Colors.white.withValues(alpha: 0.12), size: 120),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(widget.app.icon,
+                          color: Colors.white, size: 22),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text('$chipCount شاشة',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700)),
+                    ),
+                  ]),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.app.labelAr,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.2,
+                          )),
+                      const SizedBox(height: 2),
+                      Text(widget.app.descriptionAr,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 10.5,
+                            height: 1.4,
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── COMPACT TILE (1×) — clean with gold/primary accent ───────────
+class _BentoCompactTile extends StatefulWidget {
+  final V5Service svc;
+  final V5MainModule app;
+  final int index;
+  final String highlight;
+  const _BentoCompactTile({
+    required this.svc,
+    required this.app,
+    required this.index,
+    required this.highlight,
+  });
+  @override
+  State<_BentoCompactTile> createState() => _BentoCompactTileState();
+}
+
+class _BentoCompactTileState extends State<_BentoCompactTile> {
+  bool _hover = false;
+  @override
+  Widget build(BuildContext context) {
+    final c = moduleColor(widget.app.id, fallback: widget.svc.color);
+    final chipCount = widget.app.chips.length;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () =>
+            context.go('/app/${widget.svc.id}/${widget.app.id}'),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: _hover
+                  ? c.withValues(alpha: 0.55)
+                  : core_theme.AC.bdr.withValues(alpha: 0.7),
+              width: _hover ? 1.5 : 1,
+            ),
+            boxShadow: _hover
+                ? [
+                    BoxShadow(
+                      color: c.withValues(alpha: 0.22),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                Container(
+                  padding: const EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
+                      colors: [
+                        c,
+                        Color.alphaBlend(
+                            Colors.black.withValues(alpha: 0.20), c),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(9),
+                    boxShadow: [
+                      BoxShadow(
+                        color: c.withValues(alpha: 0.25),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(widget.app.icon, color: Colors.white, size: 18),
+                ),
+                const Spacer(),
+                Text('$chipCount',
+                    style: TextStyle(
+                      color: c,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    )),
+              ]),
+              const Spacer(),
+              Text(widget.app.labelAr,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: core_theme.AC.tp,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    height: 1.25,
+                  )),
+              const SizedBox(height: 2),
+              Text(widget.app.descriptionAr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: core_theme.AC.td,
+                    fontSize: 9.5,
+                    height: 1.3,
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
