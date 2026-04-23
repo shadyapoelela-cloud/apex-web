@@ -1658,10 +1658,19 @@ class _Sidebar extends StatelessWidget {
       duration: core_theme.DS.motionMed,
       curve: core_theme.DS.easeEmphasized,
       width: isCollapsed ? 64 : 264,
-      decoration: BoxDecoration(
-        color: core_theme.AC.sidebarBg,
-      ),
-      child: Column(
+      decoration: BoxDecoration(color: core_theme.AC.sidebarBg),
+      // Theme-identity: 3px accent on the leading edge reflects the
+      // selected theme's primary color, making each of the 12 themes
+      // visually distinct at a glance (per user feedback).
+      child: Stack(children: [
+        PositionedDirectional(
+          start: 0, top: 0, bottom: 0,
+          width: 3,
+          child: Container(color: core_theme.AC.sidebarAccentEdge),
+        ),
+        Padding(
+          padding: const EdgeInsetsDirectional.only(start: 3),
+          child: Column(
         children: [
           _activeModuleHeader(context, activeMod),
           Container(
@@ -1683,6 +1692,8 @@ class _Sidebar extends StatelessWidget {
           _collapseToggle(),
         ],
       ),
+        ),
+      ]),
     );
   }
 

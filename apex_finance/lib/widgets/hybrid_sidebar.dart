@@ -315,24 +315,34 @@ class _HybridSidebarState extends State<HybridSidebar> {
           end: BorderSide(color: AC.sidebarBorder, width: 1),
         ),
       ),
-      child: Column(children: [
-        _buildHeader(isRail, isOverlay, onToggle),
-        _buildQuickActions(isRail),
-        Divider(color: AC.sidebarBorder, height: 1),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            itemCount: _groups.length,
-            itemBuilder: (ctx, i) =>
-                _buildGroup(_groups[i], isRail, current, isOverlay),
-          ),
+      child: Stack(children: [
+        // Theme-identity accent on the leading edge
+        PositionedDirectional(
+          start: 0, top: 0, bottom: 0, width: 3,
+          child: Container(color: AC.sidebarAccentEdge),
         ),
-        Divider(color: AC.sidebarBorder, height: 1),
-        _buildBottomItem(Icons.person_rounded, 'الحساب', '/account/sessions',
-            isRail, current, isOverlay),
-        _buildBottomItem(Icons.settings_rounded, 'الإعدادات',
-            '/admin/policies', isRail, current, isOverlay),
-        _buildFooter(isRail),
+        Padding(
+          padding: const EdgeInsetsDirectional.only(start: 3),
+          child: Column(children: [
+            _buildHeader(isRail, isOverlay, onToggle),
+            _buildQuickActions(isRail),
+            Divider(color: AC.sidebarBorder, height: 1),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                itemCount: _groups.length,
+                itemBuilder: (ctx, i) =>
+                    _buildGroup(_groups[i], isRail, current, isOverlay),
+              ),
+            ),
+            Divider(color: AC.sidebarBorder, height: 1),
+            _buildBottomItem(Icons.person_rounded, 'الحساب',
+                '/account/sessions', isRail, current, isOverlay),
+            _buildBottomItem(Icons.settings_rounded, 'الإعدادات',
+                '/admin/policies', isRail, current, isOverlay),
+            _buildFooter(isRail),
+          ]),
+        ),
       ]),
     );
   }

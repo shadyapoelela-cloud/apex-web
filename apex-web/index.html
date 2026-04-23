@@ -113,6 +113,7 @@
         console.log('[APEX] PWA installed');
       });
       // APEX: function-style accessors for Dart js_util.callMethod
+      // (Dart side calls window.apexCanInstall() / apexIsStandalone() as functions)
       window.apexCanInstall = function() {
         return !!(window.__APEX_PWA__ && window.__APEX_PWA__.canInstall);
       };

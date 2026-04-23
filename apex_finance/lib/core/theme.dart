@@ -520,39 +520,46 @@ class AC {
   // ═══════════════════════════════════════════════════════════════════
 
   /// Sidebar base background — one step deeper than card surface,
-  /// tinted with a whisper of primary so each theme feels cohesive.
+  /// tinted with a PERCEPTIBLE layer of primary so each theme feels
+  /// distinctly different. Boosted after user feedback: "I don't see
+  /// the change" on light navy (where primary is too close to bg).
   static Color get sidebarBg => Color.alphaBlend(
-        _current.primary.withValues(alpha: _current.isDark ? 0.04 : 0.025),
+        _current.primary.withValues(alpha: _current.isDark ? 0.10 : 0.06),
         _current.bg2,
       );
 
   /// Elevated sidebar surface (expanded panels, active groups).
   static Color get sidebarBgElevated => Color.alphaBlend(
-        _current.primary.withValues(alpha: _current.isDark ? 0.06 : 0.035),
+        _current.primary.withValues(alpha: _current.isDark ? 0.14 : 0.09),
         _current.bg3,
       );
 
   /// Sidebar header — branded gradient top-strip (Linear / Notion style).
+  /// Alpha boosted so the theme personality is clearly visible.
   static LinearGradient get sidebarHeaderGradient => LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          _current.primary.withValues(alpha: _current.isDark ? 0.12 : 0.08),
-          _current.primary.withValues(alpha: 0.02),
+          _current.primary.withValues(alpha: _current.isDark ? 0.22 : 0.18),
+          _current.primary.withValues(alpha: _current.isDark ? 0.06 : 0.04),
         ],
       );
 
-  /// Selected item bg — subtle primary tint (Fiori 3 / Linear pattern).
+  /// Selected item bg — clear primary tint (Fiori 3 / Linear pattern).
   static Color get sidebarItemSelectedBg =>
-      _current.primary.withValues(alpha: _current.isDark ? 0.14 : 0.10);
+      _current.primary.withValues(alpha: _current.isDark ? 0.22 : 0.16);
 
   /// Hover state — soft neutral overlay.
   static Color get sidebarItemHoverBg => _current.isDark
-      ? Colors.white.withValues(alpha: 0.04)
-      : Colors.black.withValues(alpha: 0.035);
+      ? Colors.white.withValues(alpha: 0.06)
+      : Colors.black.withValues(alpha: 0.05);
 
   /// 3px leading stripe — marks the active route (SAP Fiori / Linear).
   static Color get sidebarActiveStripe => _current.primary;
+
+  /// Vertical accent strip on the leading edge of the whole sidebar —
+  /// makes theme identity unmistakable at a glance.
+  static Color get sidebarAccentEdge => _current.primary;
 
   /// Group header color — primary-tinted but softer than item text.
   static Color get sidebarGroupFg => _current.primary;
@@ -563,9 +570,10 @@ class AC {
   /// Item label color (dim).
   static Color get sidebarItemDim => _current.textSecondary;
 
-  /// Border / divider for the sidebar column.
+  /// Border / divider for the sidebar column — bolder so it's visible
+  /// even on low-contrast light themes.
   static Color get sidebarBorder =>
-      _current.primary.withValues(alpha: _current.isDark ? 0.14 : 0.10);
+      _current.primary.withValues(alpha: _current.isDark ? 0.22 : 0.16);
 
   /// Scrim for overlay sidebar on narrow screens.
   static Color get sidebarScrim => _current.isDark
