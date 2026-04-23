@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import get_db
@@ -252,10 +253,16 @@ def list_wps_batches(entity_id: str, db: Session = Depends(get_db)):
     ).order_by(WpsBatch.year.desc(), WpsBatch.month.desc()).all()
 
 
-@router.get("/wps/batches/{batch_id}/sif", response_class=None)
+@router.get("/wps/batches/{batch_id}/sif", response_class=PlainTextResponse)
 def download_sif(batch_id: str, db: Session = Depends(get_db)):
-    """تنزيل ملف SIF كـ plain text."""
-    from fastapi.responses import PlainTextResponse
+    """تنزيل ملف SIF كـ plain text.
+
+    NOTE: response_class must be PlainTextResponse (not None) — setting
+    it to None breaks FastAPI's OpenAPI schema generator with
+    `AssertionError: A response class is needed to generate OpenAPI`,
+    which 500s /openapi.json across the whole API. Caught by
+    scripts/post_deploy_check.sh on 2026-04-24.
+    """
     batch = db.query(WpsBatch).filter(WpsBatch.id == batch_id).first()
     if not batch:
         raise HTTPException(404, "الدفعة غير موجودة")
