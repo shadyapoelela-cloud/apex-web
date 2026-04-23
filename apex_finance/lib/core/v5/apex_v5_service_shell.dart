@@ -100,6 +100,12 @@ class ApexV5ServiceShell extends ConsumerWidget {
             CmdKPalette.show(context),
         const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () =>
             CmdKPalette.show(context),
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          // Close expanded sidebar if it's open as overlay.
+          if (!SidebarPrefs.collapsed.value) {
+            SidebarPrefs.collapsed.value = true;
+          }
+        },
       },
       child: Focus(
         autofocus: true,
@@ -118,29 +124,71 @@ class ApexV5ServiceShell extends ConsumerWidget {
             ),
             const Divider(height: 1),
             // ── Layer 4: Body ──────────────────────────────────────────
-            // In Apps Hub mode → body fills full width (no sidebar / rail).
-            // In module mode → sidebar (left) + body + quick-access (right).
+            // 10R research: sidebar uses OVERLAY mode when expanded, not
+            // inline-push. This fixes the user-reported "expanded sidebar
+            // covers content" issue. Patterns applied:
+            //   • Fluent 2 inline-drawer → overlay on <640px breakpoint
+            //   • Material 3 modal navigation rail
+            //   • Linear / Notion drawer-over-content on expand
+            // Inline: always a compact 64px rail (persistent quick-nav).
+            // Expanded: floats as drawer over content + scrim.
             Expanded(
               child: isAppsHub || isNarrow
                   ? Column(children: [Expanded(child: _buildBody(context))])
-                  : Row(children: [
-                      // Left sidebar — عرضه داخلي (64 مطوي / 264 موسَّع)
-                      // 10R research: auto-collapse على المتوسط (<1024)
-                      // لتفادي تغطية المحتوى — Fluent 2 / Material 3 pattern
-                      ValueListenableBuilder<bool>(
-                        valueListenable: SidebarPrefs.collapsed,
-                        builder: (_, collapsed, __) => _Sidebar(
-                          service: service,
-                          activeMainId: mainModule?.id ?? '',
-                          isCollapsed: collapsed || isMedium,
-                        ),
-                      ),
-                      VerticalDivider(width: 1, color: core_theme.AC.sidebarBorder),
-                      Expanded(child: _buildBody(context)),
-                      if (!isMedium)
-                        VerticalDivider(width: 1, color: core_theme.AC.sidebarBorder),
-                      if (!isMedium) const _QuickAccessRail(),
-                    ]),
+                  : ValueListenableBuilder<bool>(
+                      valueListenable: SidebarPrefs.collapsed,
+                      builder: (_, collapsed, __) => Stack(children: [
+                        // Inline layer: always-rail + body + right rail.
+                        Row(children: [
+                          _Sidebar(
+                            service: service,
+                            activeMainId: mainModule?.id ?? '',
+                            isCollapsed: true, // inline is ALWAYS rail
+                          ),
+                          VerticalDivider(
+                              width: 1,
+                              color: core_theme.AC.sidebarBorder),
+                          Expanded(child: _buildBody(context)),
+                          if (!isMedium)
+                            VerticalDivider(
+                                width: 1,
+                                color: core_theme.AC.sidebarBorder),
+                          if (!isMedium) const _QuickAccessRail(),
+                        ]),
+                        // Overlay layer: only when user expanded.
+                        if (!collapsed) ...[
+                          // Scrim — click to close, covers everything
+                          // except the rail itself so rail stays clickable.
+                          PositionedDirectional(
+                            start: 64, end: 0, top: 0, bottom: 0,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () =>
+                                  SidebarPrefs.collapsed.value = true,
+                              child: AnimatedContainer(
+                                duration: core_theme.DS.motionMed,
+                                color: core_theme.AC.sidebarScrim,
+                              ),
+                            ),
+                          ),
+                          // Expanded drawer slides over content.
+                          PositionedDirectional(
+                            start: 64, top: 0, bottom: 0,
+                            width: 264,
+                            child: Material(
+                              elevation: 16,
+                              color: core_theme.AC.sidebarBg,
+                              shadowColor: core_theme.AC.overlay,
+                              child: _Sidebar(
+                                service: service,
+                                activeMainId: mainModule?.id ?? '',
+                                isCollapsed: false, // overlay = expanded
+                              ),
+                            ),
+                          ),
+                        ],
+                      ]),
+                    ),
             ),
           ]),
           drawer: (!isAppsHub && isNarrow)
