@@ -75,9 +75,10 @@ class _HybridSidebarState extends State<HybridSidebar> {
           Icons.admin_panel_settings_rounded),
       _NavItem('مركز الامتثال', '/compliance', Icons.shield_rounded),
     ], expanded: true),
-    _NavGroup('العملاء والعقود', Icons.people_rounded, [
-      _NavItem('العملاء', '/clients', Icons.person_rounded),
-      _NavItem('خدمات العملاء', '/marketplace', Icons.store_rounded),
+    _NavGroup('الشركات والعقود', Icons.apartment_rounded, [
+      _NavItem('الشركات', '/clients', Icons.apartment_rounded,
+          keywords: ['companies', 'clients', 'شركات', 'عملاء']),
+      _NavItem('خدمات الشركات', '/marketplace', Icons.store_rounded),
     ]),
     _NavGroup('القوائم المالية', Icons.auto_graph_rounded, [
       _NavItem('القوائم (TB/IS/BS)', '/compliance/financial-statements',
@@ -917,7 +918,7 @@ class _NewMenuDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      ('عميل جديد', Icons.person_add_rounded, '/clients/new'),
+      ('شركة جديدة', Icons.domain_add_rounded, '/clients/new'),
       ('فاتورة ZATCA', Icons.receipt_long_rounded, '/compliance/zatca-invoice'),
       ('قيد محاسبي', Icons.edit_note_rounded,
           '/compliance/journal-entry-builder'),

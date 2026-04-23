@@ -83,7 +83,7 @@ class _ClientListS extends State<ClientListScreen> {
         children: [
           // 1. Apex Sticky Toolbar
           ApexStickyToolbar(
-            title: 'العملاء',
+            title: 'الشركات',
             actions: [
               ApexToolbarAction(
                 label: 'تحديث',
@@ -91,7 +91,7 @@ class _ClientListS extends State<ClientListScreen> {
                 onPressed: _load,
               ),
               ApexToolbarAction(
-                label: 'عميل جديد',
+                label: 'شركة جديدة',
                 icon: Icons.add,
                 primary: true,
                 onPressed: _openCreate,
@@ -100,7 +100,7 @@ class _ClientListS extends State<ClientListScreen> {
           ),
           // 2. Apex Filter Bar
           ApexFilterBar(
-            searchHint: 'ابحث بالاسم أو النوع...',
+            searchHint: 'ابحث باسم الشركة أو النوع...',
             chips: const [
               ApexFilterChip(
                 key: 'knowledge_mode',

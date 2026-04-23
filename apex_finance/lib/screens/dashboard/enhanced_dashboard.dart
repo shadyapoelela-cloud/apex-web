@@ -153,10 +153,10 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
           crossAxisSpacing: 14,
           childAspectRatio: 1.7,
           children: [
-            apexScoreCard(label: 'العملاء النشطون', value: '$total', subtitle: total > 0 ? 'مسجلون في النظام' : 'لا يوجد عملاء', tintColor: blueC, infoTip: 'عدد العملاء المسجلين والنشطين في المنصة حالياً'),
-            apexScoreCard(label: 'شجرة معتمدة', value: '$coaApproved', subtitle: 'من أصل $total', tintColor: greenC, valueColor: greenC, infoTip: 'عدد العملاء الذين تم اعتماد شجرة حساباتهم بنجاح'),
+            apexScoreCard(label: 'الشركات النشطة', value: '$total', subtitle: total > 0 ? 'مسجلة في النظام' : 'لا توجد شركات', tintColor: blueC, infoTip: 'عدد الشركات المسجلة والنشطة في المنصة حالياً'),
+            apexScoreCard(label: 'شجرة معتمدة', value: '$coaApproved', subtitle: 'من أصل $total', tintColor: greenC, valueColor: greenC, infoTip: 'عدد الشركات التي تم اعتماد شجرة حساباتها بنجاح'),
             apexScoreCard(label: 'قيد المراجعة', value: '$coaReview', subtitle: coaReview > 0 ? 'بانتظار قرار' : 'لا يوجد', tintColor: orangeC, valueColor: orangeC, infoTip: 'شجرات حسابات بانتظار مراجعة واعتماد المراجع'),
-            apexScoreCard(label: 'جاهز لـ TB', value: '$coaReady', subtitle: coaReady > 0 ? '$coaReady عملاء' : 'بعد COA', tintColor: iconGold, valueColor: gold, infoTip: 'عملاء جاهزون لرفع ميزان المراجعة بعد اعتماد الشجرة'),
+            apexScoreCard(label: 'جاهز لـ TB', value: '$coaReady', subtitle: coaReady > 0 ? '$coaReady شركات' : 'بعد COA', tintColor: iconGold, valueColor: gold, infoTip: 'شركات جاهزة لرفع ميزان المراجعة بعد اعتماد الشجرة'),
           ],
         );
       },
@@ -178,11 +178,11 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
             mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 2.6,
             children: [
               ApexActionCard(
-                label: 'إنشاء عميل جديد',
+                label: 'إنشاء شركة جديدة',
                 description: 'بدء معالج الإنشاء',
-                icon: Icons.person_add_rounded,
+                icon: Icons.domain_add_rounded,
                 color: iconGold,
-                tooltip: 'فتح معالج إنشاء عميل جديد وإضافته للنظام',
+                tooltip: 'فتح معالج إنشاء شركة جديدة وإضافتها للنظام',
                 onTap: () {
                   if (widget.onCreateClient != null) widget.onCreateClient!();
                   else if (widget.onSwitchToClients != null) widget.onSwitchToClients!();
@@ -193,7 +193,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 description: 'تحميل ملف COA',
                 icon: Icons.upload_file_rounded,
                 color: blueC,
-                tooltip: 'رفع ملف شجرة الحسابات (CSV أو Excel) لعميل محدد',
+                tooltip: 'رفع ملف شجرة الحسابات (CSV أو Excel) لشركة محددة',
                 onTap: () {
                   if (widget.onNavigateToCoa != null) {
                     widget.onNavigateToCoa!();
@@ -205,11 +205,11 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                 },
               ),
               ApexActionCard(
-                label: 'عرض العملاء',
-                description: 'قائمة العملاء المسجلين',
-                icon: Icons.people_rounded,
+                label: 'عرض الشركات',
+                description: 'قائمة الشركات المسجلة',
+                icon: Icons.apartment_rounded,
                 color: greenC,
-                tooltip: 'الانتقال لصفحة العملاء لعرض وإدارة جميع العملاء',
+                tooltip: 'الانتقال لصفحة الشركات لعرض وإدارة جميع الشركات',
                 onTap: () {
                   if (widget.onSwitchToClients != null) widget.onSwitchToClients!();
                 },
@@ -237,11 +237,11 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          apexSectionTitle('حالة العملاء',
+          apexSectionTitle('حالة الشركات',
             icon: Icons.timeline,
-            infoTip: 'ملخص حالة شجرة الحسابات لكل عميل — اضغط على عميل لعرض التفاصيل',
+            infoTip: 'ملخص حالة شجرة الحسابات لكل شركة — اضغط على شركة لعرض التفاصيل',
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-              _badge('${_clients.length} عملاء', textDim),
+              _badge('${_clients.length} شركات', textDim),
               const SizedBox(width: 6),
               ApexIconButton(
                 icon: Icons.refresh_rounded,
@@ -320,7 +320,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
               SizedBox(height: 8),
               Center(child: TextButton(
                 onPressed: widget.onSwitchToClients,
-                child: Text('عرض جميع العملاء (${_clients.length})', style: TextStyle(color: AC.goldText, fontSize: 12)),
+                child: Text('عرض جميع الشركات (${_clients.length})', style: TextStyle(color: AC.goldText, fontSize: 12)),
               )),
             ],
           ],
@@ -331,7 +331,7 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
 
   Future<void> _navigateToCoa(dynamic client) async {
     final clientId = client['id'] ?? client['client_code'] ?? '1';
-    final clientName = client['name_ar'] ?? client['name'] ?? 'عميل';
+    final clientName = client['name_ar'] ?? client['name'] ?? 'شركة';
     await context.push('/coa/journey', extra: {'clientId': '$clientId', 'clientName': clientName});
     if (mounted) _loadClients();
 }
@@ -342,24 +342,24 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   Widget _buildRecentActivity() {
     final activities = <_Activity>[];
     for (final c in _clients.take(3)) {
-      final name = c['name_ar'] ?? c['name'] ?? 'عميل';
+      final name = c['name_ar'] ?? c['name'] ?? 'شركة';
       final coaStatus = (c['coa_status'] ?? '').toString();
       if (coaStatus == 'approved' || coaStatus == 'معتمد') {
         activities.add(_Activity('تم اعتماد شجرة حسابات $name', 'جميع الحسابات معتمدة', 'مؤخرًا', Icons.check_circle_outline, greenC));
       } else if (coaStatus.isNotEmpty && coaStatus != 'pending') {
         activities.add(_Activity('مراجعة مطلوبة: شجرة حسابات $name', 'بانتظار قرار المراجعة', 'مؤخرًا', Icons.error_outline, orangeC));
       } else {
-        activities.add(_Activity('تم إنشاء عميل: $name', 'بانتظار رفع المستندات', 'مؤخرًا', Icons.add, blueC));
+        activities.add(_Activity('تم إنشاء شركة: $name', 'بانتظار رفع المستندات', 'مؤخرًا', Icons.add, blueC));
       }
     }
     if (activities.isEmpty) {
-      activities.add(_Activity('مرحبًا بك في APEX', 'ابدأ بإنشاء عميلك الأول', 'الآن', Icons.waving_hand, iconGold));
+      activities.add(_Activity('مرحبًا بك في APEX', 'ابدأ بإنشاء شركتك الأولى', 'الآن', Icons.waving_hand, iconGold));
     }
     return _card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          apexSectionTitle('النشاط الأخير', icon: Icons.description, infoTip: 'آخر التحديثات والإجراءات على العملاء والمستندات'),
+          apexSectionTitle('النشاط الأخير', icon: Icons.description, infoTip: 'آخر التحديثات والإجراءات على الشركات والمستندات'),
           const SizedBox(height: 12),
           ...activities.map((a) => apexFeedItem(
             title: a.title,
@@ -378,13 +378,13 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
   // ════════════════════════════════════════
   Widget _buildNextStepCard() {
     String title = 'ابدأ الآن';
-    String desc = 'أنشئ عميلك الأول لبدء المسار المالي';
-    String btn = 'إنشاء عميل';
+    String desc = 'أنشئ شركتك الأولى لبدء المسار المالي';
+    String btn = 'إنشاء شركة';
     VoidCallback? action = widget.onCreateClient ?? widget.onSwitchToClients;
 
     for (final c in _clients) {
       final coaStatus = (c['coa_status'] ?? '').toString().toLowerCase();
-      final name = c['name_ar'] ?? c['name'] ?? 'عميل';
+      final name = c['name_ar'] ?? c['name'] ?? 'شركة';
       if (coaStatus == 'review' || coaStatus == 'مراجعة' || coaStatus == 'in_progress') {
         title = 'الخطوة التالية المقترحة';
         desc = '$name لديه شجرة حسابات بانتظار المراجعة';
@@ -435,11 +435,11 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
     final banners = <Widget>[];
     if (_clients.isEmpty) {
       banners.add(apexNoticeBanner(
-        title: 'لا يوجد عملاء',
-        text: 'ابدأ بإنشاء عميلك الأول لتفعيل المسار المالي الكامل.',
+        title: 'لا توجد شركات',
+        text: 'ابدأ بإنشاء شركتك الأولى لتفعيل المسار المالي الكامل.',
         tint: ApexTint.blue,
         icon: Icons.info_rounded,
-        actionLabel: 'إنشاء عميل',
+        actionLabel: 'إنشاء شركة',
         onAction: widget.onCreateClient ?? widget.onSwitchToClients,
       ));
     } else {

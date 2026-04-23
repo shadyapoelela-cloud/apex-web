@@ -188,7 +188,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
       if (mounted) {
         if (r.success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('تم إنشاء العميل بنجاح'), backgroundColor: AC.ok));
+            SnackBar(content: Text('تم إنشاء الشركة بنجاح'), backgroundColor: AC.ok));
           Navigator.pop(context, true);
         } else {
           setState(() { _error = r.error ?? 'فشل الإنشاء'; _loading = false; });
@@ -209,7 +209,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
     return Scaffold(
       backgroundColor: AC.navy,
       appBar: AppBar(
-        title: Text('تسجيل عميل جديد', style: TextStyle(color: AC.gold)),
+        title: Text('تسجيل شركة جديدة', style: TextStyle(color: AC.gold)),
         leading: _step > 0 ? IconButton(icon: Icon(Icons.arrow_back, color: AC.gold), onPressed: _back) : null,
         actions: [
           if (_stageNote != null) ApexIconButton(
@@ -233,7 +233,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
         Padding(padding: EdgeInsets.all(16), child: Row(children: [
           if (_step > 0) Expanded(child: apexSecondaryButton('السابق', _back)),
           if (_step > 0) const SizedBox(width: 12),
-          Expanded(child: apexPrimaryButton(_step == 6 ? 'إنشاء العميل' : 'التالي', _step == 6 ? _submit : _next)),
+          Expanded(child: apexPrimaryButton(_step == 6 ? 'إنشاء الشركة' : 'التالي', _step == 6 ? _submit : _next)),
         ])),
       ]),
     );
@@ -259,7 +259,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
   }
 
   String _stepTitle() {
-    const titles = ['بيانات الكيان', 'الشكل القانوني', 'النشاط الرئيسي', 'النشاط الفرعي', 'نوع العميل', 'المستندات', 'المراجعة والتفعيل'];
+    const titles = ['بيانات الكيان', 'الشكل القانوني', 'النشاط الرئيسي', 'النشاط الفرعي', 'نوع الشركة', 'المستندات', 'المراجعة والتفعيل'];
     return titles[_step.clamp(0, 6)];
   }
 
@@ -433,7 +433,7 @@ class _WizardState extends State<ClientOnboardingWizard> {
     _reviewRow('الشكل القانوني', _selectedEntityType ?? '—'),
     _reviewRow('النشاط الرئيسي', _selectedSector ?? '—'),
     _reviewRow('النشاط الفرعي', _selectedSubSector ?? '—'),
-    _reviewRow('نوع العميل', _clientType),
+    _reviewRow('نوع الشركة', _clientType),
     _reviewRow('المدينة', _cityC.text),
   ]);
 

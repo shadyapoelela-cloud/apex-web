@@ -4,6 +4,7 @@ import 'dart:html' as html;
 import 'package:http/http.dart' as http;
 import 'core/api_config.dart';
 import 'core/session.dart';
+import 'core/company_store.dart';
 
 class ApiService {
   static const _base = apiBase;
@@ -43,13 +44,93 @@ class ApiService {
   static Future<ApiResult> acceptLegalDoc(String docId) => _post('/legal/accept/$docId', {});
   static Future<ApiResult> acceptAllLegal() => _post('/legal/accept-all', {});
 
-  // ── Clients ──
+  // ── Clients (aka "الشركات") ──
+  // Guest-mode safe: when the backend can't be reached (or returns 401
+  // because login is disabled), we transparently fall back to the local
+  // CompanyLocalStore so guests can still create & browse their companies.
   static Future<ApiResult> getClientTypes() => _get('/client-types');
   static Future<ApiResult> listNotifications() => _get('/notifications');
-  static Future<ApiResult> listClients() => _get('/clients');
-  static Future<ApiResult> getClient(String id) => _get('/clients/$id');
-  static Future<ApiResult> createClient({required String clientCode, required String name, required String clientType, String? nameAr, String? industry, String? country, String? currency}) => _post('/clients', {'client_code':clientCode,'name':name,'name_ar':nameAr ?? name,'client_type_code':clientType,if(industry!=null)'industry':industry,if(country!=null)'country':country,if(currency!=null)'currency':currency});
-  static Future<ApiResult> updateClient(String id, Map body) => _put('/clients/$id', body);
+
+  /// Returns the list of companies the user sees. Merges remote (if
+  /// authenticated & reachable) with local-persisted companies.
+  static Future<ApiResult> listClients() async {
+    final remote = await _get('/clients');
+    if (remote.success) {
+      final raw = remote.data;
+      final list = raw is List
+          ? raw.cast<Map<String, dynamic>>()
+          : ((raw is Map && raw['clients'] is List)
+              ? (raw['clients'] as List).cast<Map<String, dynamic>>()
+              : <Map<String, dynamic>>[]);
+      final merged = CompanyLocalStore.mergeWithRemote(list);
+      return ApiResult.ok(merged);
+    }
+    // Backend unreachable or 401 — degrade gracefully to local store.
+    final local = CompanyLocalStore.list();
+    return ApiResult.ok(local);
+  }
+
+  static Future<ApiResult> getClient(String id) async {
+    if (id.startsWith('local_')) {
+      final local = CompanyLocalStore.list().firstWhere(
+        (c) => c['id'] == id,
+        orElse: () => <String, dynamic>{},
+      );
+      if (local.isEmpty) return ApiResult.error('الشركة غير موجودة');
+      return ApiResult.ok(local);
+    }
+    return _get('/clients/$id');
+  }
+
+  static Future<ApiResult> createClient({
+    required String clientCode,
+    required String name,
+    required String clientType,
+    String? nameAr,
+    String? industry,
+    String? country,
+    String? currency,
+  }) async {
+    final body = {
+      'client_code': clientCode,
+      'name': name,
+      'name_ar': nameAr ?? name,
+      'client_type_code': clientType,
+      if (industry != null) 'industry': industry,
+      if (country != null) 'country': country,
+      if (currency != null) 'currency': currency,
+    };
+    final remote = await _post('/clients', body);
+    if (remote.success) {
+      // Also mirror to local store so list survives a later 401.
+      final d = remote.data;
+      if (d is Map) {
+        CompanyLocalStore.add(Map<String, dynamic>.from(d));
+      }
+      return remote;
+    }
+    // Fallback: persist to local store, return a synthetic success.
+    final saved = CompanyLocalStore.add(body);
+    return ApiResult.ok({
+      ...saved,
+      '_local_only': true,
+      '_notice': 'تم الحفظ محلياً (بدون تسجيل دخول)',
+    });
+  }
+
+  static Future<ApiResult> updateClient(String id, Map body) async {
+    if (id.startsWith('local_')) {
+      final updated =
+          CompanyLocalStore.update(id, Map<String, dynamic>.from(body));
+      if (updated == null) return ApiResult.error('الشركة غير موجودة');
+      return ApiResult.ok(updated);
+    }
+    final remote = await _put('/clients/$id', body);
+    if (remote.success) {
+      CompanyLocalStore.update(id, Map<String, dynamic>.from(body));
+    }
+    return remote;
+  }
 
 
   // ── Client Onboarding (New) ──

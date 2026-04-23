@@ -16,7 +16,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
 
   Future<void> _create() async {
     if (_nameC.text.trim().isEmpty || _sel == null) {
-      setState(() => _err = 'ادخل اسم العميل واختر النوع');
+      setState(() => _err = 'ادخل اسم الشركة واختر النوع');
       return;
     }
     setState(() { _ld = true; _err = null; });
@@ -37,7 +37,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AC.navy,
-      appBar: AppBar(title: Text('عميل جديد', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
+      appBar: AppBar(title: Text('شركة جديدة', style: TextStyle(color: AC.gold)), backgroundColor: AC.navy),
       body: Column(children: [
         Padding(padding: EdgeInsets.fromLTRB(16, 16, 16, 0), child: SizedBox(height: 56, child: TextField(
           controller: _nameC, style: TextStyle(color: AC.tp),
@@ -47,7 +47,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
             enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.bdr), borderRadius: BorderRadius.circular(8)),
             focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AC.gold), borderRadius: BorderRadius.circular(8)))))),
         if (_err != null) Padding(padding: EdgeInsets.all(12), child: Text(_err!, style: const TextStyle(color: Colors.redAccent))),
-        Padding(padding: EdgeInsets.fromLTRB(16, 12, 16, 8), child: Text('* نوع العميل', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
+        Padding(padding: EdgeInsets.fromLTRB(16, 12, 16, 8), child: Text('* نوع الشركة', style: TextStyle(color: AC.gold, fontWeight: FontWeight.bold))),
         Expanded(child: ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: [
           _tc('standard_business', 'شركة تجارية عادية', false),
           _tc('financial_entity', 'جهة مالية', true),
@@ -62,7 +62,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
           onPressed: _ld ? null : _create,
           style: ElevatedButton.styleFrom(backgroundColor: AC.gold, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
           child: _ld ? SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.btnFg))
-              : Text('انشاء العميل', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16))))),
+              : Text('إنشاء الشركة', style: TextStyle(color: AC.navy, fontWeight: FontWeight.bold, fontSize: 16))))),
       ]),
     );
   }

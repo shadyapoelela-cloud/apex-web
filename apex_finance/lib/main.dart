@@ -356,7 +356,7 @@ class ApexSearch extends SearchDelegate<String> {
       final items = [
         {'ن': 'الرئيسية', 'r': '/home'},
         {'ن': 'Apex Copilot', 'r': '/copilot'},
-        {'ن': 'العملاء', 'r': '/clients'},
+        {'ن': 'الشركات', 'r': '/clients'},
         {'ن': 'شجرة الحسابات', 'r': '/home'},
         {'ن': 'ميزان المراجعة', 'r': '/financial-ops'},
         {'ن': 'القوائم المالية', 'r': '/financial-ops'},
@@ -433,7 +433,7 @@ class _MainNavS extends ConsumerState<MainNav> {
             ApexIconButton(icon: Icons.search, tooltip: 'البحث في المنصة', onPressed: () {
               showSearch(context: context, delegate: ApexSearch());
             }),
-            Builder(key: _bizKey, builder: (btnCtx) => ApexIconButton(icon: Icons.business, tooltip: 'تبديل العميل النشط',
+            Builder(key: _bizKey, builder: (btnCtx) => ApexIconButton(icon: Icons.business, tooltip: 'تبديل الشركة النشطة',
               showBadge: _activeClients.isNotEmpty, badgeColor: AC.ok,
               onPressed: () {
                 final RenderBox btn = btnCtx.findRenderObject() as RenderBox;
@@ -573,7 +573,7 @@ class _MainNavS extends ConsumerState<MainNav> {
           children: [
           _drawerItem(Icons.dashboard_rounded, 'الرئيسية', () { setState(() { _i = 0; _dr = false; }); }, isActive: _i == 0),
           _drawerItem(Icons.smart_toy, 'Apex Copilot', () { context.push('/copilot'); setState(() => _dr = false); }, isGold: true),
-          _drawerItem(Icons.business_rounded, 'العملاء', () { setState(() { _i = 1; _dr = false; }); }, isActive: _i == 1),
+          _drawerItem(Icons.apartment_rounded, 'الشركات', () { setState(() { _i = 1; _dr = false; }); }, isActive: _i == 1),
           ],
         ),
         ExpansionTile(
@@ -1560,13 +1560,13 @@ class _ClientsS extends ConsumerState<ClientsTab> {
     return Scaffold(
       backgroundColor: AC.navy,
       floatingActionButton: ApexGlowFAB(icon: Icons.add, color: AC.gold,
-        onPressed: () => _showNewClientWizard(c), tooltip: 'عميل جديد'),
+        onPressed: () => _showNewClientWizard(c), tooltip: 'شركة جديدة'),
       body: Column(children: [
         // Header with title + search
         Container(padding: EdgeInsets.fromLTRB(16, 16, 16, 12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Row(children: [
-              Expanded(child: Text('العملاء', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
+              Expanded(child: Text('الشركات', style: TextStyle(color: AC.gold, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
               Text('${_cl.length} عميل', style: TextStyle(color: AC.ts, fontSize: 12)),
             ]),
             SizedBox(height: 12),

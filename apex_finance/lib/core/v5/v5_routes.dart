@@ -260,9 +260,9 @@ class V5Launchpad extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     children: const [
                       _LaunchpadQuickCard(
-                        label: 'العملاء',
+                        label: 'الشركات',
                         sublabel: 'الشركات والمنشآت المنشأة',
-                        icon: Icons.people_rounded,
+                        icon: Icons.apartment_rounded,
                         route: '/clients',
                         color: Color(0xFF0369A1),
                       ),
