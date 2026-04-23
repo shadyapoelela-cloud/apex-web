@@ -124,17 +124,20 @@ class ApexV5ServiceShell extends ConsumerWidget {
                   ? Column(children: [Expanded(child: _buildBody(context))])
                   : Row(children: [
                       // Left sidebar — عرضه داخلي (64 مطوي / 264 موسَّع)
+                      // 10R research: auto-collapse على المتوسط (<1024)
+                      // لتفادي تغطية المحتوى — Fluent 2 / Material 3 pattern
                       ValueListenableBuilder<bool>(
                         valueListenable: SidebarPrefs.collapsed,
                         builder: (_, collapsed, __) => _Sidebar(
                           service: service,
                           activeMainId: mainModule?.id ?? '',
-                          isCollapsed: collapsed,
+                          isCollapsed: collapsed || isMedium,
                         ),
                       ),
-                      const VerticalDivider(width: 1),
+                      VerticalDivider(width: 1, color: core_theme.AC.sidebarBorder),
                       Expanded(child: _buildBody(context)),
-                      if (!isMedium) const VerticalDivider(width: 1),
+                      if (!isMedium)
+                        VerticalDivider(width: 1, color: core_theme.AC.sidebarBorder),
                       if (!isMedium) const _QuickAccessRail(),
                     ]),
             ),
@@ -1652,33 +1655,18 @@ class _Sidebar extends StatelessWidget {
           color: core_theme.AC.gold.withValues(alpha: 0.03));
     }
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
+      duration: core_theme.DS.motionMed,
+      curve: core_theme.DS.easeEmphasized,
       width: isCollapsed ? 64 : 264,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            core_theme.AC.gold.withValues(alpha: 0.05),
-            core_theme.AC.gold.withValues(alpha: 0.02),
-          ],
-        ),
+        color: core_theme.AC.sidebarBg,
       ),
       child: Column(
         children: [
           _activeModuleHeader(context, activeMod),
           Container(
             height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  core_theme.AC.gold.withValues(alpha: 0.0),
-                  core_theme.AC.gold.withValues(alpha: 0.25),
-                  core_theme.AC.gold.withValues(alpha: 0.0),
-                ],
-              ),
-            ),
+            color: core_theme.AC.sidebarBorder,
           ),
           Expanded(
             child: ListView(
@@ -1688,15 +1676,7 @@ class _Sidebar extends StatelessWidget {
           ),
           Container(
             height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  core_theme.AC.gold.withValues(alpha: 0.0),
-                  core_theme.AC.gold.withValues(alpha: 0.25),
-                  core_theme.AC.gold.withValues(alpha: 0.0),
-                ],
-              ),
-            ),
+            color: core_theme.AC.sidebarBorder,
           ),
           _otherModulesButton(context),
           // Collapse toggle
@@ -1711,14 +1691,12 @@ class _Sidebar extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () => SidebarPrefs.toggle(),
-        hoverColor: core_theme.AC.gold.withValues(alpha: 0.10),
-        splashColor: core_theme.AC.gold.withValues(alpha: 0.18),
+        hoverColor: core_theme.AC.sidebarItemHoverBg,
+        splashColor: core_theme.AC.sidebarItemSelectedBg,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            border: Border(
-                top: BorderSide(
-                    color: core_theme.AC.gold.withValues(alpha: 0.12))),
+            border: Border(top: BorderSide(color: core_theme.AC.sidebarBorder)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1764,6 +1742,7 @@ class _Sidebar extends StatelessWidget {
           padding: isCollapsed
               ? const EdgeInsets.fromLTRB(8, 14, 8, 14)
               : const EdgeInsets.fromLTRB(16, 16, 16, 14),
+          decoration: BoxDecoration(gradient: core_theme.AC.sidebarHeaderGradient),
           child: Row(
             mainAxisAlignment: isCollapsed
                 ? MainAxisAlignment.center
@@ -1774,17 +1753,9 @@ class _Sidebar extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        core_theme.AC.gold.withValues(alpha: 0.22),
-                        core_theme.AC.gold.withValues(alpha: 0.10),
-                      ],
-                    ),
+                    color: core_theme.AC.sidebarItemSelectedBg,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: core_theme.AC.gold.withValues(alpha: 0.28)),
+                    border: Border.all(color: core_theme.AC.sidebarBorder),
                   ),
                   child: Icon(m.icon, color: core_theme.AC.gold, size: 18),
                 ),
@@ -1858,18 +1829,7 @@ class _Sidebar extends StatelessWidget {
   Widget _collapsedPhaseDivider() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Container(
-        height: 1,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              core_theme.AC.gold.withValues(alpha: 0.0),
-              core_theme.AC.gold.withValues(alpha: 0.2),
-              core_theme.AC.gold.withValues(alpha: 0.0),
-            ],
-          ),
-        ),
-      ),
+      child: Container(height: 1, color: core_theme.AC.sidebarBorder),
     );
   }
 
@@ -1947,14 +1907,7 @@ class _Sidebar extends StatelessWidget {
             ? const EdgeInsets.symmetric(horizontal: 8, vertical: 12)
             : const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              core_theme.AC.gold.withValues(alpha: 0.10),
-              core_theme.AC.gold.withValues(alpha: 0.04),
-            ],
-          ),
+          color: core_theme.AC.sidebarBgElevated,
         ),
         child: Row(
           mainAxisAlignment: isCollapsed
