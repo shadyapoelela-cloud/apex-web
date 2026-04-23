@@ -1079,6 +1079,15 @@ try:
 except Exception as e:
     logging.error(f"Email verification routes not mounted: {e}", exc_info=True)
 
+# ── Admin backup (/admin/backup-now + /admin/backup-status)
+try:
+    from app.core.admin_backup_routes import router as backup_router
+
+    app.include_router(backup_router)
+    logging.info("Admin backup routes mounted (/admin/backup-*)")
+except Exception as e:
+    logging.error(f"Admin backup routes not mounted: {e}", exc_info=True)
+
 # ── ZATCA CSID (cert lifecycle: register/revoke/expiry tracking)
 try:
     from app.core.zatca_csid_routes import router as zatca_csid_router
