@@ -106,7 +106,7 @@ legal_service = LegalService()
 
 
 @router.post("/auth/register", tags=["Auth"])
-async def register(req: RegisterRequest, request: Request):
+async def register(req: RegisterRequest, request: Request, response: Response):
     result = auth_service.register(
         username=req.username,
         email=req.email,
@@ -117,6 +117,28 @@ async def register(req: RegisterRequest, request: Request):
     )
     if not result["success"]:
         raise HTTPException(status_code=400, detail=result["error"])
+    # Register returns the same token envelope as login — set the
+    # HttpOnly cookie here too so a freshly-registered user is on the
+    # cookie-auth path from their very first request. Without this,
+    # new users spent their whole first session on the legacy
+    # Authorization-header path until they explicitly re-logged in,
+    # which would 403 once CSRF_ENABLED=true (CSRF depends on the
+    # session cookie). Same lookup fallback chain as login.
+    access_token = (
+        result.get("tokens", {}).get("access_token")
+        or result.get("data", {}).get("access_token")
+        or result.get("access_token")
+    )
+    if access_token:
+        response.set_cookie(
+            key="apex_token",
+            value=access_token,
+            max_age=60 * 60 * 24,
+            httponly=True,
+            secure=True,
+            samesite="lax",
+            path="/",
+        )
     return result
 
 

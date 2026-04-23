@@ -123,6 +123,34 @@ def test_cookie_only_authenticates_protected_endpoint(client) -> None:
     )
 
 
+def test_register_also_sets_the_cookie(client) -> None:
+    """Registration must set the HttpOnly cookie too, so a newly-
+    registered user lands on the cookie-auth path from their very
+    first request. Without this, new users spent their whole first
+    session on the legacy header path until they re-logged in —
+    which would 403 once CSRF_ENABLED=true."""
+    username, password = _unique_credentials()
+    r = client.post(
+        "/auth/register",
+        json={
+            "username": username,
+            "email": f"{username}@apex-test.local",
+            "password": password,
+            "display_name": "اختبار التسجيل",
+        },
+    )
+    assert r.status_code in (200, 201), f"register failed: {r.text[:300]}"
+    assert "apex_token" in r.cookies, (
+        "register did not set apex_token cookie — new users can't use "
+        "cookie-auth path until they explicitly log in"
+    )
+    set_cookie = r.headers.get("set-cookie", "")
+    lowered = set_cookie.lower()
+    assert "httponly" in lowered
+    assert "secure" in lowered
+    assert "samesite=" in lowered
+
+
 def test_logout_clears_the_cookie(client) -> None:
     """Logout must issue a Set-Cookie that deletes apex_token."""
     username, password = _unique_credentials()
