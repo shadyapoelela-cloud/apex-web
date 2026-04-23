@@ -128,7 +128,7 @@ class _SAS extends State<SlideAuthScreen> {
     _tf(_lu, 'البريد أو اسم المستخدم', Icons.email_outlined, ltr: true),
     const SizedBox(height: 10),
     _pf(_lp, 'كلمة المرور', _lo, () => setState(() => _lo = !_lo), sub: _login),
-    Align(alignment: Alignment.centerLeft, child: TextButton(
+    Align(alignment: AlignmentDirectional.centerStart, child: TextButton(
       onPressed: () => context.go('/forgot-password'),
       style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size(0, 30)),
       child: Text('نسيت كلمة المرور؟', style: TextStyle(color: AC.goldText, fontSize: 12)))),

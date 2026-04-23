@@ -215,7 +215,7 @@ class _LoginS extends State<LoginScreen> {
           ),
           onSubmitted: (_) => _go()),
         // Forgot password
-        Align(alignment: Alignment.centerLeft, child: TextButton(
+        Align(alignment: AlignmentDirectional.centerStart, child: TextButton(
           onPressed: () => context.go('/forgot-password'),
           child: Text('\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f', style: TextStyle(color: AC.goldText, fontSize: 12)))),
         const SizedBox(height: 8),

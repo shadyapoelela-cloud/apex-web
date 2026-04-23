@@ -204,7 +204,7 @@ class _InboxDrawerState extends State<_InboxDrawer> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Align(
-        alignment: Alignment.centerLeft,
+        alignment: AlignmentDirectional.centerStart,
         child: Material(
           color: Colors.transparent,
           child: Container(

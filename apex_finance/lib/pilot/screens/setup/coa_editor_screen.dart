@@ -2242,7 +2242,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                           height: 4,
                           color: color.withValues(alpha: 0.12),
                           child: FractionallySizedBox(
-                            alignment: Alignment.centerRight,
+                            alignment: AlignmentDirectional.centerEnd,
                             widthFactor: pct,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 400),

@@ -325,14 +325,14 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
   }
 
   Widget _sectionTitle(String title) => Align(
-    alignment: Alignment.centerRight,
+    alignment: AlignmentDirectional.centerEnd,
     child: Text(title, textDirection: TextDirection.rtl,
       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700,
         color: _textPrimary, fontFamily: 'Tajawal')));
 
   Widget _subTitle(String title) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
-    child: Align(alignment: Alignment.centerRight,
+    child: Align(alignment: AlignmentDirectional.centerEnd,
       child: Text(title, textDirection: TextDirection.rtl,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
           color: _gold, fontFamily: 'Tajawal'))));

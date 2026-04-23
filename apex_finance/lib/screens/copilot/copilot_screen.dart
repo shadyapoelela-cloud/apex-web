@@ -734,7 +734,7 @@ class _CopilotScreenState extends State<CopilotScreen> with TickerProviderStateM
 
   // ── Typing indicator ──
   Widget _buildTypingIndicator() => Align(
-    alignment: Alignment.centerLeft,
+    alignment: AlignmentDirectional.centerStart,
     child: Container(
       margin: EdgeInsets.only(bottom: 12), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
