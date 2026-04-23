@@ -18,6 +18,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/theme.dart';
 import '../../core/entity_store.dart';
@@ -174,11 +175,245 @@ class _EntitySetupScreenState extends State<EntitySetupScreen> {
             ),
           ],
         ),
+        // 2026 pattern: adaptive setup checklist with progress indicator
+        if (hasAny) _buildSetupChecklist(),
         Expanded(
           child: !hasAny ? _buildEmptyState() : _buildTree(standaloneCompanies),
         ),
       ]),
     );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Setup progress checklist — SaaS 2026 / SAP Task List pattern
+  // Shows 5 steps with adaptive completion markers.
+  // ─────────────────────────────────────────────────────────────
+  Widget _buildSetupChecklist() {
+    final hasEntities = _entities.isNotEmpty;
+    final hasCompanies = _companies.isNotEmpty;
+    final hasBranches = _branches.isNotEmpty;
+    // "CoA configured" heuristic: at least one company OR any branch
+    // with independentCoA=true (local-only flag — real persistence
+    // to be wired when user enables backend auth).
+    final coaStarted = hasCompanies;
+
+    final steps = [
+      _Step(
+        label: 'الكيان / الشركة',
+        icon: Icons.corporate_fare_rounded,
+        done: hasCompanies,
+        onTap: () {}, // already on this screen
+        estMin: 3,
+      ),
+      _Step(
+        label: 'الفروع',
+        icon: Icons.store_mall_directory_outlined,
+        done: hasBranches,
+        onTap: () {
+          if (_companies.isNotEmpty) {
+            _editBranch(null, _companies.first);
+          }
+        },
+        estMin: 2,
+      ),
+      _Step(
+        label: 'شجرة الحسابات',
+        icon: Icons.account_tree_rounded,
+        done: false, // backend wiring comes later
+        onTap: () => _openChip('coa-editor'),
+        estMin: 5,
+        enabled: coaStarted,
+      ),
+      _Step(
+        label: 'مراكز التكلفة',
+        icon: Icons.pie_chart_rounded,
+        done: false,
+        onTap: () => _openChip('cost-centers'),
+        estMin: 4,
+        enabled: coaStarted,
+      ),
+      _Step(
+        label: 'القوائم المالية',
+        icon: Icons.insert_chart_rounded,
+        done: false,
+        onTap: () => _openChip('statements'),
+        estMin: 2,
+        enabled: coaStarted,
+      ),
+    ];
+
+    final doneCount = steps.where((s) => s.done).length;
+    final pct = doneCount / steps.length;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AC.surface,
+        borderRadius: BorderRadius.circular(DS.rLg),
+        border: Border.all(color: AC.sidebarBorder),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Icon(Icons.checklist_rounded, color: AC.gold, size: 18),
+          const SizedBox(width: 8),
+          Text('رحلة الإعداد — ${(pct * 100).toInt()}%',
+              style: TextStyle(
+                  color: AC.textStrong,
+                  fontSize: 13.5,
+                  fontWeight: DS.fwBold)),
+          const Spacer(),
+          _pill('$doneCount / ${steps.length} خطوات مكتملة',
+              pct >= 0.6 ? AC.ok : AC.info),
+          if (!hasEntities && !hasBranches) ...[
+            const SizedBox(width: 6),
+            _pill('ابدأ بإنشاء شركة', AC.warn),
+          ],
+        ]),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: pct,
+            minHeight: 4,
+            backgroundColor: AC.sidebarBgElevated,
+            valueColor: AlwaysStoppedAnimation(AC.gold),
+          ),
+        ),
+        const SizedBox(height: 12),
+        LayoutBuilder(builder: (ctx, cons) {
+          final isNarrow = cons.maxWidth < 720;
+          if (isNarrow) {
+            return Column(
+              children: steps.map(_stepRow).toList(),
+            );
+          }
+          return Row(
+            children: steps.map((s) => Expanded(child: _stepTile(s))).toList(),
+          );
+        }),
+      ]),
+    );
+  }
+
+  Widget _stepTile(_Step s) {
+    final enabled = s.enabled;
+    final done = s.done;
+    final color =
+        done ? AC.ok : (enabled ? AC.gold : AC.sidebarItemDim);
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.55,
+      child: InkWell(
+        onTap: enabled ? s.onTap : null,
+        borderRadius: BorderRadius.circular(DS.rMd),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          decoration: BoxDecoration(
+            color: done
+                ? AC.ok.withValues(alpha: 0.08)
+                : (enabled
+                    ? AC.sidebarBgElevated
+                    : AC.sidebarBgElevated.withValues(alpha: 0.5)),
+            borderRadius: BorderRadius.circular(DS.rMd),
+            border: Border.all(
+                color: done ? AC.ok.withValues(alpha: 0.4) : AC.sidebarBorder),
+          ),
+          child: Row(children: [
+            Container(
+              width: 28, height: 28,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                done ? Icons.check_rounded : s.icon,
+                color: color,
+                size: 16,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(s.label,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: AC.textStrong,
+                          fontSize: 11.5,
+                          fontWeight: DS.fwSemibold)),
+                  Text('~${s.estMin} د',
+                      style: TextStyle(
+                          color: AC.textMedium, fontSize: 9.5)),
+                ],
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _stepRow(_Step s) {
+    final enabled = s.enabled;
+    final done = s.done;
+    final color =
+        done ? AC.ok : (enabled ? AC.gold : AC.sidebarItemDim);
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.55,
+      child: InkWell(
+        onTap: enabled ? s.onTap : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(children: [
+            Container(
+              width: 24, height: 24,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                done ? Icons.check_rounded : s.icon,
+                color: color,
+                size: 14,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+                child: Text(s.label,
+                    style: TextStyle(
+                        color: AC.textStrong,
+                        fontSize: 12.5,
+                        fontWeight: DS.fwSemibold))),
+            Text('~${s.estMin} د',
+                style: TextStyle(color: AC.textMedium, fontSize: 10)),
+            const SizedBox(width: 6),
+            Icon(Icons.chevron_left_rounded,
+                color: AC.sidebarItemDim, size: 16),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _pill(String text, Color color) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(DS.rPill),
+        ),
+        child: Text(text,
+            style: TextStyle(
+                color: color, fontSize: 10.5, fontWeight: DS.fwSemibold)),
+      );
+
+  /// Navigate to a chip inside the Finance module. Used by the "next-step"
+  /// CTAs to send the user from Entity Setup → Chart of Accounts, etc.
+  void _openChip(String chipId) {
+    try {
+      context.go('/app/erp/finance/$chipId');
+    } catch (_) {}
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -504,6 +739,34 @@ class _EntitySetupScreenState extends State<EntitySetupScreen> {
     if (b.independentInventory) indeps.add('مخزون');
     if (b.independentCostCenters) indeps.add('مراكز تكلفة');
     if (b.independentCurrency) indeps.add('عملة');
+
+    // Next-step CTAs: show per-branch quick links to configure the
+    // independent modules the user toggled on. Based on NetSuite +
+    // Sage Intacct pattern: each node exposes its "configure" actions.
+    final ctas = <_BranchCta>[];
+    if (b.independentCoA) {
+      ctas.add(_BranchCta(
+          label: 'تهيئة شجرة الحسابات',
+          icon: Icons.account_tree_rounded,
+          chipId: 'coa-editor',
+          color: AC.info));
+    }
+    if (b.independentCostCenters) {
+      ctas.add(_BranchCta(
+          label: 'مراكز التكلفة',
+          icon: Icons.pie_chart_rounded,
+          chipId: 'cost-centers',
+          color: AC.purple));
+    }
+    if (b.independentInventory) {
+      ctas.add(_BranchCta(
+          label: 'المخازن',
+          icon: Icons.warehouse_rounded,
+          chipId: 'warehouse',
+          color: AC.ok,
+          moduleId: 'inventory'));
+    }
+
     return Container(
       margin: const EdgeInsetsDirectional.only(start: 4, bottom: 6),
       padding: const EdgeInsets.fromLTRB(10, 8, 6, 8),
@@ -512,55 +775,100 @@ class _EntitySetupScreenState extends State<EntitySetupScreen> {
         borderRadius: BorderRadius.circular(DS.rSm),
         border: Border.all(color: AC.dividerSubtle),
       ),
-      child: Row(children: [
-        Icon(Icons.store_mall_directory_outlined,
-            color: AC.sidebarItemDim, size: 16),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: [
-                Text(b.nameAr,
-                    style: TextStyle(
-                        color: AC.textStrong,
-                        fontSize: 12.5,
-                        fontWeight: DS.fwSemibold)),
-                if (b.city != null) ...[
-                  const SizedBox(width: 6),
-                  Text('· ${b.city}',
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Icon(Icons.store_mall_directory_outlined,
+              color: AC.sidebarItemDim, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  Text(b.nameAr,
                       style: TextStyle(
-                          color: AC.textMedium, fontSize: 11)),
-                ],
-                if (b.zatcaBranchCode != null &&
-                    b.zatcaBranchCode!.isNotEmpty) ...[
-                  const SizedBox(width: 6),
-                  _chip('ZATCA: ${b.zatcaBranchCode}', AC.gold),
-                ],
-              ]),
-              if (indeps.isNotEmpty) ...[
-                const SizedBox(height: 3),
-                Wrap(spacing: 4, runSpacing: 2, children: [
-                  for (final s in indeps) _chip('مستقل: $s', AC.info),
-                  if (b.includeInConsolidation) _chip('ضمن التوحيد', AC.ok),
+                          color: AC.textStrong,
+                          fontSize: 12.5,
+                          fontWeight: DS.fwSemibold)),
+                  if (b.city != null) ...[
+                    const SizedBox(width: 6),
+                    Text('· ${b.city}',
+                        style: TextStyle(
+                            color: AC.textMedium, fontSize: 11)),
+                  ],
+                  if (b.zatcaBranchCode != null &&
+                      b.zatcaBranchCode!.isNotEmpty) ...[
+                    const SizedBox(width: 6),
+                    _chip('ZATCA: ${b.zatcaBranchCode}', AC.gold),
+                  ],
                 ]),
-              ] else if (b.includeInConsolidation)
-                Padding(
-                  padding: const EdgeInsets.only(top: 3),
-                  child: _chip('وراثة كاملة من الشركة الأم', AC.textMedium),
-                ),
-            ],
+                if (indeps.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Wrap(spacing: 4, runSpacing: 2, children: [
+                    for (final s in indeps) _chip('مستقل: $s', AC.info),
+                    if (b.includeInConsolidation) _chip('ضمن التوحيد', AC.ok),
+                  ]),
+                ] else if (b.includeInConsolidation)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: _chip('وراثة كاملة من الشركة الأم', AC.textMedium),
+                  ),
+              ],
+            ),
           ),
-        ),
-        _nodeAction(
-            Icons.edit_outlined, 'تعديل الفرع', () => _editBranch(b, company)),
-        _nodeAction(
-            Icons.delete_outline_rounded,
-            'حذف الفرع',
-            () => _confirmDelete(
-                'الفرع "${b.nameAr}"', () => EntityStore.deleteBranch(b.id)),
-            danger: true),
+          _nodeAction(Icons.edit_outlined, 'تعديل الفرع',
+              () => _editBranch(b, company)),
+          _nodeAction(
+              Icons.delete_outline_rounded,
+              'حذف الفرع',
+              () => _confirmDelete('الفرع "${b.nameAr}"',
+                  () => EntityStore.deleteBranch(b.id)),
+              danger: true),
+        ]),
+        // Next-step CTA row — only visible if the branch has independent
+        // modules. Gives the user a clear forward path into the
+        // per-module setup screens (COA / Cost Centers / Warehouses).
+        if (ctas.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(start: 24, end: 4),
+            child: Wrap(spacing: 6, runSpacing: 6, children: [
+              for (final cta in ctas) _ctaButton(cta),
+            ]),
+          ),
+        ],
       ]),
+    );
+  }
+
+  Widget _ctaButton(_BranchCta cta) {
+    return InkWell(
+      onTap: () {
+        try {
+          final mod = cta.moduleId ?? 'finance';
+          context.go('/app/erp/$mod/${cta.chipId}');
+        } catch (_) {}
+      },
+      borderRadius: BorderRadius.circular(DS.rSm),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: cta.color.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(DS.rSm),
+          border: Border.all(color: cta.color.withValues(alpha: 0.35)),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(cta.icon, color: cta.color, size: 13),
+          const SizedBox(width: 6),
+          Text(cta.label,
+              style: TextStyle(
+                  color: cta.color,
+                  fontSize: 11,
+                  fontWeight: DS.fwSemibold)),
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_left_rounded, color: cta.color, size: 13),
+        ]),
+      ),
     );
   }
 
@@ -1328,6 +1636,42 @@ class _BranchDialogState extends State<_BranchDialog> {
 // ═══════════════════════════════════════════════════════════════════
 // Shared helpers
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// Setup-step model (used by the 2026 progress checklist)
+// ═══════════════════════════════════════════════════════════════════
+class _Step {
+  final String label;
+  final IconData icon;
+  final bool done;
+  final VoidCallback onTap;
+  final int estMin;
+  final bool enabled;
+  const _Step({
+    required this.label,
+    required this.icon,
+    required this.done,
+    required this.onTap,
+    required this.estMin,
+    this.enabled = true,
+  });
+}
+
+// Per-branch "configure this" CTA descriptor
+class _BranchCta {
+  final String label;
+  final IconData icon;
+  final String chipId;
+  final Color color;
+  final String? moduleId; // defaults to 'finance' if null
+  const _BranchCta({
+    required this.label,
+    required this.icon,
+    required this.chipId,
+    required this.color,
+    this.moduleId,
+  });
+}
+
 Widget _field(TextEditingController c, String label,
     {IconData? icon, int maxLines = 1}) {
   return TextField(

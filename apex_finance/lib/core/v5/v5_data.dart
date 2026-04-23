@@ -486,6 +486,9 @@ List<V5Service> v5Services = [
             widgets: _financeDashboardWidgets,
           ),
 
+          // ━━━ Entity Setup (first, foundational) ━━━
+          const V5Chip(id: 'entity-setup', labelAr: 'إعداد الكيانات والشركات والفروع', labelEn: 'Entity / Company / Branch Setup', icon: Icons.corporate_fare_rounded, phase: ChipPhase.setup),
+
           // ━━━ Master Data (5) ━━━
           const V5Chip(id: 'coa-editor', labelAr: 'دليل الحسابات', labelEn: 'Chart of Accounts', icon: Icons.account_tree, phase: ChipPhase.setup),
           const V5Chip(id: 'cost-centers', labelAr: 'مراكز التكلفة', labelEn: 'Cost Centers', icon: Icons.pie_chart, phase: ChipPhase.setup),
