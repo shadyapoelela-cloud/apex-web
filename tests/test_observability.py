@@ -71,10 +71,16 @@ class TestLogging:
 
         buf = io.StringIO()
         capture = logging.StreamHandler(buf)
-        from pythonjsonlogger import jsonlogger
+        # Match observability.py — prefer pythonjsonlogger.json (3.x),
+        # fall back to .jsonlogger (2.x). The old-path import emits a
+        # DeprecationWarning that would cloud the test output.
+        try:
+            from pythonjsonlogger.json import JsonFormatter  # type: ignore
+        except ImportError:
+            from pythonjsonlogger.jsonlogger import JsonFormatter  # type: ignore
 
         capture.setFormatter(
-            jsonlogger.JsonFormatter(
+            JsonFormatter(
                 "%(asctime)s %(levelname)s %(name)s %(message)s",
                 rename_fields={"asctime": "timestamp", "levelname": "level"},
             )

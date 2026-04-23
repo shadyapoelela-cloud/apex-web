@@ -79,7 +79,7 @@ def _stateless_claude_chat(user_message: str, user: dict, client_id: Optional[st
                 system_prompt += f"\n👤 اسم المستخدم: {user_name}"
 
             response = client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-sonnet-4-5-20250929",
                 max_tokens=1500,
                 temperature=0.6,
                 system=system_prompt,

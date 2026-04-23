@@ -72,7 +72,7 @@ if not any(
         pass
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-AI_MODEL = os.environ.get("APEX_AI_MODEL", "claude-sonnet-4-20250514")
+AI_MODEL = os.environ.get("APEX_AI_MODEL", "claude-sonnet-4-5-20250929")
 
 SUPPORTED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 SUPPORTED_PDF_TYPES = {"application/pdf"}

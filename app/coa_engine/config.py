@@ -37,7 +37,7 @@ ERROR_DEDUCTIONS = {"Critical": -15, "High": -8, "Medium": -3, "Low": -1}
 
 # ── Claude API (ملحق ح) ──────────────────────────────────────
 ANTHROPIC_API_KEY   = os.getenv("ANTHROPIC_API_KEY", "")
-LLM_MODEL           = "claude-sonnet-4-20250514"
+LLM_MODEL           = "claude-sonnet-4-5-20250929"
 LLM_MAX_TOKENS      = 300
 LLM_TEMPERATURE     = 0.0
 LLM_TIMEOUT_SECONDS = 15

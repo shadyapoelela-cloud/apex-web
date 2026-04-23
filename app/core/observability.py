@@ -59,14 +59,24 @@ def configure_logging() -> None:
     handler = logging.StreamHandler(stream=sys.stdout)
 
     if fmt == "json":
+        # NOTE: pythonjsonlogger.jsonlogger was renamed to .json in 3.x; the
+        # old path emits a DeprecationWarning on every import. Try the new
+        # path first, fall back to the old for compat with 2.x installs.
+        JsonFormatter = None
         try:
-            from pythonjsonlogger import jsonlogger  # type: ignore
+            from pythonjsonlogger.json import JsonFormatter  # type: ignore
+        except ImportError:
+            try:
+                from pythonjsonlogger.jsonlogger import JsonFormatter  # type: ignore
+            except ImportError:
+                JsonFormatter = None
 
-            formatter = jsonlogger.JsonFormatter(
+        if JsonFormatter is not None:
+            formatter = JsonFormatter(
                 "%(asctime)s %(levelname)s %(name)s %(message)s",
                 rename_fields={"asctime": "timestamp", "levelname": "level"},
             )
-        except ImportError:
+        else:
             # Graceful degradation if python-json-logger isn't available
             # (e.g. minimal dev env). Humans can still read the output.
             formatter = logging.Formatter(

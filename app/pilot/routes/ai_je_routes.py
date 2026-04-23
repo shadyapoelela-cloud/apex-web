@@ -27,7 +27,7 @@ from app.pilot.models import Entity, GLAccount
 router = APIRouter(prefix="/pilot", tags=["AI / Journal Entries"])
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-_CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-20250514")
+_CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
 _MAX_FILE_BYTES = 20 * 1024 * 1024  # 20 MB
 _ALLOWED_TYPES = {
     "application/pdf",

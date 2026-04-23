@@ -82,7 +82,7 @@ def ai_health():
 
     return AiHealthResponse(
         ai_enabled=bool(ANTHROPIC_API_KEY),
-        model=os.environ.get("APEX_AI_MODEL", "claude-sonnet-4-20250514"),
+        model=os.environ.get("APEX_AI_MODEL", "claude-sonnet-4-5-20250929"),
         supported_media_types=sorted(ALL_SUPPORTED),
     )
 
@@ -419,7 +419,7 @@ def suggest_memo(payload: SuggestMemoRequest, db: Session = Depends(get_db)):
         client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         import os as _os
 
-        model = _os.environ.get("APEX_AI_MODEL", "claude-sonnet-4-20250514")
+        model = _os.environ.get("APEX_AI_MODEL", "claude-sonnet-4-5-20250929")
         response = client.messages.create(
             model=model,
             max_tokens=300,

@@ -254,7 +254,7 @@ Write a comprehensive analytical report. Respond with JSON only, no markdown:
 
         client = anthropic.Anthropic(api_key=self.anthropic_key)
         message = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-5-20250929",
             max_tokens=3000,
             temperature=0.3,
             messages=[{"role": "user", "content": prompt}],
