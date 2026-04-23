@@ -260,8 +260,15 @@ class V5Launchpad extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     children: const [
                       _LaunchpadQuickCard(
+                        label: 'إعداد الكيانات',
+                        sublabel: 'كيانات · شركات · فروع (موحّد)',
+                        icon: Icons.corporate_fare_rounded,
+                        route: '/settings/entities',
+                        color: Color(0xFF7C3AED),
+                      ),
+                      _LaunchpadQuickCard(
                         label: 'الشركات',
-                        sublabel: 'الشركات والمنشآت المنشأة',
+                        sublabel: 'قائمة الشركات المنشأة',
                         icon: Icons.apartment_rounded,
                         route: '/clients',
                         color: Color(0xFF0369A1),
@@ -272,13 +279,6 @@ class V5Launchpad extends StatelessWidget {
                         icon: Icons.shield_rounded,
                         route: '/compliance',
                         color: Color(0xFF15803D),
-                      ),
-                      _LaunchpadQuickCard(
-                        label: 'القوائم المالية',
-                        sublabel: 'TB · IS · BS · Cash Flow',
-                        icon: Icons.auto_graph_rounded,
-                        route: '/compliance/financial-statements',
-                        color: Color(0xFFB8860B),
                       ),
                       _LaunchpadQuickCard(
                         label: 'قيود اليومية',

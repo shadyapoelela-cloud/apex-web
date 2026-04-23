@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'core/api_config.dart';
 import 'core/session.dart';
 import 'core/company_store.dart';
+import 'core/entity_store.dart';
 
 class ApiService {
   static const _base = apiBase;
@@ -51,9 +52,13 @@ class ApiService {
   static Future<ApiResult> getClientTypes() => _get('/client-types');
   static Future<ApiResult> listNotifications() => _get('/notifications');
 
-  /// Returns the list of companies the user sees. Merges remote (if
-  /// authenticated & reachable) with local-persisted companies.
+  /// Returns the list of companies the user sees. Merges three sources:
+  ///   1. Remote /clients (if authenticated & reachable)
+  ///   2. Unified EntityStore companies (new hierarchical setup)
+  ///   3. Legacy CompanyLocalStore (pre-refactor local companies)
   static Future<ApiResult> listClients() async {
+    final entityStoreList = EntityStore.legacyClientsProjection();
+    final legacyList = CompanyLocalStore.list();
     final remote = await _get('/clients');
     if (remote.success) {
       final raw = remote.data;
@@ -63,11 +68,20 @@ class ApiService {
               ? (raw['clients'] as List).cast<Map<String, dynamic>>()
               : <Map<String, dynamic>>[]);
       final merged = CompanyLocalStore.mergeWithRemote(list);
-      return ApiResult.ok(merged);
+      final byId = <String, Map<String, dynamic>>{};
+      for (final m in [...legacyList, ...merged, ...entityStoreList]) {
+        final id = m['id']?.toString();
+        if (id != null) byId[id] = m;
+      }
+      return ApiResult.ok(byId.values.toList());
     }
-    // Backend unreachable or 401 — degrade gracefully to local store.
-    final local = CompanyLocalStore.list();
-    return ApiResult.ok(local);
+    // Backend unreachable or 401 — degrade to combined local sources.
+    final byId = <String, Map<String, dynamic>>{};
+    for (final m in [...legacyList, ...entityStoreList]) {
+      final id = m['id']?.toString();
+      if (id != null) byId[id] = m;
+    }
+    return ApiResult.ok(byId.values.toList());
   }
 
   static Future<ApiResult> getClient(String id) async {

@@ -44,12 +44,12 @@ import '../screens/extracted/client_screens.dart';
 import '../screens/coa_v2/coa_journey_screen.dart';
 import '../screens/auth/forgot_password_flow.dart';
 import '../screens/auth/slide_auth_screen.dart';
-import '../screens/clients/client_onboarding_wizard.dart' as wizard;
+// client_onboarding_wizard removed — redirected to unified /settings/entities
 import '../screens/marketplace/service_catalog_screen.dart' as catalog;
 import '../screens/account/archive_screen.dart' as archive;
 import '../screens/tasks/audit_service_screen.dart' as audit;
 import '../core/session.dart' show S;
-import '../client_create.dart';
+// client_create.dart import removed — redirected to unified /settings/entities
 import '../upload_screen.dart';
 import '../analysis_full_screen.dart';
 import '../analysis_result_screen.dart';
@@ -103,6 +103,7 @@ import 'package:file_picker/file_picker.dart';
 import 'v4/v4_routes.dart';
 import 'v5/v5_routes.dart';
 import '../widgets/hybrid_sidebar.dart';
+import '../screens/settings/entity_setup_screen.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
@@ -558,19 +559,28 @@ final appRouter = GoRouter(
     GoRoute(path: '/provider/profile', pageBuilder: (c, s) {
       return _apexPage(ProviderProfileScreen(provider: s.extra as Map<String, dynamic>? ?? {}), s);
     }),
-    GoRoute(path: '/onboarding/wizard', pageBuilder: (c, s) {
-      final args = s.extra as Map<String, dynamic>?;
-      return _apexPage(wizard.ClientOnboardingWizard(token: args?['token'] as String?), s);
-    }),
-    // Intuitive alias — many UIs linked to /clients/onboarding
-    GoRoute(path: '/clients/onboarding', pageBuilder: (c, s) {
-      final args = s.extra as Map<String, dynamic>?;
-      return _apexPage(wizard.ClientOnboardingWizard(token: args?['token'] as String?), s);
-    }),
-    GoRoute(path: '/clients/new', pageBuilder: (c, s) {
-      final args = s.extra as Map<String, dynamic>?;
-      return _apexPage(wizard.ClientOnboardingWizard(token: args?['token'] as String?), s);
-    }),
+    // Unified entity/company/branch setup (single source of truth).
+    // Old onboarding paths below all redirect here to eliminate the
+    // duplicate setup journeys the user reported.
+    GoRoute(
+      path: '/settings/entities',
+      pageBuilder: (c, s) {
+        final q = s.uri.queryParameters['action'];
+        return _apexPage(EntitySetupScreen(initialAction: q), s);
+      },
+    ),
+    GoRoute(
+      path: '/onboarding/wizard',
+      redirect: (c, s) => '/settings/entities?action=new-company',
+    ),
+    GoRoute(
+      path: '/clients/onboarding',
+      redirect: (c, s) => '/settings/entities?action=new-company',
+    ),
+    GoRoute(
+      path: '/clients/new',
+      redirect: (c, s) => '/settings/entities?action=new-company',
+    ),
     GoRoute(path: '/coa/journey', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
       return _apexPage(CoaJourneyV2Screen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
@@ -588,7 +598,11 @@ final appRouter = GoRouter(
       return _apexPage(KnowledgeFeedbackScreen(resultId: args?['resultId'] as String?), s);
     }),
     GoRoute(path: '/marketplace/new-request', pageBuilder: (c, s) => _apexPage(const NewServiceRequestScreen(), s)),
-    GoRoute(path: '/clients/create', pageBuilder: (c, s) => _apexPage(const ClientCreateScreen2(), s)),
+    // /clients/create — legacy path; redirect to the unified setup.
+    GoRoute(
+      path: '/clients/create',
+      redirect: (c, s) => '/settings/entities?action=new-company',
+    ),
     GoRoute(path: '/audit/service', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
       return _apexPage(audit.AuditServiceScreen(
