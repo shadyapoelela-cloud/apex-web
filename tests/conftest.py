@@ -23,7 +23,43 @@ from app.main import app
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_db():
-    """Create all tables once for the test session."""
+    """Create all tables once per test session on a clean DB.
+
+    Previously this fixture only created tables; it relied on the
+    (best-effort) teardown to remove ``test.db``. On Windows the file
+    is often locked and the removal silently fails, so subsequent runs
+    inherit state. That turned 12 deterministic tests (JE sequence,
+    dimensions, ZATCA fiscal-year-isolation, audit chain) into flakes
+    that failed iff you'd ever run the suite before — i.e. always in
+    CI's second run or local dev.
+
+    Fix: remove ``test.db`` at the START of the session before tables
+    are created. If removal fails we fall back to truncating every
+    table so at least in-suite ordering is deterministic.
+    """
+    try:
+        if os.path.exists("test.db"):
+            try:
+                os.remove("test.db")
+            except OSError:
+                # Windows lock fallback — drop every table's rows instead.
+                import sqlite3
+                conn = sqlite3.connect("test.db")
+                try:
+                    tables = conn.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table'"
+                    ).fetchall()
+                    for (name,) in tables:
+                        try:
+                            conn.execute(f'DELETE FROM "{name}"')
+                        except sqlite3.Error:
+                            pass
+                    conn.commit()
+                finally:
+                    conn.close()
+    except Exception:
+        pass  # Never block the suite on pre-clean failure.
+
     try:
         from app.phase1.models.platform_models import Base, engine
 
@@ -31,12 +67,13 @@ def setup_test_db():
     except Exception:
         pass
     yield
-    # Cleanup: try to remove test.db after session
+    # Best-effort teardown (may be locked on Windows — pre-run cleanup
+    # above is now the real guarantee).
     try:
         if os.path.exists("test.db"):
             os.remove("test.db")
     except OSError:
-        pass  # File may be locked on Windows
+        pass
 
 
 @pytest.fixture()
